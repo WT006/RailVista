@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>Z8991 进藏沿途地图</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="map"></div>
+
+  <header class="top-bar">
+    <div class="status-card">
+      <div class="status-row status-row--primary">
+        <span class="train-badge">Z8991</span>
+        <span class="route-text">西宁 → 拉萨</span>
+        <span class="depart-text">8/11 22:00</span>
+        <time class="clock" id="clock-chip">--</time>
+      </div>
+      <div class="status-row status-row--secondary">
+        <span id="progress-chip">进度 <strong>0%</strong></span>
+        <span class="status-divider" aria-hidden="true">·</span>
+        <span id="mode-chip">定位 <strong>--</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <button type="button" class="locate-btn" id="locate-btn" aria-label="定位到当前位置">定位</button>
+
+  <button type="button" class="legend-toggle" id="legend-toggle" aria-expanded="false" aria-controls="legend">图例</button>
+
+  <div class="legend" id="legend">
+    <div><i class="rail"></i>青藏铁路</div>
+    <div><i class="station"></i>经停站</div>
+    <div><i class="spot"></i>风景 1–18</div>
+    <div><i class="train"></i>列车估算位置</div>
+    <div><i class="gps"></i>手机 GPS</div>
+  </div>
+
+  <footer class="bottom-panel">
+    <section class="location-card">
+      <div class="location-card__head">
+        <h2 id="location-title">当前位置</h2>
+        <span class="location-mode" id="location-mode">时刻表</span>
+      </div>
+      <div class="location-segment" id="location-segment">定位中…</div>
+      <div class="location-meta" id="location-meta"></div>
+    </section>
+
+    <div class="panel-divider" aria-hidden="true"></div>
+
+    <section class="upcoming-card">
+      <div class="bottom-panel__head">
+        <h2 id="next-title">即将到达</h2>
+        <span class="bottom-panel__progress-text" id="bottom-progress-text">0%</span>
+      </div>
+      <div class="next-name" id="next-name">加载中…</div>
+      <div class="meta" id="next-meta"></div>
+    </section>
+    <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+  </footer>
+
+  <div class="error-overlay" id="error-overlay">
+    <div class="error-card">
+      <h1>需要先配置地图 Key</h1>
+      <p id="error-text"></p>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/railway-line.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

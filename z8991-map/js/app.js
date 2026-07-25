@@ -14,6 +14,9 @@
   let railwayLength = 0;
   let trainMarker;
   let gpsMarker;
+  let railLine;
+  let spotMarkers = [];
+  let stationMarkers = [];
   let gpsAvailable = false;
   let lastGpsAt = 0;
   let lastGps = null;
@@ -22,6 +25,7 @@
   let currentProgress = 0;
   let lastMode = '时刻表估算';
   let isCompact = false;
+  let layerVisibility = scheduleApi.getLayerVisibility();
 
   const els = {
     mode: document.getElementById('mode-chip'),
@@ -210,7 +214,7 @@
   function moveGpsMarker(gps) {
     if (!map) return;
     const stale = !gpsAvailable || Date.now() - lastGpsAt > 120000;
-    if (!gps || stale) {
+    if (!gps || stale || !layerVisibility.gps) {
       if (gpsMarker) gpsMarker.hide();
       return;
     }
@@ -478,6 +482,49 @@
     updateLocationUi(progress, mode);
   }
 
+  function applyLayerVisibility() {
+    if (railLine) {
+      if (layerVisibility.rail) railLine.show();
+      else railLine.hide();
+    }
+    spotMarkers.forEach((marker) => {
+      if (layerVisibility.spot) marker.show();
+      else marker.hide();
+    });
+    stationMarkers.forEach((marker) => {
+      if (layerVisibility.station) marker.show();
+      else marker.hide();
+    });
+    if (trainMarker) {
+      if (layerVisibility.train) trainMarker.show();
+      else trainMarker.hide();
+    }
+    if (gpsMarker) {
+      const gpsActive = gpsAvailable && lastGps && Date.now() - lastGpsAt <= 120000;
+      if (layerVisibility.gps && gpsActive) gpsMarker.show();
+      else gpsMarker.hide();
+    }
+    els.legend?.querySelectorAll('[data-layer]').forEach((btn) => {
+      const layer = btn.dataset.layer;
+      if (!layer) return;
+      btn.setAttribute('aria-pressed', layerVisibility[layer] ? 'true' : 'false');
+    });
+  }
+
+  function bindLayerToggles() {
+    if (!els.legend) return;
+    els.legend.querySelectorAll('[data-layer]').forEach((btn) => {
+      btn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const layer = btn.dataset.layer;
+        if (!layer) return;
+        layerVisibility = scheduleApi.setLayerVisible(layer, !layerVisibility[layer]);
+        applyLayerVisibility();
+        map?.clearInfoWindow();
+      });
+    });
+  }
+
   function moveTrainMarker(point) {
     if (!trainMarker) return;
     trainMarker.setPosition([point.lng, point.lat]);
@@ -509,7 +556,7 @@
     });
 
     const coords = getRailwayCoords();
-    const railLine = new AMap.Polyline({
+    railLine = new AMap.Polyline({
       path: coords.map(([lng, lat]) => [lng, lat]),
       strokeColor: '#38bdf8',
       strokeWeight: isCompact ? 4 : 5,
@@ -518,6 +565,7 @@
     });
     map.add(railLine);
 
+    spotMarkers = [];
     data.scenicSpots.forEach((spot) => {
       const marker = new AMap.Marker({
         position: [spot.lng, spot.lat],
@@ -537,8 +585,10 @@
         info.open(map, marker.getPosition());
       });
       map.add(marker);
+      spotMarkers.push(marker);
     });
 
+    stationMarkers = [];
     data.stations.forEach((s) => {
       const scheduleText = scheduleApi.formatStationSchedule(s, shifted);
 
@@ -563,6 +613,7 @@
         info.open(map, marker.getPosition());
       });
       map.add(marker);
+      stationMarkers.push(marker);
     });
 
     trainMarker = new AMap.Marker({
@@ -586,16 +637,17 @@
       info.open(map, trainMarker.getPosition());
     });
     map.add(trainMarker);
+    applyLayerVisibility();
     updateOverlayMetrics(true);
     observeOverlayResize();
   }
 
   function startGeolocation() {
-    if (!navigator.geolocation) {
-      setInterval(() => tick(null), 5000);
-      tick(null);
-      return;
-    }
+    const TICK_MS = 1000;
+    setInterval(() => tick(null), TICK_MS);
+    tick(null);
+
+    if (!navigator.geolocation) return;
 
     navigator.geolocation.watchPosition(
       (pos) => {
@@ -615,12 +667,6 @@
       },
       { enableHighAccuracy: true, maximumAge: 15000, timeout: 20000 }
     );
-
-    setInterval(() => {
-      if (!gpsAvailable || Date.now() - lastGpsAt > 30000) {
-        tick(null);
-      }
-    }, 5000);
   }
 
   function boot() {
@@ -638,6 +684,7 @@
     buildRailwayMetrics();
     buildStationDistances();
     bindLegendToggle();
+    bindLayerToggles();
     bindLocateButton();
     scheduleApi.updateDepartBadge(departure);
     scheduleApi.bindDepartureEditor({

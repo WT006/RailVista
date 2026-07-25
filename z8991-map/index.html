@@ -34,11 +34,21 @@
   <button type="button" class="legend-toggle" id="legend-toggle" aria-expanded="false" aria-controls="legend">图例</button>
 
   <div class="legend" id="legend">
-    <div><i class="rail"></i>青藏铁路</div>
-    <div><i class="station"></i>经停站</div>
-    <div><i class="spot"></i>风景 1–18</div>
-    <div><i class="train"></i>列车估算位置</div>
-    <div><i class="gps"></i>手机 GPS</div>
+    <button type="button" class="legend-item legend-item--toggle" data-layer="rail" aria-pressed="true" title="点击显示或隐藏铁路线">
+      <i class="rail"></i>青藏铁路
+    </button>
+    <button type="button" class="legend-item legend-item--toggle" data-layer="station" aria-pressed="true" title="点击显示或隐藏经停站">
+      <i class="station"></i>经停站
+    </button>
+    <button type="button" class="legend-item legend-item--toggle" data-layer="spot" aria-pressed="true" title="点击显示或隐藏风景点">
+      <i class="spot"></i>风景 1–18
+    </button>
+    <button type="button" class="legend-item legend-item--toggle" data-layer="train" aria-pressed="true" title="点击显示或隐藏列车估算位置">
+      <i class="train"></i>列车估算位置
+    </button>
+    <button type="button" class="legend-item legend-item--toggle" data-layer="gps" aria-pressed="true" title="点击显示或隐藏手机 GPS">
+      <i class="gps"></i>手机 GPS
+    </button>
   </div>
 
   <footer class="bottom-panel">

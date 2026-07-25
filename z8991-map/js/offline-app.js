@@ -19,11 +19,15 @@
   let lastMode = '时刻表估算';
   let currentProgress = 0;
   let isCompact = false;
+  let layerVisibility = scheduleApi.getLayerVisibility();
 
   let svg;
   let viewport;
   let trainEl;
   let gpsEl;
+  let railLayerEl;
+  let spotLayerEl;
+  let stationLayerEl;
   let mapPopupEl = null;
   let mapPopupAnchor = null;
   let suppressMapClick = false;
@@ -654,7 +658,8 @@
       .map(([lng, lat]) => projectFn.project(lng, lat))
       .map(({ x, y }) => `${x},${y}`)
       .join(' ');
-    viewport.appendChild(svgEl('polyline', {
+    railLayerEl = svgEl('g', { id: 'rail-layer' });
+    railLayerEl.appendChild(svgEl('polyline', {
       points: railPoints,
       fill: 'none',
       stroke: '#38bdf8',
@@ -663,8 +668,10 @@
       'stroke-linejoin': 'round',
       opacity: '0.9',
     }));
+    viewport.appendChild(railLayerEl);
 
     const spotPositions = computeSpotDisplayPositions();
+    spotLayerEl = svgEl('g', { id: 'spot-layer' });
 
     data.scenicSpots.forEach((spot) => {
       const { x, y } = spotPositions.get(spot.id);
@@ -694,9 +701,11 @@
         });
       };
       bindMarkerClick(g, showSpot);
-      viewport.appendChild(g);
+      spotLayerEl.appendChild(g);
     });
+    viewport.appendChild(spotLayerEl);
 
+    stationLayerEl = svgEl('g', { id: 'station-layer' });
     data.stations.forEach((station) => {
       const { x, y } = projectFn.project(station.lng, station.lat);
       const g = svgEl('g', { class: 'station-node' });
@@ -725,8 +734,9 @@
           detail: station.intro,
         });
       });
-      viewport.appendChild(g);
+      stationLayerEl.appendChild(g);
     });
+    viewport.appendChild(stationLayerEl);
 
     gpsEl = svgEl('g', { id: 'gps-marker', display: 'none' });
     gpsEl.appendChild(svgEl('circle', {
@@ -767,9 +777,49 @@
       });
     });
     viewport.appendChild(trainEl);
+    applyLayerVisibility();
 
     svg.appendChild(viewport);
     bindPanZoom();
+  }
+
+  function applyLayerVisibility() {
+    if (railLayerEl) {
+      railLayerEl.setAttribute('display', layerVisibility.rail ? 'inline' : 'none');
+    }
+    if (spotLayerEl) {
+      spotLayerEl.setAttribute('display', layerVisibility.spot ? 'inline' : 'none');
+    }
+    if (stationLayerEl) {
+      stationLayerEl.setAttribute('display', layerVisibility.station ? 'inline' : 'none');
+    }
+    if (trainEl) {
+      trainEl.setAttribute('display', layerVisibility.train ? 'inline' : 'none');
+    }
+    if (gpsEl) {
+      const gpsActive = gpsAvailable && lastGps && Date.now() - lastGpsAt <= 120000;
+      gpsEl.setAttribute('display', layerVisibility.gps && gpsActive ? 'inline' : 'none');
+    }
+    if (!layerVisibility.train && mapPopupAnchor?.kind === 'train') closeMapPopup();
+    els.legend?.querySelectorAll('[data-layer]').forEach((btn) => {
+      const layer = btn.dataset.layer;
+      if (!layer) return;
+      btn.setAttribute('aria-pressed', layerVisibility[layer] ? 'true' : 'false');
+    });
+  }
+
+  function bindLayerToggles() {
+    if (!els.legend) return;
+    els.legend.querySelectorAll('[data-layer]').forEach((btn) => {
+      btn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const layer = btn.dataset.layer;
+        if (!layer) return;
+        layerVisibility = scheduleApi.setLayerVisible(layer, !layerVisibility[layer]);
+        applyLayerVisibility();
+        if (mapPopupEl && !mapPopupEl.hidden) closeMapPopup();
+      });
+    });
   }
 
   function moveMarkers(point, gps) {
@@ -786,7 +836,7 @@
     if (gpsEl && gps && gpsAvailable && Date.now() - lastGpsAt <= 120000) {
       const gp = projectFn.project(gps.lng, gps.lat);
       gpsEl.setAttribute('transform', `translate(${gp.x}, ${gp.y})`);
-      gpsEl.setAttribute('display', 'inline');
+      gpsEl.setAttribute('display', layerVisibility.gps ? 'inline' : 'none');
     } else if (gpsEl) {
       gpsEl.setAttribute('display', 'none');
     }
@@ -968,11 +1018,11 @@
   }
 
   function startGeolocation() {
-    if (!navigator.geolocation) {
-      setInterval(() => tick(null), 5000);
-      tick(null);
-      return;
-    }
+    const TICK_MS = 1000;
+    setInterval(() => tick(null), TICK_MS);
+    tick(null);
+
+    if (!navigator.geolocation) return;
 
     navigator.geolocation.watchPosition(
       (pos) => {
@@ -990,10 +1040,6 @@
       },
       { enableHighAccuracy: true, maximumAge: 15000, timeout: 20000 }
     );
-
-    setInterval(() => {
-      if (!gpsAvailable || Date.now() - lastGpsAt > 30000) tick(null);
-    }, 5000);
   }
 
   function boot() {
@@ -1003,6 +1049,7 @@
     buildStationDistances();
     renderMap();
     bindLegendToggle();
+    bindLayerToggles();
     bindLocateButton();
     scheduleApi.updateDepartBadge(departure);
     scheduleApi.bindDepartureEditor({

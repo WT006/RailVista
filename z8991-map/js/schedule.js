@@ -1,5 +1,14 @@
 (function () {
   const STORAGE_KEY = 'z8991_departure';
+  const TRAIN_MARKER_KEY = 'z8991_show_train_marker';
+  const LAYER_VISIBILITY_KEY = 'z8991_layer_visibility';
+  const DEFAULT_LAYER_VISIBILITY = {
+    rail: true,
+    station: true,
+    spot: true,
+    train: true,
+    gps: true,
+  };
 
   function shiftDate(value, offsetMs) {
     const date = value instanceof Date ? value : new Date(value);
@@ -54,6 +63,48 @@
 
   function clearDeparture() {
     localStorage.removeItem(STORAGE_KEY);
+  }
+
+  function isShowTrainMarker() {
+    return isLayerVisible('train');
+  }
+
+  function setShowTrainMarker(show) {
+    setLayerVisible('train', show);
+  }
+
+  function readStoredLayers() {
+    try {
+      const raw = localStorage.getItem(LAYER_VISIBILITY_KEY);
+      if (raw) {
+        return { ...DEFAULT_LAYER_VISIBILITY, ...JSON.parse(raw) };
+      }
+      const legacyTrain = localStorage.getItem(TRAIN_MARKER_KEY);
+      if (legacyTrain !== null) {
+        return { ...DEFAULT_LAYER_VISIBILITY, train: legacyTrain !== '0' };
+      }
+    } catch (_) {
+      /* private mode / invalid JSON */
+    }
+    return { ...DEFAULT_LAYER_VISIBILITY };
+  }
+
+  function getLayerVisibility() {
+    return readStoredLayers();
+  }
+
+  function setLayerVisible(layer, show) {
+    const next = { ...readStoredLayers(), [layer]: !!show };
+    try {
+      localStorage.setItem(LAYER_VISIBILITY_KEY, JSON.stringify(next));
+    } catch (_) {
+      /* private mode */
+    }
+    return next;
+  }
+
+  function isLayerVisible(layer) {
+    return readStoredLayers()[layer] !== false;
   }
 
   function formatDepartBadge(date) {
@@ -165,11 +216,19 @@
 
   window.Z8991Schedule = {
     STORAGE_KEY,
+    TRAIN_MARKER_KEY,
+    LAYER_VISIBILITY_KEY,
+    DEFAULT_LAYER_VISIBILITY,
     shiftDate,
     getDepartureIso,
     resolveSchedule,
     setDepartureIso,
     clearDeparture,
+    isShowTrainMarker,
+    setShowTrainMarker,
+    getLayerVisibility,
+    setLayerVisible,
+    isLayerVisible,
     toDatetimeLocalValue,
     fromDatetimeLocalValue,
     formatDepartBadge,

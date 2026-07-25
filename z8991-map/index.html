@@ -14,17 +14,29 @@
   <div id="map"></div>
 
   <header class="top-bar">
-    <div class="status-card">
-      <div class="status-row status-row--primary">
-        <span class="train-badge">Z8991</span>
-        <span class="route-text">西宁 → 拉萨</span>
-        <button type="button" class="depart-text" id="depart-btn" title="点击修改发车时间">8/11 22:00</button>
-        <time class="clock" id="clock-chip">--</time>
+    <div class="top-bar__cluster">
+      <div class="status-card">
+        <div class="status-row status-row--primary">
+          <span class="train-badge">Z8991</span>
+          <span class="route-text">西宁 → 拉萨</span>
+          <button type="button" class="depart-text" id="depart-btn" title="点击修改发车时间">8/11 22:00</button>
+          <button type="button" class="calibrate-btn" id="calibrate-toggle" aria-expanded="false" aria-controls="calibrate-panel" title="站点校准">校准</button>
+          <time class="clock" id="clock-chip">--</time>
+        </div>
+        <div class="status-row status-row--secondary">
+          <span id="progress-chip">进度 <strong>0%</strong></span>
+          <span class="status-divider" aria-hidden="true">·</span>
+          <span id="mode-chip">定位 <strong>--</strong></span>
+        </div>
       </div>
-      <div class="status-row status-row--secondary">
-        <span id="progress-chip">进度 <strong>0%</strong></span>
-        <span class="status-divider" aria-hidden="true">·</span>
-        <span id="mode-chip">定位 <strong>--</strong></span>
+      <div class="calibrate-popover" id="calibrate-panel" hidden>
+        <div class="calibrate-popover__head">
+          <span class="calibrate-popover__title">站点校准</span>
+          <span class="calibrate-card__status" id="calibrate-status">未校准</span>
+        </div>
+        <p class="calibrate-panel__hint">到站下车后点选当前站，后续估算将整体顺延或提前（仅本机生效）。</p>
+        <div class="calibrate-stations" id="calibrate-stations"></div>
+        <button type="button" class="calibrate-clear" id="calibrate-clear" hidden>清除校准</button>
       </div>
     </div>
   </header>
@@ -97,6 +109,20 @@
       </div>
     </div>
   </div>
+
+  <div class="schedule-dialog" id="calibrate-dialog" hidden>
+    <div class="schedule-dialog__backdrop"></div>
+    <div class="schedule-dialog__card" role="dialog" aria-labelledby="calibrate-dialog-title">
+      <h2 id="calibrate-dialog-title">确认站点校准</h2>
+      <p class="schedule-dialog__hint calibrate-dialog__text" id="calibrate-dialog-text"></p>
+      <div class="schedule-dialog__actions">
+        <button type="button" id="calibrate-cancel">取消</button>
+        <button type="button" id="calibrate-confirm" class="primary">确认校准</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
 
   <script src="config.js"></script>
   <script src="js/data.js"></script>

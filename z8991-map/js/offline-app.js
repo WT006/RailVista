@@ -8,6 +8,8 @@
   let arrival = scheduleState.arrival;
   let offsetMs = scheduleState.offsetMs;
   const shifted = (value) => scheduleApi.shiftDate(value, offsetMs);
+  let calibration = scheduleApi.readCalibration();
+  let calibrationUi = null;
 
   let railwayPath = [];
   let railwayLength = 0;
@@ -57,8 +59,33 @@
     departure = next.departure;
     arrival = next.arrival;
     offsetMs = next.offsetMs;
+    calibration = null;
     scheduleApi.updateDepartBadge(departure);
+    calibrationUi?.refresh();
     tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function applyCalibration(record) {
+    calibration = record;
+    tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function clearCalibrationState() {
+    calibration = null;
+    tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function getNow() {
+    const mock = new URLSearchParams(window.location.search).get('mockNow');
+    if (mock) {
+      const parsed = new Date(mock);
+      if (!Number.isNaN(parsed.getTime())) return parsed;
+    }
+    return new Date();
+  }
+
+  function getEffectiveNow(now) {
+    return scheduleApi.effectiveScheduleDate(now, calibration);
   }
 
   function getSpotTimeLabel(spot) {
@@ -72,9 +99,13 @@
   function shortModeLabel(mode) {
     if (!isCompact) return mode;
     return mode
+      .replace('时刻表估算（已校准·GPS 弱）', '时刻表（已校准）')
+      .replace('时刻表估算（已校准·偏离）', '时刻表（已校准）')
+      .replace('时刻表估算（已校准）', '时刻表（已校准）')
       .replace('时刻表估算（GPS 信号弱）', '时刻表（GPS弱）')
       .replace('时刻表估算（偏离铁路较远）', '时刻表（偏离）')
       .replace('时刻表估算', '时刻表')
+      .replace('GPS + 时刻表（已校准）', 'GPS（已校准）')
       .replace('GPS + 时刻表', 'GPS');
   }
 
@@ -203,20 +234,27 @@
       return { progress: Math.max(0, Math.min(1, simulated)), mode: '模拟进度' };
     }
 
-    const scheduleP = scheduleProgress(now);
-    if (!gps) return { progress: scheduleP, mode: '时刻表估算' };
+    const effectiveNow = getEffectiveNow(now);
+    const scheduleP = scheduleProgress(effectiveNow);
+    const calibrated = !!calibration;
+    const scheduleMode = calibrated ? '时刻表估算（已校准）' : '时刻表估算';
+
+    if (!gps) return { progress: scheduleP, mode: scheduleMode };
 
     const ageMs = now.getTime() - gps.timestamp;
     if (ageMs > 120000 || gps.accuracy > 800) {
-      return { progress: scheduleP, mode: '时刻表估算（GPS 信号弱）' };
+      return { progress: scheduleP, mode: calibrated ? '时刻表估算（已校准·GPS 弱）' : '时刻表估算（GPS 信号弱）' };
     }
 
     const projected = projectToRailway(gps.lng, gps.lat);
     if (projected.distKm > 8) {
-      return { progress: scheduleP, mode: '时刻表估算（偏离铁路较远）' };
+      return { progress: scheduleP, mode: calibrated ? '时刻表估算（已校准·偏离）' : '时刻表估算（偏离铁路较远）' };
     }
 
-    return { progress: projected.progress * 0.65 + scheduleP * 0.35, mode: 'GPS + 时刻表' };
+    return {
+      progress: projected.progress * 0.65 + scheduleP * 0.35,
+      mode: calibrated ? 'GPS + 时刻表（已校准）' : 'GPS + 时刻表',
+    };
   }
 
   function formatClock(now) {
@@ -235,8 +273,9 @@
     });
   }
 
-  function formatEta(targetDate) {
-    const diffMin = Math.round((targetDate - new Date()) / 60000);
+  function formatEta(targetDate, referenceNow) {
+    const ref = referenceNow || new Date();
+    const diffMin = Math.round((targetDate - ref) / 60000);
     if (diffMin <= 0) return '即将经过或已通过';
     if (diffMin < 60) return `约 ${diffMin} 分钟后`;
     const h = Math.floor(diffMin / 60);
@@ -245,10 +284,11 @@
   }
 
   function getUpcomingSpot(now, progress) {
+    const effectiveNow = getEffectiveNow(now);
     const spots = [...data.scenicSpots].sort((a, b) => shifted(a.at) - shifted(b.at));
-    const upcomingByTime = spots.find((s) => shifted(s.at) >= now);
+    const upcomingByTime = spots.find((s) => shifted(s.at) >= effectiveNow);
     if (upcomingByTime) {
-      return { spot: upcomingByTime, reason: formatEta(shifted(upcomingByTime.at)) };
+      return { spot: upcomingByTime, reason: formatEta(shifted(upcomingByTime.at), effectiveNow) };
     }
 
     const currentPoint = pointAtProgress(progress);
@@ -417,6 +457,7 @@
       <div class="map-popup__title"></div>
       <div class="map-popup__subtitle"></div>
       <div class="map-popup__detail"></div>
+      <div class="map-popup__actions"></div>
       <div class="map-popup__arrow" aria-hidden="true"></div>
     `;
     shell.appendChild(mapPopupEl);
@@ -447,12 +488,24 @@
     mapPopupEl.style.top = `${y - shellRect.top}px`;
   }
 
-  function openMapPopup({ svgX, svgY, title, subtitle, detail, kind = 'fixed' }) {
+  function openMapPopup({ svgX, svgY, title, subtitle, detail, kind = 'fixed', station = null }) {
     ensureMapPopup();
     mapPopupAnchor = { svgX, svgY, kind };
     mapPopupEl.querySelector('.map-popup__title').textContent = title;
     mapPopupEl.querySelector('.map-popup__subtitle').textContent = subtitle || '';
     mapPopupEl.querySelector('.map-popup__detail').textContent = detail || '';
+    const actionsEl = mapPopupEl.querySelector('.map-popup__actions');
+    if (actionsEl) {
+      actionsEl.innerHTML = station?.type === 'stop'
+        ? `<button type="button" class="map-popup__calibrate" data-station-calibrate="${station.name}">我在 ${station.name} 站</button>`
+        : '';
+      const calibrateBtn = actionsEl.querySelector('[data-station-calibrate]');
+      calibrateBtn?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        closeMapPopup();
+        calibrationUi?.openConfirmForStation(station);
+      });
+    }
     mapPopupEl.hidden = false;
     updateMapPopupPosition();
   }
@@ -732,6 +785,7 @@
           title: station.name,
           subtitle: formatStationSchedule(station),
           detail: station.intro,
+          station,
         });
       });
       stationLayerEl.appendChild(g);
@@ -843,7 +897,7 @@
   }
 
   function tick(gps) {
-    const now = new Date();
+    const now = getNow();
     if (gps) {
       lastGps = gps;
       gpsAvailable = true;
@@ -1057,6 +1111,26 @@
       config,
       getSchedule: () => scheduleState,
       onApply: applySchedule,
+    });
+    calibrationUi = scheduleApi.bindStationCalibration({
+      data,
+      shifted,
+      getNow,
+      getCalibration: () => calibration,
+      onApply: applyCalibration,
+      onClear: clearCalibrationState,
+      elements: {
+        toggle: document.getElementById('calibrate-toggle'),
+        panel: document.getElementById('calibrate-panel'),
+        list: document.getElementById('calibrate-stations'),
+        status: document.getElementById('calibrate-status'),
+        clearBtn: document.getElementById('calibrate-clear'),
+        dialog: document.getElementById('calibrate-dialog'),
+        dialogText: document.getElementById('calibrate-dialog-text'),
+        dialogConfirm: document.getElementById('calibrate-confirm'),
+        dialogCancel: document.getElementById('calibrate-cancel'),
+        toast: document.getElementById('toast'),
+      },
     });
     updateOverlayMetrics();
 

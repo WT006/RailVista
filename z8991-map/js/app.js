@@ -8,6 +8,8 @@
   let arrival = scheduleState.arrival;
   let offsetMs = scheduleState.offsetMs;
   const shifted = (value) => scheduleApi.shiftDate(value, offsetMs);
+  let calibration = scheduleApi.readCalibration();
+  let calibrationUi = null;
 
   let map;
   let railwayPath = [];
@@ -51,8 +53,24 @@
     departure = next.departure;
     arrival = next.arrival;
     offsetMs = next.offsetMs;
+    calibration = null;
     scheduleApi.updateDepartBadge(departure);
+    calibrationUi?.refresh();
     tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function applyCalibration(record) {
+    calibration = record;
+    tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function clearCalibrationState() {
+    calibration = null;
+    tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function getEffectiveNow(now) {
+    return scheduleApi.effectiveScheduleDate(now, calibration);
   }
 
   function isMobileLayout() {
@@ -66,9 +84,13 @@
   function shortModeLabel(mode) {
     if (!isCompact) return mode;
     return mode
+      .replace('时刻表估算（已校准·GPS 弱）', '时刻表（已校准）')
+      .replace('时刻表估算（已校准·偏离）', '时刻表（已校准）')
+      .replace('时刻表估算（已校准）', '时刻表（已校准）')
       .replace('时刻表估算（GPS 信号弱）', '时刻表（GPS弱）')
       .replace('时刻表估算（偏离铁路较远）', '时刻表（偏离）')
       .replace('时刻表估算', '时刻表')
+      .replace('GPS + 时刻表（已校准）', 'GPS（已校准）')
       .replace('GPS + 时刻表', 'GPS');
   }
 
@@ -378,23 +400,27 @@
       return { progress: Math.max(0, Math.min(1, simulated)), mode: '模拟进度' };
     }
 
-    const scheduleP = scheduleProgress(now);
+    const effectiveNow = getEffectiveNow(now);
+    const scheduleP = scheduleProgress(effectiveNow);
+    const calibrated = !!calibration;
+    const scheduleMode = calibrated ? '时刻表估算（已校准）' : '时刻表估算';
+
     if (!gps) {
-      return { progress: scheduleP, mode: '时刻表估算' };
+      return { progress: scheduleP, mode: scheduleMode };
     }
 
     const ageMs = now.getTime() - gps.timestamp;
     if (ageMs > 120000 || gps.accuracy > 800) {
-      return { progress: scheduleP, mode: '时刻表估算（GPS 信号弱）' };
+      return { progress: scheduleP, mode: calibrated ? '时刻表估算（已校准·GPS 弱）' : '时刻表估算（GPS 信号弱）' };
     }
 
     const projected = projectToRailway(gps.lng, gps.lat);
     if (projected.distKm > 8) {
-      return { progress: scheduleP, mode: '时刻表估算（偏离铁路较远）' };
+      return { progress: scheduleP, mode: calibrated ? '时刻表估算（已校准·偏离）' : '时刻表估算（偏离铁路较远）' };
     }
 
     const blended = projected.progress * 0.65 + scheduleP * 0.35;
-    return { progress: blended, mode: 'GPS + 时刻表' };
+    return { progress: blended, mode: calibrated ? 'GPS + 时刻表（已校准）' : 'GPS + 时刻表' };
   }
 
   function formatClock(now) {
@@ -418,8 +444,9 @@
     });
   }
 
-  function formatEta(targetDate) {
-    const diffMin = Math.round((targetDate - new Date()) / 60000);
+  function formatEta(targetDate, referenceNow) {
+    const ref = referenceNow || new Date();
+    const diffMin = Math.round((targetDate - ref) / 60000);
     if (diffMin <= 0) return '即将经过或已通过';
     if (diffMin < 60) return `约 ${diffMin} 分钟后`;
     const h = Math.floor(diffMin / 60);
@@ -428,12 +455,13 @@
   }
 
   function getUpcomingSpot(now, progress) {
+    const effectiveNow = getEffectiveNow(now);
     const spots = [...data.scenicSpots].sort((a, b) => shifted(a.at) - shifted(b.at));
-    const upcomingByTime = spots.find((s) => shifted(s.at) >= now);
+    const upcomingByTime = spots.find((s) => shifted(s.at) >= effectiveNow);
     if (upcomingByTime) {
       return {
         spot: upcomingByTime,
-        reason: formatEta(shifted(upcomingByTime.at)),
+        reason: formatEta(shifted(upcomingByTime.at), effectiveNow),
       };
     }
 
@@ -603,10 +631,13 @@
         const introLine = s.intro
           ? `<br/><span style="color:#64748b;">${s.intro}</span>`
           : '';
+        const calibrateBtn = s.type === 'stop'
+          ? `<br/><button type="button" class="info-calibrate-btn" data-station-calibrate="${s.name}">我在 ${s.name} 站</button>`
+          : '';
         const info = new AMap.InfoWindow({
           content: `<div style="max-width:min(260px,78vw);padding:6px 4px;font-size:14px;line-height:1.5;color:#334155;">
             <strong style="color:#111827;font-size:15px;">${s.name}</strong><br/>
-            <span style="color:#0369a1;font-weight:600;">${scheduleText}</span>${introLine}
+            <span style="color:#0369a1;font-weight:600;">${scheduleText}</span>${introLine}${calibrateBtn}
           </div>`,
           offset: new AMap.Pixel(0, -20),
         });
@@ -640,6 +671,15 @@
     applyLayerVisibility();
     updateOverlayMetrics(true);
     observeOverlayResize();
+
+    map.getContainer().addEventListener('click', (event) => {
+      const btn = event.target.closest?.('[data-station-calibrate]');
+      if (!btn) return;
+      const station = data.stations.find((item) => item.name === btn.dataset.stationCalibrate);
+      if (!station) return;
+      map.clearInfoWindow();
+      calibrationUi?.openConfirmForStation(station);
+    });
   }
 
   function startGeolocation() {
@@ -692,6 +732,26 @@
       config,
       getSchedule: () => scheduleState,
       onApply: applySchedule,
+    });
+    calibrationUi = scheduleApi.bindStationCalibration({
+      data,
+      shifted,
+      getNow,
+      getCalibration: () => calibration,
+      onApply: applyCalibration,
+      onClear: clearCalibrationState,
+      elements: {
+        toggle: document.getElementById('calibrate-toggle'),
+        panel: document.getElementById('calibrate-panel'),
+        list: document.getElementById('calibrate-stations'),
+        status: document.getElementById('calibrate-status'),
+        clearBtn: document.getElementById('calibrate-clear'),
+        dialog: document.getElementById('calibrate-dialog'),
+        dialogText: document.getElementById('calibrate-dialog-text'),
+        dialogConfirm: document.getElementById('calibrate-confirm'),
+        dialogCancel: document.getElementById('calibrate-cancel'),
+        toast: document.getElementById('toast'),
+      },
     });
 
     window.addEventListener('resize', () => {

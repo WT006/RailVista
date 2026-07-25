@@ -54,6 +54,11 @@ body {
   pointer-events: none;
 }
 
+.top-bar__cluster {
+  position: relative;
+  pointer-events: auto;
+}
+
 .status-card {
   pointer-events: auto;
   background: var(--panel-bg);
@@ -120,6 +125,33 @@ body {
 .depart-text:hover {
   border-color: rgba(56, 189, 248, 0.45);
   color: #e2e8f0;
+}
+
+.calibrate-btn {
+  flex-shrink: 0;
+  padding: 2px 6px;
+  margin: 0;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.35);
+  color: #cbd5e1;
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calibrate-btn:hover,
+.calibrate-btn[aria-expanded="true"] {
+  border-color: rgba(34, 197, 94, 0.45);
+  color: #bbf7d0;
+}
+
+.calibrate-btn.is-active {
+  border-color: rgba(34, 197, 94, 0.55);
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
 }
 
 .schedule-dialog {
@@ -339,6 +371,136 @@ body {
   font-weight: 700;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
+}
+
+.calibrate-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 102;
+  padding: 10px 12px;
+  background: var(--panel-bg);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+}
+
+.calibrate-popover[hidden] {
+  display: none !important;
+}
+
+.calibrate-popover__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.calibrate-popover__title {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.calibrate-card__status {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: right;
+}
+
+.calibrate-panel__hint {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.calibrate-stations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.calibrate-station-btn,
+.calibrate-clear,
+.info-calibrate-btn,
+.map-popup__calibrate {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.45);
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calibrate-station-btn,
+.info-calibrate-btn,
+.map-popup__calibrate {
+  padding: 5px 10px;
+}
+
+.calibrate-station-btn.is-active {
+  border-color: rgba(34, 197, 94, 0.55);
+  background: rgba(34, 197, 94, 0.14);
+  color: #86efac;
+}
+
+.calibrate-station-btn.is-near {
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.15);
+}
+
+.calibrate-clear {
+  margin-top: 8px;
+  padding: 5px 12px;
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.calibrate-dialog__text {
+  white-space: pre-line;
+}
+
+.info-calibrate-btn,
+.map-popup__calibrate {
+  display: inline-block;
+  margin-top: 8px;
+  border-color: rgba(34, 197, 94, 0.45);
+  color: #86efac;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--bottom-overlay) + 56px);
+  transform: translateX(-50%);
+  z-index: 220;
+  max-width: min(92vw, 360px);
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #e2e8f0;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.toast[hidden] {
+  display: none !important;
+}
+
+.map-popup__actions {
+  margin-top: 8px;
 }
 
 .locate-btn {
@@ -678,7 +840,8 @@ body {
 }
 
 @media (max-width: 380px) {
-  .depart-text {
+  .depart-text,
+  .calibrate-btn {
     font-size: 10px;
     padding: 2px 5px;
   }
@@ -697,18 +860,30 @@ body {
   </div>
 
   <header class="top-bar">
-    <div class="status-card">
-      <div class="status-row status-row--primary">
-        <span class="train-badge">Z8991</span>
-        <span class="route-text">西宁 → 拉萨</span>
-        <button type="button" class="depart-text" id="depart-btn" title="点击修改发车时间">8/11 22:00</button>
-        <span class="offline-badge">离线</span>
-        <time class="clock" id="clock-chip">--</time>
+    <div class="top-bar__cluster">
+      <div class="status-card">
+        <div class="status-row status-row--primary">
+          <span class="train-badge">Z8991</span>
+          <span class="route-text">西宁 → 拉萨</span>
+          <button type="button" class="depart-text" id="depart-btn" title="点击修改发车时间">8/11 22:00</button>
+          <button type="button" class="calibrate-btn" id="calibrate-toggle" aria-expanded="false" aria-controls="calibrate-panel" title="站点校准">校准</button>
+          <span class="offline-badge">离线</span>
+          <time class="clock" id="clock-chip">--</time>
+        </div>
+        <div class="status-row status-row--secondary">
+          <span id="progress-chip">进度 <strong>0%</strong></span>
+          <span class="status-divider" aria-hidden="true">·</span>
+          <span id="mode-chip">定位 <strong>--</strong></span>
+        </div>
       </div>
-      <div class="status-row status-row--secondary">
-        <span id="progress-chip">进度 <strong>0%</strong></span>
-        <span class="status-divider" aria-hidden="true">·</span>
-        <span id="mode-chip">定位 <strong>--</strong></span>
+      <div class="calibrate-popover" id="calibrate-panel" hidden>
+        <div class="calibrate-popover__head">
+          <span class="calibrate-popover__title">站点校准</span>
+          <span class="calibrate-card__status" id="calibrate-status">未校准</span>
+        </div>
+        <p class="calibrate-panel__hint">到站下车后点选当前站，后续估算将整体顺延或提前（仅本机生效）。</p>
+        <div class="calibrate-stations" id="calibrate-stations"></div>
+        <button type="button" class="calibrate-clear" id="calibrate-clear" hidden>清除校准</button>
       </div>
     </div>
   </header>
@@ -755,7 +930,7 @@ body {
     <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
   </footer>
 
-  <p class="offline-hint">单文件离线版 · 点击顶部发车时间可修改 · 加 ?progress=35 可模拟进度</p>
+  <p class="offline-hint">单文件离线版 · 点击顶部发车时间可修改 · 底部可站点校准 · 加 ?progress=35 可模拟进度</p>
 
   <div class="schedule-dialog" id="schedule-dialog" hidden>
     <div class="schedule-dialog__backdrop"></div>
@@ -773,6 +948,18 @@ body {
       </div>
     </div>
   </div>
+  <div class="schedule-dialog" id="calibrate-dialog" hidden>
+    <div class="schedule-dialog__backdrop"></div>
+    <div class="schedule-dialog__card" role="dialog" aria-labelledby="calibrate-dialog-title">
+      <h2 id="calibrate-dialog-title">确认站点校准</h2>
+      <p class="schedule-dialog__hint calibrate-dialog__text" id="calibrate-dialog-text"></p>
+      <div class="schedule-dialog__actions">
+        <button type="button" id="calibrate-cancel">取消</button>
+        <button type="button" id="calibrate-confirm" class="primary">确认校准</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
 
   <script>
 /** 数据来源：飞书多维表格「Z8991途径风景」https://my.feishu.cn/base/YZaLbPNuJaF8O0s25W4c6hgCnDh */
@@ -1062,8 +1249,10 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
   <script>
 (function () {
   const STORAGE_KEY = 'z8991_departure';
+  const CALIBRATION_STORAGE_KEY = 'z8991_station_calibration';
   const TRAIN_MARKER_KEY = 'z8991_show_train_marker';
   const LAYER_VISIBILITY_KEY = 'z8991_layer_visibility';
+  const CALIBRATE_WINDOW_MS = 45 * 60 * 1000;
   const DEFAULT_LAYER_VISIBILITY = {
     rail: true,
     station: true,
@@ -1125,6 +1314,269 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
 
   function clearDeparture() {
     localStorage.removeItem(STORAGE_KEY);
+  }
+
+  function readCalibration() {
+    try {
+      const raw = localStorage.getItem(CALIBRATION_STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (typeof parsed.offsetMs !== 'number' || !parsed.stationName) return null;
+      return parsed;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function writeCalibration(record) {
+    try {
+      localStorage.setItem(CALIBRATION_STORAGE_KEY, JSON.stringify(record));
+    } catch (_) {
+      /* private mode */
+    }
+    return record;
+  }
+
+  function clearCalibration() {
+    try {
+      localStorage.removeItem(CALIBRATION_STORAGE_KEY);
+    } catch (_) {
+      /* private mode */
+    }
+  }
+
+  /** 中间经停站（不含始发西宁、终到拉萨） */
+  function getCalibratableStations(stations) {
+    return stations.filter((s) => s.type === 'stop');
+  }
+
+  function getStationAnchorTime(station, shifted) {
+    if (station.type !== 'stop' || !station.arrive) return null;
+    return shifted(station.arrive);
+  }
+
+  function computeCalibrationOffset(now, anchorTime) {
+    return now.getTime() - anchorTime.getTime();
+  }
+
+  /** 将真实时间映射回图定时刻轴，后续进度与 ETA 均基于此 */
+  function effectiveScheduleDate(now, calibration) {
+    if (!calibration || typeof calibration.offsetMs !== 'number') {
+      return now instanceof Date ? now : new Date(now);
+    }
+    const base = now instanceof Date ? now : new Date(now);
+    return new Date(base.getTime() - calibration.offsetMs);
+  }
+
+  function formatOffsetLabel(offsetMs) {
+    const min = Math.round(offsetMs / 60000);
+    if (min === 0) return '准点';
+    if (min > 0) return `晚点 ${min} 分钟`;
+    return `早点 ${Math.abs(min)} 分钟`;
+  }
+
+  function isNearScheduledArrival(now, station, shifted, windowMs = CALIBRATE_WINDOW_MS) {
+    const anchor = getStationAnchorTime(station, shifted);
+    if (!anchor) return false;
+    return Math.abs(now.getTime() - anchor.getTime()) <= windowMs;
+  }
+
+  function buildCalibrationPreview(station, now, shifted, stations, currentCalibration) {
+    const anchorTime = getStationAnchorTime(station, shifted);
+    if (!anchorTime) {
+      return { ok: false, reason: '该站不支持校准' };
+    }
+    const offsetMs = computeCalibrationOffset(now, anchorTime);
+    const deltaMin = Math.round(offsetMs / 60000);
+    let backward = false;
+    if (currentCalibration) {
+      const lastIdx = stations.findIndex((s) => s.name === currentCalibration.stationName);
+      const newIdx = stations.findIndex((s) => s.name === station.name);
+      backward = lastIdx >= 0 && newIdx >= 0 && newIdx < lastIdx;
+    }
+    return {
+      ok: true,
+      offsetMs,
+      deltaMin,
+      anchorTime,
+      backward,
+      shiftLabel: deltaMin >= 0 ? '延后' : '提前',
+      shiftMin: Math.abs(deltaMin),
+    };
+  }
+
+  function calibrateAtStation(station, now, shifted) {
+    const anchorTime = getStationAnchorTime(station, shifted);
+    if (!anchorTime) return null;
+    return writeCalibration({
+      stationName: station.name,
+      offsetMs: computeCalibrationOffset(now, anchorTime),
+      calibratedAt: now.toISOString(),
+      anchorIso: anchorTime.toISOString(),
+    });
+  }
+
+  function showToast(el, message, durationMs = 2800) {
+    if (!el) return;
+    el.textContent = message;
+    el.hidden = false;
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => {
+      el.hidden = true;
+    }, durationMs);
+  }
+
+  function bindStationCalibration({
+    data,
+    shifted,
+    getNow,
+    getCalibration,
+    onApply,
+    onClear,
+    elements,
+  }) {
+    const {
+      toggle,
+      panel,
+      list,
+      status,
+      clearBtn,
+      dialog,
+      dialogText,
+      dialogConfirm,
+      dialogCancel,
+      toast,
+    } = elements;
+    if (!list || !dialog) return { refresh: () => {} };
+
+    const backdrop = dialog.querySelector('.schedule-dialog__backdrop');
+    let pendingStation = null;
+
+    const closeDialog = () => {
+      pendingStation = null;
+      dialog.hidden = true;
+    };
+
+    const renderList = () => {
+      const cal = getCalibration();
+      const now = getNow();
+      list.innerHTML = '';
+      getCalibratableStations(data.stations).forEach((station) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'calibrate-station-btn';
+        btn.textContent = station.name;
+        if (cal?.stationName === station.name) btn.classList.add('is-active');
+        if (isNearScheduledArrival(now, station, shifted)) btn.classList.add('is-near');
+        btn.addEventListener('click', () => {
+          pendingStation = station;
+          const preview = buildCalibrationPreview(
+            station,
+            now,
+            shifted,
+            data.stations,
+            cal
+          );
+          if (!preview.ok) {
+            showToast(toast, preview.reason || '无法校准');
+            return;
+          }
+          const backwardNote = preview.backward
+            ? `\n\n注意：当前已按「${cal.stationName}」校准，改到更早的站会覆盖后续估算。`
+            : '';
+          dialogText.textContent =
+            `确认您现在在「${station.name}」？\n` +
+            `图定到点 ${formatTime(preview.anchorTime)}，当前 ${formatTime(now)}（${formatOffsetLabel(preview.offsetMs)}）。\n` +
+            `确认后，后续风景点与进度估算将整体${preview.shiftLabel} ${preview.shiftMin} 分钟。${backwardNote}`;
+          dialog.hidden = false;
+        });
+        list.appendChild(btn);
+      });
+    };
+
+    const updateStatus = () => {
+      const cal = getCalibration();
+      if (status) {
+        status.textContent = cal
+          ? `已校准·${cal.stationName}（${formatOffsetLabel(cal.offsetMs)}）`
+          : '未校准';
+      }
+      if (toggle) {
+        toggle.classList.toggle('is-active', !!cal);
+        toggle.title = cal
+          ? `站点校准：${cal.stationName}（${formatOffsetLabel(cal.offsetMs)}）`
+          : '站点校准';
+      }
+      if (clearBtn) clearBtn.hidden = !cal;
+    };
+
+    const closePanel = () => {
+      if (!panel) return;
+      panel.hidden = true;
+      toggle?.setAttribute('aria-expanded', 'false');
+    };
+
+    const refresh = () => {
+      updateStatus();
+      if (panel && !panel.hidden) renderList();
+    };
+
+    toggle?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const open = panel.hidden;
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) refresh();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!panel || panel.hidden) return;
+      if (panel.contains(event.target) || toggle?.contains(event.target)) return;
+      closePanel();
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      clearCalibration();
+      onClear?.();
+      refresh();
+      showToast(toast, '已清除站点校准');
+    });
+
+    dialogCancel?.addEventListener('click', closeDialog);
+    backdrop?.addEventListener('click', closeDialog);
+
+    dialogConfirm?.addEventListener('click', () => {
+      if (!pendingStation) return;
+      const record = calibrateAtStation(pendingStation, getNow(), shifted);
+      closeDialog();
+      if (record) {
+        onApply?.(record);
+        closePanel();
+        refresh();
+        showToast(toast, `已按「${record.stationName}」校准，后续估算已${formatOffsetLabel(record.offsetMs)}`);
+      }
+    });
+
+    refresh();
+    return { refresh, openConfirmForStation: (station) => {
+      pendingStation = station;
+      const preview = buildCalibrationPreview(
+        station,
+        getNow(),
+        shifted,
+        data.stations,
+        getCalibration()
+      );
+      if (!preview.ok) {
+        showToast(toast, preview.reason || '无法校准');
+        return;
+      }
+      dialogText.textContent =
+        `确认您现在在「${station.name}」？\n` +
+        `图定到点 ${formatTime(preview.anchorTime)}，当前 ${formatTime(getNow())}（${formatOffsetLabel(preview.offsetMs)}）。\n` +
+        `确认后，后续风景点与进度估算将整体${preview.shiftLabel} ${preview.shiftMin} 分钟。`;
+      dialog.hidden = false;
+    } };
   }
 
   function isShowTrainMarker() {
@@ -1262,6 +1714,7 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
 
     resetBtn?.addEventListener('click', () => {
       clearDeparture();
+      clearCalibration();
       onApply(resolveSchedule(data, config));
       closeDialog();
     });
@@ -1270,6 +1723,7 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
       const iso = fromDatetimeLocalValue(input?.value);
       if (!iso || Number.isNaN(new Date(iso).getTime())) return;
       setDepartureIso(iso);
+      clearCalibration();
       const nextConfig = { ...(config || {}), DEPARTURE: iso };
       onApply(resolveSchedule(data, nextConfig));
       closeDialog();
@@ -1278,14 +1732,26 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
 
   window.Z8991Schedule = {
     STORAGE_KEY,
-    TRAIN_MARKER_KEY,
-    LAYER_VISIBILITY_KEY,
-    DEFAULT_LAYER_VISIBILITY,
+    CALIBRATION_STORAGE_KEY,
+    CALIBRATE_WINDOW_MS,
     shiftDate,
     getDepartureIso,
     resolveSchedule,
     setDepartureIso,
     clearDeparture,
+    readCalibration,
+    writeCalibration,
+    clearCalibration,
+    getCalibratableStations,
+    getStationAnchorTime,
+    computeCalibrationOffset,
+    effectiveScheduleDate,
+    formatOffsetLabel,
+    isNearScheduledArrival,
+    buildCalibrationPreview,
+    calibrateAtStation,
+    showToast,
+    bindStationCalibration,
     isShowTrainMarker,
     setShowTrainMarker,
     getLayerVisibility,
@@ -1300,6 +1766,9 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
     formatStationSchedule,
     updateDepartBadge,
     bindDepartureEditor,
+    TRAIN_MARKER_KEY,
+    LAYER_VISIBILITY_KEY,
+    DEFAULT_LAYER_VISIBILITY,
   };
 })();
 
@@ -1315,6 +1784,8 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
   let arrival = scheduleState.arrival;
   let offsetMs = scheduleState.offsetMs;
   const shifted = (value) => scheduleApi.shiftDate(value, offsetMs);
+  let calibration = scheduleApi.readCalibration();
+  let calibrationUi = null;
 
   let railwayPath = [];
   let railwayLength = 0;
@@ -1364,8 +1835,33 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
     departure = next.departure;
     arrival = next.arrival;
     offsetMs = next.offsetMs;
+    calibration = null;
     scheduleApi.updateDepartBadge(departure);
+    calibrationUi?.refresh();
     tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function applyCalibration(record) {
+    calibration = record;
+    tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function clearCalibrationState() {
+    calibration = null;
+    tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function getNow() {
+    const mock = new URLSearchParams(window.location.search).get('mockNow');
+    if (mock) {
+      const parsed = new Date(mock);
+      if (!Number.isNaN(parsed.getTime())) return parsed;
+    }
+    return new Date();
+  }
+
+  function getEffectiveNow(now) {
+    return scheduleApi.effectiveScheduleDate(now, calibration);
   }
 
   function getSpotTimeLabel(spot) {
@@ -1379,9 +1875,13 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
   function shortModeLabel(mode) {
     if (!isCompact) return mode;
     return mode
+      .replace('时刻表估算（已校准·GPS 弱）', '时刻表（已校准）')
+      .replace('时刻表估算（已校准·偏离）', '时刻表（已校准）')
+      .replace('时刻表估算（已校准）', '时刻表（已校准）')
       .replace('时刻表估算（GPS 信号弱）', '时刻表（GPS弱）')
       .replace('时刻表估算（偏离铁路较远）', '时刻表（偏离）')
       .replace('时刻表估算', '时刻表')
+      .replace('GPS + 时刻表（已校准）', 'GPS（已校准）')
       .replace('GPS + 时刻表', 'GPS');
   }
 
@@ -1510,20 +2010,27 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
       return { progress: Math.max(0, Math.min(1, simulated)), mode: '模拟进度' };
     }
 
-    const scheduleP = scheduleProgress(now);
-    if (!gps) return { progress: scheduleP, mode: '时刻表估算' };
+    const effectiveNow = getEffectiveNow(now);
+    const scheduleP = scheduleProgress(effectiveNow);
+    const calibrated = !!calibration;
+    const scheduleMode = calibrated ? '时刻表估算（已校准）' : '时刻表估算';
+
+    if (!gps) return { progress: scheduleP, mode: scheduleMode };
 
     const ageMs = now.getTime() - gps.timestamp;
     if (ageMs > 120000 || gps.accuracy > 800) {
-      return { progress: scheduleP, mode: '时刻表估算（GPS 信号弱）' };
+      return { progress: scheduleP, mode: calibrated ? '时刻表估算（已校准·GPS 弱）' : '时刻表估算（GPS 信号弱）' };
     }
 
     const projected = projectToRailway(gps.lng, gps.lat);
     if (projected.distKm > 8) {
-      return { progress: scheduleP, mode: '时刻表估算（偏离铁路较远）' };
+      return { progress: scheduleP, mode: calibrated ? '时刻表估算（已校准·偏离）' : '时刻表估算（偏离铁路较远）' };
     }
 
-    return { progress: projected.progress * 0.65 + scheduleP * 0.35, mode: 'GPS + 时刻表' };
+    return {
+      progress: projected.progress * 0.65 + scheduleP * 0.35,
+      mode: calibrated ? 'GPS + 时刻表（已校准）' : 'GPS + 时刻表',
+    };
   }
 
   function formatClock(now) {
@@ -1542,8 +2049,9 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
     });
   }
 
-  function formatEta(targetDate) {
-    const diffMin = Math.round((targetDate - new Date()) / 60000);
+  function formatEta(targetDate, referenceNow) {
+    const ref = referenceNow || new Date();
+    const diffMin = Math.round((targetDate - ref) / 60000);
     if (diffMin <= 0) return '即将经过或已通过';
     if (diffMin < 60) return `约 ${diffMin} 分钟后`;
     const h = Math.floor(diffMin / 60);
@@ -1552,10 +2060,11 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
   }
 
   function getUpcomingSpot(now, progress) {
+    const effectiveNow = getEffectiveNow(now);
     const spots = [...data.scenicSpots].sort((a, b) => shifted(a.at) - shifted(b.at));
-    const upcomingByTime = spots.find((s) => shifted(s.at) >= now);
+    const upcomingByTime = spots.find((s) => shifted(s.at) >= effectiveNow);
     if (upcomingByTime) {
-      return { spot: upcomingByTime, reason: formatEta(shifted(upcomingByTime.at)) };
+      return { spot: upcomingByTime, reason: formatEta(shifted(upcomingByTime.at), effectiveNow) };
     }
 
     const currentPoint = pointAtProgress(progress);
@@ -1724,6 +2233,7 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
       <div class="map-popup__title"></div>
       <div class="map-popup__subtitle"></div>
       <div class="map-popup__detail"></div>
+      <div class="map-popup__actions"></div>
       <div class="map-popup__arrow" aria-hidden="true"></div>
     `;
     shell.appendChild(mapPopupEl);
@@ -1754,12 +2264,24 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
     mapPopupEl.style.top = `${y - shellRect.top}px`;
   }
 
-  function openMapPopup({ svgX, svgY, title, subtitle, detail, kind = 'fixed' }) {
+  function openMapPopup({ svgX, svgY, title, subtitle, detail, kind = 'fixed', station = null }) {
     ensureMapPopup();
     mapPopupAnchor = { svgX, svgY, kind };
     mapPopupEl.querySelector('.map-popup__title').textContent = title;
     mapPopupEl.querySelector('.map-popup__subtitle').textContent = subtitle || '';
     mapPopupEl.querySelector('.map-popup__detail').textContent = detail || '';
+    const actionsEl = mapPopupEl.querySelector('.map-popup__actions');
+    if (actionsEl) {
+      actionsEl.innerHTML = station?.type === 'stop'
+        ? `<button type="button" class="map-popup__calibrate" data-station-calibrate="${station.name}">我在 ${station.name} 站</button>`
+        : '';
+      const calibrateBtn = actionsEl.querySelector('[data-station-calibrate]');
+      calibrateBtn?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        closeMapPopup();
+        calibrationUi?.openConfirmForStation(station);
+      });
+    }
     mapPopupEl.hidden = false;
     updateMapPopupPosition();
   }
@@ -2039,6 +2561,7 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
           title: station.name,
           subtitle: formatStationSchedule(station),
           detail: station.intro,
+          station,
         });
       });
       stationLayerEl.appendChild(g);
@@ -2150,7 +2673,7 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
   }
 
   function tick(gps) {
-    const now = new Date();
+    const now = getNow();
     if (gps) {
       lastGps = gps;
       gpsAvailable = true;
@@ -2364,6 +2887,26 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
       config,
       getSchedule: () => scheduleState,
       onApply: applySchedule,
+    });
+    calibrationUi = scheduleApi.bindStationCalibration({
+      data,
+      shifted,
+      getNow,
+      getCalibration: () => calibration,
+      onApply: applyCalibration,
+      onClear: clearCalibrationState,
+      elements: {
+        toggle: document.getElementById('calibrate-toggle'),
+        panel: document.getElementById('calibrate-panel'),
+        list: document.getElementById('calibrate-stations'),
+        status: document.getElementById('calibrate-status'),
+        clearBtn: document.getElementById('calibrate-clear'),
+        dialog: document.getElementById('calibrate-dialog'),
+        dialogText: document.getElementById('calibrate-dialog-text'),
+        dialogConfirm: document.getElementById('calibrate-confirm'),
+        dialogCancel: document.getElementById('calibrate-cancel'),
+        toast: document.getElementById('toast'),
+      },
     });
     updateOverlayMetrics();
 

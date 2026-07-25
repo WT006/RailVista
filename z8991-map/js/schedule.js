@@ -1,7 +1,9 @@
 (function () {
   const STORAGE_KEY = 'z8991_departure';
+  const CALIBRATION_STORAGE_KEY = 'z8991_station_calibration';
   const TRAIN_MARKER_KEY = 'z8991_show_train_marker';
   const LAYER_VISIBILITY_KEY = 'z8991_layer_visibility';
+  const CALIBRATE_WINDOW_MS = 45 * 60 * 1000;
   const DEFAULT_LAYER_VISIBILITY = {
     rail: true,
     station: true,
@@ -63,6 +65,269 @@
 
   function clearDeparture() {
     localStorage.removeItem(STORAGE_KEY);
+  }
+
+  function readCalibration() {
+    try {
+      const raw = localStorage.getItem(CALIBRATION_STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (typeof parsed.offsetMs !== 'number' || !parsed.stationName) return null;
+      return parsed;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function writeCalibration(record) {
+    try {
+      localStorage.setItem(CALIBRATION_STORAGE_KEY, JSON.stringify(record));
+    } catch (_) {
+      /* private mode */
+    }
+    return record;
+  }
+
+  function clearCalibration() {
+    try {
+      localStorage.removeItem(CALIBRATION_STORAGE_KEY);
+    } catch (_) {
+      /* private mode */
+    }
+  }
+
+  /** 中间经停站（不含始发西宁、终到拉萨） */
+  function getCalibratableStations(stations) {
+    return stations.filter((s) => s.type === 'stop');
+  }
+
+  function getStationAnchorTime(station, shifted) {
+    if (station.type !== 'stop' || !station.arrive) return null;
+    return shifted(station.arrive);
+  }
+
+  function computeCalibrationOffset(now, anchorTime) {
+    return now.getTime() - anchorTime.getTime();
+  }
+
+  /** 将真实时间映射回图定时刻轴，后续进度与 ETA 均基于此 */
+  function effectiveScheduleDate(now, calibration) {
+    if (!calibration || typeof calibration.offsetMs !== 'number') {
+      return now instanceof Date ? now : new Date(now);
+    }
+    const base = now instanceof Date ? now : new Date(now);
+    return new Date(base.getTime() - calibration.offsetMs);
+  }
+
+  function formatOffsetLabel(offsetMs) {
+    const min = Math.round(offsetMs / 60000);
+    if (min === 0) return '准点';
+    if (min > 0) return `晚点 ${min} 分钟`;
+    return `早点 ${Math.abs(min)} 分钟`;
+  }
+
+  function isNearScheduledArrival(now, station, shifted, windowMs = CALIBRATE_WINDOW_MS) {
+    const anchor = getStationAnchorTime(station, shifted);
+    if (!anchor) return false;
+    return Math.abs(now.getTime() - anchor.getTime()) <= windowMs;
+  }
+
+  function buildCalibrationPreview(station, now, shifted, stations, currentCalibration) {
+    const anchorTime = getStationAnchorTime(station, shifted);
+    if (!anchorTime) {
+      return { ok: false, reason: '该站不支持校准' };
+    }
+    const offsetMs = computeCalibrationOffset(now, anchorTime);
+    const deltaMin = Math.round(offsetMs / 60000);
+    let backward = false;
+    if (currentCalibration) {
+      const lastIdx = stations.findIndex((s) => s.name === currentCalibration.stationName);
+      const newIdx = stations.findIndex((s) => s.name === station.name);
+      backward = lastIdx >= 0 && newIdx >= 0 && newIdx < lastIdx;
+    }
+    return {
+      ok: true,
+      offsetMs,
+      deltaMin,
+      anchorTime,
+      backward,
+      shiftLabel: deltaMin >= 0 ? '延后' : '提前',
+      shiftMin: Math.abs(deltaMin),
+    };
+  }
+
+  function calibrateAtStation(station, now, shifted) {
+    const anchorTime = getStationAnchorTime(station, shifted);
+    if (!anchorTime) return null;
+    return writeCalibration({
+      stationName: station.name,
+      offsetMs: computeCalibrationOffset(now, anchorTime),
+      calibratedAt: now.toISOString(),
+      anchorIso: anchorTime.toISOString(),
+    });
+  }
+
+  function showToast(el, message, durationMs = 2800) {
+    if (!el) return;
+    el.textContent = message;
+    el.hidden = false;
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => {
+      el.hidden = true;
+    }, durationMs);
+  }
+
+  function bindStationCalibration({
+    data,
+    shifted,
+    getNow,
+    getCalibration,
+    onApply,
+    onClear,
+    elements,
+  }) {
+    const {
+      toggle,
+      panel,
+      list,
+      status,
+      clearBtn,
+      dialog,
+      dialogText,
+      dialogConfirm,
+      dialogCancel,
+      toast,
+    } = elements;
+    if (!list || !dialog) return { refresh: () => {} };
+
+    const backdrop = dialog.querySelector('.schedule-dialog__backdrop');
+    let pendingStation = null;
+
+    const closeDialog = () => {
+      pendingStation = null;
+      dialog.hidden = true;
+    };
+
+    const renderList = () => {
+      const cal = getCalibration();
+      const now = getNow();
+      list.innerHTML = '';
+      getCalibratableStations(data.stations).forEach((station) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'calibrate-station-btn';
+        btn.textContent = station.name;
+        if (cal?.stationName === station.name) btn.classList.add('is-active');
+        if (isNearScheduledArrival(now, station, shifted)) btn.classList.add('is-near');
+        btn.addEventListener('click', () => {
+          pendingStation = station;
+          const preview = buildCalibrationPreview(
+            station,
+            now,
+            shifted,
+            data.stations,
+            cal
+          );
+          if (!preview.ok) {
+            showToast(toast, preview.reason || '无法校准');
+            return;
+          }
+          const backwardNote = preview.backward
+            ? `\n\n注意：当前已按「${cal.stationName}」校准，改到更早的站会覆盖后续估算。`
+            : '';
+          dialogText.textContent =
+            `确认您现在在「${station.name}」？\n` +
+            `图定到点 ${formatTime(preview.anchorTime)}，当前 ${formatTime(now)}（${formatOffsetLabel(preview.offsetMs)}）。\n` +
+            `确认后，后续风景点与进度估算将整体${preview.shiftLabel} ${preview.shiftMin} 分钟。${backwardNote}`;
+          dialog.hidden = false;
+        });
+        list.appendChild(btn);
+      });
+    };
+
+    const updateStatus = () => {
+      const cal = getCalibration();
+      if (status) {
+        status.textContent = cal
+          ? `已校准·${cal.stationName}（${formatOffsetLabel(cal.offsetMs)}）`
+          : '未校准';
+      }
+      if (toggle) {
+        toggle.classList.toggle('is-active', !!cal);
+        toggle.title = cal
+          ? `站点校准：${cal.stationName}（${formatOffsetLabel(cal.offsetMs)}）`
+          : '站点校准';
+      }
+      if (clearBtn) clearBtn.hidden = !cal;
+    };
+
+    const closePanel = () => {
+      if (!panel) return;
+      panel.hidden = true;
+      toggle?.setAttribute('aria-expanded', 'false');
+    };
+
+    const refresh = () => {
+      updateStatus();
+      if (panel && !panel.hidden) renderList();
+    };
+
+    toggle?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const open = panel.hidden;
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) refresh();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!panel || panel.hidden) return;
+      if (panel.contains(event.target) || toggle?.contains(event.target)) return;
+      closePanel();
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      clearCalibration();
+      onClear?.();
+      refresh();
+      showToast(toast, '已清除站点校准');
+    });
+
+    dialogCancel?.addEventListener('click', closeDialog);
+    backdrop?.addEventListener('click', closeDialog);
+
+    dialogConfirm?.addEventListener('click', () => {
+      if (!pendingStation) return;
+      const record = calibrateAtStation(pendingStation, getNow(), shifted);
+      closeDialog();
+      if (record) {
+        onApply?.(record);
+        closePanel();
+        refresh();
+        showToast(toast, `已按「${record.stationName}」校准，后续估算已${formatOffsetLabel(record.offsetMs)}`);
+      }
+    });
+
+    refresh();
+    return { refresh, openConfirmForStation: (station) => {
+      pendingStation = station;
+      const preview = buildCalibrationPreview(
+        station,
+        getNow(),
+        shifted,
+        data.stations,
+        getCalibration()
+      );
+      if (!preview.ok) {
+        showToast(toast, preview.reason || '无法校准');
+        return;
+      }
+      dialogText.textContent =
+        `确认您现在在「${station.name}」？\n` +
+        `图定到点 ${formatTime(preview.anchorTime)}，当前 ${formatTime(getNow())}（${formatOffsetLabel(preview.offsetMs)}）。\n` +
+        `确认后，后续风景点与进度估算将整体${preview.shiftLabel} ${preview.shiftMin} 分钟。`;
+      dialog.hidden = false;
+    } };
   }
 
   function isShowTrainMarker() {
@@ -200,6 +465,7 @@
 
     resetBtn?.addEventListener('click', () => {
       clearDeparture();
+      clearCalibration();
       onApply(resolveSchedule(data, config));
       closeDialog();
     });
@@ -208,6 +474,7 @@
       const iso = fromDatetimeLocalValue(input?.value);
       if (!iso || Number.isNaN(new Date(iso).getTime())) return;
       setDepartureIso(iso);
+      clearCalibration();
       const nextConfig = { ...(config || {}), DEPARTURE: iso };
       onApply(resolveSchedule(data, nextConfig));
       closeDialog();
@@ -216,14 +483,26 @@
 
   window.Z8991Schedule = {
     STORAGE_KEY,
-    TRAIN_MARKER_KEY,
-    LAYER_VISIBILITY_KEY,
-    DEFAULT_LAYER_VISIBILITY,
+    CALIBRATION_STORAGE_KEY,
+    CALIBRATE_WINDOW_MS,
     shiftDate,
     getDepartureIso,
     resolveSchedule,
     setDepartureIso,
     clearDeparture,
+    readCalibration,
+    writeCalibration,
+    clearCalibration,
+    getCalibratableStations,
+    getStationAnchorTime,
+    computeCalibrationOffset,
+    effectiveScheduleDate,
+    formatOffsetLabel,
+    isNearScheduledArrival,
+    buildCalibrationPreview,
+    calibrateAtStation,
+    showToast,
+    bindStationCalibration,
     isShowTrainMarker,
     setShowTrainMarker,
     getLayerVisibility,
@@ -238,5 +517,8 @@
     formatStationSchedule,
     updateDepartBadge,
     bindDepartureEditor,
+    TRAIN_MARKER_KEY,
+    LAYER_VISIBILITY_KEY,
+    DEFAULT_LAYER_VISIBILITY,
   };
 })();

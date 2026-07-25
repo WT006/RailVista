@@ -1,5 +1,0 @@
-[out:json][timeout:180];
-relation["name"="Qinghai-Tibet railway"];
-out body;
->;
-out geom;

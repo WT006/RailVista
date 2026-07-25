@@ -1,5 +1,0 @@
-[out:json][timeout:180];
-relation(152884);
-out body;
->;
-out geom;

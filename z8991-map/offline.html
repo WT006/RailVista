@@ -105,8 +105,107 @@ body {
 
 .depart-text {
   flex-shrink: 0;
+  padding: 2px 6px;
+  margin: 0;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.35);
   color: #cbd5e1;
   font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.depart-text:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #e2e8f0;
+}
+
+.schedule-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.schedule-dialog[hidden] {
+  display: none;
+}
+
+.schedule-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.72);
+}
+
+.schedule-dialog__card {
+  position: relative;
+  width: min(360px, 100%);
+  padding: 18px 16px 14px;
+  border-radius: 12px;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+}
+
+.schedule-dialog__card h2 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  color: #f1f5f9;
+}
+
+.schedule-dialog__hint {
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #94a3b8;
+}
+
+.schedule-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.schedule-dialog__field input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #1e293b;
+  color: #f8fafc;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+.schedule-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.schedule-dialog__actions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.schedule-dialog__actions button.primary {
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(56, 189, 248, 0.15);
+  color: #7dd3fc;
+  font-weight: 600;
 }
 
 .clock {
@@ -541,7 +640,8 @@ body {
 
 @media (max-width: 380px) {
   .depart-text {
-    display: none;
+    font-size: 10px;
+    padding: 2px 5px;
   }
 
   .status-row--primary {
@@ -592,7 +692,7 @@ body {
   position: absolute;
   z-index: 50;
   transform: translate(-50%, calc(-100% - 14px));
-  max-width: min(280px, 78vw);
+  max-width: min(320px, 85vw);
   padding: 10px 28px 10px 12px;
   background: #fff;
   border-radius: 8px;
@@ -600,6 +700,7 @@ body {
   font-size: 14px;
   line-height: 1.55;
   color: #334155;
+  color-scheme: light;
   pointer-events: auto;
 }
 
@@ -609,12 +710,15 @@ body {
 
 .map-popup__title {
   font-weight: 700;
-  color: #0f172a;
+  font-size: 15px;
+  color: #111827;
   margin-bottom: 2px;
 }
 
 .map-popup__subtitle {
-  color: #334155;
+  color: #0369a1;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   margin-bottom: 4px;
 }
 
@@ -800,6 +904,7 @@ body {
       <div class="status-row status-row--primary">
         <span class="train-badge">Z8991</span>
         <span class="route-text">西宁 → 拉萨</span>
+        <button type="button" class="depart-text" id="depart-btn" title="点击修改发车时间">8/11 22:00</button>
         <span class="offline-badge">离线</span>
         <time class="clock" id="clock-chip">--</time>
       </div>
@@ -842,10 +947,27 @@ body {
     <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
   </footer>
 
-  <p class="offline-hint">单文件离线版 · 无需联网 · 发给手机直接打开 · 加 ?progress=35 可模拟进度</p>
+  <p class="offline-hint">单文件离线版 · 点击顶部发车时间可修改 · 加 ?progress=35 可模拟进度</p>
+
+  <div class="schedule-dialog" id="schedule-dialog" hidden>
+    <div class="schedule-dialog__backdrop"></div>
+    <div class="schedule-dialog__card" role="dialog" aria-labelledby="schedule-dialog-title">
+      <h2 id="schedule-dialog-title">设置发车时间</h2>
+      <p class="schedule-dialog__hint">修改西宁开点后，时刻表估算与风景点计划时间将整体顺延或提前。设置保存在本机浏览器。</p>
+      <label class="schedule-dialog__field">
+        <span>西宁开点（北京时间）</span>
+        <input type="datetime-local" id="departure-input" />
+      </label>
+      <div class="schedule-dialog__actions">
+        <button type="button" id="departure-reset">恢复默认</button>
+        <button type="button" id="departure-cancel">取消</button>
+        <button type="button" id="departure-save" class="primary">保存</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-/** 数据来源：飞书多维表格「Z8991途径风景」静态导出 */
+/** 数据来源：飞书多维表格「Z8991途径风景」https://my.feishu.cn/base/YZaLbPNuJaF8O0s25W4c6hgCnDh */
 window.Z8991_DATA = {
   meta: {
     train: 'Z8991',
@@ -854,62 +976,272 @@ window.Z8991_DATA = {
     feishuBase: 'https://my.feishu.cn/base/YZaLbPNuJaF8O0s25W4c6hgCnDh',
   },
 
-  // 经停站（用于时刻表估算位置）
+  // 经停站（Z8991 官方时刻表，基准日 2026-08-11 22:00 西宁开；坐标来自飞书「地理位置」）
   stations: [
-    { name: '西宁', type: 'depart', at: '2026-08-11T22:00:00+08:00', lng: 101.815, lat: 36.642 },
-    { name: '格尔木', type: 'stop', arrive: '2026-08-12T04:03:00+08:00', depart: '2026-08-12T04:28:00+08:00', lng: 94.905, lat: 36.406 },
-    { name: '不冻泉', type: 'stop', arrive: '2026-08-12T06:51:00+08:00', depart: '2026-08-12T07:03:00+08:00', lng: 93.88, lat: 35.43 },
-    { name: '沱沱河', type: 'stop', arrive: '2026-08-12T09:46:00+08:00', depart: '2026-08-12T09:48:00+08:00', lng: 92.331, lat: 34.233 },
-    { name: '雁石坪', type: 'stop', arrive: '2026-08-12T10:59:00+08:00', depart: '2026-08-12T11:03:00+08:00', lng: 91.85, lat: 33.65 },
-    { name: '安多', type: 'stop', arrive: '2026-08-12T13:16:00+08:00', depart: '2026-08-12T13:20:00+08:00', lng: 91.68, lat: 32.26 },
-    { name: '那曲', type: 'stop', arrive: '2026-08-12T14:38:00+08:00', depart: '2026-08-12T14:44:00+08:00', lng: 92.051, lat: 31.476 },
-    { name: '拉萨', type: 'arrive', at: '2026-08-12T18:28:00+08:00', lng: 91.117, lat: 29.654 },
+    {
+      name: '西宁',
+      type: 'depart',
+      at: '2026-08-11T22:00:00+08:00',
+      lng: 101.814362,
+      lat: 36.620233,
+      intro: '青藏铁路的东端起点，青藏高原核心铁路枢纽，是绝大多数旅客开启天路进藏旅程的始发门户',
+    },
+    {
+      name: '格尔木',
+      type: 'stop',
+      arrive: '2026-08-12T04:03:00+08:00',
+      depart: '2026-08-12T04:28:00+08:00',
+      lng: 94.907016,
+      lat: 36.382567,
+      intro: '青藏铁路格拉段（格尔木 - 拉萨）的北起点，地处柴达木盆地腹地，是进藏前核心的列车整备与物资补给枢纽',
+    },
+    {
+      name: '不冻泉',
+      type: 'stop',
+      arrive: '2026-08-12T06:51:00+08:00',
+      depart: '2026-08-12T07:03:00+08:00',
+      lng: 93.932505,
+      lat: 35.53556,
+      intro: '海拔 4611 米，坐落于可可西里国家级自然保护区北缘，因周边终年不冻的泉水得名，是青藏铁路驶入可可西里无人区的首个客运乘降站点。',
+    },
+    {
+      name: '沱沱河',
+      type: 'stop',
+      arrive: '2026-08-12T09:46:00+08:00',
+      depart: '2026-08-12T09:48:00+08:00',
+      lng: 92.446302,
+      lat: 34.231005,
+      intro: '被誉为「长江源头第一站」，海拔 4547 米，紧邻长江正源沱沱河与长江源特大桥，站内设有观景平台，是直面万里长江发源盛景的绝佳点位。',
+    },
+    {
+      name: '雁石坪',
+      type: 'stop',
+      arrive: '2026-08-12T10:59:00+08:00',
+      depart: '2026-08-12T11:03:00+08:00',
+      lng: 92.072352,
+      lat: 33.579227,
+      intro: '海拔 4721 米，是青藏铁路全线海拔最高的客运乘降所，坐落于唐古拉山山麓，2025 年正式开通客运，彻底改变了当地牧民长途辗转乘车的历史。',
+    },
+    {
+      name: '安多',
+      type: 'stop',
+      arrive: '2026-08-12T13:16:00+08:00',
+      depart: '2026-08-12T13:20:00+08:00',
+      lng: 91.66742,
+      lat: 32.250636,
+      intro: '海拔 4702 米，是世界上海拔最高的有人值守火车站，也是青藏铁路进入西藏自治区后的第一座有人值守大站，素有「西藏北大门」之称。',
+    },
+    {
+      name: '那曲',
+      type: 'stop',
+      arrive: '2026-08-12T14:38:00+08:00',
+      depart: '2026-08-12T14:44:00+08:00',
+      lng: 91.991429,
+      lat: 31.443755,
+      intro: '海拔 4513 米，扎根羌塘草原腹地，是藏北地区核心的客货运枢纽，配套世界海拔最高的物流中心，是串联藏北草原民生与经济的关键节点。',
+    },
+    {
+      name: '拉萨',
+      type: 'arrive',
+      at: '2026-08-12T18:28:00+08:00',
+      lng: 91.070434,
+      lat: 29.623017,
+      intro: '青藏铁路的南端终点与全线最大客货综合枢纽，站房融合藏式建筑特色与布达拉宫设计元素，是雪域圣城面向内地的核心铁路门户，也是天路旅程的标志性终点。',
+    },
   ],
 
   // 青藏铁路近似折线（经停站 + 关键拐点，非精确轨道）
   railway: [
-    [101.815, 36.642],
+    [101.814362, 36.620233],
     [100.274, 36.619],
     [97.5, 36.8],
     [95.192, 36.95],
-    [94.905, 36.406],
+    [94.907016, 36.382567],
     [94.238, 35.655],
     [94.07, 35.64],
-    [93.88, 35.43],
+    [93.932505, 35.53556],
     [93.082, 35.217],
     [92.911, 34.677],
     [92.443, 34.216],
-    [92.331, 34.233],
+    [92.446302, 34.231005],
     [92.533, 33.868],
+    [92.072352, 33.579227],
     [91.92, 32.862],
     [91.426, 31.997],
-    [91.68, 32.26],
-    [92.051, 31.476],
+    [91.66742, 32.250636],
+    [91.991429, 31.443755],
     [90.894, 30.424],
     [90.809, 30.528],
     [90.499, 30.061],
-    [91.117, 29.654],
+    [91.070434, 29.623017],
   ],
 
   scenicSpots: [
-    { id: 1, name: '青海湖', timeLabel: '23:00～23:20', at: '2026-08-11T23:00:00+08:00', nightOnly: true, lng: 100.274005, lat: 36.619181, address: '青海省海南藏族自治州共和县 / 海北藏族自治州刚察县，青藏铁路青海湖北岸段' },
-    { id: 2, name: '察尔汗盐湖（万丈盐桥）', timeLabel: '03:00～03:40', at: '2026-08-12T03:00:00+08:00', nightOnly: true, lng: 95.192077, lat: 36.949738, address: '青海省海西蒙古族藏族自治州格尔木市察尔汗镇，柴达木盆地南缘' },
-    { id: 3, name: '柴达木盆地戈壁', timeLabel: '03:40～04:00', at: '2026-08-12T03:40:00+08:00', nightOnly: true, lng: 91.464562, lat: 37.60875, address: '青海省海西蒙古族藏族自治州格尔木市至都兰县段，柴达木盆地东缘' },
-    { id: 4, name: '昆仑山口', timeLabel: '06:20～06:40', at: '2026-08-12T06:20:00+08:00', lng: 94.069242, lat: 35.64013, address: '青海省海西蒙古族藏族自治州格尔木市南部，G109 青藏公路与铁路并行段' },
-    { id: 5, name: '玉珠峰', timeLabel: '06:20～06:50', at: '2026-08-12T06:20:00+08:00', lng: 94.238052, lat: 35.655018, address: '青海省海西蒙古族藏族自治州格尔木市南部昆仑山脉东段' },
-    { id: 6, name: '可可西里无人区', timeLabel: '07:30～09:00', at: '2026-08-12T07:30:00+08:00', lng: 94.05147, lat: 35.643831, address: '青海省玉树藏族自治州西部至西藏那曲市安多县北部，可可西里国家级自然保护区' },
-    { id: 7, name: '五道梁高原荒原', timeLabel: '08:00～08:30', at: '2026-08-12T08:00:00+08:00', lng: 93.08206, lat: 35.217307, address: '青海省玉树藏族自治州治多县五道梁，可可西里腹地' },
-    { id: 8, name: '风火山', timeLabel: '09:00～09:20', at: '2026-08-12T09:00:00+08:00', lng: 92.911295, lat: 34.67715, address: '青海省玉树藏族自治州治多县，风火山隧道一带' },
-    { id: 9, name: '沱沱河（长江正源）', timeLabel: '09:30～09:50', at: '2026-08-12T09:30:00+08:00', lng: 92.330821, lat: 34.232831, address: '青海省玉树藏族自治州格尔木市唐古拉山镇，长江源区沱沱河河谷' },
-    { id: 10, name: '通天河', timeLabel: '10:10～10:40', at: '2026-08-12T10:10:00+08:00', lng: 92.533285, lat: 33.868366, address: '青海省玉树藏族自治州与西藏那曲市交界，长江源区通天河段' },
-    { id: 11, name: '三江源自然保护区', timeLabel: '09:40～11:00', at: '2026-08-12T09:40:00+08:00', lng: 92.443193, lat: 34.216085, address: '青海省玉树藏族自治州，长江、黄河、澜沧江发源地汇水区' },
-    { id: 12, name: '唐古拉山口', timeLabel: '12:00～12:20', at: '2026-08-12T12:00:00+08:00', lng: 91.920087, lat: 32.86254, address: '青海省海西州与西藏那曲市安多县交界，唐古拉山垭口' },
-    { id: 13, name: '格拉丹东峰（远眺）', timeLabel: '12:00～12:20', at: '2026-08-12T12:00:00+08:00', lng: 90.927662, lat: 33.449162, address: '青海省玉树藏族自治州与西藏那曲市安多县交界，唐古拉山脉主峰' },
-    { id: 14, name: '措那湖', timeLabel: '13:30～13:45', at: '2026-08-12T13:30:00+08:00', lng: 91.425851, lat: 31.996877, address: '西藏自治区那曲市安多县，唐古拉山南麓，青藏铁路贴湖岸段' },
-    { id: 15, name: '羌塘草原（藏北草原）', timeLabel: '14:00～16:00', at: '2026-08-12T14:00:00+08:00', lng: 90.894875, lat: 30.424285, address: '西藏自治区那曲市那曲县至当雄县，羌塘国家级自然保护区南缘' },
-    { id: 16, name: '念青唐古拉山脉', timeLabel: '16:30～17:10', at: '2026-08-12T16:30:00+08:00', lng: 90.809049, lat: 30.527848, address: '西藏自治区那曲市当雄县，念青唐古拉山主峰海拔7162米' },
-    { id: 17, name: '纳木错（远观）', timeLabel: '16:40～17:00', at: '2026-08-12T16:40:00+08:00', lng: 90.643697, lat: 30.734004, address: '西藏自治区那曲市当雄县，念青唐古拉山西侧' },
-    { id: 18, name: '羊八井地热温泉', timeLabel: '17:20～17:50', at: '2026-08-12T17:20:00+08:00', lng: 90.499117, lat: 30.061468, address: '西藏自治区拉萨市当雄县羊八井镇，青藏铁路羊八井段' },
+    {
+      id: 1,
+      name: '青海湖',
+      timeLabel: '23:00～23:20',
+      at: '2026-08-11T23:00:00+08:00',
+      nightOnly: true,
+      lng: 100.274005,
+      lat: 36.619181,
+      intro: '中国最大的内陆咸水湖，青藏铁路沿湖北岸蜿蜒穿行，是全线最具代表性的高原湖泊地标，可同时饱览碧湖、草原与雪山同框的经典高原盛景',
+    },
+    {
+      id: 2,
+      name: '察尔汗盐湖（万丈盐桥）',
+      timeLabel: '03:00～03:40',
+      at: '2026-08-12T03:00:00+08:00',
+      nightOnly: true,
+      lng: 95.192077,
+      lat: 36.949738,
+      intro: '中国最大的天然盐湖，青藏铁路从全长 32 公里的「万丈盐桥」上通过，路基完全由盐壳浇筑而成，是世界罕见的无桥墩、无护栏的盐质铁路通道。',
+    },
+    {
+      id: 3,
+      name: '柴达木盆地戈壁',
+      timeLabel: '03:40～04:00',
+      at: '2026-08-12T03:40:00+08:00',
+      nightOnly: true,
+      lng: 91.464562,
+      lat: 37.60875,
+      intro: '素有中国「聚宝盆」之称的柴达木盆地核心荒漠带，青藏铁路横穿这片广袤戈壁与雅丹地貌，是全线苍茫感最强、人烟最稀少的荒漠穿行区段。',
+    },
+    {
+      id: 4,
+      name: '昆仑山口',
+      timeLabel: '06:20～06:40',
+      at: '2026-08-12T06:20:00+08:00',
+      lng: 94.069242,
+      lat: 35.64013,
+      intro: '海拔 4768 米，是青藏铁路翻越昆仑山脉的核心隘口，也是黄土高原与青藏高原腹地的地理分界，素有「进藏第一关」之称。',
+    },
+    {
+      id: 5,
+      name: '玉珠峰',
+      timeLabel: '06:20～06:50',
+      at: '2026-08-12T06:20:00+08:00',
+      lng: 94.238052,
+      lat: 35.655018,
+      intro: '昆仑山东段最高峰，海拔 6178 米，是青藏铁路沿线第一座映入眼帘的 6000 米级雪山，终年积雪的山体是昆仑山口最醒目的地标。',
+    },
+    {
+      id: 6,
+      name: '可可西里无人区',
+      timeLabel: '07:30～09:00',
+      at: '2026-08-12T07:30:00+08:00',
+      lng: 94.05147,
+      lat: 35.643831,
+      intro: '世界自然遗产地，中国面积最大的无人区之一，青藏铁路沿其北缘穿行，是全线藏羚羊、藏野驴等珍稀高原野生动物最集中的观测区段',
+    },
+    {
+      id: 7,
+      name: '五道梁高原荒原',
+      timeLabel: '08:00～08:30',
+      at: '2026-08-12T08:00:00+08:00',
+      lng: 93.08206,
+      lat: 35.217307,
+      intro: '青藏铁路沿线高寒缺氧的典型代表，因气候极端恶劣素有「到了五道梁，哭爹又叫娘」的说法，是全线含氧量最低、气候条件最差的高原荒原段。',
+    },
+    {
+      id: 8,
+      name: '风火山',
+      timeLabel: '09:00～09:20',
+      at: '2026-08-12T09:00:00+08:00',
+      lng: 92.911295,
+      lat: 34.67715,
+      intro: '青藏铁路的工程奇迹地标，世界海拔最高的冻土隧道 —— 风火山隧道坐落于此，是人类攻克多年冻土筑路世界级难题的核心标志性工程点。',
+    },
+    {
+      id: 9,
+      name: '沱沱河（长江正源）',
+      timeLabel: '09:30～09:50',
+      at: '2026-08-12T09:30:00+08:00',
+      lng: 92.330821,
+      lat: 34.232831,
+      intro: '万里长江的正源水系，青藏铁路横跨长江源特大桥，是整条线路上唯一能直面长江发源地带、近距离俯瞰江源水系的点位。',
+    },
+    {
+      id: 10,
+      name: '通天河',
+      timeLabel: '10:10～10:40',
+      at: '2026-08-12T10:10:00+08:00',
+      lng: 92.533285,
+      lat: 33.868366,
+      intro: '长江上游干流河段，因《西游记》唐僧师徒渡河的传说闻名，青藏铁路跨越通天河谷，是江源宽谷向高山峡谷过渡的标志性地貌分界。',
+    },
+    {
+      id: 11,
+      name: '三江源自然保护区',
+      timeLabel: '09:40～11:00',
+      at: '2026-08-12T09:40:00+08:00',
+      lng: 92.443193,
+      lat: 34.216085,
+      intro: '被誉为「中华水塔」，是长江、黄河、澜沧江三大江河的发源地，青藏铁路穿行其核心保育区，是全球海拔最高、面积最大的高原湿地生态带。',
+    },
+    {
+      id: 12,
+      name: '唐古拉山口',
+      timeLabel: '12:00～12:20',
+      at: '2026-08-12T12:00:00+08:00',
+      lng: 91.920087,
+      lat: 32.86254,
+      intro: '海拔 5072 米，是青藏铁路全线海拔最高点，同时也是世界铁路的海拔制高点，还是青海与西藏两省区的行政与地理分界山口。',
+    },
+    {
+      id: 13,
+      name: '格拉丹东峰（远眺）',
+      timeLabel: '12:00～12:20',
+      at: '2026-08-12T12:00:00+08:00',
+      lng: 90.927662,
+      lat: 33.449162,
+      intro: '海拔 6621 米的唐古拉山脉主峰，是万里长江的源头冰川所在地，青藏铁路沿线可远眺其巍峨雪峰，是整条线路上可遥望的最高山体。',
+    },
+    {
+      id: 14,
+      name: '措那湖',
+      timeLabel: '13:30～13:45',
+      at: '2026-08-12T13:30:00+08:00',
+      lng: 91.425851,
+      lat: 31.996877,
+      intro: '世界上海拔最高的淡水湖之一，青藏铁路紧贴湖岸线铺设，是全线距离湖泊最近、视野最开阔的高原圣湖景观段，湖水常与蓝天融为一体。',
+    },
+    {
+      id: 15,
+      name: '羌塘草原（藏北草原）',
+      timeLabel: '14:00～16:00',
+      at: '2026-08-12T14:00:00+08:00',
+      lng: 90.894875,
+      lat: 30.424285,
+      intro: '西藏面积最大的纯天然草原，中国五大牧场之一，青藏铁路纵贯其腹地，是沿线最具藏北游牧风情、牛羊与毡房星罗棋布的辽阔草原带。',
+    },
+    {
+      id: 16,
+      name: '念青唐古拉山脉',
+      timeLabel: '16:30～17:10',
+      at: '2026-08-12T16:30:00+08:00',
+      lng: 90.809049,
+      lat: 30.527848,
+      intro: '藏地三大神山之一，终年积雪的山脉横亘藏北，青藏铁路沿其南麓延伸，巍峨雪峰与脚下的草原河谷形成极具冲击力的地貌反差。',
+    },
+    {
+      id: 17,
+      name: '纳木错（远观）',
+      timeLabel: '16:40～17:00',
+      at: '2026-08-12T16:40:00+08:00',
+      lng: 90.643697,
+      lat: 30.734004,
+      intro: '西藏三大圣湖之首，青藏铁路当雄段可远眺其湛蓝湖面，是整条线路上能遥望到的海拔最高、体量最大的高原圣湖。',
+    },
+    {
+      id: 18,
+      name: '羊八井地热温泉',
+      timeLabel: '17:20～17:50',
+      at: '2026-08-12T17:20:00+08:00',
+      lng: 90.499117,
+      lat: 30.061468,
+      intro: '中国最大的高温地热田，青藏铁路途经此处可见终年升腾的地热蒸汽云，是沿线唯一兼具地热奇观与高原温泉资源的独特地标。',
+    },
   ],
 };
 
@@ -921,14 +1253,27 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
   </script>
   <script>
 (function () {
+  const STORAGE_KEY = 'z8991_departure';
+
   function shiftDate(value, offsetMs) {
     const date = value instanceof Date ? value : new Date(value);
     return new Date(date.getTime() + offsetMs);
   }
 
+  function getDepartureIso(data, config, searchParams) {
+    const params = searchParams || new URLSearchParams(window.location.search);
+    let stored = null;
+    try {
+      stored = localStorage.getItem(STORAGE_KEY);
+    } catch (_) {
+      /* private mode */
+    }
+    return params.get('departure') || stored || config?.DEPARTURE || data.stations[0].at;
+  }
+
   /**
-   * 解析发车/到达时间。修改 DEPARTURE 会将 data.js 中全部站时刻与风景点时刻整体平移相同偏移。
-   * 在线版：config.js；离线版：config.js（若引入）或 URL ?departure= / ?arrival=
+   * 解析发车/到达。修改发车时间会将 data.js 中全部站时刻与风景点时刻整体平移相同偏移。
+   * 优先级：URL ?departure= > localStorage > config.js > data.js 默认
    */
   function resolveSchedule(data, config, searchParams) {
     const params = searchParams || new URLSearchParams(window.location.search);
@@ -936,16 +1281,33 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
     const baseDeparture = new Date(data.stations[0].at);
     const baseArrival = new Date(data.stations[data.stations.length - 1].at);
 
-    const departureValue = params.get('departure') || cfg.DEPARTURE || data.stations[0].at;
+    const departureValue = getDepartureIso(data, cfg, params);
     const departure = new Date(departureValue);
     const offsetMs = departure.getTime() - baseDeparture.getTime();
 
     const arrivalValue = params.get('arrival') || cfg.ARRIVAL || null;
-    const arrival = arrivalValue
-      ? new Date(arrivalValue)
-      : shiftDate(baseArrival, offsetMs);
+    const arrival = arrivalValue ? new Date(arrivalValue) : shiftDate(baseArrival, offsetMs);
 
     return { departure, arrival, offsetMs, baseDeparture, baseArrival };
+  }
+
+  function toDatetimeLocalValue(isoOrDate) {
+    const date = isoOrDate instanceof Date ? isoOrDate : new Date(isoOrDate);
+    const s = date.toLocaleString('sv-SE', { timeZone: 'Asia/Shanghai' });
+    return s.slice(0, 16).replace(' ', 'T');
+  }
+
+  function fromDatetimeLocalValue(value) {
+    if (!value) return null;
+    return `${value}:00+08:00`;
+  }
+
+  function setDepartureIso(iso) {
+    localStorage.setItem(STORAGE_KEY, iso);
+  }
+
+  function clearDeparture() {
+    localStorage.removeItem(STORAGE_KEY);
   }
 
   function formatDepartBadge(date) {
@@ -985,12 +1347,92 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
     });
   }
 
+  function formatSpotTimeLabel(spot, shiftedStart) {
+    const start = shiftedStart instanceof Date ? shiftedStart : new Date(shiftedStart);
+    const m = spot.timeLabel && spot.timeLabel.match(/(\d{1,2}:\d{2})\s*[～~]\s*(\d{1,2}:\d{2})/);
+    if (!m) return formatTime(start);
+    const [sh, sm] = m[1].split(':').map(Number);
+    const [eh, em] = m[2].split(':').map(Number);
+    let durMin = (eh * 60 + em) - (sh * 60 + sm);
+    if (durMin < 0) durMin += 24 * 60;
+    const end = new Date(start.getTime() + durMin * 60000);
+    return `${formatTime(start)}～${formatTime(end)}`;
+  }
+
+  function formatStationSchedule(station, shifted) {
+    if (station.type === 'depart') {
+      return `开点 ${formatTime(shifted(station.at))} · 始发`;
+    }
+    if (station.type === 'arrive') {
+      return `到点 ${formatTime(shifted(station.at))} · 终到`;
+    }
+    const arr = formatTime(shifted(station.arrive));
+    const dep = formatTime(shifted(station.depart));
+    return `到 ${arr} · 开 ${dep}`;
+  }
+
+  function updateDepartBadge(departure) {
+    const btn = document.getElementById('depart-btn');
+    if (btn) btn.textContent = formatDepartBadge(departure);
+  }
+
+  function bindDepartureEditor({ data, config, getSchedule, onApply }) {
+    const btn = document.getElementById('depart-btn');
+    const dialog = document.getElementById('schedule-dialog');
+    if (!btn || !dialog) return;
+
+    const input = document.getElementById('departure-input');
+    const saveBtn = document.getElementById('departure-save');
+    const cancelBtn = document.getElementById('departure-cancel');
+    const resetBtn = document.getElementById('departure-reset');
+    const backdrop = dialog.querySelector('.schedule-dialog__backdrop');
+
+    const openDialog = () => {
+      const current = getSchedule();
+      if (input) input.value = toDatetimeLocalValue(current.departure);
+      dialog.hidden = false;
+    };
+
+    const closeDialog = () => {
+      dialog.hidden = true;
+    };
+
+    btn.addEventListener('click', openDialog);
+    cancelBtn?.addEventListener('click', closeDialog);
+    backdrop?.addEventListener('click', closeDialog);
+
+    resetBtn?.addEventListener('click', () => {
+      clearDeparture();
+      onApply(resolveSchedule(data, config));
+      closeDialog();
+    });
+
+    saveBtn?.addEventListener('click', () => {
+      const iso = fromDatetimeLocalValue(input?.value);
+      if (!iso || Number.isNaN(new Date(iso).getTime())) return;
+      setDepartureIso(iso);
+      const nextConfig = { ...(config || {}), DEPARTURE: iso };
+      onApply(resolveSchedule(data, nextConfig));
+      closeDialog();
+    });
+  }
+
   window.Z8991Schedule = {
+    STORAGE_KEY,
     shiftDate,
+    getDepartureIso,
     resolveSchedule,
+    setDepartureIso,
+    clearDeparture,
+    toDatetimeLocalValue,
+    fromDatetimeLocalValue,
     formatDepartBadge,
     formatDepartLong,
     formatTime,
+    formatSpotTimeLabel,
+    formatStationSchedule,
+    updateDepartBadge,
+    bindDepartureEditor,
   };
 })();
 
@@ -1000,8 +1442,11 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
   const config = window.Z8991_CONFIG || {};
   const data = window.Z8991_DATA || {};
   const scheduleApi = window.Z8991Schedule;
-  const schedule = scheduleApi.resolveSchedule(data, config);
-  const { departure, arrival, offsetMs } = schedule;
+
+  let scheduleState = scheduleApi.resolveSchedule(data, config);
+  let departure = scheduleState.departure;
+  let arrival = scheduleState.arrival;
+  let offsetMs = scheduleState.offsetMs;
   const shifted = (value) => scheduleApi.shiftDate(value, offsetMs);
 
   let railwayPath = [];
@@ -1042,6 +1487,19 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
     locationMeta: document.getElementById('location-meta'),
     locationMode: document.getElementById('location-mode'),
   };
+
+  function applySchedule(next) {
+    scheduleState = next;
+    departure = next.departure;
+    arrival = next.arrival;
+    offsetMs = next.offsetMs;
+    scheduleApi.updateDepartBadge(departure);
+    tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function getSpotTimeLabel(spot) {
+    return scheduleApi.formatSpotTimeLabel(spot, shifted(spot.at));
+  }
 
   function isMobileLayout() {
     return window.matchMedia('(max-width: 640px)').matches;
@@ -1242,7 +1700,7 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
     }
 
     return {
-      spot: { name: '拉萨', timeLabel: `${scheduleApi.formatTime(arrival)} 到达`, address: '青藏铁路终点站' },
+      spot: { name: '拉萨', timeLabel: `${scheduleApi.formatTime(arrival)} 到达`, intro: '青藏铁路南端终点，天路旅程的标志性终点。' },
       reason: '行程即将结束',
     };
   }
@@ -1318,10 +1776,11 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
     els.progressBar.style.width = `${pct}%`;
 
     const { spot, reason } = getUpcomingSpot(now, progress);
+    const timeLabel = spot.at ? getSpotTimeLabel(spot) : spot.timeLabel;
     els.nextTitle.textContent = progress >= 1 ? '已到达' : '即将到达';
     els.nextName.textContent = spot.name;
-    const shortMeta = `${spot.timeLabel ? `计划 ${spot.timeLabel} · ` : ''}${reason}`;
-    els.nextMeta.textContent = isCompact || !spot.address ? shortMeta : `${shortMeta} · ${spot.address}`;
+    const shortMeta = `${timeLabel ? `计划 ${timeLabel} · ` : ''}${reason}`;
+    els.nextMeta.textContent = isCompact || !spot.intro ? shortMeta : `${shortMeta} · ${spot.intro}`;
 
     const loc = getCurrentLocationInfo(progress, mode);
     if (els.locationSegment) els.locationSegment.textContent = loc.segment;
@@ -1380,15 +1839,7 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
   }
 
   function formatStationSchedule(station) {
-    if (station.type === 'depart') {
-      return `开点 ${scheduleApi.formatTime(shifted(station.at))} · 始发`;
-    }
-    if (station.type === 'arrive') {
-      return `到点 ${scheduleApi.formatTime(shifted(station.at))} · 终到`;
-    }
-    const arr = scheduleApi.formatTime(shifted(station.arrive));
-    const dep = scheduleApi.formatTime(shifted(station.depart));
-    return `到 ${arr} · 开 ${dep}`;
+    return scheduleApi.formatStationSchedule(station, shifted);
   }
 
   function ensureMapPopup() {
@@ -1678,8 +2129,8 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
           svgX: x,
           svgY: y,
           title: spot.name,
-          subtitle: spot.timeLabel,
-          detail: spot.address,
+          subtitle: getSpotTimeLabel(spot),
+          detail: spot.intro,
         });
       };
       bindMarkerClick(g, showSpot);
@@ -1711,6 +2162,7 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
           svgY: y,
           title: station.name,
           subtitle: formatStationSchedule(station),
+          detail: station.intro,
         });
       });
       viewport.appendChild(g);
@@ -1992,6 +2444,13 @@ window.Z8991_RAILWAY = [[101.677107,36.657038],[101.669491,36.656071],[101.66422
     renderMap();
     bindLegendToggle();
     bindLocateButton();
+    scheduleApi.updateDepartBadge(departure);
+    scheduleApi.bindDepartureEditor({
+      data,
+      config,
+      getSchedule: () => scheduleState,
+      onApply: applySchedule,
+    });
     updateOverlayMetrics();
 
     window.addEventListener('resize', () => {

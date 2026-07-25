@@ -8,7 +8,26 @@ const offlineCss = fs.readFileSync(path.join(root, 'css/offline.css'), 'utf8')
 const css = `${style}\n${offlineCss}`;
 const dataJs = fs.readFileSync(path.join(root, 'js/data.js'), 'utf8');
 const railwayJs = fs.readFileSync(path.join(root, 'js/railway-line.js'), 'utf8');
+const scheduleJs = fs.readFileSync(path.join(root, 'js/schedule.js'), 'utf8');
 const appJs = fs.readFileSync(path.join(root, 'js/offline-app.js'), 'utf8');
+
+const scheduleDialogHtml = `
+  <div class="schedule-dialog" id="schedule-dialog" hidden>
+    <div class="schedule-dialog__backdrop"></div>
+    <div class="schedule-dialog__card" role="dialog" aria-labelledby="schedule-dialog-title">
+      <h2 id="schedule-dialog-title">设置发车时间</h2>
+      <p class="schedule-dialog__hint">修改西宁开点后，时刻表估算与风景点计划时间将整体顺延或提前。设置保存在本机浏览器。</p>
+      <label class="schedule-dialog__field">
+        <span>西宁开点（北京时间）</span>
+        <input type="datetime-local" id="departure-input" />
+      </label>
+      <div class="schedule-dialog__actions">
+        <button type="button" id="departure-reset">恢复默认</button>
+        <button type="button" id="departure-cancel">取消</button>
+        <button type="button" id="departure-save" class="primary">保存</button>
+      </div>
+    </div>
+  </div>`;
 
 const html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -34,6 +53,7 @@ ${css}
       <div class="status-row status-row--primary">
         <span class="train-badge">Z8991</span>
         <span class="route-text">西宁 → 拉萨</span>
+        <button type="button" class="depart-text" id="depart-btn" title="点击修改发车时间">8/11 22:00</button>
         <span class="offline-badge">离线</span>
         <time class="clock" id="clock-chip">--</time>
       </div>
@@ -76,13 +96,17 @@ ${css}
     <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
   </footer>
 
-  <p class="offline-hint">单文件离线版 · 无需联网 · 发给手机直接打开 · 加 ?progress=35 可模拟进度</p>
+  <p class="offline-hint">单文件离线版 · 点击顶部发车时间可修改 · 加 ?progress=35 可模拟进度</p>
+${scheduleDialogHtml}
 
   <script>
 ${dataJs}
   </script>
   <script>
 ${railwayJs}
+  </script>
+  <script>
+${scheduleJs}
   </script>
   <script>
 ${appJs}

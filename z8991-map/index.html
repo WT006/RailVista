@@ -18,7 +18,7 @@
       <div class="status-row status-row--primary">
         <span class="train-badge">Z8991</span>
         <span class="route-text">西宁 → 拉萨</span>
-        <span class="depart-text">8/11 22:00</span>
+        <button type="button" class="depart-text" id="depart-btn" title="点击修改发车时间">8/11 22:00</button>
         <time class="clock" id="clock-chip">--</time>
       </div>
       <div class="status-row status-row--secondary">
@@ -71,9 +71,27 @@
     </div>
   </div>
 
+  <div class="schedule-dialog" id="schedule-dialog" hidden>
+    <div class="schedule-dialog__backdrop"></div>
+    <div class="schedule-dialog__card" role="dialog" aria-labelledby="schedule-dialog-title">
+      <h2 id="schedule-dialog-title">设置发车时间</h2>
+      <p class="schedule-dialog__hint">修改西宁开点后，时刻表估算与风景点计划时间将整体顺延或提前。设置保存在本机浏览器。</p>
+      <label class="schedule-dialog__field">
+        <span>西宁开点（北京时间）</span>
+        <input type="datetime-local" id="departure-input" />
+      </label>
+      <div class="schedule-dialog__actions">
+        <button type="button" id="departure-reset">恢复默认</button>
+        <button type="button" id="departure-cancel">取消</button>
+        <button type="button" id="departure-save" class="primary">保存</button>
+      </div>
+    </div>
+  </div>
+
   <script src="config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/railway-line.js"></script>
+  <script src="js/schedule.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

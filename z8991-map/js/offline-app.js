@@ -1,7 +1,13 @@
 (function () {
+  const config = window.Z8991_CONFIG || {};
   const data = window.Z8991_DATA || {};
-  const departure = new Date(data.stations[0].at);
-  const arrival = new Date(data.stations[data.stations.length - 1].at);
+  const scheduleApi = window.Z8991Schedule;
+
+  let scheduleState = scheduleApi.resolveSchedule(data, config);
+  let departure = scheduleState.departure;
+  let arrival = scheduleState.arrival;
+  let offsetMs = scheduleState.offsetMs;
+  const shifted = (value) => scheduleApi.shiftDate(value, offsetMs);
 
   let railwayPath = [];
   let railwayLength = 0;
@@ -41,6 +47,19 @@
     locationMeta: document.getElementById('location-meta'),
     locationMode: document.getElementById('location-mode'),
   };
+
+  function applySchedule(next) {
+    scheduleState = next;
+    departure = next.departure;
+    arrival = next.arrival;
+    offsetMs = next.offsetMs;
+    scheduleApi.updateDepartBadge(departure);
+    tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
+  function getSpotTimeLabel(spot) {
+    return scheduleApi.formatSpotTimeLabel(spot, shifted(spot.at));
+  }
 
   function isMobileLayout() {
     return window.matchMedia('(max-width: 640px)').matches;
@@ -141,9 +160,9 @@
   function scheduleProgress(now) {
     const timeline = [];
     data.stations.forEach((s) => {
-      if (s.at) timeline.push({ at: new Date(s.at), name: s.name });
-      if (s.arrive) timeline.push({ at: new Date(s.arrive), name: `${s.name}（到）` });
-      if (s.depart) timeline.push({ at: new Date(s.depart), name: `${s.name}（开）` });
+      if (s.at) timeline.push({ at: shifted(s.at), name: s.name });
+      if (s.arrive) timeline.push({ at: shifted(s.arrive), name: `${s.name}（到）` });
+      if (s.depart) timeline.push({ at: shifted(s.depart), name: `${s.name}（开）` });
     });
     timeline.sort((a, b) => a.at - b.at);
     if (now <= departure) return 0;
@@ -222,10 +241,10 @@
   }
 
   function getUpcomingSpot(now, progress) {
-    const spots = [...data.scenicSpots].sort((a, b) => new Date(a.at) - new Date(b.at));
-    const upcomingByTime = spots.find((s) => new Date(s.at) >= now);
+    const spots = [...data.scenicSpots].sort((a, b) => shifted(a.at) - shifted(b.at));
+    const upcomingByTime = spots.find((s) => shifted(s.at) >= now);
     if (upcomingByTime) {
-      return { spot: upcomingByTime, reason: formatEta(new Date(upcomingByTime.at)) };
+      return { spot: upcomingByTime, reason: formatEta(shifted(upcomingByTime.at)) };
     }
 
     const currentPoint = pointAtProgress(progress);
@@ -241,7 +260,7 @@
     }
 
     return {
-      spot: { name: '拉萨', timeLabel: '18:28 到达', address: '青藏铁路终点站' },
+      spot: { name: '拉萨', timeLabel: `${scheduleApi.formatTime(arrival)} 到达`, intro: '青藏铁路南端终点，天路旅程的标志性终点。' },
       reason: '行程即将结束',
     };
   }
@@ -252,7 +271,7 @@
     const pct = Math.round(progress * 100);
 
     if (progress <= 0) {
-      let meta = `8月11日 22:00 发车前 · 全程约 ${Math.round(railwayLength)} 公里`;
+      let meta = `${scheduleApi.formatDepartLong(departure)} 发车前 · 全程约 ${Math.round(railwayLength)} 公里`;
       if (lastGps && gpsAvailable) {
         const proj = projectToRailway(lastGps.lng, lastGps.lat);
         if (proj.distKm > 8) {
@@ -317,10 +336,11 @@
     els.progressBar.style.width = `${pct}%`;
 
     const { spot, reason } = getUpcomingSpot(now, progress);
+    const timeLabel = spot.at ? getSpotTimeLabel(spot) : spot.timeLabel;
     els.nextTitle.textContent = progress >= 1 ? '已到达' : '即将到达';
     els.nextName.textContent = spot.name;
-    const shortMeta = `${spot.timeLabel ? `计划 ${spot.timeLabel} · ` : ''}${reason}`;
-    els.nextMeta.textContent = isCompact || !spot.address ? shortMeta : `${shortMeta} · ${spot.address}`;
+    const shortMeta = `${timeLabel ? `计划 ${timeLabel} · ` : ''}${reason}`;
+    els.nextMeta.textContent = isCompact || !spot.intro ? shortMeta : `${shortMeta} · ${spot.intro}`;
 
     const loc = getCurrentLocationInfo(progress, mode);
     if (els.locationSegment) els.locationSegment.textContent = loc.segment;
@@ -379,15 +399,7 @@
   }
 
   function formatStationSchedule(station) {
-    if (station.type === 'depart') {
-      return `开点 ${new Date(station.at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })} · 始发`;
-    }
-    if (station.type === 'arrive') {
-      return `到点 ${new Date(station.at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })} · 终到`;
-    }
-    const arr = new Date(station.arrive).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
-    const dep = new Date(station.depart).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
-    return `到 ${arr} · 开 ${dep}`;
+    return scheduleApi.formatStationSchedule(station, shifted);
   }
 
   function ensureMapPopup() {
@@ -677,8 +689,8 @@
           svgX: x,
           svgY: y,
           title: spot.name,
-          subtitle: spot.timeLabel,
-          detail: spot.address,
+          subtitle: getSpotTimeLabel(spot),
+          detail: spot.intro,
         });
       };
       bindMarkerClick(g, showSpot);
@@ -710,6 +722,7 @@
           svgY: y,
           title: station.name,
           subtitle: formatStationSchedule(station),
+          detail: station.intro,
         });
       });
       viewport.appendChild(g);
@@ -991,6 +1004,13 @@
     renderMap();
     bindLegendToggle();
     bindLocateButton();
+    scheduleApi.updateDepartBadge(departure);
+    scheduleApi.bindDepartureEditor({
+      data,
+      config,
+      getSchedule: () => scheduleState,
+      onApply: applySchedule,
+    });
     updateOverlayMetrics();
 
     window.addEventListener('resize', () => {

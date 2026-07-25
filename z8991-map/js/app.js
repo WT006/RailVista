@@ -1,8 +1,13 @@
 (function () {
   const config = window.Z8991_CONFIG || {};
   const data = window.Z8991_DATA || {};
-  const departure = new Date(config.DEPARTURE || data.stations[0].at);
-  const arrival = new Date(config.ARRIVAL || data.stations[data.stations.length - 1].at);
+  const scheduleApi = window.Z8991Schedule;
+
+  let scheduleState = scheduleApi.resolveSchedule(data, config);
+  let departure = scheduleState.departure;
+  let arrival = scheduleState.arrival;
+  let offsetMs = scheduleState.offsetMs;
+  const shifted = (value) => scheduleApi.shiftDate(value, offsetMs);
 
   let map;
   let railwayPath = [];
@@ -37,8 +42,21 @@
     locationMode: document.getElementById('location-mode'),
   };
 
+  function applySchedule(next) {
+    scheduleState = next;
+    departure = next.departure;
+    arrival = next.arrival;
+    offsetMs = next.offsetMs;
+    scheduleApi.updateDepartBadge(departure);
+    tick(lastGps && gpsAvailable ? lastGps : null);
+  }
+
   function isMobileLayout() {
     return window.matchMedia('(max-width: 640px)').matches;
+  }
+
+  function getSpotTimeLabel(spot) {
+    return scheduleApi.formatSpotTimeLabel(spot, shifted(spot.at));
   }
 
   function shortModeLabel(mode) {
@@ -127,7 +145,7 @@
     const pct = Math.round(progress * 100);
 
     if (progress <= 0) {
-      let meta = `8月11日 22:00 发车前 · 全程约 ${Math.round(railwayLength)} 公里`;
+      let meta = `${scheduleApi.formatDepartLong(departure)} 发车前 · 全程约 ${Math.round(railwayLength)} 公里`;
       if (lastGps && gpsAvailable) {
         const proj = projectToRailway(lastGps.lng, lastGps.lat);
         if (proj.distKm > 8) {
@@ -325,9 +343,9 @@
   function scheduleProgress(now) {
     const timeline = [];
     data.stations.forEach((s) => {
-      if (s.at) timeline.push({ at: new Date(s.at), name: s.name });
-      if (s.arrive) timeline.push({ at: new Date(s.arrive), name: s.name + '（到）' });
-      if (s.depart) timeline.push({ at: new Date(s.depart), name: s.name + '（开）' });
+      if (s.at) timeline.push({ at: shifted(s.at), name: s.name });
+      if (s.arrive) timeline.push({ at: shifted(s.arrive), name: s.name + '（到）' });
+      if (s.depart) timeline.push({ at: shifted(s.depart), name: s.name + '（开）' });
     });
     timeline.sort((a, b) => a.at - b.at);
 
@@ -406,12 +424,12 @@
   }
 
   function getUpcomingSpot(now, progress) {
-    const spots = [...data.scenicSpots].sort((a, b) => new Date(a.at) - new Date(b.at));
-    const upcomingByTime = spots.find((s) => new Date(s.at) >= now);
+    const spots = [...data.scenicSpots].sort((a, b) => shifted(a.at) - shifted(b.at));
+    const upcomingByTime = spots.find((s) => shifted(s.at) >= now);
     if (upcomingByTime) {
       return {
         spot: upcomingByTime,
-        reason: formatEta(new Date(upcomingByTime.at)),
+        reason: formatEta(shifted(upcomingByTime.at)),
       };
     }
 
@@ -431,7 +449,7 @@
     }
 
     return {
-      spot: { name: '拉萨', timeLabel: '18:28 到达', address: '青藏铁路终点站' },
+      spot: { name: '拉萨', timeLabel: `${scheduleApi.formatTime(arrival)} 到达`, intro: '青藏铁路南端终点，天路旅程的标志性终点。' },
       reason: '行程即将结束',
     };
   }
@@ -450,12 +468,13 @@
     els.progressBar.style.width = `${pct}%`;
 
     const { spot, reason } = getUpcomingSpot(now, progress);
+    const timeLabel = spot.at ? getSpotTimeLabel(spot) : spot.timeLabel;
     els.nextTitle.textContent = progress >= 1 ? '已到达' : '即将到达';
     els.nextName.textContent = spot.name;
-    const shortMeta = `${spot.timeLabel ? `计划 ${spot.timeLabel} · ` : ''}${reason}`;
-    els.nextMeta.textContent = isCompact || !spot.address
+    const shortMeta = `${timeLabel ? `计划 ${timeLabel} · ` : ''}${reason}`;
+    els.nextMeta.textContent = isCompact || !spot.intro
       ? shortMeta
-      : `${shortMeta} · ${spot.address}`;
+      : `${shortMeta} · ${spot.intro}`;
     updateLocationUi(progress, mode);
   }
 
@@ -508,10 +527,10 @@
       });
       marker.on('click', () => {
         const info = new AMap.InfoWindow({
-          content: `<div style="max-width:min(280px,78vw);padding:6px 4px;font-size:14px;line-height:1.5;">
-            <strong>${spot.name}</strong><br/>
-            ${spot.timeLabel}<br/>
-            <span style="color:#64748b;">${spot.address}</span>
+          content: `<div style="max-width:min(280px,78vw);padding:6px 4px;font-size:14px;line-height:1.5;color:#334155;">
+            <strong style="color:#111827;font-size:15px;">${spot.name}</strong><br/>
+            <span style="color:#0369a1;font-weight:600;">${getSpotTimeLabel(spot)}</span><br/>
+            <span style="color:#64748b;">${spot.intro}</span>
           </div>`,
           offset: new AMap.Pixel(0, -28),
         });
@@ -521,14 +540,7 @@
     });
 
     data.stations.forEach((s) => {
-      let schedule = '';
-      if (s.type === 'depart') schedule = `开点 ${new Date(s.at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })} · 始发`;
-      else if (s.type === 'arrive') schedule = `到点 ${new Date(s.at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })} · 终到`;
-      else {
-        const arr = new Date(s.arrive).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
-        const dep = new Date(s.depart).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
-        schedule = `到 ${arr} · 开 ${dep}`;
-      }
+      const scheduleText = scheduleApi.formatStationSchedule(s, shifted);
 
       const marker = new AMap.Marker({
         position: [s.lng, s.lat],
@@ -538,10 +550,13 @@
         zIndex: 150,
       });
       marker.on('click', () => {
+        const introLine = s.intro
+          ? `<br/><span style="color:#64748b;">${s.intro}</span>`
+          : '';
         const info = new AMap.InfoWindow({
-          content: `<div style="max-width:min(260px,78vw);padding:6px 4px;font-size:14px;line-height:1.5;">
-            <strong>${s.name}</strong><br/>
-            <span style="color:#64748b;">${schedule}</span>
+          content: `<div style="max-width:min(260px,78vw);padding:6px 4px;font-size:14px;line-height:1.5;color:#334155;">
+            <strong style="color:#111827;font-size:15px;">${s.name}</strong><br/>
+            <span style="color:#0369a1;font-weight:600;">${scheduleText}</span>${introLine}
           </div>`,
           offset: new AMap.Pixel(0, -20),
         });
@@ -624,6 +639,13 @@
     buildStationDistances();
     bindLegendToggle();
     bindLocateButton();
+    scheduleApi.updateDepartBadge(departure);
+    scheduleApi.bindDepartureEditor({
+      data,
+      config,
+      getSchedule: () => scheduleState,
+      onApply: applySchedule,
+    });
 
     window.addEventListener('resize', () => {
       const nextCompact = isMobileLayout();

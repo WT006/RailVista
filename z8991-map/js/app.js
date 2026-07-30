@@ -457,6 +457,15 @@
   function getUpcomingSpot(now, progress) {
     const effectiveNow = getEffectiveNow(now);
     const spots = [...data.scenicSpots].sort((a, b) => shifted(a.at) - shifted(b.at));
+
+    if (progress <= 0 && now < departure) {
+      const firstSpot = spots[0];
+      return {
+        spot: firstSpot,
+        reason: `${scheduleApi.formatDepartLong(departure)} 发车 · 首个计划风景点`,
+      };
+    }
+
     const upcomingByTime = spots.find((s) => shifted(s.at) >= effectiveNow);
     if (upcomingByTime) {
       return {
@@ -501,7 +510,11 @@
 
     const { spot, reason } = getUpcomingSpot(now, progress);
     const timeLabel = spot.at ? getSpotTimeLabel(spot) : spot.timeLabel;
-    els.nextTitle.textContent = progress >= 1 ? '已到达' : '即将到达';
+    if (progress <= 0 && now < departure) {
+      els.nextTitle.textContent = '发车后首站';
+    } else {
+      els.nextTitle.textContent = progress >= 1 ? '已到达' : '即将到达';
+    }
     els.nextName.textContent = spot.name;
     const shortMeta = `${timeLabel ? `计划 ${timeLabel} · ` : ''}${reason}`;
     els.nextMeta.textContent = isCompact || !spot.intro

@@ -286,6 +286,15 @@
   function getUpcomingSpot(now, progress) {
     const effectiveNow = getEffectiveNow(now);
     const spots = [...data.scenicSpots].sort((a, b) => shifted(a.at) - shifted(b.at));
+
+    if (progress <= 0 && now < departure) {
+      const firstSpot = spots[0];
+      return {
+        spot: firstSpot,
+        reason: `${scheduleApi.formatDepartLong(departure)} 发车 · 首个计划风景点`,
+      };
+    }
+
     const upcomingByTime = spots.find((s) => shifted(s.at) >= effectiveNow);
     if (upcomingByTime) {
       return { spot: upcomingByTime, reason: formatEta(shifted(upcomingByTime.at), effectiveNow) };
@@ -381,7 +390,11 @@
 
     const { spot, reason } = getUpcomingSpot(now, progress);
     const timeLabel = spot.at ? getSpotTimeLabel(spot) : spot.timeLabel;
-    els.nextTitle.textContent = progress >= 1 ? '已到达' : '即将到达';
+    if (progress <= 0 && now < departure) {
+      els.nextTitle.textContent = '发车后首站';
+    } else {
+      els.nextTitle.textContent = progress >= 1 ? '已到达' : '即将到达';
+    }
     els.nextName.textContent = spot.name;
     const shortMeta = `${timeLabel ? `计划 ${timeLabel} · ` : ''}${reason}`;
     els.nextMeta.textContent = isCompact || !spot.intro ? shortMeta : `${shortMeta} · ${spot.intro}`;
@@ -554,7 +567,7 @@
     updateOverlayMetrics();
     const insets = getOverlayInsets();
     const visibleH = Math.max(120, insets.height - insets.top - insets.bottom);
-    const visibleW = insets.width;
+    const visibleW = Math.max(200, insets.width);
     const pad = isCompact ? 1.12 : 1.06;
     let w = baseViewBox.w * pad;
     let h = baseViewBox.h * pad;
@@ -566,10 +579,24 @@
       w = h * visibleAspect;
     }
 
-    const point = focusPoint || { lng: 97, lat: 35 };
-    const { x, y } = projectFn.project(point.lng, point.lat);
+    let cx;
+    let cy;
+    if (focusPoint && projectFn) {
+      const p = projectFn.project(focusPoint.lng, focusPoint.lat);
+      cx = p.x;
+      cy = p.y;
+    } else {
+      cx = baseViewBox.x + baseViewBox.w / 2;
+      cy = baseViewBox.y + baseViewBox.h / 2;
+    }
     const yShift = ((insets.bottom - insets.top) / insets.height) * h * 0.18;
-    setViewBox({ x: x - w / 2, y: y - h / 2 + yShift, w, h });
+    setViewBox({ x: cx - w / 2, y: cy - h / 2 + yShift, w, h });
+  }
+
+  function scheduleFitRouteView(focusPoint) {
+    fitRouteView(focusPoint);
+    requestAnimationFrame(() => fitRouteView(focusPoint));
+    setTimeout(() => fitRouteView(focusPoint), 120);
   }
 
   function svgEl(name, attrs, text) {
@@ -1141,14 +1168,14 @@
         return;
       }
       updateOverlayMetrics();
-      fitRouteView(lastTrainPoint);
+      scheduleFitRouteView(lastTrainPoint);
       updateMapPopupPosition();
     });
 
     window.addEventListener('orientationchange', () => {
       setTimeout(() => {
         updateOverlayMetrics();
-        fitRouteView(lastTrainPoint);
+        scheduleFitRouteView(lastTrainPoint);
         updateMapPopupPosition();
       }, 180);
     });
@@ -1170,7 +1197,7 @@
 
     startGeolocation();
     tick(null);
-    fitRouteView(lastTrainPoint);
+    scheduleFitRouteView(null);
   }
 
   boot();

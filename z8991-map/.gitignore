@@ -1,1 +1,17 @@
+node_modules
+dist
+*.local
+.env
+.env.*
+!.env.example
+apps/web/.env
+apps/web/.env.production
+apps/api/.env
 config.js
+data/station_name.cache.json
+data/presets/corridors/_hsr-rails.geojson
+.DS_Store
+.idea
+*.log
+coverage
+.turbo

@@ -46,11 +46,49 @@ body {
   right: calc(10px + var(--safe-right));
   z-index: 100;
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.map-back-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 36px;
+  padding: 0 12px 0 8px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.map-back-btn:hover {
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #f8fafc;
+}
+
+.map-back-btn__icon {
+  font-size: 20px;
+  line-height: 1;
+  margin-top: -1px;
 }
 
 .top-bar__cluster {
   position: relative;
   pointer-events: auto;
+  width: 100%;
 }
 
 .status-card {
@@ -798,6 +836,11 @@ body {
     left: calc(12px + var(--safe-left));
     right: auto;
     max-width: 520px;
+  }
+
+  .map-back-btn {
+    min-height: 38px;
+    font-size: 14px;
   }
 
   .status-card {

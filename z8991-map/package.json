@@ -1,0 +1,17 @@
+{
+  "name": "railvista",
+  "private": true,
+  "version": "0.1.0",
+  "description": "RailVista — 铁路旅客车上沿途风景与行程定位伴侣",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "pnpm --filter @railvista/shared build && pnpm -r --parallel --filter @railvista/web --filter @railvista/api run dev",
+    "dev:web": "pnpm --filter @railvista/web dev",
+    "dev:api": "pnpm --filter @railvista/api dev",
+    "build": "pnpm --filter @railvista/shared build && pnpm -r --filter @railvista/api --filter @railvista/web run build",
+    "test": "pnpm --filter @railvista/shared test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -23,7 +23,6 @@ ssh $Server "mkdir -p '$RemotePath'"
 # config.js 在 .gitignore 中，本地有的话一并上传
 $includes = @(
     "index.html",
-    "offline.html",
     "css",
     "js",
     "config.js",

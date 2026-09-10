@@ -1,96 +1,45 @@
-# Z8991 进藏沿途地图
+# RailVista
 
-在地图上展示 Z8991 西宁→拉萨沿途 18 个风景点、青藏铁路 OSM 真实轨道线，并支持 **GPS + 时刻表混合定位** 与底部「即将到达」提示。
+铁路旅客的车上沿途风景与行程定位伴侣（MVP）。
 
-数据来源：[飞书多维表格](https://my.feishu.cn/base/YZaLbPNuJaF8O0s25W4c6hgCnDh)
+## 本地开发
 
-## 1. 配置高德 Key
-
-1. 打开 [高德开放平台](https://lbs.amap.com/) → 应用管理 → 创建应用 → 添加 **Web 端 (JS API)** Key
-2. 复制配置：
+前置：Node.js ≥ 20（推荐 22）、pnpm 9。
 
 ```bash
-copy config.example.js config.js
+pnpm install
+pnpm --filter @railvista/shared build
+pnpm dev
 ```
 
-3. 编辑 `config.js`，填入：
+- 前端：http://localhost:5173  
+- API：http://localhost:3000/api/health  
 
-```js
-AMAP_KEY: '你的Key',
-AMAP_SECURITY_CODE: '你的安全密钥', // 2021年后新建 Key 通常需要
+复制 `apps/web/.env.example` 为 `apps/web/.env`，填入高德 Web Key / 安全密钥。
+
+演示入口：首页「演示：Z8991 青藏线」（不依赖 12306）。
+
+任意车次进入地图前，会请求 `/api/rail-geometry` 从 OpenStreetMap 匹配真实铁路线；失败则回退站点示意折线。API 需能访问 Overpass，并建议配置 `apps/api/.env` 中的 `AMAP_KEY` 用于补全车站坐标。
+
+## 目录
+
+```
+apps/web      Vue 3 SPA
+apps/api      Hono BFF（12306 查询代理）
+packages/shared  类型与日程/进度引擎
+data/         车站坐标与预置风景
+deploy/       Nginx / PM2 样例
+docs/         PRD / 技术方案
 ```
 
-4. 在 Key 的「域名白名单」中加入你实际访问的域名，例如：
-   - 本地测试：`localhost`
-   - GitHub Pages：`你的用户名.github.io`
-   - 云服务器：`你的域名`
+原静态单页保留在仓库根目录（`index.html`、`js/` 等），可逐步迁入 `legacy/`。
 
-## 2. 本地预览
+## 构建与部署
 
 ```bash
-cd z8991-map
-npx serve . -p 8080
+pnpm -r build
+# web → apps/web/dist
+# api → apps/api/dist
 ```
 
-浏览器打开 `http://localhost:8080`。
-
-> 手机 GPS 需要 **HTTPS**。本地仅适合电脑预览；车上请用下面部署方式。
-
-## 2b. 离线版（无需联网）
-
-若不想配置高德 Key、或想在无网络环境直接打开，使用 **`offline.html`**：
-
-- 双击打开，或通过本地服务器访问：`http://localhost:8080/offline.html`
-- **单文件版**：`offline.html` 已内联全部 CSS/JS（约 94KB），可单独发给手机打开，无需其他文件
-- 重新打包：修改 `css/` 或 `js/` 后运行 `node scripts/bundle-offline-html.js`
-- **不需要** `config.js`，不加载任何在线地图 API
-- 用 SVG 绘制铁路线、站点、风景点和当前位置（ schematic 示意图，无真实地图底图）
-- 支持双指缩放 / 拖拽平移；右下角「定位」按钮可跳到当前位置
-- 本地预览进度：在 URL 加 `?progress=35` 模拟 35% 行程（例如 `offline.html?progress=35`）
-
-需要复制的文件：`offline.html`、`css/`、`js/data.js`、`js/railway-line.js`、`js/offline-app.js`（整个 `z8991-map` 文件夹最省事）。
-
-## 3. 部署（二选一）
-
-### 方式 A：GitHub Pages（推荐，最简单）
-
-1. 将 `z8991-map` 推送到 GitHub 仓库
-2. 仓库 Settings → Pages → Source 选 `main` 分支 `/z8991-map` 或根目录
-3. 访问 `https://<用户名>.github.io/<仓库名>/`
-4. 高德白名单添加 `*.github.io` 或完整域名
-
-### 方式 B：云服务器 Nginx
-
-把目录上传到服务器，例如 `/var/www/z8991-map`，Nginx 配置：
-
-```nginx
-server {
-    listen 443 ssl;
-    server_name your.domain.com;
-    root /var/www/z8991-map;
-    index index.html;
-    location / {
-        try_files $uri $uri/ =404;
-    }
-}
-```
-
-配置 HTTPS 证书（Let's Encrypt 等），高德白名单添加 `your.domain.com`。
-
-## 4. 车上使用
-
-1. 手机浏览器打开 HTTPS 页面
-2. 允许「位置信息」权限
-3. 页面会：
-   - 用 GPS 定位并投影到铁路线附近
-   - GPS 弱/丢失时，按 **8月11日 22:00 发车** 时刻表估算位置
-   - 底部显示「即将到达 xxx」
-
-## 说明
-
-- **在线版**（`index.html`）依赖高德地图，必须联网并配置 Key
-- **离线版**（`offline.html`）纯前端静态页，无地图底图，可断网使用
-- 铁路线来自 OpenStreetMap [青藏铁路 relation:152884](https://www.openstreetmap.org/relation/152884)（约 2342 个轨道点，非景点直连）
-- 火车内 GPS 可能不准或丢信号，时刻表估算是重要兜底
-- 景点坐标来自飞书表格，更新表格后需重新导出 `js/data.js`
-- 若 OSM 铁路数据更新，可运行 `node scripts/build-railway.js` 重新生成 `js/railway-line.js`
+参见 `deploy/nginx.railvista.conf.example` 与 `deploy/ecosystem.config.cjs`。

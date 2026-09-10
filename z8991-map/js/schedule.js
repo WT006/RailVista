@@ -330,14 +330,6 @@
     } };
   }
 
-  function isShowTrainMarker() {
-    return isLayerVisible('train');
-  }
-
-  function setShowTrainMarker(show) {
-    setLayerVisible('train', show);
-  }
-
   function readStoredLayers() {
     try {
       const raw = localStorage.getItem(LAYER_VISIBILITY_KEY);
@@ -366,10 +358,6 @@
       /* private mode */
     }
     return next;
-  }
-
-  function isLayerVisible(layer) {
-    return readStoredLayers()[layer] !== false;
   }
 
   function formatDepartBadge(date) {
@@ -482,43 +470,18 @@
   }
 
   window.Z8991Schedule = {
-    STORAGE_KEY,
-    CALIBRATION_STORAGE_KEY,
-    CALIBRATE_WINDOW_MS,
     shiftDate,
-    getDepartureIso,
     resolveSchedule,
-    setDepartureIso,
-    clearDeparture,
     readCalibration,
-    writeCalibration,
-    clearCalibration,
-    getCalibratableStations,
-    getStationAnchorTime,
-    computeCalibrationOffset,
     effectiveScheduleDate,
-    formatOffsetLabel,
-    isNearScheduledArrival,
-    buildCalibrationPreview,
-    calibrateAtStation,
-    showToast,
     bindStationCalibration,
-    isShowTrainMarker,
-    setShowTrainMarker,
     getLayerVisibility,
     setLayerVisible,
-    isLayerVisible,
-    toDatetimeLocalValue,
-    fromDatetimeLocalValue,
-    formatDepartBadge,
     formatDepartLong,
     formatTime,
     formatSpotTimeLabel,
     formatStationSchedule,
     updateDepartBadge,
     bindDepartureEditor,
-    TRAIN_MARKER_KEY,
-    LAYER_VISIBILITY_KEY,
-    DEFAULT_LAYER_VISIBILITY,
   };
 })();

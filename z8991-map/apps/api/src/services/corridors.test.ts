@@ -1,0 +1,399 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { matchCorridor, sliceCorridorForStops, loadCorridors } from './corridors.js';
+
+describe('matchCorridor', () => {
+  it('loads phase-1 corridors', () => {
+    const list = loadCorridors();
+    const ids = list.map((c) => c.id).sort();
+    for (const id of ['jinghu', 'jingguang', 'hukun', 'xulan', 'jingha', 'haida', 'qingzang']) {
+      assert.ok(ids.includes(id), `missing corridor ${id}`);
+    }
+  });
+
+  it('loads phase-2 coastal/riverside corridors', () => {
+    const list = loadCorridors();
+    const ids = list.map((c) => c.id);
+    for (const id of [
+      'qingrong',
+      'xulian',
+      'yantong',
+      'huhang',
+      'hangtai',
+      'hangwen',
+      'fuxia',
+      'guangshengang',
+      'huningyanjiang',
+      'zhengyu',
+      'chengyu',
+    ]) {
+      assert.ok(ids.includes(id), `missing phase-2 corridor ${id}`);
+    }
+  });
+
+  it('loads phase-3 corridors (incl. ninghang)', () => {
+    const list = loadCorridors();
+    const ids = list.map((c) => c.id);
+    for (const id of [
+      'ninghang',
+      'hefu',
+      'hangchang',
+      'daxi',
+      'xicheng',
+      'yinxi',
+      'yinlan',
+      'guiguang',
+      'guinan',
+      'nankun',
+      'zhengtai',
+      'rilan',
+    ]) {
+      assert.ok(ids.includes(id), `missing phase-3 corridor ${id}`);
+    }
+  });
+
+  it('matches Nanjing-Hangzhou on ninghang', () => {
+    const hit = matchCorridor([
+      { name: '南京南', lng: 118.798, lat: 31.969 },
+      { name: '湖州', lng: 120.1, lat: 30.85 },
+      { name: '杭州东', lng: 120.213, lat: 30.291 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'ninghang');
+    const sliced = sliceCorridorForStops(hit!.corridor, [
+      { name: '南京南', lng: 118.798, lat: 31.969 },
+      { name: '杭州东', lng: 120.213, lat: 30.291 },
+    ]);
+    assert.ok(sliced);
+    assert.ok(sliced!.length > 100);
+  });
+
+  it('matches Hefei-Fuzhou on hefu', () => {
+    const hit = matchCorridor([
+      { name: '合肥南', lng: 117.285, lat: 31.80 },
+      { name: '黄山北', lng: 118.3, lat: 29.8 },
+      { name: '福州南', lng: 119.30, lat: 26.12 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'hefu');
+  });
+
+  it('matches Xian-Chengdu on xicheng', () => {
+    const hit = matchCorridor([
+      { name: '西安北', lng: 108.939, lat: 34.377 },
+      { name: '汉中', lng: 107.0, lat: 33.1 },
+      { name: '成都东', lng: 104.145, lat: 30.644 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'xicheng');
+  });
+
+  it('matches Guiyang-Guangzhou on guiguang', () => {
+    const hit = matchCorridor([
+      { name: '贵阳北', lng: 106.826, lat: 26.649 },
+      { name: '桂林西', lng: 110.2, lat: 25.3 },
+      { name: '广州南', lng: 113.269, lat: 22.989 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'guiguang');
+  });
+
+  it('matches Hangzhou-Taizhou on hangtai even when Hangzhou East is off the stub', () => {
+    const hit = matchCorridor([
+      { name: '杭州东', lng: 120.213, lat: 30.291 },
+      { name: '台州', lng: 121.32, lat: 28.49 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'hangtai');
+    const sliced = sliceCorridorForStops(hit!.corridor, [
+      { name: '杭州东', lng: 120.213, lat: 30.291 },
+      { name: '台州', lng: 121.32, lat: 28.49 },
+    ]);
+    assert.ok(sliced);
+    assert.ok(sliced!.length > 50);
+  });
+
+  it('matches HangzhouWest-Wenzhou on hangwen with far terminal snap', () => {
+    const hit = matchCorridor([
+      { name: '杭州西', lng: 119.99, lat: 30.29 },
+      { name: '温州南', lng: 120.68, lat: 28.07 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'hangwen');
+    const sliced = sliceCorridorForStops(hit!.corridor, [
+      { name: '杭州西', lng: 119.99, lat: 30.29 },
+      { name: '温州南', lng: 120.68, lat: 28.07 },
+    ]);
+    assert.ok(sliced);
+    assert.ok(sliced!.length > 50);
+  });
+
+  it('matches Shanghai-Hangzhou on huhang (not full hukun)', () => {
+    const hit = matchCorridor([
+      { name: '上海虹桥', lng: 121.316, lat: 31.194 },
+      { name: '嘉兴南', lng: 120.78, lat: 30.68 },
+      { name: '杭州东', lng: 120.213, lat: 30.291 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'huhang');
+  });
+
+  it('does NOT match 虹桥→嘉兴→海宁→杭州南 as huhang (普速站 ≠ 高铁南站)', () => {
+    const hit = matchCorridor([
+      { name: '上海虹桥', lng: 121.3165, lat: 31.194 },
+      { name: '嘉兴', lng: 120.7595, lat: 30.7665 },
+      { name: '海宁', lng: 120.6813, lat: 30.5362 },
+      { name: '杭州南', lng: 120.29, lat: 30.1747 },
+    ]);
+    assert.equal(hit, null);
+  });
+
+  it('still matches Shanghai-Kunming on hukun (not truncated huhang)', () => {
+    const hit = matchCorridor([
+      { name: '上海虹桥', lng: 121.316, lat: 31.194 },
+      { name: '杭州东', lng: 120.213, lat: 30.291 },
+      { name: '长沙南', lng: 113.066, lat: 28.151 },
+      { name: '昆明南', lng: 102.861, lat: 24.873 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'hukun');
+  });
+
+  it('matches Guangzhou-HongKong on guangshengang', () => {
+    const hit = matchCorridor([
+      { name: '广州南', lng: 113.269, lat: 22.989 },
+      { name: '深圳北', lng: 114.029, lat: 22.609 },
+      { name: '香港西九龙', lng: 114.165, lat: 22.304 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'guangshengang');
+  });
+
+  it('does not truncate guangshengang when HongKong lacks coords', () => {
+    const corridors = loadCorridors();
+    const c = corridors.find((x) => x.id === 'guangshengang')!;
+    const sliced = sliceCorridorForStops(c, [
+      { name: '广州南', lng: 113.269, lat: 22.989 },
+      { name: '深圳北', lng: 114.029, lat: 22.609 },
+      { name: '香港西九龙' },
+    ]);
+    assert.ok(sliced);
+    const end = sliced!.at(-1)!;
+    assert.ok(end[0] > 114.1, `end should be near West Kowloon, got ${end}`);
+    assert.ok(end[1] < 22.35);
+  });
+
+  it('matches Qingdao-Rongcheng on qingrong', () => {
+    const hit = matchCorridor([
+      { name: '青岛', lng: 120.329, lat: 36.336 },
+      { name: '烟台南', lng: 121.35, lat: 37.35 },
+      { name: '荣成', lng: 122.404, lat: 37.139 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'qingrong');
+  });
+
+  it('matches Fuzhou-Xiamen on fuxia', () => {
+    const hit = matchCorridor([
+      { name: '福州南', lng: 119.386, lat: 25.994 },
+      { name: '泉州', lng: 118.68, lat: 24.92 },
+      { name: '厦门北', lng: 118.08, lat: 24.64 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'fuxia');
+  });
+
+  it('matches Zhengzhou-Chongqing on zhengyu full length', () => {
+    const corridors = loadCorridors();
+    const c = corridors.find((x) => x.id === 'zhengyu')!;
+    const sliced = sliceCorridorForStops(c, [
+      { name: '郑州东', lng: 113.777, lat: 34.76 },
+      { name: '襄阳东', lng: 112.25, lat: 32.05 },
+      { name: '万州北', lng: 108.4, lat: 30.82 },
+      { name: '重庆北', lng: 106.57, lat: 29.62 },
+    ]);
+    assert.ok(sliced);
+    assert.ok(sliced!.length > 400);
+    const end = sliced!.at(-1)!;
+    assert.ok(end[0] < 107, `end should be near Chongqing, got ${end}`);
+  });
+
+  it('matches Chengdu-Chongqing on chengyu', () => {
+    const hit = matchCorridor([
+      { name: '成都东', lng: 104.121, lat: 30.592 },
+      { name: '内江北', lng: 105.05, lat: 29.6 },
+      { name: '重庆西', lng: 106.46, lat: 29.56 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'chengyu');
+  });
+
+  it('matches Beijing-Shanghai OD on jinghu', () => {
+    const hit = matchCorridor([
+      { name: '北京南', lng: 116.3789, lat: 39.8651 },
+      { name: '济南西', lng: 116.885, lat: 36.668 },
+      { name: '南京南', lng: 118.798, lat: 31.969 },
+      { name: '上海虹桥', lng: 121.316, lat: 31.194 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'jinghu');
+  });
+
+  it('matches Beijing-Guangzhou OD on jingguang', () => {
+    const hit = matchCorridor([
+      { name: '北京西', lng: 116.322, lat: 39.895 },
+      { name: '石家庄', lng: 114.485, lat: 38.01 },
+      { name: '郑州东', lng: 113.777, lat: 34.76 },
+      { name: '武汉', lng: 114.317, lat: 30.607 },
+      { name: '长沙南', lng: 113.066, lat: 28.151 },
+      { name: '广州南', lng: 113.269, lat: 22.989 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'jingguang');
+  });
+
+  it('matches Shanghai-Kunming OD on hukun', () => {
+    const hit = matchCorridor([
+      { name: '上海虹桥', lng: 121.316, lat: 31.194 },
+      { name: '杭州东', lng: 120.213, lat: 30.291 },
+      { name: '南昌西', lng: 115.792, lat: 28.663 },
+      { name: '长沙南', lng: 113.066, lat: 28.151 },
+      { name: '贵阳北', lng: 106.673, lat: 26.65 },
+      { name: '昆明南', lng: 102.861, lat: 24.873 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'hukun');
+  });
+
+  it('matches Xuzhou-Lanzhou OD on xulan', () => {
+    const hit = matchCorridor([
+      { name: '徐州东', lng: 117.306, lat: 34.267 },
+      { name: '郑州东', lng: 113.777, lat: 34.76 },
+      { name: '西安北', lng: 108.939, lat: 34.377 },
+      { name: '兰州西', lng: 103.758, lat: 36.069 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'xulan');
+  });
+
+  it('matches Beijing-Harbin OD on jingha', () => {
+    const hit = matchCorridor([
+      { name: '北京朝阳', lng: 116.506, lat: 39.944 },
+      { name: '承德南', lng: 117.932, lat: 40.886 },
+      { name: '沈阳', lng: 123.4, lat: 41.8 },
+      { name: '长春西', lng: 125.196, lat: 43.873 },
+      { name: '哈尔滨西', lng: 126.575, lat: 45.706 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'jingha');
+  });
+
+  it('matches Shenyang-Dalian OD on haida', () => {
+    const hit = matchCorridor([
+      { name: '沈阳', lng: 123.4, lat: 41.8 },
+      { name: '鞍山西', lng: 122.94, lat: 41.12 },
+      { name: '营口东', lng: 122.3, lat: 40.58 },
+      { name: '大连北', lng: 121.603, lat: 39.087 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'haida');
+  });
+
+  it('does NOT match Taiyuan-Shanghai as jinghu (partial southern overlap)', () => {
+    const hit = matchCorridor([
+      { name: '太原南', lng: 112.598, lat: 37.736 },
+      { name: '阳泉北', lng: 113.451, lat: 38.085 },
+      { name: '石家庄', lng: 114.485, lat: 38.01 },
+      { name: '郑州东', lng: 113.777, lat: 34.76 },
+      { name: '合肥', lng: 117.285, lat: 31.885 },
+      { name: '南京南', lng: 118.798, lat: 31.969 },
+      { name: '苏州北', lng: 120.553, lat: 31.423 },
+      { name: '上海虹桥', lng: 121.316, lat: 31.194 },
+    ]);
+    assert.equal(hit, null);
+  });
+
+  it('matches jingguang even when many intermediate names miss hints', () => {
+    const hit = matchCorridor([
+      { name: '北京西', lng: 116.322, lat: 39.895 },
+      { name: '某某东', lng: 115.0, lat: 38.2 }, // 近走廊但不在 hints
+      { name: '石家庄', lng: 114.485, lat: 38.01 },
+      { name: '临时站', lng: 114.0, lat: 34.5 },
+      { name: '长沙南', lng: 113.066, lat: 28.151 },
+      { name: '广州南', lng: 113.269, lat: 22.989 },
+    ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'jingguang');
+  });
+
+  it('sliceCorridorForStops rejects Taiyuan projected onto jinghu', () => {
+    const corridors = loadCorridors();
+    const jinghu = corridors.find((c) => c.id === 'jinghu')!;
+    const sliced = sliceCorridorForStops(jinghu, [
+      { name: '太原南', lng: 112.598, lat: 37.736 },
+      { name: '上海虹桥', lng: 121.316, lat: 31.194 },
+    ]);
+    assert.equal(sliced, null);
+  });
+
+  it('sliceCorridorForStops keeps jingguang Beijing-Guangzhou length', () => {
+    const corridors = loadCorridors();
+    const c = corridors.find((x) => x.id === 'jingguang')!;
+    const sliced = sliceCorridorForStops(c, [
+      { name: '北京西', lng: 116.322, lat: 39.895 },
+      { name: '郑州东', lng: 113.777, lat: 34.76 },
+      { name: '广州南', lng: 113.269, lat: 22.989 },
+    ]);
+    assert.ok(sliced);
+    assert.ok(sliced!.length > 200);
+  });
+
+  it('does not truncate hukun to Changsha when Kunming lacks coords', () => {
+    const corridors = loadCorridors();
+    const c = corridors.find((x) => x.id === 'hukun')!;
+    // 昆明南缺坐标时，应用走廊终点兜底，而不是截到长沙南
+    const sliced = sliceCorridorForStops(c, [
+      { name: '上海虹桥', lng: 121.316, lat: 31.194 },
+      { name: '杭州东', lng: 120.213, lat: 30.291 },
+      { name: '长沙南', lng: 113.066, lat: 28.151 },
+      { name: '昆明南' },
+    ]);
+    assert.ok(sliced);
+    const end = sliced!.at(-1)!;
+    assert.ok(end[0] < 104, `end should be near Kunming, got ${end}`);
+    assert.ok(sliced!.length > 800);
+  });
+
+  it('slices hukun Shanghai-Kunming full length', () => {
+    const corridors = loadCorridors();
+    const c = corridors.find((x) => x.id === 'hukun')!;
+    const sliced = sliceCorridorForStops(c, [
+      { name: '上海虹桥', lng: 121.316, lat: 31.194 },
+      { name: '长沙南', lng: 113.066, lat: 28.151 },
+      { name: '昆明南', lng: 102.861, lat: 24.873 },
+    ]);
+    assert.ok(sliced);
+    assert.ok(sliced!.length > 800);
+    const end = sliced!.at(-1)!;
+    assert.ok(end[0] < 104, `end lng should be near Kunming, got ${end}`);
+  });
+
+  it('still matches and slices jinghu / jingguang after hukun fixes', () => {
+    assert.equal(
+      matchCorridor([
+        { name: '北京南', lng: 116.3789, lat: 39.8651 },
+        { name: '南京南', lng: 118.798, lat: 31.969 },
+        { name: '上海虹桥', lng: 121.316, lat: 31.194 },
+      ])?.corridor.id,
+      'jinghu',
+    );
+    assert.equal(
+      matchCorridor([
+        { name: '北京西', lng: 116.322, lat: 39.895 },
+        { name: '武汉', lng: 114.317, lat: 30.607 },
+        { name: '广州南', lng: 113.269, lat: 22.989 },
+      ])?.corridor.id,
+      'jingguang',
+    );
+  });
+});

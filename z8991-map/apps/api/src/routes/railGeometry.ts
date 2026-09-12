@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { buildRailGeometry, type LngLat } from '../services/osmRailway.js';
 import { enrichStopsCoords } from '../services/geocode.js';
 import { matchCorridor, sliceCorridorForStops, loadCorridors } from '../services/corridors.js';
+import { matchCorridorNetwork } from '../services/corridorNetwork.js';
+import { createRailGeometryJob, getRailGeometryJob } from '../services/railGeometryJob.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const presetsDir = join(__dirname, '../../../../data/presets');
@@ -21,6 +23,10 @@ type Body = {
   mode?: 'preset' | 'full';
 };
 
+function clientKeyOf(c: { req: { header: (name: string) => string | undefined } }): string {
+  return c.req.header('x-forwarded-for')?.split(',')[0]?.trim() || c.req.header('x-real-ip') || 'local';
+}
+
 function tryPresetRailway(trainCode?: string): [number, number][] | null {
   if (!trainCode || !/^Z8991$/i.test(trainCode)) return null;
   const path = join(presetsDir, 'z8991-railway.json');
@@ -31,6 +37,90 @@ function tryPresetRailway(trainCode?: string): [number, number][] | null {
     return null;
   }
 }
+
+async function resolveStops(body: Body) {
+  const enriched = await enrichStopsCoords(
+    (body.stops || []).map((s) => ({
+      name: s.name || '',
+      lng: s.lng,
+      lat: s.lat,
+    })),
+  );
+  const stops: LngLat[] = enriched
+    .filter((s) => s.lng != null && s.lat != null)
+    .map((s) => ({ lng: Number(s.lng), lat: Number(s.lat) }));
+  return { enriched, stops };
+}
+
+railGeometryRoute.post('/jobs', async (c) => {
+  let body: Body = {};
+  try {
+    body = (await c.req.json()) as Body;
+  } catch {
+    return c.json(
+      { ok: false, error: { code: 'BAD_REQUEST', message: '需要 JSON body' } },
+      400,
+    );
+  }
+
+  const { enriched } = await resolveStops(body);
+  const namedStops = enriched
+    .filter((s) => s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat))
+    .map((s) => ({ name: s.name, lng: Number(s.lng), lat: Number(s.lat) }));
+  if (namedStops.length < 2) {
+    return c.json(
+      {
+        ok: false,
+        error: { code: 'BAD_REQUEST', message: '至少需要 2 个可定位的经停站' },
+      },
+      400,
+    );
+  }
+
+  try {
+    const job = createRailGeometryJob({
+      stops: namedStops,
+      trainCode: body.trainCode,
+      clientKey: clientKeyOf(c),
+    });
+    return c.json({
+      ok: true,
+      data: {
+        ...job,
+        // 回传全部 enrich 结果（含站名），前端按名合并，禁止按下标写坐标
+        stops: enriched.map((s) => ({
+          name: s.name,
+          lng: s.lng != null ? Number(s.lng) : undefined,
+          lat: s.lat != null ? Number(s.lat) : undefined,
+        })),
+      },
+    });
+  } catch (e) {
+    const err = e as Error & { code?: string };
+    return c.json(
+      {
+        ok: false,
+        error: {
+          code: err.code || 'JOB_FAIL',
+          message: err.message || '创建精确路线任务失败',
+        },
+      },
+      err.code === 'BAD_REQUEST' ? 400 : 500,
+    );
+  }
+});
+
+railGeometryRoute.get('/jobs/:jobId', async (c) => {
+  const jobId = c.req.param('jobId');
+  const job = getRailGeometryJob(jobId);
+  if (!job) {
+    return c.json(
+      { ok: false, error: { code: 'NOT_FOUND', message: '任务不存在或已过期' } },
+      404,
+    );
+  }
+  return c.json({ ok: true, data: job });
+});
 
 railGeometryRoute.post('/', async (c) => {
   let body: Body = {};
@@ -43,16 +133,7 @@ railGeometryRoute.post('/', async (c) => {
     );
   }
 
-  const enriched = await enrichStopsCoords(
-    (body.stops || []).map((s) => ({
-      name: s.name || '',
-      lng: s.lng,
-      lat: s.lat,
-    })),
-  );
-  const stops: LngLat[] = enriched
-    .filter((s) => s.lng != null && s.lat != null)
-    .map((s) => ({ lng: Number(s.lng), lat: Number(s.lat) }));
+  const { enriched, stops } = await resolveStops(body);
 
   if (stops.length < 2) {
     return c.json(
@@ -79,6 +160,7 @@ railGeometryRoute.post('/', async (c) => {
         segmentsOk: stops.length - 1,
         segmentsTotal: stops.length - 1,
         fromPreset: true,
+        canUpgrade: false,
         corridorId: 'z8991',
       },
     });
@@ -98,6 +180,7 @@ railGeometryRoute.post('/', async (c) => {
           segmentsOk: stops.length - 1,
           segmentsTotal: stops.length - 1,
           fromPreset: true,
+          canUpgrade: false,
           corridorId: matched.corridor.id,
           corridorName: matched.corridor.name,
           matchScore: matched.score,
@@ -106,9 +189,30 @@ railGeometryRoute.post('/', async (c) => {
     }
   }
 
+  // 2b) 单走廊未命中：精品路网多段寻路拼接（京沪+宁杭、大西+徐兰 等）
+  const networked = matchCorridorNetwork(enriched);
+  if (networked?.coords && networked.coords.length >= 2) {
+    return c.json({
+      ok: true,
+      data: {
+        coords: networked.coords,
+        stops: enriched,
+        source: 'osm',
+        segmentsOk: stops.length - 1,
+        segmentsTotal: stops.length - 1,
+        fromPreset: true,
+        canUpgrade: false,
+        corridorId: networked.corridorIds.join('+'),
+        corridorName: networked.corridorNames.join(' + '),
+        transferHubs: networked.transferHubs,
+        matchScore: networked.score,
+      },
+    });
+  }
+
   const stationLine = stops.map((s) => [s.lng, s.lat] as [number, number]);
 
-  // preset 模式：不打 OSM，交给前端「获取精确路线」按需触发
+  // preset 模式：不打 OSM，交给前端「获取精品路线」按需触发
   if (body.mode === 'preset') {
     return c.json({
       ok: true,
@@ -119,12 +223,13 @@ railGeometryRoute.post('/', async (c) => {
         segmentsOk: 0,
         segmentsTotal: stops.length - 1,
         fromPreset: false,
-        message: '无精品预置，可点击获取精确路线',
+        canUpgrade: true,
+        message: '无精品预置，可点击获取精品路线',
       },
     });
   }
 
-  // 3) 现场 OSM 拼线（慢，按需）
+  // 3) 现场 OSM 拼线（慢；兼容旧调用，推荐改用 /jobs）
   try {
     const result = await buildRailGeometry(stops, body.trainCode);
     if (result.source === 'none' || result.coords.length < 2) {
@@ -136,13 +241,20 @@ railGeometryRoute.post('/', async (c) => {
           source: 'station',
           segmentsOk: result.segmentsOk,
           segmentsTotal: result.segmentsTotal,
+          fromPreset: false,
+          canUpgrade: true,
           message: '未能匹配 OSM 铁路线，已使用站点示意折线',
         },
       });
     }
     return c.json({
       ok: true,
-      data: { ...result, stops: enriched, fromPreset: false },
+      data: {
+        ...result,
+        stops: enriched,
+        fromPreset: false,
+        canUpgrade: false,
+      },
     });
   } catch (e) {
     const err = e as Error & { code?: string };
@@ -155,6 +267,8 @@ railGeometryRoute.post('/', async (c) => {
           source: 'station',
           segmentsOk: 0,
           segmentsTotal: stops.length - 1,
+          fromPreset: false,
+          canUpgrade: true,
           message: err.message || 'OSM 失败，已使用站点示意折线',
         },
       });

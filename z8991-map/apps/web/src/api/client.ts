@@ -17,6 +17,32 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return json.data;
 }
 
+export type RailGeometryData = {
+  coords: [number, number][];
+  stops?: Array<{ name: string; lng?: number; lat?: number }>;
+  source: 'osm' | 'mixed' | 'station' | 'none';
+  segmentsOk: number;
+  segmentsTotal: number;
+  fromPreset?: boolean;
+  canUpgrade?: boolean;
+  corridorId?: string;
+  corridorName?: string;
+  message?: string;
+};
+
+export type RailGeometryJob = {
+  jobId: string;
+  status: 'queued' | 'running' | 'done' | 'partial' | 'failed';
+  segmentsTotal: number;
+  segmentsDone: number;
+  segmentsOk: number;
+  coords: [number, number][];
+  source: 'osm' | 'mixed' | 'station';
+  message: string;
+  trainCode?: string;
+  stops?: Array<{ name?: string; lng?: number; lat?: number }>;
+};
+
 export const api = {
   suggestStations(q: string) {
     return request<{ stations: { name: string; telecode: string }[] }>(
@@ -46,20 +72,23 @@ export const api = {
     /** preset：仅精品预置；full：含 OSM（默认） */
     mode?: 'preset' | 'full';
   }) {
-    return request<{
-      coords: [number, number][];
-      stops?: Array<{ name: string; lng?: number; lat?: number }>;
-      source: 'osm' | 'mixed' | 'station' | 'none';
-      segmentsOk: number;
-      segmentsTotal: number;
-      fromPreset?: boolean;
-      corridorId?: string;
-      corridorName?: string;
-      message?: string;
-    }>('/rail-geometry', {
+    return request<RailGeometryData>('/rail-geometry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
+  },
+  createRailGeometryJob(body: {
+    trainCode?: string;
+    stops: Array<{ lng?: number; lat?: number; name?: string }>;
+  }) {
+    return request<RailGeometryJob>('/rail-geometry/jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  },
+  getRailGeometryJob(jobId: string) {
+    return request<RailGeometryJob>(`/rail-geometry/jobs/${encodeURIComponent(jobId)}`);
   },
 };

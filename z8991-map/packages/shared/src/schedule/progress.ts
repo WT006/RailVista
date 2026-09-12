@@ -22,6 +22,7 @@ export function buildPolyline(stops: Array<{ lng?: number; lat?: number }>): [nu
 
 /**
  * 按上下车站投影，从完整铁路线截取 OD 区间折线。
+ * 若行驶方向与走廊存储方向相反，截取后会 reverse，保证折线从 from → to。
  * 无坐标或投影失败时返回 null，调用方应回退站点连线。
  */
 export function slicePolylineByOd(
@@ -40,8 +41,9 @@ export function slicePolylineByOd(
   // 大型枢纽/联络线可能离主线稍远，放宽到 45km
   if (a.distKm > 45 || b.distKm > 45) return null;
 
-  let p0 = Math.min(a.progress, b.progress);
-  let p1 = Math.max(a.progress, b.progress);
+  const reversed = a.progress > b.progress;
+  const p0 = Math.min(a.progress, b.progress);
+  const p1 = Math.max(a.progress, b.progress);
   if (p1 - p0 < 0.0005) return null;
 
   const startKm = p0 * lengthKm;
@@ -61,6 +63,7 @@ export function slicePolylineByOd(
   const endPt = pointAtProgress(path, lengthKm, p1);
   out.push([endPt.lng, endPt.lat]);
 
+  if (reversed) out.reverse();
   return out.length >= 2 ? out : null;
 }
 

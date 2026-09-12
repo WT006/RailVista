@@ -10,14 +10,15 @@ const geoPath = join(__dirname, '../../../../data/stations-geo.json');
 
 const OVERPASS_URLS = [
   'https://overpass-api.de/api/interpreter',
+  'https://lz4.overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
 ];
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
-/** 选车后补坐标不能拖太久；失败则用地图站点折线兜底 */
+/** 选车后补坐标：长途车次缺站多，需更大预算（仍有超时上限） */
 const OVERPASS_TIMEOUT_MS = 12000;
 const NOMINATIM_TIMEOUT_MS = 6000;
-const NOMINATIM_MAX = 4;
+const REMOTE_GEO_MAX = 20;
 
 let geoFileCache: Record<string, { name?: string; telecode?: string; lng: number; lat: number }> | null =
   null;
@@ -29,9 +30,63 @@ function normalizeStationName(name: string): string {
   return name.replace(/站$/, '').trim();
 }
 
+/**
+ * 易被 OSM/Nominatim 误匹配到同名他处的站：区域锚点（超距则拒收）。
+ * 例如「潜江」曾被标到江苏句容附近，导致沪蓉示意线在苏皖交叉。
+ */
+const STATION_REGION_ANCHORS: Record<string, { lng: number; lat: number; maxKm: number }> = {
+  潜江: { lng: 112.7685, lat: 30.4212, maxKm: 60 },
+  荆州: { lng: 112.209, lat: 30.322, maxKm: 60 },
+  宜昌东: { lng: 111.4608, lat: 30.6586, maxKm: 60 },
+  枝江北: { lng: 111.751, lat: 30.512, maxKm: 60 },
+  仙桃: { lng: 113.387, lat: 30.365, maxKm: 60 },
+  天门南: { lng: 113.447, lat: 30.55, maxKm: 60 },
+  汉川: { lng: 113.84, lat: 30.65, maxKm: 60 },
+  扬州: { lng: 119.346, lat: 32.392, maxKm: 40 },
+  扬州东: { lng: 119.55, lat: 32.42, maxKm: 40 },
+  泰州: { lng: 119.976, lat: 32.531, maxKm: 40 },
+  泰州南: { lng: 119.92, lat: 32.42, maxKm: 40 },
+  南通西: { lng: 120.761, lat: 32.104, maxKm: 40 },
+  张家港: { lng: 120.669, lat: 31.819, maxKm: 40 },
+  六安: { lng: 116.494, lat: 31.717, maxKm: 40 },
+};
+
+function haversineKm(a: Point, b: Point): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const lat1 = toRad(a.lat);
+  const lat2 = toRad(b.lat);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(h));
+}
+
+/** 名称区域锚点校验；无锚点则通过 */
+export function matchesStationRegion(name: string, lng: number, lat: number): boolean {
+  const key = normalizeStationName(name);
+  const anchor = STATION_REGION_ANCHORS[key];
+  if (!anchor) return true;
+  return haversineKm({ lng, lat }, { lng: anchor.lng, lat: anchor.lat }) <= anchor.maxKm;
+}
+
+/**
+ * 中国境内铁路站可信范围。排除日本本州/九州等误匹配
+ * （东北边境如绥芬河 lng≈131、lat≈44 仍保留）。
+ */
+export function isPlausibleCnRailPoint(lng: number, lat: number): boolean {
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return false;
+  if (lng < 73 || lng > 135 || lat < 18 || lat > 54) return false;
+  // 日本本州/四国/九州主体（纬度偏低）；勿误伤中国东北边境
+  if (lng >= 128.5 && lat < 41.5) return false;
+  if (lng >= 138) return false;
+  return true;
+}
+
 export function loadStationsGeo(): Record<
   string,
-  { name?: string; telecode?: string; lng: number; lat: number }
+  { name?: string; telecode?: string; lng: number; lat: number; source?: string }
 > {
   if (existsSync(geoPath)) {
     try {
@@ -52,8 +107,22 @@ function lookupLocalGeo(name: string): Point | null {
   const geo = loadStationsGeo();
   const key = normalizeStationName(name);
   const hit = geo[name] || geo[key] || geo[`${key}站`];
-  if (hit?.lng != null && hit?.lat != null) return { lng: hit.lng, lat: hit.lat };
-  return null;
+  if (hit?.lng == null || hit?.lat == null) return null;
+  const point = { lng: Number(hit.lng), lat: Number(hit.lat) };
+  if (!isPlausibleCnRailPoint(point.lng, point.lat)) {
+    console.warn(`[geocode] reject bad local geo ${key}`, point);
+    return null;
+  }
+  if (!matchesStationRegion(key, point.lng, point.lat)) {
+    console.warn(`[geocode] reject out-of-region local geo ${key}`, point);
+    delete geo[key];
+    if (geo[name]) delete geo[name];
+    geoFileCache = geo;
+    geoDirty = true;
+    schedulePersistGeo();
+    return null;
+  }
+  return point;
 }
 
 function schedulePersistGeo() {
@@ -75,6 +144,14 @@ function schedulePersistGeo() {
 function rememberGeo(name: string, point: Point) {
   const key = normalizeStationName(name);
   if (!key) return;
+  if (!isPlausibleCnRailPoint(point.lng, point.lat)) {
+    console.warn(`[geocode] refuse to persist non-CN point ${key}`, point);
+    return;
+  }
+  if (!matchesStationRegion(key, point.lng, point.lat)) {
+    console.warn(`[geocode] refuse to persist out-of-region point ${key}`, point);
+    return;
+  }
   const geo = loadStationsGeo();
   if (geo[key]?.lng === point.lng && geo[key]?.lat === point.lat) return;
   geo[key] = { name: key, lng: point.lng, lat: point.lat };
@@ -84,12 +161,41 @@ function rememberGeo(name: string, point: Point) {
   schedulePersistGeo();
 }
 
+function tagMatchesStation(tagName: string, requested: string): boolean {
+  const t = normalizeStationName(tagName);
+  const r = normalizeStationName(requested);
+  return !!t && !!r && (t === r || tagName === requested || tagName === `${r}站`);
+}
+
+function scoreStationHit(
+  el: { tags?: Record<string, string>; lat: number; lon: number },
+  requested: string,
+): number {
+  let score = 0;
+  const railway = el.tags?.railway;
+  const pt = el.tags?.public_transport;
+  if (railway === 'station') score += 60;
+  else if (railway === 'halt') score += 15;
+  else if (pt === 'station') score += 25;
+
+  const zh = el.tags?.['name:zh'] || '';
+  const name = el.tags?.name || '';
+  const r = normalizeStationName(requested);
+  if (zh === `${r}站` || name === `${r}站`) score += 40;
+  else if (normalizeStationName(zh) === r || normalizeStationName(name) === r) score += 25;
+
+  // 略偏向中国几何中心，抑制境外同名
+  const d = Math.hypot(el.lon - 105, el.lat - 35);
+  score += Math.max(0, 25 - d / 2);
+  return score;
+}
+
 async function overpassStationsByNames(names: string[]): Promise<Map<string, Point>> {
   const unique = [...new Set(names.map(normalizeStationName).filter(Boolean))];
   const found = new Map<string, Point>();
   if (!unique.length) return found;
 
-  // China-ish bbox to reduce noise
+  // China-ish bbox（仍可能扫到日本西部，需结果过滤）
   const bbox = '18,73,54,135';
   const clauses = unique
     .flatMap((n) => {
@@ -100,6 +206,7 @@ async function overpassStationsByNames(names: string[]): Promise<Map<string, Poi
         `node["railway"="station"]["name:zh"="${n}"](${bbox});`,
         `node["railway"="station"]["name:zh"="${withStation}"](${bbox});`,
         `node["railway"="halt"]["name"="${n}"](${bbox});`,
+        `node["railway"="halt"]["name:zh"="${n}"](${bbox});`,
         `node["public_transport"="station"]["name"="${n}"](${bbox});`,
       ];
     })
@@ -112,6 +219,9 @@ ${clauses}
 );
 out center;
 `.trim();
+
+  type Cand = { key: string; point: Point; score: number };
+  const best = new Map<string, Cand>();
 
   let lastErr: unknown;
   for (const url of OVERPASS_URLS) {
@@ -138,15 +248,32 @@ out center;
           tags?: Record<string, string>;
         }>;
       };
+
       for (const el of json.elements || []) {
         const lat = el.lat ?? el.center?.lat;
         const lon = el.lon ?? el.center?.lon;
         if (lat == null || lon == null) continue;
+        if (!isPlausibleCnRailPoint(lon, lat)) continue;
+
         const tagName = el.tags?.['name:zh'] || el.tags?.name || '';
-        const key = normalizeStationName(tagName);
-        if (!key) continue;
-        if (!found.has(key)) found.set(key, { lng: lon, lat });
+        for (const requested of unique) {
+          if (!tagMatchesStation(tagName, requested)) continue;
+          const score = scoreStationHit(
+            { tags: el.tags, lat, lon },
+            requested,
+          );
+          const prev = best.get(requested);
+          if (!prev || score > prev.score) {
+            best.set(requested, {
+              key: requested,
+              point: { lng: lon, lat },
+              score,
+            });
+          }
+        }
       }
+
+      for (const [k, c] of best) found.set(k, c.point);
       return found;
     } catch (e) {
       lastErr = e;
@@ -161,7 +288,7 @@ async function nominatimStation(name: string): Promise<Point | null> {
   const qs = new URLSearchParams({
     q,
     format: 'json',
-    limit: '1',
+    limit: '3',
     countrycodes: 'cn',
   });
   try {
@@ -174,22 +301,139 @@ async function nominatimStation(name: string): Promise<Point | null> {
     });
     if (!res.ok) return null;
     const json = (await res.json()) as Array<{ lon: string; lat: string }>;
-    const hit = json[0];
-    if (!hit) return null;
-    const lng = Number(hit.lon);
-    const lat = Number(hit.lat);
-    if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
-    return { lng, lat };
+    for (const hit of json) {
+      const lng = Number(hit.lon);
+      const lat = Number(hit.lat);
+      if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue;
+      if (!isPlausibleCnRailPoint(lng, lat)) continue;
+      return { lng, lat };
+    }
+    return null;
   } catch {
     return null;
   }
+}
+
+/** 高德地名搜索（火车站类型），GCJ-02，仅作缺坐标兜底 */
+async function amapStation(name: string): Promise<Point | null> {
+  const key = process.env.AMAP_KEY;
+  if (!key) return null;
+  const keywords = name.endsWith('站') ? name : `${name}站`;
+  const qs = new URLSearchParams({
+    key,
+    keywords,
+    types: '150200',
+    offset: '5',
+    page: '1',
+    extensions: 'base',
+  });
+  try {
+    const res = await fetch(`https://restapi.amap.com/v3/place/text?${qs}`, {
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      status?: string;
+      pois?: Array<{ name?: string; location?: string }>;
+    };
+    if (json.status !== '1' || !json.pois?.length) return null;
+    const want = normalizeStationName(name);
+    const ranked = [...json.pois].sort((a, b) => {
+      const an = normalizeStationName(a.name || '');
+      const bn = normalizeStationName(b.name || '');
+      const as = an === want || (a.name || '').includes(want) ? 0 : 1;
+      const bs = bn === want || (b.name || '').includes(want) ? 0 : 1;
+      return as - bs;
+    });
+    for (const poi of ranked) {
+      const loc = poi.location?.split(',');
+      if (!loc || loc.length < 2) continue;
+      const lng = Number(loc[0]);
+      const lat = Number(loc[1]);
+      if (!isPlausibleCnRailPoint(lng, lat)) continue;
+      return { lng, lat };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function acceptPoint(point: Point | null | undefined): point is Point {
+  return !!point && isPlausibleCnRailPoint(point.lng, point.lat);
+}
+
+/**
+ * 示意折线交错检测：中间站绕行远超直连时，清掉可疑坐标。
+ * 时刻表站序本身正确；交叉几乎总是中间站坐标飞点（如潜江被标到江苏）。
+ * 清除本地库脏点（含非 corridor），避免下次 enrich 再次污染。
+ */
+function scrubZigzagLocalCoords<T extends { name: string; lng?: number; lat?: number }>(
+  stops: T[],
+): T[] {
+  const geo = loadStationsGeo();
+  const out = stops.map((s) => ({ ...s }));
+  let changed = true;
+  let guard = 0;
+  while (changed && guard < 8) {
+    changed = false;
+    guard += 1;
+    for (let i = 1; i < out.length - 1; i++) {
+      const prev = out[i - 1];
+      const mid = out[i];
+      const next = out[i + 1];
+      if (
+        prev.lng == null ||
+        prev.lat == null ||
+        mid.lng == null ||
+        mid.lat == null ||
+        next.lng == null ||
+        next.lat == null
+      ) {
+        continue;
+      }
+      const a = { lng: Number(prev.lng), lat: Number(prev.lat) };
+      const b = { lng: Number(mid.lng), lat: Number(mid.lat) };
+      const c = { lng: Number(next.lng), lat: Number(next.lat) };
+      if (
+        !isPlausibleCnRailPoint(a.lng, a.lat) ||
+        !isPlausibleCnRailPoint(b.lng, b.lat) ||
+        !isPlausibleCnRailPoint(c.lng, c.lat)
+      ) {
+        continue;
+      }
+      const direct = haversineKm(a, c);
+      const via = haversineKm(a, b) + haversineKm(b, c);
+      // 直连已有一定跨度，且经中间站绕行明显过大 → 中间站坐标可疑
+      if (!(direct > 40 && via > direct * 1.75 && via - direct > 50)) continue;
+
+      const key = normalizeStationName(mid.name);
+      const local = geo[key] || geo[mid.name];
+      const src = String(local?.source || '');
+      console.warn(
+        `[geocode] scrub zigzag stop ${mid.name} via=${via.toFixed(0)}km direct=${direct.toFixed(0)}km source=${src || 'inline'}`,
+      );
+      out[i] = { ...mid, lng: undefined, lat: undefined };
+      // 飞点会反复污染示意线：本地库一律清掉，交由区域锚点/远程重查
+      if (geo[key]) {
+        delete geo[key];
+        geoFileCache = geo;
+        geoDirty = true;
+        schedulePersistGeo();
+      }
+      changed = true;
+    }
+  }
+  return out;
 }
 
 export async function geocodeStation(name: string): Promise<Point | null> {
   if (!name) return null;
   const key = `geo:osm:${normalizeStationName(name)}`;
   const cached = cache.get<Point>(key);
-  if (cached) return cached;
+  if (acceptPoint(cached) && matchesStationRegion(name, cached.lng, cached.lat)) {
+    return cached;
+  }
 
   const local = lookupLocalGeo(name);
   if (local) {
@@ -199,15 +443,21 @@ export async function geocodeStation(name: string): Promise<Point | null> {
 
   const batch = await overpassStationsByNames([name]);
   const hit = batch.get(normalizeStationName(name));
-  if (hit) {
+  if (acceptPoint(hit) && matchesStationRegion(name, hit.lng, hit.lat)) {
     rememberGeo(name, hit);
     return hit;
   }
 
   const nom = await nominatimStation(name);
-  if (nom) {
+  if (acceptPoint(nom) && matchesStationRegion(name, nom.lng, nom.lat)) {
     rememberGeo(name, nom);
     return nom;
+  }
+
+  const amap = await amapStation(name);
+  if (acceptPoint(amap) && matchesStationRegion(name, amap.lng, amap.lat)) {
+    rememberGeo(name, amap);
+    return amap;
   }
   return null;
 }
@@ -215,19 +465,35 @@ export async function geocodeStation(name: string): Promise<Point | null> {
 export async function enrichStopsCoords<
   T extends { name: string; lng?: number; lat?: number },
 >(stops: T[]): Promise<T[]> {
-  const out: T[] = stops.map((s) => {
-    if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) {
-      return s;
-    }
-    const local = lookupLocalGeo(s.name);
-    if (local) {
-      rememberGeo(s.name, local);
-      return { ...s, lng: local.lng, lat: local.lat };
-    }
-    const mem = cache.get<Point>(`geo:osm:${normalizeStationName(s.name)}`);
-    if (mem) return { ...s, lng: mem.lng, lat: mem.lat };
-    return s;
-  });
+  const out: T[] = scrubZigzagLocalCoords(
+    stops.map((s) => {
+      // 已有坐标若不在中国可信范围，视为缺失（修复日本「天津」这类脏数据）
+      if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) {
+        if (
+          isPlausibleCnRailPoint(Number(s.lng), Number(s.lat)) &&
+          matchesStationRegion(s.name, Number(s.lng), Number(s.lat))
+        ) {
+          return s;
+        }
+        console.warn(`[geocode] drop implausible stop coords ${s.name}`, {
+          lng: s.lng,
+          lat: s.lat,
+        });
+      }
+      const local = lookupLocalGeo(s.name);
+      if (local) {
+        return { ...s, lng: local.lng, lat: local.lat };
+      }
+      const mem = cache.get<Point>(`geo:osm:${normalizeStationName(s.name)}`);
+      if (
+        acceptPoint(mem) &&
+        matchesStationRegion(s.name, mem.lng, mem.lat)
+      ) {
+        return { ...s, lng: mem.lng, lat: mem.lat };
+      }
+      return { ...s, lng: undefined, lat: undefined };
+    }),
+  );
 
   const missing = out.filter(
     (s) => s.lng == null || s.lat == null || !Number.isFinite(s.lng) || !Number.isFinite(s.lat),
@@ -242,7 +508,7 @@ export async function enrichStopsCoords<
     }
     const key = normalizeStationName(s.name);
     const point = batch.get(key) || null;
-    if (point) {
+    if (acceptPoint(point) && matchesStationRegion(s.name, point.lng, point.lat)) {
       rememberGeo(s.name, point);
       return { ...s, lng: point.lng, lat: point.lat };
     }
@@ -250,7 +516,7 @@ export async function enrichStopsCoords<
     return s;
   });
 
-  // 优先补全行程首末站（避免沪昆西段缺坐标导致截断到长沙）
+  // 优先补全行程首末站，再沿途均匀抽样，避免长途只解析到几个站导致示意线大跨/环路
   const endpointNames = new Set(
     [result[0]?.name, result[result.length - 1]?.name]
       .filter(Boolean)
@@ -261,18 +527,55 @@ export async function enrichStopsCoords<
     const be = endpointNames.has(normalizeStationName(b.name)) ? 0 : 1;
     return ae - be;
   });
-  const toNom = stillSorted.slice(0, Math.max(NOMINATIM_MAX, endpointNames.size));
-  if (toNom.length) {
-    const nomHits = await Promise.all(
-      toNom.map(async (s) => {
-        const point = await nominatimStation(s.name);
-        return point ? { name: s.name, point } : null;
-      }),
-    );
+  const budget = Math.min(
+    stillSorted.length,
+    Math.max(REMOTE_GEO_MAX, endpointNames.size, Math.ceil(stillSorted.length * 0.4)),
+  );
+  const toResolve: typeof stillSorted = [];
+  const seen = new Set<string>();
+  const pushUnique = (s: (typeof stillSorted)[number]) => {
+    const k = normalizeStationName(s.name);
+    if (!k || seen.has(k)) return;
+    seen.add(k);
+    toResolve.push(s);
+  };
+  for (const s of stillSorted) {
+    if (endpointNames.has(normalizeStationName(s.name))) pushUnique(s);
+  }
+  const rest = stillSorted.filter((s) => !endpointNames.has(normalizeStationName(s.name)));
+  if (rest.length && toResolve.length < budget) {
+    const need = budget - toResolve.length;
+    if (rest.length <= need) {
+      for (const s of rest) pushUnique(s);
+    } else {
+      for (let i = 0; i < need; i++) {
+        const idx = Math.min(rest.length - 1, Math.round(((i + 0.5) * rest.length) / need - 0.5));
+        pushUnique(rest[idx]);
+      }
+    }
+  }
+  if (toResolve.length) {
+    // 限并发，避免 Nominatim/高德打爆
+    const concurrency = 4;
+    const hits: Array<{ name: string; point: Point } | null> = [];
+    for (let i = 0; i < toResolve.length; i += concurrency) {
+      const batchNames = toResolve.slice(i, i + concurrency);
+      const part = await Promise.all(
+        batchNames.map(async (s) => {
+          const point =
+            (await nominatimStation(s.name)) || (await amapStation(s.name));
+          if (!acceptPoint(point) || !matchesStationRegion(s.name, point.lng, point.lat)) {
+            return null;
+          }
+          return { name: s.name, point };
+        }),
+      );
+      hits.push(...part);
+    }
     const byName = new Map(
-      nomHits.filter(Boolean).map((h) => [normalizeStationName(h!.name), h!.point] as const),
+      hits.filter(Boolean).map((h) => [normalizeStationName(h!.name), h!.point] as const),
     );
-    for (const hit of nomHits) {
+    for (const hit of hits) {
       if (hit) rememberGeo(hit.name, hit.point);
     }
     return result.map((s) => {

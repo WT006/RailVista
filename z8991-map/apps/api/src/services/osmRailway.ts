@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { cache } from './cache.js';
+import { buildLocalSegment } from './localRails.js';
 
 export type LngLat = { lng: number; lat: number };
 
@@ -13,15 +14,18 @@ type AdjEdge = { j: number; enter: 'head' | 'tail'; reverse: boolean };
 
 const OVERPASS_URLS = [
   'https://overpass-api.de/api/interpreter',
+  'https://lz4.overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
 ];
 
-/** 与 Z8991 构建脚本一致的拼接容差 */
-const CONNECT_TOL = 0.006;
+/** 与 Z8991 构建脚本一致的拼接容差（约 600～1000m） */
+const CONNECT_TOL = 0.01;
 const CACHE_TTL_SEC = Number(process.env.CACHE_TTL_RAIL_SEC || 12 * 3600);
 /** 走廊查询半径（米），越大越全但越慢 */
 const CORRIDOR_RADIUS_M = 9000;
 const CHUNK_STATIONS = 5;
+/** 车站投影到钢轨的最大可信距离 */
+const MAX_SNAP_KM = 20;
 
 function dist(a: LngLat, b: LngLat): number {
   return Math.hypot(a.lng - b.lng, a.lat - b.lat);
@@ -45,9 +49,14 @@ function wayLengthKm(points: LngLat[]): number {
   return sum;
 }
 
-async function overpass(query: string): Promise<OsmWay[]> {
+async function overpass(
+  query: string,
+  timeoutMs = 25000,
+  opts?: { maxMirrors?: number },
+): Promise<OsmWay[]> {
   let lastErr: unknown;
-  for (const url of OVERPASS_URLS) {
+  const mirrors = OVERPASS_URLS.slice(0, Math.max(1, opts?.maxMirrors ?? OVERPASS_URLS.length));
+  for (const url of mirrors) {
     try {
       const res = await fetch(url, {
         method: 'POST',
@@ -56,7 +65,7 @@ async function overpass(query: string): Promise<OsmWay[]> {
           'User-Agent': 'RailVista/0.1 (railway geometry; educational)',
         },
         body: `data=${encodeURIComponent(query)}`,
-        signal: AbortSignal.timeout(25000),
+        signal: AbortSignal.timeout(timeoutMs),
       });
       if (!res.ok) {
         lastErr = new Error(`Overpass HTTP ${res.status}`);
@@ -369,6 +378,7 @@ function pathOnGraph(
   adj: Array<{ head: AdjEdge[]; tail: AdjEdge[] }>,
   from: LngLat,
   to: LngLat,
+  maxSnapKm = MAX_SNAP_KM,
 ): LngLat[] | null {
   if (haversineKm(from, to) < 0.5) return [from, to];
 
@@ -376,7 +386,7 @@ function pathOnGraph(
   const end = nearestOnWays(ways, to);
   if (!start || !end) return null;
   // 车站距钢轨过远则不可信（高铁站广场可达数公里）
-  if (start.dKm > 12 || end.dKm > 12) return null;
+  if (start.dKm > maxSnapKm || end.dKm > maxSnapKm) return null;
 
   if (start.wayIdx === end.wayIdx) {
     const pts = ways[start.wayIdx].points;
@@ -395,7 +405,7 @@ function cacheKey(stops: LngLat[], trainCode?: string): string {
   return `rail:v5:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
 }
 
-function isHighspeedTrain(trainCode?: string): boolean {
+export function isHighspeedTrain(trainCode?: string): boolean {
   return !!trainCode && /^[GDC]/i.test(trainCode);
 }
 
@@ -405,6 +415,183 @@ export type RailGeometryResult = {
   segmentsOk: number;
   segmentsTotal: number;
 };
+
+export type SegmentGeometryResult = {
+  coords: LngLat[];
+  ok: boolean;
+  fromCache: boolean;
+  reason?: string;
+};
+
+const SEGMENT_CACHE_TTL_SEC = Number(process.env.CACHE_TTL_RAIL_SEG_SEC || 12 * 3600);
+
+/** 沿站间直线加密采样，避免只查两端导致中间无轨、图不连通 */
+function sampleCorridor(from: LngLat, to: LngLat, stepKm = 35): LngLat[] {
+  const total = haversineKm(from, to);
+  if (total <= stepKm) return [from, to];
+  const n = Math.min(14, Math.max(2, Math.ceil(total / stepKm)));
+  const pts: LngLat[] = [];
+  for (let i = 0; i <= n; i += 1) {
+    const t = i / n;
+    pts.push({
+      lng: from.lng + (to.lng - from.lng) * t,
+      lat: from.lat + (to.lat - from.lat) * t,
+    });
+  }
+  return pts;
+}
+
+function segmentCacheKey(from: LngLat, to: LngLat, preferHs: boolean): string {
+  const r = (p: LngLat) => `${p.lng.toFixed(3)},${p.lat.toFixed(3)}`;
+  const raw = `${preferHs ? 'hs' : 'all'}|${r(from)}|${r(to)}`;
+  return `railseg:v4:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
+}
+
+function pathFromWays(ways: OsmWay[], from: LngLat, to: LngLat): LngLat[] | null {
+  if (ways.length < 1) return null;
+  const adj = buildAdj(ways);
+  return pathOnGraph(ways, adj, from, to, MAX_SNAP_KM);
+}
+
+/** 本地高铁轨网：不依赖 Overpass，国内环境稳定 */
+function tryLocalSegment(from: LngLat, to: LngLat): LngLat[] | null {
+  return buildLocalSegment(from, to);
+}
+
+async function fetchWaysForSegment(from: LngLat, to: LngLat, preferHs: boolean): Promise<OsmWay[]> {
+  const byId = new Map<number, OsmWay>();
+  const spanKm = haversineKm(from, to);
+  const hs = preferHs ? '["highspeed"="yes"]' : '';
+  // 走廊半径：短段紧一点，长段放宽以覆盖弯道偏离直线采样
+  const radiusM = spanKm < 80 ? 12000 : spanKm < 200 ? 15000 : 18000;
+  const samples = sampleCorridor(from, to, spanKm < 120 ? 30 : 40);
+  const fetchTimeout = 18000;
+
+  const merge = (ways: OsmWay[]) => {
+    for (const w of ways) byId.set(w.id, w);
+  };
+
+  // 1) 沿采样点走廊拉取（核心：覆盖站间中段）
+  try {
+    const around = aroundChain(samples, radiusM);
+    const query = `
+[out:json][timeout:15];
+(
+  way["railway"="rail"]${hs}(${around});
+);
+out geom;
+`.trim();
+    merge(await overpass(query, fetchTimeout));
+  } catch (e) {
+    console.warn('[rail-seg] corridor failed', e);
+  }
+
+  // 2) 仍太少时再补 bbox；过长 bbox 易超时
+  if (byId.size < 3 && spanKm < 220) {
+    try {
+      const pad = spanKm < 100 ? 0.12 : 0.18;
+      const bbox = bboxOfStops([from, to], pad);
+      const { south, west, north, east } = bbox;
+      const query = `
+[out:json][timeout:15];
+(
+  way["railway"="rail"]${hs}(${south},${west},${north},${east});
+);
+out geom;
+`.trim();
+      merge(await overpass(query, fetchTimeout));
+    } catch (e) {
+      console.warn('[rail-seg] bbox failed', e);
+    }
+  }
+
+  console.log(
+    `[rail-seg] osm ways=${byId.size} hs=${preferHs} spanKm=${spanKm.toFixed(0)} samples=${samples.length} r=${radiusM}`,
+  );
+  return [...byId.values()];
+}
+
+function toCoordPairs(points: LngLat[]): [number, number][] {
+  return simplify(points, 0.45).map((p) => [
+    Number(p.lng.toFixed(6)),
+    Number(p.lat.toFixed(6)),
+  ]);
+}
+
+/**
+ * 单站间段精确折线：优先本地高铁轨网，失败再 Overpass。
+ */
+export async function buildSegmentGeometry(
+  from: LngLat,
+  to: LngLat,
+  opts?: { preferHighspeed?: boolean },
+): Promise<SegmentGeometryResult> {
+  if (
+    !Number.isFinite(from.lng) ||
+    !Number.isFinite(from.lat) ||
+    !Number.isFinite(to.lng) ||
+    !Number.isFinite(to.lat)
+  ) {
+    return { coords: [from, to], ok: false, fromCache: false, reason: 'bad_coords' };
+  }
+  if (haversineKm(from, to) < 0.5) {
+    return { coords: [from, to], ok: true, fromCache: false };
+  }
+
+  const preferHs = !!opts?.preferHighspeed;
+  const key = segmentCacheKey(from, to, preferHs);
+  const cached = cache.get<LngLat[]>(key);
+  if (cached && cached.length >= 2) {
+    return { coords: cached, ok: true, fromCache: true };
+  }
+
+  // 1) 本地轨网（稳定、秒级）
+  try {
+    const localLine = tryLocalSegment(from, to);
+    if (localLine && localLine.length >= 2) {
+      const simplified = simplify(localLine, 0.45);
+      cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
+      console.log(`[rail-seg] ok via local pts=${simplified.length}`);
+      return { coords: simplified, ok: true, fromCache: false, reason: 'local' };
+    }
+  } catch (e) {
+    console.warn('[rail-seg] local failed', e);
+  }
+
+  // 2) Overpass 兜底
+  let lastReason = 'no_ways';
+  const tryOsm = async (hs: boolean): Promise<LngLat[] | null> => {
+    const ways = await fetchWaysForSegment(from, to, hs);
+    if (ways.length < 1) {
+      lastReason = 'overpass_empty';
+      return null;
+    }
+    const line = pathFromWays(ways, from, to);
+    if (!line || line.length < 2) {
+      lastReason = 'path_unconnected';
+      return null;
+    }
+    return line;
+  };
+
+  let line = preferHs ? await tryOsm(true) : await tryOsm(false);
+  if ((!line || line.length < 2) && preferHs) {
+    line = await tryOsm(false);
+  }
+
+  if (!line || line.length < 2) {
+    return { coords: [from, to], ok: false, fromCache: false, reason: lastReason };
+  }
+
+  const simplified = simplify(line, 0.45);
+  cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
+  console.log(`[rail-seg] ok via osm pts=${simplified.length}`);
+  return { coords: simplified, ok: true, fromCache: false, reason: 'osm' };
+}
+
+export function formatRailCoords(points: LngLat[]): [number, number][] {
+  return toCoordPairs(points);
+}
 
 /**
  * 一次拉取走廊轨道图，再按站序寻路拼接——与 Z8991 精品线同思路。

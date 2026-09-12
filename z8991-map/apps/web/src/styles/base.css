@@ -46,6 +46,42 @@ body:has(.select-page) {
   line-height: 1.4;
 }
 
+.rail-upgrade {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.rail-upgrade-btn {
+  appearance: none;
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  background: rgba(56, 189, 248, 0.14);
+  color: #7dd3fc;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.rail-upgrade-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.rail-upgrade-btn:not(:disabled):hover {
+  background: rgba(56, 189, 248, 0.22);
+}
+
+.rail-upgrade-error {
+  font-size: 11px;
+  color: #fca5a5;
+  line-height: 1.3;
+}
+
 .dialog-actions {
   display: flex;
   flex-wrap: wrap;

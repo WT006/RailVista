@@ -186,6 +186,7 @@ async function enterTrip() {
     // 进图前尝试精品走廊精确线（快）；无命中再用站点折线
     let preciseRailway: [number, number][] | null = null;
     let railHint = '示意线（站点连线）';
+    let canUpgradePrecise = true;
     try {
       const geo = await api.getRailGeometry({
         trainCode: selected.value.trainCode,
@@ -205,10 +206,12 @@ async function enterTrip() {
       }
       if (geo.fromPreset && geo.coords?.length >= 2 && geo.source !== 'station') {
         preciseRailway = geo.coords;
+        canUpgradePrecise = false;
         railHint = geo.corridorName
           ? `真实轨道线（${geo.corridorName}）`
           : '真实轨道线（精品预置）';
       } else {
+        canUpgradePrecise = geo.canUpgrade !== false;
         console.warn('[enter] no preset corridor', {
           fromPreset: geo.fromPreset,
           source: geo.source,
@@ -238,6 +241,7 @@ async function enterTrip() {
       spots,
       preciseRailway,
       railHint,
+      canUpgradePrecise,
     });
     router.push({
       path: '/trip',

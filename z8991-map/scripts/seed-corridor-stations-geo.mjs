@@ -1,10 +1,11 @@
 /**
- * 用各走廊折线按站序插值，补齐 / 纠正 stations-geo 中的干线枢纽坐标。
+ * 用各走廊折线补齐 / 纠正 stations-geo 中的干线枢纽坐标。
  *
  * 规则：
- * - 非 corridor 来源（OSM/手标等）永不覆盖
- * - 多走廊同站：优先选「同时靠近最多条走廊」的插值点（避免沪昆线性插值把上饶甩飞后压过合福）
- * - 单走廊：直接用该走廊插值
+ * - 非 corridor 来源（OSM/手标等）永不覆盖，并作为锚点
+ * - 走廊折线常有折返毛刺，禁止对全程做等分插值（会把新乡东插到郑州以南）
+ * - 在相邻锚点的站序区间内，按站序比例插值 progress，再落到折线上
+ * - 多走廊同站：优先选「同时靠近最多条走廊」的插值点
  *
  * node scripts/seed-corridor-stations-geo.mjs
  */
@@ -18,6 +19,8 @@ const geoPath = join(__dirname, '../data/stations-geo.json');
 
 /** 认为「落在走廊上」的距离阈值 */
 const ON_RAIL_KM = 20;
+/** 锚点投影到走廊的最大偏离 */
+const ANCHOR_MAX_KM = 45;
 
 function haversine(a, b) {
   const toRad = (d) => (d * Math.PI) / 180;
@@ -31,36 +34,55 @@ function haversine(a, b) {
   return 6371 * 2 * Math.asin(Math.sqrt(h));
 }
 
-function pointAtKm(coords, targetKm) {
-  if (!coords.length) return null;
-  if (targetKm <= 0) return { lng: coords[0][0], lat: coords[0][1] };
-  let acc = 0;
-  for (let i = 1; i < coords.length; i++) {
-    const a = { lng: coords[i - 1][0], lat: coords[i - 1][1] };
-    const b = { lng: coords[i][0], lat: coords[i][1] };
-    const seg = haversine(a, b);
-    if (acc + seg >= targetKm) {
-      const t = seg > 0 ? (targetKm - acc) / seg : 0;
+function buildMetrics(coords) {
+  const path = coords.map(([lng, lat]) => ({ lng, lat, distFromStart: 0 }));
+  let lengthKm = 0;
+  for (let i = 1; i < path.length; i++) {
+    lengthKm += haversine(path[i - 1], path[i]);
+    path[i].distFromStart = lengthKm;
+  }
+  return { path, lengthKm };
+}
+
+function pointAtProgress(path, lengthKm, progress) {
+  if (!path.length) return null;
+  if (lengthKm <= 0) return { lng: path[0].lng, lat: path[0].lat };
+  const target = Math.max(0, Math.min(1, progress)) * lengthKm;
+  for (let i = 1; i < path.length; i++) {
+    if (path[i].distFromStart >= target) {
+      const a = path[i - 1];
+      const b = path[i];
+      const seg = b.distFromStart - a.distFromStart || 1;
+      const t = (target - a.distFromStart) / seg;
       return {
         lng: a.lng + (b.lng - a.lng) * t,
         lat: a.lat + (b.lat - a.lat) * t,
       };
     }
-    acc += seg;
   }
-  const last = coords[coords.length - 1];
-  return { lng: last[0], lat: last[1] };
+  const last = path[path.length - 1];
+  return { lng: last.lng, lat: last.lat };
 }
 
-function lineLengthKm(coords) {
-  let sum = 0;
-  for (let i = 1; i < coords.length; i++) {
-    sum += haversine(
-      { lng: coords[i - 1][0], lat: coords[i - 1][1] },
-      { lng: coords[i][0], lat: coords[i][1] },
+function projectToRailway(path, lengthKm, lng, lat) {
+  let best = { distKm: Infinity, progress: 0, point: path[0] };
+  if (!path.length || lengthKm <= 0) return best;
+  for (let i = 1; i < path.length; i++) {
+    const a = path[i - 1];
+    const b = path[i];
+    const segLen = b.distFromStart - a.distFromStart || 1;
+    const dx = b.lng - a.lng;
+    const dy = b.lat - a.lat;
+    const t = Math.max(
+      0,
+      Math.min(1, ((lng - a.lng) * dx + (lat - a.lat) * dy) / (dx * dx + dy * dy || 1)),
     );
+    const point = { lng: a.lng + dx * t, lat: a.lat + dy * t };
+    const distKm = haversine({ lng, lat }, point);
+    const progress = (a.distFromStart + segLen * t) / lengthKm;
+    if (distKm < best.distKm) best = { distKm, progress, point };
   }
-  return sum;
+  return best;
 }
 
 function nearestOnRail(coords, lng, lat) {
@@ -80,9 +102,6 @@ function corridorsNearCount(pt, list) {
   return n;
 }
 
-/**
- * 多走廊同站：选「落在最多走廊附近」的插值；并列时选离其它候选总距最小者。
- */
 function pickBest(list) {
   if (list.length === 1) {
     return { pt: list[0].pt, id: list[0].id };
@@ -104,34 +123,100 @@ function pickBest(list) {
   return best;
 }
 
+function isTrustedGeo(entry) {
+  if (!entry || entry.lng == null || entry.lat == null) return false;
+  const src = String(entry.source || '');
+  return !src.startsWith('corridor:');
+}
+
+/**
+ * 在 hint 站序上用可信锚点约束 progress，避免折线折返导致等分错位。
+ */
+function progressForHints(hints, railway, geo) {
+  const { path, lengthKm } = buildMetrics(railway);
+  if (lengthKm <= 0 || hints.length < 2) return null;
+
+  /** @type {Array<{ index: number, progress: number }>} */
+  const anchors = [{ index: 0, progress: 0 }];
+
+  for (let i = 1; i < hints.length - 1; i++) {
+    const name = hints[i];
+    const existing = geo[name];
+    if (!isTrustedGeo(existing)) continue;
+    const proj = projectToRailway(
+      path,
+      lengthKm,
+      Number(existing.lng),
+      Number(existing.lat),
+    );
+    if (proj.distKm > ANCHOR_MAX_KM) continue;
+    const last = anchors[anchors.length - 1];
+    // 锚点 progress 必须沿站序非降，否则跳过（脏锚点）
+    if (proj.progress + 0.002 < last.progress) continue;
+    anchors.push({ index: i, progress: proj.progress });
+  }
+
+  anchors.push({ index: hints.length - 1, progress: 1 });
+
+  // 若相邻锚点 progress 倒挂（极端脏数据），拉平
+  for (let i = 1; i < anchors.length; i++) {
+    if (anchors[i].progress < anchors[i - 1].progress) {
+      anchors[i].progress = anchors[i - 1].progress;
+    }
+  }
+
+  const out = new Array(hints.length);
+  for (let i = 0; i < hints.length; i++) {
+    let left = anchors[0];
+    let right = anchors[anchors.length - 1];
+    for (let a = 0; a < anchors.length; a++) {
+      if (anchors[a].index <= i) left = anchors[a];
+      if (anchors[a].index >= i) {
+        right = anchors[a];
+        break;
+      }
+    }
+    if (left.index === right.index) {
+      out[i] = left.progress;
+    } else {
+      const t = (i - left.index) / (right.index - left.index);
+      out[i] = left.progress + t * (right.progress - left.progress);
+    }
+  }
+  return { progresses: out, path, lengthKm, anchorCount: anchors.length };
+}
+
 /** @type {Map<string, Array<{ id: string, pt: {lng:number,lat:number}, railway: number[][] }>>} */
 const candidates = new Map();
 
+const geo = JSON.parse(readFileSync(geoPath, 'utf8'));
+
 for (const file of readdirSync(corridorsDir).filter((f) => f.endsWith('.json'))) {
   const c = JSON.parse(readFileSync(join(corridorsDir, file), 'utf8'));
-  const hints = c.stationsHint || [];
+  const hints = (c.stationsHint || [])
+    .map((h) => String(h).replace(/站$/, '').trim())
+    .filter(Boolean);
   const railway = c.railway || [];
   if (hints.length < 2 || railway.length < 2) continue;
-  const totalKm = lineLengthKm(railway);
+
+  const placed = progressForHints(hints, railway, geo);
+  if (!placed) continue;
+
   for (let i = 0; i < hints.length; i++) {
-    const name = String(hints[i]).replace(/站$/, '').trim();
-    if (!name) continue;
-    const frac = hints.length === 1 ? 0 : i / (hints.length - 1);
-    const pt = pointAtKm(railway, totalKm * frac);
+    const name = hints[i];
+    const pt = pointAtProgress(placed.path, placed.lengthKm, placed.progresses[i]);
     if (!pt) continue;
     if (!candidates.has(name)) candidates.set(name, []);
     candidates.get(name).push({ id: c.id, pt, railway });
   }
 }
 
-const geo = JSON.parse(readFileSync(geoPath, 'utf8'));
 let added = 0;
 let kept = 0;
 let corrected = 0;
 
 for (const [name, list] of candidates) {
   const best = pickBest(list);
-  // 吸附到得分最高候选自己的折线（保证落在精品线上）
   const snap = nearestOnRail(
     list.find((x) => x.id === best.id).railway,
     best.pt.lng,
@@ -161,10 +246,10 @@ for (const [name, list] of candidates) {
     }
     geo[name] = next;
     corrected += 1;
-    if (name === '上饶' || moved > 30) {
+    if (moved > 20) {
       console.log(
         `corrected ${name}: moved ${moved.toFixed(1)}km ` +
-          `${existing.lng},${existing.lat} → ${next.lng},${next.lat} (${next.source}, near=${corridorsNearCount(next, list)}/${list.length})`,
+          `${existing.lng},${existing.lat} → ${next.lng},${next.lat} (${next.source})`,
       );
     }
     continue;
@@ -185,4 +270,19 @@ console.log(
   'total',
   Object.keys(geo).length,
 );
-console.log('上饶', geo['上饶']);
+
+// 抽样校验：京广若干站 lat 应北→南单调（相对可信锚点）
+const jgCheck = ['邯郸东', '鹤壁东', '新乡东', '郑州东', '许昌东', '漯河西'];
+let prevLat = Infinity;
+for (const n of jgCheck) {
+  const g = geo[n];
+  if (!g) {
+    console.warn('missing', n);
+    continue;
+  }
+  console.log(n, g.lat.toFixed(3), g.lng.toFixed(3), g.source || 'trusted');
+  if (g.lat > prevLat + 0.05) {
+    console.warn(`WARN ${n} lat rose vs previous — possible residual error`);
+  }
+  prevLat = g.lat;
+}

@@ -65,6 +65,23 @@ const schedule = computed(() => {
   return resolveSchedule(seg.baseDepartureIso, seg.baseArrivalIso, prefs.departureIso);
 });
 
+const showPreciseAction = computed(() => {
+  if (trip.preciseLoading) return true;
+  if (trip.canUpgradePrecise) return true;
+  const st = trip.preciseJob?.status;
+  return st === 'partial' || st === 'failed';
+});
+
+const preciseActionLabel = computed(() => {
+  const job = trip.preciseJob;
+  if (trip.preciseLoading && job) {
+    return `加载中 ${job.segmentsDone}/${job.segmentsTotal}…`;
+  }
+  if (trip.preciseLoading) return '加载中…';
+  if (job?.status === 'partial' || job?.status === 'failed') return '重试精确路线';
+  return '获取精品路线';
+});
+
 const shifted = (iso: string) => shiftDate(iso, schedule.value?.offsetMs || 0);
 
 function showToast(msg: string) {
@@ -450,6 +467,46 @@ function goBackToSelect() {
   router.push('/');
 }
 
+function refreshRailLine() {
+  if (!railLine || !map) return;
+  const coords = trip.railwayCoords;
+  if (coords.length < 2) return;
+  railLine.setPath(coords);
+  pathMetrics = buildRailwayMetrics(coords);
+  tick();
+}
+
+function refreshStationMarkers() {
+  const seg = segment.value;
+  if (!map || !seg) return;
+  seg.stops.forEach((s, i) => {
+    const marker = stationMarkers[i];
+    if (!marker) return;
+    if (s.lng == null || s.lat == null || !Number.isFinite(s.lng) || !Number.isFinite(s.lat)) {
+      return;
+    }
+    marker.setPosition([s.lng, s.lat]);
+    // 进图时无坐标的站未上图；补坐标后需要动态 map.add
+    const onMap = typeof marker.getMap === 'function' ? marker.getMap() : null;
+    if (!onMap) {
+      map.add(marker);
+      if (!prefs.layers.station) marker.hide();
+    }
+  });
+}
+
+async function onUpgradePrecise() {
+  await trip.upgradePrecise();
+  refreshStationMarkers();
+  refreshRailLine();
+  if (trip.railwayCoords.length >= 2) {
+    map?.setFitView(null, false, getMapPadding());
+  }
+  if (trip.preciseError) showToast(trip.preciseError);
+  else if (trip.preciseJob?.status === 'done') showToast('精确路线已加载');
+  else if (trip.preciseJob?.status === 'partial') showToast(trip.preciseJob.message);
+}
+
 onMounted(async () => {
   try {
     await ensureTripLoaded();
@@ -464,7 +521,23 @@ watch([now, gps, () => prefs.calibration, () => prefs.departureIso, () => prefs.
   applyLayers();
 });
 
+watch(
+  () => trip.railwayCoords,
+  () => {
+    refreshRailLine();
+  },
+  { deep: true },
+);
+
+watch(
+  () => segment.value?.stops.map((s) => `${s.name}:${s.lng},${s.lat}`).join('|'),
+  () => {
+    refreshStationMarkers();
+  },
+);
+
 onUnmounted(() => {
+  trip.stopPrecisePoll();
   map?.destroy?.();
 });
 </script>
@@ -510,6 +583,17 @@ onUnmounted(() => {
               <span>定位 <strong>{{ mode }}</strong></span>
             </div>
             <p class="rail-hint">{{ trip.polylineHint }}</p>
+            <div v-if="showPreciseAction" class="rail-upgrade">
+              <button
+                type="button"
+                class="rail-upgrade-btn"
+                :disabled="trip.preciseLoading"
+                @click="onUpgradePrecise"
+              >
+                {{ preciseActionLabel }}
+              </button>
+              <span v-if="trip.preciseError" class="rail-upgrade-error">{{ trip.preciseError }}</span>
+            </div>
           </div>
 
           <div v-if="calibrateOpen" class="calibrate-popover">

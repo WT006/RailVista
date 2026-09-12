@@ -30,6 +30,10 @@ let cacheMtimeMs = 0;
 export function clearCorridorCache(): void {
   cache = null;
   cacheMtimeMs = 0;
+  // 延迟清路网缓存，避免循环依赖
+  import('./corridorNetwork.js')
+    .then((m) => m.clearCorridorNetworkCache())
+    .catch(() => undefined);
 }
 
 function corridorsDirMtimeMs(): number {

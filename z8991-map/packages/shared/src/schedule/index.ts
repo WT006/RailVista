@@ -187,6 +187,20 @@ export function sliceStopsByOd(stopsAll: Stop[], fromName: string, toName: strin
   });
 }
 
+/**
+ * 经停站序必须以 12306/时刻表顺序为准，禁止按经纬度重排。
+ * 示意折线交叉应修坐标飞点，而不是改站序。
+ */
+export function assertTimetableStopOrder(stops: Stop[]): void {
+  for (let i = 1; i < stops.length; i++) {
+    const prev = stops[i - 1]?.seq;
+    const cur = stops[i]?.seq;
+    if (prev != null && cur != null && cur < prev) {
+      throw new Error(`经停站序倒挂：${stops[i - 1]?.name}(seq=${prev}) → ${stops[i]?.name}(seq=${cur})`);
+    }
+  }
+}
+
 export function stopAnchorIso(stop: Stop, prefer: 'depart' | 'arrive' | 'auto' = 'auto'): string | null {
   if (prefer === 'depart') return stop.depart || stop.departTime || stop.at || stop.arrive || stop.arriveTime;
   if (prefer === 'arrive') return stop.arrive || stop.arriveTime || stop.at || stop.depart || stop.departTime;
@@ -206,6 +220,7 @@ export function buildUserSegment(params: {
   stopsAll: Stop[];
 }): UserSegment {
   const stops = sliceStopsByOd(params.stopsAll, params.fromName, params.toName);
+  assertTimetableStopOrder(stops);
   const first = stops[0];
   const last = stops[stops.length - 1];
   const baseDepartureIso = stopAnchorIso(first, 'depart');

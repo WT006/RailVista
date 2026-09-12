@@ -28,7 +28,9 @@ app.use('*', async (c, next) => {
     hits.set(ip, bucket);
   }
   bucket.n += 1;
-  const limit = c.req.path.includes('/rail-geometry') ? 20 : 90;
+  const path = c.req.path;
+  const isRailJobPoll = c.req.method === 'GET' && path.includes('/rail-geometry/jobs/');
+  const limit = path.includes('/rail-geometry') ? (isRailJobPoll ? 120 : 24) : 90;
   if (bucket.n > limit) {
     return c.json(
       { ok: false, error: { code: 'RATE_LIMIT', message: '请求过于频繁，请稍后再试' } },
@@ -47,6 +49,8 @@ app.route('/rail-geometry', railGeometryRoute);
 const port = Number(process.env.PORT || 3000);
 
 await loadStationIndex();
+const { loadLocalHsrRails } = await import('./services/localRails.js');
+loadLocalHsrRails();
 console.log(`[railvista-api] AMAP_KEY=${process.env.AMAP_KEY ? 'set' : 'missing'} listening on :${port}`);
 
 serve({ fetch: app.fetch, port });

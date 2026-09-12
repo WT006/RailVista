@@ -1,6 +1,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import {
+  buildRailwayMetrics,
+  haversineKm,
+  projectToRailway,
+} from '@railvista/shared';
 import { matchCorridor, sliceCorridorForStops, loadCorridors } from './corridors.js';
+import { matchCorridorNetwork } from './corridorNetwork.js';
 
 describe('matchCorridor', () => {
   it('loads phase-1 corridors', () => {
@@ -394,6 +400,134 @@ describe('matchCorridor', () => {
         { name: '广州南', lng: 113.269, lat: 22.989 },
       ])?.corridor.id,
       'jingguang',
+    );
+  });
+});
+
+describe('matchCorridorNetwork', () => {
+  it('stitches 济南西→杭州东 via jinghu+ninghang', () => {
+    const hit = matchCorridorNetwork([
+      { name: '济南西', lng: 116.885, lat: 36.668 },
+      { name: '南京南', lng: 118.798, lat: 31.969 },
+      { name: '杭州东', lng: 120.213, lat: 30.291 },
+    ]);
+    assert.ok(hit, 'expected network match');
+    assert.ok(hit!.corridorIds.includes('jinghu'));
+    assert.ok(hit!.corridorIds.includes('ninghang'));
+    assert.ok(hit!.coords.length > 200);
+    assert.ok(hit!.hops >= 2);
+  });
+
+  it('stitches 太原南→兰州西 via daxi+xulan (or zhengtai+xulan)', () => {
+    const hit = matchCorridorNetwork([
+      { name: '太原南', lng: 112.598, lat: 37.736 },
+      { name: '西安北', lng: 108.939, lat: 34.377 },
+      { name: '兰州西', lng: 103.758, lat: 36.069 },
+    ]);
+    assert.ok(hit, 'expected network match');
+    assert.ok(hit!.corridorIds.includes('xulan'));
+    // 经停含西安北时应优先大西+徐兰；至少要是含徐兰的两段精品拼接
+    assert.ok(
+      hit!.corridorIds.includes('daxi') || hit!.corridorIds.includes('zhengtai'),
+      `unexpected path ${hit!.corridorIds.join('+')}`,
+    );
+    assert.ok(hit!.coords.length > 200);
+  });
+
+  it('does not network-match when single corridor already covers OD', () => {
+    // 京沪全程应由单走廊处理，路网返回 null
+    const hit = matchCorridorNetwork([
+      { name: '北京南', lng: 116.3789, lat: 39.8651 },
+      { name: '南京南', lng: 118.798, lat: 31.969 },
+      { name: '上海虹桥', lng: 121.316, lat: 31.194 },
+    ]);
+    assert.equal(hit, null);
+  });
+
+  it('stitches 厦门北→北京南 via fuxia+hefu+jinghu (not hukun via Shanghai)', () => {
+    const stops = [
+      { name: '厦门北', lng: 118.004482, lat: 24.597728 },
+      { name: '福州南', lng: 119.386113, lat: 25.994224 },
+      { name: '上饶', lng: 117.941062, lat: 28.64769 },
+      { name: '黄山北', lng: 118.22474, lat: 29.783277 },
+      { name: '合肥南', lng: 117.316, lat: 31.798 },
+      { name: '蚌埠南', lng: 117.416, lat: 32.917 },
+      { name: '北京南', lng: 116.3789, lat: 39.8651 },
+    ];
+    const hit = matchCorridorNetwork(stops);
+    assert.ok(hit, 'expected network match');
+    assert.deepEqual(hit!.corridorIds, ['fuxia', 'hefu', 'jinghu']);
+    assert.ok(!hit!.corridorIds.includes('hukun'), 'must not detour via 沪昆');
+    // 折线不应摸到上海一带
+    const maxLng = Math.max(...hit!.coords.map((c) => c[0]));
+    assert.ok(maxLng < 120.5, `unexpected east excursion maxLng=${maxLng}`);
+    assert.ok(hit!.coords.length > 400);
+
+    const start = hit!.coords[0];
+    const end = hit!.coords[hit!.coords.length - 1];
+    assert.ok(
+      haversineKm({ lng: start[0], lat: start[1] }, { lng: stops[0].lng, lat: stops[0].lat }) < 40,
+      `start must be near 厦门北, got ${start}`,
+    );
+    assert.ok(
+      haversineKm({ lng: end[0], lat: end[1] }, { lng: stops[6].lng, lat: stops[6].lat }) < 40,
+      `end must be near 北京南, got ${end}`,
+    );
+
+    let maxJump = 0;
+    for (let i = 1; i < hit!.coords.length; i++) {
+      const d = haversineKm(
+        { lng: hit!.coords[i - 1][0], lat: hit!.coords[i - 1][1] },
+        { lng: hit!.coords[i][0], lat: hit!.coords[i][1] },
+      );
+      if (d > maxJump) maxJump = d;
+    }
+    // 合肥南→蚌埠南桥接约 125km；方向拼错会出现 800km+
+    assert.ok(maxJump < 280, `chaotic jump ${maxJump.toFixed(1)}km`);
+
+    const { path, lengthKm } = buildRailwayMetrics(hit!.coords);
+    assert.ok(lengthKm > 1500 && lengthKm < 2800, `railKm=${lengthKm.toFixed(0)} out of range`);
+    let lastProg = -0.02;
+    for (const s of stops) {
+      const p = projectToRailway(path, lengthKm, s.lng, s.lat);
+      assert.ok(p.distKm < 45, `${s.name} far from rail ${p.distKm}`);
+      assert.ok(p.progress + 0.04 >= lastProg, `${s.name} progress regress ${lastProg}→${p.progress}`);
+      lastProg = Math.max(lastProg, p.progress);
+    }
+  });
+
+  it('stitches 鹤壁东→合肥南 via jingguang+zhengfu+shanghehang', () => {
+    const hit = matchCorridorNetwork([
+      { name: '鹤壁东', lng: 114.336, lat: 35.756 },
+      { name: '郑州东', lng: 113.777, lat: 34.76 },
+      { name: '周口东', lng: 114.7407189, lat: 33.6468018 },
+      { name: '阜阳西', lng: 115.734, lat: 32.916 },
+      { name: '淮南南', lng: 117.0359185, lat: 32.5442515 },
+      { name: '合肥南', lng: 117.316, lat: 31.798 },
+    ]);
+    assert.ok(hit, 'expected network match');
+    assert.deepEqual(hit!.corridorIds, ['jingguang', 'zhengfu', 'shanghehang']);
+    assert.ok(hit!.coords.length > 200);
+    const start = hit!.coords[0];
+    const end = hit!.coords[hit!.coords.length - 1];
+    assert.ok(
+      haversineKm({ lng: start[0], lat: start[1] }, { lng: 114.336, lat: 35.756 }) < 40,
+    );
+    assert.ok(
+      haversineKm({ lng: end[0], lat: end[1] }, { lng: 117.316, lat: 31.798 }) < 40,
+    );
+  });
+
+  it('does not stitch 虹桥→嘉兴→海宁→杭州南 as huhang network', () => {
+    // 起终若都贴 huhang，路网直接放弃；单走廊也会因方位冲突拒绝
+    assert.equal(
+      matchCorridor([
+        { name: '上海虹桥', lng: 121.3165, lat: 31.194 },
+        { name: '嘉兴', lng: 120.7595, lat: 30.7665 },
+        { name: '海宁', lng: 120.6813, lat: 30.5362 },
+        { name: '杭州南', lng: 120.29, lat: 30.1747 },
+      ]),
+      null,
     );
   });
 });

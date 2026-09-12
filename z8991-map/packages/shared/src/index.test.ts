@@ -3,9 +3,11 @@ import assert from 'node:assert/strict';
 import {
   buildPolyline,
   buildRailwayMetrics,
+  haversineKm,
   resolveSchedule,
   resolveTripPolyline,
   scheduleProgress,
+  slicePolylineByOd,
   sliceStopsByOd,
 } from './index.js';
 import type { Stop } from './types.js';
@@ -90,5 +92,28 @@ describe('polyline + progress', () => {
     });
     assert.equal(sliced.source, 'precise');
     assert.ok(sliced.coords.length >= 2);
+  });
+
+  it('reverses slice when OD travels opposite to corridor storage', () => {
+    // 走廊存储：西→东；行程：东→西
+    const full: [number, number][] = [
+      [100.0, 30.0],
+      [101.0, 30.0],
+      [102.0, 30.0],
+      [103.0, 30.0],
+    ];
+    const sliced = slicePolylineByOd(full, { lng: 102.5, lat: 30.0 }, { lng: 100.5, lat: 30.0 });
+    assert.ok(sliced && sliced.length >= 2);
+    const start = sliced![0];
+    const end = sliced![sliced!.length - 1];
+    assert.ok(
+      haversineKm({ lng: start[0], lat: start[1] }, { lng: 102.5, lat: 30.0 }) < 5,
+      `start should be near from, got ${start}`,
+    );
+    assert.ok(
+      haversineKm({ lng: end[0], lat: end[1] }, { lng: 100.5, lat: 30.0 }) < 5,
+      `end should be near to, got ${end}`,
+    );
+    assert.ok(start[0] > end[0], 'polyline should run east→west');
   });
 });

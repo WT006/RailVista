@@ -365,6 +365,49 @@ body:has(.select-page) {
   font-family: inherit;
 }
 
+.station-field__control {
+  position: relative;
+}
+
+.station-field__control input {
+  width: 100%;
+}
+
+.station-suggest {
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  max-height: 240px;
+  overflow: auto;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(56, 189, 248, 0.06) inset;
+  overscroll-behavior: contain;
+}
+
+.station-suggest li {
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.station-suggest li.is-active,
+.station-suggest li:hover {
+  background: rgba(56, 189, 248, 0.16);
+  color: #e0f2fe;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

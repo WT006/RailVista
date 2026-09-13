@@ -95,7 +95,7 @@ const phase6 = [
     anchors: [
       { name: '杭州东', lng: 120.212, lat: 30.289 },
       { name: '富阳', lng: 119.95, lat: 30.05 },
-      { name: '桐庐', lng: 119.68, lat: 29.8 },
+      { name: '桐庐', lng: 119.727725, lat: 29.791394 },
       { name: '建德', lng: 119.28, lat: 29.49 },
       { name: '千岛湖', lng: 119.1880833, lat: 29.7374 },
       { name: '三阳', lng: 118.75, lat: 29.85 },

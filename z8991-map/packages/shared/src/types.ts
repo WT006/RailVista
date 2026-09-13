@@ -54,6 +54,9 @@ export interface UserSegment {
 
 export type SpotSide = 'left' | 'right' | 'both' | 'unknown';
 
+/** 车窗可见性：决定默认贴线距离阈值 */
+export type SpotVisibility = 'window' | 'distant' | 'on_track';
+
 export interface ScenicSpot {
   id: string;
   name: string;
@@ -64,7 +67,15 @@ export interface ScenicSpot {
   at?: string;
   side?: SpotSide;
   nightOnly?: boolean;
-  source: 'preset';
+  visibility?: SpotVisibility;
+  category?: string;
+  /** 入库可选；空则按 visibility 默认半径 */
+  maxDistKm?: number;
+  /** 匹配结果：点到行程折线最短距离 */
+  distKm?: number;
+  /** 匹配结果：投影点距折线起点累计公里 */
+  progressKm?: number;
+  source: 'preset' | 'curated';
   trainCode?: string;
 }
 

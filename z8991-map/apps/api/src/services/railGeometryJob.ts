@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { haversineKm } from '@railvista/shared';
+import { haversineKm, type ScenicSpot } from '@railvista/shared';
 import {
   buildRailGeometry,
   buildSegmentGeometry,
@@ -9,6 +9,7 @@ import {
 } from './osmRailway.js';
 import { matchCorridor, sliceCorridorForStops } from './corridors.js';
 import { matchCorridorNetwork } from './corridorNetwork.js';
+import { matchScenicSpotsForRailway } from './scenicSpots.js';
 
 export type RailJobStatus = 'queued' | 'running' | 'done' | 'partial' | 'failed';
 
@@ -31,6 +32,8 @@ export type RailJobSnapshot = {
   trainCode?: string;
   /** 校正后的经停坐标（必须带站名，供前端按名合并） */
   stops?: NamedStop[];
+  /** 按当前 coords 过滤的风景点 */
+  scenicSpots?: ScenicSpot[];
 };
 
 type SegSlot = { coords: LngLat[]; ok: boolean; reason?: string } | null;
@@ -127,6 +130,7 @@ function snapshot(job: RailJob): RailJobSnapshot {
     qualityTier: job.qualityTier,
     trainCode: job.trainCode,
     stops: job.stops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat })),
+    scenicSpots: matchScenicSpotsForRailway(job.coords),
   };
 }
 

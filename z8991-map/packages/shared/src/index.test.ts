@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   buildPolyline,
   buildRailwayMetrics,
+  filterSpotsAlongRailway,
   haversineKm,
   resolveSchedule,
   resolveTripPolyline,
@@ -115,5 +116,86 @@ describe('polyline + progress', () => {
       `end should be near to, got ${end}`,
     );
     assert.ok(start[0] > end[0], 'polyline should run east→west');
+  });
+});
+
+describe('filterSpotsAlongRailway', () => {
+  const line: [number, number][] = [
+    [100.0, 30.0],
+    [101.0, 30.0],
+    [102.0, 30.0],
+  ];
+
+  it('returns empty for short polyline', () => {
+    assert.deepEqual(filterSpotsAlongRailway([{ id: 'a', name: 'A', lng: 100, lat: 30, source: 'curated' }], [[100, 30]]), []);
+  });
+
+  it('keeps window spots within 8km and sorts by progress', () => {
+    const spots = filterSpotsAlongRailway(
+      [
+        {
+          id: 'far',
+          name: 'Far',
+          lng: 101.0,
+          lat: 30.2,
+          visibility: 'window',
+          source: 'curated',
+        },
+        {
+          id: 'near-end',
+          name: 'NearEnd',
+          lng: 101.95,
+          lat: 30.01,
+          visibility: 'window',
+          source: 'curated',
+        },
+        {
+          id: 'near-start',
+          name: 'NearStart',
+          lng: 100.05,
+          lat: 30.01,
+          visibility: 'window',
+          source: 'curated',
+        },
+      ],
+      line,
+    );
+    assert.equal(spots.length, 2);
+    assert.equal(spots[0].id, 'near-start');
+    assert.equal(spots[1].id, 'near-end');
+    assert.ok((spots[0].progressKm ?? 0) < (spots[1].progressKm ?? 0));
+  });
+
+  it('respects custom maxDistKm and distant default', () => {
+    const far = filterSpotsAlongRailway(
+      [
+        {
+          id: 'peak',
+          name: 'Peak',
+          lng: 101.0,
+          lat: 30.25,
+          visibility: 'distant',
+          source: 'curated',
+        },
+      ],
+      line,
+    );
+    assert.equal(far.length, 1);
+
+    const tight = filterSpotsAlongRailway(
+      [
+        {
+          id: 'peak2',
+          name: 'Peak2',
+          lng: 101.0,
+          lat: 30.25,
+          visibility: 'distant',
+          maxDistKm: 5,
+          source: 'curated',
+        },
+      ],
+      line,
+    );
+    assert.equal(tight.length, 0);
   });
 });

@@ -108,6 +108,14 @@ function showToast(msg: string) {
   }, 2800);
 }
 
+function escHtml(s: string) {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 async function ensureTripLoaded() {
   if (trip.segment) {
     if (!trip.isDemo) prefs.loadForCurrentTrip();
@@ -133,6 +141,31 @@ async function ensureTripLoaded() {
       lat: s.lat,
       intro: s.intro,
     }));
+    let spots: import('@railvista/shared').ScenicSpot[] = [];
+    let preciseRailway = (preset.railway as [number, number][] | undefined) || null;
+    try {
+      const geo = await api.getRailGeometry({
+        trainCode: preset.meta.train,
+        mode: 'preset',
+        stops: demoStops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat })),
+      });
+      if (geo.coords?.length >= 2) preciseRailway = geo.coords;
+      if (geo.scenicSpots?.length) spots = geo.scenicSpots;
+    } catch {
+      /* ignore */
+    }
+    if (!spots.length && preset.scenicSpots?.length) {
+      spots = preset.scenicSpots.map((s) => ({
+        id: String(s.id),
+        name: s.name,
+        lng: s.lng,
+        lat: s.lat,
+        intro: s.intro,
+        nightOnly: s.nightOnly,
+        visibility: 'window' as const,
+        source: 'preset' as const,
+      }));
+    }
     trip.setTrip({
       trainCode: preset.meta.train,
       trainNo: preset.meta.trainNo || 'demo',
@@ -140,19 +173,8 @@ async function ensureTripLoaded() {
       fromName: from || preset.meta.from,
       toName: to || preset.meta.to,
       stops: demoStops,
-      spots: (preset.scenicSpots || []).map((s) => ({
-        id: String(s.id),
-        name: s.name,
-        lng: s.lng,
-        lat: s.lat,
-        intro: s.intro,
-        timeLabel: s.timeLabel,
-        at: s.at,
-        nightOnly: s.nightOnly,
-        source: 'preset' as const,
-        trainCode: 'Z8991',
-      })),
-      preciseRailway: (preset.railway as [number, number][] | undefined) || null,
+      spots,
+      preciseRailway,
       isDemo: true,
     });
     prefs.loadForCurrentTrip();
@@ -376,17 +398,49 @@ async function initMap() {
       position: [spot.lng, spot.lat],
       title: spot.name,
       anchor: 'bottom-center',
-      content: `<div class="spot-marker${compact.value ? ' spot-marker--compact' : ''}">${spot.id || idx + 1}</div>`,
+      content: `<div class="spot-marker${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
     });
     marker.on('click', () => {
-      const label = spot.at ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at)) : spot.timeLabel || '';
+      const visLabel =
+        spot.visibility === 'distant'
+          ? '远眺'
+          : spot.visibility === 'on_track'
+            ? '穿行'
+            : spot.visibility === 'window'
+              ? '窗外'
+              : '';
+      const visClass =
+        spot.visibility === 'distant' || spot.visibility === 'on_track' || spot.visibility === 'window'
+          ? spot.visibility
+          : '';
+      const timeLabel = spot.at
+        ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
+        : spot.timeLabel || '';
+      const badges = [
+        visLabel && visClass
+          ? `<span class="map-info-card__badge map-info-card__badge--${visClass}">${escHtml(visLabel)}</span>`
+          : '',
+        spot.nightOnly
+          ? `<span class="map-info-card__badge map-info-card__badge--night">夜间</span>`
+          : '',
+        timeLabel
+          ? `<span class="map-info-card__badge map-info-card__badge--time">${escHtml(timeLabel)}</span>`
+          : '',
+      ]
+        .filter(Boolean)
+        .join('');
       const info = new AMap.InfoWindow({
-        content: `<div style="max-width:min(280px,78vw);padding:6px 4px;font-size:14px;line-height:1.5;color:#334155;">
-          <strong style="color:#111827;font-size:15px;">${spot.name}</strong><br/>
-          <span style="color:#0369a1;font-weight:600;">${label}</span><br/>
-          <span style="color:#64748b;">${spot.intro || ''}</span>
+        isCustom: true,
+        autoMove: true,
+        closeWhenClickMap: true,
+        content: `<div class="map-info-card">
+          <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
+          <div class="map-info-card__title">${escHtml(spot.name)}</div>
+          ${badges ? `<div class="map-info-card__meta">${badges}</div>` : ''}
+          ${spot.intro ? `<p class="map-info-card__intro">${escHtml(spot.intro)}</p>` : ''}
+          <div class="map-info-card__arrow" aria-hidden="true"></div>
         </div>`,
-        offset: new AMap.Pixel(0, -28),
+        offset: new AMap.Pixel(0, -34),
       });
       info.open(map, marker.getPosition());
     });
@@ -398,7 +452,7 @@ async function initMap() {
     const marker = new AMap.Marker({
       position: [s.lng!, s.lat!],
       title: s.name,
-      content: `<div class="station-marker${compact.value ? ' station-marker--compact' : ''}"><span class="station-dot"></span><span class="station-label">${s.name}</span></div>`,
+      content: `<div class="station-marker${compact.value ? ' station-marker--compact' : ''}"><span class="station-dot"></span><span class="station-label">${escHtml(s.name)}</span></div>`,
       anchor: 'center',
       zIndex: 150,
     });
@@ -406,15 +460,21 @@ async function initMap() {
       const scheduleText = formatStationSchedule(s, shifted);
       const calibrateBtn =
         getCalibratableStations([s]).length > 0
-          ? `<br/><button type="button" class="info-calibrate-btn" data-station="${s.name}">我在 ${s.name} 站</button>`
+          ? `<button type="button" class="info-calibrate-btn" data-station="${escHtml(s.name)}">我在 ${escHtml(s.name)} 站</button>`
           : '';
       const info = new AMap.InfoWindow({
-        content: `<div style="max-width:min(260px,78vw);padding:6px 4px;font-size:14px;line-height:1.5;color:#334155;">
-          <strong style="color:#111827;font-size:15px;">${s.name}</strong><br/>
-          <span style="color:#0369a1;font-weight:600;">${scheduleText}</span>
-          ${s.intro ? `<br/><span style="color:#64748b;">${s.intro}</span>` : ''}${calibrateBtn}
+        isCustom: true,
+        autoMove: true,
+        closeWhenClickMap: true,
+        content: `<div class="map-info-card">
+          <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
+          <div class="map-info-card__title">${escHtml(s.name)}</div>
+          ${scheduleText ? `<p class="map-info-card__schedule">${escHtml(scheduleText)}</p>` : ''}
+          ${s.intro ? `<p class="map-info-card__intro">${escHtml(s.intro)}</p>` : ''}
+          ${calibrateBtn}
+          <div class="map-info-card__arrow" aria-hidden="true"></div>
         </div>`,
-        offset: new AMap.Pixel(0, -20),
+        offset: new AMap.Pixel(0, -22),
       });
       info.open(map, marker.getPosition());
     });
@@ -440,7 +500,12 @@ async function initMap() {
   gpsMarker.hide();
 
   map.getContainer().addEventListener('click', (event: MouseEvent) => {
-    const btn = (event.target as HTMLElement).closest?.('[data-station]') as HTMLElement | null;
+    const t = event.target as HTMLElement;
+    if (t.closest?.('[data-info-close]')) {
+      map?.clearInfoWindow?.();
+      return;
+    }
+    const btn = t.closest?.('[data-station]') as HTMLElement | null;
     if (!btn) return;
     const station = seg.stops.find((item) => item.name === btn.dataset.station);
     if (station) openCalibrateConfirm(station);

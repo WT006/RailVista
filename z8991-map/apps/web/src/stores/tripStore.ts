@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { ScenicSpot, Stop, UserSegment } from '@railvista/shared';
-import { buildUserSegment, resolveTripPolyline } from '@railvista/shared';
+import { buildUserSegment, filterSpotsAlongRailway, resolveTripPolyline } from '@railvista/shared';
 import { api, type RailGeometryJob } from '../api/client';
 import type { TripSnapshot } from '../lib/tripCache';
 
@@ -77,7 +77,12 @@ export const useTripStore = defineStore('trip', () => {
 
   function applyPreciseCoords(
     coords: [number, number][],
-    opts?: { hint?: string; source?: 'precise' | 'station'; canUpgrade?: boolean },
+    opts?: {
+      hint?: string;
+      source?: 'precise' | 'station';
+      canUpgrade?: boolean;
+      scenicSpots?: ScenicSpot[];
+    },
   ) {
     if (coords.length < 2) return;
     railwayCoords.value = coords;
@@ -87,6 +92,12 @@ export const useTripStore = defineStore('trip', () => {
     }
     if (opts?.hint) polylineHint.value = opts.hint;
     if (opts?.canUpgrade != null) canUpgradePrecise.value = opts.canUpgrade;
+    if (opts?.scenicSpots != null) {
+      scenicSpots.value = filterSpotsAlongRailway(opts.scenicSpots, coords);
+    } else if (scenicSpots.value.length) {
+      // 折线升级后按新几何重筛已有候选（无库时至少按当前点再投影）
+      scenicSpots.value = filterSpotsAlongRailway(scenicSpots.value, coords);
+    }
   }
 
   function setTrip(params: {
@@ -123,7 +134,6 @@ export const useTripStore = defineStore('trip', () => {
       toTelecode: params.toTelecode,
       stopsAll: params.stops,
     });
-    scenicSpots.value = filterSpotsForSegment(params.spots || [], segment.value);
 
     const resolved = resolveTripPolyline({
       stops: segment.value.stops,
@@ -141,6 +151,12 @@ export const useTripStore = defineStore('trip', () => {
           ? '真实轨道线（OpenStreetMap）'
           : '示意线（站点连线），非真实轨道';
     }
+
+    // 服务端已按折线过滤；再用最终 OD 折线收紧一次（Z8991 全线预置等）
+    const incoming = params.spots || [];
+    scenicSpots.value = incoming.length
+      ? filterSpotsAlongRailway(incoming, resolved.coords)
+      : [];
 
     if (!isDemo.value) {
       void import('./prefsStore').then(({ usePrefsStore }) => {
@@ -218,6 +234,7 @@ export const useTripStore = defineStore('trip', () => {
         applyPreciseCoords(job.coords, {
           hint: hintForJob(job),
           source: job.source === 'station' ? 'station' : 'precise',
+          scenicSpots: job.scenicSpots,
         });
       }
 
@@ -264,6 +281,7 @@ export const useTripStore = defineStore('trip', () => {
         applyPreciseCoords(job.coords, {
           hint: hintForJob(job),
           source: job.source === 'station' ? 'station' : 'precise',
+          scenicSpots: job.scenicSpots,
         });
       }
       if (job.status === 'done' || job.status === 'partial' || job.status === 'failed') {
@@ -292,6 +310,7 @@ export const useTripStore = defineStore('trip', () => {
       hint: hintForJob(job),
       source: 'precise',
       canUpgrade: job.status === 'partial',
+      scenicSpots: job.scenicSpots,
     });
     preciseError.value = '';
     if (job.status === 'done' || job.status === 'partial') {
@@ -334,15 +353,3 @@ export const useTripStore = defineStore('trip', () => {
     clear,
   };
 });
-
-function filterSpotsForSegment(spots: ScenicSpot[], seg: UserSegment): ScenicSpot[] {
-  if (!spots.length) return [];
-  const start = new Date(seg.baseDepartureIso).getTime();
-  const end = new Date(seg.baseArrivalIso).getTime();
-  const timed = spots.filter((s) => {
-    if (!s.at) return true;
-    const t = new Date(s.at).getTime();
-    return t >= start - 30 * 60000 && t <= end + 30 * 60000;
-  });
-  return timed.length ? timed : spots;
-}

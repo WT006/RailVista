@@ -1,0 +1,3477 @@
+/**
+ * 生成 data/presets/scenic-spots.json（策展第一版）
+ * node scripts/build-scenic-spots-curated.mjs
+ */
+import { writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const outPath = join(__dirname, '../data/presets/scenic-spots.json');
+
+function spot(o) {
+  if (!o.id || !o.name || o.lng == null || o.lat == null || !o.intro || !o.visibility) {
+    throw new Error('invalid spot: ' + JSON.stringify(o));
+  }
+  if (!['window', 'distant', 'on_track'].includes(o.visibility)) {
+    throw new Error(`${o.id}: bad visibility`);
+  }
+  const row = {
+    id: o.id,
+    name: o.name,
+    lng: Number(o.lng.toFixed(6)),
+    lat: Number(o.lat.toFixed(6)),
+    intro: o.intro,
+    visibility: o.visibility,
+    source: o.source || 'curated',
+  };
+  if (o.maxDistKm != null) row.maxDistKm = o.maxDistKm;
+  if (o.category) row.category = o.category;
+  if (o.nightOnly) row.nightOnly = true;
+  return row;
+}
+
+const spots = [];
+
+// —— 青藏（Z8991 迁移）——
+spots.push(
+  spot({
+    id: 'qinghai-lake',
+    name: '青海湖',
+    lng: 100.274005,
+    lat: 36.619181,
+    visibility: 'window',
+    category: 'lake',
+    nightOnly: true,
+    source: 'preset',
+    intro:
+      '中国最大的内陆咸水湖，青藏铁路沿湖北岸一带穿行，可饱览碧湖、草原与雪山同框的高原盛景。',
+  }),
+  spot({
+    id: 'chaerhan-salt-bridge',
+    name: '察尔汗盐湖（万丈盐桥）',
+    lng: 95.192077,
+    lat: 36.949738,
+    visibility: 'on_track',
+    category: 'engineering',
+    nightOnly: true,
+    source: 'preset',
+    intro:
+      '中国最大天然盐湖，青藏铁路从约 32 公里「万丈盐桥」上通过，路基由盐壳筑成，是罕见的盐质铁路通道。',
+  }),
+  spot({
+    id: 'qaidam-gobi',
+    name: '柴达木盆地戈壁',
+    lng: 94.6,
+    lat: 36.55,
+    visibility: 'window',
+    category: 'desert',
+    nightOnly: true,
+    source: 'preset',
+    maxDistKm: 15,
+    intro:
+      '柴达木盆地核心荒漠带，铁路横穿戈壁与雅丹地貌，是全线苍茫感最强、人烟稀少的荒漠穿行区段。',
+  }),
+  spot({
+    id: 'kunlun-pass',
+    name: '昆仑山口',
+    lng: 94.069242,
+    lat: 35.64013,
+    visibility: 'on_track',
+    category: 'mountain',
+    source: 'preset',
+    intro: '海拔约 4768 米，青藏铁路翻越昆仑山的核心隘口，素有「进藏第一关」之称。',
+  }),
+  spot({
+    id: 'yuzhu-peak',
+    name: '玉珠峰',
+    lng: 94.238052,
+    lat: 35.655018,
+    visibility: 'distant',
+    category: 'mountain',
+    source: 'preset',
+    intro: '昆仑山东段高峰，海拔 6178 米，是沿线第一座醒目的 6000 米级雪山，终年积雪。',
+  }),
+  spot({
+    id: 'kekexili',
+    name: '可可西里无人区',
+    lng: 93.5,
+    lat: 35.3,
+    visibility: 'window',
+    category: 'other',
+    source: 'preset',
+    maxDistKm: 12,
+    intro:
+      '世界自然遗产地，铁路沿其北缘穿行，是藏羚羊、藏野驴等高原野生动物较集中的观测区段。',
+  }),
+  spot({
+    id: 'wudaoliang',
+    name: '五道梁高原荒原',
+    lng: 93.08206,
+    lat: 35.217307,
+    visibility: 'window',
+    category: 'grassland',
+    source: 'preset',
+    intro: '高寒缺氧典型段，气候极端，是全线含氧量低、荒原感极强的高原穿行区。',
+  }),
+  spot({
+    id: 'fenghuoshan',
+    name: '风火山',
+    lng: 92.911295,
+    lat: 34.67715,
+    visibility: 'on_track',
+    category: 'engineering',
+    source: 'preset',
+    intro:
+      '世界海拔最高冻土隧道——风火山隧道所在地，青藏铁路攻克多年冻土难题的标志性工程点。',
+  }),
+  spot({
+    id: 'tuotuohe-source',
+    name: '沱沱河（长江正源）',
+    lng: 92.330821,
+    lat: 34.232831,
+    visibility: 'window',
+    category: 'other',
+    source: 'preset',
+    intro: '长江正源水系，铁路跨越长江源特大桥，可近距离俯瞰江源宽谷风光。',
+  }),
+  spot({
+    id: 'tongtian-river',
+    name: '通天河',
+    lng: 92.533285,
+    lat: 33.868366,
+    visibility: 'window',
+    category: 'other',
+    source: 'preset',
+    intro: '长江上游干流，铁路跨越通天河谷，是江源宽谷向高山峡谷过渡的地貌分界。',
+  }),
+  spot({
+    id: 'sanjiangyuan',
+    name: '三江源自然保护区',
+    lng: 92.443193,
+    lat: 34.216085,
+    visibility: 'window',
+    category: 'other',
+    source: 'preset',
+    maxDistKm: 12,
+    intro:
+      '「中华水塔」，长江、黄河、澜沧江发源地保育区，铁路穿行全球海拔最高的高原湿地生态带之一。',
+  }),
+  spot({
+    id: 'tanggula-pass',
+    name: '唐古拉山口',
+    lng: 91.920087,
+    lat: 32.86254,
+    visibility: 'on_track',
+    category: 'mountain',
+    source: 'preset',
+    intro: '海拔约 5072 米，青藏铁路与世界铁路海拔制高点一带，亦是青、藏省界山口。',
+  }),
+  spot({
+    id: 'geladandong',
+    name: '格拉丹东峰（远眺）',
+    lng: 90.927662,
+    lat: 33.449162,
+    visibility: 'distant',
+    category: 'mountain',
+    source: 'preset',
+    intro: '唐古拉山脉主峰（约 6621 米），长江源头冰川所在，铁路沿线可远眺巍峨雪峰。',
+  }),
+  spot({
+    id: 'cuona-lake',
+    name: '措那湖',
+    lng: 91.425851,
+    lat: 31.996877,
+    visibility: 'window',
+    category: 'lake',
+    source: 'preset',
+    intro: '世界海拔最高淡水湖之一，铁路紧贴湖岸，湖天一色，视野开阔。',
+  }),
+  spot({
+    id: 'qiangtang-grassland',
+    name: '羌塘草原（藏北草原）',
+    lng: 91.2,
+    lat: 31.2,
+    visibility: 'window',
+    category: 'grassland',
+    source: 'preset',
+    maxDistKm: 15,
+    intro: '西藏面积最大的天然草原带之一，铁路纵贯腹地，可见游牧风情与辽阔草场。',
+  }),
+  spot({
+    id: 'nyainqentanglha',
+    name: '念青唐古拉山脉',
+    lng: 90.809049,
+    lat: 30.527848,
+    visibility: 'distant',
+    category: 'mountain',
+    source: 'preset',
+    intro: '藏地著名神山山脉，铁路沿其南麓延伸，雪峰与草原河谷反差强烈。',
+  }),
+  spot({
+    id: 'namtso-distant',
+    name: '纳木错（远观）',
+    lng: 90.643697,
+    lat: 30.734004,
+    visibility: 'distant',
+    category: 'lake',
+    source: 'preset',
+    intro: '西藏三大圣湖之首，当雄一带可远眺湛蓝湖面。',
+  }),
+  spot({
+    id: 'yangbajing-geothermal',
+    name: '羊八井地热温泉',
+    lng: 90.499117,
+    lat: 30.061468,
+    visibility: 'window',
+    category: 'other',
+    source: 'preset',
+    intro: '中国著名高温地热田，沿线可见地热蒸汽升腾，兼具地热奇观气质。',
+  }),
+);
+
+// —— 拉林 ——
+spots.push(
+  spot({
+    id: 'yarlung-tsangpo-gorge-lalin',
+    name: '雅鲁藏布江峡谷（拉林段）',
+    lng: 92.8,
+    lat: 29.2,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '拉林铁路沿雅鲁藏布江深切河谷穿行，可见陡峭峡谷与「雪域江南」过渡风光。',
+  }),
+  spot({
+    id: 'zang-southeast-forest',
+    name: '藏东南林海湿地',
+    lng: 93.5,
+    lat: 29.18,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '藏东南湿润气候带，铁路两侧可见森林、河谷农田与雪山交织的景观。',
+  }),
+  spot({
+    id: 'nyingchi-peach-blossom',
+    name: '林芝桃花谷方向',
+    lng: 94.36,
+    lat: 29.57,
+    visibility: 'window',
+    category: 'other',
+    intro: '林芝一带春季桃花闻名，「坐着火车看桃花」热门主题，周边雪山与桃花同框。',
+  }),
+  spot({
+    id: 'namcha-barwa-distant',
+    name: '南迦巴瓦峰（远眺）',
+    lng: 95.05,
+    lat: 29.63,
+    visibility: 'distant',
+    category: 'mountain',
+    maxDistKm: 40,
+    intro: '「中国最美山峰」之一，林芝附近天气晴好时可远眺金字塔形雪峰。',
+  }),
+  spot({
+    id: 'lalin-sangri-valley',
+    name: '桑日—加查河谷',
+    lng: 92.3,
+    lat: 29.25,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '雅江中游河谷段，铁路贴江而行，可见河谷阶地与藏南田园。',
+  }),
+);
+
+// —— 拉日 ——
+spots.push(
+  spot({
+    id: 'yarlung-valley-lari',
+    name: '雅鲁藏布江河谷（拉日段）',
+    lng: 90.7,
+    lat: 29.35,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '拉日铁路沿雅江河谷西行，可见宽谷江面与藏南田园风光。',
+  }),
+  spot({
+    id: 'yamdrok-distant',
+    name: '羊卓雍措方向（远眺）',
+    lng: 90.4,
+    lat: 29.1,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '西藏三大圣湖之一方向，拉日线部分区段天气好时可远眺湖光山色。',
+  }),
+  spot({
+    id: 'shigatse-plain',
+    name: '日喀则河谷平原',
+    lng: 88.88,
+    lat: 29.27,
+    visibility: 'window',
+    category: 'other',
+    intro: '藏南重要农牧平原，进入日喀则前可见开阔河谷与田园聚落。',
+  }),
+);
+
+// —— 川青 ——
+spots.push(
+  spot({
+    id: 'sanxingdui-area',
+    name: '三星堆方向',
+    lng: 104.12,
+    lat: 31.08,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 20,
+    intro: '古蜀文明重要遗址区域，川青铁路经三星堆站一带，可衔接短途探访。',
+  }),
+  spot({
+    id: 'minjiang-gorge-chuanqing',
+    name: '岷江峡谷（茂县段）',
+    lng: 103.79,
+    lat: 31.98,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '铁路穿行岷江河谷与羌族山地，可见陡峭峡谷与羌藏村寨。',
+  }),
+  spot({
+    id: 'songpan-grassland',
+    name: '松潘草原',
+    lng: 103.64,
+    lat: 32.52,
+    visibility: 'window',
+    category: 'grassland',
+    intro: '川西北高原草甸风光，松潘站一带可见开阔草原与远山。',
+  }),
+  spot({
+    id: 'huanglong-jiuzhai-portal',
+    name: '黄龙九寨门户',
+    lng: 103.696,
+    lat: 32.786,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 25,
+    intro: '黄龙九寨站为黄龙、九寨沟景区铁路门户，钙华彩池与九寨风光需转乘进入。',
+  }),
+);
+
+// —— 兰新高铁 ——
+spots.push(
+  spot({
+    id: 'menyuan-rapeseed',
+    name: '门源油菜花海',
+    lng: 101.62,
+    lat: 37.38,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '青海门源夏季万亩油菜花海闻名，西宁—门源段是「花海列车」热门观景主题。',
+  }),
+  spot({
+    id: 'qilian-snow-lanxin',
+    name: '祁连雪山（远眺）',
+    lng: 100.8,
+    lat: 38.2,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '河西走廊南侧祁连山脉，民乐—张掖一带可远眺皑皑雪峰。',
+  }),
+  spot({
+    id: 'hexi-corridor-gobi',
+    name: '河西走廊戈壁',
+    lng: 100.43,
+    lat: 38.92,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '张掖以西戈壁绿洲交错，高铁穿行大漠旷野，河西走廊苍茫感强烈。',
+  }),
+  spot({
+    id: 'zhangye-danxia-distant',
+    name: '张掖丹霞方向（远眺）',
+    lng: 100.1,
+    lat: 38.95,
+    visibility: 'distant',
+    category: 'other',
+    intro: '七彩丹霞景区方向，张掖西站可转乘前往；铁路本身以戈壁与远山为主。',
+  }),
+  spot({
+    id: 'jiayuguan-fort-distant',
+    name: '嘉峪关长城方向',
+    lng: 98.31,
+    lat: 39.72,
+    visibility: 'distant',
+    category: 'engineering',
+    maxDistKm: 20,
+    intro: '明代长城西端重镇方向，嘉峪关南站为河西走廊标志性文化节点。',
+  }),
+  spot({
+    id: 'turpan-flaming-mountain',
+    name: '吐鲁番火焰山方向',
+    lng: 89.5,
+    lat: 42.9,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '吐鲁番盆地赤褐色山地景观方向，吐鲁番北站一带进入火焰山与绿洲过渡带。',
+  }),
+  spot({
+    id: 'hami-oasis',
+    name: '哈密绿洲',
+    lng: 93.51,
+    lat: 42.83,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '东疆重要绿洲节点，铁路两侧可见戈壁环抱的绿洲田园。',
+  }),
+);
+
+// —— 敦格 ——
+spots.push(
+  spot({
+    id: 'dunhuang-mogao-distant',
+    name: '敦煌莫高窟方向',
+    lng: 94.8,
+    lat: 40.04,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 25,
+    intro: '世界文化遗产莫高窟方向，敦煌站为「大漠新丝路」门户；洞窟需进城探访。',
+  }),
+  spot({
+    id: 'yardang-geomorphology',
+    name: '雅丹地貌（敦格沿线）',
+    lng: 94.0,
+    lat: 40.5,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 15,
+    intro: '敦格铁路穿越雅丹与戈壁，风蚀地貌「类火星」景观是大漠段标志看点。',
+  }),
+  spot({
+    id: 'dangjinshan-pass',
+    name: '当金山口一带',
+    lng: 94.3,
+    lat: 39.0,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '敦格线翻越当金山一带，可见祁连西段山地与柴达木北缘过渡风光。',
+  }),
+  spot({
+    id: 'emerald-lake-distant',
+    name: '翡翠湖方向（大柴旦）',
+    lng: 95.2,
+    lat: 37.85,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '大柴旦翡翠湖等盐湖群方向，柴达木段可感受盐湖盆地苍茫气质。',
+  }),
+);
+
+// —— 格库 ——
+spots.push(
+  spot({
+    id: 'altun-mountains',
+    name: '阿尔金山一带',
+    lng: 90.5,
+    lat: 38.2,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '格库铁路穿越阿尔金山地区，可见高原荒漠与山脉交错的无人区气质。',
+  }),
+  spot({
+    id: 'taklamakan-south-geku',
+    name: '塔克拉玛干南缘（格库）',
+    lng: 88.5,
+    lat: 39.0,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 15,
+    intro: '铁路贴近沙漠南缘，戈壁、沙丘与绿洲交替，是环塔通道重要段落。',
+  }),
+  spot({
+    id: 'taitema-lake',
+    name: '台特玛湖方向',
+    lng: 88.3,
+    lat: 39.4,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '塔里木河尾闾湖方向，若羌以西可见干涸湖盆与荒漠景观。',
+  }),
+);
+
+// —— 和若 ——
+spots.push(
+  spot({
+    id: 'taklamakan-ring-heruo',
+    name: '塔克拉玛干南缘（和若）',
+    lng: 82.0,
+    lat: 37.0,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '环沙漠铁路环线一段，可见防沙治沙工程与沙丘「铁龙同框」。',
+  }),
+  spot({
+    id: 'kunlun-north-foothill',
+    name: '昆仑山北麓',
+    lng: 80.5,
+    lat: 36.8,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '和田—于田一带北望昆仑雪峰，南疆绿洲与雪山对照鲜明。',
+  }),
+  spot({
+    id: 'desert-sunset-heruo',
+    name: '沙漠长河落日段',
+    lng: 85.0,
+    lat: 37.5,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 15,
+    intro: '且末—若羌戈壁沙漠段，日落时分天际线极具「长河落日」氛围。',
+  }),
+);
+
+// —— 南疆 ——
+spots.push(
+  spot({
+    id: 'tianshan-south-nanjiang',
+    name: '天山南麓',
+    lng: 86.5,
+    lat: 42.0,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '库尔勒以西可见天山南麓，绿洲与雪山相望。',
+  }),
+  spot({
+    id: 'bosten-lake-distant',
+    name: '博斯腾湖方向',
+    lng: 87.0,
+    lat: 41.95,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '中国最大内陆淡水湖之一方向，焉耆—库尔勒一带湖区平原开阔。',
+  }),
+  spot({
+    id: 'kuqa-canyon-distant',
+    name: '库车大峡谷方向',
+    lng: 83.5,
+    lat: 41.7,
+    visibility: 'distant',
+    category: 'gorge',
+    intro: '库车站周边可转往天山神秘大峡谷；铁路可见南疆绿洲与戈壁过渡。',
+  }),
+  spot({
+    id: 'tarim-oasis-belt',
+    name: '塔里木盆地绿洲带',
+    lng: 80.5,
+    lat: 41.2,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '阿克苏—喀什绿洲连绵，铁路穿行棉田、白杨与沙漠边缘。',
+  }),
+  spot({
+    id: 'pamir-kashgar-distant',
+    name: '帕米尔方向（喀什）',
+    lng: 76.05,
+    lat: 39.49,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '南疆铁路终点喀什，西望帕米尔高原方向，丝路门户气质浓厚。',
+  }),
+);
+
+// —— 临哈 / 胡杨 ——
+spots.push(
+  spot({
+    id: 'ejina-populus',
+    name: '额济纳胡杨林',
+    lng: 101.07,
+    lat: 41.96,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '金秋胡杨闻名全国，胡杨专列终点区域，10 月金色胡杨是西北铁路经典主题。',
+  }),
+  spot({
+    id: 'badan-jaran-edge',
+    name: '巴丹吉林沙漠边缘',
+    lng: 102.5,
+    lat: 41.5,
+    visibility: 'distant',
+    category: 'desert',
+    intro: '临哈铁路穿越沙漠边缘，可见沙丘起伏与戈壁旷野。',
+  }),
+  spot({
+    id: 'heishui-city-distant',
+    name: '黑水城遗址方向',
+    lng: 101.15,
+    lat: 41.78,
+    visibility: 'distant',
+    category: 'other',
+    intro: '西夏黑水城遗址方向，额济纳旗重要人文景点，可与胡杨林联游。',
+  }),
+  spot({
+    id: 'juyan-lake-distant',
+    name: '居延海方向',
+    lng: 101.2,
+    lat: 42.3,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '居延海方向，额济纳湿地与沙漠交错景观。',
+  }),
+);
+
+// —— 丽香 ——
+spots.push(
+  spot({
+    id: 'yulong-snow-mountain',
+    name: '玉龙雪山',
+    lng: 100.18,
+    lat: 27.1,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '丽江标志性雪山，丽香铁路出丽江后可远眺玉龙十三峰。',
+  }),
+  spot({
+    id: 'lashi-lake',
+    name: '拉市海湿地',
+    lng: 100.14,
+    lat: 26.88,
+    visibility: 'window',
+    category: 'lake',
+    intro: '高原湿地拉市海，经拉市海站一带可见湖光与候鸟栖息地风貌。',
+  }),
+  spot({
+    id: 'tiger-leaping-gorge-bridge',
+    name: '虎跳峡金沙江大桥',
+    lng: 100.05,
+    lat: 27.18,
+    visibility: 'on_track',
+    category: 'gorge',
+    intro: '丽香铁路跨金沙江特大桥飞越虎跳峡上空，官方广播常提示观景，峡谷险峻。',
+  }),
+  spot({
+    id: 'haba-snow-mountain',
+    name: '哈巴雪山（远眺）',
+    lng: 100.08,
+    lat: 27.35,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '虎跳峡北岸哈巴雪山，与玉龙雪山隔江对峙，跨江段可远眺。',
+  }),
+  spot({
+    id: 'xiaozhongdian-meadow',
+    name: '小中甸花海草甸',
+    lng: 99.8,
+    lat: 27.55,
+    visibility: 'window',
+    category: 'grassland',
+    intro: '小中甸高原草甸与花海，夏秋时节五彩斑斓，香格里拉门户风景。',
+  }),
+  spot({
+    id: 'shangri-la-plateau',
+    name: '香格里拉高原',
+    lng: 99.69,
+    lat: 27.81,
+    visibility: 'window',
+    category: 'grassland',
+    intro: '滇西北高原终点风光，可衔接普达措、独克宗古城等探访。',
+  }),
+);
+
+// —— 中老国内段 ——
+spots.push(
+  spot({
+    id: 'yuanjiang-bridge',
+    name: '元江特大桥',
+    lng: 102.05,
+    lat: 23.67,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '中老铁路著名高桥之一，跨越元江河谷，桥高与峡谷落差冲击力强。',
+  }),
+  spot({
+    id: 'puer-tea-mountains',
+    name: '普洱茶山云雾',
+    lng: 100.97,
+    lat: 22.74,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '普洱一带万亩茶山与云雾梯田，中老铁路「一站一景」中的茶乡段落。',
+  }),
+  spot({
+    id: 'xishuangbanna-rainforest',
+    name: '西双版纳热带雨林',
+    lng: 100.94,
+    lat: 22.26,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '亚洲象栖息与热带雨林景观区，进入傣乡后植被与湿热气候骤变。',
+  }),
+  spot({
+    id: 'dai-villages-banna',
+    name: '傣家村寨与佛塔',
+    lng: 100.8,
+    lat: 22.0,
+    visibility: 'window',
+    category: 'other',
+    intro: '西双版纳—勐腊一带可见傣家竹楼、金塔与热带田园。',
+  }),
+  spot({
+    id: 'mohan-border-gateway',
+    name: '磨憨口岸门户',
+    lng: 101.68,
+    lat: 21.18,
+    visibility: 'window',
+    category: 'other',
+    intro: '中老铁路国内段终点口岸，跨境通道象征，热带边境风光。',
+  }),
+);
+
+// —— 大丽 / 昆丽 ——
+spots.push(
+  spot({
+    id: 'erhai-cangshan',
+    name: '苍山洱海',
+    lng: 100.2,
+    lat: 25.7,
+    visibility: 'window',
+    category: 'lake',
+    maxDistKm: 12,
+    intro: '大理标志性山水，大丽铁路北上可见洱海湖光与苍山十九峰。',
+  }),
+  spot({
+    id: 'bai-villages-rice',
+    name: '白族村寨与稻田',
+    lng: 100.25,
+    lat: 26.2,
+    visibility: 'window',
+    category: 'other',
+    intro: '鹤庆—丽江段可见白族聚落、田园与低缓山地交错。',
+  }),
+);
+
+// —— 成昆 ——
+spots.push(
+  spot({
+    id: 'dadu-river-gorge',
+    name: '大渡河峡谷',
+    lng: 103.1,
+    lat: 29.3,
+    visibility: 'window',
+    category: 'gorge',
+    maxDistKm: 12,
+    intro: '成昆铁路经典峡谷段，关村坝等桥隧密集，横断山脉险峻风光。',
+  }),
+  spot({
+    id: 'jinkouhe-canyon',
+    name: '金口河峡谷',
+    lng: 103.05,
+    lat: 29.25,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '大渡河深切峡谷，桥隧相连，是成昆「征服自然」叙事的代表性段落。',
+  }),
+  spot({
+    id: 'anning-river-valley',
+    name: '安宁河谷田园',
+    lng: 102.25,
+    lat: 27.9,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '西昌一带安宁河宽谷，可见攀西田园与河谷平原。',
+  }),
+  spot({
+    id: 'qionghai-distant',
+    name: '邛海方向（西昌）',
+    lng: 102.3,
+    lat: 27.82,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '西昌邛海方向，高原淡水湖与城市绿洲气质。',
+  }),
+  spot({
+    id: 'jinsha-bridge-chengkun',
+    name: '金沙江大桥一带',
+    lng: 101.7,
+    lat: 26.6,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '成昆线跨越金沙江的标志性工程段落，江峡与钢桥同框。',
+  }),
+);
+
+// —— 滇越 ——
+spots.push(
+  spot({
+    id: 'renzi-bridge',
+    name: '人字桥',
+    lng: 103.68,
+    lat: 23.15,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '滇越铁路世界级工程奇迹，钢桁架悬挂绝壁，屏边一带标志性看点。',
+  }),
+  spot({
+    id: 'bisezhai-station',
+    name: '碧色寨法式车站',
+    lng: 103.4,
+    lat: 23.45,
+    visibility: 'window',
+    category: 'other',
+    intro: '百年米轨法式站房，《芳华》取景地，滇越铁路人文地标。',
+  }),
+  spot({
+    id: 'wantang-waterfall',
+    name: '湾塘火车与瀑布',
+    lng: 103.55,
+    lat: 23.0,
+    visibility: 'window',
+    category: 'other',
+    intro: '米轨与瀑布同框的经典摄影点，滇南山林水汽氤氲。',
+  }),
+  spot({
+    id: 'hekou-border',
+    name: '河口边境风光',
+    lng: 103.95,
+    lat: 22.52,
+    visibility: 'window',
+    category: 'other',
+    intro: '滇越铁路云南段终点，红河口岸与中越边境城镇风貌。',
+  }),
+);
+
+// —— 云桂 / 南昆客专 ——
+spots.push(
+  spot({
+    id: 'puzhehei-karst',
+    name: '普者黑喀斯特山水',
+    lng: 104.12,
+    lat: 24.14,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '「三生三世」取景地，峰林湖泊交织，云桂高铁标志性风景站区。',
+  }),
+  spot({
+    id: 'guangnan-countryside',
+    name: '文山田园峰林',
+    lng: 105.0,
+    lat: 24.0,
+    visibility: 'window',
+    category: 'other',
+    intro: '滇桂交界喀斯特峰林与田园，高铁穿行绿丘与溶蚀地貌。',
+  }),
+  spot({
+    id: 'baise-youjiang',
+    name: '百色右江河谷',
+    lng: 106.62,
+    lat: 23.9,
+    visibility: 'window',
+    category: 'other',
+    intro: '右江河谷田园与红色故地气质，云贵高原向广西盆地过渡带。',
+  }),
+);
+
+// —— 宜万 ——
+spots.push(
+  spot({
+    id: 'wuling-karst-yiwan',
+    name: '武陵山喀斯特',
+    lng: 109.5,
+    lat: 30.4,
+    visibility: 'window',
+    category: 'gorge',
+    maxDistKm: 12,
+    intro: '宜万铁路「桥隧博物馆」主体，岩溶、河谷与高桥密集。',
+  }),
+  spot({
+    id: 'yesanguan-bridge',
+    name: '野三河大桥一带',
+    lng: 110.3,
+    lat: 30.7,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '巴东野三关附近高桥深谷，宜万线标志性工程景观。',
+  }),
+  spot({
+    id: 'enshi-grand-canyon-distant',
+    name: '恩施大峡谷方向',
+    lng: 109.2,
+    lat: 30.5,
+    visibility: 'distant',
+    category: 'gorge',
+    intro: '恩施站周边可转往大峡谷景区；铁路本身可见清江流域山地。',
+  }),
+  spot({
+    id: 'qingjiang-gallery-distant',
+    name: '清江画廊方向',
+    lng: 109.4,
+    lat: 30.35,
+    visibility: 'distant',
+    category: 'gorge',
+    intro: '清江流域山水画廊方向，利川—恩施段山地河谷连绵。',
+  }),
+);
+
+// —— 渝利 ——
+spots.push(
+  spot({
+    id: 'three-gorges-reservoir',
+    name: '三峡库区山色',
+    lng: 107.4,
+    lat: 29.7,
+    visibility: 'window',
+    category: 'gorge',
+    maxDistKm: 12,
+    intro: '渝利铁路穿越三峡库区山地，可见长江支流河谷与喀斯特峰丛。',
+  }),
+  spot({
+    id: 'wujiang-gallery-distant',
+    name: '乌江画廊方向',
+    lng: 107.5,
+    lat: 29.5,
+    visibility: 'distant',
+    category: 'gorge',
+    intro: '涪陵一带乌江入江方向，峡谷水色为渝东南经典主题。',
+  }),
+);
+
+// —— 贵广 ——
+spots.push(
+  spot({
+    id: 'guilin-karst',
+    name: '桂林喀斯特峰林',
+    lng: 110.3,
+    lat: 25.3,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '贵广高铁穿行桂林峰林，可见「山水甲天下」的塔状喀斯特。',
+  }),
+  spot({
+    id: 'yangshuo-lijiang-distant',
+    name: '阳朔漓江方向（远眺）',
+    lng: 110.5,
+    lat: 24.78,
+    visibility: 'distant',
+    category: 'other',
+    intro: '「20 元人民币背景」方向，阳朔站周边可转漓江观景。',
+  }),
+  spot({
+    id: 'miaoling-mountains',
+    name: '苗岭山地',
+    lng: 107.5,
+    lat: 26.3,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '黔南苗岭山区，贵广高铁桥隧穿行绿丘与峡谷。',
+  }),
+);
+
+// —— 西成 ——
+spots.push(
+  spot({
+    id: 'qinling-forest',
+    name: '秦岭林海',
+    lng: 108.0,
+    lat: 33.9,
+    visibility: 'window',
+    category: 'mountain',
+    maxDistKm: 12,
+    intro: '首条穿越秦岭的高铁，春雪秋色林海是西成线核心窗景。',
+  }),
+  spot({
+    id: 'hanzhong-basin',
+    name: '汉中盆地花海',
+    lng: 107.98,
+    lat: 33.5,
+    visibility: 'window',
+    category: 'other',
+    intro: '汉中盆地油菜花与稻田季节景观，南北气候分界的田园段落。',
+  }),
+  spot({
+    id: 'jianmenguan',
+    name: '剑门关',
+    lng: 105.58,
+    lat: 32.32,
+    visibility: 'distant',
+    category: 'mountain',
+    maxDistKm: 20,
+    intro: '蜀道雄关方向，西成高铁剑门关站为川北门户标志。',
+  }),
+);
+
+// —— 成贵 ——
+spots.push(
+  spot({
+    id: 'leshan-buddha-distant',
+    name: '乐山大佛方向',
+    lng: 103.77,
+    lat: 29.55,
+    visibility: 'distant',
+    category: 'other',
+    intro: '乐山站周边世界文化遗产乐山大佛方向，岷江—大渡河交汇地带。',
+  }),
+  spot({
+    id: 'shunan-bamboo-distant',
+    name: '蜀南竹海方向',
+    lng: 104.98,
+    lat: 28.5,
+    visibility: 'distant',
+    category: 'other',
+    intro: '宜宾—长宁一带竹海景区方向，成贵线川南绿色走廊。',
+  }),
+  spot({
+    id: 'wumeng-mountains',
+    name: '乌蒙山',
+    lng: 105.3,
+    lat: 27.3,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '成贵高铁穿乌蒙山区，高原峡谷与桥隧景观密集。',
+  }),
+);
+
+// —— 渝贵 ——
+spots.push(
+  spot({
+    id: 'loushanguan',
+    name: '娄山关一带',
+    lng: 106.85,
+    lat: 28.05,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '黔北娄山关山地，渝贵铁路穿行喀斯特峡谷与关隘风光。',
+  }),
+  spot({
+    id: 'zunyi-karst',
+    name: '黔北喀斯特峡谷',
+    lng: 106.9,
+    lat: 27.7,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '遵义周边峰丛峡谷，高铁桥隧与岩溶地貌交织。',
+  }),
+);
+
+// —— 宝成 ——
+spots.push(
+  spot({
+    id: 'qinling-switchback',
+    name: '秦岭「8」字展线',
+    lng: 106.95,
+    lat: 34.2,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '宝成铁路观音山展线等盘山展线，中国铁路展线经典，秋日彩林尤美。',
+  }),
+  spot({
+    id: 'jialing-gorge-baocheng',
+    name: '嘉陵江峡谷',
+    lng: 106.0,
+    lat: 33.0,
+    visibility: 'window',
+    category: 'gorge',
+    maxDistKm: 12,
+    intro: '略阳—阳平关嘉陵江峡谷，蜀道天险与江峡同框。',
+  }),
+  spot({
+    id: 'lingguanxia-distant',
+    name: '灵官峡方向',
+    lng: 106.2,
+    lat: 33.4,
+    visibility: 'distant',
+    category: 'gorge',
+    intro: '嘉陵江灵官峡一带，宝成线经典摄影与慢车情怀段落。',
+  }),
+);
+
+// —— 张吉怀 ——
+spots.push(
+  spot({
+    id: 'zhangjiajie-wulingyuan-distant',
+    name: '张家界武陵源方向',
+    lng: 110.48,
+    lat: 29.35,
+    visibility: 'distant',
+    category: 'mountain',
+    maxDistKm: 25,
+    intro: '石英砂岩峰林世界遗产方向，张家界西站为湘西高铁门户。',
+  }),
+  spot({
+    id: 'tianmen-mountain-distant',
+    name: '天门山方向',
+    lng: 110.48,
+    lat: 29.05,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '天门山景区方向，与武陵源并列的张家界山岳名片。',
+  }),
+  spot({
+    id: 'furong-town',
+    name: '芙蓉镇（酉水）',
+    lng: 109.9,
+    lat: 28.9,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '酉水畔吊脚楼古镇，张吉怀高铁芙蓉镇站直达，湘西风情浓厚。',
+  }),
+  spot({
+    id: 'aizhai-bridge-distant',
+    name: '矮寨大桥与德夯方向',
+    lng: 109.6,
+    lat: 28.3,
+    visibility: 'distant',
+    category: 'engineering',
+    intro: '吉首附近矮寨特大桥与德夯大峡谷方向，公路奇观可联游。',
+  }),
+  spot({
+    id: 'fenghuang-ancient-town',
+    name: '凤凰古城',
+    lng: 109.6,
+    lat: 28.02,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 10,
+    intro: '沱江吊脚楼与湘西古城，凤凰古城站直达，张吉怀线人文高光。',
+  }),
+);
+
+// —— 湘黔 ——
+spots.push(
+  spot({
+    id: 'zhenyuan-ancient-town',
+    name: '镇远古城',
+    lng: 108.43,
+    lat: 27.05,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 8,
+    intro: '舞阳河畔古城，火车穿城俯瞰的经典画面，湘黔铁路人文地标。',
+  }),
+  spot({
+    id: 'wuyang-river',
+    name: '舞阳河',
+    lng: 108.5,
+    lat: 27.1,
+    visibility: 'window',
+    category: 'other',
+    intro: '镇远周边舞阳河山水，黔东河谷与苗侗风情过渡带。',
+  }),
+  spot({
+    id: 'kaili-miao-distant',
+    name: '凯里苗寨方向',
+    lng: 107.98,
+    lat: 26.58,
+    visibility: 'distant',
+    category: 'other',
+    intro: '黔东南苗侗聚落方向，湘黔线进入苗岭腹地。',
+  }),
+);
+
+// —— 池黄 ——
+spots.push(
+  spot({
+    id: 'jiuhuashan',
+    name: '九华山',
+    lng: 117.8,
+    lat: 30.48,
+    visibility: 'distant',
+    category: 'mountain',
+    maxDistKm: 20,
+    intro: '佛教名山，池黄高铁九华山站直达门户，可远眺山峦与田园。',
+  }),
+  spot({
+    id: 'taiping-lake',
+    name: '太平湖',
+    lng: 117.98,
+    lat: 30.4,
+    visibility: 'window',
+    category: 'lake',
+    maxDistKm: 12,
+    intro: '黄山西大门水域，池黄高铁沿线湖光山色。',
+  }),
+  spot({
+    id: 'huangshan-west-portal',
+    name: '黄山（西大门方向）',
+    lng: 118.1,
+    lat: 30.1,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '黄山西大门方向，黟县—黄山北一带徽派山水门户。',
+  }),
+  spot({
+    id: 'yixian-ancient-villages',
+    name: '黟县古村方向（宏村西递）',
+    lng: 118.0,
+    lat: 29.95,
+    visibility: 'distant',
+    category: 'other',
+    intro: '宏村、西递世界遗产村落方向，池黄/杭黄线徽文化高光。',
+  }),
+);
+
+// —— 杭黄 ——
+spots.push(
+  spot({
+    id: 'fuchun-xin-an-river',
+    name: '富春江—新安江画廊',
+    lng: 119.6,
+    lat: 29.8,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '杭黄高铁经典「之」字观景选线，江湾、丘陵与村落如画。',
+  }),
+  spot({
+    id: 'qiandao-lake',
+    name: '千岛湖',
+    lng: 119.19,
+    lat: 29.74,
+    visibility: 'window',
+    category: 'lake',
+    maxDistKm: 10,
+    intro: '跨湖大桥与千岛湖面，杭黄高铁标志性湖景段落。',
+  }),
+  spot({
+    id: 'jixi-huizhou',
+    name: '绩溪—古徽州田园',
+    lng: 118.58,
+    lat: 30.07,
+    visibility: 'window',
+    category: 'other',
+    intro: '徽派民居与油菜花田园，杭黄线「最美高铁」人文段落。',
+  }),
+  spot({
+    id: 'huangshan-north-portal',
+    name: '黄山北门户',
+    lng: 118.22,
+    lat: 29.78,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '黄山北站为黄山景区主要高铁门户，可衔接山岳与徽州古城。',
+  }),
+);
+
+// —— 合福 ——
+spots.push(
+  spot({
+    id: 'wuyuan-rapeseed',
+    name: '婺源徽州风光',
+    lng: 117.86,
+    lat: 29.25,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '婺源油菜花与徽派村落闻名，合福高铁「世遗高铁」重要看点。',
+  }),
+  spot({
+    id: 'sanqingshan-distant',
+    name: '三清山方向',
+    lng: 118.05,
+    lat: 28.9,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '世界自然遗产三清山方向，合福线赣皖交界山岳。',
+  }),
+  spot({
+    id: 'wuyishan-distant',
+    name: '武夷山方向',
+    lng: 118.0,
+    lat: 27.75,
+    visibility: 'distant',
+    category: 'mountain',
+    maxDistKm: 25,
+    intro: '世界双遗产武夷山方向，合福高铁福建段标志性文旅节点。',
+  }),
+  spot({
+    id: 'huangshan-hefu',
+    name: '黄山（合福线）',
+    lng: 118.22,
+    lat: 29.78,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '合福高铁经黄山北，串联黄山与皖南山水。',
+  }),
+);
+
+// —— 海南环岛 ——
+spots.push(
+  spot({
+    id: 'hainan-east-coast',
+    name: '海南东线海岸',
+    lng: 110.5,
+    lat: 19.2,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 8,
+    intro: '环岛高铁东段多处近海，椰风海韵，部分路段距海岸仅数百米。',
+  }),
+  spot({
+    id: 'wanning-bays',
+    name: '万宁石梅湾—日月湾方向',
+    lng: 110.34,
+    lat: 18.77,
+    visibility: 'window',
+    category: 'other',
+    intro: '万宁一带海湾与冲浪海岸，东环高铁滨海观景热点。',
+  }),
+  spot({
+    id: 'sanya-yalong-distant',
+    name: '三亚亚龙湾方向',
+    lng: 109.65,
+    lat: 18.23,
+    visibility: 'distant',
+    category: 'other',
+    intro: '三亚站周边亚龙湾等海湾方向，环岛线南端滨海终点气质。',
+  }),
+  spot({
+    id: 'hainan-west-salt-fields',
+    name: '海南西线盐田与热带田园',
+    lng: 108.7,
+    lat: 19.1,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '西环高铁可见盐田、热带农田与较原生态的滨海平原。',
+  }),
+  spot({
+    id: 'wenchang-space-distant',
+    name: '文昌航天城方向',
+    lng: 110.8,
+    lat: 19.65,
+    visibility: 'distant',
+    category: 'engineering',
+    intro: '文昌站周边航天发射场方向，东环线特色人文科技地标。',
+  }),
+);
+
+// —— 福平 ——
+spots.push(
+  spot({
+    id: 'pingtan-strait-bridge',
+    name: '平潭海峡公铁大桥',
+    lng: 119.6,
+    lat: 25.6,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '中国首座公铁两用跨海大桥之一，跨海十数公里，海上最美高铁标志工程。',
+  }),
+  spot({
+    id: 'pingtan-island-coast',
+    name: '平潭岛海景',
+    lng: 119.78,
+    lat: 25.52,
+    visibility: 'window',
+    category: 'other',
+    intro: '平潭岛石厝与东海海景，夏季或有「蓝眼泪」等海岸奇观主题。',
+  }),
+);
+
+// —— 厦深 ——
+spots.push(
+  spot({
+    id: 'xiamen-bay',
+    name: '厦门海湾',
+    lng: 118.1,
+    lat: 24.5,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 10,
+    intro: '厦深铁路北端厦门海湾与滨海城市风光。',
+  }),
+  spot({
+    id: 'yuedong-coast',
+    name: '粤东海滨',
+    lng: 115.4,
+    lat: 22.8,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '汕尾—惠州一带粤东海滨平原与海湾，杭深通道南段海风气质。',
+  }),
+);
+
+// —— 敦白 / 长白山 ——
+spots.push(
+  spot({
+    id: 'changbai-mountain',
+    name: '长白山',
+    lng: 128.15,
+    lat: 42.4,
+    visibility: 'distant',
+    category: 'mountain',
+    maxDistKm: 25,
+    intro: '长白山天池与林海雪原方向，敦白高铁直达门户，冬雾凇秋五花山。',
+  }),
+  spot({
+    id: 'changbai-forest-snow',
+    name: '长白山林海',
+    lng: 128.0,
+    lat: 42.6,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '敦化—长白山段林海雪原与火山熔岩台地过渡风光。',
+  }),
+);
+
+// —— 哈牡 ——
+spots.push(
+  spot({
+    id: 'yabuli-ski-distant',
+    name: '亚布力滑雪场方向',
+    lng: 128.28,
+    lat: 44.98,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '亚布力西站直达著名滑雪度假区方向，冬季冰雪旅游热门。',
+  }),
+  spot({
+    id: 'xuexiang-distant',
+    name: '雪乡方向',
+    lng: 128.5,
+    lat: 44.5,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 40,
+    intro: '双峰林场雪乡方向，哈牡线冬季冰雪主题延伸目的地。',
+  }),
+  spot({
+    id: 'mudanjiang-forest',
+    name: '牡丹江林海',
+    lng: 129.6,
+    lat: 44.59,
+    visibility: 'window',
+    category: 'other',
+    intro: '哈牡高铁东段林海雪原与山地河谷，东北铁路代表窗景。',
+  }),
+);
+
+// —— 集通 ——
+spots.push(
+  spot({
+    id: 'gongger-grassland',
+    name: '贡格尔草原',
+    lng: 117.5,
+    lat: 43.3,
+    visibility: 'window',
+    category: 'grassland',
+    maxDistKm: 15,
+    intro: '集通铁路穿越内蒙古草原腹地，贡格尔等草场开阔辽远。',
+  }),
+  spot({
+    id: 'dari-nor-distant',
+    name: '达里诺尔湖方向',
+    lng: 116.6,
+    lat: 43.3,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '克什克腾旗达里诺尔湖方向，草原火山湖景观。',
+  }),
+  spot({
+    id: 'jitong-steam-photo',
+    name: '集通蒸汽机车摄影地标方向',
+    lng: 116.0,
+    lat: 42.5,
+    visibility: 'window',
+    category: 'engineering',
+    maxDistKm: 15,
+    intro: '曾为世界最后干线蒸汽运营线之一，司明义大桥等机位仍是铁路摄影圣地气质。',
+  }),
+);
+
+// —— 张呼 ——
+spots.push(
+  spot({
+    id: 'bashang-grassland',
+    name: '坝上草原',
+    lng: 115.5,
+    lat: 41.5,
+    visibility: 'window',
+    category: 'grassland',
+    maxDistKm: 15,
+    intro: '张呼高铁出河北进入坝上，可见高原草甸与疏林草原。',
+  }),
+  spot({
+    id: 'ulat-cabl-volcano-grassland',
+    name: '乌兰察布火山草原方向',
+    lng: 113.15,
+    lat: 40.96,
+    visibility: 'distant',
+    category: 'grassland',
+    intro: '辉腾锡勒等火山草原方向，张呼线内蒙古段标志风光。',
+  }),
+);
+
+// —— 京张 ——
+spots.push(
+  spot({
+    id: 'badaling-great-wall',
+    name: '八达岭长城',
+    lng: 115.97,
+    lat: 40.36,
+    visibility: 'distant',
+    category: 'engineering',
+    maxDistKm: 8,
+    intro: '八达岭长城站为世界最深高铁站之一，出站可探访长城；列车段多在隧道。',
+  }),
+  spot({
+    id: 'guanting-reservoir',
+    name: '官厅水库',
+    lng: 115.6,
+    lat: 40.35,
+    visibility: 'window',
+    category: 'lake',
+    maxDistKm: 10,
+    intro: '京张高铁怀来段可见官厅水库湖面与河谷，长城高铁经典水面段落。',
+  }),
+);
+
+// —— 杭昌补充（千岛湖已在杭黄；补鄱阳湖等）——
+spots.push(
+  spot({
+    id: 'poyang-lake-distant',
+    name: '鄱阳湖方向',
+    lng: 116.0,
+    lat: 29.0,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '杭昌/合福等线赣北可感知鄱阳湖平原开阔水域气质。',
+  }),
+  spot({
+    id: 'jingdezhen-kiln-distant',
+    name: '景德镇瓷都方向',
+    lng: 117.2,
+    lat: 29.3,
+    visibility: 'distant',
+    category: 'other',
+    intro: '杭昌高铁景德镇北站方向，千年瓷都人文节点。',
+  }),
+);
+
+// —— 第二轮：高优先线补强（坐标贴近走廊折线，保证打开车次能命中）——
+spots.push(
+  // 拉林（当前仅 2）
+  spot({
+    id: 'lalin-gongga-valley',
+    name: '贡嘎—扎囊雅江河谷',
+    lng: 91.387633,
+    lat: 29.245225,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '拉林铁路出拉萨后贴雅鲁藏布江河谷东行，可见宽谷江面与藏南田园。',
+  }),
+  spot({
+    id: 'lalin-shannan-canyon',
+    name: '山南深切峡谷段',
+    lng: 91.937184,
+    lat: 29.265647,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '山南—桑日一带雅江深切，铁路桥隧穿行，雪域江南过渡感强烈。',
+  }),
+  spot({
+    id: 'lalin-milin-peach',
+    name: '米林桃花与河谷',
+    lng: 92.904953,
+    lat: 29.059127,
+    visibility: 'window',
+    category: 'other',
+    intro: '米林—岗嘎段春季桃花与河谷同框，是「坐着火车看桃花」的核心段落。',
+  }),
+  spot({
+    id: 'lalin-nyingchi-gateway',
+    name: '林芝雪域门户',
+    lng: 94.422733,
+    lat: 29.504945,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '拉林铁路东端林芝，藏东南林海雪山门户，可衔接南迦巴瓦等探访。',
+  }),
+  spot({
+    id: 'lalin-namcha-barwa-view',
+    name: '南迦巴瓦峰观景段',
+    lng: 94.2,
+    lat: 29.48,
+    visibility: 'distant',
+    category: 'mountain',
+    maxDistKm: 40,
+    intro: '接近林芝时天气晴好可远眺南迦巴瓦金字塔形雪峰。',
+  }),
+
+  // 和若（当前 1）
+  spot({
+    id: 'heruo-hotan-oasis',
+    name: '和田绿洲',
+    lng: 79.9169,
+    lat: 37.16006,
+    visibility: 'window',
+    category: 'other',
+    intro: '和若铁路西端和田绿洲，昆仑北麓玉石之乡，沙漠与田园交界。',
+  }),
+  spot({
+    id: 'heruo-desert-mid',
+    name: '塔克拉玛干南缘铁龙',
+    lng: 83.457672,
+    lat: 37.408822,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '环沙漠铁路中段，防沙治沙草方格与沙丘同框，是和若线标志窗景。',
+  }),
+  spot({
+    id: 'heruo-qiemo-desert',
+    name: '且末沙漠旷野',
+    lng: 85.551176,
+    lat: 38.195629,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '且末以东戈壁沙漠开阔，日落时分天际线极具「长河落日」感。',
+  }),
+  spot({
+    id: 'heruo-ruoqiang-gateway',
+    name: '若羌沙漠门户',
+    lng: 88.181354,
+    lat: 38.984621,
+    visibility: 'window',
+    category: 'desert',
+    intro: '和若铁路东端若羌，衔接格库线，塔里木东南缘沙漠门户。',
+  }),
+
+  // 福平（当前 1）— 补跨海大桥
+  spot({
+    id: 'fuping-strait-bridge-mid',
+    name: '平潭海峡公铁大桥',
+    lng: 119.551766,
+    lat: 25.885626,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '福平铁路跨海公铁大桥主体，列车在桥面疾驰，东海海景一览无余。',
+  }),
+  spot({
+    id: 'fuping-changle-coast',
+    name: '长乐滨海段',
+    lng: 119.381576,
+    lat: 26.029816,
+    visibility: 'window',
+    category: 'other',
+    intro: '福州—长乐段逐渐近海，可见东海与滨海平原过渡风光。',
+  }),
+  spot({
+    id: 'fuping-pingtan-approach',
+    name: '平潭岛进岛海景',
+    lng: 119.737484,
+    lat: 25.610173,
+    visibility: 'window',
+    category: 'other',
+    intro: '接近平潭岛时跨海视野开阔，石厝与蓝眼泪等海岛主题的铁路门户。',
+  }),
+
+  // 滇越（当前 2）— 补人字桥等
+  spot({
+    id: 'diandong-renzi-bridge-rail',
+    name: '人字桥',
+    lng: 103.736175,
+    lat: 23.136832,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '滇越米轨世界级工程奇迹，钢桁架悬挂绝壁，屏边一带必看。',
+  }),
+  spot({
+    id: 'diandong-kaiyuan-metre',
+    name: '开远米轨风情',
+    lng: 103.187253,
+    lat: 23.878503,
+    visibility: 'window',
+    category: 'other',
+    intro: '开远一带百年米轨与法式铁路遗产气质，滇南乡愁代表性段落。',
+  }),
+  spot({
+    id: 'diandong-yiliang-hills',
+    name: '宜良坝子与山地',
+    lng: 103.043256,
+    lat: 24.692992,
+    visibility: 'window',
+    category: 'other',
+    intro: '昆明出城后宜良坝子与山地交错，滇越铁路北段田园窗景。',
+  }),
+
+  // 中老（当前 4）— 补元江桥等
+  spot({
+    id: 'zhonglao-yuanjiang-bridge-rail',
+    name: '元江特大桥',
+    lng: 102.092494,
+    lat: 23.857551,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '中老铁路标志性高桥，跨越元江深谷，桥高与峡谷落差冲击力强。',
+  }),
+  spot({
+    id: 'zhonglao-mojiang-hills',
+    name: '墨江山地茶乡',
+    lng: 101.869513,
+    lat: 23.511075,
+    visibility: 'window',
+    category: 'other',
+    intro: '元江—墨江山地段落，云雾与梯田茶园渐显热带北缘风光。',
+  }),
+  spot({
+    id: 'zhonglao-yuxi-plateau',
+    name: '玉溪高原田园',
+    lng: 102.5,
+    lat: 24.35,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '昆明南出城后玉溪一带高原田园与烟草产区风光。',
+  }),
+
+  // 宝成（当前 4）— 补秦岭展线
+  spot({
+    id: 'baocheng-qinling-switchback-rail',
+    name: '秦岭「8」字展线',
+    lng: 106.051182,
+    lat: 33.552971,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '宝成铁路观音山一带盘山展线，中国铁路展线经典，秋日彩林尤美。',
+  }),
+  spot({
+    id: 'baocheng-fengzhou',
+    name: '凤州山地',
+    lng: 106.5,
+    lat: 34.0,
+    visibility: 'window',
+    category: 'mountain',
+    maxDistKm: 12,
+    intro: '宝鸡出秦岭前山地段落，嘉陵江源与蜀道天险气质渐浓。',
+  }),
+  spot({
+    id: 'baocheng-guangyuan-jialing',
+    name: '广元嘉陵江',
+    lng: 105.118634,
+    lat: 32.019444,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '广元一带嘉陵江河谷，宝成线出秦岭后的川北门户风光。',
+  }),
+
+  // 张吉怀（当前 4）
+  spot({
+    id: 'zhangjihuai-furong-rail',
+    name: '芙蓉镇（酉水）',
+    lng: 110.198761,
+    lat: 28.905298,
+    visibility: 'window',
+    category: 'other',
+    intro: '张吉怀高铁芙蓉镇站一带，酉水吊脚楼古镇风情浓厚。',
+  }),
+  spot({
+    id: 'zhangjihuai-guzhang-wuling',
+    name: '古丈武陵山色',
+    lng: 109.906025,
+    lat: 28.49157,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '古丈西—吉首东段穿武陵山腹地，桥隧比高，山峦层叠如画。',
+  }),
+  spot({
+    id: 'zhangjihuai-mengdong-distant',
+    name: '猛洞河方向',
+    lng: 109.95,
+    lat: 28.7,
+    visibility: 'distant',
+    category: 'gorge',
+    intro: '猛洞河漂流景区方向，张吉怀线湘西山水联游节点。',
+  }),
+
+  // 川青（当前 3）
+  spot({
+    id: 'chuanqing-maoxian-gorge',
+    name: '茂县岷江峡谷',
+    lng: 103.721725,
+    lat: 32.338542,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '川青铁路茂县—镇江关岷江峡谷，羌藏村寨与陡峭河谷同框。',
+  }),
+  spot({
+    id: 'chuanqing-gaochuan',
+    name: '高川山地',
+    lng: 104.209404,
+    lat: 31.678042,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '安州—高川段爬升进入龙门山—岷山过渡带，平原转山地的风景分界。',
+  }),
+  spot({
+    id: 'chuanqing-zhenjiangguan',
+    name: '镇江关高原门户',
+    lng: 103.6,
+    lat: 32.55,
+    visibility: 'window',
+    category: 'mountain',
+    maxDistKm: 12,
+    intro: '镇江关一带进入川西北高原，是黄龙九寨旅游专线的关键门户段落。',
+  }),
+
+  // 敦格（当前 3）
+  spot({
+    id: 'dunge-yardang-rail',
+    name: '雅丹地貌段',
+    lng: 94.867755,
+    lat: 39.30949,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '敦煌以南雅丹与戈壁，风蚀地貌「类火星」是敦格线大漠段标志。',
+  }),
+  spot({
+    id: 'dunge-dangjinshan-rail',
+    name: '当金山口',
+    lng: 94.62973,
+    lat: 38.067568,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '敦格线翻越当金山，祁连西段与柴达木北缘的地理分界山口。',
+  }),
+  spot({
+    id: 'dunge-qaidam-salt',
+    name: '柴达木盐湖盆地',
+    lng: 95.433673,
+    lat: 37.531633,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '大柴旦—饮马峡盐湖盆地，戈壁与盐湖交织的「大漠新丝路」南段。',
+  }),
+
+  // 宜万（当前 3）
+  spot({
+    id: 'yiwan-yesanhe-rail',
+    name: '野三河大桥一带',
+    lng: 110.67739,
+    lat: 30.631584,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '宜万铁路巴东野三关附近高桥深谷，桥隧博物馆的标志性工程景观。',
+  }),
+  spot({
+    id: 'yiwan-enshi-karst',
+    name: '恩施岩溶山地',
+    lng: 109.981073,
+    lat: 30.596136,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '建始—恩施岩溶峰丛与河谷，宜万线武陵山腹地核心窗景。',
+  }),
+  spot({
+    id: 'yiwan-lichuan-plateau',
+    name: '利川齐岳山一带',
+    lng: 108.863368,
+    lat: 30.278895,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '利川高原山地，宜万铁路西段出清江流域、近万州的山原风光。',
+  }),
+
+  // 敦白（当前 1）
+  spot({
+    id: 'dunbai-forest-mid',
+    name: '长白山林海',
+    lng: 128.23722,
+    lat: 42.790723,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '敦化—长白山段林海雪原，秋五花山、冬雾凇是敦白高铁代表窗景。',
+  }),
+  spot({
+    id: 'dunbai-antu',
+    name: '安图山地',
+    lng: 128.221835,
+    lat: 42.612832,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '安图西一带火山熔岩台地与针叶林，接近长白山景区门户。',
+  }),
+  spot({
+    id: 'dunbai-changbai-station',
+    name: '长白山站林海',
+    lng: 128.109818,
+    lat: 42.452998,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '敦白高铁终点长白山站，林海环绕，可转乘前往天池景区。',
+  }),
+
+  // 张呼（当前 1）
+  spot({
+    id: 'zhanghu-bashang-rail',
+    name: '坝上草原',
+    lng: 114.064984,
+    lat: 40.795318,
+    visibility: 'window',
+    category: 'grassland',
+    maxDistKm: 12,
+    intro: '张呼高铁出河北进入坝上，疏林草原与高原草甸开阔辽远。',
+  }),
+  spot({
+    id: 'zhanghu-xinghe',
+    name: '兴和草原过渡带',
+    lng: 112.987748,
+    lat: 40.988488,
+    visibility: 'window',
+    category: 'grassland',
+    intro: '兴和北—乌兰察布段草原与农田交错，阴山南麓风光。',
+  }),
+  spot({
+    id: 'zhanghu-zhuozi',
+    name: '卓资山地草原',
+    lng: 112.350118,
+    lat: 40.978748,
+    visibility: 'window',
+    category: 'grassland',
+    intro: '卓资东一带阴山支脉与草原，接近呼和浩特前的山原段落。',
+  }),
+
+  // 集通（当前 1）
+  spot({
+    id: 'jitong-hexigten-rail',
+    name: '克什克腾草原',
+    lng: 117.216541,
+    lat: 43.174743,
+    visibility: 'window',
+    category: 'grassland',
+    maxDistKm: 15,
+    intro: '集通铁路克什克腾段，贡格尔草原腹地，夏季绿浪、冬季白雪。',
+  }),
+  spot({
+    id: 'jitong-zhengxiangbai',
+    name: '正镶白旗草原',
+    lng: 114.734102,
+    lat: 42.179751,
+    visibility: 'window',
+    category: 'grassland',
+    maxDistKm: 12,
+    intro: '集宁以东正镶白旗一带锡林郭勒南缘草原，集通线经典旷野。',
+  }),
+  spot({
+    id: 'jitong-linxi',
+    name: '林西山地草甸',
+    lng: 119.225851,
+    lat: 43.793842,
+    visibility: 'window',
+    category: 'grassland',
+    intro: '林西—查布嘎段草甸与低山，接近通辽前的科尔沁过渡风光。',
+  }),
+
+  // 临哈（当前 2）
+  spot({
+    id: 'linha-wuliangsuhai-distant',
+    name: '乌梁素海方向',
+    lng: 108.8,
+    lat: 40.9,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '包头—临河一带乌梁素海方向，河套湿地与草原过渡。',
+  }),
+  spot({
+    id: 'linha-hexi-gobi',
+    name: '临河—额济纳戈壁',
+    lng: 106.236701,
+    lat: 40.451509,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '临哈铁路西段戈壁旷野，胡杨专列进入沙漠边缘的苍茫段落。',
+  }),
+  spot({
+    id: 'linha-badan-rail',
+    name: '巴丹吉林沙漠边缘',
+    lng: 104.179029,
+    lat: 41.235736,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 15,
+    intro: '接近额济纳前的巴丹吉林沙漠边缘，沙丘与戈壁同框。',
+  }),
+
+  // 海南东/西环
+  spot({
+    id: 'hainandong-qionghai',
+    name: '琼海滨海平原',
+    lng: 110.463726,
+    lat: 18.947215,
+    visibility: 'window',
+    category: 'other',
+    intro: '东环高铁琼海段近海平原与椰林，热带滨海田园气质。',
+  }),
+  spot({
+    id: 'hainandong-lingshui',
+    name: '陵水近海段',
+    lng: 110.003409,
+    lat: 18.531787,
+    visibility: 'window',
+    category: 'other',
+    intro: '陵水一带铁路近海岸，可见海湾与热带植被，东环南段精华。',
+  }),
+  spot({
+    id: 'hainanxi-qiziwan',
+    name: '棋子湾方向',
+    lng: 108.759757,
+    lat: 19.22473,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '西环高铁昌江—东方一带，棋子湾等海湾与火山岩海岸方向。',
+  }),
+  spot({
+    id: 'hainanxi-dongfang-salt',
+    name: '东方盐田',
+    lng: 108.720053,
+    lat: 18.680651,
+    visibility: 'window',
+    category: 'other',
+    intro: '东方附近盐田与热带田园，西环线有别于东线的原生态滨海风光。',
+  }),
+  spot({
+    id: 'hainanxi-lingao',
+    name: '临高滨海',
+    lng: 109.636984,
+    lat: 19.84382,
+    visibility: 'window',
+    category: 'other',
+    intro: '海口西行临高南一带，西环起点段的热带滨海平原。',
+  }),
+
+  // 哈牡（当前 2）
+  spot({
+    id: 'hamu-shangzhi-forest',
+    name: '尚志林海',
+    lng: 127.868415,
+    lat: 45.220647,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '哈牡高铁尚志南一带林海雪原，冬季雾凇、夏季绿浪。',
+  }),
+  spot({
+    id: 'hamu-hailin',
+    name: '海林山地',
+    lng: 128.690181,
+    lat: 44.902756,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '亚布力—海林北段山地森林，接近牡丹江的冰雪旅游走廊。',
+  }),
+
+  // 南昆客专（当前 2）— 补普者黑
+  spot({
+    id: 'nankun-puzhehei-rail',
+    name: '普者黑喀斯特',
+    lng: 103.838091,
+    lat: 23.84824,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '南昆高铁丘北—弥勒一带喀斯特峰林湖泊，「三生三世」取景地气质。',
+  }),
+  spot({
+    id: 'nankun-funing-karst',
+    name: '富宁峰林',
+    lng: 105.874818,
+    lat: 23.694673,
+    visibility: 'window',
+    category: 'other',
+    intro: '滇桂交界富宁—广南喀斯特峰林与田园，南昆客专经典窗景。',
+  }),
+
+  // 丽香 — 虎跳峡贴线
+  spot({
+    id: 'lixiang-tiger-leap-rail',
+    name: '虎跳峡金沙江大桥',
+    lng: 99.9675,
+    lat: 27.39,
+    visibility: 'on_track',
+    category: 'gorge',
+    intro: '丽香铁路跨金沙江特大桥飞越虎跳峡，官方广播常提示观景。',
+  }),
+  spot({
+    id: 'lixiang-newshang',
+    name: '丽江北上山地',
+    lng: 100.101637,
+    lat: 27.040603,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '出丽江后爬升横断山区，玉龙雪山方向渐近，海拔与植被快速变化。',
+  }),
+
+  // 成昆补强
+  spot({
+    id: 'chengkun-liangshan',
+    name: '大凉山峡谷',
+    lng: 102.724846,
+    lat: 28.942556,
+    visibility: 'window',
+    category: 'gorge',
+    maxDistKm: 12,
+    intro: '成昆铁路汉源—甘洛大凉山峡谷，桥隧密集，横断山脉险峻代表段。',
+  }),
+  spot({
+    id: 'chengkun-panzhihua',
+    name: '攀枝花金沙江',
+    lng: 101.861989,
+    lat: 25.929817,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '攀枝花一带金沙江河谷，成昆线出川入滇的江峡门户。',
+  }),
+  spot({
+    id: 'chengkun-emei-distant',
+    name: '峨眉山方向',
+    lng: 103.45,
+    lat: 29.55,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '成都南下峨眉站方向，可远眺峨眉山山峦，成昆北段文旅节点。',
+  }),
+
+  // 银兰（0）适量补
+  spot({
+    id: 'yinlan-helan-distant',
+    name: '贺兰山方向',
+    lng: 106.2,
+    lat: 38.5,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '银兰高铁银川出城后可见贺兰山轮廓，宁夏平原西侧屏障。',
+  }),
+  spot({
+    id: 'yinlan-yellow-river',
+    name: '黄河宁夏段',
+    lng: 105.9,
+    lat: 37.5,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '银兰高铁沿宁夏平原南下，部分区段可感知黄河灌区田园风光。',
+  }),
+  spot({
+    id: 'yinlan-zhongwei',
+    name: '中卫沙坡头方向',
+    lng: 105.2,
+    lat: 37.5,
+    visibility: 'distant',
+    category: 'desert',
+    intro: '中卫一带腾格里沙漠边缘与黄河，沙坡头景区方向的铁路门户。',
+  }),
+
+  // 厦深 / 兰渝 适量
+  spot({
+    id: 'xiashen-xiamen-bay-rail',
+    name: '厦门海湾',
+    lng: 118.05,
+    lat: 24.55,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '厦深铁路北端厦门海湾与滨海城市风光。',
+  }),
+  spot({
+    id: 'xiashen-chaoshan',
+    name: '潮汕平原',
+    lng: 116.6,
+    lat: 23.4,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '潮汕—揭阳一带粤东平原与村镇田园，厦深线中段窗景。',
+  }),
+  spot({
+    id: 'lanyu-longnan',
+    name: '陇南山水',
+    lng: 105.0,
+    lat: 33.4,
+    visibility: 'window',
+    category: 'mountain',
+    maxDistKm: 15,
+    intro: '兰渝铁路陇南段山地与河谷，黄土高原向嘉陵江流域过渡。',
+  }),
+  spot({
+    id: 'lanyu-nanchong',
+    name: '南充嘉陵江',
+    lng: 106.1,
+    lat: 30.8,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '南充北一带嘉陵江河谷田园，兰渝线川东北门户风光。',
+  }),
+);
+
+// —— 第三轮：中优先与仍偏少线路补强 ——
+spots.push(
+  // 渝利
+  spot({
+    id: 'yuli-fuling',
+    name: '涪陵长江库区',
+    lng: 106.864489,
+    lat: 29.681138,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '渝利铁路涪陵北一带，长江三峡库区山色与河谷同框。',
+  }),
+  spot({
+    id: 'yuli-fengdu',
+    name: '丰都库区山地',
+    lng: 107.255532,
+    lat: 29.778942,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '丰都段穿行库区山地，喀斯特峰丛与长江支流河谷交错。',
+  }),
+  spot({
+    id: 'yuli-shizhu',
+    name: '石柱山地',
+    lng: 108.079063,
+    lat: 29.950388,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '石柱县站一带武陵余脉，渝利线东段山原风光。',
+  }),
+  spot({
+    id: 'yuli-lichuan-portal',
+    name: '利川齐岳山门户',
+    lng: 108.775383,
+    lat: 30.259047,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '渝利铁路东端利川，衔接宜万线，齐岳山高原门户。',
+  }),
+
+  // 渝贵
+  spot({
+    id: 'yugui-qijiang',
+    name: '綦江山地',
+    lng: 106.724081,
+    lat: 28.885998,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '重庆西出城后綦江东一带山地，渝贵铁路北段窗景。',
+  }),
+  spot({
+    id: 'yugui-tongzi',
+    name: '桐梓娄山北麓',
+    lng: 106.801058,
+    lat: 28.588455,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '桐梓东接近娄山关，黔北喀斯特峡谷渐显。',
+  }),
+  spot({
+    id: 'yugui-zunyi-city',
+    name: '遵义黔北风光',
+    lng: 106.888424,
+    lat: 28.029856,
+    visibility: 'window',
+    category: 'other',
+    intro: '遵义站区周边黔北峰丛与河谷，红色故地与喀斯特同在。',
+  }),
+  spot({
+    id: 'yugui-xifeng',
+    name: '息烽峡谷',
+    lng: 106.903861,
+    lat: 27.597521,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '息烽—贵阳北前峡谷与峰林，渝贵线南段典型黔中地貌。',
+  }),
+
+  // 京张补强
+  spot({
+    id: 'jingzhang-qinghe',
+    name: '清河出京段',
+    lng: 116.201239,
+    lat: 40.178175,
+    visibility: 'window',
+    category: 'other',
+    intro: '京张高铁清河一带出京，城区渐隐、山地渐近。',
+  }),
+  spot({
+    id: 'jingzhang-huailai-valley',
+    name: '怀来河谷',
+    lng: 115.501264,
+    lat: 40.399503,
+    visibility: 'window',
+    category: 'other',
+    intro: '怀来盆地河谷与葡萄产区，官厅水库周边田园风光。',
+  }),
+  spot({
+    id: 'jingzhang-zhangjiakou-portal',
+    name: '张家口坝上门户',
+    lng: 114.88048,
+    lat: 40.749052,
+    visibility: 'window',
+    category: 'grassland',
+    intro: '京张高铁终点张家口，衔接张呼线，坝上草原门户。',
+  }),
+
+  // 拉日补强
+  spot({
+    id: 'lari-quxiu',
+    name: '曲水雅江宽谷',
+    lng: 90.593854,
+    lat: 29.288322,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '拉日铁路曲水段雅鲁藏布江宽谷，藏南田园开阔。',
+  }),
+  spot({
+    id: 'lari-nimu',
+    name: '尼木河谷',
+    lng: 90.098311,
+    lat: 29.353752,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '尼木一带河谷与藏香之乡田园，拉日线中段经典窗景。',
+  }),
+  spot({
+    id: 'lari-renbu',
+    name: '仁布山地',
+    lng: 89.498307,
+    lat: 29.334143,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '仁布段山地与河谷过渡，接近日喀则平原前的藏南山色。',
+  }),
+
+  // 贵广补强
+  spot({
+    id: 'guiguang-duyun',
+    name: '都匀斗篷山方向',
+    lng: 109.709547,
+    lat: 25.641467,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '都匀东一带苗岭山地，斗篷山方向可远眺。',
+  }),
+  spot({
+    id: 'guiguang-rongjiang',
+    name: '榕江山地',
+    lng: 110.502415,
+    lat: 25.186148,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '榕江—从江黔东南山地，贵广高铁桥隧穿行绿丘峡谷。',
+  }),
+  spot({
+    id: 'guiguang-hezhou',
+    name: '贺州山水',
+    lng: 111.361908,
+    lat: 24.539753,
+    visibility: 'window',
+    category: 'other',
+    intro: '贺州一带桂东山水与田园，桂林峰林向粤西过渡。',
+  }),
+  spot({
+    id: 'guiguang-zhaoqing',
+    name: '肇庆星湖方向',
+    lng: 112.730207,
+    lat: 23.197597,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '肇庆东站周边星湖、七星岩方向，贵广线粤境文旅节点。',
+  }),
+
+  // 湘黔补强
+  spot({
+    id: 'xiangqian-loudi',
+    name: '娄底丘陵',
+    lng: 111.81447,
+    lat: 27.60454,
+    visibility: 'window',
+    category: 'other',
+    intro: '湘黔铁路娄底一带丘陵田园，出长株潭后的湘中风光。',
+  }),
+  spot({
+    id: 'xiangqian-xupu',
+    name: '溆浦武陵谷地',
+    lng: 110.606047,
+    lat: 27.612386,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '溆浦—怀化武陵山与雪峰山夹峙谷地，湘黔线湘西门户。',
+  }),
+  spot({
+    id: 'xiangqian-huaihua',
+    name: '怀化山地',
+    lng: 109.176264,
+    lat: 27.395242,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '怀化一带雪峰余脉，衔接张吉怀与沪昆的湘西南枢纽风光。',
+  }),
+
+  // 厦深补强
+  spot({
+    id: 'xiashen-zhangzhou',
+    name: '漳州滨海',
+    lng: 117.582111,
+    lat: 24.187187,
+    visibility: 'window',
+    category: 'other',
+    intro: '厦深铁路漳州段滨海平原与村镇，闽南风光。',
+  }),
+  spot({
+    id: 'xiashen-yunxiao',
+    name: '云霄沿海',
+    lng: 116.801242,
+    lat: 23.624209,
+    visibility: 'window',
+    category: 'other',
+    intro: '云霄一带近海田园与海湾，厦深线闽粤交界气质。',
+  }),
+  spot({
+    id: 'xiashen-shanwei',
+    name: '汕尾红海湾方向',
+    lng: 115.418996,
+    lat: 22.814218,
+    visibility: 'distant',
+    category: 'other',
+    intro: '汕尾站周边红海湾方向，粤东海滨旅游节点。',
+  }),
+  spot({
+    id: 'xiashen-huizhou',
+    name: '惠州南滨海',
+    lng: 114.615277,
+    lat: 22.843136,
+    visibility: 'window',
+    category: 'other',
+    intro: '惠州南接近珠江口东岸，厦深线进入大湾区前的滨海平原。',
+  }),
+
+  // 兰渝补强
+  spot({
+    id: 'lanyu-lanzhou-south',
+    name: '兰州南缘黄土',
+    lng: 104.196136,
+    lat: 34.881869,
+    visibility: 'window',
+    category: 'other',
+    intro: '兰渝铁路出兰州后黄土高原沟壑，黄河上游向秦岭过渡。',
+  }),
+  spot({
+    id: 'lanyu-guangyuan-rail',
+    name: '广元蜀道',
+    lng: 105.835331,
+    lat: 32.486888,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '广元一带蜀道山地与嘉陵江，兰渝线入川门户。',
+  }),
+  spot({
+    id: 'lanyu-chongqing-approach',
+    name: '重庆北前山城',
+    lng: 106.17807,
+    lat: 30.027354,
+    visibility: 'window',
+    category: 'other',
+    intro: '接近重庆北时丘陵与嘉陵江水系交织，山城门户风光。',
+  }),
+
+  // 银兰补强
+  spot({
+    id: 'yinlan-wuzhong',
+    name: '吴忠黄河灌区',
+    lng: 106.10422,
+    lat: 37.639483,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '银兰高铁吴忠一带黄河灌区田园，宁夏平原绿洲风光。',
+  }),
+  spot({
+    id: 'yinlan-zhongwei-rail',
+    name: '中卫南沙漠边缘',
+    lng: 105.464326,
+    lat: 37.445705,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '中卫南接近腾格里沙漠与黄河，沙坡头方向铁路门户。',
+  }),
+  spot({
+    id: 'yinlan-jingtai',
+    name: '景泰黄河石林方向',
+    lng: 104.734232,
+    lat: 36.738107,
+    visibility: 'distant',
+    category: 'other',
+    intro: '景泰站周边黄河石林方向，银兰线甘青交界前的特色地貌。',
+  }),
+  spot({
+    id: 'yinlan-baiyin',
+    name: '白银黄土丘陵',
+    lng: 104.210835,
+    lat: 36.478799,
+    visibility: 'window',
+    category: 'other',
+    intro: '白银南一带黄土丘陵，接近兰州新区前的苍茫段落。',
+  }),
+
+  // 南疆补强
+  spot({
+    id: 'nanjiang-korla-oasis',
+    name: '库尔勒绿洲',
+    lng: 86.202643,
+    lat: 41.738055,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '南疆铁路库尔勒梨城绿洲，天山南麓与塔里木北缘交汇。',
+  }),
+  spot({
+    id: 'nanjiang-luntai',
+    name: '轮台胡杨与戈壁',
+    lng: 83.66186,
+    lat: 41.801066,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '轮台一带沙漠公路与胡杨林方向，南疆线中段戈壁绿洲。',
+  }),
+  spot({
+    id: 'nanjiang-aksu',
+    name: '阿克苏绿洲',
+    lng: 80.734734,
+    lat: 41.281666,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '阿克苏棉田与白杨绿洲，塔里木盆地北缘重要农业带。',
+  }),
+  spot({
+    id: 'nanjiang-artux',
+    name: '阿图什至喀什绿洲',
+    lng: 78.56824,
+    lat: 39.844895,
+    visibility: 'window',
+    category: 'other',
+    intro: '阿图什—喀什绿洲连绵，帕米尔高原东麓门户风光。',
+  }),
+
+  // 大丽 / 昆丽补强
+  spot({
+    id: 'kunli-chuxiong',
+    name: '楚雄高原',
+    lng: 101.434727,
+    lat: 25.097864,
+    visibility: 'window',
+    category: 'other',
+    intro: '昆明西行楚雄一带高原田园，滇中向滇西过渡。',
+  }),
+  spot({
+    id: 'kunli-xiangyun',
+    name: '祥云坝子',
+    lng: 100.893623,
+    lat: 25.346736,
+    visibility: 'window',
+    category: 'other',
+    intro: '祥云坝子田园开阔，接近大理前的滇西平原风光。',
+  }),
+  spot({
+    id: 'kunli-heqing',
+    name: '鹤庆田园',
+    lng: 100.234014,
+    lat: 26.095411,
+    visibility: 'window',
+    category: 'other',
+    intro: '鹤庆段白族田园与低缓山地，大丽线北上丽江前的经典窗景。',
+  }),
+
+  // 西成补强
+  spot({
+    id: 'xicheng-foping',
+    name: '佛坪秦岭腹地',
+    lng: 108.487697,
+    lat: 33.850898,
+    visibility: 'window',
+    category: 'mountain',
+    maxDistKm: 12,
+    intro: '西成高铁佛坪一带秦岭腹地林海，春雪秋色最美段落之一。',
+  }),
+  spot({
+    id: 'xicheng-ningqiang',
+    name: '宁强南秦巴',
+    lng: 105.920944,
+    lat: 32.578066,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '宁强南秦巴山地，西成线出汉中盆地、入川前的关隘风光。',
+  }),
+  spot({
+    id: 'xicheng-jiangyou',
+    name: '江油绵阳平原',
+    lng: 104.584388,
+    lat: 31.370337,
+    visibility: 'window',
+    category: 'other',
+    intro: '江油—绵阳成都平原北缘，西成高铁入川后的田园段落。',
+  }),
+
+  // 成贵补强
+  spot({
+    id: 'chenggui-leshan-rail',
+    name: '乐山岷江',
+    lng: 104.000872,
+    lat: 29.299626,
+    visibility: 'window',
+    category: 'other',
+    intro: '成贵高铁乐山段岷江河谷，大佛景区门户铁路风光。',
+  }),
+  spot({
+    id: 'chenggui-yibin',
+    name: '宜宾江城',
+    lng: 104.517022,
+    lat: 28.785,
+    visibility: 'window',
+    category: 'other',
+    intro: '宜宾西三江交汇地带，川南江城与丘陵田园。',
+  }),
+  spot({
+    id: 'chenggui-bijie',
+    name: '毕节乌蒙',
+    lng: 105.119535,
+    lat: 27.610958,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '毕节一带乌蒙山，成贵高铁黔西北高原桥隧段落。',
+  }),
+  spot({
+    id: 'chenggui-bailidujuan-distant',
+    name: '百里杜鹃方向',
+    lng: 105.8,
+    lat: 27.2,
+    visibility: 'distant',
+    category: 'other',
+    intro: '毕节—贵阳北百里杜鹃景区方向，春季花海主题联游节点。',
+  }),
+
+  // 格库补强
+  spot({
+    id: 'geku-huatugou',
+    name: '花土沟石油城戈壁',
+    lng: 91.450495,
+    lat: 37.973657,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '格库铁路花土沟一带柴达木西缘戈壁，无人区气质浓厚。',
+  }),
+  spot({
+    id: 'geku-ruoqiang-rail',
+    name: '若羌沙漠绿洲',
+    lng: 88.218434,
+    lat: 39.006084,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '若羌绿洲镶嵌沙漠边缘，格库与和若交汇的塔东南门户。',
+  }),
+  spot({
+    id: 'geku-yuli',
+    name: '尉犁塔里木',
+    lng: 87.252451,
+    lat: 40.13451,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '尉犁一带塔里木河下游与胡杨，接近库尔勒前的南疆风光。',
+  }),
+
+  // 银西（0）
+  spot({
+    id: 'yinxi-wuzhong-rail',
+    name: '吴忠宁东平原',
+    lng: 106.696756,
+    lat: 37.431185,
+    visibility: 'window',
+    category: 'other',
+    intro: '银西高铁吴忠一带宁夏平原田园，贺兰山与黄河灌区之间。',
+  }),
+  spot({
+    id: 'yinxi-guyuan',
+    name: '固原六盘山方向',
+    lng: 107.441103,
+    lat: 36.419558,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '固原—六盘山站方向，银西线翻越陇东黄土与六盘山地。',
+  }),
+  spot({
+    id: 'yinxi-liupanshan',
+    name: '六盘山段',
+    lng: 107.613434,
+    lat: 35.724614,
+    visibility: 'window',
+    category: 'mountain',
+    maxDistKm: 12,
+    intro: '六盘山高铁段山地林海，陇东向关中过渡的风景分界。',
+  }),
+  spot({
+    id: 'yinxi-qingyang',
+    name: '庆阳黄土高原',
+    lng: 108.120624,
+    lat: 34.67314,
+    visibility: 'window',
+    category: 'other',
+    intro: '庆阳一带黄土高原沟壑与塬面，银西线陕甘交界风光。',
+  }),
+  spot({
+    id: 'yinxi-xianyang',
+    name: '咸阳渭河平原',
+    lng: 108.756859,
+    lat: 34.387062,
+    visibility: 'window',
+    category: 'other',
+    intro: '接近西安北时渭河平原田园，银西高铁关中终点段。',
+  }),
+
+  // 郑渝（0）
+  spot({
+    id: 'zhengyu-nanyang',
+    name: '南阳盆地',
+    lng: 112.294399,
+    lat: 32.019264,
+    visibility: 'window',
+    category: 'other',
+    intro: '郑渝高铁南阳南一带盆地田园，中原向鄂西过渡。',
+  }),
+  spot({
+    id: 'zhengyu-xiangyang',
+    name: '襄阳汉江',
+    lng: 112.0,
+    lat: 32.05,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '襄阳东汉江流域，郑渝线鄂北门户山水。',
+  }),
+  spot({
+    id: 'zhengyu-xingshan',
+    name: '兴山三峡山地',
+    lng: 110.923422,
+    lat: 31.710233,
+    visibility: 'window',
+    category: 'gorge',
+    maxDistKm: 12,
+    intro: '兴山—巴东北穿行三峡山地，郑渝高铁桥隧与峡谷密集。',
+  }),
+  spot({
+    id: 'zhengyu-wushan',
+    name: '巫山峡谷',
+    lng: 109.547411,
+    lat: 31.080141,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '巫山站一带长江三峡峡谷，郑渝线最著名的山岳段落之一。',
+  }),
+  spot({
+    id: 'zhengyu-wanzhou',
+    name: '万州库区',
+    lng: 107.947014,
+    lat: 30.749848,
+    visibility: 'window',
+    category: 'gorge',
+    intro: '万州北三峡库区山城与江峡，郑渝线入渝门户。',
+  }),
+
+  // 青荣（0）
+  spot({
+    id: 'qingrong-jimo',
+    name: '即墨滨海',
+    lng: 120.438957,
+    lat: 36.644548,
+    visibility: 'window',
+    category: 'other',
+    intro: '青荣城际即墨北一带胶东滨海平原。',
+  }),
+  spot({
+    id: 'qingrong-haiyang',
+    name: '海阳海岸方向',
+    lng: 120.97209,
+    lat: 37.076115,
+    visibility: 'distant',
+    category: 'other',
+    intro: '海阳北站周边黄海海岸方向，青荣线滨海旅游节点。',
+  }),
+  spot({
+    id: 'qingrong-yantai',
+    name: '烟台滨海',
+    lng: 121.338096,
+    lat: 37.406702,
+    visibility: 'window',
+    category: 'other',
+    intro: '烟台南—牟平胶东半岛滨海城市风光。',
+  }),
+  spot({
+    id: 'qingrong-weihai',
+    name: '威海海岸',
+    lng: 121.778468,
+    lat: 37.436566,
+    visibility: 'window',
+    category: 'other',
+    intro: '威海北一带黄海海岸与海蚀地貌方向，青荣线东段精华。',
+  }),
+  spot({
+    id: 'qingrong-rongcheng',
+    name: '荣成天尽头方向',
+    lng: 122.40392,
+    lat: 37.138626,
+    visibility: 'distant',
+    category: 'other',
+    intro: '荣成站为青荣城际东端，成山头「天尽头」方向海岸门户。',
+  }),
+
+  // 日兰（0）
+  spot({
+    id: 'rilan-rizhao',
+    name: '日照海滨方向',
+    lng: 119.41704,
+    lat: 35.394629,
+    visibility: 'distant',
+    category: 'other',
+    intro: '日照西站黄海海滨城市门户，日兰高铁东端起点风光。',
+  }),
+  spot({
+    id: 'rilan-linyi',
+    name: '临沂沂蒙',
+    lng: 118.303471,
+    lat: 35.205594,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '临沂北一带沂蒙山地与平原过渡，日兰线鲁南窗景。',
+  }),
+  spot({
+    id: 'rilan-qufu',
+    name: '曲阜儒家故里方向',
+    lng: 117.0,
+    lat: 35.55,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 20,
+    intro: '曲阜东站孔孟故里方向，日兰与京沪交汇的人文节点。',
+  }),
+  spot({
+    id: 'rilan-heze',
+    name: '菏泽平原',
+    lng: 115.433882,
+    lat: 35.128267,
+    visibility: 'window',
+    category: 'other',
+    intro: '菏泽东鲁西南平原田园，日兰高铁西段风光。',
+  }),
+
+  // 商合杭（0）
+  spot({
+    id: 'shanghehang-huainan',
+    name: '淮南江淮',
+    lng: 117.102799,
+    lat: 32.53833,
+    visibility: 'window',
+    category: 'other',
+    intro: '商合杭淮南南一带江淮丘陵与田园。',
+  }),
+  spot({
+    id: 'shanghehang-chaohu',
+    name: '巢湖方向',
+    lng: 117.947244,
+    lat: 31.507173,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '巢湖东站周边巢湖水面方向，商合杭合肥—芜湖段。',
+  }),
+  spot({
+    id: 'shanghehang-wuhu',
+    name: '芜湖长江',
+    lng: 118.805913,
+    lat: 30.922544,
+    visibility: 'window',
+    category: 'other',
+    intro: '芜湖长江沿岸城市风光，商合杭线皖南门户。',
+  }),
+  spot({
+    id: 'shanghehang-xuancheng',
+    name: '宣城皖南',
+    lng: 119.807442,
+    lat: 30.850904,
+    visibility: 'window',
+    category: 'other',
+    intro: '宣城—广德南皖南丘陵与徽风田园，接近杭黄前的过渡。',
+  }),
+  spot({
+    id: 'shanghehang-huzhou',
+    name: '湖州水乡',
+    lng: 120.1,
+    lat: 30.85,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '湖州一带江南水乡与太湖南缘，商合杭入浙段落。',
+  }),
+
+  // 沪昆适量（超长干线只取标志段）
+  spot({
+    id: 'hukun-yiwu',
+    name: '义乌金华丘陵',
+    lng: 119.953741,
+    lat: 29.293511,
+    visibility: 'window',
+    category: 'other',
+    intro: '沪昆高铁义乌—金华浙中丘陵与城市风光。',
+  }),
+  spot({
+    id: 'hukun-shangrao',
+    name: '上饶信江',
+    lng: 117.383568,
+    lat: 28.408641,
+    visibility: 'window',
+    category: 'other',
+    intro: '上饶一带赣东北山水，沪昆线衔接合福/杭黄的枢纽段。',
+  }),
+  spot({
+    id: 'hukun-changsha',
+    name: '长沙湘江方向',
+    lng: 113.0,
+    lat: 28.15,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 20,
+    intro: '长沙南湘江与岳麓方向，沪昆高铁中段都会门户。',
+  }),
+  spot({
+    id: 'hukun-huaihua-rail',
+    name: '怀化南雪峰',
+    lng: 110.0,
+    lat: 27.55,
+    visibility: 'window',
+    category: 'mountain',
+    maxDistKm: 15,
+    intro: '怀化南雪峰山一带，沪昆高铁湘黔交界山地。',
+  }),
+  spot({
+    id: 'hukun-guiyang-karst',
+    name: '贵阳北喀斯特',
+    lng: 106.7,
+    lat: 26.65,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '贵阳北周边黔中喀斯特峰林，沪昆线西南枢纽风光。',
+  }),
+  spot({
+    id: 'hukun-qujing',
+    name: '曲靖滇东高原',
+    lng: 103.8,
+    lat: 25.5,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '曲靖北滇东高原田园，沪昆高铁入滇前段落。',
+  }),
+
+  // 宁杭 / 沪杭 适量
+  spot({
+    id: 'ninghang-liyang',
+    name: '溧阳天目湖方向',
+    lng: 119.101381,
+    lat: 31.666344,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '宁杭高铁溧阳站一带，天目湖方向江南丘陵湖光。',
+  }),
+  spot({
+    id: 'ninghang-yixing-rail',
+    name: '宜兴陶都山水',
+    lng: 119.859719,
+    lat: 31.281425,
+    visibility: 'window',
+    category: 'other',
+    intro: '宜兴一带江南山水与陶都风情，宁杭线苏浙交界。',
+  }),
+  spot({
+    id: 'ninghang-huzhou-rail',
+    name: '湖州太湖南缘',
+    lng: 120.017366,
+    lat: 30.816353,
+    visibility: 'window',
+    category: 'other',
+    intro: '湖州太湖南缘水乡，宁杭高铁入杭前风光。',
+  }),
+  spot({
+    id: 'huhang-jiashan',
+    name: '嘉善—嘉兴水乡',
+    lng: 120.735001,
+    lat: 30.658906,
+    visibility: 'window',
+    category: 'other',
+    intro: '沪杭高铁嘉善南—嘉兴南一带江南水乡与运河平原。',
+  }),
+  spot({
+    id: 'huhang-haining',
+    name: '海宁西钱塘方向',
+    lng: 120.409321,
+    lat: 30.461615,
+    visibility: 'window',
+    category: 'other',
+    intro: '海宁西接近钱塘江北岸，沪杭线入杭前平原风光。',
+  }),
+  spot({
+    id: 'huhang-hangzhou-portal',
+    name: '杭州东门户',
+    lng: 120.21233,
+    lat: 30.289012,
+    visibility: 'distant',
+    category: 'lake',
+    intro: '接近杭州东时可感知西湖—钱塘江城市山水门户气质。',
+  }),
+);
+
+// —— 第四轮：空白/极少线路只补核心看点（不凑数）——
+spots.push(
+  // 杭台：天台山
+  spot({
+    id: 'hangtai-tiantaishan',
+    name: '天台山',
+    lng: 120.986098,
+    lat: 29.129648,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '杭台高铁天台山站直达，天台山佛教名山与浙东山水门户。',
+  }),
+  spot({
+    id: 'hangtai-shengzhou',
+    name: '嵊州新昌山水',
+    lng: 120.796743,
+    lat: 29.948628,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '嵊州新昌一带浙东丘陵，杭台线入天台前的山水段落。',
+  }),
+
+  // 杭温：楠溪江
+  spot({
+    id: 'hangwen-nanxijiang',
+    name: '楠溪江',
+    lng: 120.594313,
+    lat: 28.90468,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '杭温高铁楠溪江站一带，永嘉楠溪江山水是本线核心窗景。',
+  }),
+  spot({
+    id: 'hangwen-yandang-distant',
+    name: '雁荡山方向',
+    lng: 120.65,
+    lat: 28.35,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '接近温州时可感知雁荡山方向，杭温线浙南山地门户。',
+  }),
+
+  // 贵南：荔波
+  spot({
+    id: 'guinan-libo',
+    name: '荔波喀斯特',
+    lng: 108.158538,
+    lat: 24.659599,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '贵南高铁荔波站，世界自然遗产荔波喀斯特峰林湖泊是本线高光。',
+  }),
+  spot({
+    id: 'guinan-dushan',
+    name: '独山山地',
+    lng: 107.695615,
+    lat: 25.641793,
+    visibility: 'window',
+    category: 'mountain',
+    intro: '独山一带黔南山地，贵南高铁出都匀后的峰丛段落。',
+  }),
+
+  // 大西：平遥、黄河方向
+  spot({
+    id: 'daxi-pingyao',
+    name: '平遥古城方向',
+    lng: 111.864312,
+    lat: 36.695351,
+    visibility: 'distant',
+    category: 'other',
+    intro: '大西高铁平遥古城站，世界文化遗产平遥古城门户。',
+  }),
+  spot({
+    id: 'daxi-yellow-river-yongji',
+    name: '永济黄河方向',
+    lng: 111.282404,
+    lat: 35.611928,
+    visibility: 'distant',
+    category: 'other',
+    intro: '运城—永济北一带黄河东岸，大西高铁晋陕交界风光。',
+  }),
+  spot({
+    id: 'daxi-taiyuan-basin',
+    name: '太原盆地',
+    lng: 112.662334,
+    lat: 37.754023,
+    visibility: 'window',
+    category: 'other',
+    intro: '太原南周边晋中盆地田园，大西高铁中段都会段。',
+  }),
+
+  // 沈大：渤海/大连
+  spot({
+    id: 'haida-bayuquan',
+    name: '鲅鱼圈渤海',
+    lng: 122.012493,
+    lat: 40.083731,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 10,
+    intro: '沈大高铁鲅鱼圈近渤海，辽东湾海岸是本线代表窗景。',
+  }),
+  spot({
+    id: 'haida-dalian-coast',
+    name: '大连滨海',
+    lng: 121.613745,
+    lat: 39.019475,
+    visibility: 'window',
+    category: 'other',
+    intro: '沈大高铁南端大连，黄渤海滨城门户风光。',
+  }),
+
+  // 京哈：承德等少量
+  spot({
+    id: 'jingha-chengde-distant',
+    name: '承德避暑山庄方向',
+    lng: 120.182262,
+    lat: 41.452262,
+    visibility: 'distant',
+    category: 'other',
+    intro: '京哈高铁承德南站，避暑山庄与坝上方向文旅门户。',
+  }),
+  spot({
+    id: 'jingha-changchun-plain',
+    name: '长春平原雪原',
+    lng: 125.0374,
+    lat: 43.739309,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '长春西一带东北平原，冬季雪原是京哈线典型气质。',
+  }),
+
+  // 徐连：连云港海滨
+  spot({
+    id: 'xulian-lianyungang',
+    name: '连云港海滨',
+    lng: 119.156824,
+    lat: 34.611259,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 10,
+    intro: '徐连高铁终点连云港东，黄海海滨与云台山方向门户。',
+  }),
+
+  // 郑太：太行
+  spot({
+    id: 'zhengtai-taihang',
+    name: '太行山晋城段',
+    lng: 113.097741,
+    lat: 36.041785,
+    visibility: 'window',
+    category: 'mountain',
+    maxDistKm: 12,
+    intro: '郑太高铁晋城东—高平东穿太行山，是本线核心山岳窗景。',
+  }),
+  spot({
+    id: 'zhengtai-changzhi',
+    name: '长治上党盆地',
+    lng: 113.101452,
+    lat: 36.664013,
+    visibility: 'window',
+    category: 'other',
+    intro: '长治东上党盆地，郑太高铁出太行后的高原田园。',
+  }),
+
+  // 广深港：珠江口
+  spot({
+    id: 'guangshengang-humen',
+    name: '虎门珠江口',
+    lng: 113.71562,
+    lat: 22.867999,
+    visibility: 'window',
+    category: 'other',
+    intro: '广深港高铁虎门站一带珠江口江海交汇，大湾区标志段落。',
+  }),
+  spot({
+    id: 'guangshengang-hongkong-distant',
+    name: '香港西九龙门户',
+    lng: 114.164274,
+    lat: 22.306248,
+    visibility: 'window',
+    category: 'other',
+    intro: '广深港高铁终点香港西九龙，跨境高铁与维港都会门户。',
+  }),
+
+  // 福厦：湄洲/泉州
+  spot({
+    id: 'fuxia-putian',
+    name: '莆田湄洲湾方向',
+    lng: 119.058632,
+    lat: 25.357824,
+    visibility: 'distant',
+    category: 'other',
+    intro: '福厦高铁莆田站，湄洲岛妈祖文化与海湾方向。',
+  }),
+  spot({
+    id: 'fuxia-quanzhou',
+    name: '泉州海丝方向',
+    lng: 118.44829,
+    lat: 24.645644,
+    visibility: 'distant',
+    category: 'other',
+    intro: '泉州站海丝古城方向，福厦高铁闽南文旅节点。',
+  }),
+
+  // 盐通：大丰湿地（唯一值得提的）
+  spot({
+    id: 'yantong-dafeng-wetland',
+    name: '大丰麋鹿湿地方向',
+    lng: 120.331278,
+    lat: 32.924867,
+    visibility: 'distant',
+    category: 'other',
+    intro: '盐通高铁盐城大丰站，黄海湿地与麋鹿保护区方向。',
+  }),
+
+  // 沪宁沿江：长江
+  spot({
+    id: 'huningyanjiang-jiangyin',
+    name: '江阴长江',
+    lng: 120.095286,
+    lat: 31.732614,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 10,
+    intro: '沪宁沿江高铁江阴段近长江，苏南沿江工业与江景并存。',
+  }),
+
+  // 京广：只补真正标志段
+  spot({
+    id: 'jingguang-yellow-river',
+    name: '黄河郑州段方向',
+    lng: 113.9427,
+    lat: 33.718289,
+    visibility: 'distant',
+    category: 'other',
+    intro: '京广高铁郑州东南北，黄河中下游平原与枢纽都会气质。',
+  }),
+  spot({
+    id: 'jingguang-wuhan-yangtze',
+    name: '武汉长江方向',
+    lng: 114.368123,
+    lat: 29.966212,
+    visibility: 'distant',
+    category: 'other',
+    intro: '京广高铁武汉站一带长江大河与江城门户。',
+  }),
+  spot({
+    id: 'jingguang-yueyang',
+    name: '岳阳楼洞庭方向',
+    lng: 113.1,
+    lat: 29.35,
+    visibility: 'distant',
+    category: 'lake',
+    maxDistKm: 25,
+    intro: '岳阳东站洞庭湖与岳阳楼方向，京广线湘北文旅节点。',
+  }),
+
+  // 徐兰：华山、龙门
+  spot({
+    id: 'xulan-huashan',
+    name: '华山北',
+    lng: 109.729735,
+    lat: 34.52314,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '徐兰高铁华山北站，西岳华山是本线最醒目山岳看点。',
+  }),
+  spot({
+    id: 'xulan-longmen',
+    name: '洛阳龙门方向',
+    lng: 112.45,
+    lat: 34.55,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 20,
+    intro: '洛阳龙门站龙门石窟方向，徐兰高铁中原文旅高光。',
+  }),
+  spot({
+    id: 'xulan-tianshui',
+    name: '天水秦岭北麓',
+    lng: 105.7,
+    lat: 34.55,
+    visibility: 'window',
+    category: 'mountain',
+    maxDistKm: 15,
+    intro: '天水南一带秦岭北麓，徐兰高铁入甘前的山地段落。',
+  }),
+
+  // 京沪：泰山、长江
+  spot({
+    id: 'jinghu-taishan',
+    name: '泰山方向',
+    lng: 116.801762,
+    lat: 36.899625,
+    visibility: 'distant',
+    category: 'mountain',
+    intro: '京沪高铁泰安站，东岳泰山方向是本线标志山岳。',
+  }),
+  spot({
+    id: 'jinghu-nanjing-yangtze',
+    name: '南京长江',
+    lng: 118.663907,
+    lat: 31.933515,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 10,
+    intro: '京沪高铁南京南一带长江下游江城门户风光。',
+  }),
+
+  // 成渝：几乎无标志窗景，只留重庆山城门户 1 个
+  spot({
+    id: 'chengyu-chongqing-hills',
+    name: '重庆西山城丘陵',
+    lng: 106.461517,
+    lat: 29.555794,
+    visibility: 'window',
+    category: 'other',
+    intro: '成渝高铁接近重庆西时丘陵与山城门户，本线少有辨识度的段落。',
+  }),
+);
+
+// 去重校验
+const ids = new Set();
+for (const s of spots) {
+  if (ids.has(s.id)) throw new Error('duplicate id: ' + s.id);
+  ids.add(s.id);
+}
+
+/** 青藏点：地物中心常离轨过远，投影到 z8991-railway 作为贴线观景参考点 */
+const QINGZANG_SNAP_IDS = new Set([
+  'qinghai-lake',
+  'chaerhan-salt-bridge',
+  'qaidam-gobi',
+  'kunlun-pass',
+  'yuzhu-peak',
+  'kekexili',
+  'wudaoliang',
+  'fenghuoshan',
+  'tuotuohe-source',
+  'tongtian-river',
+  'sanjiangyuan',
+  'tanggula-pass',
+  'geladandong',
+  'cuona-lake',
+  'qiangtang-grassland',
+  'nyainqentanglha',
+  'namtso-distant',
+  'yangbajing-geothermal',
+]);
+
+function haversineKm(a, b) {
+  const toRad = (d) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const lat1 = toRad(a.lat);
+  const lat2 = toRad(b.lat);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(h));
+}
+
+function snapQingzangToRailway(list) {
+  const railPath = join(__dirname, '../data/presets/z8991-railway.json');
+  if (!existsSync(railPath)) {
+    console.warn('skip qingzang snap: missing z8991-railway.json');
+    return;
+  }
+  const coords = JSON.parse(readFileSync(railPath, 'utf8'));
+  const path = coords.map(([lng, lat], index) => ({ lng, lat, index, distFromStart: 0 }));
+  let lengthKm = 0;
+  for (let i = 1; i < path.length; i += 1) {
+    lengthKm += haversineKm(path[i - 1], path[i]);
+    path[i].distFromStart = lengthKm;
+  }
+  const defaults = { on_track: 3, window: 8, distant: 35 };
+  let snapped = 0;
+  for (const s of list) {
+    if (!QINGZANG_SNAP_IDS.has(s.id) || lengthKm <= 0) continue;
+    let best = { distKm: Infinity, point: path[0] };
+    for (let i = 1; i < path.length; i += 1) {
+      const a = path[i - 1];
+      const b = path[i];
+      const dx = b.lng - a.lng;
+      const dy = b.lat - a.lat;
+      const t = Math.max(
+        0,
+        Math.min(1, ((s.lng - a.lng) * dx + (s.lat - a.lat) * dy) / (dx * dx + dy * dy || 1)),
+      );
+      const point = { lng: a.lng + dx * t, lat: a.lat + dy * t };
+      const distKm = haversineKm({ lng: s.lng, lat: s.lat }, point);
+      if (distKm < best.distKm) best = { distKm, point };
+    }
+    const max = s.maxDistKm ?? defaults[s.visibility] ?? 8;
+    if (best.distKm <= max * 0.85) continue;
+    s.lng = Number(best.point.lng.toFixed(6));
+    s.lat = Number(best.point.lat.toFixed(6));
+    if (s.visibility === 'on_track') delete s.maxDistKm;
+    if (s.visibility === 'window' && s.maxDistKm && s.maxDistKm > 12) s.maxDistKm = 12;
+    snapped += 1;
+  }
+  if (snapped) console.log(`qingzang snap: ${snapped} spots -> z8991-railway`);
+}
+
+snapQingzangToRailway(spots);
+
+const doc = {
+  version: 1,
+  updated: '2026-09-13',
+  note: '策展第一版：关键出名铁路窗景；坐标为贴线观景参考点（青藏已投影到 z8991-railway）。规范见 docs/scenic-spots-spec.md',
+  spots,
+};
+
+writeFileSync(outPath, JSON.stringify(doc, null, 2) + '\n', 'utf8');
+console.log(`wrote ${spots.length} spots -> ${outPath}`);
+console.log(
+  'by visibility',
+  Object.fromEntries(
+    ['window', 'distant', 'on_track'].map((v) => [
+      v,
+      spots.filter((s) => s.visibility === v).length,
+    ]),
+  ),
+);

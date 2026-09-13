@@ -64,7 +64,9 @@ const STATION_REGION_ANCHORS: Record<string, { lng: number; lat: number; maxKm: 
   千岛湖: { lng: 119.1880833, lat: 29.7374, maxKm: 25 },
   三阳: { lng: 118.801888, lat: 30.029526, maxKm: 25 },
   建德: { lng: 119.5314, lat: 29.6849, maxKm: 30 },
-  桐庐: { lng: 119.7631, lat: 29.8769, maxKm: 30 },
+  // 桐庐站在城南街道（杭黄），勿与江南镇桐庐东混淆——错锚会把蓝线拉出尖刺
+  桐庐: { lng: 119.727725, lat: 29.791394, maxKm: 20 },
+  桐庐东: { lng: 119.75968, lat: 29.85729, maxKm: 20 },
   富阳: { lng: 119.955, lat: 30.003, maxKm: 30 },
 };
 

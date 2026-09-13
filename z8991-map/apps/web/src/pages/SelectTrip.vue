@@ -25,6 +25,10 @@ const to = ref('');
 const date = ref('');
 const fromSuggest = ref<{ name: string; telecode: string }[]>([]);
 const toSuggest = ref<{ name: string; telecode: string }[]>([]);
+const fromOpen = ref(false);
+const toOpen = ref(false);
+const fromActive = ref(-1);
+const toActive = ref(-1);
 const trains = ref<TrainSummary[]>([]);
 const loading = ref(false);
 const loadingPhase = ref<'search' | 'stops' | 'enter' | 'demo' | 'resume' | null>(null);
@@ -169,14 +173,26 @@ function onSuggest(which: 'from' | 'to', q: string) {
   clearTimeout(suggestTimer);
   suggestTimer = window.setTimeout(async () => {
     if (!q.trim()) {
-      if (which === 'from') fromSuggest.value = [];
-      else toSuggest.value = [];
+      if (which === 'from') {
+        fromSuggest.value = [];
+        fromActive.value = -1;
+      } else {
+        toSuggest.value = [];
+        toActive.value = -1;
+      }
       return;
     }
     try {
       const res = await api.suggestStations(q);
-      if (which === 'from') fromSuggest.value = res.stations;
-      else toSuggest.value = res.stations;
+      if (which === 'from') {
+        fromSuggest.value = res.stations;
+        fromActive.value = res.stations.length ? 0 : -1;
+        fromOpen.value = res.stations.length > 0;
+      } else {
+        toSuggest.value = res.stations;
+        toActive.value = res.stations.length ? 0 : -1;
+        toOpen.value = res.stations.length > 0;
+      }
     } catch {
       /* ignore suggest errors */
     }
@@ -185,6 +201,39 @@ function onSuggest(which: 'from' | 'to', q: string) {
 
 watch(from, (q) => onSuggest('from', q));
 watch(to, (q) => onSuggest('to', q));
+
+function pickStation(which: 'from' | 'to', name: string) {
+  if (which === 'from') {
+    from.value = name;
+    fromSuggest.value = [];
+    fromOpen.value = false;
+    fromActive.value = -1;
+  } else {
+    to.value = name;
+    toSuggest.value = [];
+    toOpen.value = false;
+    toActive.value = -1;
+  }
+}
+
+function onSuggestKey(which: 'from' | 'to', e: KeyboardEvent) {
+  const list = which === 'from' ? fromSuggest.value : toSuggest.value;
+  const active = which === 'from' ? fromActive : toActive;
+  const open = which === 'from' ? fromOpen : toOpen;
+  if (!open.value || !list.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    active.value = (active.value + 1) % list.length;
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    active.value = (active.value - 1 + list.length) % list.length;
+  } else if (e.key === 'Enter' && active.value >= 0) {
+    e.preventDefault();
+    pickStation(which, list[active.value]!.name);
+  } else if (e.key === 'Escape') {
+    open.value = false;
+  }
+}
 
 async function search() {
   error.value = '';
@@ -251,26 +300,13 @@ async function enterTrip() {
     if (/^Z8991$/i.test(selected.value.trainCode)) {
       try {
         const preset = await api.getPreset('z8991');
-        spots = (preset.scenicSpots || []).map((s) => ({
-          id: String(s.id),
-          name: s.name,
-          lng: s.lng,
-          lat: s.lat,
-          intro: s.intro,
-          timeLabel: s.timeLabel,
-          at: s.at,
-          nightOnly: s.nightOnly,
-          side: s.side,
-          source: 'preset' as const,
-          trainCode: 'Z8991',
-        }));
         const byName = new Map(preset.stations.map((s) => [s.name, s]));
         stops.value = stops.value.map((st) => {
           const p = byName.get(st.name);
           return p ? { ...st, lng: p.lng, lat: p.lat, intro: p.intro || st.intro } : st;
         });
       } catch {
-        /* scenic optional */
+        /* station enrich optional */
       }
     }
 
@@ -306,6 +342,9 @@ async function enterTrip() {
           return s;
         });
       }
+      if (geo.scenicSpots?.length) {
+        spots = geo.scenicSpots;
+      }
       if (geo.fromPreset && geo.coords?.length >= 2 && geo.source !== 'station') {
         preciseRailway = geo.coords;
         canUpgradePrecise = false;
@@ -314,6 +353,8 @@ async function enterTrip() {
           : '真实轨道线（精品预置）';
       } else {
         canUpgradePrecise = geo.canUpgrade !== false;
+        // 示意折线也可能命中附近风景点
+        if (!spots.length && geo.scenicSpots) spots = geo.scenicSpots;
         console.warn('[enter] no preset corridor', {
           fromPreset: geo.fromPreset,
           source: geo.source,
@@ -380,19 +421,32 @@ async function loadDemo() {
       intro: s.intro,
       telecode: s.telecode,
     }));
-    const spots = (preset.scenicSpots || []).map((s) => ({
-      id: String(s.id),
-      name: s.name,
-      lng: s.lng,
-      lat: s.lat,
-      intro: s.intro,
-      timeLabel: s.timeLabel,
-      at: s.at,
-      nightOnly: s.nightOnly,
-      side: s.side,
-      source: 'preset' as const,
-      trainCode: 'Z8991',
-    }));
+    let spots: import('@railvista/shared').ScenicSpot[] = [];
+    let preciseRailway = (preset.railway as [number, number][] | undefined) || null;
+    try {
+      const geo = await api.getRailGeometry({
+        trainCode: preset.meta.train,
+        mode: 'preset',
+        stops: demoStops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat })),
+      });
+      if (geo.coords?.length >= 2) preciseRailway = geo.coords;
+      if (geo.scenicSpots?.length) spots = geo.scenicSpots;
+    } catch {
+      /* fallback below */
+    }
+    if (!spots.length && preset.scenicSpots?.length) {
+      spots = preset.scenicSpots.map((s) => ({
+        id: String(s.id),
+        name: s.name,
+        lng: s.lng,
+        lat: s.lat,
+        intro: s.intro,
+        nightOnly: s.nightOnly,
+        side: s.side,
+        visibility: 'window' as const,
+        source: 'preset' as const,
+      }));
+    }
     trip.setTrip({
       trainCode: preset.meta.train,
       trainNo: preset.meta.trainNo || '5500000Z8991',
@@ -401,7 +455,7 @@ async function loadDemo() {
       toName: preset.meta.to,
       stops: demoStops,
       spots,
-      preciseRailway: (preset.railway as [number, number][] | undefined) || null,
+      preciseRailway,
       isDemo: true,
     });
     router.push({
@@ -464,19 +518,55 @@ const showHomeLists = computed(() => step.value === 'search' && trains.value.len
     <p v-if="resumeHint" class="error">{{ resumeHint }}</p>
 
     <form class="select-form" @submit.prevent="search">
-      <label>
+      <label class="station-field">
         <span>出发站</span>
-        <input v-model="from" list="from-list" autocomplete="off" placeholder="例如 西宁" />
-        <datalist id="from-list">
-          <option v-for="s in fromSuggest" :key="s.telecode" :value="s.name" />
-        </datalist>
+        <div class="station-field__control">
+          <input
+            v-model="from"
+            autocomplete="off"
+            placeholder="例如 西宁"
+            @focus="fromOpen = fromSuggest.length > 0"
+            @blur="fromOpen = false"
+            @keydown="onSuggestKey('from', $event)"
+          />
+          <ul v-show="fromOpen && fromSuggest.length" class="station-suggest" role="listbox">
+            <li
+              v-for="(s, i) in fromSuggest"
+              :key="s.telecode"
+              role="option"
+              :aria-selected="i === fromActive"
+              :class="{ 'is-active': i === fromActive }"
+              @mousedown.prevent="pickStation('from', s.name)"
+            >
+              {{ s.name }}
+            </li>
+          </ul>
+        </div>
       </label>
-      <label>
+      <label class="station-field">
         <span>到达站</span>
-        <input v-model="to" list="to-list" autocomplete="off" placeholder="例如 拉萨" />
-        <datalist id="to-list">
-          <option v-for="s in toSuggest" :key="s.telecode" :value="s.name" />
-        </datalist>
+        <div class="station-field__control">
+          <input
+            v-model="to"
+            autocomplete="off"
+            placeholder="例如 拉萨"
+            @focus="toOpen = toSuggest.length > 0"
+            @blur="toOpen = false"
+            @keydown="onSuggestKey('to', $event)"
+          />
+          <ul v-show="toOpen && toSuggest.length" class="station-suggest" role="listbox">
+            <li
+              v-for="(s, i) in toSuggest"
+              :key="s.telecode"
+              role="option"
+              :aria-selected="i === toActive"
+              :class="{ 'is-active': i === toActive }"
+              @mousedown.prevent="pickStation('to', s.name)"
+            >
+              {{ s.name }}
+            </li>
+          </ul>
+        </div>
       </label>
       <label>
         <span>乘车日期</span>

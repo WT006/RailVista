@@ -7,7 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "test": "tsx --test src/services/corridors.test.ts src/services/osmRailway.test.ts"
+    "test": "tsx --test src/services/corridors.test.ts src/services/osmRailway.test.ts src/services/scenicSpots.test.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.1",

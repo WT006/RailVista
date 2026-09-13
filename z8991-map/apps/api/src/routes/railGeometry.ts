@@ -7,14 +7,24 @@ import { enrichStopsCoords } from '../services/geocode.js';
 import { matchCorridor, sliceCorridorForStops, loadCorridors } from '../services/corridors.js';
 import { matchCorridorNetwork } from '../services/corridorNetwork.js';
 import { createRailGeometryJob, getRailGeometryJob } from '../services/railGeometryJob.js';
+import { loadScenicSpots, matchScenicSpotsForRailway } from '../services/scenicSpots.js';
+import { slicePolylineByOd } from '@railvista/shared';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const presetsDir = join(__dirname, '../../../../data/presets');
 
 export const railGeometryRoute = new Hono();
 
-// 启动时加载走廊预置
+// 启动时加载走廊预置与风景库
 loadCorridors();
+loadScenicSpots();
+
+function attachScenic<T extends { coords: [number, number][] }>(data: T) {
+  return {
+    ...data,
+    scenicSpots: matchScenicSpotsForRailway(data.coords),
+  };
+}
 
 type Body = {
   stops?: Array<{ lng?: number; lat?: number; name?: string }>;
@@ -151,21 +161,32 @@ railGeometryRoute.post('/', async (c) => {
     );
   }
 
-  // 1) Z8991 专用预置
+  // 1) Z8991 专用预置（按 OD 站投影切片后再挂风景，避免全线景点灌入短途）
   const preset = tryPresetRailway(body.trainCode);
   if (preset?.length) {
+    const from = enriched.find((s) => s.lng != null && s.lat != null);
+    const to = [...enriched].reverse().find((s) => s.lng != null && s.lat != null);
+    let coords = preset;
+    if (from && to && from !== to) {
+      const sliced = slicePolylineByOd(
+        preset,
+        { lng: Number(from.lng), lat: Number(from.lat) },
+        { lng: Number(to.lng), lat: Number(to.lat) },
+      );
+      if (sliced && sliced.length >= 2) coords = sliced;
+    }
     return c.json({
       ok: true,
-      data: {
-        coords: preset,
+      data: attachScenic({
+        coords,
         stops: enriched,
-        source: 'osm',
+        source: 'osm' as const,
         segmentsOk: stops.length - 1,
         segmentsTotal: stops.length - 1,
         fromPreset: true,
         canUpgrade: false,
         corridorId: 'z8991',
-      },
+      }),
     });
   }
 
@@ -177,10 +198,10 @@ railGeometryRoute.post('/', async (c) => {
     if (sliced && sliced.length >= 2) {
       return c.json({
         ok: true,
-        data: {
+        data: attachScenic({
           coords: sliced,
           stops: enriched,
-          source: 'osm',
+          source: 'osm' as const,
           segmentsOk: stops.length - 1,
           segmentsTotal: stops.length - 1,
           fromPreset: true,
@@ -188,7 +209,7 @@ railGeometryRoute.post('/', async (c) => {
           corridorId: matched.corridor.id,
           corridorName: matched.corridor.name,
           matchScore: matched.score,
-        },
+        }),
       });
     }
   }
@@ -198,10 +219,10 @@ railGeometryRoute.post('/', async (c) => {
   if (networked?.coords && networked.coords.length >= 2) {
     return c.json({
       ok: true,
-      data: {
+      data: attachScenic({
         coords: networked.coords,
         stops: enriched,
-        source: 'osm',
+        source: 'osm' as const,
         segmentsOk: stops.length - 1,
         segmentsTotal: stops.length - 1,
         fromPreset: true,
@@ -210,7 +231,7 @@ railGeometryRoute.post('/', async (c) => {
         corridorName: networked.corridorNames.join(' + '),
         transferHubs: networked.transferHubs,
         matchScore: networked.score,
-      },
+      }),
     });
   }
 
@@ -220,16 +241,16 @@ railGeometryRoute.post('/', async (c) => {
   if (body.mode === 'preset') {
     return c.json({
       ok: true,
-      data: {
+      data: attachScenic({
         coords: stationLine,
         stops: enriched,
-        source: 'station',
+        source: 'station' as const,
         segmentsOk: 0,
         segmentsTotal: stops.length - 1,
         fromPreset: false,
         canUpgrade: true,
         message: '无精品预置，可点击获取精确路线',
-      },
+      }),
     });
   }
 
@@ -239,42 +260,42 @@ railGeometryRoute.post('/', async (c) => {
     if (result.source === 'none' || result.coords.length < 2) {
       return c.json({
         ok: true,
-        data: {
+        data: attachScenic({
           coords: stationLine,
           stops: enriched,
-          source: 'station',
+          source: 'station' as const,
           segmentsOk: result.segmentsOk,
           segmentsTotal: result.segmentsTotal,
           fromPreset: false,
           canUpgrade: true,
           message: '未能匹配 OSM 铁路线，已使用站点示意折线',
-        },
+        }),
       });
     }
     return c.json({
       ok: true,
-      data: {
+      data: attachScenic({
         ...result,
         stops: enriched,
         fromPreset: false,
         canUpgrade: false,
-      },
+      }),
     });
   } catch (e) {
     const err = e as Error & { code?: string };
     if (stationLine.length >= 2) {
       return c.json({
         ok: true,
-        data: {
+        data: attachScenic({
           coords: stationLine,
           stops: enriched,
-          source: 'station',
+          source: 'station' as const,
           segmentsOk: 0,
           segmentsTotal: stops.length - 1,
           fromPreset: false,
           canUpgrade: true,
           message: err.message || 'OSM 失败，已使用站点示意折线',
-        },
+        }),
       });
     }
     return c.json(

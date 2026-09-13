@@ -28,6 +28,7 @@ export type RailGeometryData = {
   corridorId?: string;
   corridorName?: string;
   message?: string;
+  scenicSpots?: import('@railvista/shared').ScenicSpot[];
 };
 
 export type RailQualityTier =
@@ -51,6 +52,7 @@ export type RailGeometryJob = {
   qualityTier?: RailQualityTier;
   trainCode?: string;
   stops?: Array<{ name?: string; lng?: number; lat?: number }>;
+  scenicSpots?: import('@railvista/shared').ScenicSpot[];
 };
 
 export const api = {

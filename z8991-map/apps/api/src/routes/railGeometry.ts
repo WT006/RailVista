@@ -21,6 +21,8 @@ type Body = {
   trainCode?: string;
   /** preset：仅精品预置/走廊（快）；full：含 OSM 现场拼线（慢，按需） */
   mode?: 'preset' | 'full';
+  /** 仅重算上一趟失败段 */
+  retryFailedOnly?: boolean;
 };
 
 function clientKeyOf(c: { req: { header: (name: string) => string | undefined } }): string {
@@ -82,6 +84,7 @@ railGeometryRoute.post('/jobs', async (c) => {
       stops: namedStops,
       trainCode: body.trainCode,
       clientKey: clientKeyOf(c),
+      retryFailedOnly: !!body.retryFailedOnly,
     });
     return c.json({
       ok: true,
@@ -167,7 +170,8 @@ railGeometryRoute.post('/', async (c) => {
   }
 
   // 2) 干线精品走廊（京沪等）——须首末站归属该走廊，避免太原→沪误套京沪
-  const matched = matchCorridor(enriched);
+  // 普速车（K/T/Z…）禁止套高铁走廊，避免「安阳/鹤壁」贴上「安阳东/鹤壁东」平行线
+  const matched = matchCorridor(enriched, { trainCode: body.trainCode });
   if (matched) {
     const sliced = sliceCorridorForStops(matched.corridor, enriched);
     if (sliced && sliced.length >= 2) {
@@ -190,7 +194,7 @@ railGeometryRoute.post('/', async (c) => {
   }
 
   // 2b) 单走廊未命中：精品路网多段寻路拼接（京沪+宁杭、大西+徐兰 等）
-  const networked = matchCorridorNetwork(enriched);
+  const networked = matchCorridorNetwork(enriched, { trainCode: body.trainCode });
   if (networked?.coords && networked.coords.length >= 2) {
     return c.json({
       ok: true,
@@ -212,7 +216,7 @@ railGeometryRoute.post('/', async (c) => {
 
   const stationLine = stops.map((s) => [s.lng, s.lat] as [number, number]);
 
-  // preset 模式：不打 OSM，交给前端「获取精品路线」按需触发
+  // preset 模式：不打 OSM，交给前端「获取精确路线」按需触发
   if (body.mode === 'preset') {
     return c.json({
       ok: true,
@@ -224,7 +228,7 @@ railGeometryRoute.post('/', async (c) => {
         segmentsTotal: stops.length - 1,
         fromPreset: false,
         canUpgrade: true,
-        message: '无精品预置，可点击获取精品路线',
+        message: '无精品预置，可点击获取精确路线',
       },
     });
   }

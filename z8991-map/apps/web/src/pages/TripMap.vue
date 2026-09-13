@@ -23,6 +23,14 @@ import {
   type Stop,
 } from '@railvista/shared';
 import { api } from '../api/client';
+import { hydrateFromSnapshot, persistActiveTrip } from '../lib/persistTrip';
+import {
+  clearAutoResume,
+  getAutoResumeTripKey,
+  getSnapshot,
+  markStayOnSelect,
+  tripCacheKey,
+} from '../lib/tripCache';
 import { loadAmap } from '../map/amap';
 import { readSimulatedProgress, useGeolocation, useNow } from '../composables/useGeolocation';
 import { usePrefsStore } from '../stores/prefsStore';
@@ -46,6 +54,7 @@ const departOpen = ref(false);
 const departInput = ref('');
 const confirmOpen = ref(false);
 const confirmText = ref('');
+const confirmMode = ref<'calibrate' | 'newTrip'>('calibrate');
 const pendingStation = ref<Stop | null>(null);
 const toast = ref('');
 let toastTimer: number | undefined;
@@ -59,6 +68,12 @@ let stationMarkers: any[] = [];
 let pathMetrics = { path: [] as ReturnType<typeof buildRailwayMetrics>['path'], lengthKm: 0 };
 
 const segment = computed(() => trip.segment);
+const resumeKeyNow = ref<string | null>(getAutoResumeTripKey());
+const isPinnedCurrent = computed(() => {
+  const seg = segment.value;
+  if (!seg || trip.isDemo) return false;
+  return resumeKeyNow.value === tripCacheKey(seg);
+});
 const schedule = computed(() => {
   const seg = segment.value;
   if (!seg) return null;
@@ -78,8 +93,9 @@ const preciseActionLabel = computed(() => {
     return `加载中 ${job.segmentsDone}/${job.segmentsTotal}…`;
   }
   if (trip.preciseLoading) return '加载中…';
-  if (job?.status === 'partial' || job?.status === 'failed') return '重试精确路线';
-  return '获取精品路线';
+  if (job?.status === 'partial') return '重试缺口路段';
+  if (job?.status === 'failed') return '重试精确路线';
+  return '获取精确路线';
 });
 
 const shifted = (iso: string) => shiftDate(iso, schedule.value?.offsetMs || 0);
@@ -94,14 +110,15 @@ function showToast(msg: string) {
 
 async function ensureTripLoaded() {
   if (trip.segment) {
-    prefs.loadForCurrentTrip();
+    if (!trip.isDemo) prefs.loadForCurrentTrip();
     return;
   }
   const trainCode = String(route.query.trainCode || '');
   const date = String(route.query.date || '');
   const from = String(route.query.from || '');
   const to = String(route.query.to || '');
-  if (route.query.demo === '1' || /^Z8991$/i.test(trainCode)) {
+
+  if (route.query.demo === '1') {
     const preset = await api.getPreset('z8991');
     const demoStops: Stop[] = preset.stations.map((s, i) => ({
       seq: i + 1,
@@ -136,15 +153,49 @@ async function ensureTripLoaded() {
         trainCode: 'Z8991',
       })),
       preciseRailway: (preset.railway as [number, number][] | undefined) || null,
+      isDemo: true,
     });
     prefs.loadForCurrentTrip();
     return;
   }
-  if (!trainCode || !date || !from || !to) {
-    router.replace('/');
-    return;
+
+  if (trainCode && date && from && to) {
+    const key = tripCacheKey({ trainCode, date, fromName: from, toName: to });
+    const snap = await getSnapshot(key);
+    if (snap) {
+      hydrateFromSnapshot(snap);
+      return;
+    }
   }
-  throw new Error('行程未加载，请从选车页重新进入');
+
+  // query 未命中时，再试自动恢复指针（刷新 /trip 时常见）
+  const resumeKey = getAutoResumeTripKey();
+  if (resumeKey) {
+    const snap = await getSnapshot(resumeKey);
+    if (snap) {
+      hydrateFromSnapshot(snap);
+      await router.replace({
+        path: '/trip',
+        query: {
+          trainCode: snap.segment.trainCode,
+          date: snap.segment.date,
+          from: snap.segment.fromName,
+          to: snap.segment.toName,
+        },
+      });
+      return;
+    }
+    clearAutoResume();
+  }
+
+  // 有 query 但无缓存：回首页（由选车页展示提示），避免卡在错误页
+  try {
+    sessionStorage.setItem('railvista:resumeHint', '无法恢复上次行程');
+  } catch {
+    /* */
+  }
+  markStayOnSelect();
+  await router.replace('/');
 }
 
 function updateOverlayMetrics() {
@@ -412,6 +463,7 @@ function openCalibrateConfirm(station: Stop) {
   }
   const offsetMs = computeCalibrationOffset(now.value, anchor);
   pendingStation.value = station;
+  confirmMode.value = 'calibrate';
   confirmText.value = `确认您现在在「${station.name}」？\n图定到点 ${formatTime(anchor)}，当前 ${formatTime(now.value)}（${formatOffsetLabel(offsetMs)}）。\n确认后，后续估算将整体${offsetMs >= 0 ? '延后' : '提前'} ${Math.abs(Math.round(offsetMs / 60000))} 分钟。`;
   confirmOpen.value = true;
   map?.clearInfoWindow?.();
@@ -463,8 +515,44 @@ function locateTrain() {
 }
 
 function goBackToSelect() {
+  // 仅清内存；保留 autoResume。标记本次留在首页，避免立刻又被自动拉回地图。
+  markStayOnSelect();
   trip.clear();
   router.push('/');
+}
+
+function openStartNewTrip() {
+  confirmMode.value = 'newTrip';
+  confirmText.value =
+    '开始新行程后，下次打开将不再自动进入本趟。最近访问列表仍会保留，可随时再选。';
+  confirmOpen.value = true;
+}
+
+async function setAsCurrentTrip() {
+  if (trip.isDemo || !segment.value) return;
+  if (isPinnedCurrent.value) {
+    clearAutoResume();
+    resumeKeyNow.value = null;
+    showToast('已取消当前行程');
+    return;
+  }
+  const snap = await persistActiveTrip({ bumpOpenedAt: true, setResume: true });
+  resumeKeyNow.value = getAutoResumeTripKey();
+  if (snap) showToast('已设为当前行程');
+  else showToast('设置失败，请稍后重试');
+}
+
+function confirmDialogAction() {
+  if (confirmMode.value === 'newTrip') {
+    confirmOpen.value = false;
+    clearAutoResume();
+    resumeKeyNow.value = null;
+    markStayOnSelect();
+    trip.clear();
+    router.push('/');
+    return;
+  }
+  applyCalibration();
 }
 
 function refreshRailLine() {
@@ -503,13 +591,20 @@ async function onUpgradePrecise() {
     map?.setFitView(null, false, getMapPadding());
   }
   if (trip.preciseError) showToast(trip.preciseError);
-  else if (trip.preciseJob?.status === 'done') showToast('精确路线已加载');
-  else if (trip.preciseJob?.status === 'partial') showToast(trip.preciseJob.message);
+  else if (trip.preciseJob?.status === 'done') {
+    const tier = trip.preciseJob.qualityTier;
+    if (tier === 'soft') showToast('近似轨道已加载（跨站补缝）');
+    else if (tier === 'corridor' || tier === 'network') showToast('精品精确路线已加载');
+    else if (tier === 'local') showToast('本地轨网路线已加载');
+    else showToast('精确路线已加载');
+  } else if (trip.preciseJob?.status === 'partial') showToast(trip.preciseJob.message);
 }
 
 onMounted(async () => {
   try {
     await ensureTripLoaded();
+    if (!trip.segment) return;
+    resumeKeyNow.value = getAutoResumeTripKey();
     await initMap();
   } catch (e) {
     error.value = e instanceof Error ? e.message : '地图初始化失败';
@@ -555,10 +650,29 @@ onUnmounted(() => {
 
     <template v-if="segment && schedule">
       <header class="top-bar">
-        <button type="button" class="map-back-btn" @click="goBackToSelect">
-          <span class="map-back-btn__icon" aria-hidden="true">‹</span>
-          重选路线
-        </button>
+        <div class="map-nav-actions">
+          <button type="button" class="map-back-btn" @click="goBackToSelect">
+            <span class="map-back-btn__icon" aria-hidden="true">‹</span>
+            重选路线
+          </button>
+          <button
+            v-if="!trip.isDemo"
+            type="button"
+            class="map-pin-trip-btn"
+            :class="{ 'is-active': isPinnedCurrent }"
+            @click="setAsCurrentTrip"
+          >
+            {{ isPinnedCurrent ? '取消当前行程' : '设为当前行程' }}
+          </button>
+          <button
+            v-if="!trip.isDemo"
+            type="button"
+            class="map-new-trip-btn"
+            @click="openStartNewTrip"
+          >
+            开始新行程
+          </button>
+        </div>
         <div class="top-bar__cluster">
           <div class="status-card">
             <div class="status-row status-row--primary">
@@ -582,7 +696,6 @@ onUnmounted(() => {
               <span class="status-divider">·</span>
               <span>定位 <strong>{{ mode }}</strong></span>
             </div>
-            <p class="rail-hint">{{ trip.polylineHint }}</p>
             <div v-if="showPreciseAction" class="rail-upgrade">
               <button
                 type="button"
@@ -689,10 +802,13 @@ onUnmounted(() => {
     <div v-if="confirmOpen" class="schedule-dialog">
       <div class="schedule-dialog__backdrop" @click="confirmOpen = false" />
       <div class="schedule-dialog__card">
+        <h3 v-if="confirmMode === 'newTrip'">开始新行程？</h3>
         <p style="white-space: pre-wrap">{{ confirmText }}</p>
         <div class="dialog-actions">
           <button type="button" class="btn ghost" @click="confirmOpen = false">取消</button>
-          <button type="button" class="btn primary" @click="applyCalibration">确认校准</button>
+          <button type="button" class="btn primary" @click="confirmDialogAction">
+            {{ confirmMode === 'newTrip' ? '确认开始新行程' : '确认校准' }}
+          </button>
         </div>
       </div>
     </div>

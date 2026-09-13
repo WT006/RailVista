@@ -22,6 +22,11 @@ export type CorridorPreset = {
 
 export type CorridorStop = { name: string; lng?: number; lat?: number };
 
+/** 精品走廊均为高铁仿真轨；G/D/C 以外（K/T/Z 等）不得套用 */
+export function isHsrTrainCode(trainCode?: string): boolean {
+  return !!trainCode && /^[GDC]/i.test(String(trainCode).trim());
+}
+
 let cache: CorridorPreset[] | null = null;
 /** 目录内 json 的最新 mtime；变更后自动重载，避免二期入库后仍命中旧缓存 */
 let cacheMtimeMs = 0;
@@ -87,6 +92,8 @@ function namesMatch(a: string, b: string): boolean {
 /** 行程站与走廊 hints 存在「同城不同方位站」冲突（如杭州南 vs 杭州东） */
 function hasDirectionalConflict(name: string, hints: string[]): boolean {
   const n = normalize(name);
+  // 本站就是走廊站（精确命中）则不算冲突——走廊 hints 常同时含温州北/温州南
+  if (hints.some((h) => normalize(h) === n)) return false;
   const stem = stationStem(n);
   if (stem.length < 2) return false;
   return hints.some((h) => {
@@ -149,25 +156,46 @@ function endpointsBelong(
   return endOk(first) && endOk(last);
 }
 
-function geoFitScore(corridor: CorridorPreset, stops: CorridorStop[]): number {
+function geoFitScore(corridor: CorridorPreset, stops: CorridorStop[], hints: string[]): number {
   const withCoord = stops.filter((s) => s.lng != null && s.lat != null);
   if (withCoord.length < 2) return 0;
   let near = 0;
+  let eligible = 0;
   for (const s of withCoord) {
+    // 「安阳」≠「安阳东」：平行普速站靠近高铁线，不得算作贴合
+    if (hasDirectionalConflict(s.name, hints)) continue;
+    eligible += 1;
     if (nearCorridor(corridor, s, 35)) near += 1;
   }
-  return near / withCoord.length;
+  if (eligible < 2) return 0;
+  return near / eligible;
+}
+
+/** 经停中与走廊 hints 同城不同方位的比例（普速线误套高铁的信号） */
+function directionalConflictRatio(stops: CorridorStop[], hints: string[]): number {
+  if (!stops.length) return 0;
+  let n = 0;
+  for (const s of stops) {
+    if (hasDirectionalConflict(s.name, hints)) n += 1;
+  }
+  return n / stops.length;
 }
 
 /**
  * 按首末站归属 + 几何贴合（主）/ 站名命中（辅）匹配精品走廊。
  * 长途车经停多、站名不全在 hints 里时，仍可靠几何命中京广等干线。
+ * 普速车（K/T/Z…）禁止套高铁走廊——否则会画出「线在东、站在西」的平行错位。
  */
 export function matchCorridor(
   stops: CorridorStop[],
+  opts?: { trainCode?: string },
 ): { corridor: CorridorPreset; score: number } | null {
   const corridors = loadCorridors();
   if (!corridors.length || stops.length < 2) return null;
+  // 未传车次时保持旧行为（测试/兼容）；明确为非高铁则拒绝
+  if (opts?.trainCode != null && !isHsrTrainCode(opts.trainCode)) {
+    return null;
+  }
 
   const first = stops[0];
   const last = stops[stops.length - 1];
@@ -183,8 +211,13 @@ export function matchCorridor(
       if (onHints(s.name, hints)) hit += 1;
     }
     const nameScore = hit / stops.length;
-    const geoScore = geoFitScore(c, stops);
+    const geoScore = geoFitScore(c, stops, hints);
+    const conflictRatio = directionalConflictRatio(stops, hints);
     const endpointsNamed = onHints(first.name, hints) && onHints(last.name, hints);
+    // 大量「安阳/鹤壁」类平行普速站 → 拒绝京广高铁等走廊
+    if (conflictRatio >= 0.2 && hit < Math.max(3, Math.ceil(stops.length * 0.25))) {
+      continue;
+    }
     // 综合分：几何权重大，避免「站名覆盖率」卡死长途车
     const score = geoScore * 0.65 + nameScore * 0.35;
 

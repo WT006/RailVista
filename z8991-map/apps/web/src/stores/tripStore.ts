@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import type { ScenicSpot, Stop, UserSegment } from '@railvista/shared';
 import { buildUserSegment, resolveTripPolyline } from '@railvista/shared';
 import { api, type RailGeometryJob } from '../api/client';
+import type { TripSnapshot } from '../lib/tripCache';
 
 export const useTripStore = defineStore('trip', () => {
   const segment = ref<UserSegment | null>(null);
@@ -16,6 +17,14 @@ export const useTripStore = defineStore('trip', () => {
   const preciseJob = ref<RailGeometryJob | null>(null);
   const preciseLoading = ref(false);
   const preciseError = ref('');
+  /** 演示行程不写最近列表 / 不参与自动恢复 */
+  const isDemo = ref(false);
+
+  function schedulePersist(opts?: { bumpOpenedAt?: boolean; setResume?: boolean }) {
+    void import('../lib/persistTrip').then(({ persistActiveTrip }) => {
+      void persistActiveTrip(opts);
+    });
+  }
 
   let pollTimer: ReturnType<typeof setInterval> | undefined;
 
@@ -94,11 +103,14 @@ export const useTripStore = defineStore('trip', () => {
     preciseRailway?: [number, number][] | null;
     railHint?: string;
     canUpgradePrecise?: boolean;
+    /** 演示入口：不写本地行程缓存 */
+    isDemo?: boolean;
   }) {
     stopPrecisePoll();
     preciseJob.value = null;
     preciseLoading.value = false;
     preciseError.value = '';
+    isDemo.value = !!params.isDemo;
 
     stopsAll.value = params.stops;
     segment.value = buildUserSegment({
@@ -129,6 +141,45 @@ export const useTripStore = defineStore('trip', () => {
           ? '真实轨道线（OpenStreetMap）'
           : '示意线（站点连线），非真实轨道';
     }
+
+    if (!isDemo.value) {
+      void import('./prefsStore').then(({ usePrefsStore }) => {
+        usePrefsStore().loadForCurrentTrip();
+        void import('../lib/persistTrip').then(({ persistActiveTrip }) => {
+          void persistActiveTrip({ bumpOpenedAt: true, setResume: false }).then((snap) => {
+            if (!snap) console.warn('[trip] persist after setTrip returned null');
+          });
+        });
+      });
+    }
+  }
+
+  function hydrateFromSnapshot(snap: TripSnapshot) {
+    stopPrecisePoll();
+    isDemo.value = false;
+    segment.value = JSON.parse(JSON.stringify(snap.segment));
+    stopsAll.value = JSON.parse(JSON.stringify(snap.stopsAll));
+    scenicSpots.value = JSON.parse(JSON.stringify(snap.scenicSpots));
+    railwayCoords.value = JSON.parse(JSON.stringify(snap.railwayCoords));
+    railwaySource.value = snap.railwaySource;
+    polylineHint.value = snap.polylineHint;
+    canUpgradePrecise.value = snap.canUpgradePrecise;
+    preciseLoading.value = false;
+    preciseError.value = '';
+    if (snap.preciseStatus === 'done' || snap.preciseStatus === 'partial') {
+      preciseJob.value = {
+        jobId: `cached:${snap.key}`,
+        status: snap.preciseStatus,
+        segmentsTotal: 1,
+        segmentsDone: 1,
+        segmentsOk: 1,
+        coords: JSON.parse(JSON.stringify(snap.railwayCoords)),
+        source: snap.railwaySource === 'precise' ? 'osm' : 'station',
+        message: snap.polylineHint,
+      };
+    } else {
+      preciseJob.value = null;
+    }
   }
 
   async function upgradePrecise() {
@@ -152,16 +203,20 @@ export const useTripStore = defineStore('trip', () => {
     preciseError.value = '';
     stopPrecisePoll();
 
+    const retryFailedOnly =
+      preciseJob.value?.status === 'partial' || preciseJob.value?.status === 'failed';
+
     try {
       const job = await api.createRailGeometryJob({
         trainCode: seg.trainCode,
         stops,
+        retryFailedOnly,
       });
       preciseJob.value = job;
       if (job.stops?.length) applyStopCoords(job.stops);
       if (job.coords?.length >= 2) {
         applyPreciseCoords(job.coords, {
-          hint: job.message || '加载中…',
+          hint: hintForJob(job),
           source: job.source === 'station' ? 'station' : 'precise',
         });
       }
@@ -180,6 +235,26 @@ export const useTripStore = defineStore('trip', () => {
     }
   }
 
+  function hintForJob(job: RailGeometryJob): string {
+    if (job.message) return job.message;
+    switch (job.qualityTier) {
+      case 'corridor':
+        return '真实轨道线（精品走廊）';
+      case 'network':
+        return '真实轨道线（精品路网）';
+      case 'local':
+        return '真实轨道线（本地轨网）';
+      case 'soft':
+        return '近似轨道（跨站补缝）';
+      case 'osm':
+        return '真实轨道线（OSM）';
+      case 'mixed':
+        return '部分精确（混合来源）';
+      default:
+        return '示意线（站点连线）';
+    }
+  }
+
   async function pollPreciseJob(jobId: string) {
     try {
       const job = await api.getRailGeometryJob(jobId);
@@ -187,7 +262,7 @@ export const useTripStore = defineStore('trip', () => {
       if (job.stops?.length) applyStopCoords(job.stops);
       if (job.coords?.length >= 2) {
         applyPreciseCoords(job.coords, {
-          hint: job.message,
+          hint: hintForJob(job),
           source: job.source === 'station' ? 'station' : 'precise',
         });
       }
@@ -208,20 +283,20 @@ export const useTripStore = defineStore('trip', () => {
 
     if (job.status === 'failed' || job.source === 'station') {
       canUpgradePrecise.value = true;
-      polylineHint.value = job.message || '未能生成精确路线，仍为示意线';
+      polylineHint.value = hintForJob(job) || '未能生成精确路线，仍为示意线';
       preciseError.value = job.message || '生成失败';
       return;
     }
 
     applyPreciseCoords(job.coords, {
-      hint:
-        job.status === 'partial'
-          ? job.message
-          : job.message || '真实轨道线（按需生成）',
+      hint: hintForJob(job),
       source: 'precise',
       canUpgrade: job.status === 'partial',
     });
     preciseError.value = '';
+    if (job.status === 'done' || job.status === 'partial') {
+      schedulePersist({ bumpOpenedAt: false, setResume: false });
+    }
   }
 
   function clear() {
@@ -236,6 +311,7 @@ export const useTripStore = defineStore('trip', () => {
     preciseJob.value = null;
     preciseLoading.value = false;
     preciseError.value = '';
+    isDemo.value = false;
   }
 
   return {
@@ -249,7 +325,9 @@ export const useTripStore = defineStore('trip', () => {
     preciseJob,
     preciseLoading,
     preciseError,
+    isDemo,
     setTrip,
+    hydrateFromSnapshot,
     applyPreciseCoords,
     upgradePrecise,
     stopPrecisePoll,

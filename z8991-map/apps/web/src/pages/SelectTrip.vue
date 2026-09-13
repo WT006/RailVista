@@ -3,6 +3,18 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Stop, TrainSummary } from '@railvista/shared';
 import { api } from '../api/client';
+import { hydrateFromSnapshot } from '../lib/persistTrip';
+import {
+  clearAutoResume,
+  consumeStayOnSelect,
+  deleteSnapshot,
+  getAutoResumeTripKey,
+  getSnapshot,
+  isTripInProgress,
+  listRecentTrips,
+  pruneRecentTrips,
+  type TripIndexEntry,
+} from '../lib/tripCache';
 import { useTripStore } from '../stores/tripStore';
 
 const router = useRouter();
@@ -15,13 +27,16 @@ const fromSuggest = ref<{ name: string; telecode: string }[]>([]);
 const toSuggest = ref<{ name: string; telecode: string }[]>([]);
 const trains = ref<TrainSummary[]>([]);
 const loading = ref(false);
-const loadingPhase = ref<'search' | 'stops' | 'enter' | 'demo' | null>(null);
+const loadingPhase = ref<'search' | 'stops' | 'enter' | 'demo' | 'resume' | null>(null);
 const error = ref('');
+const resumeHint = ref('');
 const selected = ref<TrainSummary | null>(null);
 const stops = ref<Stop[]>([]);
 const boardFrom = ref('');
 const boardTo = ref('');
 const step = ref<'search' | 'od'>('search');
+const recent = ref<TripIndexEntry[]>([]);
+const currentEntry = ref<TripIndexEntry | null>(null);
 
 const loadingCopy = computed(() => {
   switch (loadingPhase.value) {
@@ -33,12 +48,14 @@ const loadingCopy = computed(() => {
       return { title: '正在进入行程地图', detail: '整理站点与路线数据' };
     case 'demo':
       return { title: '正在加载演示线路', detail: 'Z8991 青藏线预置数据' };
+    case 'resume':
+      return { title: '正在恢复上次行程', detail: '从本机缓存打开' };
     default:
       return { title: '加载中', detail: '请稍候…' };
   }
 });
 
-function beginLoading(phase: 'search' | 'stops' | 'enter' | 'demo') {
+function beginLoading(phase: 'search' | 'stops' | 'enter' | 'demo' | 'resume') {
   loadingPhase.value = phase;
   loading.value = true;
 }
@@ -54,8 +71,97 @@ function defaultDate() {
   return d.toISOString().slice(0, 10);
 }
 
-onMounted(() => {
+function refreshRecentUi() {
+  const entries = listRecentTrips();
+  recent.value = entries;
+  const resumeKey = getAutoResumeTripKey();
+  const hit = resumeKey ? entries.find((e) => e.key === resumeKey) : null;
+  currentEntry.value = hit && isTripInProgress(hit) ? hit : null;
+}
+
+async function openCachedTrip(key: string) {
+  beginLoading('resume');
+  error.value = '';
+  resumeHint.value = '';
+  try {
+    const snap = await getSnapshot(key);
+    if (!snap) {
+      resumeHint.value = '无法恢复该行程，请重新查询。';
+      await deleteSnapshot(key);
+      refreshRecentUi();
+      return;
+    }
+    hydrateFromSnapshot(snap);
+    await router.replace({
+      path: '/trip',
+      query: {
+        trainCode: snap.segment.trainCode,
+        date: snap.segment.date,
+        from: snap.segment.fromName,
+        to: snap.segment.toName,
+      },
+    });
+  } catch (e) {
+    resumeHint.value = '无法恢复上次行程';
+    error.value = e instanceof Error ? e.message : '恢复失败';
+    clearAutoResume();
+    refreshRecentUi();
+  } finally {
+    endLoading();
+  }
+}
+
+function startNewTrip() {
+  clearAutoResume();
+  trip.clear();
+  currentEntry.value = null;
+  refreshRecentUi();
+}
+
+async function removeRecent(key: string) {
+  await deleteSnapshot(key);
+  refreshRecentUi();
+}
+
+onMounted(async () => {
   date.value = defaultDate();
+  try {
+    const hint = sessionStorage.getItem('railvista:resumeHint');
+    if (hint) {
+      resumeHint.value = hint;
+      sessionStorage.removeItem('railvista:resumeHint');
+    }
+  } catch {
+    /* */
+  }
+  beginLoading('resume');
+  try {
+    await pruneRecentTrips();
+    refreshRecentUi();
+    const stayOnSelect = consumeStayOnSelect();
+    const resumeKey = getAutoResumeTripKey();
+    if (!stayOnSelect && resumeKey) {
+      const snap = await getSnapshot(resumeKey);
+      if (snap) {
+        hydrateFromSnapshot(snap);
+        await router.replace({
+          path: '/trip',
+          query: {
+            trainCode: snap.segment.trainCode,
+            date: snap.segment.date,
+            from: snap.segment.fromName,
+            to: snap.segment.toName,
+          },
+        });
+        return;
+      }
+      clearAutoResume();
+      resumeHint.value = '无法恢复上次行程';
+      refreshRecentUi();
+    }
+  } finally {
+    endLoading();
+  }
 });
 
 let suggestTimer: number | undefined;
@@ -116,7 +222,6 @@ async function pickTrain(t: TrainSummary) {
     stops.value = res.stops;
     boardFrom.value = from.value;
     boardTo.value = to.value;
-    // snap names to stop list if possible
     const names = stops.value.map((s) => s.name);
     if (!names.includes(boardFrom.value)) {
       const hit = names.find((n) => n.includes(from.value) || from.value.includes(n));
@@ -169,7 +274,6 @@ async function enterTrip() {
       }
     }
 
-    // 按乘车 OD 截取经停，再请求精品精确线（整段站序交给 API 补坐标，勿只传有坐标站）
     const names = stops.value.map((s) => s.name);
     let iFrom = names.indexOf(boardFrom.value);
     let iTo = names.indexOf(boardTo.value);
@@ -183,7 +287,6 @@ async function enterTrip() {
       return;
     }
 
-    // 进图前尝试精品走廊精确线（快）；无命中再用站点折线
     let preciseRailway: [number, number][] | null = null;
     let railHint = '示意线（站点连线）';
     let canUpgradePrecise = true;
@@ -191,7 +294,6 @@ async function enterTrip() {
       const geo = await api.getRailGeometry({
         trainCode: selected.value.trainCode,
         mode: 'preset',
-        // 带上全部 OD 站（含缺坐标），由服务端 enrich，保证首末站是真 OD
         stops: odStops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat })),
       });
       if (geo.stops?.length) {
@@ -300,6 +402,7 @@ async function loadDemo() {
       stops: demoStops,
       spots,
       preciseRailway: (preset.railway as [number, number][] | undefined) || null,
+      isDemo: true,
     });
     router.push({
       path: '/trip',
@@ -319,6 +422,9 @@ async function loadDemo() {
 }
 
 const odOptions = computed(() => stops.value.map((s) => s.name));
+
+/** 仅首页展示当前行程 / 最近访问；有查询结果或确认 OD 时隐藏 */
+const showHomeLists = computed(() => step.value === 'search' && trains.value.length === 0);
 </script>
 
 <template>
@@ -328,6 +434,34 @@ const odOptions = computed(() => stops.value.map((s) => s.name));
       <h1>车上风景与行程定位</h1>
       <p class="sub">选择出发站、到达站与日期，进入行程地图</p>
     </header>
+
+    <section v-if="currentEntry && showHomeLists" class="current-trip">
+      <div class="current-trip__row">
+        <div class="current-trip__body">
+          <p class="current-trip__label">当前行程</p>
+          <p class="current-trip__title">
+            <strong>{{ currentEntry.trainCode }}</strong>
+            <span>{{ currentEntry.fromName }} → {{ currentEntry.toName }}</span>
+          </p>
+          <p class="current-trip__meta">{{ currentEntry.date }} · 未到站前可继续</p>
+        </div>
+        <div class="current-trip__actions">
+          <button
+            type="button"
+            class="btn primary btn-sm"
+            :disabled="loading"
+            @click="openCachedTrip(currentEntry.key)"
+          >
+            继续行程
+          </button>
+          <button type="button" class="btn ghost btn-sm" :disabled="loading" @click="startNewTrip">
+            开始新行程
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <p v-if="resumeHint" class="error">{{ resumeHint }}</p>
 
     <form class="select-form" @submit.prevent="search">
       <label>
@@ -357,6 +491,31 @@ const odOptions = computed(() => stops.value.map((s) => s.name));
     </form>
 
     <p v-if="error" class="error">{{ error }}</p>
+
+    <section v-if="recent.length && showHomeLists" class="recent-list">
+      <h2>最近访问</h2>
+      <div v-for="item in recent" :key="item.key" class="recent-row">
+        <button type="button" class="recent-card" :disabled="loading" @click="openCachedTrip(item.key)">
+          <span class="recent-card__main">
+            <strong>{{ item.trainCode }}</strong>
+            <span>{{ item.fromName }} → {{ item.toName }}</span>
+          </span>
+          <span class="recent-card__meta muted">
+            {{ item.date }}
+            <template v-if="item.hasPrecise"> · 已缓存精确线</template>
+          </span>
+        </button>
+        <button
+          type="button"
+          class="recent-delete"
+          title="从最近访问删除"
+          :disabled="loading"
+          @click="removeRecent(item.key)"
+        >
+          删除
+        </button>
+      </div>
+    </section>
 
     <section v-if="trains.length && step === 'search'" class="train-list">
       <h2>直达车次</h2>
@@ -397,7 +556,7 @@ const odOptions = computed(() => stops.value.map((s) => s.name));
       </button>
     </section>
 
-    <p class="footnote">时刻数据来自公开查询，仅供参考。</p>
+    <p class="footnote">时刻数据来自公开查询，仅供参考。行程缓存在本机浏览器。</p>
 
     <div v-if="loading" class="select-loading" role="status" aria-live="polite" aria-busy="true">
       <div class="select-loading__card">

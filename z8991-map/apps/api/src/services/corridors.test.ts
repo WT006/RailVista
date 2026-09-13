@@ -9,6 +9,54 @@ import { matchCorridor, sliceCorridorForStops, loadCorridors } from './corridors
 import { matchCorridorNetwork } from './corridorNetwork.js';
 
 describe('matchCorridor', () => {
+  it('loads lixiang / kunli corridors', () => {
+    const list = loadCorridors();
+    const ids = list.map((c) => c.id);
+    assert.ok(ids.includes('lixiang'), 'missing lixiang');
+    assert.ok(ids.includes('kunli'), 'missing kunli');
+  });
+
+  it('matches Lijiang→Shangri-La on lixiang for C trains', () => {
+    const stops = [
+      { name: '丽江', lng: 100.2512118, lat: 26.8143271 },
+      { name: '小中甸', lng: 99.81346, lat: 27.56238 },
+      { name: '香格里拉', lng: 99.6885399, lat: 27.8133154 },
+    ];
+    const hit = matchCorridor(stops, { trainCode: 'C118' });
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'lixiang');
+    const sliced = sliceCorridorForStops(hit!.corridor, stops);
+    assert.ok(sliced && sliced.length >= 2);
+  });
+
+  it('stitches Kunming→Shangri-La via kunli+lixiang network', () => {
+    const stops = [
+      { name: '昆明', lng: 102.720287, lat: 25.0186616 },
+      { name: '大理', lng: 100.297, lat: 25.591 },
+      { name: '丽江', lng: 100.2512118, lat: 26.8143271 },
+      { name: '小中甸', lng: 99.81346, lat: 27.56238 },
+      { name: '香格里拉', lng: 99.6885399, lat: 27.8133154 },
+    ];
+    assert.equal(matchCorridor(stops, { trainCode: 'C118' }), null);
+    const net = matchCorridorNetwork(stops, { trainCode: 'C118' });
+    assert.ok(net);
+    assert.deepEqual(net!.corridorIds, ['kunli', 'lixiang']);
+    assert.ok(net!.coords.length >= 2);
+  });
+
+  it('rejects K trains on lixiang corridor', () => {
+    assert.equal(
+      matchCorridor(
+        [
+          { name: '丽江', lng: 100.2512118, lat: 26.8143271 },
+          { name: '香格里拉', lng: 99.6885399, lat: 27.8133154 },
+        ],
+        { trainCode: 'K123' },
+      ),
+      null,
+    );
+  });
+
   it('loads phase-1 corridors', () => {
     const list = loadCorridors();
     const ids = list.map((c) => c.id).sort();
@@ -254,6 +302,42 @@ describe('matchCorridor', () => {
       { name: '长沙南', lng: 113.066, lat: 28.151 },
       { name: '广州南', lng: 113.269, lat: 22.989 },
     ]);
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'jingguang');
+  });
+
+  it('does NOT match K599-like 北京丰台→广州白云 on jingguang (普速平行线)', () => {
+    // 安阳/鹤壁 距安阳东/鹤壁东仅数公里，旧逻辑会误套京广高铁导致「线不经过站」
+    const stops = [
+      { name: '北京丰台', lng: 116.2953, lat: 39.85 },
+      { name: '石家庄', lng: 114.485, lat: 38.01 },
+      { name: '安阳', lng: 114.3343, lat: 36.1046 },
+      { name: '鹤壁', lng: 114.2674, lat: 35.7602 },
+      { name: '郑州', lng: 113.658, lat: 34.758 },
+      { name: '武汉', lng: 114.317, lat: 30.607 },
+      { name: '长沙', lng: 113.0, lat: 28.2 },
+      { name: '广州白云', lng: 113.2405, lat: 23.194 },
+    ];
+    assert.equal(matchCorridor(stops, { trainCode: 'K599' }), null);
+    assert.equal(matchCorridorNetwork(stops, { trainCode: 'K599' }), null);
+    // 无车次时方位冲突也应拦下（安阳≠安阳东）
+    assert.equal(matchCorridor(stops), null);
+  });
+
+  it('still matches G-train 北京西→广州南 on jingguang', () => {
+    const hit = matchCorridor(
+      [
+        { name: '北京西', lng: 116.322, lat: 39.895 },
+        { name: '石家庄', lng: 114.485, lat: 38.01 },
+        { name: '安阳东', lng: 114.427, lat: 36.108 },
+        { name: '鹤壁东', lng: 114.336, lat: 35.756 },
+        { name: '郑州东', lng: 113.777, lat: 34.76 },
+        { name: '武汉', lng: 114.317, lat: 30.607 },
+        { name: '长沙南', lng: 113.066, lat: 28.151 },
+        { name: '广州南', lng: 113.269, lat: 22.989 },
+      ],
+      { trainCode: 'G79' },
+    );
     assert.ok(hit);
     assert.equal(hit!.corridor.id, 'jingguang');
   });

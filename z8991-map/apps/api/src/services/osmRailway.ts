@@ -18,9 +18,9 @@ const OVERPASS_URLS = [
   'https://overpass.kumi.systems/api/interpreter',
 ];
 
-/** 与 Z8991 构建脚本一致的拼接容差（约 600～1000m） */
-const CONNECT_TOL = 0.01;
-const CACHE_TTL_SEC = Number(process.env.CACHE_TTL_RAIL_SEC || 12 * 3600);
+/** 山区轨断口略放宽（约 800～1200m） */
+const CONNECT_TOL = 0.012;
+const CACHE_TTL_SEC = Number(process.env.CACHE_TTL_RAIL_SEC || 24 * 3600);
 /** 走廊查询半径（米），越大越全但越慢 */
 const CORRIDOR_RADIUS_M = 9000;
 const CHUNK_STATIONS = 5;
@@ -402,7 +402,7 @@ function pathOnGraph(
 
 function cacheKey(stops: LngLat[], trainCode?: string): string {
   const raw = `${trainCode || ''}|${stops.map((s) => `${s.lng.toFixed(3)},${s.lat.toFixed(3)}`).join('|')}`;
-  return `rail:v5:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
+  return `rail:v6:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
 }
 
 export function isHighspeedTrain(trainCode?: string): boolean {
@@ -423,7 +423,55 @@ export type SegmentGeometryResult = {
   reason?: string;
 };
 
-const SEGMENT_CACHE_TTL_SEC = Number(process.env.CACHE_TTL_RAIL_SEG_SEC || 12 * 3600);
+const SEGMENT_CACHE_TTL_SEC = Number(process.env.CACHE_TTL_RAIL_SEG_SEC || 24 * 3600);
+
+/** 路径长度 / 站间距上限；过大视为绕错线 */
+const MAX_LENGTH_RATIO = 2.2;
+/** 端点到折线最大距离（km） */
+const MAX_ENDPOINT_DIST_KM = 8;
+/** 折线点相对站间弦的最大横向偏离（km） */
+const MAX_LATERAL_DEV_KM = 45;
+
+/**
+ * 段级质量门禁：拒绕路 / 端点飞离 / 横向大幅偏航。
+ * 不通过则不得标精确、不得写入缓存。
+ */
+export function acceptSegmentGeometry(
+  line: LngLat[],
+  from: LngLat,
+  to: LngLat,
+): { ok: true } | { ok: false; reason: string } {
+  if (!line || line.length < 2) return { ok: false, reason: 'empty_line' };
+  const chord = haversineKm(from, to);
+  if (chord < 0.5) return { ok: true };
+  const len = wayLengthKm(line);
+  if (len > chord * MAX_LENGTH_RATIO && len - chord > 25) {
+    return { ok: false, reason: `detour_ratio:${(len / chord).toFixed(2)}` };
+  }
+  const dFrom = Math.min(...line.map((p) => haversineKm(p, from)));
+  const dTo = Math.min(...line.map((p) => haversineKm(p, to)));
+  if (dFrom > MAX_ENDPOINT_DIST_KM || dTo > MAX_ENDPOINT_DIST_KM) {
+    return { ok: false, reason: 'endpoint_far' };
+  }
+  // 弦向量；用叉积近似横向距离（度→km 粗估）
+  const dx = to.lng - from.lng;
+  const dy = to.lat - from.lat;
+  const chordDeg = Math.hypot(dx, dy) || 1e-9;
+  let maxLatKm = 0;
+  const step = Math.max(1, Math.floor(line.length / 40));
+  for (let i = 0; i < line.length; i += step) {
+    const p = line[i];
+    const cross = (p.lng - from.lng) * dy - (p.lat - from.lat) * dx;
+    const latDeg = Math.abs(cross) / chordDeg;
+    const midLat = ((from.lat + to.lat) / 2) * (Math.PI / 180);
+    const latKm = latDeg * 111 * Math.max(0.5, Math.cos(midLat));
+    if (latKm > maxLatKm) maxLatKm = latKm;
+  }
+  if (maxLatKm > MAX_LATERAL_DEV_KM) {
+    return { ok: false, reason: `lateral:${maxLatKm.toFixed(0)}km` };
+  }
+  return { ok: true };
+}
 
 /** 沿站间直线加密采样，避免只查两端导致中间无轨、图不连通 */
 function sampleCorridor(from: LngLat, to: LngLat, stepKm = 35): LngLat[] {
@@ -444,7 +492,7 @@ function sampleCorridor(from: LngLat, to: LngLat, stepKm = 35): LngLat[] {
 function segmentCacheKey(from: LngLat, to: LngLat, preferHs: boolean): string {
   const r = (p: LngLat) => `${p.lng.toFixed(3)},${p.lat.toFixed(3)}`;
   const raw = `${preferHs ? 'hs' : 'all'}|${r(from)}|${r(to)}`;
-  return `railseg:v4:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
+  return `railseg:v6:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
 }
 
 function pathFromWays(ways: OsmWay[], from: LngLat, to: LngLat): LngLat[] | null {
@@ -545,17 +593,23 @@ export async function buildSegmentGeometry(
     return { coords: cached, ok: true, fromCache: true };
   }
 
-  // 1) 本地轨网（稳定、秒级）
-  try {
-    const localLine = tryLocalSegment(from, to);
-    if (localLine && localLine.length >= 2) {
-      const simplified = simplify(localLine, 0.45);
-      cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
-      console.log(`[rail-seg] ok via local pts=${simplified.length}`);
-      return { coords: simplified, ok: true, fromCache: false, reason: 'local' };
+  // 1) 本地轨网仅为高铁仿真；普速车（K/T/Z…）禁止套用，否则银川→中卫会贴银兰经吴忠而跳过青铜峡
+  if (preferHs) {
+    try {
+      const localLine = tryLocalSegment(from, to);
+      if (localLine && localLine.length >= 2) {
+        const simplified = simplify(localLine, 0.45);
+        const gate = acceptSegmentGeometry(simplified, from, to);
+        if (gate.ok) {
+          cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
+          console.log(`[rail-seg] ok via local pts=${simplified.length}`);
+          return { coords: simplified, ok: true, fromCache: false, reason: 'local' };
+        }
+        console.warn(`[rail-seg] local rejected ${gate.reason}`);
+      }
+    } catch (e) {
+      console.warn('[rail-seg] local failed', e);
     }
-  } catch (e) {
-    console.warn('[rail-seg] local failed', e);
   }
 
   // 2) Overpass 兜底
@@ -584,6 +638,11 @@ export async function buildSegmentGeometry(
   }
 
   const simplified = simplify(line, 0.45);
+  const gate = acceptSegmentGeometry(simplified, from, to);
+  if (!gate.ok) {
+    console.warn(`[rail-seg] osm rejected ${gate.reason}`);
+    return { coords: [from, to], ok: false, fromCache: false, reason: gate.reason };
+  }
   cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
   console.log(`[rail-seg] ok via osm pts=${simplified.length}`);
   return { coords: simplified, ok: true, fromCache: false, reason: 'osm' };

@@ -49,6 +49,23 @@ const STATION_REGION_ANCHORS: Record<string, { lng: number; lat: number; maxKm: 
   南通西: { lng: 120.761, lat: 32.104, maxKm: 40 },
   张家港: { lng: 120.669, lat: 31.819, maxKm: 40 },
   六安: { lng: 116.494, lat: 31.717, maxKm: 40 },
+  // 丽香铁路：易被误匹配到华北同名地
+  小中甸: { lng: 99.81346, lat: 27.56238, maxKm: 40 },
+  香格里拉: { lng: 99.68854, lat: 27.81332, maxKm: 40 },
+  // 怀化南曾被沪昆 seed 标飞（西偏 ~34km），与张吉怀末端脱节
+  怀化南: { lng: 109.98898, lat: 27.51439, maxKm: 25 },
+  怀化: { lng: 109.96333, lat: 27.56083, maxKm: 25 },
+  // 贵阳北曾被 guinan seed 标飞（东偏 ~35km），成贵/渝贵末端脱节
+  贵阳北: { lng: 106.6725, lat: 26.6225, maxKm: 25 },
+  // 宜宾西/兴文曾被 yukun seed 标到渝昆平行线
+  宜宾西: { lng: 104.6033361, lat: 28.7257667, maxKm: 30 },
+  兴文: { lng: 105.244562, lat: 28.338113, maxKm: 30 },
+  // 杭黄：千岛湖/三阳曾被 seed 标飞，蓝线看似绕站
+  千岛湖: { lng: 119.1880833, lat: 29.7374, maxKm: 25 },
+  三阳: { lng: 118.801888, lat: 30.029526, maxKm: 25 },
+  建德: { lng: 119.5314, lat: 29.6849, maxKm: 30 },
+  桐庐: { lng: 119.7631, lat: 29.8769, maxKm: 30 },
+  富阳: { lng: 119.955, lat: 30.003, maxKm: 30 },
 };
 
 function haversineKm(a: Point, b: Point): number {
@@ -498,7 +515,8 @@ export async function enrichStopsCoords<
   const missing = out.filter(
     (s) => s.lng == null || s.lat == null || !Number.isFinite(s.lng) || !Number.isFinite(s.lat),
   );
-  if (!missing.length) return out;
+  // 远程补点后可能再次引入飞点，出口统一再 scrub 一次
+  if (!missing.length) return scrubZigzagLocalCoords(out);
 
   const batch = await overpassStationsByNames(missing.map((s) => s.name));
   const still: T[] = [];
@@ -578,14 +596,16 @@ export async function enrichStopsCoords<
     for (const hit of hits) {
       if (hit) rememberGeo(hit.name, hit.point);
     }
-    return result.map((s) => {
-      if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) {
-        return s;
-      }
-      const point = byName.get(normalizeStationName(s.name));
-      return point ? { ...s, lng: point.lng, lat: point.lat } : s;
-    });
+    return scrubZigzagLocalCoords(
+      result.map((s) => {
+        if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) {
+          return s;
+        }
+        const point = byName.get(normalizeStationName(s.name));
+        return point ? { ...s, lng: point.lng, lat: point.lat } : s;
+      }),
+    );
   }
 
-  return result;
+  return scrubZigzagLocalCoords(result);
 }

@@ -17,6 +17,7 @@ import {
   type CorridorStop,
   loadCorridors,
   corridorFitsStops,
+  isHsrTrainCode,
 } from './corridors.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -603,9 +604,16 @@ function stopsProgressMostlyMonotonic(
 
 /**
  * 单走廊未命中时：路网寻路并拼线。
+ * 普速车次禁止套用高铁精品路网（与 matchCorridor 一致）。
  */
-export function matchCorridorNetwork(stops: CorridorStop[]): NetworkMatch | null {
+export function matchCorridorNetwork(
+  stops: CorridorStop[],
+  opts?: { trainCode?: string },
+): NetworkMatch | null {
   if (stops.length < 2) return null;
+  if (opts?.trainCode != null && !isHsrTrainCode(opts.trainCode)) {
+    return null;
+  }
   const first = stops[0];
   const last = stops[stops.length - 1];
   const g = getGraph();

@@ -30,6 +30,15 @@ export type RailGeometryData = {
   message?: string;
 };
 
+export type RailQualityTier =
+  | 'corridor'
+  | 'network'
+  | 'local'
+  | 'osm'
+  | 'soft'
+  | 'mixed'
+  | 'station';
+
 export type RailGeometryJob = {
   jobId: string;
   status: 'queued' | 'running' | 'done' | 'partial' | 'failed';
@@ -39,6 +48,7 @@ export type RailGeometryJob = {
   coords: [number, number][];
   source: 'osm' | 'mixed' | 'station';
   message: string;
+  qualityTier?: RailQualityTier;
   trainCode?: string;
   stops?: Array<{ name?: string; lng?: number; lat?: number }>;
 };
@@ -81,6 +91,7 @@ export const api = {
   createRailGeometryJob(body: {
     trainCode?: string;
     stops: Array<{ lng?: number; lat?: number; name?: string }>;
+    retryFailedOnly?: boolean;
   }) {
     return request<RailGeometryJob>('/rail-geometry/jobs', {
       method: 'POST',

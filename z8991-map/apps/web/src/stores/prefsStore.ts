@@ -7,6 +7,7 @@ import {
   type LayerVisibility,
   type UserSegment,
 } from '@railvista/shared';
+import type { TripSnapshotPrefs } from '../lib/tripCache';
 import { useTripStore } from './tripStore';
 
 function readJson<T>(key: string, fallback: T): T {
@@ -19,10 +20,18 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
+function schedulePersistPrefs() {
+  void import('../lib/persistTrip').then(({ persistActiveTrip }) => {
+    void persistActiveTrip({ bumpOpenedAt: false, setResume: false });
+  });
+}
+
 export const usePrefsStore = defineStore('prefs', () => {
   const departureIso = ref<string | null>(null);
   const calibration = ref<CalibrationRecord | null>(null);
   const layers = ref<LayerVisibility>({ ...DEFAULT_LAYER_VISIBILITY });
+  /** 从快照灌入时跳过一次写回，避免覆盖 */
+  let suppressPersist = false;
 
   function segmentKey(): UserSegment | null {
     return useTripStore().segment;
@@ -40,6 +49,31 @@ export const usePrefsStore = defineStore('prefs', () => {
     layers.value = readJson(prefsKey(seg, 'layers'), { ...DEFAULT_LAYER_VISIBILITY });
   }
 
+  function applyFromSnapshot(prefs: TripSnapshotPrefs) {
+    suppressPersist = true;
+    departureIso.value = prefs.departureIso;
+    calibration.value = prefs.calibration ? { ...prefs.calibration } : null;
+    layers.value = { ...DEFAULT_LAYER_VISIBILITY, ...prefs.layers };
+    const seg = segmentKey();
+    if (seg) {
+      try {
+        if (prefs.departureIso) localStorage.setItem(prefsKey(seg, 'departure'), prefs.departureIso);
+        else localStorage.removeItem(prefsKey(seg, 'departure'));
+        if (prefs.calibration) {
+          localStorage.setItem(prefsKey(seg, 'calibration'), JSON.stringify(prefs.calibration));
+        } else {
+          localStorage.removeItem(prefsKey(seg, 'calibration'));
+        }
+        localStorage.setItem(prefsKey(seg, 'layers'), JSON.stringify(layers.value));
+      } catch {
+        /* */
+      }
+    }
+    queueMicrotask(() => {
+      suppressPersist = false;
+    });
+  }
+
   function setDeparture(iso: string | null) {
     const seg = segmentKey();
     departureIso.value = iso;
@@ -52,6 +86,7 @@ export const usePrefsStore = defineStore('prefs', () => {
     } catch {
       /* private mode */
     }
+    if (!suppressPersist && !useTripStore().isDemo) schedulePersistPrefs();
   }
 
   function setCalibration(record: CalibrationRecord | null) {
@@ -64,6 +99,7 @@ export const usePrefsStore = defineStore('prefs', () => {
     } catch {
       /* */
     }
+    if (!suppressPersist && !useTripStore().isDemo) schedulePersistPrefs();
   }
 
   function setLayer(layer: keyof LayerVisibility, show: boolean) {
@@ -75,11 +111,15 @@ export const usePrefsStore = defineStore('prefs', () => {
     } catch {
       /* */
     }
+    if (!suppressPersist && !useTripStore().isDemo) schedulePersistPrefs();
   }
 
   watch(
     () => useTripStore().segment,
-    () => loadForCurrentTrip(),
+    () => {
+      if (suppressPersist) return;
+      loadForCurrentTrip();
+    },
     { deep: true },
   );
 
@@ -88,6 +128,7 @@ export const usePrefsStore = defineStore('prefs', () => {
     calibration,
     layers,
     loadForCurrentTrip,
+    applyFromSnapshot,
     setDeparture,
     setCalibration,
     setLayer,

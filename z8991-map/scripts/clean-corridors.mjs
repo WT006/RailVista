@@ -4,6 +4,7 @@
  *   node scripts/clean-corridors.mjs              # dry-run 报告
  *   node scripts/clean-corridors.mjs --write       # 写回改进的走廊
  *   node scripts/clean-corridors.mjs --write --id hanghuang
+ *   node scripts/clean-corridors.mjs --write --fill-jumps  # 可选：直线 densify（默认关闭，避免冒充断口已修）
  */
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -12,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dir = join(__dirname, '../data/presets/corridors');
 const wantWrite = process.argv.includes('--write');
+const wantFillJumps = process.argv.includes('--fill-jumps');
 const onlyId = (() => {
   const i = process.argv.indexOf('--id');
   return i >= 0 ? process.argv[i + 1] : null;
@@ -185,17 +187,62 @@ function fillJumps(coords, maxJumpKm = 12) {
   return out;
 }
 
+/**
+ * 枢纽附近常见：贴到站后原路折返一小段，再大跳接回主线（地图上呈 Y/V 短岔）。
+ * 条件：折点转角 ≥160°，随后若干点仍靠近折点，且在 3..25 点内出现 >3.5km 跳。
+ */
+function removeHubRetraces(coords) {
+  let out = coords.map((c) => [...c]);
+  for (let pass = 0; pass < 20; pass++) {
+    let hit = false;
+    for (let i = 2; i < out.length - 3; i++) {
+      const deg = turnDeg(out[i - 1], out[i], out[i + 1]);
+      if (deg < 160) continue;
+      let jumpAt = -1;
+      for (let j = i + 3; j <= Math.min(out.length - 1, i + 25); j++) {
+        if (
+          haversine(
+            { lng: out[j - 1][0], lat: out[j - 1][1] },
+            { lng: out[j][0], lat: out[j][1] },
+          ) > 3.5
+        ) {
+          jumpAt = j;
+          break;
+        }
+      }
+      if (jumpAt < 0) continue;
+      const pivot = { lng: out[i][0], lat: out[i][1] };
+      let backNear = 0;
+      for (let j = i + 1; j < jumpAt; j++) {
+        if (haversine(pivot, { lng: out[j][0], lat: out[j][1] }) < 8) backNear += 1;
+      }
+      if (backNear < 2) continue;
+      const n = jumpAt - (i + 1);
+      if (n < 2) continue;
+      out.splice(i + 1, n);
+      hit = true;
+      break;
+    }
+    if (!hit) break;
+  }
+  return out;
+}
+
 function cleanRailway(railway) {
   let out = railway.map((c) => [Number(c[0]), Number(c[1])]);
   const before = metrics(out);
   out = removeSpikes(out, 145);
   out = removeProtrusions(out, 2.0, 2.5);
   out = removeBacktracks(out);
+  out = removeHubRetraces(out);
   out = removeSpikes(out, 150);
   out = removeProtrusions(out, 2.2, 3.0);
   out = simplify(out, 0.35);
-  out = fillJumps(out, 15);
-  out = simplify(out, 0.35);
+  // 默认不 fillJumps：直线 densify 会掩盖真断口（playbook / TECH 一期）
+  if (wantFillJumps) {
+    out = fillJumps(out, 15);
+    out = simplify(out, 0.35);
+  }
   out = out.map((c) => [Number(c[0].toFixed(6)), Number(c[1].toFixed(6))]);
   const after = metrics(out);
   // 清洗后若里程掉太多且折返未改善，拒绝；折返大幅下降时允许里程收缩（去掉折返虚增）
@@ -218,7 +265,9 @@ function cleanRailway(railway) {
   return { railway: out, before, after, improved, badShrink };
 }
 
-const files = readdirSync(dir).filter((f) => f.endsWith('.json') && !f.startsWith('_'));
+const files = readdirSync(dir).filter(
+  (f) => f.endsWith('.json') && !f.startsWith('_') && !f.includes('__'),
+);
 const summary = { ok: 0, light: 0, medium: 0, heavy: 0, written: 0, skipped: 0, rejected: 0 };
 const rows = [];
 

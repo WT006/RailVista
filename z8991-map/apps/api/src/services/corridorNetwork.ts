@@ -17,7 +17,8 @@ import {
   type CorridorStop,
   loadCorridors,
   corridorFitsStops,
-  isHsrTrainCode,
+  isHsrCorridor,
+  isConventionalCorridor,
 } from './corridors.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -65,8 +66,6 @@ type CorridorGraph = {
   byId: Map<string, CorridorPreset>;
   fp: string;
 };
-
-let graphCache: CorridorGraph | null = null;
 
 const MAX_HOPS = 5;
 const START_NEAR_KM = 40;
@@ -163,12 +162,17 @@ function corridorLengthKm(c: CorridorPreset): number {
   return lengthKm;
 }
 
+let graphCacheHsr: CorridorGraph | null = null;
+let graphCacheConv: CorridorGraph | null = null;
+let graphCacheAll: CorridorGraph | null = null;
+
 export function clearCorridorNetworkCache(): void {
-  graphCache = null;
+  graphCacheHsr = null;
+  graphCacheConv = null;
+  graphCacheAll = null;
 }
 
-function buildGraph(): CorridorGraph {
-  const corridors = loadCorridors();
+function buildGraph(corridors: CorridorPreset[]): CorridorGraph {
   const byId = new Map(corridors.map((c) => [c.id, c]));
   const adj = new Map<string, HubLink[]>();
   for (const c of corridors) adj.set(c.id, []);
@@ -223,13 +227,26 @@ function buildGraph(): CorridorGraph {
   };
 }
 
-function getGraph(): CorridorGraph {
-  const corridors = loadCorridors();
-  const fingerprint = corridors.map((c) => c.id).join(',');
-  if (!graphCache || graphCache.fp !== fingerprint) {
-    graphCache = buildGraph();
-  }
-  return graphCache;
+type GraphKind = 'hsr' | 'conventional' | 'all';
+
+function getGraph(kind: GraphKind = 'all'): CorridorGraph {
+  const all = loadCorridors();
+  const corridors =
+    kind === 'hsr'
+      ? all.filter(isHsrCorridor)
+      : kind === 'conventional'
+        ? all.filter(isConventionalCorridor)
+        : all;
+  const fingerprint = `${kind}:${corridors.map((c) => c.id).join(',')}`;
+  const cached =
+    kind === 'hsr' ? graphCacheHsr : kind === 'conventional' ? graphCacheConv : graphCacheAll;
+  if (cached && cached.fp === fingerprint) return cached;
+  const g = buildGraph(corridors);
+  g.fp = fingerprint;
+  if (kind === 'hsr') graphCacheHsr = g;
+  else if (kind === 'conventional') graphCacheConv = g;
+  else graphCacheAll = g;
+  return g;
 }
 
 type PathNode = {
@@ -377,8 +394,9 @@ function findCorridorPath(
   startIds: string[],
   endIds: Set<string>,
   stops: CorridorStop[],
+  kind: GraphKind = 'all',
 ): { ids: string[]; hubs: Array<string | null> } | null {
-  const g = getGraph();
+  const g = getGraph(kind);
   const first = stops[0];
   const last = stops[stops.length - 1];
   const startTip =
@@ -604,19 +622,25 @@ function stopsProgressMostlyMonotonic(
 
 /**
  * 单走廊未命中时：路网寻路并拼线。
- * 普速车次禁止套用高铁精品路网（与 matchCorridor 一致）。
+ * G/D → 高铁路网；C → 全库；K/T/Z → 普速路网。
  */
 export function matchCorridorNetwork(
   stops: CorridorStop[],
   opts?: { trainCode?: string },
 ): NetworkMatch | null {
   if (stops.length < 2) return null;
-  if (opts?.trainCode != null && !isHsrTrainCode(opts.trainCode)) {
-    return null;
+  const trainCode = opts?.trainCode;
+  const code = trainCode != null ? String(trainCode).trim() : '';
+  let kind: GraphKind = 'all';
+  if (code) {
+    if (/^[GD]/i.test(code)) kind = 'hsr';
+    else if (/^C/i.test(code)) kind = 'all';
+    else kind = 'conventional';
   }
+
   const first = stops[0];
   const last = stops[stops.length - 1];
-  const g = getGraph();
+  const g = getGraph(kind);
   const corridors = [...g.byId.values()];
 
   const startIds = corridors.filter((c) => stopTouchesCorridor(c, first)).map((c) => c.id);
@@ -628,7 +652,7 @@ export function matchCorridorNetwork(
   // 起终落在同一走廊：交给单走廊逻辑，避免路网抢答
   if (startIds.some((id) => endIds.has(id))) return null;
 
-  const path = findCorridorPath(startIds, endIds, stops);
+  const path = findCorridorPath(startIds, endIds, stops, kind);
   if (!path || path.ids.length < 2) return null;
 
   const chain = path.ids.map((id) => g.byId.get(id)!);

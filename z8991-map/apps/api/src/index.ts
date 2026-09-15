@@ -7,6 +7,7 @@ import { trainsRoute } from './routes/trains.js';
 import { presetsRoute } from './routes/presets.js';
 import { railGeometryRoute } from './routes/railGeometry.js';
 import { loadStationIndex } from './services/stationIndex.js';
+import { trustedClientIp } from './lib/clientIdentity.js';
 
 const app = new Hono().basePath('/api');
 
@@ -15,27 +16,58 @@ app.use(
   '*',
   cors({
     origin: corsOrigin === '*' ? '*' : corsOrigin.split(',').map((s) => s.trim()),
+    allowHeaders: ['Content-Type', 'Accept', 'X-Client-Id', 'X-Railvista-Client-Id'],
   }),
 );
 
-const hits = new Map<string, { n: number; reset: number }>();
-app.use('*', async (c, next) => {
-  const ip = c.req.header('x-forwarded-for')?.split(',')[0]?.trim() || 'local';
-  const now = Date.now();
-  let bucket = hits.get(ip);
+type Bucket = { n: number; reset: number };
+/** 限流分桶：通用 / 精确任务轮询 分开，避免同 IP 多人轮询挤爆搜车 */
+const hitsGeneral = new Map<string, Bucket>();
+const hitsRailPoll = new Map<string, Bucket>();
+
+function takeHit(map: Map<string, Bucket>, key: string, now: number): number {
+  let bucket = map.get(key);
   if (!bucket || now > bucket.reset) {
     bucket = { n: 0, reset: now + 60_000 };
-    hits.set(ip, bucket);
+    map.set(key, bucket);
   }
   bucket.n += 1;
+  return bucket.n;
+}
+
+function pruneHits(map: Map<string, Bucket>, now: number) {
+  if (map.size < 2_000) return;
+  for (const [k, v] of map) {
+    if (now > v.reset) map.delete(k);
+  }
+}
+
+app.use('*', async (c, next) => {
+  const ip = trustedClientIp((n) => c.req.header(n));
+  const now = Date.now();
   const path = c.req.path;
   const isRailJobPoll = c.req.method === 'GET' && path.includes('/rail-geometry/jobs/');
-  const limit = path.includes('/rail-geometry') ? (isRailJobPoll ? 120 : 24) : 90;
-  if (bucket.n > limit) {
-    return c.json(
-      { ok: false, error: { code: 'RATE_LIMIT', message: '请求过于频繁，请稍后再试' } },
-      429,
-    );
+  const isRailMutate = path.includes('/rail-geometry') && !isRailJobPoll;
+
+  pruneHits(hitsGeneral, now);
+  pruneHits(hitsRailPoll, now);
+
+  if (isRailJobPoll) {
+    // 1.5s 轮询 ≈ 40/min；多人同出口放宽
+    if (takeHit(hitsRailPoll, ip, now) > 180) {
+      return c.json(
+        { ok: false, error: { code: 'RATE_LIMIT', message: '请求过于频繁，请稍后再试' } },
+        429,
+      );
+    }
+  } else {
+    const limit = isRailMutate ? 36 : 120;
+    if (takeHit(hitsGeneral, ip, now) > limit) {
+      return c.json(
+        { ok: false, error: { code: 'RATE_LIMIT', message: '请求过于频繁，请稍后再试' } },
+        429,
+      );
+    }
   }
   await next();
 });

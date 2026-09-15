@@ -89,13 +89,45 @@ const showPreciseAction = computed(() => {
 
 const preciseActionLabel = computed(() => {
   const job = trip.preciseJob;
+  const ok = job?.segmentsOk ?? 0;
+  const total = job?.segmentsTotal ?? 0;
+  const ratio = total > 0 ? `${ok}/${total}` : '';
+
   if (trip.preciseLoading && job) {
+    const msg = (job.message || '').trim();
+    if (msg && !/^加载中\s+\d+\/\d+/.test(msg)) {
+      return msg.endsWith('…') || msg.endsWith('...') ? msg : `${msg}…`;
+    }
     return `加载中 ${job.segmentsDone}/${job.segmentsTotal}…`;
   }
   if (trip.preciseLoading) return '加载中…';
-  if (job?.status === 'partial') return '重试缺口路段';
-  if (job?.status === 'failed') return '重试精确路线';
+  if (job?.status === 'partial') {
+    if (ok > 0 && total > 0) {
+      return `部分精确 ${ratio} · 重试缺口`;
+    }
+    return '重试精确路线';
+  }
+  if (job?.status === 'failed') {
+    if (ok > 0 && total > 0) return `已保留 ${ratio} · 重试`;
+    return '重试精确路线';
+  }
   return '获取精确路线';
+});
+
+/** 状态栏：精确路段完成情况 */
+const preciseStatusHint = computed(() => {
+  const job = trip.preciseJob;
+  if (!job) return '';
+  const ok = job.segmentsOk ?? 0;
+  const total = job.segmentsTotal ?? 0;
+  if (trip.preciseLoading) {
+    if (job.message && !/^加载中\s+\d+\/\d+/.test(job.message)) return job.message;
+    return total ? `精确 ${job.segmentsDone}/${total}` : '精确加载中';
+  }
+  if (job.status === 'done') return '精确路线已完成';
+  if (ok > 0 && total > 0) return `精确 ${ok}/${total}`;
+  if (job.status === 'partial' || job.status === 'failed') return '精确未完成';
+  return '';
 });
 
 const shifted = (iso: string) => shiftDate(iso, schedule.value?.offsetMs || 0);
@@ -665,12 +697,24 @@ async function onUpgradePrecise() {
   } else if (trip.preciseJob?.status === 'partial') showToast(trip.preciseJob.message);
 }
 
+function onPageHidePersist() {
+  void persistActiveTrip({ bumpOpenedAt: false, setResume: false });
+}
+
+function onVisibilityPersist() {
+  if (document.visibilityState === 'hidden') {
+    void persistActiveTrip({ bumpOpenedAt: false, setResume: false });
+  }
+}
+
 onMounted(async () => {
   try {
     await ensureTripLoaded();
     if (!trip.segment) return;
     resumeKeyNow.value = getAutoResumeTripKey();
     await initMap();
+    window.addEventListener('pagehide', onPageHidePersist);
+    document.addEventListener('visibilitychange', onVisibilityPersist);
   } catch (e) {
     error.value = e instanceof Error ? e.message : '地图初始化失败';
   }
@@ -697,6 +741,9 @@ watch(
 );
 
 onUnmounted(() => {
+  window.removeEventListener('pagehide', onPageHidePersist);
+  document.removeEventListener('visibilitychange', onVisibilityPersist);
+  void persistActiveTrip({ bumpOpenedAt: false, setResume: false });
   trip.stopPrecisePoll();
   map?.destroy?.();
 });
@@ -760,6 +807,10 @@ onUnmounted(() => {
               <span>进度 <strong>{{ Math.round(progress * 100) }}%</strong></span>
               <span class="status-divider">·</span>
               <span>定位 <strong>{{ mode }}</strong></span>
+              <template v-if="preciseStatusHint">
+                <span class="status-divider">·</span>
+                <span class="precise-status-hint">{{ preciseStatusHint }}</span>
+              </template>
             </div>
             <div v-if="showPreciseAction" class="rail-upgrade">
               <button

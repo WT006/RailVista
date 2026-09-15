@@ -1,4 +1,5 @@
 import type { ApiResponse } from '@railvista/shared';
+import { getClientId } from '../lib/clientId';
 
 const BASE = import.meta.env.VITE_API_BASE || '/api';
 
@@ -7,6 +8,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
     headers: {
       Accept: 'application/json',
+      'X-Client-Id': getClientId(),
       ...(init?.headers || {}),
     },
   });

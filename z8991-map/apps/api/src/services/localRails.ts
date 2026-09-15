@@ -12,18 +12,36 @@ export type LocalRailWay = {
   bbox: { minLng: number; minLat: number; maxLng: number; maxLat: number };
 };
 
+export type LocalRailKind = 'hsr' | 'rail';
+
 type GeoFeature = {
-  properties?: { osm_id?: number; name?: string; hsr?: number | boolean };
+  properties?: { osm_id?: number; name?: string; hsr?: number | boolean; highspeed?: boolean };
   geometry?: {
     type?: string;
     coordinates?: number[][] | number[][][];
   };
 };
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const HSR_PATH = join(__dirname, '../../../../data/presets/corridors/_hsr-rails.geojson');
+type GraphFile = {
+  version?: number;
+  kind?: string;
+  ways?: Array<{
+    id?: number;
+    name?: string;
+    highspeed?: boolean;
+    points: Array<[number, number] | LngLat>;
+  }>;
+};
 
-let cache: LocalRailWay[] | null = null;
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const DATA_ROOT = join(__dirname, '../../../../data');
+const HSR_GEOJSON = join(DATA_ROOT, 'presets/corridors/_hsr-rails.geojson');
+const HSR_GRAPH = join(DATA_ROOT, 'rails/china-hsr.graph');
+const RAIL_GRAPH = join(DATA_ROOT, 'rails/china-rail.graph');
+const RAIL_GEOJSON = join(DATA_ROOT, 'rails/china-rail.geojson');
+
+let hsrCache: LocalRailWay[] | null = null;
+let railCache: LocalRailWay[] | null = null;
 
 function bboxOf(points: LngLat[]) {
   let minLng = Infinity;
@@ -60,34 +78,112 @@ function asLineStrings(geom: GeoFeature['geometry']): LngLat[][] {
   return [];
 }
 
-export function loadLocalHsrRails(): LocalRailWay[] {
-  if (cache) return cache;
-  if (!existsSync(HSR_PATH)) {
-    console.warn('[local-rails] missing', HSR_PATH);
-    cache = [];
-    return cache;
+function pointOf(p: [number, number] | LngLat): LngLat | null {
+  if (Array.isArray(p) && p.length >= 2) {
+    const lng = Number(p[0]);
+    const lat = Number(p[1]);
+    if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+    return { lng, lat };
   }
-  const t0 = Date.now();
-  const json = JSON.parse(readFileSync(HSR_PATH, 'utf8')) as {
-    features?: GeoFeature[];
-  };
+  const o = p as LngLat;
+  if (!Number.isFinite(o.lng) || !Number.isFinite(o.lat)) return null;
+  return { lng: o.lng, lat: o.lat };
+}
+
+function loadWaysFromGraph(path: string, forceHs?: boolean): LocalRailWay[] {
+  if (!existsSync(path)) return [];
+  const json = JSON.parse(readFileSync(path, 'utf8')) as GraphFile;
+  const ways: LocalRailWay[] = [];
+  let seq = 1;
+  for (const w of json.ways || []) {
+    const points: LngLat[] = [];
+    for (const raw of w.points || []) {
+      const pt = pointOf(raw);
+      if (pt) points.push(pt);
+    }
+    if (points.length < 2) continue;
+    ways.push({
+      id: Number(w.id) || seq++,
+      points,
+      name: w.name,
+      highspeed: forceHs ?? !!w.highspeed,
+      bbox: bboxOf(points),
+    });
+  }
+  return ways;
+}
+
+function loadWaysFromGeoJson(path: string, forceHs?: boolean): LocalRailWay[] {
+  if (!existsSync(path)) return [];
+  const json = JSON.parse(readFileSync(path, 'utf8')) as { features?: GeoFeature[] };
   const ways: LocalRailWay[] = [];
   let seq = 1;
   for (const f of json.features || []) {
     const lines = asLineStrings(f.geometry);
     for (const points of lines) {
+      const hs =
+        forceHs ??
+        !!(f.properties?.hsr || f.properties?.highspeed);
       ways.push({
         id: Number(f.properties?.osm_id) || seq++,
         points,
         name: f.properties?.name,
-        highspeed: true,
+        highspeed: hs,
         bbox: bboxOf(points),
       });
     }
   }
-  cache = ways;
-  console.log(`[local-rails] loaded ${ways.length} ways from hsr-rails in ${Date.now() - t0}ms`);
-  return cache;
+  return ways;
+}
+
+/** 测试或热更新时可清空 */
+export function clearLocalRailsCache(): void {
+  hsrCache = null;
+  railCache = null;
+}
+
+export function loadLocalHsrRails(): LocalRailWay[] {
+  if (hsrCache) return hsrCache;
+  const t0 = Date.now();
+  let ways = loadWaysFromGraph(HSR_GRAPH, true);
+  let src = 'china-hsr.graph';
+  if (!ways.length) {
+    ways = loadWaysFromGeoJson(HSR_GEOJSON, true);
+    src = '_hsr-rails.geojson';
+  }
+  hsrCache = ways;
+  if (!ways.length) console.warn('[local-rails] missing HSR assets');
+  else console.log(`[local-rails] loaded ${ways.length} HSR ways from ${src} in ${Date.now() - t0}ms`);
+  return hsrCache;
+}
+
+/** 普速轨网：优先 graph，其次合成 geojson；不含高铁仿真轨 */
+export function loadLocalConventionalRails(): LocalRailWay[] {
+  if (railCache) return railCache;
+  const t0 = Date.now();
+  let ways = loadWaysFromGraph(RAIL_GRAPH, false).filter((w) => !w.highspeed);
+  let src = 'china-rail.graph';
+  if (!ways.length) {
+    ways = loadWaysFromGeoJson(RAIL_GEOJSON, false).filter((w) => !w.highspeed);
+    src = 'china-rail.geojson';
+  }
+  // 再兜底：图文件可能未标 highspeed=false，整文件当作普速
+  if (!ways.length && existsSync(RAIL_GRAPH)) {
+    ways = loadWaysFromGraph(RAIL_GRAPH, false);
+    src = 'china-rail.graph(all)';
+  }
+  if (!ways.length && existsSync(RAIL_GEOJSON)) {
+    ways = loadWaysFromGeoJson(RAIL_GEOJSON, false);
+    src = 'china-rail.geojson(all)';
+  }
+  railCache = ways;
+  if (!ways.length) console.warn('[local-rails] missing conventional rail assets (run scripts/build-rail-graph.mjs)');
+  else console.log(`[local-rails] loaded ${ways.length} conventional ways from ${src} in ${Date.now() - t0}ms`);
+  return railCache;
+}
+
+export function loadLocalRails(kind: LocalRailKind): LocalRailWay[] {
+  return kind === 'hsr' ? loadLocalHsrRails() : loadLocalConventionalRails();
 }
 
 function expandBbox(
@@ -111,20 +207,23 @@ function bboxOverlap(
 }
 
 /**
- * 从本地高铁轨网取走廊附近 ways（不访问 Overpass）。
+ * 从本地轨网取走廊附近 ways（不访问 Overpass）。
  * padDeg≈0.15 ≈ 15km。
  */
 export function queryLocalWaysAlong(
   samples: LngLat[],
-  opts?: { padDeg?: number; highspeedOnly?: boolean },
+  opts?: { padDeg?: number; highspeedOnly?: boolean; kind?: LocalRailKind },
 ): LocalRailWay[] {
-  const ways = loadLocalHsrRails();
+  const kind: LocalRailKind =
+    opts?.kind ?? (opts?.highspeedOnly === false ? 'rail' : 'hsr');
+  const ways = loadLocalRails(kind);
   if (!ways.length || samples.length < 1) return [];
   const padDeg = opts?.padDeg ?? 0.16;
   const window = expandBbox(samples, padDeg);
   const out: LocalRailWay[] = [];
   for (const w of ways) {
     if (opts?.highspeedOnly && !w.highspeed) continue;
+    if (kind === 'rail' && w.highspeed) continue;
     if (!bboxOverlap(window, w.bbox)) continue;
     out.push(w);
   }
@@ -184,16 +283,13 @@ function filterWaysInCorridor(
     const latHead = distToChordKm(head, from, to);
     const latTail = distToChordKm(tail, from, to);
     if (Math.min(latMid, latHead, latTail) > maxLateralKm) return false;
-    // 段在 OD 轴上至少有一部分落在 [ -5%, 105% ]
     const a0 = alongChord(head, from, to);
     const a1 = alongChord(tail, from, to);
     const lo = Math.min(a0, a1);
     const hi = Math.max(a0, a1);
     if (hi < -0.05 || lo > 1.05) return false;
-    // 极短无关联络线：相对 OD 太短且偏离轴
     const segKm = haversineKm(head, mid) + haversineKm(mid, tail);
     if (segKm < 0.8 && latMid > maxLateralKm * 0.5) return false;
-    // 几乎垂直于 OD 的短段（易引入锯齿）
     const alongSpan = Math.abs(a1 - a0) * odKm;
     if (segKm > 3 && alongSpan < segKm * 0.25 && latMid > 8) return false;
     return true;
@@ -208,15 +304,14 @@ export function stitchLocalOd(
   from: LngLat,
   to: LngLat,
   ways: LocalRailWay[],
-  opts?: { allowPrefer?: boolean },
+  opts?: { allowPrefer?: boolean; allWays?: LocalRailWay[] },
 ): LngLat[] | null {
   if (ways.length < 1) return null;
   const allowPrefer = opts?.allowPrefer !== false;
+  const catalog = opts?.allWays || ways;
   const odKm = haversineKm(from, to) || 1;
-  // 长途干线相对弦线弯曲大（京沪可偏几十公里），半宽随里程放宽
   const maxLateral = Math.min(90, Math.max(14, odKm * 0.09));
 
-  // 若首末附近共享干线名（如京沪高铁），优先整线使用，避免弦线过滤砍掉弯段
   const near = (w: LocalRailWay, p: LngLat, lim: number) => {
     const d0 = dist(p, w.points[0]);
     const d1 = dist(p, w.points[w.points.length - 1]);
@@ -248,8 +343,7 @@ export function stitchLocalOd(
 
   let poolWays: LocalRailWay[];
   if (preferredName && bestCommon >= 4) {
-    // 整库同名 ways，避免走廊 pad 漏掉沿海弯段
-    const named = loadLocalHsrRails().filter((w) => w.name === preferredName);
+    const named = catalog.filter((w) => w.name === preferredName);
     if (named.length >= 8) {
       console.log(`[local-rails] prefer line "${preferredName}" ways=${named.length}`);
       poolWays = named;
@@ -266,11 +360,9 @@ export function stitchLocalOd(
   const segs: Seg[] = poolWays.map((w) => ({ pts: w.points, used: false, name: w.name }));
   let currentName = preferredName;
   const namedLine = Boolean(preferredName && poolWays.every((w) => !w.name || w.name === preferredName));
-  // 命名干线（京沪）数据常有 1°+ 拓扑断口，且相对 OD 弦线可偏 200km+
   const softLateral = namedLine ? Infinity : maxLateral * 1.25;
   const bridgeMax = namedLine ? (odKm > 300 ? 1.8 : 0.8) : odKm > 300 ? 1.3 : 0.55;
 
-  // 起点：靠近 from，且朝 to 明显前进（避免站场短岔线原地打转）
   let startIdx = -1;
   let startRev = false;
   let startScore = Infinity;
@@ -285,7 +377,6 @@ export function stitchLocalOd(
       const tipToDest = haversineKm(tip, to);
       const lateral = namedLine ? 0 : distToChordKm(tip, from, to);
       const nameBonus = preferredName && s.name === preferredName ? -30 : 0;
-      // 强惩罚不朝终点前进的站场短段
       const score = d0 * 1000 - toward * 220 + tipToDest * 0.15 + lateral * 2 + nameBonus;
       if (score < startScore) {
         startScore = score;
@@ -336,7 +427,6 @@ export function stitchLocalOd(
         const alongGain = along1 - along0;
         if (alongGain < minAlongGain) continue;
         const dist1 = haversineKm(tip, to);
-        // 大跨接时必须净靠近终点，避免站场岔线互连
         if (d > 0.25 && dist1 > dist0 - 2) continue;
         const lateral = distToChordKm(tip, from, to);
         if (lateral > softLateral) continue;
@@ -365,7 +455,6 @@ export function stitchLocalOd(
     line.push(...best.pts.slice(1));
   }
 
-  // 终点仍远：跨拓扑断口（命名干线常见 1°+ 间隙）
   if (haversineKm(line[line.length - 1], to) > 6) {
     let guard = 0;
     while (haversineKm(line[line.length - 1], to) > 3 && guard++ < 2000) {
@@ -433,7 +522,6 @@ export function stitchLocalOd(
   let sliced = line.slice(i0, i1 + 1);
   if (sliced.length < 2) return null;
 
-  // 去掉明显折返：沿弦进度回退过大的点（命名干线放宽，沿海弯段投影会抖）
   const backTol = namedLine ? 0.02 : 0.008;
   const cleaned: LngLat[] = [sliced[0]];
   let maxAlong = alongChord(sliced[0], from, to);
@@ -452,7 +540,6 @@ export function stitchLocalOd(
     console.warn(`[local-rails] stitch abort: short len=${len.toFixed(0)} od=${odKm.toFixed(0)}`);
     return null;
   }
-  // 绕路过多则拒绝（短途严、长途宽；命名干线更宽）
   const maxRatio = namedLine
     ? odKm < 500
       ? 1.75
@@ -486,7 +573,14 @@ export function stitchLocalOd(
 }
 
 /** 查询并拼出站间精确折线（纯本地） */
-export function buildLocalSegment(from: LngLat, to: LngLat): LngLat[] | null {
+export function buildLocalSegment(
+  from: LngLat,
+  to: LngLat,
+  opts?: { highspeed?: boolean },
+): LngLat[] | null {
+  const preferHs = opts?.highspeed !== false;
+  const kind: LocalRailKind = preferHs ? 'hsr' : 'rail';
+  const catalog = loadLocalRails(kind);
   const spanKm = haversineKm(from, to);
   const samples: LngLat[] = [];
   const n = Math.min(16, Math.max(2, Math.ceil(spanKm / 40)));
@@ -499,18 +593,20 @@ export function buildLocalSegment(from: LngLat, to: LngLat): LngLat[] | null {
   }
 
   const tryPad = (padDeg: number) => {
-    const ways = queryLocalWaysAlong(samples, { padDeg });
+    const ways = queryLocalWaysAlong(samples, {
+      padDeg,
+      kind,
+      highspeedOnly: preferHs,
+    });
     console.log(
-      `[local-rails] query ways=${ways.length} spanKm=${spanKm.toFixed(0)} samples=${samples.length} pad=${padDeg}`,
+      `[local-rails] query kind=${kind} ways=${ways.length} spanKm=${spanKm.toFixed(0)} samples=${samples.length} pad=${padDeg}`,
     );
     if (ways.length < 1) return null;
-    // 先试干线名偏好；失败再走廊过滤（避免京港等超长线锁定后拼到远端）
-    const preferred = stitchLocalOd(from, to, ways, { allowPrefer: true });
+    const preferred = stitchLocalOd(from, to, ways, { allowPrefer: true, allWays: catalog });
     if (preferred) return preferred;
-    return stitchLocalOd(from, to, ways, { allowPrefer: false });
+    return stitchLocalOd(from, to, ways, { allowPrefer: false, allWays: catalog });
   };
 
-  // 先窄走廊防旁线；失败再略放宽（长途干线需要）
   const narrow = spanKm < 80 ? 0.12 : spanKm < 250 ? 0.15 : 0.18;
   const wide = spanKm < 80 ? 0.16 : spanKm < 250 ? 0.2 : 0.26;
   return tryPad(narrow) || (wide > narrow + 0.01 ? tryPad(wide) : null);

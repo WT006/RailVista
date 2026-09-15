@@ -10,6 +10,7 @@ import {
 import { matchCorridor, sliceCorridorForStops } from './corridors.js';
 import { matchCorridorNetwork } from './corridorNetwork.js';
 import { matchScenicSpotsForRailway } from './scenicSpots.js';
+import { getPreciseHotCache, savePreciseHotCache } from './preciseRouteCache.js';
 
 export type RailJobStatus = 'queued' | 'running' | 'done' | 'partial' | 'failed';
 
@@ -45,17 +46,46 @@ type RailJob = Omit<RailJobSnapshot, 'stops'> & {
   stopsFp: string;
   createdAt: number;
   updatedAt: number;
+  /** 被同客户端新 OD 任务取代后不再写缓存 / 进度 */
+  abandoned?: boolean;
 };
 
 const JOB_TTL_MS = 30 * 60 * 1000;
+/** 整趟精确任务墙钟上限：超时后用已有结果收尾，避免卡在 Overpass */
+function jobMaxMs() {
+  return Number(process.env.RAIL_JOB_MAX_MS || 50_000);
+}
+/** 同时真正跑 runJob 的上限（多人共享） */
+function maxInflightJobs() {
+  return Math.max(1, Number(process.env.RAIL_JOB_MAX_INFLIGHT || 8));
+}
+/** 等待开跑的排队上限；满则 BUSY */
+function maxQueuedJobs() {
+  return Math.max(0, Number(process.env.RAIL_JOB_MAX_QUEUED || 24));
+}
 /** 本地轨网为主时可适度并发 */
 const CONCURRENCY = 3;
 const STRICT_VIA_KM = 12;
 const SOFT_VIA_KM = 25;
 const jobs = new Map<string, RailJob>();
+/** 同一浏览器 clientKey 当前进行中的任务（换 OD 时作废旧任务） */
 const runningByClient = new Map<string, string>();
-/** 同 OD 最近一次结束的任务，供失败段定向重试 */
-const lastFinishedByClient = new Map<string, string>();
+/** 同客户端 + 同 OD 最近一次结束的任务，供失败段定向重试 */
+const lastFinishedByKey = new Map<string, string>();
+let inflightJobs = 0;
+const startQueue: Array<{ job: RailJob; onlyFailed: boolean }> = [];
+
+function finishedKey(clientKey: string, stopsFp: string) {
+  return `${clientKey}||${stopsFp}`;
+}
+
+function jobTimedOut(job: RailJob): boolean {
+  return Date.now() - job.createdAt >= jobMaxMs();
+}
+
+function shouldStopJob(job: RailJob): boolean {
+  return !!job.abandoned || jobTimedOut(job);
+}
 
 function pruneJobs() {
   const now = Date.now();
@@ -63,9 +93,60 @@ function pruneJobs() {
     if (now - job.updatedAt > JOB_TTL_MS) {
       jobs.delete(id);
       if (runningByClient.get(job.clientKey) === id) runningByClient.delete(job.clientKey);
-      if (lastFinishedByClient.get(job.clientKey) === id) lastFinishedByClient.delete(job.clientKey);
+      const fk = finishedKey(job.clientKey, job.stopsFp);
+      if (lastFinishedByKey.get(fk) === id) lastFinishedByKey.delete(fk);
+      removeFromStartQueue(id);
     }
   }
+}
+
+function removeFromStartQueue(jobId: string) {
+  const i = startQueue.findIndex((q) => q.job.jobId === jobId);
+  if (i >= 0) startQueue.splice(i, 1);
+}
+
+function launchJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
+  inflightJobs += 1;
+  void runJob(job, opts)
+    .catch((e) => {
+      console.error('[rail-job] fatal', job.jobId, e);
+      if (!job.abandoned) {
+        job.status = 'failed';
+        job.message = e instanceof Error ? e.message : '精确路线生成失败';
+        refreshJobDerived(job);
+        finishJob(job);
+      }
+    })
+    .finally(() => {
+      inflightJobs = Math.max(0, inflightJobs - 1);
+      pumpStartQueue();
+    });
+}
+
+function pumpStartQueue() {
+  while (inflightJobs < maxInflightJobs() && startQueue.length) {
+    const next = startQueue.shift()!;
+    if (next.job.abandoned) continue;
+    if (next.job.status !== 'queued' && next.job.status !== 'running') continue;
+    next.job.message = next.onlyFailed ? '重试缺口…' : '加载中…';
+    next.job.updatedAt = Date.now();
+    launchJob(next.job, { onlyFailed: next.onlyFailed });
+  }
+  startQueue.forEach((q, i) => {
+    if (!q.job.abandoned && q.job.status === 'queued') {
+      q.job.message = `排队中（第 ${i + 1} 位）…`;
+      q.job.updatedAt = Date.now();
+    }
+  });
+}
+
+function scheduleRunJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
+  if (inflightJobs < maxInflightJobs()) {
+    launchJob(job, opts);
+    return;
+  }
+  job.message = `排队中（第 ${startQueue.length + 1} 位）…`;
+  startQueue.push({ job, onlyFailed: !!opts?.onlyFailed });
 }
 
 function stopsFingerprint(stops: NamedStop[], trainCode?: string): string {
@@ -109,10 +190,18 @@ function deriveQualityTier(job: RailJob): RailQualityTier {
 function refreshJobDerived(job: RailJob) {
   const ok = job.slots.filter((s) => s?.ok).length;
   job.segmentsOk = ok;
-  job.coords = formatRailCoords(mergeSlots(job.stops, job.slots));
+  const merged = formatRailCoords(mergeSlots(job.stops, job.slots));
+  const hasRealSlotCoords = job.slots.some((s) => !!(s?.ok && s.coords.length >= 2));
+  // 走廊/热缓存/种子折线：槽位常无 coords，禁止 mergeSlots 退化成站间示意线
+  if (hasRealSlotCoords || job.coords.length < 2) {
+    job.coords = merged;
+  }
   if (ok === 0) job.source = 'station';
-  else if (ok >= Math.ceil(job.segmentsTotal * 0.7)) job.source = 'osm';
-  else job.source = 'mixed';
+  else if (ok >= Math.ceil(job.segmentsTotal * 0.7)) {
+    if (job.source === 'station') job.source = 'osm';
+  } else if (job.source === 'station') {
+    job.source = 'mixed';
+  }
   job.qualityTier = deriveQualityTier(job);
   job.updatedAt = Date.now();
 }
@@ -134,23 +223,32 @@ function snapshot(job: RailJob): RailJobSnapshot {
   };
 }
 
-function finalizeMessage(job: RailJob) {
+function finalizeMessage(job: RailJob, opts?: { timedOut?: boolean }) {
   const tier = job.qualityTier || deriveQualityTier(job);
+  const timedOut = !!opts?.timedOut || jobTimedOut(job);
   if (job.segmentsOk === 0) {
     const reasons = job.slots.map((s) => s?.reason).filter(Boolean);
     const mostlyEmpty =
-      reasons.filter((r) => r === 'overpass_empty' || r === 'no_ways').length >=
-      Math.ceil(job.segmentsTotal / 2);
-    job.status = 'failed';
-    job.message = mostlyEmpty
-      ? '暂无可用轨道数据（本地未覆盖且 OSM 不可用），请稍后重试'
-      : '未能匹配精确轨道，仍为示意线';
+      reasons.filter((r) => r === 'overpass_empty' || r === 'no_ways' || r === 'overpass_disabled')
+        .length >= Math.ceil(job.segmentsTotal / 2);
+    // 二期：零成功段不硬 failed，保留示意线并可重试
+    job.status = 'partial';
+    job.qualityTier = 'station';
+    if (timedOut) {
+      job.message = '精确路线加载超时，仍为示意线，可稍后重试';
+    } else {
+      job.message = mostlyEmpty
+        ? '暂无可用轨道数据（本地未覆盖且 OSM 不可用），仍为示意线，可稍后重试'
+        : '未能匹配精确轨道，仍为示意线，可重试';
+    }
     return;
   }
   if (job.segmentsOk < job.segmentsTotal) {
     job.status = 'partial';
-    if (tier === 'soft') {
-      job.message = `近似轨道（跨站补缝） ${job.segmentsOk}/${job.segmentsTotal}，缺口为示意`;
+    if (timedOut) {
+      job.message = `部分精确 ${job.segmentsOk}/${job.segmentsTotal}（加载超时），缺口为示意，可重试缺口`;
+    } else if (tier === 'soft') {
+      job.message = `部分精确 ${job.segmentsOk}/${job.segmentsTotal}（跨站补缝），缺口为示意`;
     } else {
       job.message = `部分精确 ${job.segmentsOk}/${job.segmentsTotal}，缺口为示意`;
     }
@@ -166,6 +264,7 @@ function finalizeMessage(job: RailJob) {
 }
 
 async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
+  if (job.abandoned) return;
   job.status = 'running';
   if (!opts?.onlyFailed) {
     job.message = `加载中 0/${job.segmentsTotal}`;
@@ -174,13 +273,43 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
   }
   refreshJobDerived(job);
 
-  // 0) 先尝试精品走廊 / 路网拼接（整段精确，避免站间 OSM 部分失败）
+  // 0) 热门指纹缓存（含真实轨段的成功/部分结果）
+  if (!opts?.onlyFailed) {
+    const hot = getPreciseHotCache(job.trainCode, job.stops);
+    if (hot && hot.coords.length >= 2) {
+      if (job.abandoned) return;
+      const okCount = Math.min(hot.segmentsOk, job.segmentsTotal);
+      for (let i = 0; i < job.segmentsTotal; i++) {
+        job.slots[i] =
+          i < okCount
+            ? { coords: [], ok: true, reason: 'hot-cache' }
+            : { coords: [], ok: false, reason: 'hot-cache-gap' };
+      }
+      job.segmentsDone = job.segmentsTotal;
+      job.segmentsOk = okCount;
+      job.coords = hot.coords;
+      job.source = hot.source;
+      job.qualityTier = (hot.qualityTier as RailQualityTier) || 'local';
+      job.status = okCount >= job.segmentsTotal ? 'done' : 'partial';
+      job.message =
+        hot.message ||
+        (okCount >= job.segmentsTotal
+          ? '真实轨道线（热门缓存）'
+          : `部分精确（热门缓存） ${okCount}/${job.segmentsTotal}`);
+      job.updatedAt = Date.now();
+      finishJob(job);
+      return;
+    }
+  }
+
+  // 1) 先尝试精品走廊 / 路网拼接（整段精确，避免站间 OSM 部分失败）
   if (!opts?.onlyFailed) {
     try {
       const corridorStops = job.stops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat }));
       const single = matchCorridor(corridorStops, { trainCode: job.trainCode });
       const sliced = single ? sliceCorridorForStops(single.corridor, corridorStops) : null;
       if (sliced && sliced.length >= 2) {
+        if (job.abandoned) return;
         for (let i = 0; i < job.segmentsTotal; i++) {
           job.slots[i] = { coords: [], ok: true, reason: `corridor:${single!.corridor.id}` };
         }
@@ -197,6 +326,7 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
       }
       const networked = matchCorridorNetwork(corridorStops, { trainCode: job.trainCode });
       if (networked?.coords && networked.coords.length >= 2) {
+        if (job.abandoned) return;
         for (let i = 0; i < job.segmentsTotal; i++) {
           job.slots[i] = {
             coords: [],
@@ -220,6 +350,8 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
     }
   }
 
+  if (job.abandoned) return;
+
   const preferHs = isHighspeedTrain(job.trainCode);
   const pending: number[] = [];
   for (let i = 0; i < job.segmentsTotal; i++) {
@@ -233,6 +365,7 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
   let next = 0;
   const worker = async () => {
     while (true) {
+      if (shouldStopJob(job)) return;
       const pi = next;
       next += 1;
       if (pi >= pending.length) return;
@@ -242,8 +375,10 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
       const to = job.stops[i + 1];
       try {
         const seg = await buildSegmentGeometry(from, to, { preferHighspeed: preferHs });
+        if (job.abandoned) return;
         job.slots[i] = { coords: seg.coords, ok: seg.ok, reason: seg.reason };
       } catch (e) {
+        if (job.abandoned) return;
         console.warn('[rail-job] segment failed', job.jobId, i, e);
         job.slots[i] = {
           coords: [from, to],
@@ -263,24 +398,93 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
     await Promise.all(Array.from({ length: n }, () => worker()));
   }
 
-  // 失败段：严格/软桥补缝
-  await bridgeFailedSegments(job, preferHs);
+  if (job.abandoned) return;
 
-  // 仍有缺口：整 OD 一次 Overpass 寻路回退（山区常比逐 hop 稳）
-  if (job.segmentsOk < job.segmentsTotal) {
-    await tryWholeTripFallback(job);
+  // 超时：不再补缝 / 整趟 Overpass，直接友好收尾
+  if (jobTimedOut(job)) {
+    console.warn('[rail-job] deadline after segments', job.jobId, `${jobMaxMs()}ms`);
+    // 未写完的槽位按示意失败占位，保证 segmentsDone 完整
+    for (let i = 0; i < job.segmentsTotal; i++) {
+      if (job.slots[i] == null) {
+        const from = job.stops[i];
+        const to = job.stops[i + 1];
+        job.slots[i] = { coords: [from, to], ok: false, reason: 'job_timeout' };
+      }
+    }
+    job.segmentsDone = job.segmentsTotal;
+    refreshJobDerived(job);
+    finalizeMessage(job, { timedOut: true });
+    refreshJobDerived(job);
+    finishJob(job);
+    return;
   }
 
-  finalizeMessage(job);
+  // 失败段：严格/软桥补缝（仍受墙钟限制）
+  if (job.segmentsOk < job.segmentsTotal) {
+    job.message = `补缝中 ${job.segmentsOk}/${job.segmentsTotal}…`;
+    await bridgeFailedSegments(job, preferHs);
+  }
+  if (job.abandoned) return;
+
+  if (jobTimedOut(job)) {
+    console.warn('[rail-job] deadline after bridge', job.jobId);
+    refreshJobDerived(job);
+    finalizeMessage(job, { timedOut: true });
+    refreshJobDerived(job);
+    finishJob(job);
+    return;
+  }
+
+  // 仍有缺口：短途才整 OD Overpass（长途如广州南→南京南会拖死）
+  if (job.segmentsOk < job.segmentsTotal) {
+    const longTrip = job.segmentsTotal >= 8 || job.stops.length >= 10;
+    if (longTrip) {
+      console.log(
+        `[rail-job] skip whole-trip Overpass (long trip segs=${job.segmentsTotal})`,
+        job.jobId,
+      );
+    } else {
+      job.message = `收尾中 ${job.segmentsOk}/${job.segmentsTotal}…`;
+      await tryWholeTripFallback(job);
+    }
+  }
+  if (job.abandoned) return;
+
+  finalizeMessage(job, { timedOut: jobTimedOut(job) });
   refreshJobDerived(job);
   finishJob(job);
 }
 
-function finishJob(job: RailJob) {
+function abandonJob(job: RailJob) {
+  job.abandoned = true;
+  job.status = 'failed';
+  job.message = '已取消（已切换行程）';
+  job.updatedAt = Date.now();
+  removeFromStartQueue(job.jobId);
   if (runningByClient.get(job.clientKey) === job.jobId) {
     runningByClient.delete(job.clientKey);
   }
-  lastFinishedByClient.set(job.clientKey, job.jobId);
+  pumpStartQueue();
+}
+
+function finishJob(job: RailJob) {
+  if (job.abandoned) return;
+  if (runningByClient.get(job.clientKey) === job.jobId) {
+    runningByClient.delete(job.clientKey);
+  }
+  lastFinishedByKey.set(finishedKey(job.clientKey, job.stopsFp), job.jobId);
+  if (job.segmentsOk > 0 && job.source !== 'station' && job.coords.length >= 2) {
+    savePreciseHotCache({
+      trainCode: job.trainCode,
+      stops: job.stops,
+      coords: job.coords as [number, number][],
+      source: job.source,
+      qualityTier: job.qualityTier,
+      message: job.message,
+      segmentsOk: job.segmentsOk,
+      segmentsTotal: job.segmentsTotal,
+    });
+  }
 }
 
 /** 折线上最近点距离（km）；用于判断桥接线是否仍经过被跳过的中间站 */
@@ -300,6 +504,7 @@ function minDistToPolylineKm(pt: LngLat, line: LngLat[]): number {
 async function bridgeFailedSegments(job: RailJob, preferHs: boolean) {
   let i = 0;
   while (i < job.segmentsTotal) {
+    if (shouldStopJob(job)) return;
     if (job.slots[i]?.ok) {
       i += 1;
       continue;
@@ -312,7 +517,9 @@ async function bridgeFailedSegments(job: RailJob, preferHs: boolean) {
       const to = job.stops[j];
       if (to) {
         try {
+          job.message = `补缝中 ${from.name}→${to.name}…`;
           const seg = await buildSegmentGeometry(from, to, { preferHighspeed: preferHs });
+          if (job.abandoned) return;
           if (seg.ok && seg.coords.length >= 2) {
             const vias = job.stops.slice(i + 1, j);
             const farStrict = vias.find((v) => minDistToPolylineKm(v, seg.coords) > STRICT_VIA_KM);
@@ -408,23 +615,35 @@ export function createRailGeometryJob(params: {
     throw Object.assign(new Error('至少需要 2 个可定位的经停站'), { code: 'BAD_REQUEST' });
   }
 
+  const fp = stopsFingerprint(stops, params.trainCode);
   const existingId = runningByClient.get(params.clientKey);
   if (existingId) {
     const existing = jobs.get(existingId);
     if (existing && (existing.status === 'queued' || existing.status === 'running')) {
-      return snapshot(existing);
+      // 同 OD 幂等复用；同一浏览器换行程则作废旧任务（不同 clientKey 互不影响）
+      if (existing.stopsFp === fp) {
+        return snapshot(existing);
+      }
+      abandonJob(existing);
     }
   }
 
-  const fp = stopsFingerprint(stops, params.trainCode);
+  if (inflightJobs >= maxInflightJobs() && startQueue.length >= maxQueuedJobs()) {
+    throw Object.assign(new Error('精确路线排队已满，请稍后再试'), { code: 'BUSY' });
+  }
+
   const jobId = `rj_${randomBytes(8).toString('hex')}`;
   const total = stops.length - 1;
 
   let slots: SegSlot[] = Array.from({ length: total }, () => null);
   let onlyFailed = false;
+  let seedCoords: [number, number][] | null = null;
+  let seedSource: RailJob['source'] = 'station';
+  let seedTier: RailQualityTier = 'station';
+  let seedMessage = '排队中';
 
   if (params.retryFailedOnly) {
-    const prevId = lastFinishedByClient.get(params.clientKey);
+    const prevId = lastFinishedByKey.get(finishedKey(params.clientKey, fp));
     const prev = prevId ? jobs.get(prevId) : undefined;
     if (
       prev &&
@@ -434,28 +653,40 @@ export function createRailGeometryJob(params: {
     ) {
       slots = prev.slots.map((s) => (s ? { ...s, coords: [...(s.coords || [])] } : null));
       onlyFailed = slots.some((s) => !s?.ok);
+      // 关键：沿用上一趟已拼好的折线（ok 槽位常 coords=[]，mergeSlots 会退化成示意线）
+      if (prev.coords?.length >= 2 && prev.segmentsOk > 0 && prev.source !== 'station') {
+        seedCoords = prev.coords.slice() as [number, number][];
+        seedSource = prev.source;
+        seedTier = prev.qualityTier || 'mixed';
+        seedMessage = prev.message || `部分精确 ${prev.segmentsOk}/${prev.segmentsTotal}`;
+      }
       if (!onlyFailed) {
         // 无失败段则整趟重跑
         slots = Array.from({ length: total }, () => null);
+        seedCoords = null;
+        seedSource = 'station';
+        seedTier = 'station';
+        seedMessage = '排队中';
       }
     }
   }
 
+  const mergedNow = formatRailCoords(
+    mergeSlots(
+      stops,
+      slots.map((s) => s || { coords: [], ok: false }),
+    ),
+  );
   const job: RailJob = {
     jobId,
     status: 'queued',
     segmentsTotal: total,
     segmentsDone: slots.filter((s) => s != null).length,
     segmentsOk: slots.filter((s) => s?.ok).length,
-    coords: formatRailCoords(
-      mergeSlots(
-        stops,
-        slots.map((s) => s || { coords: [], ok: false }),
-      ),
-    ),
-    source: 'station',
-    message: onlyFailed ? '重试缺口…' : '排队中',
-    qualityTier: 'station',
+    coords: seedCoords && seedCoords.length >= 2 ? seedCoords : mergedNow,
+    source: seedCoords ? seedSource : 'station',
+    message: onlyFailed ? '重试缺口…' : seedMessage,
+    qualityTier: seedCoords ? seedTier : 'station',
     trainCode: params.trainCode,
     stops,
     slots,
@@ -467,13 +698,7 @@ export function createRailGeometryJob(params: {
 
   jobs.set(jobId, job);
   runningByClient.set(params.clientKey, jobId);
-  void runJob(job, { onlyFailed }).catch((e) => {
-    console.error('[rail-job] fatal', jobId, e);
-    job.status = 'failed';
-    job.message = e instanceof Error ? e.message : '精确路线生成失败';
-    refreshJobDerived(job);
-    finishJob(job);
-  });
+  scheduleRunJob(job, { onlyFailed });
 
   return snapshot(job);
 }

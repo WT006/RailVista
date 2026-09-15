@@ -8,6 +8,7 @@ import { matchCorridor, sliceCorridorForStops, loadCorridors } from '../services
 import { matchCorridorNetwork } from '../services/corridorNetwork.js';
 import { createRailGeometryJob, getRailGeometryJob } from '../services/railGeometryJob.js';
 import { loadScenicSpots, matchScenicSpotsForRailway } from '../services/scenicSpots.js';
+import { clientKeyFromRequest } from '../lib/clientIdentity.js';
 import { slicePolylineByOd } from '@railvista/shared';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -34,10 +35,6 @@ type Body = {
   /** 仅重算上一趟失败段 */
   retryFailedOnly?: boolean;
 };
-
-function clientKeyOf(c: { req: { header: (name: string) => string | undefined } }): string {
-  return c.req.header('x-forwarded-for')?.split(',')[0]?.trim() || c.req.header('x-real-ip') || 'local';
-}
 
 function tryPresetRailway(trainCode?: string): [number, number][] | null {
   if (!trainCode || !/^Z8991$/i.test(trainCode)) return null;
@@ -93,7 +90,7 @@ railGeometryRoute.post('/jobs', async (c) => {
     const job = createRailGeometryJob({
       stops: namedStops,
       trainCode: body.trainCode,
-      clientKey: clientKeyOf(c),
+      clientKey: clientKeyFromRequest((n) => c.req.header(n)),
       retryFailedOnly: !!body.retryFailedOnly,
     });
     return c.json({
@@ -110,6 +107,8 @@ railGeometryRoute.post('/jobs', async (c) => {
     });
   } catch (e) {
     const err = e as Error & { code?: string };
+    const status =
+      err.code === 'BAD_REQUEST' ? 400 : err.code === 'BUSY' ? 503 : 500;
     return c.json(
       {
         ok: false,
@@ -118,7 +117,7 @@ railGeometryRoute.post('/jobs', async (c) => {
           message: err.message || '创建精确路线任务失败',
         },
       },
-      err.code === 'BAD_REQUEST' ? 400 : 500,
+      status,
     );
   }
 });

@@ -10,8 +10,24 @@ import { useTripStore } from '../stores/tripStore';
 
 function preciseStatusOf(trip: ReturnType<typeof useTripStore>): PreciseCacheStatus {
   const st = trip.preciseJob?.status;
-  if (st === 'done' || st === 'partial') return st;
+  if (st === 'done') return 'done';
+  if (st === 'partial') return 'partial';
+  // 加载中途已有精确折线：落盘为 partial，刷新后仍能显示并继续升级
+  if (
+    (st === 'running' || st === 'queued') &&
+    trip.railwaySource === 'precise' &&
+    trip.railwayCoords.length >= 2
+  ) {
+    return 'partial';
+  }
   if (trip.railwaySource === 'precise') return 'done';
+  return null;
+}
+
+function preciseJobIdOf(trip: ReturnType<typeof useTripStore>): string | null {
+  const job = trip.preciseJob;
+  if (!job?.jobId || job.jobId.startsWith('cached:')) return null;
+  if (job.status === 'queued' || job.status === 'running') return job.jobId;
   return null;
 }
 
@@ -32,6 +48,7 @@ export async function persistActiveTrip(opts?: {
     polylineHint: trip.polylineHint,
     canUpgradePrecise: trip.canUpgradePrecise,
     preciseStatus: preciseStatusOf(trip),
+    preciseJobId: preciseJobIdOf(trip),
     prefs: {
       departureIso: prefs.departureIso,
       calibration: prefs.calibration ? { ...toRaw(prefs.calibration) } : null,

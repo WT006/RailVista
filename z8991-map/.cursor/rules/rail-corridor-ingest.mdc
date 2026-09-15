@@ -1,0 +1,54 @@
+---
+description: 新走廊/干线入库一次性正确的操作清单与验收
+globs: data/presets/corridors/**,data/stations-geo.json,scripts/*corridor*,scripts/*yinlan*,scripts/seed-corridor*,scripts/extract-corridor*,apps/api/src/services/corridors.ts,apps/api/src/services/corridorNetwork.ts,apps/api/src/services/localRails.ts,apps/api/src/services/railGeometryJob.ts,apps/api/src/services/osmRailway.ts,apps/api/src/services/geocode.ts
+alwaysApply: false
+---
+
+# 走廊入库清单（一次性做对）
+
+## A. 提取与写入
+
+1. 用 `scripts/extract-corridor-from-hsr.mjs` / `build-phase*.mjs`，`--axis` 与干线走向一致（ns/ew）。
+2. `stationsHint` 用**本线真实站名**（含方位后缀：兰州西 ≠ 兰州）。
+3. 写入 `data/presets/corridors/{id}.json`：`id` / `name` / `sourceNames` / `railway` / `stationsHint`。
+4. 源轨网断口：跑专用补丁（如 `patch-yinlan-lanzhou-bridge.mjs`）或等价桥接，写清 `note`。
+5. 相关站坐标：`seed-corridor-stations-geo.mjs`（锚站投影），再人工抽查易混站。
+
+## B. 验收命令（必过）
+
+```bash
+# 几何门禁（尖刺/折返/大跳）；默认 heavy 失败
+node scripts/verify-corridor-geometry.mjs
+
+# 清洗（dry-run / 写回）
+node scripts/clean-corridors.mjs
+node scripts/clean-corridors.mjs --write
+
+# 相位自检（端点距离、里程、折返）
+node scripts/verify-phase3-corridors.mjs   # 或对应 phase 脚本
+```
+
+入库前：`verify-corridor-geometry` 不得为 heavy。dirty bbox 走廊优先 `clean-corridors`；救不了再用站链重拼。
+
+## C. 常见坑（入库时主动避开）
+
+| 坑 | 处理 |
+|----|------|
+| 平行高铁/普速站 | 方位冲突逻辑；hints 勿混用「东/西/南/北」错站 |
+| 超长同名干线 prefer | prefer 后必须 allowPrefer:false 回退 |
+| 多走廊接缝反向 | 网络拼接单调性 + OD reverse |
+| 仅中间站有坐标 | OD 首末必须有坐标再 slice；否则勿用中间站冒充 OD |
+| 改 JSON 后仍旧线 | 走廊按目录 mtime 热载；精确段缓存需 bump version |
+| 地图「像从邻市出发」 | 核对站坐标 vs 市名注记（银川站靠近吴忠市注记属正常） |
+| OSM relation 默认 member-order | 兰新曾拼成 ~1.7 万 km；必须 `--from/--to` Dijkstra + 门禁 |
+| Windows 中文 argv 乱码 | `spawn` 不要 `shell:true`；否则 hsr 提取名对不上 |
+| 枢纽 Y/V 短岔 | 贴站后折返再大跳；用 `removeHubRetraces`，勿全局猛删（会砍虹桥） |
+| 走廊起点不在首站 | 沪昆东端曾在闵行、虹桥脱节；补 `_hsr-rails` 进路（`patch-hukun-hongqiao-approach.mjs`） |
+| 裸 hsr 重抽当修复 | 沪昆 sharp 可变差；先 `clean-corridors`，抽完立刻 verify |
+
+细节与复跑：`docs/rail-geometry-quality-playbook.md`。
+
+## D. 改代码时
+
+- 共享包变更后：`pnpm --filter @railvista/shared build`。
+- 补测试：反向 OD 切片、K 车拒高铁、桥接拒远中间站。

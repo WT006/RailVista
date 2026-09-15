@@ -402,7 +402,7 @@ function pathOnGraph(
 
 function cacheKey(stops: LngLat[], trainCode?: string): string {
   const raw = `${trainCode || ''}|${stops.map((s) => `${s.lng.toFixed(3)},${s.lat.toFixed(3)}`).join('|')}`;
-  return `rail:v6:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
+  return `rail:v7:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
 }
 
 export function isHighspeedTrain(trainCode?: string): boolean {
@@ -491,8 +491,9 @@ function sampleCorridor(from: LngLat, to: LngLat, stepKm = 35): LngLat[] {
 
 function segmentCacheKey(from: LngLat, to: LngLat, preferHs: boolean): string {
   const r = (p: LngLat) => `${p.lng.toFixed(3)},${p.lat.toFixed(3)}`;
-  const raw = `${preferHs ? 'hs' : 'all'}|${r(from)}|${r(to)}`;
-  return `railseg:v6:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
+  const raw = `${preferHs ? 'hs' : 'conv'}|${r(from)}|${r(to)}`;
+  // v7：分轨本地图 + Overpass 可选
+  return `railseg:v7:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
 }
 
 function pathFromWays(ways: OsmWay[], from: LngLat, to: LngLat): LngLat[] | null {
@@ -501,9 +502,15 @@ function pathFromWays(ways: OsmWay[], from: LngLat, to: LngLat): LngLat[] | null
   return pathOnGraph(ways, adj, from, to, MAX_SNAP_KM);
 }
 
-/** 本地高铁轨网：不依赖 Overpass，国内环境稳定 */
-function tryLocalSegment(from: LngLat, to: LngLat): LngLat[] | null {
-  return buildLocalSegment(from, to);
+/** Overpass 可选：RAIL_OVERPASS=0 时跳过（弱网/离线） */
+export function isOverpassEnabled(): boolean {
+  const v = String(process.env.RAIL_OVERPASS ?? '1').trim().toLowerCase();
+  return !(v === '0' || v === 'false' || v === 'off' || v === 'no');
+}
+
+/** 本地轨网：G/D/C→HSR 图；K/T/Z→普速图（禁止交叉） */
+function tryLocalSegment(from: LngLat, to: LngLat, preferHs: boolean): LngLat[] | null {
+  return buildLocalSegment(from, to, { highspeed: preferHs });
 }
 
 async function fetchWaysForSegment(from: LngLat, to: LngLat, preferHs: boolean): Promise<OsmWay[]> {
@@ -513,7 +520,9 @@ async function fetchWaysForSegment(from: LngLat, to: LngLat, preferHs: boolean):
   // 走廊半径：短段紧一点，长段放宽以覆盖弯道偏离直线采样
   const radiusM = spanKm < 80 ? 12000 : spanKm < 200 ? 15000 : 18000;
   const samples = sampleCorridor(from, to, spanKm < 120 ? 30 : 40);
-  const fetchTimeout = 18000;
+  const fetchTimeout = 12_000;
+  // 段级只打 1 个镜像，避免 3×18s 拖死整趟 job
+  const opOpts = { maxMirrors: 1 };
 
   const merge = (ways: OsmWay[]) => {
     for (const w of ways) byId.set(w.id, w);
@@ -523,13 +532,13 @@ async function fetchWaysForSegment(from: LngLat, to: LngLat, preferHs: boolean):
   try {
     const around = aroundChain(samples, radiusM);
     const query = `
-[out:json][timeout:15];
+[out:json][timeout:12];
 (
   way["railway"="rail"]${hs}(${around});
 );
 out geom;
 `.trim();
-    merge(await overpass(query, fetchTimeout));
+    merge(await overpass(query, fetchTimeout, opOpts));
   } catch (e) {
     console.warn('[rail-seg] corridor failed', e);
   }
@@ -541,13 +550,13 @@ out geom;
       const bbox = bboxOfStops([from, to], pad);
       const { south, west, north, east } = bbox;
       const query = `
-[out:json][timeout:15];
+[out:json][timeout:12];
 (
   way["railway"="rail"]${hs}(${south},${west},${north},${east});
 );
 out geom;
 `.trim();
-      merge(await overpass(query, fetchTimeout));
+      merge(await overpass(query, fetchTimeout, opOpts));
     } catch (e) {
       console.warn('[rail-seg] bbox failed', e);
     }
@@ -567,7 +576,8 @@ function toCoordPairs(points: LngLat[]): [number, number][] {
 }
 
 /**
- * 单站间段精确折线：优先本地高铁轨网，失败再 Overpass。
+ * 单站间段精确折线：本地分轨图优先，Overpass 可选兜底。
+ * G/D/C → 仅 HSR 本地图；K/T/Z → 仅普速本地图（禁止交叉）。
  */
 export async function buildSegmentGeometry(
   from: LngLat,
@@ -593,26 +603,28 @@ export async function buildSegmentGeometry(
     return { coords: cached, ok: true, fromCache: true };
   }
 
-  // 1) 本地轨网仅为高铁仿真；普速车（K/T/Z…）禁止套用，否则银川→中卫会贴银兰经吴忠而跳过青铜峡
-  if (preferHs) {
-    try {
-      const localLine = tryLocalSegment(from, to);
-      if (localLine && localLine.length >= 2) {
-        const simplified = simplify(localLine, 0.45);
-        const gate = acceptSegmentGeometry(simplified, from, to);
-        if (gate.ok) {
-          cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
-          console.log(`[rail-seg] ok via local pts=${simplified.length}`);
-          return { coords: simplified, ok: true, fromCache: false, reason: 'local' };
-        }
-        console.warn(`[rail-seg] local rejected ${gate.reason}`);
+  // 1) 本地轨网（分轨）
+  try {
+    const localLine = tryLocalSegment(from, to, preferHs);
+    if (localLine && localLine.length >= 2) {
+      const simplified = simplify(localLine, 0.45);
+      const gate = acceptSegmentGeometry(simplified, from, to);
+      if (gate.ok) {
+        cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
+        console.log(`[rail-seg] ok via local-${preferHs ? 'hsr' : 'rail'} pts=${simplified.length}`);
+        return { coords: simplified, ok: true, fromCache: false, reason: 'local' };
       }
-    } catch (e) {
-      console.warn('[rail-seg] local failed', e);
+      console.warn(`[rail-seg] local rejected ${gate.reason}`);
     }
+  } catch (e) {
+    console.warn('[rail-seg] local failed', e);
   }
 
-  // 2) Overpass 兜底
+  // 2) Overpass 可选兜底
+  if (!isOverpassEnabled()) {
+    return { coords: [from, to], ok: false, fromCache: false, reason: 'overpass_disabled' };
+  }
+
   let lastReason = 'no_ways';
   const tryOsm = async (hs: boolean): Promise<LngLat[] | null> => {
     const ways = await fetchWaysForSegment(from, to, hs);
@@ -628,6 +640,7 @@ export async function buildSegmentGeometry(
     return line;
   };
 
+  // 高铁可试 HS；普速禁止退回 highspeed=yes（避免贴银兰等）
   let line = preferHs ? await tryOsm(true) : await tryOsm(false);
   if ((!line || line.length < 2) && preferHs) {
     line = await tryOsm(false);
@@ -669,6 +682,9 @@ export async function buildRailGeometry(
   if (cached) return cached;
 
   const preferHs = isHighspeedTrain(trainCode);
+  if (!isOverpassEnabled()) {
+    return { coords: [], source: 'none', segmentsOk: 0, segmentsTotal: stops.length - 1 };
+  }
   let ways = await fetchWaysAlongRoute(stops, preferHs);
   if (ways.length < 2) {
     return { coords: [], source: 'none', segmentsOk: 0, segmentsTotal: stops.length - 1 };

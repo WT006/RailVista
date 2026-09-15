@@ -9,6 +9,8 @@ apps/web/.env.production
 apps/api/.env
 config.js
 data/station_name.cache.json
+data/cache/
+data/rails/_china-railway.osm.pbf
 data/presets/corridors/_hsr-rails.geojson
 .DS_Store
 .idea

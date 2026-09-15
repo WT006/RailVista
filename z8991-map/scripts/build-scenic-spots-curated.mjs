@@ -1042,21 +1042,23 @@ spots.push(
 spots.push(
   spot({
     id: 'loushanguan',
-    name: '娄山关一带',
-    lng: 106.85,
-    lat: 28.05,
-    visibility: 'window',
+    name: '娄山关',
+    lng: 106.843,
+    lat: 28.053,
+    visibility: 'distant',
     category: 'mountain',
-    intro: '黔北娄山关山地，渝贵铁路穿行喀斯特峡谷与关隘风光。',
+    maxDistKm: 12,
+    intro: '黔北娄山关关隘与喀斯特山地（关城一带）；渝贵铁路从关隘一侧穿行，车窗可见峰丛峡谷。',
   }),
   spot({
     id: 'zunyi-karst',
     name: '黔北喀斯特峡谷',
-    lng: 106.9,
-    lat: 27.7,
+    lng: 106.97,
+    lat: 27.65,
     visibility: 'window',
     category: 'gorge',
-    intro: '遵义周边峰丛峡谷，高铁桥隧与岩溶地貌交织。',
+    maxDistKm: 10,
+    intro: '遵义以南峰丛峡谷与河谷（地貌范围内靠铁路东侧取点）；高铁桥隧与岩溶同框。',
   }),
 );
 
@@ -2259,42 +2261,46 @@ spots.push(
     intro: '渝利铁路东端利川，衔接宜万线，齐岳山高原门户。',
   }),
 
-  // 渝贵
+  // 渝贵（大面积靠轨 2～4 km，禁止钉在站房/轨面）
   spot({
     id: 'yugui-qijiang',
     name: '綦江山地',
-    lng: 106.724081,
-    lat: 28.885998,
+    lng: 106.6109,
+    lat: 29.1389,
     visibility: 'window',
     category: 'mountain',
-    intro: '重庆西出城后綦江东一带山地，渝贵铁路北段窗景。',
+    maxDistKm: 10,
+    intro: '綦江东站一带渝南山地丘陵（靠铁路东侧取点）；重庆西出城后北段窗景。',
   }),
   spot({
     id: 'yugui-tongzi',
     name: '桐梓娄山北麓',
-    lng: 106.801058,
-    lat: 28.588455,
+    lng: 106.8331,
+    lat: 28.4663,
     visibility: 'window',
     category: 'mountain',
-    intro: '桐梓东接近娄山关，黔北喀斯特峡谷渐显。',
+    maxDistKm: 10,
+    intro: '桐梓东站以东娄山北麓喀斯特（靠铁路取点）；再往南即娄山关段。',
   }),
   spot({
     id: 'yugui-zunyi-city',
     name: '遵义黔北风光',
-    lng: 106.888424,
-    lat: 28.029856,
+    lng: 106.972,
+    lat: 27.655,
     visibility: 'window',
     category: 'other',
-    intro: '遵义站区周边黔北峰丛与河谷，红色故地与喀斯特同在。',
+    maxDistKm: 10,
+    intro: '遵义站东南侧黔北峰丛与河谷（靠铁路取点，非站房）；红色故地与喀斯特同在。',
   }),
   spot({
     id: 'yugui-xifeng',
     name: '息烽峡谷',
-    lng: 106.903861,
-    lat: 27.597521,
+    lng: 106.8278,
+    lat: 27.2799,
     visibility: 'window',
     category: 'gorge',
-    intro: '息烽—贵阳北前峡谷与峰林，渝贵线南段典型黔中地貌。',
+    maxDistKm: 10,
+    intro: '息烽站东侧峡谷峰林（靠铁路取点）；渝贵线南段典型黔中地貌。',
   }),
 
   // 京张补强
@@ -2740,11 +2746,12 @@ spots.push(
   spot({
     id: 'yinxi-xianyang',
     name: '咸阳渭河平原',
-    lng: 108.756859,
-    lat: 34.387062,
+    lng: 108.73,
+    lat: 34.355,
     visibility: 'window',
     category: 'other',
-    intro: '接近西安北时渭河平原田园，银西高铁关中终点段。',
+    maxDistKm: 10,
+    intro: '咸阳—西安之间渭河及沿岸平原田园（大面积靠铁路南侧取点）；银西高铁关中终点段窗外可见。',
   }),
 
   // 郑渝（0）
@@ -3111,33 +3118,36 @@ spots.push(
     intro: '独山一带黔南山地，贵南高铁出都匀后的峰丛段落。',
   }),
 
-  // 大西：平遥、黄河方向
+  // 大西：平遥、黄河、太原盆地
   spot({
     id: 'daxi-pingyao',
-    name: '平遥古城方向',
-    lng: 111.864312,
-    lat: 36.695351,
+    name: '平遥古城',
+    lng: 112.15444,
+    lat: 37.20139,
     visibility: 'distant',
     category: 'other',
-    intro: '大西高铁平遥古城站，世界文化遗产平遥古城门户。',
+    maxDistKm: 12,
+    intro: '世界文化遗产平遥古城本体（县城古城墙一带）；大西高铁平遥古城站在其西南约十余公里，车窗可远眺古城。',
   }),
   spot({
     id: 'daxi-yellow-river-yongji',
-    name: '永济黄河方向',
-    lng: 111.282404,
-    lat: 35.611928,
-    visibility: 'distant',
+    name: '永济黄河',
+    lng: 110.18,
+    lat: 35.02,
+    visibility: 'window',
     category: 'other',
-    intro: '运城—永济北一带黄河东岸，大西高铁晋陕交界风光。',
+    maxDistKm: 10,
+    intro: '永济以西黄河河道与滩地（大面积水体靠大西高铁西侧取点）；晋陕交界窗外可见黄河。',
   }),
   spot({
     id: 'daxi-taiyuan-basin',
     name: '太原盆地',
-    lng: 112.662334,
-    lat: 37.754023,
+    lng: 112.68,
+    lat: 37.7,
     visibility: 'window',
     category: 'other',
-    intro: '太原南周边晋中盆地田园，大西高铁中段都会段。',
+    maxDistKm: 10,
+    intro: '太原南以南晋中盆地田园（盆地范围内靠近大西高铁取点）。',
   }),
 
   // 沈大：渤海/大连
@@ -3311,12 +3321,13 @@ spots.push(
   // 徐兰：华山、龙门
   spot({
     id: 'xulan-huashan',
-    name: '华山北',
-    lng: 109.729735,
-    lat: 34.52314,
+    name: '华山',
+    lng: 110.08083,
+    lat: 34.46333,
     visibility: 'distant',
     category: 'mountain',
-    intro: '徐兰高铁华山北站，西岳华山是本线最醒目山岳看点。',
+    maxDistKm: 20,
+    intro: '西岳华山（华山风景名胜区主峰一带）；徐兰高铁华山北站在其北侧约十余公里，是本线最醒目的山岳远眺。',
   }),
   spot({
     id: 'xulan-longmen',
@@ -3332,11 +3343,11 @@ spots.push(
     id: 'xulan-tianshui',
     name: '天水秦岭北麓',
     lng: 105.7,
-    lat: 34.55,
+    lat: 34.65,
     visibility: 'window',
     category: 'mountain',
-    maxDistKm: 15,
-    intro: '天水南一带秦岭北麓，徐兰高铁入甘前的山地段落。',
+    maxDistKm: 12,
+    intro: '天水南一带秦岭北麓山地（山麓范围内靠近徐兰高铁取点）；入甘前窗外可见北麓起伏。',
   }),
 
   // 京沪：泰山、长江
@@ -3372,6 +3383,638 @@ spots.push(
   }),
 );
 
+// —— 车窗风景总清单补缺（2026-09）：公开窗景名录对照后入库 ——
+// 原则：只收「车厢内肉眼可观赏」的核心/出名点；季节变体、观光小火车、说不清可见性的点不收。
+spots.push(
+  // 高原雪域补缺
+  spot({
+    id: 'lamulatso-distant',
+    name: '拉姆拉措方向（远眺）',
+    lng: 91.75,
+    lat: 29.15,
+    visibility: 'distant',
+    category: 'lake',
+    maxDistKm: 35,
+    intro: '山南段远观高山圣湖方向，青藏/拉林沿线藏南高原湖泊远景。',
+  }),
+  spot({
+    id: 'baima-snow-mountain',
+    name: '白马雪山',
+    lng: 99.2,
+    lat: 28.25,
+    visibility: 'window',
+    category: 'mountain',
+    maxDistKm: 15,
+    intro: '丽香铁路反复穿越白马雪山支脉，高山针叶林与雪峰连绵，滇西北典型窗景。',
+  }),
+  spot({
+    id: 'meili-snow-mountain-distant',
+    name: '梅里雪山（远眺）',
+    lng: 98.85,
+    lat: 28.4,
+    visibility: 'distant',
+    category: 'mountain',
+    maxDistKm: 35,
+    intro: '天气晴好时，丽香铁路白马雪山隧道一带可远眺梅里群峰。',
+  }),
+  spot({
+    id: 'dukezong-distant',
+    name: '独克宗古城方向',
+    lng: 99.705,
+    lat: 27.825,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '香格里拉段远观独克宗古城与高原城镇天际，进站前的人文门户。',
+  }),
+  spot({
+    id: 'guozigou-bridge',
+    name: '果子沟大桥',
+    lng: 81.12,
+    lat: 44.42,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '精伊霍铁路天山山谷 S 型巨型桥梁，雪山为背景，北疆标志性跨谷工程。',
+  }),
+  spot({
+    id: 'sailimu-lake-distant',
+    name: '赛里木湖（远眺）',
+    lng: 81.15,
+    lat: 44.58,
+    visibility: 'distant',
+    category: 'lake',
+    maxDistKm: 25,
+    intro: '精伊霍铁路晴朗天气可远眺赛里木湖湛蓝湖面，天山明珠。',
+  }),
+  spot({
+    id: 'nalati-grassland-distant',
+    name: '那拉提—巩乃斯草原方向',
+    lng: 84.0,
+    lat: 43.25,
+    visibility: 'distant',
+    category: 'grassland',
+    maxDistKm: 30,
+    intro: '精伊霍铁路天山腹地，那拉提/巩乃斯草原与云杉林远景。',
+  }),
+  spot({
+    id: 'fuxian-lake-distant',
+    name: '抚仙湖方向',
+    lng: 102.88,
+    lat: 24.48,
+    visibility: 'distant',
+    category: 'lake',
+    maxDistKm: 25,
+    intro: '昆玉河铁路玉溪段远眺抚仙湖，高原深水湖泊窗景。',
+  }),
+  spot({
+    id: 'caohai-weining',
+    name: '威宁草海',
+    lng: 104.25,
+    lat: 26.86,
+    visibility: 'window',
+    category: 'lake',
+    maxDistKm: 12,
+    intro: '内昆铁路威宁段高原淡水湖与候鸟湿地，冬季黑颈鹤栖息地。',
+  }),
+
+  // 山川峡谷与喀斯特补缺
+  spot({
+    id: 'beipanjiang-bridge',
+    name: '北盘江特大桥',
+    lng: 105.155,
+    lat: 25.905,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '沪昆高铁跨北盘江大峡谷，世界级高墩桥飞越深谷，桥下喀斯特绝壁。',
+  }),
+  spot({
+    id: 'malinghe-canyon',
+    name: '马岭河峡谷瀑布群',
+    lng: 104.92,
+    lat: 25.12,
+    visibility: 'window',
+    category: 'gorge',
+    maxDistKm: 12,
+    intro: '贵广高铁兴义段马岭河地缝与瀑布群，雾气氤氲的峡谷窗景。',
+  }),
+  spot({
+    id: 'lancang-bridge-lixiang',
+    name: '澜沧江特大桥（丽香）',
+    lng: 99.45,
+    lat: 27.55,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '丽香铁路大跨度拱桥飞越澜沧江峡谷，脚下激流、两侧高山峡谷。',
+  }),
+  spot({
+    id: 'nujiang-bridge-darui',
+    name: '怒江特大桥方向',
+    lng: 98.88,
+    lat: 25.12,
+    visibility: 'distant',
+    category: 'engineering',
+    maxDistKm: 20,
+    intro: '大瑞铁路保山段跨怒江超级高桥方向，怒江大峡谷远景。',
+  }),
+  spot({
+    id: 'shuihong-spiral',
+    name: '水红铁路四层螺旋展线',
+    lng: 104.55,
+    lat: 26.15,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '水红铁路乌蒙山区火车绕山盘旋的四层螺旋展线，河谷村寨层层铺开。',
+  }),
+  spot({
+    id: 'yulong-river-karst',
+    name: '遇龙河峰丛',
+    lng: 110.48,
+    lat: 24.75,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '贵广高铁阳朔段遇龙河蜿蜒穿峰林，河道与馒头峰同框。',
+  }),
+  spot({
+    id: 'wanfenglin',
+    name: '万峰林',
+    lng: 104.95,
+    lat: 25.15,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '南昆/贵广兴义一带大片锥状峰林铺展田野，西南喀斯特标志地貌。',
+  }),
+  spot({
+    id: 'xiaozhai-tiankeng-distant',
+    name: '小寨天坑方向',
+    lng: 109.45,
+    lat: 31.08,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 25,
+    intro: '郑渝高铁奉节段远眺小寨天坑喀斯特方向，三峡库区奇观。',
+  }),
+  spot({
+    id: 'xingwen-stone-sea',
+    name: '兴文石海方向',
+    lng: 105.1,
+    lat: 28.3,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 20,
+    intro: '成贵高铁兴文段石海喀斯特峰丛方向，川南石林地貌。',
+  }),
+  spot({
+    id: 'zhijin-karst',
+    name: '织金喀斯特峰丛',
+    lng: 105.75,
+    lat: 26.65,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '沪昆高铁织金段喀斯特峰丛与山地田园，黔中岩溶窗景。',
+  }),
+  spot({
+    id: 'wugongshan-distant',
+    name: '武功山云端草甸方向',
+    lng: 114.18,
+    lat: 27.45,
+    visibility: 'distant',
+    category: 'grassland',
+    maxDistKm: 30,
+    intro: '沪昆高铁萍乡段远眺武功山高山草甸与云海方向。',
+  }),
+  spot({
+    id: 'zhangshiyan-taihang',
+    name: '太行嶂石岩地貌',
+    lng: 113.7,
+    lat: 37.55,
+    visibility: 'window',
+    category: 'gorge',
+    maxDistKm: 15,
+    intro: '石太/太行沿线阳泉一带峡谷与嶂石岩层状地貌，华北山地窗景。',
+  }),
+
+  // 森林草原荒漠补缺
+  spot({
+    id: 'daxinganling-forest',
+    name: '大兴安岭林海',
+    lng: 121.5,
+    lat: 50.4,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '滨洲/牙林/漠河线落叶松与白桦林绵延，东北林海雪原核心段。',
+  }),
+  spot({
+    id: 'hulunbuir-grassland',
+    name: '呼伦贝尔草原',
+    lng: 119.75,
+    lat: 49.2,
+    visibility: 'window',
+    category: 'grassland',
+    maxDistKm: 15,
+    intro: '滨洲铁路海拉尔—满洲里段无边草场与蒙古包，北疆草原窗景。',
+  }),
+  spot({
+    id: 'mingsha-mountain',
+    name: '鸣沙山沙漠',
+    lng: 94.68,
+    lat: 40.08,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 12,
+    intro: '敦格铁路敦煌段沙丘起伏，与月牙泉同框的沙漠窗景。',
+  }),
+  spot({
+    id: 'yueyaquan-distant',
+    name: '月牙泉方向',
+    lng: 94.67,
+    lat: 40.09,
+    visibility: 'distant',
+    category: 'lake',
+    maxDistKm: 15,
+    intro: '敦煌鸣沙山环抱的月牙泉方向，敦格铁路进敦煌门户人文自然景观。',
+  }),
+  spot({
+    id: 'gurbantunggut-desert',
+    name: '古尔班通古特沙漠',
+    lng: 87.5,
+    lat: 44.5,
+    visibility: 'window',
+    category: 'desert',
+    maxDistKm: 15,
+    intro: '北疆铁路半固定沙丘与梭梭林，准噶尔盆地荒漠穿行。',
+  }),
+  spot({
+    id: 'mengdong-bamboo-sea',
+    name: '猛洞河竹海',
+    lng: 109.95,
+    lat: 28.55,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '焦柳/张吉怀湘西段猛洞河沿岸翠绿竹海连绵。',
+  }),
+
+  // 江河湖海湿地补缺
+  spot({
+    id: 'yellow-river-lankao-bend',
+    name: '黄河兰考九曲弯',
+    lng: 114.82,
+    lat: 34.82,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '陇海高铁兰考段黄河河道蜿蜒，九曲黄河下游标志性河弯。',
+  }),
+  spot({
+    id: 'wanquan-river',
+    name: '万泉河湿地',
+    lng: 110.42,
+    lat: 19.22,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 10,
+    intro: '海南环岛高铁东线万泉河河道与椰林湿地，热带水乡窗景。',
+  }),
+  spot({
+    id: 'boao-jade-shoal',
+    name: '博鳌玉带滩',
+    lng: 110.57,
+    lat: 19.15,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 10,
+    intro: '海南环岛高铁博鳌一带玉带滩与入海口，碧蓝海岸线。',
+  }),
+  spot({
+    id: 'beibu-gulf-xiwan',
+    name: '北部湾西湾跨海',
+    lng: 108.35,
+    lat: 21.62,
+    visibility: 'on_track',
+    category: 'other',
+    intro: '防东铁路西湾跨海大桥段，列车近海穿行北部湾。',
+  }),
+  spot({
+    id: 'qiongzhou-strait-ferry',
+    name: '琼州海峡火车轮渡',
+    lng: 110.18,
+    lat: 20.05,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '粤海铁路列车开上渡轮跨琼州海峡，海上全景的独特车窗体验。',
+  }),
+
+  // 花海田园村落补缺
+  spot({
+    id: 'luoping-rapeseed',
+    name: '罗平金鸡峰丛油菜花',
+    lng: 104.32,
+    lat: 24.88,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '南昆铁路罗平段 2–3 月喀斯特峰林与金色油菜花海同框，滇东花季名景。',
+  }),
+  spot({
+    id: 'hani-terrace-distant',
+    name: '元阳哈尼梯田方向',
+    lng: 102.75,
+    lat: 23.12,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 35,
+    intro: '玉蒙铁路元阳段远眺哈尼梯田，冬季灌水期如镜面梯田。',
+  }),
+  spot({
+    id: 'congjiang-dong-village',
+    name: '从江侗寨鼓楼群',
+    lng: 108.9,
+    lat: 25.75,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '贵广高铁从江段半山腰侗族村寨与鼓楼群，黔东南人文窗景。',
+  }),
+  spot({
+    id: 'tulou-longyan',
+    name: '闽西土楼群',
+    lng: 117.0,
+    lat: 24.65,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 20,
+    intro: '龙厦铁路龙岩段圆形土楼群方向，客家民居世界遗产远景。',
+  }),
+  spot({
+    id: 'wulin-ancient-village',
+    name: '梧林古厝红砖村',
+    lng: 118.52,
+    lat: 24.72,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '福厦高铁泉州段红砖飞檐闽南古村方向，海丝人文窗景。',
+  }),
+  spot({
+    id: 'hakka-weilong-ganzhou',
+    name: '赣南客家围屋方向',
+    lng: 115.0,
+    lat: 25.85,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 20,
+    intro: '京九高铁赣州段赣南圆形围屋方向，客家聚落远景。',
+  }),
+  spot({
+    id: 'gongyi-imperial-tombs',
+    name: '北宋皇陵石像生麦田',
+    lng: 112.95,
+    lat: 34.65,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 10,
+    intro: '陇海高铁巩义段麦田中散布千年石像生，麦浪与皇陵同框。',
+  }),
+  spot({
+    id: 'liangshan-terraces',
+    name: '大凉山梯田',
+    lng: 102.85,
+    lat: 28.15,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '成昆铁路大凉山段层层叠叠水田如镜，彝族山地田园。',
+  }),
+
+  // 历史人文补缺
+  spot({
+    id: 'dali-three-pagodas',
+    name: '崇圣寺三塔方向',
+    lng: 100.15,
+    lat: 25.71,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '大丽铁路洱海畔远眺大理古城与崇圣寺三塔。',
+  }),
+  spot({
+    id: 'jianshui-double-dragon',
+    name: '建水双龙桥方向',
+    lng: 102.82,
+    lat: 23.62,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '玉蒙铁路建水段十七孔双龙桥与古城方向。',
+  }),
+  spot({
+    id: 'tengwangge',
+    name: '滕王阁方向',
+    lng: 115.88,
+    lat: 28.68,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '沪昆高铁南昌段赣江边滕王阁古楼方向。',
+  }),
+  spot({
+    id: 'yellow-crane-tower-distant',
+    name: '黄鹤楼方向',
+    lng: 114.3,
+    lat: 30.55,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '京广高铁武汉段长江边黄鹤楼方向，江城标志。',
+  }),
+  spot({
+    id: 'wudang-mountain-distant',
+    name: '武当山方向',
+    lng: 111.0,
+    lat: 32.4,
+    visibility: 'distant',
+    category: 'mountain',
+    maxDistKm: 30,
+    intro: '汉十高铁十堰段远眺武当山道教名山。',
+  }),
+  spot({
+    id: 'gulongzhong-distant',
+    name: '古隆中方向',
+    lng: 112.05,
+    lat: 32.05,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '汉十高铁襄阳段古隆中三国遗迹方向。',
+  }),
+  spot({
+    id: 'heijing-ancient-town',
+    name: '黑井古镇',
+    lng: 101.55,
+    lat: 25.4,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 8,
+    intro: '成昆铁路黑井站千年盐都古镇，峡谷中的人文停靠点。',
+  }),
+  spot({
+    id: 'shanhaiguan-great-wall',
+    name: '山海关长城',
+    lng: 119.75,
+    lat: 40.01,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 10,
+    intro: '津山铁路渤海之滨山海关长城关隘，「天下第一关」。',
+  }),
+  spot({
+    id: 'hanguguan-distant',
+    name: '函谷关方向',
+    lng: 110.85,
+    lat: 34.65,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '陇海铁路灵宝段古函谷关关隘方向。',
+  }),
+  spot({
+    id: 'lingqu-canal',
+    name: '兴安灵渠',
+    lng: 110.65,
+    lat: 25.6,
+    visibility: 'window',
+    category: 'engineering',
+    maxDistKm: 10,
+    intro: '衡柳高铁兴安段现代高铁与千年灵渠运河同框。',
+  }),
+  spot({
+    id: 'leifeng-pagoda-distant',
+    name: '西湖雷峰塔方向',
+    lng: 120.15,
+    lat: 30.23,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '沪昆/杭黄高铁杭州段西湖雷峰塔方向。',
+  }),
+
+  // 铁路工程与城市天际线补缺
+  spot({
+    id: 'yixiantian-bridge-chengkun',
+    name: '成昆一线天桥',
+    lng: 102.92,
+    lat: 29.25,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '成昆铁路峡谷中单拱石桥「一线天」，绝壁夹江的工程奇观。',
+  }),
+  spot({
+    id: 'qingshuihe-bridge-qingzang',
+    name: '清水河特大桥',
+    lng: 93.05,
+    lat: 35.35,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '青藏铁路可可西里超长铁路桥，兼作藏羚羊迁徙通道的标志工程。',
+  }),
+  spot({
+    id: 'xingfuyuan-bridge',
+    name: '幸福源大桥（阳朔）',
+    lng: 110.55,
+    lat: 24.72,
+    visibility: 'on_track',
+    category: 'engineering',
+    intro: '贵广高铁阳朔段横跨峰林峡谷的幸福源大桥，高铁穿画而行。',
+  }),
+  spot({
+    id: 'lujiazui-skyline',
+    name: '上海陆家嘴天际线',
+    lng: 121.5,
+    lat: 31.24,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 15,
+    intro: '京沪/沪昆高铁上海端可远眺陆家嘴摩天楼群天际线。',
+  }),
+  spot({
+    id: 'zhujiang-newtown',
+    name: '广州珠江新城天际线',
+    lng: 113.32,
+    lat: 23.12,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '京广/广深港高铁广州段珠江新城 CBD 天际线。',
+  }),
+  spot({
+    id: 'chongqing-rivers-confluence',
+    name: '重庆两江交汇山城',
+    lng: 106.58,
+    lat: 29.56,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '嘉陵江与长江交汇的山城江景，郑渝/成渝高铁重庆段标志窗景。',
+  }),
+  spot({
+    id: 'hzmb-distant',
+    name: '港珠澳大桥方向',
+    lng: 113.55,
+    lat: 22.28,
+    visibility: 'distant',
+    category: 'engineering',
+    maxDistKm: 25,
+    intro: '广深港高铁珠海/港珠澳方向远眺跨海大桥群。',
+  }),
+  spot({
+    id: 'wuhan-yangtze-bridge',
+    name: '武汉长江大桥',
+    lng: 114.289,
+    lat: 30.55,
+    visibility: 'window',
+    category: 'engineering',
+    maxDistKm: 8,
+    intro: '京广铁路经典公铁两用桥，列车过桥可俯瞰长江与龟蛇二山。',
+  }),
+  spot({
+    id: 'nanjing-yangtze-bridge',
+    name: '南京长江大桥',
+    lng: 118.75,
+    lat: 32.12,
+    visibility: 'window',
+    category: 'engineering',
+    maxDistKm: 8,
+    intro: '京沪铁路南京长江大桥，公铁两用经典江桥窗景。',
+  }),
+
+  // 生态窗景（可辨识栖息地段）
+  spot({
+    id: 'banna-elephant-habitat',
+    name: '西双版纳亚洲象栖息山林',
+    lng: 100.8,
+    lat: 22.05,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 12,
+    intro: '中老铁路西双版纳段热带雨林边缘，傍晚偶见亚洲象活动的林地窗景带。',
+  }),
+  spot({
+    id: 'baima-snub-nosed-monkey-forest',
+    name: '白马雪山滇金丝猴山林',
+    lng: 99.18,
+    lat: 28.3,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 20,
+    intro: '丽香铁路白马雪山段高山针叶林，滇金丝猴栖息地山林远景。',
+  }),
+);
+
 // 去重校验
 const ids = new Set();
 for (const s of spots) {
@@ -3379,26 +4022,32 @@ for (const s of spots) {
   ids.add(s.id);
 }
 
-/** 青藏点：地物中心常离轨过远，投影到 z8991-railway 作为贴线观景参考点 */
-const QINGZANG_SNAP_IDS = new Set([
+/** 青藏广域点：仅允许大面积/廊道类向 z8991-railway 靠拢。
+ * 具名山峰/圣湖/地热等按「钉本体」规则，禁止吸到轨上。 */
+const QINGZANG_AREA_SNAP_IDS = new Set([
   'qinghai-lake',
-  'chaerhan-salt-bridge',
   'qaidam-gobi',
-  'kunlun-pass',
-  'yuzhu-peak',
   'kekexili',
   'wudaoliang',
-  'fenghuoshan',
   'tuotuohe-source',
   'tongtian-river',
   'sanjiangyuan',
-  'tanggula-pass',
-  'geladandong',
-  'cuona-lake',
   'qiangtang-grassland',
+  'cuona-lake',
+]);
+
+/** 青藏具名点：禁止 snap；靠 maxDistKm 匹配 */
+const QINGZANG_NAMED_NO_SNAP = new Set([
+  'yuzhu-peak',
+  'geladandong',
   'nyainqentanglha',
   'namtso-distant',
   'yangbajing-geothermal',
+  'kunlun-pass',
+  'fenghuoshan',
+  'tanggula-pass',
+  'chaerhan-salt-bridge',
+  'qingshuihe-bridge-qingzang',
 ]);
 
 function haversineKm(a, b) {
@@ -3413,23 +4062,18 @@ function haversineKm(a, b) {
   return 6371 * 2 * Math.asin(Math.sqrt(h));
 }
 
-function snapQingzangToRailway(list) {
+function snapQingzangAreasToRailway(list) {
   const railPath = join(__dirname, '../data/presets/z8991-railway.json');
   if (!existsSync(railPath)) {
-    console.warn('skip qingzang snap: missing z8991-railway.json');
+    console.warn('skip qingzang area snap: missing z8991-railway.json');
     return;
   }
   const coords = JSON.parse(readFileSync(railPath, 'utf8'));
-  const path = coords.map(([lng, lat], index) => ({ lng, lat, index, distFromStart: 0 }));
-  let lengthKm = 0;
-  for (let i = 1; i < path.length; i += 1) {
-    lengthKm += haversineKm(path[i - 1], path[i]);
-    path[i].distFromStart = lengthKm;
-  }
+  const path = coords.map(([lng, lat]) => ({ lng, lat }));
   const defaults = { on_track: 3, window: 8, distant: 35 };
   let snapped = 0;
   for (const s of list) {
-    if (!QINGZANG_SNAP_IDS.has(s.id) || lengthKm <= 0) continue;
+    if (!QINGZANG_AREA_SNAP_IDS.has(s.id) || QINGZANG_NAMED_NO_SNAP.has(s.id)) continue;
     let best = { distKm: Infinity, point: path[0] };
     for (let i = 1; i < path.length; i += 1) {
       const a = path[i - 1];
@@ -3445,22 +4089,45 @@ function snapQingzangToRailway(list) {
       if (distKm < best.distKm) best = { distKm, point };
     }
     const max = s.maxDistKm ?? defaults[s.visibility] ?? 8;
+    // 大面积：向轨靠拢，但保留在地貌侧（不完全吸到轨面）
     if (best.distKm <= max * 0.85) continue;
-    s.lng = Number(best.point.lng.toFixed(6));
-    s.lat = Number(best.point.lat.toFixed(6));
-    if (s.visibility === 'on_track') delete s.maxDistKm;
-    if (s.visibility === 'window' && s.maxDistKm && s.maxDistKm > 12) s.maxDistKm = 12;
+    const pull = 0.55;
+    s.lng = Number((s.lng + (best.point.lng - s.lng) * pull).toFixed(6));
+    s.lat = Number((s.lat + (best.point.lat - s.lat) * pull).toFixed(6));
+    if (s.visibility === 'window' && (!s.maxDistKm || s.maxDistKm < 12)) s.maxDistKm = 12;
     snapped += 1;
   }
-  if (snapped) console.log(`qingzang snap: ${snapped} spots -> z8991-railway`);
+  if (snapped) console.log(`qingzang area pull: ${snapped} spots toward z8991-railway`);
 }
 
-snapQingzangToRailway(spots);
+function applyCalibrationPatches(list) {
+  const patchPath = join(__dirname, '../data/presets/scenic-spot-calibration-patches.json');
+  if (!existsSync(patchPath)) {
+    console.warn('skip calibration patches: file missing');
+    return;
+  }
+  const doc = JSON.parse(readFileSync(patchPath, 'utf8'));
+  const byId = new Map((doc.patches || []).map((p) => [p.id, p]));
+  let n = 0;
+  for (const s of list) {
+    const p = byId.get(s.id);
+    if (!p) continue;
+    if (p.lng != null) s.lng = Number(Number(p.lng).toFixed(6));
+    if (p.lat != null) s.lat = Number(Number(p.lat).toFixed(6));
+    if (p.visibility) s.visibility = p.visibility;
+    if (p.maxDistKm != null) s.maxDistKm = p.maxDistKm;
+    n += 1;
+  }
+  if (n) console.log(`calibration patches applied: ${n}`);
+}
+
+snapQingzangAreasToRailway(spots);
+applyCalibrationPatches(spots);
 
 const doc = {
   version: 1,
-  updated: '2026-09-13',
-  note: '策展第一版：关键出名铁路窗景；坐标为贴线观景参考点（青藏已投影到 z8991-railway）。规范见 docs/scenic-spots-spec.md',
+  updated: '2026-09-14',
+  note: '策展+校准：具名钉本体，大面积适当靠轨；patches 见 scenic-spot-calibration-patches.json。规范 docs/scenic-spots-spec.md / scenic-spots-location-verify.md',
   spots,
 };
 

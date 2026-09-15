@@ -87,6 +87,11 @@ body:has(.select-page) {
   line-height: 1.3;
 }
 
+.precise-status-hint {
+  color: #7dd3fc;
+  font-weight: 600;
+}
+
 .dialog-actions {
   display: flex;
   flex-wrap: wrap;

@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>精确路线 · 二期效果演示</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a222c;
+      --line: #2a3544;
+      --text: #e8eef5;
+      --muted: #8b9aab;
+      --accent: #3d9cf0;
+      --good: #3ecf8e;
+      --warn: #f0b429;
+      --bad: #f07178;
+      --schematic: #7a8699;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, #1a2a3d, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 28px 24px 8px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 1.45rem;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 46rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 1100px;
+      margin: 16px auto 40px;
+      padding: 0 16px;
+    }
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 480px;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .card-head h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .badge {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+    .badge.now { color: var(--bad); border-color: #5a3038; background: #2a181c; }
+    .badge.next { color: var(--good); border-color: #2a5a44; background: #152820; }
+    .map {
+      position: relative;
+      height: 300px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), transparent 40%),
+        repeating-linear-gradient(0deg, transparent, transparent 23px, rgba(255,255,255,0.03) 24px),
+        repeating-linear-gradient(90deg, transparent, transparent 23px, rgba(255,255,255,0.03) 24px),
+        #121820;
+    }
+    svg { width: 100%; height: 100%; display: block; }
+    .rail-schematic {
+      fill: none;
+      stroke: var(--schematic);
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 8 7;
+      opacity: 0.85;
+    }
+    .rail-precise {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 6px rgba(61,156,240,0.35));
+    }
+    .rail-gap {
+      fill: none;
+      stroke: var(--warn);
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-dasharray: 6 6;
+      opacity: 0.95;
+    }
+    .station { fill: #dfe8f2; stroke: #0f1419; stroke-width: 2; }
+    .station-label {
+      fill: var(--muted);
+      font-size: 11px;
+      font-family: inherit;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(8,12,16,0.55);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .overlay.show { opacity: 1; }
+    .overlay .box {
+      background: #1e2833;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 200px;
+    }
+    .overlay .box strong { display: block; margin-bottom: 6px; }
+    .overlay .box span { color: var(--muted); font-size: 0.85rem; }
+    .spin {
+      width: 18px; height: 18px;
+      border: 2px solid #3a4a5c;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .footer {
+      padding: 14px 16px 16px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .status {
+      min-height: 2.6em;
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .status em { color: var(--text); font-style: normal; }
+    .status .ok { color: var(--good); }
+    .status .bad { color: var(--bad); }
+    .status .warn { color: var(--warn); }
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(180deg, #4aa3f5, #2f7fd1);
+      color: white;
+    }
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+    .btn.secondary {
+      background: #2a3544;
+      color: var(--text);
+    }
+    .actions { display: flex; gap: 8px; }
+    .actions .btn { flex: 1; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 16px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .legend i {
+      display: inline-block;
+      width: 18px;
+      height: 3px;
+      vertical-align: middle;
+      margin-right: 6px;
+      border-radius: 2px;
+    }
+    .note {
+      max-width: 1100px;
+      margin: 0 auto 48px;
+      padding: 0 16px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>精确路线：现在 vs 二期（可点演示）</h1>
+    <p>
+      假数据模拟一次「冷门长途 G 车」点击升级。左边是当前常见体验（依赖公网 Overpass，易失败）；
+      右边是二期目标（本地轨网为主，允许部分精确 + 示意补段，不白屏硬失败）。
+    </p>
+  </header>
+
+  <div class="grid">
+    <!-- NOW -->
+    <section class="card" id="card-now">
+      <div class="card-head">
+        <h2>现在</h2>
+        <span class="badge now">公网 Overpass 主路径</span>
+      </div>
+      <div class="map">
+        <svg viewBox="0 0 400 300" aria-hidden="true">
+          <path id="now-schematic" class="rail-schematic"
+            d="M40 220 C 90 200, 120 160, 160 150 S 230 140, 280 100 S 340 70, 370 50" />
+          <path id="now-precise" class="rail-precise" d="" style="display:none" />
+          <circle class="station" cx="40" cy="220" r="4.5" />
+          <circle class="station" cx="370" cy="50" r="4.5" />
+          <text class="station-label" x="28" y="242">银川</text>
+          <text class="station-label" x="330" y="42">上海虹桥</text>
+        </svg>
+        <div class="overlay" id="now-overlay">
+          <div class="box">
+            <div class="spin" id="now-spin"></div>
+            <strong id="now-overlay-title">请求 Overpass…</strong>
+            <span id="now-overlay-sub">公网限流 / 超时</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="status" id="now-status">当前：<em>站间示意线</em>（灰虚线）。点击下方按钮模拟升级。</div>
+        <div class="legend">
+          <span><i style="background:var(--schematic)"></i>示意</span>
+          <span><i style="background:var(--accent)"></i>精确</span>
+        </div>
+        <div class="actions">
+          <button class="btn" id="now-btn" type="button">获取精确路线</button>
+          <button class="btn secondary" id="now-reset" type="button">重置</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHASE 2 -->
+    <section class="card" id="card-next">
+      <div class="card-head">
+        <h2>二期目标</h2>
+        <span class="badge next">本地轨网 + 可降级</span>
+      </div>
+      <div class="map">
+        <svg viewBox="0 0 400 300" aria-hidden="true">
+          <path id="next-schematic" class="rail-schematic"
+            d="M40 220 C 90 200, 120 160, 160 150 S 230 140, 280 100 S 340 70, 370 50" />
+          <!-- precise segments -->
+          <path id="next-p1" class="rail-precise" d="" style="display:none" />
+          <path id="next-p2" class="rail-precise" d="" style="display:none" />
+          <path id="next-gap" class="rail-gap" d="" style="display:none" />
+          <circle class="station" cx="40" cy="220" r="4.5" />
+          <circle class="station" cx="200" cy="145" r="3.5" />
+          <circle class="station" cx="370" cy="50" r="4.5" />
+          <text class="station-label" x="28" y="242">银川</text>
+          <text class="station-label" x="178" y="168">郑州东</text>
+          <text class="station-label" x="330" y="42">上海虹桥</text>
+        </svg>
+        <div class="overlay" id="next-overlay">
+          <div class="box">
+            <div class="spin"></div>
+            <strong id="next-overlay-title">本地轨网寻路…</strong>
+            <span id="next-overlay-sub">不依赖公网</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="status" id="next-status">当前：<em>站间示意线</em>。点击升级 → 本地命中大部分，缺口用示意补上。</div>
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i>精确（本地）</span>
+          <span><i style="background:var(--warn)"></i>示意补段</span>
+        </div>
+        <div class="actions">
+          <button class="btn" id="next-btn" type="button">获取精确路线</button>
+          <button class="btn secondary" id="next-reset" type="button">重置</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <p class="note">
+    这是<strong>交互示意</strong>，不是真实轨网计算结果。二期真正落地还需要：Geofabrik → 离线轨网图、改精确 job 链路、G/D/C 与 K/T/Z 分图。
+    打开方式：用浏览器直接打开本文件即可。
+  </p>
+
+  <script>
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    function setOverlay(el, show, title, sub) {
+      el.classList.toggle('show', show);
+      if (title) el.querySelector('strong').textContent = title;
+      if (sub) el.querySelector('span').textContent = sub;
+    }
+
+    // —— 现在：多数失败 ——
+    const nowBtn = document.getElementById('now-btn');
+    const nowReset = document.getElementById('now-reset');
+    const nowOverlay = document.getElementById('now-overlay');
+    const nowStatus = document.getElementById('now-status');
+    const nowPrecise = document.getElementById('now-precise');
+    const nowSchematic = document.getElementById('now-schematic');
+
+    async function runNow() {
+      nowBtn.disabled = true;
+      nowPrecise.style.display = 'none';
+      nowSchematic.style.opacity = '0.85';
+      setOverlay(nowOverlay, true, '请求 Overpass…', '公网限流 / 超时');
+      nowStatus.innerHTML = '加载中：走廊未全覆盖 → 回落公网 Overpass…';
+      await sleep(900);
+      setOverlay(nowOverlay, true, '重试中…', '504 Gateway Timeout');
+      await sleep(1100);
+      setOverlay(nowOverlay, false);
+      nowStatus.innerHTML =
+        '<span class="bad">获取失败</span>：未能生成精确路线，仍为示意线。可点「重试精确路线」。';
+      nowBtn.textContent = '重试精确路线';
+      nowBtn.disabled = false;
+    }
+    function resetNow() {
+      nowPrecise.style.display = 'none';
+      nowSchematic.style.opacity = '0.85';
+      setOverlay(nowOverlay, false);
+      nowStatus.innerHTML = '当前：<em>站间示意线</em>（灰虚线）。点击下方按钮模拟升级。';
+      nowBtn.textContent = '获取精确路线';
+      nowBtn.disabled = false;
+    }
+    nowBtn.addEventListener('click', runNow);
+    nowReset.addEventListener('click', resetNow);
+
+    // —— 二期：本地为主 + partial ——
+    const nextBtn = document.getElementById('next-btn');
+    const nextReset = document.getElementById('next-reset');
+    const nextOverlay = document.getElementById('next-overlay');
+    const nextStatus = document.getElementById('next-status');
+    const nextSchematic = document.getElementById('next-schematic');
+    const p1 = document.getElementById('next-p1');
+    const p2 = document.getElementById('next-p2');
+    const gap = document.getElementById('next-gap');
+
+    // more "track-like" paths
+    const PATH_WEST = 'M40 220 C 70 210, 110 190, 140 170 S 175 150, 200 145';
+    const PATH_GAP = 'M200 145 L 245 125';
+    const PATH_EAST = 'M245 125 C 280 105, 320 80, 350 58 S 365 52, 370 50';
+
+    async function runNext() {
+      nextBtn.disabled = true;
+      p1.style.display = p2.style.display = gap.style.display = 'none';
+      nextSchematic.style.opacity = '0.85';
+      setOverlay(nextOverlay, true, '本地轨网寻路…', 'china-rail.graph');
+      nextStatus.innerHTML = '加载中：G 车 → 本地高铁图 / 全轨图…';
+      await sleep(700);
+      setOverlay(nextOverlay, true, '拼接站序…', '3/5 段命中 · 1 段缺口');
+      await sleep(800);
+
+      nextSchematic.style.opacity = '0.2';
+      p1.setAttribute('d', PATH_WEST);
+      p2.setAttribute('d', PATH_EAST);
+      gap.setAttribute('d', PATH_GAP);
+      p1.style.display = p2.style.display = gap.style.display = '';
+
+      setOverlay(nextOverlay, false);
+      nextStatus.innerHTML =
+        '<span class="ok">部分精确</span>：两端已贴本地真轨；郑州东附近缺口用<span class="warn">示意补段</span>。可点「重试缺口路段」。';
+      nextBtn.textContent = '重试缺口路段';
+      nextBtn.disabled = false;
+    }
+
+    async function retryGap() {
+      if (nextBtn.textContent !== '重试缺口路段') {
+        await runNext();
+        return;
+      }
+      nextBtn.disabled = true;
+      setOverlay(nextOverlay, true, '补洞…', '可选 Overpass / 再查本地');
+      await sleep(900);
+      // fill gap as precise
+      gap.style.display = 'none';
+      p1.setAttribute('d', PATH_WEST + ' L 245 125');
+      setOverlay(nextOverlay, false);
+      nextStatus.innerHTML =
+        '<span class="ok">精确完成</span>：层级 <em>local-graph / mixed→done</em>。弱网下也先有线可画。';
+      nextBtn.textContent = '获取精确路线';
+      nextBtn.disabled = false;
+    }
+
+    function resetNext() {
+      p1.style.display = p2.style.display = gap.style.display = 'none';
+      nextSchematic.style.opacity = '0.85';
+      setOverlay(nextOverlay, false);
+      nextStatus.innerHTML = '当前：<em>站间示意线</em>。点击升级 → 本地命中大部分，缺口用示意补上。';
+      nextBtn.textContent = '获取精确路线';
+      nextBtn.disabled = false;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (nextBtn.textContent === '重试缺口路段') retryGap();
+      else runNext();
+    });
+    nextReset.addEventListener('click', resetNext);
+  </script>
+</body>
+</html>

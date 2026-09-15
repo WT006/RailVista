@@ -44,12 +44,24 @@ describe('matchCorridor', () => {
     assert.ok(net!.coords.length >= 2);
   });
 
-  it('rejects K trains on lixiang corridor', () => {
+  it('allows K trains on lixiang conventional corridor (not HSR)', () => {
+    const hit = matchCorridor(
+      [
+        { name: '丽江', lng: 100.2512118, lat: 26.8143271 },
+        { name: '香格里拉', lng: 99.6885399, lat: 27.8133154 },
+      ],
+      { trainCode: 'K123' },
+    );
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'lixiang');
+  });
+
+  it('still rejects K trains on jingguang HSR', () => {
     assert.equal(
       matchCorridor(
         [
-          { name: '丽江', lng: 100.2512118, lat: 26.8143271 },
-          { name: '香格里拉', lng: 99.6885399, lat: 27.8133154 },
+          { name: '北京西', lng: 116.322, lat: 39.895 },
+          { name: '广州南', lng: 113.269, lat: 22.989 },
         ],
         { trainCode: 'K123' },
       ),
@@ -306,6 +318,23 @@ describe('matchCorridor', () => {
     assert.equal(hit!.corridor.id, 'jingguang');
   });
 
+  it('matches 重庆西→贵阳东 on yugui (贵阳东≈贵阳北 terminus)', () => {
+    const hit = matchCorridor(
+      [
+        { name: '重庆西', lng: 106.4322, lat: 29.5029 },
+        { name: '贵阳东', lng: 106.7407, lat: 26.6676 },
+      ],
+      { trainCode: 'G1535' },
+    );
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'yugui');
+    const sliced = sliceCorridorForStops(hit!.corridor, [
+      { name: '重庆西', lng: 106.4322, lat: 29.5029 },
+      { name: '贵阳东', lng: 106.7407, lat: 26.6676 },
+    ]);
+    assert.ok(sliced && sliced.length >= 20);
+  });
+
   it('does NOT match K599-like 北京丰台→广州白云 on jingguang (普速平行线)', () => {
     // 安阳/鹤壁 距安阳东/鹤壁东仅数公里，旧逻辑会误套京广高铁导致「线不经过站」
     const stops = [
@@ -322,6 +351,31 @@ describe('matchCorridor', () => {
     assert.equal(matchCorridorNetwork(stops, { trainCode: 'K599' }), null);
     // 无车次时方位冲突也应拦下（安阳≠安阳东）
     assert.equal(matchCorridor(stops), null);
+  });
+
+  it('matches Z-train 西宁→拉萨 on qingzang (普速走廊)', () => {
+    const hit = matchCorridor(
+      [
+        { name: '西宁', lng: 101.749, lat: 36.623 },
+        { name: '格尔木', lng: 94.905, lat: 36.402 },
+        { name: '拉萨', lng: 91.068, lat: 29.623 },
+      ],
+      { trainCode: 'Z164' },
+    );
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'qingzang');
+  });
+
+  it('rejects Z-train on jingguang HSR corridor', () => {
+    const hit = matchCorridor(
+      [
+        { name: '北京西', lng: 116.322, lat: 39.895 },
+        { name: '郑州东', lng: 113.777, lat: 34.76 },
+        { name: '广州南', lng: 113.269, lat: 22.989 },
+      ],
+      { trainCode: 'Z5' },
+    );
+    assert.equal(hit, null);
   });
 
   it('still matches G-train 北京西→广州南 on jingguang', () => {

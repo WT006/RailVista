@@ -20,6 +20,7 @@ const STORE = 'snapshots';
 const INDEX_KEY = 'railvista:recentTrips';
 const RESUME_KEY = 'railvista:autoResumeTripKey';
 
+/** partial：完成但有缺口，或加载中途已落盘的精确折线 */
 export type PreciseCacheStatus = 'done' | 'partial' | null;
 
 export type TripSnapshotPrefs = {
@@ -41,6 +42,8 @@ export type TripSnapshot = {
   polylineHint: string;
   canUpgradePrecise: boolean;
   preciseStatus: PreciseCacheStatus;
+  /** 进行中的精确任务 id；刷新后可尝试续轮询（服务端内存任务仍在时） */
+  preciseJobId?: string | null;
   prefs: TripSnapshotPrefs;
 };
 
@@ -263,6 +266,7 @@ export type SaveTripInput = {
   polylineHint: string;
   canUpgradePrecise: boolean;
   preciseStatus: PreciseCacheStatus;
+  preciseJobId?: string | null;
   prefs: TripSnapshotPrefs;
   /** 是否刷新 openedAt 并置顶，默认 true */
   bumpOpenedAt?: boolean;
@@ -290,6 +294,7 @@ export async function saveTripSnapshot(input: SaveTripInput): Promise<TripSnapsh
       polylineHint: input.polylineHint,
       canUpgradePrecise: input.canUpgradePrecise,
       preciseStatus: input.preciseStatus,
+      preciseJobId: input.preciseJobId ?? null,
       prefs: cloneData(input.prefs),
     };
 

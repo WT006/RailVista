@@ -27,6 +27,41 @@ export function isHsrTrainCode(trainCode?: string): boolean {
   return !!trainCode && /^[GDC]/i.test(String(trainCode).trim());
 }
 
+/**
+ * 高铁走廊判定：仿真源 / 名称含高铁·高速·城际 / 已知客运专线 id。
+ * 普速车禁止命中此类走廊。
+ */
+const KNOWN_HSR_CORRIDOR_IDS = new Set([
+  'xiashen',
+  'hanghuang',
+  'hamu',
+  'hainandong',
+  'jingzhang',
+  'zhanghu',
+  'chenggui',
+  'yugui',
+  'yuli',
+  'chuanqing',
+  'zhonglao',
+  'fuping',
+  'yinlan',
+  'lanxin',
+  'hefu',
+]);
+
+export function isHsrCorridor(c: Pick<CorridorPreset, 'id' | 'name' | 'source'>): boolean {
+  const src = String(c.source || '');
+  const name = String(c.name || '');
+  if (/china-hsr|hsr-rails|simulation/i.test(src)) return true;
+  if (/高铁|高速|城际/.test(name)) return true;
+  if (KNOWN_HSR_CORRIDOR_IDS.has(c.id)) return true;
+  return false;
+}
+
+export function isConventionalCorridor(c: Pick<CorridorPreset, 'id' | 'name' | 'source'>): boolean {
+  return !isHsrCorridor(c);
+}
+
 let cache: CorridorPreset[] | null = null;
 /** 目录内 json 的最新 mtime；变更后自动重载，避免二期入库后仍命中旧缓存 */
 let cacheMtimeMs = 0;
@@ -116,13 +151,15 @@ export function loadCorridors(): CorridorPreset[] {
     cacheMtimeMs = mtime;
     return cache;
   }
-  const files = readdirSync(corridorsDir).filter((f) => f.endsWith('.json'));
+  const files = readdirSync(corridorsDir).filter(
+    (f) => f.endsWith('.json') && !f.startsWith('_') && !f.includes('__'),
+  );
   cache = files
     .map((f) => {
       const raw = JSON.parse(readFileSync(join(corridorsDir, f), 'utf8')) as CorridorPreset;
       return raw;
     })
-    .filter((c) => c.railway?.length >= 2);
+    .filter((c) => c.railway?.length >= 2 && c.id && !String(c.id).includes('__'));
   cacheMtimeMs = mtime;
   console.log(`[corridors] loaded ${cache.length}: ${cache.map((c) => c.id).join(', ')}`);
   return cache;
@@ -140,7 +177,25 @@ function nearCorridor(
   return proj.distKm <= maxKm;
 }
 
-/** 首末站必须属于该走廊（站名或投影），避免「部分重合」误匹配京沪等干线 */
+/** 是否贴近走廊折线首/末端（同城异站终点：贵阳东≈贵阳北） */
+function nearCorridorTerminus(
+  corridor: CorridorPreset,
+  stop: CorridorStop,
+  maxKm = 12,
+): boolean {
+  if (stop.lng == null || stop.lat == null || corridor.railway.length < 2) return false;
+  const a = corridor.railway[0];
+  const b = corridor.railway[corridor.railway.length - 1];
+  const pt = { lng: Number(stop.lng), lat: Number(stop.lat) };
+  const d0 = haversineKm({ lng: a[0], lat: a[1] }, pt);
+  const d1 = haversineKm({ lng: b[0], lat: b[1] }, pt);
+  return Math.min(d0, d1) <= maxKm;
+}
+
+/**
+ * 首末站必须属于该走廊（站名或投影），避免「部分重合」误匹配京沪等干线。
+ * 同城异站（贵阳东 vs 贵阳北）：仅当贴走廊末端且贴线时放行，避免安阳类平行站误套。
+ */
 function endpointsBelong(
   corridor: CorridorPreset,
   first: CorridorStop,
@@ -149,8 +204,9 @@ function endpointsBelong(
 ): boolean {
   const endOk = (stop: CorridorStop) => {
     if (onHints(stop.name, hints)) return true;
-    // 杭州南 不能靠「离杭州东走廊很近」冒充沪杭高铁终点
-    if (hasDirectionalConflict(stop.name, hints)) return false;
+    if (hasDirectionalConflict(stop.name, hints)) {
+      return nearCorridorTerminus(corridor, stop, 12) && nearCorridor(corridor, stop, 15);
+    }
     return nearCorridor(corridor, stop, 40);
   };
   return endOk(first) && endOk(last);
@@ -162,8 +218,14 @@ function geoFitScore(corridor: CorridorPreset, stops: CorridorStop[], hints: str
   let near = 0;
   let eligible = 0;
   for (const s of withCoord) {
-    // 「安阳」≠「安阳东」：平行普速站靠近高铁线，不得算作贴合
-    if (hasDirectionalConflict(s.name, hints)) continue;
+    if (hasDirectionalConflict(s.name, hints)) {
+      // 终点同城异站：贴末端仍计入贴合（否则双站 OD 贵阳东会把 geoScore 打成 0）
+      if (nearCorridorTerminus(corridor, s, 12) && nearCorridor(corridor, s, 15)) {
+        eligible += 1;
+        near += 1;
+      }
+      continue;
+    }
     eligible += 1;
     if (nearCorridor(corridor, s, 35)) near += 1;
   }
@@ -183,8 +245,7 @@ function directionalConflictRatio(stops: CorridorStop[], hints: string[]): numbe
 
 /**
  * 按首末站归属 + 几何贴合（主）/ 站名命中（辅）匹配精品走廊。
- * 长途车经停多、站名不全在 hints 里时，仍可靠几何命中京广等干线。
- * 普速车（K/T/Z…）禁止套高铁走廊——否则会画出「线在东、站在西」的平行错位。
+ * G/D → 仅高铁走廊；C → 高铁+普速客运（丽香等）；K/T/Z → 仅普速走廊。
  */
 export function matchCorridor(
   stops: CorridorStop[],
@@ -192,9 +253,15 @@ export function matchCorridor(
 ): { corridor: CorridorPreset; score: number } | null {
   const corridors = loadCorridors();
   if (!corridors.length || stops.length < 2) return null;
-  // 未传车次时保持旧行为（测试/兼容）；明确为非高铁则拒绝
-  if (opts?.trainCode != null && !isHsrTrainCode(opts.trainCode)) {
-    return null;
+
+  const trainCode = opts?.trainCode;
+  const code = trainCode != null ? String(trainCode).trim() : '';
+  /** all | hsr | conventional */
+  let filterKind: 'all' | 'hsr' | 'conventional' = 'all';
+  if (code) {
+    if (/^[GD]/i.test(code)) filterKind = 'hsr';
+    else if (/^C/i.test(code)) filterKind = 'all'; // 城际可走客运专线或普速客运走廊
+    else filterKind = 'conventional';
   }
 
   const first = stops[0];
@@ -202,6 +269,9 @@ export function matchCorridor(
   let best: { corridor: CorridorPreset; score: number; hit: number } | null = null;
 
   for (const c of corridors) {
+    if (filterKind === 'hsr' && !isHsrCorridor(c)) continue;
+    if (filterKind === 'conventional' && !isConventionalCorridor(c)) continue;
+
     const hints = (c.stationsHint || []).map(normalize).filter(Boolean);
     if (hints.length < 2) continue;
     if (!endpointsBelong(c, first, last, hints)) continue;

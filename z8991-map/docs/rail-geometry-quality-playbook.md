@@ -6,8 +6,10 @@
 | 目的 | 新窗口按本文执行，得到与当前工作区相同的沪昆/兰新/厦深展示效果 |
 | 方案全文 | [`TECH-rail-geometry-quality.md`](./TECH-rail-geometry-quality.md) |
 | 硬约束 | `.cursor/rules/rail-route-invariants.mdc` · `.cursor/rules/rail-corridor-ingest.mdc` |
+| 踩坑全文（批量入库必读） | [`corridor-ingest-lessons.md`](./corridor-ingest-lessons.md) |
+| 全国缺口清单 | [`corridor-coverage-gap.md`](./corridor-coverage-gap.md) |
 
-**优先读本文再改走廊。** 不要先裸重抽 OSM / hsr。
+**优先读本文 + `corridor-ingest-lessons.md` 再改走廊。** 不要先裸重抽 OSM / hsr。
 
 ---
 

@@ -54,6 +54,7 @@ async function resolveStops(body: Body) {
       lng: s.lng,
       lat: s.lat,
     })),
+    { trainCode: body.trainCode },
   );
   const stops: LngLat[] = enriched
     .filter((s) => s.lng != null && s.lat != null)

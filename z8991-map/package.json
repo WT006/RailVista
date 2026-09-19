@@ -9,7 +9,9 @@
     "dev:web": "pnpm --filter @railvista/web dev",
     "dev:api": "pnpm --filter @railvista/api dev",
     "build": "pnpm --filter @railvista/shared build && pnpm -r --filter @railvista/api --filter @railvista/web run build",
-    "test": "pnpm --filter @railvista/shared test"
+    "test": "pnpm --filter @railvista/shared test",
+    "build:rail-graph": "node scripts/build-rail-graph.mjs",
+    "warmup:precise": "node scripts/warmup-precise-routes.mjs"
   },
   "engines": {
     "node": ">=20"

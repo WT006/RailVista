@@ -33,6 +33,7 @@ import {
 } from '../lib/tripCache';
 import { loadAmap } from '../map/amap';
 import { readSimulatedProgress, useGeolocation, useNow } from '../composables/useGeolocation';
+import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import { usePrefsStore } from '../stores/prefsStore';
 import { useTripStore } from '../stores/tripStore';
 
@@ -50,6 +51,20 @@ const progress = ref(0);
 const mode = ref('时刻表估算');
 const legendOpen = ref(false);
 const calibrateOpen = ref(false);
+const STATUS_COLLAPSE_KEY = 'railvista:map:statusCollapsed';
+const statusCollapsed = ref(
+  typeof localStorage !== 'undefined' && localStorage.getItem(STATUS_COLLAPSE_KEY) === '1',
+);
+
+function toggleStatusCollapsed() {
+  statusCollapsed.value = !statusCollapsed.value;
+  try {
+    localStorage.setItem(STATUS_COLLAPSE_KEY, statusCollapsed.value ? '1' : '0');
+  } catch {
+    /* ignore */
+  }
+  if (statusCollapsed.value) calibrateOpen.value = false;
+}
 const departOpen = ref(false);
 const departInput = ref('');
 const confirmOpen = ref(false);
@@ -59,7 +74,15 @@ const pendingStation = ref<Stop | null>(null);
 const toast = ref('');
 let toastTimer: number | undefined;
 
+const SATELLITE_PREF_KEY = 'railvista:map:satellite';
+const satelliteOn = ref(
+  typeof localStorage !== 'undefined' && localStorage.getItem(SATELLITE_PREF_KEY) === '1',
+);
+
 let map: any;
+let AMapRef: any;
+let satelliteLayer: any;
+let roadNetLayer: any;
 let railLine: any;
 let trainMarker: any;
 let gpsMarker: any;
@@ -114,21 +137,15 @@ const preciseActionLabel = computed(() => {
   return '获取精确路线';
 });
 
-/** 状态栏：精确路段完成情况 */
-const preciseStatusHint = computed(() => {
-  const job = trip.preciseJob;
-  if (!job) return '';
-  const ok = job.segmentsOk ?? 0;
-  const total = job.segmentsTotal ?? 0;
-  if (trip.preciseLoading) {
-    if (job.message && !/^加载中\s+\d+\/\d+/.test(job.message)) return job.message;
-    return total ? `精确 ${job.segmentsDone}/${total}` : '精确加载中';
-  }
-  if (job.status === 'done') return '精确路线已完成';
-  if (ok > 0 && total > 0) return `精确 ${ok}/${total}`;
-  if (job.status === 'partial' || job.status === 'failed') return '精确未完成';
-  return '';
+/** 定位文案拆成主状态 + 括号备注，避免挤在一行难读 */
+const modeParts = computed(() => {
+  const m = mode.value.trim();
+  const hit = m.match(/^(.*?)[（(](.+?)[）)]\s*$/);
+  if (hit) return { main: hit[1]!.trim(), note: hit[2]!.trim() };
+  return { main: m, note: '' };
 });
+
+const progressPct = computed(() => Math.round(progress.value * 100));
 
 const shifted = (iso: string) => shiftDate(iso, schedule.value?.offsetMs || 0);
 
@@ -358,23 +375,16 @@ const locationInfo = computed(() => {
 });
 
 const clockText = computed(() =>
-  compact.value
-    ? now.value.toLocaleTimeString('zh-CN', {
-        timeZone: 'Asia/Shanghai',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-      })
-    : now.value.toLocaleString('zh-CN', {
-        timeZone: 'Asia/Shanghai',
-        month: 'numeric',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-      }),
+  now.value.toLocaleString('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }),
 );
 
 function applyLayers() {
@@ -384,6 +394,37 @@ function applyLayers() {
   if (trainMarker) prefs.layers.train ? trainMarker.show() : trainMarker.hide();
 }
 
+function railStrokeOptions() {
+  return satelliteOn.value
+    ? { strokeColor: '#67e8f9', strokeOpacity: 0.95 }
+    : { strokeColor: '#38bdf8', strokeOpacity: 0.85 };
+}
+
+function applySatelliteLayers() {
+  if (!map || !AMapRef) return;
+  if (satelliteOn.value) {
+    if (!satelliteLayer) {
+      satelliteLayer = new AMapRef.TileLayer.Satellite();
+      roadNetLayer = new AMapRef.TileLayer.RoadNet();
+    }
+    map.add([satelliteLayer, roadNetLayer]);
+  } else {
+    if (satelliteLayer) map.remove(satelliteLayer);
+    if (roadNetLayer) map.remove(roadNetLayer);
+  }
+  railLine?.setOptions?.(railStrokeOptions());
+}
+
+function toggleSatellite() {
+  satelliteOn.value = !satelliteOn.value;
+  try {
+    localStorage.setItem(SATELLITE_PREF_KEY, satelliteOn.value ? '1' : '0');
+  } catch {
+    /* ignore quota */
+  }
+  applySatelliteLayers();
+}
+
 async function initMap() {
   const key = import.meta.env.VITE_AMAP_KEY;
   if (!key) {
@@ -391,6 +432,7 @@ async function initMap() {
     return;
   }
   const AMap = await loadAmap(key, import.meta.env.VITE_AMAP_SECURITY);
+  AMapRef = AMap;
   const seg = segment.value!;
   const coords =
     trip.railwayCoords.length >= 2
@@ -417,10 +459,9 @@ async function initMap() {
   if (coords.length >= 2) {
     railLine = new AMap.Polyline({
       path: coords,
-      strokeColor: '#38bdf8',
       strokeWeight: compact.value ? 4 : 5,
-      strokeOpacity: 0.85,
       lineJoin: 'round',
+      ...railStrokeOptions(),
     });
     map.add(railLine);
   }
@@ -544,6 +585,7 @@ async function initMap() {
   });
 
   applyLayers();
+  applySatelliteLayers();
   await nextTick();
   updateOverlayMetrics();
   if (coords.length) map.setFitView(null, false, getMapPadding());
@@ -786,46 +828,69 @@ onUnmounted(() => {
           </button>
         </div>
         <div class="top-bar__cluster">
-          <div class="status-card">
-            <div class="status-row status-row--primary">
-              <span class="train-badge">{{ segment.trainCode }}</span>
-              <span class="route-text">{{ segment.fromName }} → {{ segment.toName }}</span>
-              <button type="button" class="depart-text" @click="openDepartEditor">
-                {{ formatDepartBadge(schedule.departure) }}
-              </button>
+          <div class="status-card" :class="{ 'is-collapsed': statusCollapsed }">
+            <div class="status-head">
+              <div class="status-identity">
+                <span class="train-badge">{{ segment.trainCode }}</span>
+                <span class="route-text">{{ segment.fromName }} → {{ segment.toName }}</span>
+              </div>
+              <time v-show="!statusCollapsed" class="clock">{{ clockText }}</time>
               <button
                 type="button"
-                class="calibrate-btn"
-                :class="{ 'is-active': !!prefs.calibration }"
-                @click="calibrateOpen = !calibrateOpen"
+                class="status-collapse-btn"
+                :aria-expanded="!statusCollapsed"
+                :aria-label="statusCollapsed ? '展开行程面板' : '收起行程面板'"
+                :title="statusCollapsed ? '展开' : '收起，少挡地图'"
+                @click="toggleStatusCollapsed"
               >
-                校准
+                {{ statusCollapsed ? '展开' : '收起' }}
               </button>
-              <time class="clock">{{ clockText }}</time>
             </div>
-            <div class="status-row status-row--secondary">
-              <span>进度 <strong>{{ Math.round(progress * 100) }}%</strong></span>
-              <span class="status-divider">·</span>
-              <span>定位 <strong>{{ mode }}</strong></span>
-              <template v-if="preciseStatusHint">
-                <span class="status-divider">·</span>
-                <span class="precise-status-hint">{{ preciseStatusHint }}</span>
-              </template>
-            </div>
-            <div v-if="showPreciseAction" class="rail-upgrade">
-              <button
-                type="button"
-                class="rail-upgrade-btn"
-                :disabled="trip.preciseLoading"
-                @click="onUpgradePrecise"
-              >
-                {{ preciseActionLabel }}
-              </button>
-              <span v-if="trip.preciseError" class="rail-upgrade-error">{{ trip.preciseError }}</span>
-            </div>
+
+            <template v-if="!statusCollapsed">
+              <div class="status-progress" :aria-label="`行程进度 ${progressPct}%`">
+                <div class="status-progress__track">
+                  <div class="status-progress__bar" :style="{ width: `${progressPct}%` }" />
+                </div>
+                <span class="status-progress__pct">{{ progressPct }}%</span>
+              </div>
+
+              <div class="status-meta">
+                <button type="button" class="status-meta__item status-meta__item--btn" @click="openDepartEditor">
+                  <span class="status-meta__k">发车</span>
+                  <span class="status-meta__v">{{ formatDepartBadge(schedule.departure) }}</span>
+                </button>
+                <div class="status-meta__item status-meta__item--mode">
+                  <span class="status-meta__k">定位</span>
+                  <span class="status-meta__v">{{ modeParts.main }}</span>
+                  <span v-if="modeParts.note" class="status-meta__note">{{ modeParts.note }}</span>
+                </div>
+                <button
+                  type="button"
+                  class="calibrate-btn"
+                  :class="{ 'is-active': !!prefs.calibration }"
+                  :aria-expanded="calibrateOpen"
+                  @click="calibrateOpen = !calibrateOpen"
+                >
+                  {{ prefs.calibration ? `校准 · ${prefs.calibration.stationName}` : '站点校准' }}
+                </button>
+              </div>
+
+              <div v-if="showPreciseAction" class="status-actions">
+                <button
+                  type="button"
+                  class="rail-upgrade-btn"
+                  :disabled="trip.preciseLoading"
+                  @click="onUpgradePrecise"
+                >
+                  {{ preciseActionLabel }}
+                </button>
+              </div>
+              <p v-if="trip.preciseError" class="rail-upgrade-error">{{ trip.preciseError }}</p>
+            </template>
           </div>
 
-          <div v-if="calibrateOpen" class="calibrate-popover">
+          <div v-if="calibrateOpen && !statusCollapsed" class="calibrate-popover">
             <div class="calibrate-popover__head">
               <span>站点校准</span>
               <span>{{ prefs.calibration ? `已校准·${prefs.calibration.stationName}` : '未校准' }}</span>
@@ -859,6 +924,15 @@ onUnmounted(() => {
       </header>
 
       <button type="button" class="locate-btn" @click="locateTrain">定位</button>
+      <button
+        type="button"
+        class="satellite-btn"
+        :class="{ 'is-active': satelliteOn }"
+        :aria-pressed="satelliteOn"
+        @click="toggleSatellite"
+      >
+        {{ satelliteOn ? '标准地图' : '卫星地图' }}
+      </button>
       <button type="button" class="legend-toggle" @click="legendOpen = !legendOpen">图例</button>
       <div class="legend" :class="{ 'is-open': legendOpen }">
         <button
@@ -869,6 +943,7 @@ onUnmounted(() => {
           :aria-pressed="prefs.layers[layer]"
           @click="prefs.setLayer(layer, !prefs.layers[layer])"
         >
+          <i :class="layer" aria-hidden="true" />
           {{
             { rail: '示意铁路', station: '经停站', spot: '风景', train: '列车估算', gps: '手机 GPS' }[
               layer
@@ -904,9 +979,13 @@ onUnmounted(() => {
 
     <div v-if="departOpen" class="schedule-dialog">
       <div class="schedule-dialog__backdrop" @click="departOpen = false" />
-      <div class="schedule-dialog__card">
+      <div class="schedule-dialog__card schedule-dialog__card--wide">
         <h3>修改发车时间</h3>
-        <input v-model="departInput" type="datetime-local" />
+        <p class="schedule-dialog__hint">按实际发车时刻校准，地图进度与估算位置会同步更新。</p>
+        <div class="schedule-dialog__field">
+          <span>发车时间</span>
+          <DarkDateTimeField v-model="departInput" mode="datetime" inline />
+        </div>
         <div class="dialog-actions">
           <button type="button" class="btn ghost" @click="resetDeparture">恢复默认</button>
           <button type="button" class="btn ghost" @click="departOpen = false">取消</button>

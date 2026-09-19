@@ -28,8 +28,10 @@ export function isHsrTrainCode(trainCode?: string): boolean {
 }
 
 /**
- * 高铁走廊判定：仿真源 / 名称含高铁·高速·城际 / 已知客运专线 id。
+ * 高铁走廊判定：仿真源 / 名称含高铁·高速·城际·客专 / 已知客运专线 id。
  * 普速车禁止命中此类走廊。
+ * 注意：OSM 入库的「石济客专」「甬台温铁路」等 source 仅为 osm，必须靠名称或 id 识别，
+ * 否则 G/D 会被 filterKind=hsr 整条跳过，地图退回站间直线并报「偏离铁路较远」。
  */
 const KNOWN_HSR_CORRIDOR_IDS = new Set([
   'xiashen',
@@ -47,13 +49,46 @@ const KNOWN_HSR_CORRIDOR_IDS = new Set([
   'yinlan',
   'lanxin',
   'hefu',
+  // P0 OSM 客运专线（名称可能是「…铁路/客专」不含「高铁」字样）
+  'shitai',
+  'shiji',
+  'hebang',
+  'nanguang',
+  'yuwan',
+  'yongtaiwen',
+  'lianzhen',
+  'haqi',
+  'changhui',
+  // 同病：名称「…铁路」但跑 G/D/C，须进白名单（坑 #23）
+  'xiangpu',
+  'ganlong',
+  'hutong',
+  'qingyan',
+  'wenfu',
+  'hanyi',
+  'longxia',
+  'shenmao',
+  'qinglian',
+  'maozhan',
+  'guangxiyanhai',
+  'qianzhangchang',
+  'huzhune',
+  'musui',
+  // P1
+  'jiaojikezhuan',
+  'guangshenchengji',
+  'chengmianle',
+  'ningan',
+  // P0 补洞：名称「…铁路」但跑 G/D
+  'heining',
+  'hewu',
 ]);
 
 export function isHsrCorridor(c: Pick<CorridorPreset, 'id' | 'name' | 'source'>): boolean {
   const src = String(c.source || '');
   const name = String(c.name || '');
-  if (/china-hsr|hsr-rails|simulation/i.test(src)) return true;
-  if (/高铁|高速|城际/.test(name)) return true;
+  if (/china-hsr|hsr-rails|local-hsr-graph|simulation/i.test(src)) return true;
+  if (/高铁|高速|城际|客专|客运专线/.test(name)) return true;
   if (KNOWN_HSR_CORRIDOR_IDS.has(c.id)) return true;
   return false;
 }
@@ -195,6 +230,7 @@ function nearCorridorTerminus(
 /**
  * 首末站必须属于该走廊（站名或投影），避免「部分重合」误匹配京沪等干线。
  * 同城异站（贵阳东 vs 贵阳北）：仅当贴走廊末端且贴线时放行，避免安阳类平行站误套。
+ * 非 hint 站投影阈值 15km（原 40km 过宽：上海虹桥/南通西会误套沪宁沿江并在张家港断线）。
  */
 function endpointsBelong(
   corridor: CorridorPreset,
@@ -207,7 +243,7 @@ function endpointsBelong(
     if (hasDirectionalConflict(stop.name, hints)) {
       return nearCorridorTerminus(corridor, stop, 12) && nearCorridor(corridor, stop, 15);
     }
-    return nearCorridor(corridor, stop, 40);
+    return nearCorridor(corridor, stop, 15);
   };
   return endOk(first) && endOk(last);
 }
@@ -227,25 +263,115 @@ function geoFitScore(corridor: CorridorPreset, stops: CorridorStop[], hints: str
       continue;
     }
     eligible += 1;
-    if (nearCorridor(corridor, s, 35)) near += 1;
+    if (nearCorridor(corridor, s, 20)) near += 1;
   }
   if (eligible < 2) return 0;
   return near / eligible;
 }
 
-/** 经停中与走廊 hints 同城不同方位的比例（普速线误套高铁的信号） */
-function directionalConflictRatio(stops: CorridorStop[], hints: string[]): number {
+/**
+ * 「平行站误套」冲突比：贴走廊末端的同城异站（南通西 vs hints 南通）不计入，
+ * 否则短途 OD 会被 conflictRatio≥0.2 误杀精品走廊。
+ */
+function directionalConflictRatio(
+  stops: CorridorStop[],
+  hints: string[],
+  corridor?: CorridorPreset,
+): number {
   if (!stops.length) return 0;
   let n = 0;
   for (const s of stops) {
-    if (hasDirectionalConflict(s.name, hints)) n += 1;
+    if (!hasDirectionalConflict(s.name, hints)) continue;
+    if (
+      corridor &&
+      nearCorridorTerminus(corridor, s, 12) &&
+      nearCorridor(corridor, s, 15)
+    ) {
+      continue;
+    }
+    n += 1;
   }
   return n / stops.length;
 }
 
+/** 站到走廊折线最短距离（km）；无坐标则 Infinity */
+function distToCorridor(corridor: CorridorPreset, stop: CorridorStop): number {
+  if (stop.lng == null || stop.lat == null || !corridor.railway?.length) return Infinity;
+  const { path, lengthKm } = buildRailwayMetrics(corridor.railway);
+  if (lengthKm <= 0) return Infinity;
+  return projectToRailway(path, lengthKm, Number(stop.lng), Number(stop.lat)).distKm;
+}
+
+/**
+ * K/T/Z 默认真普速，但部分车实际走行高铁（如 Z509 兰新高铁经西宁）。
+ * 仅在强证据时放开高铁候选，避免 Z5 之类误套京广高铁：
+ * - ≥2 个带方位的中间站命中该高铁 hints 且贴线（张掖西/临泽南…），或
+ * - 存在「孤点」中间站：贴高铁 (&lt;8km) 却远离已选普速 (&gt;40km)（西宁 vs 兰新线河西）
+ */
+export function stopsEvidenceHsrOverride(
+  stops: CorridorStop[],
+  hsr: CorridorPreset,
+  conventionalBest: CorridorPreset | null,
+): boolean {
+  if (!isHsrCorridor(hsr) || stops.length < 2) return false;
+  const hints = (hsr.stationsHint || []).map(normalize).filter(Boolean);
+  if (hints.length < 2) return false;
+  if (!endpointsBelong(hsr, stops[0], stops[stops.length - 1], hints)) return false;
+
+  const geo = geoFitScore(hsr, stops, hints);
+  let directionalMids = 0;
+  for (const s of stops.slice(1, -1)) {
+    if (!onHints(s.name, hints)) continue;
+    if (!hasDirectionSuffix(s.name)) continue;
+    if (nearCorridor(hsr, s, 15)) directionalMids += 1;
+  }
+  if (directionalMids >= 2 && geo >= 0.6) return true;
+
+  if (conventionalBest) {
+    for (const s of stops.slice(1, -1)) {
+      const dH = distToCorridor(hsr, s);
+      const dC = distToCorridor(conventionalBest, s);
+      if (dH < 8 && dC > 40 && geo >= 0.55) return true;
+    }
+  }
+  return false;
+}
+
+function scoreCorridorCandidate(
+  c: CorridorPreset,
+  stops: CorridorStop[],
+  first: CorridorStop,
+  last: CorridorStop,
+): { score: number; hit: number } | null {
+  const hints = (c.stationsHint || []).map(normalize).filter(Boolean);
+  if (hints.length < 2) return null;
+  if (!endpointsBelong(c, first, last, hints)) return null;
+
+  let hit = 0;
+  for (const s of stops) {
+    if (onHints(s.name, hints)) hit += 1;
+  }
+  const nameScore = hit / stops.length;
+  const geoScore = geoFitScore(c, stops, hints);
+  const conflictRatio = directionalConflictRatio(stops, hints, c);
+  const endpointsNamed = onHints(first.name, hints) && onHints(last.name, hints);
+  // 大量「安阳/鹤壁」类平行普速站 → 拒绝京广高铁等走廊
+  if (conflictRatio >= 0.2 && hit < Math.max(3, Math.ceil(stops.length * 0.25))) {
+    return null;
+  }
+  const score = geoScore * 0.65 + nameScore * 0.35;
+  const accept =
+    geoScore >= 0.5 ||
+    (endpointsNamed && hit >= 2) ||
+    (hit >= 3 && nameScore >= 0.35);
+  if (!accept) return null;
+  return { score, hit };
+}
+
 /**
  * 按首末站归属 + 几何贴合（主）/ 站名命中（辅）匹配精品走廊。
- * G/D → 仅高铁走廊；C → 高铁+普速客运（丽香等）；K/T/Z → 仅普速走廊。
+ * G/D → 仅高铁走廊；C → 高铁+普速客运（丽香等）；K/T/Z → 仅普速走廊
+ * （例外：时刻表强证据表明实际走高铁时，见 stopsEvidenceHsrOverride）。
  */
 export function matchCorridor(
   stops: CorridorStop[],
@@ -259,6 +385,7 @@ export function matchCorridor(
   /** all | hsr | conventional */
   let filterKind: 'all' | 'hsr' | 'conventional' = 'all';
   if (code) {
+    // C 必须单独分支：不可写进 /^[GDC]/，否则永远走 hsr、城际走廊被跳过
     if (/^[GD]/i.test(code)) filterKind = 'hsr';
     else if (/^C/i.test(code)) filterKind = 'all'; // 城际可走客运专线或普速客运走廊
     else filterKind = 'conventional';
@@ -268,37 +395,10 @@ export function matchCorridor(
   const last = stops[stops.length - 1];
   let best: { corridor: CorridorPreset; score: number; hit: number } | null = null;
 
-  for (const c of corridors) {
-    if (filterKind === 'hsr' && !isHsrCorridor(c)) continue;
-    if (filterKind === 'conventional' && !isConventionalCorridor(c)) continue;
-
-    const hints = (c.stationsHint || []).map(normalize).filter(Boolean);
-    if (hints.length < 2) continue;
-    if (!endpointsBelong(c, first, last, hints)) continue;
-
-    let hit = 0;
-    for (const s of stops) {
-      if (onHints(s.name, hints)) hit += 1;
-    }
-    const nameScore = hit / stops.length;
-    const geoScore = geoFitScore(c, stops, hints);
-    const conflictRatio = directionalConflictRatio(stops, hints);
-    const endpointsNamed = onHints(first.name, hints) && onHints(last.name, hints);
-    // 大量「安阳/鹤壁」类平行普速站 → 拒绝京广高铁等走廊
-    if (conflictRatio >= 0.2 && hit < Math.max(3, Math.ceil(stops.length * 0.25))) {
-      continue;
-    }
-    // 综合分：几何权重大，避免「站名覆盖率」卡死长途车
-    const score = geoScore * 0.65 + nameScore * 0.35;
-
-    const accept =
-      geoScore >= 0.5 ||
-      (endpointsNamed && hit >= 2) ||
-      (hit >= 3 && nameScore >= 0.35);
-
-    if (!accept) continue;
-
-    // 分数接近时优先更短走廊，避免沪杭等分段 OD 误套整条沪昆巨折线
+  const consider = (c: CorridorPreset) => {
+    const scored = scoreCorridorCandidate(c, stops, first, last);
+    if (!scored) return;
+    const { score, hit } = scored;
     const shorter =
       best &&
       Math.abs(score - best.score) <= 0.05 &&
@@ -311,7 +411,24 @@ export function matchCorridor(
     ) {
       best = { corridor: c, score, hit };
     }
+  };
+
+  for (const c of corridors) {
+    if (filterKind === 'hsr' && !isHsrCorridor(c)) continue;
+    if (filterKind === 'conventional' && !isConventionalCorridor(c)) continue;
+    consider(c);
   }
+
+  // K/T/Z：普速命中后，若时刻表像「跑在高铁上」（西宁孤点 / 张掖西…），再比高铁候选
+  if (filterKind === 'conventional') {
+    const convBest = best?.corridor ?? null;
+    for (const c of corridors) {
+      if (!isHsrCorridor(c)) continue;
+      if (!stopsEvidenceHsrOverride(stops, c, convBest)) continue;
+      consider(c);
+    }
+  }
+
   return best ? { corridor: best.corridor, score: best.score } : null;
 }
 
@@ -381,8 +498,11 @@ export function sliceCorridorForStops(
   const to = resolveOdEndpoint(stops[stops.length - 1], corridor, 'to');
   if (!from || !to) return null;
 
-  const sliced = slicePolylineByOd(corridor.railway, from, to);
+  let sliced = slicePolylineByOd(corridor.railway, from, to);
   if (!sliced || sliced.length < 2) return null;
+
+  // 枢纽站常离主线折线 0.3–几 km（郑州东/虹桥等）：把行程首末接到切片，避免站标与蓝线断连
+  sliced = attachOdApproaches(sliced, from, to);
 
   const stopsForFit = stops.map((s, i) => {
     if (i === 0) return { ...s, lng: from.lng, lat: from.lat };
@@ -407,4 +527,25 @@ export function sliceCorridorForStops(
   if (stationKm > 80 && railKm < stationKm * 0.45) return null;
 
   return sliced;
+}
+
+/** 切片端点与行程 OD 之间短引线（仅 <8km，避免假飞线） */
+function attachOdApproaches(
+  coords: [number, number][],
+  from: { lng: number; lat: number },
+  to: { lng: number; lat: number },
+): [number, number][] {
+  if (coords.length < 2) return coords;
+  const out: [number, number][] = coords.map((c) => [c[0], c[1]]);
+  const start = { lng: out[0][0], lat: out[0][1] };
+  const end = { lng: out[out.length - 1][0], lat: out[out.length - 1][1] };
+  const d0 = haversineKm(from, start);
+  const d1 = haversineKm(to, end);
+  if (d0 > 0.2 && d0 < 8) {
+    out.unshift([Number(from.lng.toFixed(6)), Number(from.lat.toFixed(6))]);
+  }
+  if (d1 > 0.2 && d1 < 8) {
+    out.push([Number(to.lng.toFixed(6)), Number(to.lat.toFixed(6))]);
+  }
+  return out;
 }

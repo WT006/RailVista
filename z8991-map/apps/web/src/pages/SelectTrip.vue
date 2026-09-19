@@ -15,6 +15,7 @@ import {
   pruneRecentTrips,
   type TripIndexEntry,
 } from '../lib/tripCache';
+import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import { useTripStore } from '../stores/tripStore';
 
 const router = useRouter();
@@ -479,10 +480,49 @@ const odOptions = computed(() => stops.value.map((s) => s.name));
 
 /** 仅首页展示当前行程 / 最近访问；有查询结果或确认 OD 时隐藏 */
 const showHomeLists = computed(() => step.value === 'search' && trains.value.length === 0);
+
+const showBackBtn = computed(() => step.value === 'od' || trains.value.length > 0);
+
+function goBack() {
+  if (loading.value) return;
+  if (step.value === 'od') {
+    step.value = 'search';
+    return;
+  }
+  if (trains.value.length > 0) {
+    trains.value = [];
+    selected.value = null;
+    stops.value = [];
+    error.value = '';
+  }
+}
 </script>
 
 <template>
   <div class="select-page">
+    <div class="select-ambiance" aria-hidden="true">
+      <svg class="select-ambiance__rail" viewBox="0 0 720 280" preserveAspectRatio="xMidYMid slice">
+        <path
+          class="select-ambiance__track"
+          d="M-20 210 C 80 190, 140 120, 220 110 S 360 150, 420 90 S 560 40, 640 70 S 720 130, 760 100"
+        />
+        <path
+          class="select-ambiance__track select-ambiance__track--soft"
+          d="M-40 240 C 60 220, 160 170, 250 165 S 390 200, 470 140 S 610 80, 780 120"
+        />
+        <circle class="select-ambiance__dot select-ambiance__dot--station" cx="220" cy="110" r="4.5" />
+        <circle class="select-ambiance__dot select-ambiance__dot--spot" cx="420" cy="90" r="4" />
+        <circle class="select-ambiance__dot select-ambiance__dot--train" cx="560" cy="55" r="5" />
+      </svg>
+    </div>
+
+    <div v-if="showBackBtn" class="select-top">
+      <button type="button" class="select-back-btn" :disabled="loading" @click="goBack">
+        <span class="select-back-btn__icon" aria-hidden="true">‹</span>
+        返回
+      </button>
+    </div>
+
     <header class="select-hero">
       <p class="brand">RailVista</p>
       <h1>车上风景与行程定位</h1>
@@ -517,7 +557,11 @@ const showHomeLists = computed(() => step.value === 'search' && trains.value.len
 
     <p v-if="resumeHint" class="error">{{ resumeHint }}</p>
 
-    <form class="select-form" @submit.prevent="search">
+    <form class="select-form select-form--panel" @submit.prevent="search">
+      <div class="select-form__head">
+        <h2>开始查询</h2>
+        <p>填写 OD 与乘车日，查找直达车次</p>
+      </div>
       <label class="station-field">
         <span>出发站</span>
         <div class="station-field__control">
@@ -570,7 +614,7 @@ const showHomeLists = computed(() => step.value === 'search' && trains.value.len
       </label>
       <label>
         <span>乘车日期</span>
-        <input v-model="date" type="date" required />
+        <DarkDateTimeField v-model="date" mode="date" placeholder="选择乘车日期" />
       </label>
       <div class="actions">
         <button type="submit" class="btn primary" :disabled="loading">查询直达车次</button>

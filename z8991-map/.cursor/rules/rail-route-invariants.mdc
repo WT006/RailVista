@@ -7,6 +7,9 @@ alwaysApply: true
 
 入库或修改走廊、`stations-geo`、精确拼线时**必须**遵守。违反会出现交叉、飞线、跳站、偏离铁路。
 
+**操作清单与历史踩坑（防忘记）：** `.cursor/rules/rail-corridor-ingest.mdc` · `docs/corridor-ingest-lessons.md` · `docs/rail-geometry-quality-playbook.md`  
+批量缺口：`docs/corridor-coverage-gap.md`。新线须达沪昆/兰新金标准（`verify --strict`），过不了门禁不得正式入库。
+
 ## 1. 站序只认时刻表
 
 - 经停顺序 = 12306 时刻表顺序，**禁止**按 lat/lng 重排。
@@ -16,26 +19,39 @@ alwaysApply: true
 
 - 精品走廊 / 本地 `hsr-rails` **仅** G/D/C（`isHsrTrainCode` / `isHighspeedTrain`）。
 - K/T/Z 等禁止套银兰/京广高铁等；否则「安阳→安阳东」「青铜峡被吴忠绕开」。
+- **例外：** 时刻表强证据表明实际走高铁时（如 Z509 经西宁+张掖西，中间站贴高铁却远离普速河西线）允许命中对应高铁走廊；勿把真·河西普速 Z 车改去兰新高铁。
 - 方位冲突站（安阳 vs 安阳东、杭州南 vs 杭州东）**不算**贴合命中。
+- OSM 入库名称若是「…铁路 / …客专」而无「高铁」字样，须能通过 `isHsrCorridor`（`客专` 或 `KNOWN_HSR_CORRIDOR_IDS`），否则 G/D 匹配不到、地图变站间直线（坑 #23）。
 
 ## 3. 走廊几何质量门禁（入库前自检）
 
-对 `data/presets/corridors/*.json`：
+对 `data/presets/corridors/*.json`，**必须**跑通：
+
+`node scripts/verify-corridor-geometry.mjs --strict`（可加 `--id {id}`）
 
 | 检查 | 阈值（经验） |
 |------|----------------|
-| 站到折线距离 | 多数站 &lt; 2 km，OD 端 &lt; 5 km |
+| 站到折线距离 | 多数站 &lt; 2 km；**任一 hint 站 &gt; 12 km → 失败**（中间站孤点） |
+| OD 端 | &lt; 5 km（虹桥级 &lt; 0.5 km）；否则 patch 进路，禁止裸入库 |
+| `corridor:{id}` seed | 须贴合**该 id** 折线（&lt; 12 km）；禁止跨走廊错钉 |
 | 相邻点 maxJump | 宜 &lt; 8 km（源数据断口须显式桥接并写 note） |
 | 折角 maxTurn | 避免 ≥150° 尖刺/折返 |
 | OD 切片 | `slicePolylineByOd`：from 进度 &gt; to 时必须 **reverse** |
 
-源数据断口（如银兰末端距兰州西/徐兰 ~36 km）：用连接走廊桥接，**禁止**大跨飞线；在 JSON `note` 标明。
+源数据断口（如银兰末端距兰州西/徐兰 ~36 km）：用连接走廊桥接，**禁止**大跨飞线；在 JSON `note` 标明。  
+`attachOdApproaches` 只补 0.2–8 km 缝；**&gt;8 km 不会自动连站**——必须先修走廊几何。
 
 ## 4. 车站坐标（stations-geo）
 
 - 禁止整线「等分 progress」撒点；用**锚站投影**再插值。
 - 同名单站必须落在正确区域（区域锚点）；飞点（如潜江到江苏）→ scrub + 拒绝持久化。
+- **`corridor:xxx` seed 只能钉到该站所属干线**；分叉/平行线（长珲 vs 敦白）禁止把 A 线站 snap 到 B 线。蓝线「绕开」中间站 → 先查跨走廊错钉，再查飞点。
+- **同走廊也会错钉**：seed 贴合宿主折线 &lt;12 km **不够**——长干线（郑渝/武西）上「最近轨点」可能偏真站数十公里。入库/修站前对照 **wiki/OSM 真站位**；枢纽站（东津级）禁止只靠「往北/往南瞄一点再 cut」。
+- **改名/旧站陷阱**：高铁「襄阳东」= 东津（郑渝∩武西），≠ 原汉丹「襄阳东」（今襄州站）。区域锚点钉东津，勿用普速旧坐标。
+- **`source: wiki` 禁止被重建脚本静默改成 `corridor:xxx`**；重建只可投影非 wiki 锚站，wiki 站须保留或显式人工覆盖。
+- 蓝线对中间站出 **V/尖刺**（北冲再折回）→ **先查站坐标**，再查走廊几何；站对了尖刺会消失。
 - `corridor:xxx` 源坐标若与普速站冲突，普速行程勿强行复用。
+- `stationsHint` 须含真实经停关键站（含中间站）；只写 OD 两端会漏掉 midFar / scrub。
 
 ## 5. 精确路线任务
 
@@ -62,4 +78,13 @@ alwaysApply: true
 
 ❌ 蓝线「绕开」千岛湖 → 先怪走廊；实为站坐标飞点（偏 28km）
 ✅ 对照 wiki/OSM 真站位；走廊距真站 &lt;1km 则修 stations-geo + 区域锚点
+
+❌ 安图西被 corridor:dunbai seed，长珲蓝线绕开（偏 ~58km）
+✅ 钉回 changhui / wiki；区域锚点；dunbai hints 勿挂长珲专用站
+
+❌ 襄阳东被 corridor:zhengyu 钉到郑渝北段（~32.26°N），汉十蓝线北冲再折回成 V；verify 仍可能 PASS（seed 贴合郑渝）
+✅ wiki 东津（~32.016°N / 112.29°E）；区域锚点；走廊走武西过站，禁止北段 spur；保留 source:wiki
+
+❌ hutong 折线两端不到虹桥/南通西，蓝线悬空；指望 attachOdApproaches
+✅ OD via-legs / patch 进路至 &lt;0.5–5km；verify --strict 过门禁再入库
 ```

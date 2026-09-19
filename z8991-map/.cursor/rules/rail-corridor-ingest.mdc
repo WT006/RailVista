@@ -1,52 +1,86 @@
 ---
-description: 新走廊/干线入库一次性正确的操作清单与验收
-globs: data/presets/corridors/**,data/stations-geo.json,scripts/*corridor*,scripts/*yinlan*,scripts/seed-corridor*,scripts/extract-corridor*,apps/api/src/services/corridors.ts,apps/api/src/services/corridorNetwork.ts,apps/api/src/services/localRails.ts,apps/api/src/services/railGeometryJob.ts,apps/api/src/services/osmRailway.ts,apps/api/src/services/geocode.ts
+description: 新走廊/干线入库流水线、历史踩坑与验收门禁（对齐沪昆/兰新金标准）
+globs: data/presets/corridors/**,data/stations-geo.json,scripts/*corridor*,scripts/*yinlan*,scripts/seed-corridor*,scripts/extract-corridor*,scripts/build-corridor*,scripts/clean-corridor*,scripts/verify-corridor*,scripts/patch-corridor*,scripts/densify-corridor*,scripts/scrub-corridor*,apps/api/src/services/corridors.ts,apps/api/src/services/corridorNetwork.ts,apps/api/src/services/localRails.ts,apps/api/src/services/railGeometryJob.ts,apps/api/src/services/osmRailway.ts,apps/api/src/services/geocode.ts,docs/corridor-*.md,docs/rail-geometry*.md,docs/corridor-coverage-gap*
 alwaysApply: false
 ---
 
-# 走廊入库清单（一次性做对）
+# 走廊入库清单（一次性做对 · 对齐金标准）
 
-## A. 提取与写入
+批量补线 / 改走廊前先读：
 
-1. 用 `scripts/extract-corridor-from-hsr.mjs` / `build-phase*.mjs`，`--axis` 与干线走向一致（ns/ew）。
-2. `stationsHint` 用**本线真实站名**（含方位后缀：兰州西 ≠ 兰州）。
-3. 写入 `data/presets/corridors/{id}.json`：`id` / `name` / `sourceNames` / `railway` / `stationsHint`。
-4. 源轨网断口：跑专用补丁（如 `patch-yinlan-lanzhou-bridge.mjs`）或等价桥接，写清 `note`。
-5. 相关站坐标：`seed-corridor-stations-geo.mjs`（锚站投影），再人工抽查易混站。
+- **进度看板（已入库 / 待入库）：** `docs/corridor-ingest-progress.md`（\`node scripts/gen-corridor-ingest-progress.mjs\` 重生）
+- **踩坑全文：** `docs/corridor-ingest-lessons.md`
+- **复跑手册：** `docs/rail-geometry-quality-playbook.md`
+- **缺口清单：** `docs/corridor-coverage-gap.md`
+- **硬约束：** `.cursor/rules/rail-route-invariants.mdc`
 
-## B. 验收命令（必过）
+金标准效果：`hukun`（含虹桥进路）、`lanxin`、`xiashen`、`jinghu`、`qingzang`。  
+**过不了门禁的 JSON 不得当正式入库。**
+
+---
+
+## A. 标准流水线（每条必走）
+
+1. 备份（若覆盖已有 id）。
+2. 分类提取：
+   - 高铁：`extract-corridor-from-hsr.mjs`（`--axis` / `--reverse` 正确）或 OSM relation。
+   - 普速：`build-corridor-from-osm-relation.mjs` / `osm-bbox`——**禁止**套 hsr-rails。
+3. OSM **必须** `--from lng,lat --to lng,lat` Dijkstra（禁止 member-order）。
+4. Windows：`spawnSync(process.execPath, args)` **不要** `shell: true`（中文线名会乱码）。
+5. 写入 `corridors/{id}.json`：`id` / `name` / `sourceNames` / `railway` / `stationsHint`（真实 OD + 方位后缀）。
+   - OSM 客运专线若名称无「高铁/高速/城际」，须带「客专」或把 id 写入 `KNOWN_HSR_CORRIDOR_IDS`（坑 #23），否则 G/D 匹配不到。
+6. `node scripts/clean-corridors.mjs --write --id {id}`（含 `removeHubRetraces`）。
+7. OD 脱节 → `patch-corridor-od-approaches.mjs`（枢纽进路仿 `patch-hukun-hongqiao-approach.mjs`，禁直线穿城）。
+8. 真断口 → 显式桥接 + `note`（银兰~36km 模式）；**禁止**静默 `fillJumps` 冒充修好。
+9. `node scripts/verify-corridor-geometry.mjs --strict` → 必须 PASS。
+10. `seed-missing-stations-geo` + 抽查 / `scrub-corridor-station-flyers`。
+11. 冒烟：G/D 命中本高铁走廊；K/T/Z **不得**命中；反向 OD 无巨跳。
+12. 目视：首末贴站、大枢纽无 Y/V 短岔；改 JSON 后重启 API；改拼线规则 bump `railseg:vN`。
+
+---
+
+## B. 验收命令
 
 ```bash
-# 几何门禁（尖刺/折返/大跳）；默认 heavy 失败
-node scripts/verify-corridor-geometry.mjs
-
-# 清洗（dry-run / 写回）
-node scripts/clean-corridors.mjs
-node scripts/clean-corridors.mjs --write
-
-# 相位自检（端点距离、里程、折返）
-node scripts/verify-phase3-corridors.mjs   # 或对应 phase 脚本
+node scripts/clean-corridors.mjs --write --id {id}
+node scripts/verify-corridor-geometry.mjs --strict
+# 金标准线复跑（可选）
+node scripts/demo-corridor-rebuild.mjs
 ```
 
-入库前：`verify-corridor-geometry` 不得为 heavy。dirty bbox 走廊优先 `clean-corridors`；救不了再用站链重拼。
+阈值（经验）：站→折线多数 &lt;2 km；**任一 hint &gt;12 km 失败**；OD 端 &lt;5 km（虹桥级 &lt;0.5 km）；`corridor:{id}` seed 贴合宿主；maxJump 宜 &lt;8 km（超则 bridge+note）；无 heavy/medium。
 
-## C. 常见坑（入库时主动避开）
+---
+
+## C. 历史踩坑（入库时主动避开）
 
 | 坑 | 处理 |
 |----|------|
-| 平行高铁/普速站 | 方位冲突逻辑；hints 勿混用「东/西/南/北」错站 |
-| 超长同名干线 prefer | prefer 后必须 allowPrefer:false 回退 |
-| 多走廊接缝反向 | 网络拼接单调性 + OD reverse |
-| 仅中间站有坐标 | OD 首末必须有坐标再 slice；否则勿用中间站冒充 OD |
-| 改 JSON 后仍旧线 | 走廊按目录 mtime 热载；精确段缓存需 bump version |
-| 地图「像从邻市出发」 | 核对站坐标 vs 市名注记（银川站靠近吴忠市注记属正常） |
-| OSM relation 默认 member-order | 兰新曾拼成 ~1.7 万 km；必须 `--from/--to` Dijkstra + 门禁 |
-| Windows 中文 argv 乱码 | `spawn` 不要 `shell:true`；否则 hsr 提取名对不上 |
-| 枢纽 Y/V 短岔 | 贴站后折返再大跳；用 `removeHubRetraces`，勿全局猛删（会砍虹桥） |
-| 走廊起点不在首站 | 沪昆东端曾在闵行、虹桥脱节；补 `_hsr-rails` 进路（`patch-hukun-hongqiao-approach.mjs`） |
-| 裸 hsr 重抽当修复 | 沪昆 sharp 可变差；先 `clean-corridors`，抽完立刻 verify |
+| 裸 hsr/OSM 重抽当修复 | 先 clean；沪昆裸抽曾 sharp 72→266；失败回滚备份 |
+| OSM member-order | 兰新曾 ~1.7 万 km；必须 `--from/--to` + 立刻 verify |
+| Windows 中文 argv 乱码 | spawn 不要 `shell:true` |
+| 枢纽 Y/V 短岔 | `removeHubRetraces`；勿全局猛删弯角（曾砍虹桥出 21km 缺口） |
+| 走廊起点不在首站 | 虹桥进路软桥 Dijkstra；禁直线连站 |
+| 静默 fillJumps | 默认关闭；真断口 bridge+note 或 `densify-corridor-jumps`+note |
+| 蓝线「绕站」 | 多为 stations-geo 飞点；scrub 站坐标，**不改**时刻表站序 |
+| 跨走廊错钉（安图西→敦白） | `corridor:A` seed 须贴合 A；分叉线勿互 snap；hints 勿挂他线专用站；verify SEED/midFar |
+| 同走廊错公里（襄阳东） | seed&lt;12km 仍可能偏真站数十 km；对照 wiki；枢纽勿「北瞄再 cut」；`source:wiki` 勿被重建覆盖；蓝线中间站 V 尖刺先查站 |
+| 改名旧站（襄阳东≠襄州） | 高铁东津 ≠ 汉丹旧襄阳东；区域锚点钉真站 |
+| OD 悬空（沪通虹桥/南通西） | via-legs 或 patch 进路；`attachOdApproaches` 不补 &gt;8km；`--strict` 拦 OD&gt;5 |
+| OSM 名「铁路/客专」G/D 不命中 | `isHsrCorridor`：名称加 `客专`；id 进 `KNOWN_HSR_CORRIDOR_IDS`；冒烟用真实 G/D |
+| 平行高铁/普速 | 京沪线 ≠ `jinghu`；K 车禁套高铁走廊 |
+| Z 车真走高铁（Z509 经西宁） | `stopsEvidenceHsrOverride`：孤点中间站或 ≥2 方位高铁中间站才放行；河西普速仍走 `lanxinxian` |
+| 方位冲突站 | 杭州南≠杭州东；不算贴合命中 |
+| 反向 OD 巨跳 | `slicePolylineByOd` 必须 reverse |
+| 等分 progress 撒站 | 锚站投影再插值 |
+| bridge 跳站 | via&gt;~12km → `bridge:skip`，保留示意 |
+| 超长 prefer 锁死 | `allowPrefer: false` 回退 |
+| 源数据空/过短 | 暂缓（商合杭/石太/包银等历史），勿硬抽脏线 |
+| 改 JSON 仍旧线 | mtime 热载 / 重启 API；缓存 bump version |
 
-细节与复跑：`docs/rail-geometry-quality-playbook.md`。
+全文表：`docs/corridor-ingest-lessons.md`。
+
+---
 
 ## D. 改代码时
 

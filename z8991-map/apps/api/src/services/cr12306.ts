@@ -163,9 +163,8 @@ export class Cr12306Source implements TrainDataSource {
     const cacheKey = `stops:${query.trainNo}:${query.date}:${fromSt.telecode}:${toSt.telecode}`;
     const cached = cache.get<Stop[]>(cacheKey);
     if (cached?.length) {
-      const missing = cached.some((s) => s.lng == null || s.lat == null);
-      if (!missing) return cached;
-      const fixed = await enrichStopsCoords(cached);
+      // 始终再 enrich：stations-geo / 区域锚点更新后要覆盖缓存里的飞点（如长白山旧南偏）
+      const fixed = await enrichStopsCoords(cached, { trainCode: query.trainCode });
       cache.set(cacheKey, fixed, Number(process.env.CACHE_TTL_STOPS_SEC || 10800));
       return fixed;
     }
@@ -217,7 +216,7 @@ export class Cr12306Source implements TrainDataSource {
 
     // attach absolute ISO using query.date + day rollover
     const withIso = attachAbsoluteTimes(stops, query.date);
-    const enriched = await enrichStopsCoords(withIso);
+    const enriched = await enrichStopsCoords(withIso, { trainCode: query.trainCode });
     cache.set(cacheKey, enriched, Number(process.env.CACHE_TTL_STOPS_SEC || 10800));
     return enriched;
   }

@@ -175,10 +175,10 @@ node scripts/build-scenic-spots-curated.mjs
 
 | 文件 | 说明 |
 |---|---|
-| `data/presets/_scenic-wikidata-truths.json` | 外部真值缓存（同名错配由脚本守卫拒绝） |
-| `data/presets/scenic-spot-calibration-patches.json` | 校准补丁（build 时应用到策展结果） |
-| `data/presets/_scenic-calibration-report.json` | 全库动作报告 |
-| `data/presets/_scenic-calibration-dropped.json` | 曾因飞点剔除的坏补丁样例 |
+| `data/presets/_scenic-wikidata-truths.json` | 外部真值缓存（可用 `build-scenic-wikidata-truths.mjs` 重生；同名错配由脚本守卫拒绝） |
+| `data/presets/scenic-spot-calibration-patches.json` | 校准补丁（build 时应用到策展结果；持久产物） |
+
+校准脚本干跑时可能在 `data/presets/` 写出 `_scenic-calibration-*.json` 等临时报告，**勿入库**（已 gitignore）。
 
 **同名错配守卫：** 真值相对策展旧点位移 &gt; ~80 km（粗坐标 ~120 km）则忽略；并要求真值离关联走廊合理。  
 **青藏：** 具名山峰/圣湖禁止吸轨；仅广域点可向走廊插值靠拢。

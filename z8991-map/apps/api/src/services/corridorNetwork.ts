@@ -633,6 +633,7 @@ export function matchCorridorNetwork(
   const code = trainCode != null ? String(trainCode).trim() : '';
   let kind: GraphKind = 'all';
   if (code) {
+    // C 必须单独分支：不可写进 /^[GDC]/，否则永远走 hsr
     if (/^[GD]/i.test(code)) kind = 'hsr';
     else if (/^C/i.test(code)) kind = 'all';
     else kind = 'conventional';

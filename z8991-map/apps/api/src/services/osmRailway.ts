@@ -402,7 +402,8 @@ function pathOnGraph(
 
 function cacheKey(stops: LngLat[], trainCode?: string): string {
   const raw = `${trainCode || ''}|${stops.map((s) => `${s.lng.toFixed(3)},${s.lat.toFixed(3)}`).join('|')}`;
-  return `rail:v7:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
+  // v8：G/D/C 不再回退普速 Overpass（保精度 + 加速）
+  return `rail:v8:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
 }
 
 export function isHighspeedTrain(trainCode?: string): boolean {
@@ -424,6 +425,8 @@ export type SegmentGeometryResult = {
 };
 
 const SEGMENT_CACHE_TTL_SEC = Number(process.env.CACHE_TTL_RAIL_SEG_SEC || 24 * 3600);
+/** 失败段短 TTL，避免同一 OD 反复打 Overpass；过短以免临时网络故障永久挡死 */
+const SEGMENT_MISS_TTL_SEC = Number(process.env.CACHE_TTL_RAIL_SEG_MISS_SEC || 20 * 60);
 
 /** 路径长度 / 站间距上限；过大视为绕错线 */
 const MAX_LENGTH_RATIO = 2.2;
@@ -492,8 +495,8 @@ function sampleCorridor(from: LngLat, to: LngLat, stepKm = 35): LngLat[] {
 function segmentCacheKey(from: LngLat, to: LngLat, preferHs: boolean): string {
   const r = (p: LngLat) => `${p.lng.toFixed(3)},${p.lat.toFixed(3)}`;
   const raw = `${preferHs ? 'hs' : 'conv'}|${r(from)}|${r(to)}`;
-  // v7：分轨本地图 + Overpass 可选
-  return `railseg:v7:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
+  // v8：分轨本地图 + HS 不回退普速 Overpass + miss 短缓存
+  return `railseg:v8:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
 }
 
 function pathFromWays(ways: OsmWay[], from: LngLat, to: LngLat): LngLat[] | null {
@@ -598,9 +601,13 @@ export async function buildSegmentGeometry(
 
   const preferHs = !!opts?.preferHighspeed;
   const key = segmentCacheKey(from, to, preferHs);
+  const missKey = `${key}:miss`;
   const cached = cache.get<LngLat[]>(key);
   if (cached && cached.length >= 2) {
     return { coords: cached, ok: true, fromCache: true };
+  }
+  if (cache.get<number>(missKey) === 1) {
+    return { coords: [from, to], ok: false, fromCache: true, reason: 'cached_miss' };
   }
 
   // 1) 本地轨网（分轨）
@@ -622,6 +629,7 @@ export async function buildSegmentGeometry(
 
   // 2) Overpass 可选兜底
   if (!isOverpassEnabled()) {
+    cache.set(missKey, 1, SEGMENT_MISS_TTL_SEC);
     return { coords: [from, to], ok: false, fromCache: false, reason: 'overpass_disabled' };
   }
 
@@ -640,13 +648,12 @@ export async function buildSegmentGeometry(
     return line;
   };
 
-  // 高铁可试 HS；普速禁止退回 highspeed=yes（避免贴银兰等）
-  let line = preferHs ? await tryOsm(true) : await tryOsm(false);
-  if ((!line || line.length < 2) && preferHs) {
-    line = await tryOsm(false);
-  }
+  // G/D/C：只打 HS Overpass，禁止退回普速轨（精度 + 少一次公网往返）
+  // K/T/Z：只打普速 Overpass
+  const line = preferHs ? await tryOsm(true) : await tryOsm(false);
 
   if (!line || line.length < 2) {
+    cache.set(missKey, 1, SEGMENT_MISS_TTL_SEC);
     return { coords: [from, to], ok: false, fromCache: false, reason: lastReason };
   }
 
@@ -654,6 +661,7 @@ export async function buildSegmentGeometry(
   const gate = acceptSegmentGeometry(simplified, from, to);
   if (!gate.ok) {
     console.warn(`[rail-seg] osm rejected ${gate.reason}`);
+    cache.set(missKey, 1, SEGMENT_MISS_TTL_SEC);
     return { coords: [from, to], ok: false, fromCache: false, reason: gate.reason };
   }
   cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
@@ -713,15 +721,8 @@ export async function buildRailGeometry(
 
   runPath();
 
-  // 高铁专用网不连通时，扩大到全部铁路再寻路（更接近精品线完整度）
-  if (preferHs && ok < total) {
-    const allWays = await fetchWaysAlongRoute(stops, false);
-    if (allWays.length > ways.length) {
-      ways = allWays;
-      adj = buildAdj(ways);
-      runPath();
-    }
-  }
+  // 高铁专用网不连通时：不再扩大到普速 Overpass（避免贴错线，也省一次整趟拉取）
+  // 缺口由站间示意 / 精品走廊兜底，精度优先于「凑完整度」
 
   const simplified = simplify(merged, 0.45);
   const coords: [number, number][] = simplified.map((p) => [

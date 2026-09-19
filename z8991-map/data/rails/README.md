@@ -9,13 +9,49 @@ node scripts/build-rail-graph.mjs
 | File | Source |
 |------|--------|
 | `china-hsr.graph` | `data/presets/corridors/_hsr-rails.geojson` |
-| `china-rail.graph` | Conventional corridors (`osm` / `osm-bbox` / anchors…; excludes HSR simulation & 高铁/高速 names) |
+| `china-rail.graph` | Conventional corridors（默认）；**`--pbf` 成功后由 Geofabrik 全国普速轨覆盖** |
 | `china-rail.geojson` | Same conventional ways (debug / fallback) |
+| `_build-meta.json` | PBF 建图元信息（可选） |
+| `_china-railway.osm.pbf` | osmium tags-filter 中间产物（可删，可 gitignore） |
 
-Optional Geofabrik path (requires [osmium-tool](https://osmcode.org/osmium-tool/)):
+## Geofabrik PBF（推荐：治冷启动贴合）
+
+1. 下载（约 1.5 GB，勿提交 git）：
+
+```bash
+mkdir -p tmp
+curl -L -o tmp/china-latest.osm.pbf https://download.geofabrik.de/asia/china-latest.osm.pbf
+```
+
+2. 建图（本机需 [osmium-tool](https://osmcode.org/osmium-tool/)，或 **Docker Desktop 运行中**）：
 
 ```bash
 node scripts/build-rail-graph.mjs --pbf tmp/china-latest.osm.pbf
 ```
+
+流程：`tags-filter nwr/railway` → `export geojsonseq` → 过滤可用 `railway=rail|…` → **覆盖** `china-rail.graph`。  
+高铁图默认仍用 `_hsr-rails`；若要用 PBF 高铁标签覆盖，加 `--pbf-replace-hsr`。
+
+环境变量：
+
+| Env | 默认 | 含义 |
+|-----|------|------|
+| `OSMIUM_DOCKER_IMAGE` | `iboates/osmium` | 无本机 osmium 时的镜像 |
+| `RAIL_GRAPH_MIN_PBF_WAYS` | `100` | 普速 ways 少于此数则不覆盖走廊图 |
+
+验收：`china-rail.graph` 的 `wayCount` 应远大于走廊派生的 ~17。
+
+## 热门精确预热
+
+清单：`data/presets/precise-hotlist.json`  
+脚本（API 先启动）：
+
+```bash
+node scripts/warmup-precise-routes.mjs
+node scripts/warmup-precise-routes.mjs --dry-run
+node scripts/warmup-precise-routes.mjs --base http://127.0.0.1:8787 --limit 2
+```
+
+缓存目录：`data/cache/precise/`（`pinned` 条目 prune 时保留；低成功率默认不落盘）。
 
 Runtime loads graph first, then geojson fallback (`apps/api/src/services/localRails.ts`).

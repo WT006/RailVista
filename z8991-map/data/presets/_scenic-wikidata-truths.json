@@ -1,0 +1,2909 @@
+{
+  "updated": "2026-09-14",
+  "items": [
+    {
+      "spotId": "qinghai-lake",
+      "spotName": "青海湖",
+      "queryName": "青海湖",
+      "wikidataId": "Q201294",
+      "lng": 100,
+      "lat": 37,
+      "source": "wikidata",
+      "distKmFromSpot": 20.66
+    },
+    {
+      "spotId": "chaerhan-salt-bridge",
+      "spotName": "察尔汗盐湖（万丈盐桥）",
+      "queryName": "察尔汗盐湖",
+      "wikidataId": "Q1644517",
+      "lng": 95.16357422,
+      "lat": 37.01954996,
+      "source": "wikidata",
+      "distKmFromSpot": 8.17
+    },
+    {
+      "spotId": "qaidam-gobi",
+      "spotName": "柴达木盆地戈壁",
+      "queryName": "柴达木盆地戈壁",
+      "wikidataId": null
+    },
+    {
+      "spotId": "kunlun-pass",
+      "spotName": "昆仑山口",
+      "queryName": "昆仑山口",
+      "wikidataId": null,
+      "lng": 94.0685899,
+      "lat": 35.6404915,
+      "source": "nominatim",
+      "distKmFromSpot": 0.07
+    },
+    {
+      "spotId": "yuzhu-peak",
+      "spotName": "玉珠峰",
+      "queryName": "玉珠峰",
+      "wikidataId": "Q5938899",
+      "lng": 94.2508,
+      "lat": 35.6525,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "kekexili",
+      "spotName": "可可西里无人区",
+      "queryName": "可可西里无人区",
+      "wikidataId": null
+    },
+    {
+      "spotId": "wudaoliang",
+      "spotName": "五道梁高原荒原",
+      "queryName": "五道梁高原荒原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "fenghuoshan",
+      "spotName": "风火山",
+      "queryName": "风火山",
+      "wikidataId": null,
+      "lng": 114.17039,
+      "lat": 22.349754,
+      "source": "nominatim",
+      "distKmFromSpot": 2480.06
+    },
+    {
+      "spotId": "tuotuohe-source",
+      "spotName": "沱沱河（长江正源）",
+      "queryName": "沱沱河",
+      "wikidataId": "Q1538813",
+      "lng": 92.913179,
+      "lat": 34.092136,
+      "source": "wikidata",
+      "distKmFromSpot": 29.96
+    },
+    {
+      "spotId": "tongtian-river",
+      "spotName": "通天河",
+      "queryName": "通天河",
+      "wikidataId": "Q7821148",
+      "lng": 97.244164,
+      "lat": 32.978392,
+      "source": "wikidata",
+      "distKmFromSpot": 455.49
+    },
+    {
+      "spotId": "sanjiangyuan",
+      "spotName": "三江源自然保护区",
+      "queryName": "三江源自然保护区",
+      "wikidataId": null
+    },
+    {
+      "spotId": "tanggula-pass",
+      "spotName": "唐古拉山口",
+      "queryName": "唐古拉山口",
+      "wikidataId": "Q2166365",
+      "lng": 91.9184292,
+      "lat": 32.8826237,
+      "source": "wikidata",
+      "distKmFromSpot": 2.24
+    },
+    {
+      "spotId": "geladandong",
+      "spotName": "格拉丹东峰（远眺）",
+      "queryName": "格拉丹东峰",
+      "wikidataId": null,
+      "lng": 91.1667381,
+      "lat": 33.4960687,
+      "source": "nominatim",
+      "distKmFromSpot": 22.78
+    },
+    {
+      "spotId": "cuona-lake",
+      "spotName": "措那湖",
+      "queryName": "措那湖",
+      "wikidataId": null,
+      "lng": 91.4720838,
+      "lat": 32.0226064,
+      "source": "nominatim",
+      "distKmFromSpot": 3.93
+    },
+    {
+      "spotId": "qiangtang-grassland",
+      "spotName": "羌塘草原（藏北草原）",
+      "queryName": "羌塘草原",
+      "wikidataId": null,
+      "lng": 101.7803907,
+      "lat": 32.9396109,
+      "source": "nominatim",
+      "distKmFromSpot": 995.49
+    },
+    {
+      "spotId": "nyainqentanglha",
+      "spotName": "念青唐古拉山脉",
+      "queryName": "念青唐古拉山脉",
+      "wikidataId": null
+    },
+    {
+      "spotId": "namtso-distant",
+      "spotName": "纳木错（远观）",
+      "queryName": "纳木错",
+      "wikidataId": "Q651294",
+      "lng": 90.468055555,
+      "lat": 30.720833333,
+      "source": "wikidata",
+      "distKmFromSpot": 16.85
+    },
+    {
+      "spotId": "yangbajing-geothermal",
+      "spotName": "羊八井地热温泉",
+      "queryName": "羊八井地热温泉",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yarlung-tsangpo-gorge-lalin",
+      "spotName": "雅鲁藏布江峡谷（拉林段）",
+      "queryName": "雅鲁藏布江峡谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zang-southeast-forest",
+      "spotName": "藏东南林海湿地",
+      "queryName": "藏东南林海湿地",
+      "wikidataId": null,
+      "lng": 113.0286733,
+      "lat": 22.9460723,
+      "source": "nominatim",
+      "distKmFromSpot": 2066.88
+    },
+    {
+      "spotId": "nyingchi-peach-blossom",
+      "spotName": "林芝桃花谷方向",
+      "queryName": "林芝桃花谷",
+      "wikidataId": null,
+      "lng": 107.3849728,
+      "lat": 40.7368251,
+      "source": "nominatim",
+      "distKmFromSpot": 1712
+    },
+    {
+      "spotId": "namcha-barwa-distant",
+      "spotName": "南迦巴瓦峰（远眺）",
+      "queryName": "南迦巴瓦峰",
+      "wikidataId": "Q1050238",
+      "lng": 95.055277777,
+      "lat": 29.630555555,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "lalin-sangri-valley",
+      "spotName": "桑日—加查河谷",
+      "queryName": "桑日—加查河谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yarlung-valley-lari",
+      "spotName": "雅鲁藏布江河谷（拉日段）",
+      "queryName": "雅鲁藏布江河谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yamdrok-distant",
+      "spotName": "羊卓雍措方向（远眺）",
+      "queryName": "羊卓雍措",
+      "wikidataId": null
+    },
+    {
+      "spotId": "shigatse-plain",
+      "spotName": "日喀则河谷平原",
+      "queryName": "日喀则河谷平原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "sanxingdui-area",
+      "spotName": "三星堆方向",
+      "queryName": "三星堆",
+      "wikidataId": null
+    },
+    {
+      "spotId": "minjiang-gorge-chuanqing",
+      "spotName": "岷江峡谷（茂县段）",
+      "queryName": "岷江峡谷",
+      "wikidataId": null,
+      "lng": 120.3130702,
+      "lat": 30.1718615,
+      "source": "nominatim",
+      "distKmFromSpot": 1592.26
+    },
+    {
+      "spotId": "songpan-grassland",
+      "spotName": "松潘草原",
+      "queryName": "松潘草原",
+      "wikidataId": null,
+      "lng": 103.1333972,
+      "lat": 32.6692391,
+      "source": "nominatim",
+      "distKmFromSpot": 50.28
+    },
+    {
+      "spotId": "huanglong-jiuzhai-portal",
+      "spotName": "黄龙九寨门户",
+      "queryName": "黄龙九寨门户",
+      "wikidataId": null
+    },
+    {
+      "spotId": "menyuan-rapeseed",
+      "spotName": "门源油菜花海",
+      "queryName": "门源油菜花海",
+      "wikidataId": null,
+      "lng": 116.38327,
+      "lat": 39.8362434,
+      "source": "nominatim",
+      "distKmFromSpot": 1309.92
+    },
+    {
+      "spotId": "qilian-snow-lanxin",
+      "spotName": "祁连雪山（远眺）",
+      "queryName": "祁连雪山",
+      "wikidataId": null,
+      "lng": 120.1187269,
+      "lat": 36.0249881,
+      "source": "nominatim",
+      "distKmFromSpot": 1726.81
+    },
+    {
+      "spotId": "hexi-corridor-gobi",
+      "spotName": "河西走廊戈壁",
+      "queryName": "河西走廊戈壁",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhangye-danxia-distant",
+      "spotName": "张掖丹霞方向（远眺）",
+      "queryName": "张掖丹霞",
+      "wikidataId": null,
+      "lng": 100.1660885,
+      "lat": 39.0941392,
+      "source": "nominatim",
+      "distKmFromSpot": 17.01
+    },
+    {
+      "spotId": "jiayuguan-fort-distant",
+      "spotName": "嘉峪关长城方向",
+      "queryName": "嘉峪关长城",
+      "wikidataId": null,
+      "lng": 98.2531478,
+      "lat": 39.8509788,
+      "source": "nominatim",
+      "distKmFromSpot": 15.35
+    },
+    {
+      "spotId": "turpan-flaming-mountain",
+      "spotName": "吐鲁番火焰山方向",
+      "queryName": "吐鲁番火焰山",
+      "wikidataId": null,
+      "lng": 89.6439306,
+      "lat": 42.905288,
+      "source": "nominatim",
+      "distKmFromSpot": 11.74
+    },
+    {
+      "spotId": "hami-oasis",
+      "spotName": "哈密绿洲",
+      "queryName": "哈密绿洲",
+      "wikidataId": null
+    },
+    {
+      "spotId": "dunhuang-mogao-distant",
+      "spotName": "敦煌莫高窟方向",
+      "queryName": "敦煌莫高窟",
+      "wikidataId": null,
+      "lng": 94.8042114,
+      "lat": 40.0373163,
+      "source": "nominatim",
+      "distKmFromSpot": 0.47
+    },
+    {
+      "spotId": "yardang-geomorphology",
+      "spotName": "雅丹地貌（敦格沿线）",
+      "queryName": "雅丹地貌",
+      "wikidataId": null
+    },
+    {
+      "spotId": "dangjinshan-pass",
+      "spotName": "当金山口一带",
+      "queryName": "当金山口",
+      "wikidataId": null,
+      "lng": 120.3827344,
+      "lat": 36.1754072,
+      "source": "nominatim",
+      "distKmFromSpot": 2311.55
+    },
+    {
+      "spotId": "emerald-lake-distant",
+      "spotName": "翡翠湖方向（大柴旦）",
+      "queryName": "翡翠湖",
+      "wikidataId": null,
+      "lng": 114.9535905,
+      "lat": 40.7501998,
+      "source": "nominatim",
+      "distKmFromSpot": 1726.18
+    },
+    {
+      "spotId": "altun-mountains",
+      "spotName": "阿尔金山一带",
+      "queryName": "阿尔金山",
+      "wikidataId": "Q29613509",
+      "lng": 93.705,
+      "lat": 39.3058,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "taklamakan-south-geku",
+      "spotName": "塔克拉玛干南缘（格库）",
+      "queryName": "塔克拉玛干南缘",
+      "wikidataId": null
+    },
+    {
+      "spotId": "taitema-lake",
+      "spotName": "台特玛湖方向",
+      "queryName": "台特玛湖",
+      "wikidataId": "Q1728916",
+      "lng": 88.2573,
+      "lat": 39.4763,
+      "source": "wikidata",
+      "distKmFromSpot": 25.17
+    },
+    {
+      "spotId": "taklamakan-ring-heruo",
+      "spotName": "塔克拉玛干南缘（和若）",
+      "queryName": "塔克拉玛干南缘",
+      "wikidataId": null
+    },
+    {
+      "spotId": "kunlun-north-foothill",
+      "spotName": "昆仑山北麓",
+      "queryName": "昆仑山北麓",
+      "wikidataId": null,
+      "lng": 120.1222804,
+      "lat": 36.0479241,
+      "source": "nominatim",
+      "distKmFromSpot": 3504.75
+    },
+    {
+      "spotId": "desert-sunset-heruo",
+      "spotName": "沙漠长河落日段",
+      "queryName": "沙漠长河落日段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "tianshan-south-nanjiang",
+      "spotName": "天山南麓",
+      "queryName": "天山南麓",
+      "wikidataId": null,
+      "lng": 117.2740397,
+      "lat": 39.1237738,
+      "source": "nominatim",
+      "distKmFromSpot": 2605.06
+    },
+    {
+      "spotId": "bosten-lake-distant",
+      "spotName": "博斯腾湖方向",
+      "queryName": "博斯腾湖",
+      "wikidataId": "Q611206",
+      "lng": 87,
+      "lat": 42,
+      "source": "wikidata",
+      "distKmFromSpot": 24.14
+    },
+    {
+      "spotId": "kuqa-canyon-distant",
+      "spotName": "库车大峡谷方向",
+      "queryName": "库车大峡谷",
+      "wikidataId": null,
+      "lng": 83.0559469,
+      "lat": 42.1086786,
+      "source": "nominatim",
+      "distKmFromSpot": 58.44
+    },
+    {
+      "spotId": "tarim-oasis-belt",
+      "spotName": "塔里木盆地绿洲带",
+      "queryName": "塔里木盆地绿洲带",
+      "wikidataId": null
+    },
+    {
+      "spotId": "pamir-kashgar-distant",
+      "spotName": "帕米尔方向（喀什）",
+      "queryName": "帕米尔",
+      "wikidataId": null
+    },
+    {
+      "spotId": "ejina-populus",
+      "spotName": "额济纳胡杨林",
+      "queryName": "额济纳胡杨林",
+      "wikidataId": null,
+      "lng": 101.017426,
+      "lat": 41.8063815,
+      "source": "nominatim",
+      "distKmFromSpot": 17.63
+    },
+    {
+      "spotId": "badan-jaran-edge",
+      "spotName": "巴丹吉林沙漠边缘",
+      "queryName": "巴丹吉林沙漠边缘",
+      "wikidataId": null
+    },
+    {
+      "spotId": "heishui-city-distant",
+      "spotName": "黑水城遗址方向",
+      "queryName": "黑水城遗址",
+      "wikidataId": null,
+      "lng": 119.4069969,
+      "lat": 36.8635542,
+      "source": "nominatim",
+      "distKmFromSpot": 1659
+    },
+    {
+      "spotId": "juyan-lake-distant",
+      "spotName": "居延海方向",
+      "queryName": "居延海",
+      "wikidataId": "Q2406225",
+      "lng": 101.26,
+      "lat": 42.29,
+      "source": "wikidata",
+      "distKmFromSpot": 25.5
+    },
+    {
+      "spotId": "yulong-snow-mountain",
+      "spotName": "玉龙雪山",
+      "queryName": "玉龙雪山",
+      "wikidataId": "Q1465660",
+      "lng": 100.175,
+      "lat": 27.098333333,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "lashi-lake",
+      "spotName": "拉市海湿地",
+      "queryName": "拉市海湿地",
+      "wikidataId": null,
+      "lng": 119.817227,
+      "lat": 49.2321432,
+      "source": "nominatim",
+      "distKmFromSpot": 3004.43
+    },
+    {
+      "spotId": "tiger-leaping-gorge-bridge",
+      "spotName": "虎跳峡金沙江大桥",
+      "queryName": "虎跳峡金沙江大桥",
+      "wikidataId": null,
+      "lng": 100.085081,
+      "lat": 27.1722283,
+      "source": "nominatim",
+      "distKmFromSpot": 3.58
+    },
+    {
+      "spotId": "haba-snow-mountain",
+      "spotName": "哈巴雪山（远眺）",
+      "queryName": "哈巴雪山",
+      "wikidataId": null,
+      "lng": 100.105988,
+      "lat": 27.321895,
+      "source": "nominatim",
+      "distKmFromSpot": 4.04
+    },
+    {
+      "spotId": "xiaozhongdian-meadow",
+      "spotName": "小中甸花海草甸",
+      "queryName": "小中甸花海草甸",
+      "wikidataId": null,
+      "lng": 118.4580534,
+      "lat": 39.2788052,
+      "source": "nominatim",
+      "distKmFromSpot": 2160.45
+    },
+    {
+      "spotId": "shangri-la-plateau",
+      "spotName": "香格里拉高原",
+      "queryName": "香格里拉高原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yuanjiang-bridge",
+      "spotName": "元江特大桥",
+      "queryName": "元江特大桥",
+      "wikidataId": null,
+      "lng": 101.9467404,
+      "lat": 23.6422343,
+      "source": "nominatim",
+      "distKmFromSpot": 10.96
+    },
+    {
+      "spotId": "puer-tea-mountains",
+      "spotName": "普洱茶山云雾",
+      "queryName": "普洱茶山云雾",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xishuangbanna-rainforest",
+      "spotName": "西双版纳热带雨林",
+      "queryName": "西双版纳热带雨林",
+      "wikidataId": null,
+      "lng": 101.2702052,
+      "lat": 21.9199927,
+      "source": "nominatim",
+      "distKmFromSpot": 50.86
+    },
+    {
+      "spotId": "dai-villages-banna",
+      "spotName": "傣家村寨与佛塔",
+      "queryName": "傣家村寨与佛塔",
+      "wikidataId": null
+    },
+    {
+      "spotId": "mohan-border-gateway",
+      "spotName": "磨憨口岸门户",
+      "queryName": "磨憨口岸门户",
+      "wikidataId": null
+    },
+    {
+      "spotId": "erhai-cangshan",
+      "spotName": "苍山洱海",
+      "queryName": "苍山洱海",
+      "wikidataId": null,
+      "lng": 119.3053053,
+      "lat": 26.0443749,
+      "source": "nominatim",
+      "distKmFromSpot": 1910.16
+    },
+    {
+      "spotId": "bai-villages-rice",
+      "spotName": "白族村寨与稻田",
+      "queryName": "白族村寨与稻田",
+      "wikidataId": null
+    },
+    {
+      "spotId": "dadu-river-gorge",
+      "spotName": "大渡河峡谷",
+      "queryName": "大渡河峡谷",
+      "wikidataId": null,
+      "lng": 104.6641237,
+      "lat": 31.8608499,
+      "source": "nominatim",
+      "distKmFromSpot": 321.71
+    },
+    {
+      "spotId": "jinkouhe-canyon",
+      "spotName": "金口河峡谷",
+      "queryName": "金口河峡谷",
+      "wikidataId": null,
+      "lng": 103.0322994,
+      "lat": 29.2804223,
+      "source": "nominatim",
+      "distKmFromSpot": 3.79
+    },
+    {
+      "spotId": "anning-river-valley",
+      "spotName": "安宁河谷田园",
+      "queryName": "安宁河谷田园",
+      "wikidataId": null
+    },
+    {
+      "spotId": "qionghai-distant",
+      "spotName": "邛海方向（西昌）",
+      "queryName": "邛海",
+      "wikidataId": null,
+      "lng": 102.3121831,
+      "lat": 27.8298517,
+      "source": "nominatim",
+      "distKmFromSpot": 1.62
+    },
+    {
+      "spotId": "jinsha-bridge-chengkun",
+      "spotName": "金沙江大桥一带",
+      "queryName": "金沙江大桥",
+      "wikidataId": null,
+      "lng": 104.5847499,
+      "lat": 28.7356331,
+      "source": "nominatim",
+      "distKmFromSpot": 370.24
+    },
+    {
+      "spotId": "renzi-bridge",
+      "spotName": "人字桥",
+      "queryName": "人字桥",
+      "wikidataId": null,
+      "lng": 109.0488437,
+      "lat": 34.2298207,
+      "source": "nominatim",
+      "distKmFromSpot": 1338.08
+    },
+    {
+      "spotId": "bisezhai-station",
+      "spotName": "碧色寨法式车站",
+      "queryName": "碧色寨法式车站",
+      "wikidataId": null
+    },
+    {
+      "spotId": "wantang-waterfall",
+      "spotName": "湾塘火车与瀑布",
+      "queryName": "湾塘火车与瀑布",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hekou-border",
+      "spotName": "河口边境风光",
+      "queryName": "河口边境风光",
+      "wikidataId": null
+    },
+    {
+      "spotId": "puzhehei-karst",
+      "spotName": "普者黑喀斯特山水",
+      "queryName": "普者黑喀斯特山水",
+      "wikidataId": null
+    },
+    {
+      "spotId": "guangnan-countryside",
+      "spotName": "文山田园峰林",
+      "queryName": "文山田园峰林",
+      "wikidataId": null
+    },
+    {
+      "spotId": "baise-youjiang",
+      "spotName": "百色右江河谷",
+      "queryName": "百色右江河谷",
+      "wikidataId": null,
+      "lng": 106.1520726,
+      "lat": 23.9079997,
+      "source": "nominatim",
+      "distKmFromSpot": 47.58
+    },
+    {
+      "spotId": "wuling-karst-yiwan",
+      "spotName": "武陵山喀斯特",
+      "queryName": "武陵山喀斯特",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yesanguan-bridge",
+      "spotName": "野三河大桥一带",
+      "queryName": "野三河大桥",
+      "wikidataId": null,
+      "lng": 110.1096693,
+      "lat": 30.6778179,
+      "source": "nominatim",
+      "distKmFromSpot": 18.37
+    },
+    {
+      "spotId": "enshi-grand-canyon-distant",
+      "spotName": "恩施大峡谷方向",
+      "queryName": "恩施大峡谷",
+      "wikidataId": null,
+      "lng": 109.1746676,
+      "lat": 30.424202,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "qingjiang-gallery-distant",
+      "spotName": "清江画廊方向",
+      "queryName": "清江画廊",
+      "wikidataId": null,
+      "lng": 117.1603957,
+      "lat": 31.7428894,
+      "source": "nominatim",
+      "distKmFromSpot": 755.17
+    },
+    {
+      "spotId": "three-gorges-reservoir",
+      "spotName": "三峡库区山色",
+      "queryName": "三峡库区山色",
+      "wikidataId": null
+    },
+    {
+      "spotId": "wujiang-gallery-distant",
+      "spotName": "乌江画廊方向",
+      "queryName": "乌江画廊",
+      "wikidataId": null,
+      "lng": 120.6040266,
+      "lat": 31.1487811,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "guilin-karst",
+      "spotName": "桂林喀斯特峰林",
+      "queryName": "桂林喀斯特峰林",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yangshuo-lijiang-distant",
+      "spotName": "阳朔漓江方向（远眺）",
+      "queryName": "阳朔漓江",
+      "wikidataId": null,
+      "lng": 110.5448952,
+      "lat": 24.7816866,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "miaoling-mountains",
+      "spotName": "苗岭山地",
+      "queryName": "苗岭山地",
+      "wikidataId": null,
+      "lng": 119.421285,
+      "lat": 34.7377529,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "qinling-forest",
+      "spotName": "秦岭林海",
+      "queryName": "秦岭林海",
+      "wikidataId": null,
+      "lng": 113.5980422,
+      "lat": 34.7376043,
+      "source": "nominatim",
+      "distKmFromSpot": 522.4
+    },
+    {
+      "spotId": "hanzhong-basin",
+      "spotName": "汉中盆地花海",
+      "queryName": "汉中盆地花海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jianmenguan",
+      "spotName": "剑门关",
+      "queryName": "剑门关",
+      "wikidataId": null,
+      "lng": 105.563513,
+      "lat": 32.2150337,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "leshan-buddha-distant",
+      "spotName": "乐山大佛方向",
+      "queryName": "乐山大佛",
+      "wikidataId": null,
+      "lng": 103.7693136,
+      "lat": 29.5469169,
+      "source": "nominatim",
+      "distKmFromSpot": 0.35
+    },
+    {
+      "spotId": "shunan-bamboo-distant",
+      "spotName": "蜀南竹海方向",
+      "queryName": "蜀南竹海",
+      "wikidataId": null,
+      "lng": 105.0157313,
+      "lat": 28.4849722,
+      "source": "nominatim",
+      "distKmFromSpot": 3.87
+    },
+    {
+      "spotId": "wumeng-mountains",
+      "spotName": "乌蒙山",
+      "queryName": "乌蒙山",
+      "wikidataId": null,
+      "lng": 96.3874286,
+      "lat": 42.7245402,
+      "source": "nominatim",
+      "distKmFromSpot": 1894.78
+    },
+    {
+      "spotId": "loushanguan",
+      "spotName": "娄山关一带",
+      "queryName": "娄山关",
+      "wikidataId": null,
+      "lng": 106.8964007,
+      "lat": 28.037235,
+      "source": "nominatim",
+      "distKmFromSpot": 4.77
+    },
+    {
+      "spotId": "zunyi-karst",
+      "spotName": "黔北喀斯特峡谷",
+      "queryName": "黔北喀斯特峡谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "qinling-switchback",
+      "spotName": "秦岭「8」字展线",
+      "queryName": "秦岭「8」字展线",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jialing-gorge-baocheng",
+      "spotName": "嘉陵江峡谷",
+      "queryName": "嘉陵江峡谷",
+      "wikidataId": null,
+      "lng": 115.7600695,
+      "lat": 28.8060701,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "lingguanxia-distant",
+      "spotName": "灵官峡方向",
+      "queryName": "灵官峡",
+      "wikidataId": null,
+      "lng": 114.1638994,
+      "lat": 22.2800119,
+      "source": "nominatim",
+      "distKmFromSpot": 1462.29
+    },
+    {
+      "spotId": "zhangjiajie-wulingyuan-distant",
+      "spotName": "张家界武陵源方向",
+      "queryName": "张家界武陵源",
+      "wikidataId": null
+    },
+    {
+      "spotId": "tianmen-mountain-distant",
+      "spotName": "天门山方向",
+      "queryName": "天门山",
+      "wikidataId": null,
+      "lng": 110.4788895,
+      "lat": 29.0498814,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "furong-town",
+      "spotName": "芙蓉镇（酉水）",
+      "queryName": "芙蓉镇",
+      "wikidataId": "Q14065235",
+      "lng": 121.02714,
+      "lat": 28.29997,
+      "source": "wikidata",
+      "distKmFromSpot": 10.4
+    },
+    {
+      "spotId": "aizhai-bridge-distant",
+      "spotName": "矮寨大桥与德夯方向",
+      "queryName": "矮寨大桥与德夯",
+      "wikidataId": null
+    },
+    {
+      "spotId": "fenghuang-ancient-town",
+      "spotName": "凤凰古城",
+      "queryName": "凤凰古城",
+      "wikidataId": null,
+      "lng": 109.5991902,
+      "lat": 28.0205093,
+      "source": "nominatim",
+      "distKmFromSpot": 0.1
+    },
+    {
+      "spotId": "zhenyuan-ancient-town",
+      "spotName": "镇远古城",
+      "queryName": "镇远古城",
+      "wikidataId": null,
+      "lng": 108.4279395,
+      "lat": 27.0507455,
+      "source": "nominatim",
+      "distKmFromSpot": 0.22
+    },
+    {
+      "spotId": "wuyang-river",
+      "spotName": "舞阳河",
+      "queryName": "舞阳河",
+      "wikidataId": null,
+      "lng": 107.8980737,
+      "lat": 27.0396337,
+      "source": "nominatim",
+      "distKmFromSpot": 59.98
+    },
+    {
+      "spotId": "kaili-miao-distant",
+      "spotName": "凯里苗寨方向",
+      "queryName": "凯里苗寨",
+      "wikidataId": null,
+      "lng": 108.1232666,
+      "lat": 26.4848005,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "jiuhuashan",
+      "spotName": "九华山",
+      "queryName": "九华山",
+      "wikidataId": null,
+      "lng": 117.818174,
+      "lat": 30.463426,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "taiping-lake",
+      "spotName": "太平湖",
+      "queryName": "太平湖",
+      "wikidataId": null,
+      "lng": 126.2909244,
+      "lat": 45.626289,
+      "source": "nominatim",
+      "distKmFromSpot": 1840.5
+    },
+    {
+      "spotId": "huangshan-west-portal",
+      "spotName": "黄山（西大门方向）",
+      "queryName": "黄山",
+      "wikidataId": null,
+      "lng": 120.2249527,
+      "lat": 36.052313,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "yixian-ancient-villages",
+      "spotName": "黟县古村方向（宏村西递）",
+      "queryName": "黟县古村",
+      "wikidataId": null
+    },
+    {
+      "spotId": "fuchun-xin-an-river",
+      "spotName": "富春江—新安江画廊",
+      "queryName": "富春江—新安江画廊",
+      "wikidataId": null
+    },
+    {
+      "spotId": "qiandao-lake",
+      "spotName": "千岛湖",
+      "queryName": "千岛湖",
+      "wikidataId": null,
+      "lng": 119.0699941,
+      "lat": 29.5693707,
+      "source": "nominatim",
+      "distKmFromSpot": 22.24
+    },
+    {
+      "spotId": "jixi-huizhou",
+      "spotName": "绩溪—古徽州田园",
+      "queryName": "绩溪—古徽州田园",
+      "wikidataId": null
+    },
+    {
+      "spotId": "huangshan-north-portal",
+      "spotName": "黄山北门户",
+      "queryName": "黄山北门户",
+      "wikidataId": null,
+      "lng": 113.7074046,
+      "lat": 22.8405058,
+      "source": "nominatim",
+      "distKmFromSpot": 892.91
+    },
+    {
+      "spotId": "wuyuan-rapeseed",
+      "spotName": "婺源徽州风光",
+      "queryName": "婺源徽州风光",
+      "wikidataId": null
+    },
+    {
+      "spotId": "sanqingshan-distant",
+      "spotName": "三清山方向",
+      "queryName": "三清山",
+      "wikidataId": null,
+      "lng": 124.510609,
+      "lat": 44.3445697,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "wuyishan-distant",
+      "spotName": "武夷山方向",
+      "queryName": "武夷山",
+      "wikidataId": null,
+      "lng": 118.0297688,
+      "lat": 27.7590448,
+      "source": "nominatim",
+      "distKmFromSpot": 3.1
+    },
+    {
+      "spotId": "huangshan-hefu",
+      "spotName": "黄山（合福线）",
+      "queryName": "黄山",
+      "wikidataId": null,
+      "lng": 120.2249527,
+      "lat": 36.052313,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "hainan-east-coast",
+      "spotName": "海南东线海岸",
+      "queryName": "海南东线海岸",
+      "wikidataId": null,
+      "lng": 120.4999592,
+      "lat": 32.5493041,
+      "source": "nominatim",
+      "distKmFromSpot": 1787.76
+    },
+    {
+      "spotId": "wanning-bays",
+      "spotName": "万宁石梅湾—日月湾方向",
+      "queryName": "万宁石梅湾—日月湾",
+      "wikidataId": null
+    },
+    {
+      "spotId": "sanya-yalong-distant",
+      "spotName": "三亚亚龙湾方向",
+      "queryName": "三亚亚龙湾",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hainan-west-salt-fields",
+      "spotName": "海南西线盐田与热带田园",
+      "queryName": "海南西线盐田与热带田园",
+      "wikidataId": null
+    },
+    {
+      "spotId": "wenchang-space-distant",
+      "spotName": "文昌航天城方向",
+      "queryName": "文昌航天城",
+      "wikidataId": null,
+      "lng": 116.3307403,
+      "lat": 40.1246619,
+      "source": "nominatim",
+      "distKmFromSpot": 2336.97
+    },
+    {
+      "spotId": "pingtan-strait-bridge",
+      "spotName": "平潭海峡公铁大桥",
+      "queryName": "平潭海峡公铁大桥",
+      "wikidataId": "Q17498598",
+      "lng": 119.627777777,
+      "lat": 25.695833333,
+      "source": "wikidata",
+      "distKmFromSpot": 11.01
+    },
+    {
+      "spotId": "pingtan-island-coast",
+      "spotName": "平潭岛海景",
+      "queryName": "平潭岛海景",
+      "wikidataId": null,
+      "lng": 120.3718752,
+      "lat": 36.142461,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "xiamen-bay",
+      "spotName": "厦门海湾",
+      "queryName": "厦门海湾",
+      "wikidataId": null,
+      "lng": 118.044932,
+      "lat": 24.4869083,
+      "source": "nominatim",
+      "distKmFromSpot": 5.76
+    },
+    {
+      "spotId": "yuedong-coast",
+      "spotName": "粤东海滨",
+      "queryName": "粤东海滨",
+      "wikidataId": null,
+      "lng": 110.7825281,
+      "lat": 21.4052667,
+      "source": "nominatim",
+      "distKmFromSpot": 500.32
+    },
+    {
+      "spotId": "changbai-mountain",
+      "spotName": "长白山",
+      "queryName": "长白山",
+      "wikidataId": null,
+      "lng": 128.1219234,
+      "lat": 42.4605171,
+      "source": "nominatim",
+      "distKmFromSpot": 7.11
+    },
+    {
+      "spotId": "changbai-forest-snow",
+      "spotName": "长白山林海",
+      "queryName": "长白山林海",
+      "wikidataId": null,
+      "lng": 127.4754868,
+      "lat": 42.1869367,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "yabuli-ski-distant",
+      "spotName": "亚布力滑雪场方向",
+      "queryName": "亚布力滑雪场",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xuexiang-distant",
+      "spotName": "雪乡方向",
+      "queryName": "雪乡",
+      "wikidataId": "Q14288454",
+      "lng": 91.48508,
+      "lat": 29.82621,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "mudanjiang-forest",
+      "spotName": "牡丹江林海",
+      "queryName": "牡丹江林海",
+      "wikidataId": null,
+      "lng": 129.3350194,
+      "lat": 44.530727,
+      "source": "nominatim",
+      "distKmFromSpot": 22
+    },
+    {
+      "spotId": "gongger-grassland",
+      "spotName": "贡格尔草原",
+      "queryName": "贡格尔草原",
+      "wikidataId": null,
+      "lng": 109.6752976,
+      "lat": 40.5986524,
+      "source": "nominatim",
+      "distKmFromSpot": 713.03
+    },
+    {
+      "spotId": "dari-nor-distant",
+      "spotName": "达里诺尔湖方向",
+      "queryName": "达里诺尔湖",
+      "wikidataId": null,
+      "lng": 117.5363284,
+      "lat": 43.2570176,
+      "source": "nominatim",
+      "distKmFromSpot": 75.95
+    },
+    {
+      "spotId": "jitong-steam-photo",
+      "spotName": "集通蒸汽机车摄影地标方向",
+      "queryName": "集通蒸汽机车摄影地标",
+      "wikidataId": null
+    },
+    {
+      "spotId": "bashang-grassland",
+      "spotName": "坝上草原",
+      "queryName": "坝上草原",
+      "wikidataId": null,
+      "lng": 115.0791964,
+      "lat": 35.7666097,
+      "source": "nominatim",
+      "distKmFromSpot": 638.57
+    },
+    {
+      "spotId": "ulat-cabl-volcano-grassland",
+      "spotName": "乌兰察布火山草原方向",
+      "queryName": "乌兰察布火山草原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "badaling-great-wall",
+      "spotName": "八达岭长城",
+      "queryName": "八达岭长城",
+      "wikidataId": null,
+      "lng": 116.0050515,
+      "lat": 40.3603284,
+      "source": "nominatim",
+      "distKmFromSpot": 2.97
+    },
+    {
+      "spotId": "guanting-reservoir",
+      "spotName": "官厅水库",
+      "queryName": "官厅水库",
+      "wikidataId": "Q4151226",
+      "lng": 115.6025,
+      "lat": 40.23083333,
+      "source": "wikidata",
+      "distKmFromSpot": 6.27
+    },
+    {
+      "spotId": "poyang-lake-distant",
+      "spotName": "鄱阳湖方向",
+      "queryName": "鄱阳湖",
+      "wikidataId": null,
+      "lng": 116.2046216,
+      "lat": 29.1859199,
+      "source": "nominatim",
+      "distKmFromSpot": 28.68
+    },
+    {
+      "spotId": "jingdezhen-kiln-distant",
+      "spotName": "景德镇瓷都方向",
+      "queryName": "景德镇瓷都",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lalin-gongga-valley",
+      "spotName": "贡嘎—扎囊雅江河谷",
+      "queryName": "贡嘎—扎囊雅江河谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lalin-shannan-canyon",
+      "spotName": "山南深切峡谷段",
+      "queryName": "山南深切峡谷段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lalin-milin-peach",
+      "spotName": "米林桃花与河谷",
+      "queryName": "米林桃花与河谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lalin-nyingchi-gateway",
+      "spotName": "林芝雪域门户",
+      "queryName": "林芝雪域门户",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lalin-namcha-barwa-view",
+      "spotName": "南迦巴瓦峰观景段",
+      "queryName": "南迦巴瓦峰观景段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "heruo-hotan-oasis",
+      "spotName": "和田绿洲",
+      "queryName": "和田绿洲",
+      "wikidataId": null
+    },
+    {
+      "spotId": "heruo-desert-mid",
+      "spotName": "塔克拉玛干南缘铁龙",
+      "queryName": "塔克拉玛干南缘铁龙",
+      "wikidataId": null
+    },
+    {
+      "spotId": "heruo-qiemo-desert",
+      "spotName": "且末沙漠旷野",
+      "queryName": "且末沙漠旷野",
+      "wikidataId": null
+    },
+    {
+      "spotId": "heruo-ruoqiang-gateway",
+      "spotName": "若羌沙漠门户",
+      "queryName": "若羌沙漠门户",
+      "wikidataId": null
+    },
+    {
+      "spotId": "fuping-strait-bridge-mid",
+      "spotName": "平潭海峡公铁大桥",
+      "queryName": "平潭海峡公铁大桥",
+      "wikidataId": "Q17498598",
+      "lng": 119.627777777,
+      "lat": 25.695833333,
+      "source": "wikidata",
+      "distKmFromSpot": 22.43
+    },
+    {
+      "spotId": "fuping-changle-coast",
+      "spotName": "长乐滨海段",
+      "queryName": "长乐滨海段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "fuping-pingtan-approach",
+      "spotName": "平潭岛进岛海景",
+      "queryName": "平潭岛进岛海景",
+      "wikidataId": null,
+      "lng": 119.6939274,
+      "lat": 25.4807118,
+      "source": "nominatim",
+      "distKmFromSpot": 15.04
+    },
+    {
+      "spotId": "diandong-renzi-bridge-rail",
+      "spotName": "人字桥",
+      "queryName": "人字桥",
+      "wikidataId": null,
+      "lng": 109.0488437,
+      "lat": 34.2298207,
+      "source": "nominatim",
+      "distKmFromSpot": 1337.32
+    },
+    {
+      "spotId": "diandong-kaiyuan-metre",
+      "spotName": "开远米轨风情",
+      "queryName": "开远米轨风情",
+      "wikidataId": null
+    },
+    {
+      "spotId": "diandong-yiliang-hills",
+      "spotName": "宜良坝子与山地",
+      "queryName": "宜良坝子与山地",
+      "wikidataId": null,
+      "lng": 103.6490655,
+      "lat": 28.258269,
+      "source": "nominatim",
+      "distKmFromSpot": 401
+    },
+    {
+      "spotId": "zhonglao-yuanjiang-bridge-rail",
+      "spotName": "元江特大桥",
+      "queryName": "元江特大桥",
+      "wikidataId": null,
+      "lng": 101.9467404,
+      "lat": 23.6422343,
+      "source": "nominatim",
+      "distKmFromSpot": 28.17
+    },
+    {
+      "spotId": "zhonglao-mojiang-hills",
+      "spotName": "墨江山地茶乡",
+      "queryName": "墨江山地茶乡",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhonglao-yuxi-plateau",
+      "spotName": "玉溪高原田园",
+      "queryName": "玉溪高原田园",
+      "wikidataId": null
+    },
+    {
+      "spotId": "baocheng-qinling-switchback-rail",
+      "spotName": "秦岭「8」字展线",
+      "queryName": "秦岭「8」字展线",
+      "wikidataId": null
+    },
+    {
+      "spotId": "baocheng-fengzhou",
+      "spotName": "凤州山地",
+      "queryName": "凤州山地",
+      "wikidataId": null,
+      "lng": 113.1942965,
+      "lat": 23.1663217,
+      "source": "nominatim",
+      "distKmFromSpot": 1361.82
+    },
+    {
+      "spotId": "baocheng-guangyuan-jialing",
+      "spotName": "广元嘉陵江",
+      "queryName": "广元嘉陵江",
+      "wikidataId": null,
+      "lng": 105.8446914,
+      "lat": 32.4807454,
+      "source": "nominatim",
+      "distKmFromSpot": 85.4
+    },
+    {
+      "spotId": "zhangjihuai-furong-rail",
+      "spotName": "芙蓉镇（酉水）",
+      "queryName": "芙蓉镇",
+      "wikidataId": "Q14065235",
+      "lng": 121.02714,
+      "lat": 28.29997,
+      "source": "wikidata",
+      "distKmFromSpot": 10.4
+    },
+    {
+      "spotId": "zhangjihuai-guzhang-wuling",
+      "spotName": "古丈武陵山色",
+      "queryName": "古丈武陵山色",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhangjihuai-mengdong-distant",
+      "spotName": "猛洞河方向",
+      "queryName": "猛洞河",
+      "wikidataId": "Q15928576",
+      "lng": 109.84943,
+      "lat": 28.76757,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "chuanqing-maoxian-gorge",
+      "spotName": "茂县岷江峡谷",
+      "queryName": "茂县岷江峡谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "chuanqing-gaochuan",
+      "spotName": "高川山地",
+      "queryName": "高川山地",
+      "wikidataId": null,
+      "lng": 121.7474006,
+      "lat": 29.8859826,
+      "source": "nominatim",
+      "distKmFromSpot": 1685.36
+    },
+    {
+      "spotId": "chuanqing-zhenjiangguan",
+      "spotName": "镇江关高原门户",
+      "queryName": "镇江关高原门户",
+      "wikidataId": null,
+      "lng": 115.9433667,
+      "lat": 28.6957383,
+      "source": "nominatim",
+      "distKmFromSpot": 1255.47
+    },
+    {
+      "spotId": "dunge-yardang-rail",
+      "spotName": "雅丹地貌段",
+      "queryName": "雅丹地貌段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "dunge-dangjinshan-rail",
+      "spotName": "当金山口",
+      "queryName": "当金山口",
+      "wikidataId": null,
+      "lng": 120.3827344,
+      "lat": 36.1754072,
+      "source": "nominatim",
+      "distKmFromSpot": 2285.65
+    },
+    {
+      "spotId": "dunge-qaidam-salt",
+      "spotName": "柴达木盐湖盆地",
+      "queryName": "柴达木盐湖盆地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yiwan-yesanhe-rail",
+      "spotName": "野三河大桥一带",
+      "queryName": "野三河大桥",
+      "wikidataId": null,
+      "lng": 110.1096693,
+      "lat": 30.6778179,
+      "source": "nominatim",
+      "distKmFromSpot": 54.55
+    },
+    {
+      "spotId": "yiwan-enshi-karst",
+      "spotName": "恩施岩溶山地",
+      "queryName": "恩施岩溶山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yiwan-lichuan-plateau",
+      "spotName": "利川齐岳山一带",
+      "queryName": "利川齐岳山",
+      "wikidataId": null,
+      "lng": 108.7097403,
+      "lat": 30.3526681,
+      "source": "nominatim",
+      "distKmFromSpot": 16.87
+    },
+    {
+      "spotId": "dunbai-forest-mid",
+      "spotName": "长白山林海",
+      "queryName": "长白山林海",
+      "wikidataId": null,
+      "lng": 127.4754868,
+      "lat": 42.1869367,
+      "source": "nominatim",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "dunbai-antu",
+      "spotName": "安图山地",
+      "queryName": "安图山地",
+      "wikidataId": null,
+      "lng": 75.3939061,
+      "lat": 40.5516709,
+      "source": "nominatim",
+      "distKmFromSpot": 4327.61
+    },
+    {
+      "spotId": "dunbai-changbai-station",
+      "spotName": "长白山站林海",
+      "queryName": "长白山站林海",
+      "wikidataId": null,
+      "lng": 127.4754868,
+      "lat": 42.1869367,
+      "source": "nominatim",
+      "distKmFromSpot": 59.96
+    },
+    {
+      "spotId": "zhanghu-bashang-rail",
+      "spotName": "坝上草原",
+      "queryName": "坝上草原",
+      "wikidataId": null,
+      "lng": 115.0791964,
+      "lat": 35.7666097,
+      "source": "nominatim",
+      "distKmFromSpot": 566.12
+    },
+    {
+      "spotId": "zhanghu-xinghe",
+      "spotName": "兴和草原过渡带",
+      "queryName": "兴和草原过渡带",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhanghu-zhuozi",
+      "spotName": "卓资山地草原",
+      "queryName": "卓资山地草原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jitong-hexigten-rail",
+      "spotName": "克什克腾草原",
+      "queryName": "克什克腾草原",
+      "wikidataId": null,
+      "lng": 117.2305271,
+      "lat": 42.5283252,
+      "source": "nominatim",
+      "distKmFromSpot": 71.89
+    },
+    {
+      "spotId": "jitong-zhengxiangbai",
+      "spotName": "正镶白旗草原",
+      "queryName": "正镶白旗草原",
+      "wikidataId": null,
+      "lng": 115.240338,
+      "lat": 42.2192483,
+      "source": "nominatim",
+      "distKmFromSpot": 41.93
+    },
+    {
+      "spotId": "jitong-linxi",
+      "spotName": "林西山地草甸",
+      "queryName": "林西山地草甸",
+      "wikidataId": null
+    },
+    {
+      "spotId": "linha-wuliangsuhai-distant",
+      "spotName": "乌梁素海方向",
+      "queryName": "乌梁素海",
+      "wikidataId": null,
+      "lng": 108.9298827,
+      "lat": 40.9709366,
+      "source": "nominatim",
+      "distKmFromSpot": 33.71
+    },
+    {
+      "spotId": "linha-hexi-gobi",
+      "spotName": "临河—额济纳戈壁",
+      "queryName": "临河—额济纳戈壁",
+      "wikidataId": null
+    },
+    {
+      "spotId": "linha-badan-rail",
+      "spotName": "巴丹吉林沙漠边缘",
+      "queryName": "巴丹吉林沙漠边缘",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hainandong-qionghai",
+      "spotName": "琼海滨海平原",
+      "queryName": "琼海滨海平原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hainandong-lingshui",
+      "spotName": "陵水近海段",
+      "queryName": "陵水近海段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hainanxi-qiziwan",
+      "spotName": "棋子湾方向",
+      "queryName": "棋子湾",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hainanxi-dongfang-salt",
+      "spotName": "东方盐田",
+      "queryName": "东方盐田",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hainanxi-lingao",
+      "spotName": "临高滨海",
+      "queryName": "临高滨海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hamu-shangzhi-forest",
+      "spotName": "尚志林海",
+      "queryName": "尚志林海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hamu-hailin",
+      "spotName": "海林山地",
+      "queryName": "海林山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "nankun-puzhehei-rail",
+      "spotName": "普者黑喀斯特",
+      "queryName": "普者黑喀斯特",
+      "wikidataId": null
+    },
+    {
+      "spotId": "nankun-funing-karst",
+      "spotName": "富宁峰林",
+      "queryName": "富宁峰林",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lixiang-tiger-leap-rail",
+      "spotName": "虎跳峡金沙江大桥",
+      "queryName": "虎跳峡金沙江大桥",
+      "wikidataId": null,
+      "lng": 100.085081,
+      "lat": 27.1722283,
+      "source": "nominatim",
+      "distKmFromSpot": 26.86
+    },
+    {
+      "spotId": "lixiang-newshang",
+      "spotName": "丽江北上山地",
+      "queryName": "丽江北上山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "chengkun-liangshan",
+      "spotName": "大凉山峡谷",
+      "queryName": "大凉山峡谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "chengkun-panzhihua",
+      "spotName": "攀枝花金沙江",
+      "queryName": "攀枝花金沙江",
+      "wikidataId": null
+    },
+    {
+      "spotId": "chengkun-emei-distant",
+      "spotName": "峨眉山方向",
+      "queryName": "峨眉山",
+      "wikidataId": "Q134927",
+      "lng": 103.3325,
+      "lat": 29.519722222,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "yinlan-helan-distant",
+      "spotName": "贺兰山方向",
+      "queryName": "贺兰山",
+      "wikidataId": "Q13770",
+      "lng": 105.95,
+      "lat": 38.83333333,
+      "source": "wikidata",
+      "distKmFromSpot": 42.95
+    },
+    {
+      "spotId": "yinlan-yellow-river",
+      "spotName": "黄河宁夏段",
+      "queryName": "黄河宁夏段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yinlan-zhongwei",
+      "spotName": "中卫沙坡头方向",
+      "queryName": "中卫沙坡头",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xiashen-xiamen-bay-rail",
+      "spotName": "厦门海湾",
+      "queryName": "厦门海湾",
+      "wikidataId": null,
+      "lng": 118.044932,
+      "lat": 24.4869083,
+      "source": "nominatim",
+      "distKmFromSpot": 7.03
+    },
+    {
+      "spotId": "xiashen-chaoshan",
+      "spotName": "潮汕平原",
+      "queryName": "潮汕平原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lanyu-longnan",
+      "spotName": "陇南山水",
+      "queryName": "陇南山水",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lanyu-nanchong",
+      "spotName": "南充嘉陵江",
+      "queryName": "南充嘉陵江",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yuli-fuling",
+      "spotName": "涪陵长江库区",
+      "queryName": "涪陵长江库区",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yuli-fengdu",
+      "spotName": "丰都库区山地",
+      "queryName": "丰都库区山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yuli-shizhu",
+      "spotName": "石柱山地",
+      "queryName": "石柱山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yuli-lichuan-portal",
+      "spotName": "利川齐岳山门户",
+      "queryName": "利川齐岳山门户",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yugui-qijiang",
+      "spotName": "綦江山地",
+      "queryName": "綦江山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yugui-tongzi",
+      "spotName": "桐梓娄山北麓",
+      "queryName": "桐梓娄山北麓",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yugui-zunyi-city",
+      "spotName": "遵义黔北风光",
+      "queryName": "遵义黔北风光",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yugui-xifeng",
+      "spotName": "息烽峡谷",
+      "queryName": "息烽峡谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jingzhang-qinghe",
+      "spotName": "清河出京段",
+      "queryName": "清河出京段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jingzhang-huailai-valley",
+      "spotName": "怀来河谷",
+      "queryName": "怀来河谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jingzhang-zhangjiakou-portal",
+      "spotName": "张家口坝上门户",
+      "queryName": "张家口坝上门户",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lari-quxiu",
+      "spotName": "曲水雅江宽谷",
+      "queryName": "曲水雅江宽谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lari-nimu",
+      "spotName": "尼木河谷",
+      "queryName": "尼木河谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lari-renbu",
+      "spotName": "仁布山地",
+      "queryName": "仁布山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "guiguang-duyun",
+      "spotName": "都匀斗篷山方向",
+      "queryName": "都匀斗篷山",
+      "wikidataId": null
+    },
+    {
+      "spotId": "guiguang-rongjiang",
+      "spotName": "榕江山地",
+      "queryName": "榕江山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "guiguang-hezhou",
+      "spotName": "贺州山水",
+      "queryName": "贺州山水",
+      "wikidataId": null
+    },
+    {
+      "spotId": "guiguang-zhaoqing",
+      "spotName": "肇庆星湖方向",
+      "queryName": "肇庆星湖",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xiangqian-loudi",
+      "spotName": "娄底丘陵",
+      "queryName": "娄底丘陵",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xiangqian-xupu",
+      "spotName": "溆浦武陵谷地",
+      "queryName": "溆浦武陵谷地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xiangqian-huaihua",
+      "spotName": "怀化山地",
+      "queryName": "怀化山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xiashen-zhangzhou",
+      "spotName": "漳州滨海",
+      "queryName": "漳州滨海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xiashen-yunxiao",
+      "spotName": "云霄沿海",
+      "queryName": "云霄沿海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xiashen-shanwei",
+      "spotName": "汕尾红海湾方向",
+      "queryName": "汕尾红海湾",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xiashen-huizhou",
+      "spotName": "惠州南滨海",
+      "queryName": "惠州南滨海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lanyu-lanzhou-south",
+      "spotName": "兰州南缘黄土",
+      "queryName": "兰州南缘黄土",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lanyu-guangyuan-rail",
+      "spotName": "广元蜀道",
+      "queryName": "广元蜀道",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lanyu-chongqing-approach",
+      "spotName": "重庆北前山城",
+      "queryName": "重庆北前山城",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yinlan-wuzhong",
+      "spotName": "吴忠黄河灌区",
+      "queryName": "吴忠黄河灌区",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yinlan-zhongwei-rail",
+      "spotName": "中卫南沙漠边缘",
+      "queryName": "中卫南沙漠边缘",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yinlan-jingtai",
+      "spotName": "景泰黄河石林方向",
+      "queryName": "景泰黄河石林",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yinlan-baiyin",
+      "spotName": "白银黄土丘陵",
+      "queryName": "白银黄土丘陵",
+      "wikidataId": null
+    },
+    {
+      "spotId": "nanjiang-korla-oasis",
+      "spotName": "库尔勒绿洲",
+      "queryName": "库尔勒绿洲",
+      "wikidataId": null
+    },
+    {
+      "spotId": "nanjiang-luntai",
+      "spotName": "轮台胡杨与戈壁",
+      "queryName": "轮台胡杨与戈壁",
+      "wikidataId": null
+    },
+    {
+      "spotId": "nanjiang-aksu",
+      "spotName": "阿克苏绿洲",
+      "queryName": "阿克苏绿洲",
+      "wikidataId": null
+    },
+    {
+      "spotId": "nanjiang-artux",
+      "spotName": "阿图什至喀什绿洲",
+      "queryName": "阿图什至喀什绿洲",
+      "wikidataId": null
+    },
+    {
+      "spotId": "kunli-chuxiong",
+      "spotName": "楚雄高原",
+      "queryName": "楚雄高原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "kunli-xiangyun",
+      "spotName": "祥云坝子",
+      "queryName": "祥云坝子",
+      "wikidataId": null
+    },
+    {
+      "spotId": "kunli-heqing",
+      "spotName": "鹤庆田园",
+      "queryName": "鹤庆田园",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xicheng-foping",
+      "spotName": "佛坪秦岭腹地",
+      "queryName": "佛坪秦岭腹地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xicheng-ningqiang",
+      "spotName": "宁强南秦巴",
+      "queryName": "宁强南秦巴",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xicheng-jiangyou",
+      "spotName": "江油绵阳平原",
+      "queryName": "江油绵阳平原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "chenggui-leshan-rail",
+      "spotName": "乐山岷江",
+      "queryName": "乐山岷江",
+      "wikidataId": null
+    },
+    {
+      "spotId": "chenggui-yibin",
+      "spotName": "宜宾江城",
+      "queryName": "宜宾江城",
+      "wikidataId": null
+    },
+    {
+      "spotId": "chenggui-bijie",
+      "spotName": "毕节乌蒙",
+      "queryName": "毕节乌蒙",
+      "wikidataId": null
+    },
+    {
+      "spotId": "chenggui-bailidujuan-distant",
+      "spotName": "百里杜鹃方向",
+      "queryName": "百里杜鹃",
+      "wikidataId": "Q109349028",
+      "lng": 105.85707,
+      "lat": 27.23685,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "geku-huatugou",
+      "spotName": "花土沟石油城戈壁",
+      "queryName": "花土沟石油城戈壁",
+      "wikidataId": null
+    },
+    {
+      "spotId": "geku-ruoqiang-rail",
+      "spotName": "若羌沙漠绿洲",
+      "queryName": "若羌沙漠绿洲",
+      "wikidataId": null
+    },
+    {
+      "spotId": "geku-yuli",
+      "spotName": "尉犁塔里木",
+      "queryName": "尉犁塔里木",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yinxi-wuzhong-rail",
+      "spotName": "吴忠宁东平原",
+      "queryName": "吴忠宁东平原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yinxi-guyuan",
+      "spotName": "固原六盘山方向",
+      "queryName": "固原六盘山",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yinxi-liupanshan",
+      "spotName": "六盘山段",
+      "queryName": "六盘山段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yinxi-qingyang",
+      "spotName": "庆阳黄土高原",
+      "queryName": "庆阳黄土高原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yinxi-xianyang",
+      "spotName": "咸阳渭河平原",
+      "queryName": "咸阳渭河平原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhengyu-nanyang",
+      "spotName": "南阳盆地",
+      "queryName": "南阳盆地",
+      "wikidataId": "Q6964462",
+      "lng": 112.5,
+      "lat": 32.3,
+      "source": "wikidata",
+      "distKmFromSpot": 6.9
+    },
+    {
+      "spotId": "zhengyu-xiangyang",
+      "spotName": "襄阳汉江",
+      "queryName": "襄阳汉江",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhengyu-xingshan",
+      "spotName": "兴山三峡山地",
+      "queryName": "兴山三峡山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhengyu-wushan",
+      "spotName": "巫山峡谷",
+      "queryName": "巫山峡谷",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhengyu-wanzhou",
+      "spotName": "万州库区",
+      "queryName": "万州库区",
+      "wikidataId": null
+    },
+    {
+      "spotId": "qingrong-jimo",
+      "spotName": "即墨滨海",
+      "queryName": "即墨滨海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "qingrong-haiyang",
+      "spotName": "海阳海岸方向",
+      "queryName": "海阳海岸",
+      "wikidataId": null
+    },
+    {
+      "spotId": "qingrong-yantai",
+      "spotName": "烟台滨海",
+      "queryName": "烟台滨海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "qingrong-weihai",
+      "spotName": "威海海岸",
+      "queryName": "威海海岸",
+      "wikidataId": null
+    },
+    {
+      "spotId": "qingrong-rongcheng",
+      "spotName": "荣成天尽头方向",
+      "queryName": "荣成天尽头",
+      "wikidataId": null
+    },
+    {
+      "spotId": "rilan-rizhao",
+      "spotName": "日照海滨方向",
+      "queryName": "日照海滨",
+      "wikidataId": null
+    },
+    {
+      "spotId": "rilan-linyi",
+      "spotName": "临沂沂蒙",
+      "queryName": "临沂沂蒙",
+      "wikidataId": null
+    },
+    {
+      "spotId": "rilan-qufu",
+      "spotName": "曲阜儒家故里方向",
+      "queryName": "曲阜儒家故里",
+      "wikidataId": null
+    },
+    {
+      "spotId": "rilan-heze",
+      "spotName": "菏泽平原",
+      "queryName": "菏泽平原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "shanghehang-huainan",
+      "spotName": "淮南江淮",
+      "queryName": "淮南江淮",
+      "wikidataId": null
+    },
+    {
+      "spotId": "shanghehang-chaohu",
+      "spotName": "巢湖方向",
+      "queryName": "巢湖",
+      "wikidataId": "Q1062495",
+      "lng": 117.522738888,
+      "lat": 31.5282,
+      "source": "wikidata",
+      "distKmFromSpot": 8.06
+    },
+    {
+      "spotId": "shanghehang-wuhu",
+      "spotName": "芜湖长江",
+      "queryName": "芜湖长江",
+      "wikidataId": null
+    },
+    {
+      "spotId": "shanghehang-xuancheng",
+      "spotName": "宣城皖南",
+      "queryName": "宣城皖南",
+      "wikidataId": null
+    },
+    {
+      "spotId": "shanghehang-huzhou",
+      "spotName": "湖州水乡",
+      "queryName": "湖州水乡",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hukun-yiwu",
+      "spotName": "义乌金华丘陵",
+      "queryName": "义乌金华丘陵",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hukun-shangrao",
+      "spotName": "上饶信江",
+      "queryName": "上饶信江",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hukun-changsha",
+      "spotName": "长沙湘江方向",
+      "queryName": "长沙湘江",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hukun-huaihua-rail",
+      "spotName": "怀化南雪峰",
+      "queryName": "怀化南雪峰",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hukun-guiyang-karst",
+      "spotName": "贵阳北喀斯特",
+      "queryName": "贵阳北喀斯特",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hukun-qujing",
+      "spotName": "曲靖滇东高原",
+      "queryName": "曲靖滇东高原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "ninghang-liyang",
+      "spotName": "溧阳天目湖方向",
+      "queryName": "溧阳天目湖",
+      "wikidataId": null
+    },
+    {
+      "spotId": "ninghang-yixing-rail",
+      "spotName": "宜兴陶都山水",
+      "queryName": "宜兴陶都山水",
+      "wikidataId": null
+    },
+    {
+      "spotId": "ninghang-huzhou-rail",
+      "spotName": "湖州太湖南缘",
+      "queryName": "湖州太湖南缘",
+      "wikidataId": null
+    },
+    {
+      "spotId": "huhang-jiashan",
+      "spotName": "嘉善—嘉兴水乡",
+      "queryName": "嘉善—嘉兴水乡",
+      "wikidataId": null
+    },
+    {
+      "spotId": "huhang-haining",
+      "spotName": "海宁西钱塘方向",
+      "queryName": "海宁西钱塘",
+      "wikidataId": null
+    },
+    {
+      "spotId": "huhang-hangzhou-portal",
+      "spotName": "杭州东门户",
+      "queryName": "杭州东门户",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hangtai-tiantaishan",
+      "spotName": "天台山",
+      "queryName": "天台山",
+      "wikidataId": "Q1146118",
+      "lng": 121.042213888,
+      "lat": 29.178844444,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "hangtai-shengzhou",
+      "spotName": "嵊州新昌山水",
+      "queryName": "嵊州新昌山水",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hangwen-nanxijiang",
+      "spotName": "楠溪江",
+      "queryName": "楠溪江",
+      "wikidataId": "Q3335815",
+      "lng": 120.673,
+      "lat": 28.0381,
+      "source": "wikidata",
+      "distKmFromSpot": 1.74
+    },
+    {
+      "spotId": "hangwen-yandang-distant",
+      "spotName": "雁荡山方向",
+      "queryName": "雁荡山",
+      "wikidataId": "Q21283576",
+      "lng": 121.06,
+      "lat": 28.37,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "guinan-libo",
+      "spotName": "荔波喀斯特",
+      "queryName": "荔波喀斯特",
+      "wikidataId": null
+    },
+    {
+      "spotId": "guinan-dushan",
+      "spotName": "独山山地",
+      "queryName": "独山山地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "daxi-pingyao",
+      "spotName": "平遥古城",
+      "queryName": "平遥古城",
+      "wikidataId": "Q500061",
+      "lng": 112.176666666,
+      "lat": 37.198888888,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "daxi-yellow-river-yongji",
+      "spotName": "永济黄河",
+      "queryName": "永济黄河",
+      "wikidataId": null
+    },
+    {
+      "spotId": "daxi-taiyuan-basin",
+      "spotName": "太原盆地",
+      "queryName": "太原盆地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "haida-bayuquan",
+      "spotName": "鲅鱼圈渤海",
+      "queryName": "鲅鱼圈渤海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "haida-dalian-coast",
+      "spotName": "大连滨海",
+      "queryName": "大连滨海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jingha-chengde-distant",
+      "spotName": "承德避暑山庄方向",
+      "queryName": "承德避暑山庄",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jingha-changchun-plain",
+      "spotName": "长春平原雪原",
+      "queryName": "长春平原雪原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xulian-lianyungang",
+      "spotName": "连云港海滨",
+      "queryName": "连云港海滨",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhengtai-taihang",
+      "spotName": "太行山晋城段",
+      "queryName": "太行山晋城段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhengtai-changzhi",
+      "spotName": "长治上党盆地",
+      "queryName": "长治上党盆地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "guangshengang-humen",
+      "spotName": "虎门珠江口",
+      "queryName": "虎门珠江口",
+      "wikidataId": null
+    },
+    {
+      "spotId": "guangshengang-hongkong-distant",
+      "spotName": "香港西九龙门户",
+      "queryName": "香港西九龙门户",
+      "wikidataId": null
+    },
+    {
+      "spotId": "fuxia-putian",
+      "spotName": "莆田湄洲湾方向",
+      "queryName": "莆田湄洲湾",
+      "wikidataId": null
+    },
+    {
+      "spotId": "fuxia-quanzhou",
+      "spotName": "泉州海丝方向",
+      "queryName": "泉州海丝",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yantong-dafeng-wetland",
+      "spotName": "大丰麋鹿湿地方向",
+      "queryName": "大丰麋鹿湿地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "huningyanjiang-jiangyin",
+      "spotName": "江阴长江",
+      "queryName": "江阴长江",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jingguang-yellow-river",
+      "spotName": "黄河郑州段方向",
+      "queryName": "黄河郑州段",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jingguang-wuhan-yangtze",
+      "spotName": "武汉长江方向",
+      "queryName": "武汉长江",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jingguang-yueyang",
+      "spotName": "岳阳楼洞庭方向",
+      "queryName": "岳阳楼洞庭",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xulan-huashan",
+      "spotName": "华山",
+      "queryName": "华山",
+      "wikidataId": "Q112568",
+      "lng": 110.083333333,
+      "lat": 34.483333333,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "xulan-longmen",
+      "spotName": "洛阳龙门方向",
+      "queryName": "洛阳龙门",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xulan-tianshui",
+      "spotName": "天水秦岭北麓",
+      "queryName": "天水秦岭北麓",
+      "wikidataId": null
+    },
+    {
+      "spotId": "jinghu-taishan",
+      "spotName": "泰山方向",
+      "queryName": "泰山",
+      "wikidataId": "Q216059",
+      "lng": 117.1,
+      "lat": 36.266666666,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "jinghu-nanjing-yangtze",
+      "spotName": "南京长江",
+      "queryName": "南京长江",
+      "wikidataId": null
+    },
+    {
+      "spotId": "chengyu-chongqing-hills",
+      "spotName": "重庆西山城丘陵",
+      "queryName": "重庆西山城丘陵",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lamulatso-distant",
+      "spotName": "拉姆拉措方向（远眺）",
+      "queryName": "拉姆拉措",
+      "wikidataId": null
+    },
+    {
+      "spotId": "baima-snow-mountain",
+      "spotName": "白马雪山",
+      "queryName": "白马雪山",
+      "wikidataId": "Q15055791",
+      "lng": 99.08472222,
+      "lat": 28.30472222,
+      "source": "wikidata",
+      "distKmFromSpot": 12.82
+    },
+    {
+      "spotId": "meili-snow-mountain-distant",
+      "spotName": "梅里雪山（远眺）",
+      "queryName": "梅里雪山",
+      "wikidataId": "Q1937211",
+      "lng": 98.683333333,
+      "lat": 28.438333333,
+      "source": "wikidata",
+      "distKmFromSpot": 16.85
+    },
+    {
+      "spotId": "dukezong-distant",
+      "spotName": "独克宗古城方向",
+      "queryName": "独克宗古城",
+      "wikidataId": null
+    },
+    {
+      "spotId": "guozigou-bridge",
+      "spotName": "果子沟大桥",
+      "queryName": "果子沟大桥",
+      "wikidataId": "Q5619691",
+      "lng": 81.140278,
+      "lat": 44.47075,
+      "source": "wikidata",
+      "distKmFromSpot": 5.87
+    },
+    {
+      "spotId": "sailimu-lake-distant",
+      "spotName": "赛里木湖（远眺）",
+      "queryName": "赛里木湖",
+      "wikidataId": "Q2410894",
+      "lng": 81.164722222,
+      "lat": 44.598055555,
+      "source": "wikidata",
+      "distKmFromSpot": 2.32
+    },
+    {
+      "spotId": "nalati-grassland-distant",
+      "spotName": "那拉提—巩乃斯草原方向",
+      "queryName": "那拉提—巩乃斯草原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "fuxian-lake-distant",
+      "spotName": "抚仙湖方向",
+      "queryName": "抚仙湖",
+      "wikidataId": "Q127016",
+      "lng": 102.888888888,
+      "lat": 24.50225,
+      "source": "wikidata",
+      "distKmFromSpot": 7.85
+    },
+    {
+      "spotId": "caohai-weining",
+      "spotName": "威宁草海",
+      "queryName": "威宁草海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "beipanjiang-bridge",
+      "spotName": "北盘江特大桥",
+      "queryName": "北盘江特大桥",
+      "wikidataId": "Q19581770",
+      "lng": 105.255,
+      "lat": 25.950555555,
+      "source": "wikidata",
+      "distKmFromSpot": 11.21
+    },
+    {
+      "spotId": "malinghe-canyon",
+      "spotName": "马岭河峡谷瀑布群",
+      "queryName": "马岭河峡谷瀑布群",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lancang-bridge-lixiang",
+      "spotName": "澜沧江特大桥（丽香）",
+      "queryName": "澜沧江特大桥",
+      "wikidataId": null
+    },
+    {
+      "spotId": "nujiang-bridge-darui",
+      "spotName": "怒江特大桥方向",
+      "queryName": "怒江特大桥",
+      "wikidataId": "Q25101318",
+      "lng": 98.94669,
+      "lat": 24.75052,
+      "source": "wikidata",
+      "distKmFromSpot": 41.63
+    },
+    {
+      "spotId": "shuihong-spiral",
+      "spotName": "水红铁路四层螺旋展线",
+      "queryName": "水红铁路四层螺旋展线",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yulong-river-karst",
+      "spotName": "遇龙河峰丛",
+      "queryName": "遇龙河峰丛",
+      "wikidataId": null
+    },
+    {
+      "spotId": "wanfenglin",
+      "spotName": "万峰林",
+      "queryName": "万峰林",
+      "wikidataId": "Q10865035",
+      "lng": 104.90793,
+      "lat": 25.01562,
+      "source": "wikidata",
+      "distKmFromSpot": 15.53
+    },
+    {
+      "spotId": "xiaozhai-tiankeng-distant",
+      "spotName": "小寨天坑方向",
+      "queryName": "小寨天坑",
+      "wikidataId": null
+    },
+    {
+      "spotId": "xingwen-stone-sea",
+      "spotName": "兴文石海方向",
+      "queryName": "兴文石海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhijin-karst",
+      "spotName": "织金喀斯特峰丛",
+      "queryName": "织金喀斯特峰丛",
+      "wikidataId": null
+    },
+    {
+      "spotId": "wugongshan-distant",
+      "spotName": "武功山云端草甸方向",
+      "queryName": "武功山云端草甸",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhangshiyan-taihang",
+      "spotName": "太行嶂石岩地貌",
+      "queryName": "太行嶂石岩地貌",
+      "wikidataId": null
+    },
+    {
+      "spotId": "daxinganling-forest",
+      "spotName": "大兴安岭林海",
+      "queryName": "大兴安岭林海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hulunbuir-grassland",
+      "spotName": "呼伦贝尔草原",
+      "queryName": "呼伦贝尔草原",
+      "wikidataId": null
+    },
+    {
+      "spotId": "mingsha-mountain",
+      "spotName": "鸣沙山沙漠",
+      "queryName": "鸣沙山沙漠",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yueyaquan-distant",
+      "spotName": "月牙泉方向",
+      "queryName": "月牙泉",
+      "wikidataId": "Q1428520",
+      "lng": 94.669444444,
+      "lat": 40.086666666,
+      "source": "wikidata",
+      "distKmFromSpot": 1.52
+    },
+    {
+      "spotId": "gurbantunggut-desert",
+      "spotName": "古尔班通古特沙漠",
+      "queryName": "古尔班通古特沙漠",
+      "wikidataId": "Q1517734",
+      "lng": 87.333333333,
+      "lat": 45.133333333,
+      "source": "wikidata",
+      "distKmFromSpot": 71.64
+    },
+    {
+      "spotId": "mengdong-bamboo-sea",
+      "spotName": "猛洞河竹海",
+      "queryName": "猛洞河竹海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yellow-river-lankao-bend",
+      "spotName": "黄河兰考九曲弯",
+      "queryName": "黄河兰考九曲弯",
+      "wikidataId": null
+    },
+    {
+      "spotId": "wanquan-river",
+      "spotName": "万泉河湿地",
+      "queryName": "万泉河湿地",
+      "wikidataId": null
+    },
+    {
+      "spotId": "boao-jade-shoal",
+      "spotName": "博鳌玉带滩",
+      "queryName": "博鳌玉带滩",
+      "wikidataId": null
+    },
+    {
+      "spotId": "beibu-gulf-xiwan",
+      "spotName": "北部湾西湾跨海",
+      "queryName": "北部湾西湾跨海",
+      "wikidataId": null
+    },
+    {
+      "spotId": "qiongzhou-strait-ferry",
+      "spotName": "琼州海峡火车轮渡",
+      "queryName": "琼州海峡火车轮渡",
+      "wikidataId": null
+    },
+    {
+      "spotId": "luoping-rapeseed",
+      "spotName": "罗平金鸡峰丛油菜花",
+      "queryName": "罗平金鸡峰丛油菜花",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hani-terrace-distant",
+      "spotName": "元阳哈尼梯田方向",
+      "queryName": "元阳哈尼梯田",
+      "wikidataId": null
+    },
+    {
+      "spotId": "congjiang-dong-village",
+      "spotName": "从江侗寨鼓楼群",
+      "queryName": "从江侗寨鼓楼群",
+      "wikidataId": null
+    },
+    {
+      "spotId": "tulou-longyan",
+      "spotName": "闽西土楼群",
+      "queryName": "闽西土楼群",
+      "wikidataId": null
+    },
+    {
+      "spotId": "wulin-ancient-village",
+      "spotName": "梧林古厝红砖村",
+      "queryName": "梧林古厝红砖村",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hakka-weilong-ganzhou",
+      "spotName": "赣南客家围屋方向",
+      "queryName": "赣南客家围屋",
+      "wikidataId": null
+    },
+    {
+      "spotId": "gongyi-imperial-tombs",
+      "spotName": "北宋皇陵石像生麦田",
+      "queryName": "北宋皇陵石像生麦田",
+      "wikidataId": null
+    },
+    {
+      "spotId": "liangshan-terraces",
+      "spotName": "大凉山梯田",
+      "queryName": "大凉山梯田",
+      "wikidataId": null
+    },
+    {
+      "spotId": "dali-three-pagodas",
+      "spotName": "崇圣寺三塔方向",
+      "queryName": "崇圣寺三塔",
+      "wikidataId": "Q1257126",
+      "lng": 100.14594,
+      "lat": 25.70849,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "jianshui-double-dragon",
+      "spotName": "建水双龙桥方向",
+      "queryName": "建水双龙桥",
+      "wikidataId": null
+    },
+    {
+      "spotId": "tengwangge",
+      "spotName": "滕王阁方向",
+      "queryName": "滕王阁",
+      "wikidataId": "Q1375487",
+      "lng": 115.8756502,
+      "lat": 28.6840416,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "yellow-crane-tower-distant",
+      "spotName": "黄鹤楼方向",
+      "queryName": "黄鹤楼",
+      "wikidataId": "Q462372",
+      "lng": 114.29694444,
+      "lat": 30.54694444,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "wudang-mountain-distant",
+      "spotName": "武当山方向",
+      "queryName": "武当山",
+      "wikidataId": "Q4034",
+      "lng": 111.003888888,
+      "lat": 32.400833333,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "gulongzhong-distant",
+      "spotName": "古隆中方向",
+      "queryName": "古隆中",
+      "wikidataId": null
+    },
+    {
+      "spotId": "heijing-ancient-town",
+      "spotName": "黑井古镇",
+      "queryName": "黑井古镇",
+      "wikidataId": null
+    },
+    {
+      "spotId": "shanhaiguan-great-wall",
+      "spotName": "山海关长城",
+      "queryName": "山海关长城",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hanguguan-distant",
+      "spotName": "函谷关方向",
+      "queryName": "函谷关",
+      "wikidataId": "Q848793",
+      "lng": 110.92,
+      "lat": 34.63,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "lingqu-canal",
+      "spotName": "兴安灵渠",
+      "queryName": "兴安灵渠",
+      "wikidataId": null
+    },
+    {
+      "spotId": "leifeng-pagoda-distant",
+      "spotName": "西湖雷峰塔方向",
+      "queryName": "西湖雷峰塔",
+      "wikidataId": null
+    },
+    {
+      "spotId": "yixiantian-bridge-chengkun",
+      "spotName": "成昆一线天桥",
+      "queryName": "成昆一线天桥",
+      "wikidataId": null
+    },
+    {
+      "spotId": "qingshuihe-bridge-qingzang",
+      "spotName": "清水河特大桥",
+      "queryName": "清水河特大桥",
+      "wikidataId": "Q7221783",
+      "lng": 93.63424,
+      "lat": 35.45773,
+      "source": "wikidata",
+      "distKmFromSpot": 54.29
+    },
+    {
+      "spotId": "xingfuyuan-bridge",
+      "spotName": "幸福源大桥（阳朔）",
+      "queryName": "幸福源大桥",
+      "wikidataId": null
+    },
+    {
+      "spotId": "lujiazui-skyline",
+      "spotName": "上海陆家嘴天际线",
+      "queryName": "上海陆家嘴天际线",
+      "wikidataId": null
+    },
+    {
+      "spotId": "zhujiang-newtown",
+      "spotName": "广州珠江新城天际线",
+      "queryName": "广州珠江新城天际线",
+      "wikidataId": null
+    },
+    {
+      "spotId": "chongqing-rivers-confluence",
+      "spotName": "重庆两江交汇山城",
+      "queryName": "重庆两江交汇山城",
+      "wikidataId": null
+    },
+    {
+      "spotId": "hzmb-distant",
+      "spotName": "港珠澳大桥方向",
+      "queryName": "港珠澳大桥",
+      "wikidataId": null
+    },
+    {
+      "spotId": "wuhan-yangtze-bridge",
+      "spotName": "武汉长江大桥",
+      "queryName": "武汉长江大桥",
+      "wikidataId": "Q8039097",
+      "lng": 114.282786521,
+      "lat": 30.552201079,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "nanjing-yangtze-bridge",
+      "spotName": "南京长江大桥",
+      "queryName": "南京长江大桥",
+      "wikidataId": "Q3082765",
+      "lng": 118.738889,
+      "lat": 32.115278,
+      "source": "wikidata",
+      "distKmFromSpot": 0
+    },
+    {
+      "spotId": "banna-elephant-habitat",
+      "spotName": "西双版纳亚洲象栖息山林",
+      "queryName": "西双版纳亚洲象栖息山林",
+      "wikidataId": null
+    },
+    {
+      "spotId": "baima-snub-nosed-monkey-forest",
+      "spotName": "白马雪山滇金丝猴山林",
+      "queryName": "白马雪山滇金丝猴山林",
+      "wikidataId": null
+    }
+  ]
+}

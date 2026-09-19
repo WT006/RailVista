@@ -1,0 +1,9 @@
+{
+  "generatedAt": "2026-09-18T13:11:01.893Z",
+  "source": "geofabrik-pbf",
+  "pbf": "tmp/china-latest.osm.pbf",
+  "osmium": "docker",
+  "conventionalWays": 330551,
+  "hsrTaggedWays": 91139,
+  "hsrGraphReplaced": true
+}

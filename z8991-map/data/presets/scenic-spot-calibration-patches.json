@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updated": "2026-09-15",
-  "note": "includes off-rail fix 2026-09-15; see docs/scenic-off-rail-fix-log.md",
+  "updated": "2026-09-18",
+  "note": "audit 20260918 A/B/D fixes; named pins to truth; area pull to rail; see docs/scenic-spots-location-verify.md; v2 verified ingest 38 new / 3 refine",
   "patches": [
     {
       "id": "chaerhan-salt-bridge",
@@ -41,8 +41,8 @@
       "lng": 91.166738,
       "lat": 33.496069,
       "visibility": "distant",
-      "maxDistKm": 50,
-      "reason": "named_truth_far"
+      "maxDistKm": 75,
+      "reason": "audit_20260918:B2_maxDist"
     },
     {
       "id": "cuona-lake",
@@ -73,8 +73,8 @@
       "lng": 95.055278,
       "lat": 29.630556,
       "visibility": "distant",
-      "maxDistKm": 50,
-      "reason": "named_truth_far"
+      "maxDistKm": 65,
+      "reason": "audit_20260918:B3_maxDist"
     },
     {
       "id": "yamdrok-distant",
@@ -103,11 +103,11 @@
     },
     {
       "id": "zhangye-danxia-distant",
-      "lng": 100.145999,
-      "lat": 39.079794,
+      "lng": 100.166089,
+      "lat": 39.094139,
       "visibility": "distant",
       "maxDistKm": null,
-      "reason": "off_rail_fix_2026-09-15:truth_then_offset"
+      "reason": "audit_20260918:D_named_truth"
     },
     {
       "id": "jiayuguan-fort-distant",
@@ -132,11 +132,11 @@
     },
     {
       "id": "altun-mountains",
-      "lng": 93.705,
-      "lat": 39.3058,
+      "lng": 94.8899,
+      "lat": 38.4897,
       "visibility": "distant",
       "maxDistKm": 50,
-      "reason": "named_truth_far"
+      "reason": "audit_20260918:B8_pull_dunge"
     },
     {
       "id": "taklamakan-south-geku",
@@ -315,7 +315,9 @@
       "id": "qinling-switchback",
       "lng": 106.933575,
       "lat": 34.244179,
-      "reason": "on_track_snap"
+      "reason": "audit_v2_verified_20260918",
+      "visibility": "on_track",
+      "intro": "宝成铁路观音山「8」字/马蹄形展线盘山爬升，车窗可见下层展线「火车追火车」。"
     },
     {
       "id": "jialing-gorge-baocheng",
@@ -402,14 +404,6 @@
       "reason": "named_truth"
     },
     {
-      "id": "huangshan-hefu",
-      "lng": 120.224953,
-      "lat": 36.052313,
-      "reason": "named_truth",
-      "visibility": "distant",
-      "maxDistKm": 37.9
-    },
-    {
       "id": "sanya-yalong-distant",
       "lng": 109.624263,
       "lat": 18.296965,
@@ -436,11 +430,11 @@
     },
     {
       "id": "changbai-mountain",
-      "lng": 128.143594,
-      "lat": 42.440884,
+      "lng": 128.055,
+      "lat": 42.006,
       "visibility": "distant",
-      "maxDistKm": 25,
-      "reason": "off_rail_fix_2026-09-15:truth_then_offset"
+      "maxDistKm": 55,
+      "reason": "audit_20260918:D_west_slope_peak_not_erdao"
     },
     {
       "id": "changbai-forest-snow",
@@ -452,10 +446,11 @@
     },
     {
       "id": "xuexiang-distant",
-      "lng": 91.48508,
-      "lat": 29.82621,
-      "reason": "named_truth",
-      "visibility": "distant"
+      "lng": 128.15,
+      "lat": 44.32,
+      "reason": "audit_20260918:A1_heilongjiang_not_tibet",
+      "visibility": "distant",
+      "maxDistKm": 80
     },
     {
       "id": "mudanjiang-forest",
@@ -477,11 +472,11 @@
     },
     {
       "id": "badaling-great-wall",
-      "lng": 115.984627,
-      "lat": 40.340591,
+      "lng": 116.005052,
+      "lat": 40.360328,
       "visibility": "distant",
       "maxDistKm": 8,
-      "reason": "off_rail_fix_2026-09-15:truth_then_offset"
+      "reason": "audit_20260918:D_named_truth"
     },
     {
       "id": "lalin-namcha-barwa-view",
@@ -502,13 +497,6 @@
       "reason": "area_pull_rail"
     },
     {
-      "id": "zhangjihuai-furong-rail",
-      "lng": 121.02714,
-      "lat": 28.29997,
-      "reason": "named_truth",
-      "visibility": "distant"
-    },
-    {
       "id": "zhangjihuai-mengdong-distant",
       "lng": 109.84943,
       "lat": 28.76757,
@@ -522,22 +510,6 @@
       "visibility": "window",
       "maxDistKm": 10,
       "reason": "off_rail_fix_2026-09-15:perp_offset"
-    },
-    {
-      "id": "dunbai-forest-mid",
-      "lng": 127.475487,
-      "lat": 42.186937,
-      "visibility": "distant",
-      "maxDistKm": 50,
-      "reason": "named_truth_far"
-    },
-    {
-      "id": "dunbai-changbai-station",
-      "lng": 127.475487,
-      "lat": 42.186937,
-      "visibility": "distant",
-      "maxDistKm": 50,
-      "reason": "named_truth_far"
     },
     {
       "id": "jitong-zhengxiangbai",
@@ -563,12 +535,6 @@
       "lng": 105.200632,
       "lat": 37.483493,
       "reason": "area_pull_rail"
-    },
-    {
-      "id": "xiashen-xiamen-bay-rail",
-      "lng": 118.020646,
-      "lat": 24.530007,
-      "reason": "area_truth_pull_rail"
     },
     {
       "id": "xiashen-chaoshan",
@@ -731,8 +697,9 @@
       "id": "dali-three-pagodas",
       "lng": 100.14594,
       "lat": 25.70849,
-      "reason": "named_truth",
-      "visibility": "distant"
+      "reason": "audit_20260918:B9_maxDist",
+      "visibility": "distant",
+      "maxDistKm": 16
     },
     {
       "id": "tengwangge",
@@ -753,8 +720,8 @@
       "lng": 111.003889,
       "lat": 32.400833,
       "visibility": "distant",
-      "maxDistKm": 50,
-      "reason": "named_truth_far"
+      "maxDistKm": 55,
+      "reason": "audit_20260918:B5_maxDist"
     },
     {
       "id": "heijing-ancient-town",
@@ -820,15 +787,17 @@
       "id": "baima-snub-nosed-monkey-forest",
       "lng": 99.535978,
       "lat": 27.959321,
-      "reason": "named_coarse_pull_rail"
+      "reason": "audit_20260918:B10_maxDist",
+      "visibility": "distant",
+      "maxDistKm": 25
     },
     {
       "id": "loushanguan",
-      "lng": 106.843,
-      "lat": 28.053,
+      "lng": 106.896401,
+      "lat": 28.037235,
       "visibility": "distant",
       "maxDistKm": 12,
-      "reason": "manual_yugui_feature"
+      "reason": "audit_20260918:D_pass_truth"
     },
     {
       "id": "zunyi-karst",
@@ -968,19 +937,19 @@
     },
     {
       "id": "fenghuang-ancient-town",
-      "lng": 109.628266,
-      "lat": 28.022284,
+      "lng": 109.59919,
+      "lat": 28.020509,
       "visibility": "window",
       "maxDistKm": 10,
-      "reason": "off_rail_fix_2026-09-15:truth_then_offset"
+      "reason": "audit_20260918:D_tuojiang_core"
     },
     {
       "id": "zhenyuan-ancient-town",
-      "lng": 108.438107,
-      "lat": 27.026738,
+      "lng": 108.42794,
+      "lat": 27.050746,
       "visibility": "window",
       "maxDistKm": 10,
-      "reason": "off_rail_fix_2026-09-15:truth_then_offset"
+      "reason": "audit_20260918:D_named_truth"
     },
     {
       "id": "yixian-ancient-villages",
@@ -1191,14 +1160,6 @@
       "reason": "off_rail_fix_2026-09-15:perp_offset"
     },
     {
-      "id": "zhanghu-bashang-rail",
-      "lng": 114.044135,
-      "lat": 40.775734,
-      "visibility": "window",
-      "maxDistKm": 12,
-      "reason": "off_rail_fix_2026-09-15:perp_offset"
-    },
-    {
       "id": "zhanghu-xinghe",
       "lng": 112.984088,
       "lat": 40.963487,
@@ -1236,14 +1197,6 @@
       "lat": 40.431178,
       "visibility": "window",
       "maxDistKm": 12,
-      "reason": "off_rail_fix_2026-09-15:perp_offset"
-    },
-    {
-      "id": "linha-badan-rail",
-      "lng": 104.158357,
-      "lat": 41.215962,
-      "visibility": "window",
-      "maxDistKm": 15,
       "reason": "off_rail_fix_2026-09-15:perp_offset"
     },
     {
@@ -1840,19 +1793,19 @@
     },
     {
       "id": "shanghehang-wuhu",
-      "lng": 118.818768,
-      "lat": 30.94515,
+      "lng": 118.37,
+      "lat": 31.33,
       "visibility": "window",
-      "maxDistKm": 10,
-      "reason": "off_rail_fix_2026-09-15:perp_offset"
+      "maxDistKm": 25,
+      "reason": "audit_20260918:A4_wuhu_yangtze"
     },
     {
       "id": "shanghehang-xuancheng",
-      "lng": 119.795735,
-      "lat": 30.873961,
+      "lng": 118.72,
+      "lat": 30.95,
       "visibility": "window",
       "maxDistKm": 10,
-      "reason": "off_rail_fix_2026-09-15:perp_offset"
+      "reason": "audit_20260918:A3_xuancheng"
     },
     {
       "id": "hukun-yiwu",
@@ -1976,11 +1929,11 @@
     },
     {
       "id": "jingha-chengde-distant",
-      "lng": 120.163566,
-      "lat": 41.47315,
+      "lng": 117.937,
+      "lat": 40.978,
       "visibility": "distant",
-      "maxDistKm": null,
-      "reason": "off_rail_fix_2026-09-15:perp_offset"
+      "maxDistKm": 15,
+      "reason": "audit_20260918:A2_chengde_bishushan"
     },
     {
       "id": "jingha-changchun-plain",
@@ -2032,11 +1985,13 @@
     },
     {
       "id": "fuxia-putian",
-      "lng": 119.083473,
-      "lat": 25.346476,
-      "visibility": "distant",
+      "lng": 118.884013,
+      "lat": 25.211601,
+      "visibility": "on_track",
       "maxDistKm": null,
-      "reason": "off_rail_fix_2026-09-15:perp_offset"
+      "reason": "audit_v2_verified_20260918",
+      "name": "湄洲湾跨海大桥",
+      "intro": "福厦高铁湄洲湾跨海大桥海域段，俯瞰碧蓝海水、渔排与船只拖尾。"
     },
     {
       "id": "fuxia-quanzhou",
@@ -2093,6 +2048,479 @@
       "visibility": "window",
       "maxDistKm": 10,
       "reason": "off_rail_fix_2026-09-15:perp_offset"
+    },
+    {
+      "id": "desert-sunset-heruo",
+      "lng": 86.4837,
+      "lat": 38.6695,
+      "visibility": "window",
+      "maxDistKm": 15,
+      "reason": "audit_20260918:A5_heruo_qiemo_ruoqiang"
+    },
+    {
+      "id": "daxinganling-forest",
+      "lng": 121.4246,
+      "lat": 48.7898,
+      "visibility": "window",
+      "maxDistKm": 15,
+      "reason": "audit_20260918:A6_binzhou_boketu"
+    },
+    {
+      "id": "beibu-gulf-xiwan",
+      "lng": 107.96,
+      "lat": 21.56,
+      "visibility": "on_track",
+      "reason": "audit_20260918:A7_xiwan_bridge_await_fangdong"
+    },
+    {
+      "id": "dangjinshan-pass",
+      "lng": 94.6297,
+      "lat": 38.0676,
+      "visibility": "window",
+      "maxDistKm": 8,
+      "reason": "audit_20260918:A8_dunge_pass"
+    },
+    {
+      "id": "qinghai-lake",
+      "lng": 100.05,
+      "lat": 37.18,
+      "visibility": "window",
+      "maxDistKm": 15,
+      "reason": "audit_20260918:B1_north_shore_near_rail"
+    },
+    {
+      "id": "namtso-distant",
+      "lng": 90.468056,
+      "lat": 30.720833,
+      "visibility": "distant",
+      "maxDistKm": 50,
+      "reason": "audit_20260918:B4_truth_maxDist"
+    },
+    {
+      "id": "juyan-lake-distant",
+      "lng": 101.26,
+      "lat": 42.29,
+      "visibility": "distant",
+      "maxDistKm": 40,
+      "reason": "audit_20260918:B6_refine"
+    },
+    {
+      "id": "bosten-lake-distant",
+      "lng": 86.8,
+      "lat": 41.95,
+      "visibility": "distant",
+      "maxDistKm": 40,
+      "reason": "audit_20260918:B7_south_shore"
+    },
+    {
+      "id": "yardang-geomorphology",
+      "lng": 94.8453,
+      "lat": 39.3109,
+      "visibility": "window",
+      "maxDistKm": 15,
+      "reason": "audit_20260918:B11_dunge_yardang"
+    },
+    {
+      "id": "zhijin-karst",
+      "lng": 105.75,
+      "lat": 26.65,
+      "visibility": "distant",
+      "maxDistKm": 50,
+      "reason": "audit_20260918:B12_distant_or_drop"
+    },
+    {
+      "id": "zhangshiyan-taihang",
+      "lng": 113.7,
+      "lat": 37.55,
+      "visibility": "distant",
+      "maxDistKm": 40,
+      "reason": "audit_20260918:B13_distant"
+    },
+    {
+      "id": "hanguguan-distant",
+      "lng": 110.92,
+      "lat": 34.63,
+      "visibility": "distant",
+      "maxDistKm": 15,
+      "reason": "audit_20260918:D_wikidata"
+    },
+    {
+      "id": "siberian-tiger-park-harbin",
+      "lng": 126.596783,
+      "lat": 45.814961,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "东北虎林园（哈尔滨段）",
+      "intro": "出哈尔滨北行不久，车窗外可见东北虎林园栅栏内虎群活动，为哈齐方向特色窗景。"
+    },
+    {
+      "id": "daqing-oil-pumpjacks",
+      "lng": 125.116516,
+      "lat": 46.574478,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 10,
+      "name": "大庆油田磕头机群",
+      "intro": "进入大庆地界，抽油机成群分布线路两侧，日夜磕头作业，与高铁桥同框的工业窗景。"
+    },
+    {
+      "id": "zhalantun-cer-heritage",
+      "lng": 122.740264,
+      "lat": 48.012395,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "扎兰屯中东铁路小镇",
+      "intro": "扎兰屯站区周边中东铁路建筑群与雅鲁河沿岸风光，滨洲线人文遗产节点。"
+    },
+    {
+      "id": "boketu-xinganling-rail",
+      "lng": 121.914135,
+      "lat": 48.752064,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "博克图兴安岭段",
+      "intro": "滨洲线博克图站一带翻越大兴安岭，明线段林海深谷与中东铁路遗产气质浓厚。"
+    },
+    {
+      "id": "lamashan-balin",
+      "lng": 121.98,
+      "lat": 48.58,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 12,
+      "name": "喇嘛山（巴林段）",
+      "intro": "滨洲线巴林一带花岗岩奇峰错落于线路一侧，为大兴安岭段著名车窗奇景。"
+    },
+    {
+      "id": "shuangdao-bay-bridge",
+      "lng": 121.860789,
+      "lat": 37.441624,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "双岛湾跨海特大桥",
+      "intro": "青荣城际牟平—威海北区间，列车以大弧线跨双岛湾，桥上海景开阔。"
+    },
+    {
+      "id": "anhai-bay-bridge",
+      "lng": 118.546672,
+      "lat": 24.684474,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "安海湾特大桥",
+      "intro": "福厦高铁安海湾特大桥跨海段，湾内渔排与两岸清晰可见。"
+    },
+    {
+      "id": "changsha-bay-bridge-shanwei",
+      "lng": 115.321535,
+      "lat": 22.81077,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "长沙湾特大桥（汕尾）",
+      "intro": "厦深高铁鲘门—汕尾区间长沙湾特大桥，湾内水域、蚝田与滩涂同框。"
+    },
+    {
+      "id": "beidaihe-approach-sea",
+      "lng": 119.413724,
+      "lat": 39.849582,
+      "visibility": "distant",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 12,
+      "name": "北戴河进站远眺海面",
+      "intro": "北戴河站进站前后地势平坦，车窗可远眺渤海及南戴河一带岸线。"
+    },
+    {
+      "id": "xuwen-north-port-ferry",
+      "lng": 110.196,
+      "lat": 20.226,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "徐闻北港火车轮渡",
+      "intro": "粤海铁路轮渡徐闻北港装船段，车窗可见栈桥、渡轮与港口海面（铁水联运特殊体验）。"
+    },
+    {
+      "id": "pulandian-bay-crossing",
+      "lng": 121.93,
+      "lat": 39.42,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 12,
+      "name": "普兰店湾跨海段",
+      "intro": "哈大高铁普兰店湾跨海段，列车近海穿行，滩涂养殖圈与开阔海面同框。"
+    },
+    {
+      "id": "huangyuan-gorge-g109",
+      "lng": 101.363685,
+      "lat": 36.668926,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "湟源峡（西石峡三线并行）",
+      "intro": "青藏铁路出西宁穿西石峡，与 G109、G6 同挤湟水峡谷，丹霞状山体夹峙。"
+    },
+    {
+      "id": "laoya-gorge-lanqing",
+      "lng": 102.609943,
+      "lat": 36.392182,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "老鸦峡",
+      "intro": "民和—乐都间湟水老鸦峡，铁路与公路并行穿峡，两岸陡崖夹峙。"
+    },
+    {
+      "id": "dabancheng-wetland-bridge",
+      "lng": 88.243482,
+      "lat": 43.37833,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "达坂城湿地特大桥",
+      "intro": "兰新高铁达坂城湿地特大桥跨越戈壁中湿地，桥下绿草水鸟与荒漠反差强烈。"
+    },
+    {
+      "id": "jiayuguan-wall-underpass",
+      "lng": 98.276355,
+      "lat": 39.732694,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "嘉峪关长城桥洞",
+      "intro": "兰新高铁近嘉峪关处从明长城防御线下桥洞穿过，与第一墩景区同框。"
+    },
+    {
+      "id": "qinglongqiao-switchback",
+      "lng": 116.020237,
+      "lat": 40.351156,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "青龙桥站人字形展线",
+      "intro": "京张铁路青龙桥站「人」字形展线与百年站房，詹天佑铜像与繁体站匾同框。"
+    },
+    {
+      "id": "shuiguan-great-wall",
+      "lng": 116.031029,
+      "lat": 40.334218,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "水关长城（关沟段）",
+      "intro": "京张关沟段与水关长城墙体并行，车窗可见敌楼沿山脊蜿蜒。"
+    },
+    {
+      "id": "niangziguan-pass",
+      "lng": 113.868813,
+      "lat": 37.960136,
+      "visibility": "distant",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 25,
+      "name": "娘子关关城",
+      "intro": "石太普速娘子关站一带明代关城与绵河谷；关隘距站数百米，客专走行较远故标远眺。"
+    },
+    {
+      "id": "sanshenggong-water-hub",
+      "lng": 107.029352,
+      "lat": 40.310996,
+      "visibility": "distant",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 12,
+      "name": "三盛公水利枢纽",
+      "intro": "包兰线磴口黄河大桥过河时可远望三盛公拦河闸与黄河「几字弯」顶点。"
+    },
+    {
+      "id": "tongguan-yellow-wei-confluence",
+      "lng": 110.285158,
+      "lat": 34.606947,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 10,
+      "name": "黄河潼关段（黄渭交汇）",
+      "intro": "陇海线潼关段沿黄河南岸，北望黄河水面、风陵渡及黄渭交汇浑黄双色水线。"
+    },
+    {
+      "id": "yuandang-lake-bridge",
+      "lng": 120.929233,
+      "lat": 31.052998,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "元荡湖大桥跨湖段",
+      "intro": "沪苏湖方向元荡湖大桥斜跨示范区湖面，「湖上列车」与岸边湿地同框。"
+    },
+    {
+      "id": "wufengshan-yangtze-bridge",
+      "lng": 119.628634,
+      "lat": 32.162217,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "五峰山长江大桥",
+      "intro": "连镇高铁五峰山长江大桥（高速铁路悬索桥），俯瞰入海口段浩阔江面与锚地船队。"
+    },
+    {
+      "id": "chuishan-pagoda",
+      "lng": 119.710773,
+      "lat": 32.217967,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "圌山报恩塔",
+      "intro": "五峰山长江大桥南岸圌山孤峰与山顶报恩塔，连镇过江后显著地标。"
+    },
+    {
+      "id": "lushan-from-rail",
+      "lng": 115.874339,
+      "lat": 29.599636,
+      "visibility": "distant",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 25,
+      "name": "庐山（庐山站远眺）",
+      "intro": "武九/昌九庐山站段车窗可见庐山连绵山体与汉阳峰方向山影。"
+    },
+    {
+      "id": "balihu-jiujiang",
+      "lng": 115.960209,
+      "lat": 29.671676,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "八里湖（九江）",
+      "intro": "昌九城际出九江站沿八里湖畔走行，湖面与庐山山影同框。"
+    },
+    {
+      "id": "qixia-mountain",
+      "lng": 118.948992,
+      "lat": 32.148978,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "栖霞山",
+      "intro": "京沪线南京栖霞段，「秋栖霞」山体与山麓古寺方向车窗可见。"
+    },
+    {
+      "id": "cihu-huangshi",
+      "lng": 115.028527,
+      "lat": 30.209483,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "磁湖（黄石）",
+      "intro": "武九客专黄石北站临磁湖东岸，进站段湖面与滨湖城市天际线展开。"
+    },
+    {
+      "id": "jinjiling-danxia",
+      "lng": 113.048125,
+      "lat": 25.290916,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "金鸡岭丹霞崖壁",
+      "intro": "京广线坪石段可见金鸡岭丹霞崖壁，如巨型金鸡展翅，粤北标志窗景。"
+    },
+    {
+      "id": "zhenyang-gorge-beijang",
+      "lng": 113.355774,
+      "lat": 24.200205,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "浈阳峡（北江）",
+      "intro": "京广线北江三峡浈阳峡段，两岸峭壁夹江，铁路沿江西岸穿行。"
+    },
+    {
+      "id": "sixianjiao-confluence",
+      "lng": 112.807372,
+      "lat": 23.146537,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "思贤滘两江交汇",
+      "intro": "西江与北江交汇处「三江汇流」奇观，南广高铁临近段可俯瞰两江双色水域。"
+    },
+    {
+      "id": "xinghu-zhaoqing",
+      "lng": 112.450509,
+      "lat": 23.083685,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "肇庆星湖·波海湖",
+      "intro": "广茂/南广肇庆段沿星湖一侧，车窗可见波海湖与七星岩喀斯特孤峰。"
+    },
+    {
+      "id": "dinghu-mountain",
+      "lng": 112.581874,
+      "lat": 23.176552,
+      "visibility": "distant",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 15,
+      "name": "鼎湖山",
+      "intro": "国家级自然保护区鼎湖山，肇庆段南望可见绿意浓郁的山体轮廓。"
+    },
+    {
+      "id": "pearl-river-double-bridge",
+      "lng": 113.224717,
+      "lat": 23.131796,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "珠江大桥（双桥烟雨）",
+      "intro": "广州珠江大桥「双桥烟雨」羊城老八景，列车过桥可俯瞰珠江与白鹅潭江面。"
+    },
+    {
+      "id": "wujiangdu-five-bridges",
+      "lng": 106.761312,
+      "lat": 27.319975,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "乌江渡五桥同框",
+      "intro": "渝贵线播州乌江镇一带跨乌江，大坝与多座公路桥同框，峡谷江面同景。"
+    },
+    {
+      "id": "doushaguan-five-ways",
+      "lng": 104.130765,
+      "lat": 28.022727,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "豆沙关五道并行",
+      "intro": "内昆线关河峡谷豆沙关，秦五尺道、水道、公路、高速与铁路「五道并行」奇观。"
+    },
+    {
+      "id": "dujiangyan-yulei",
+      "lng": 103.609305,
+      "lat": 31.003438,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 8,
+      "name": "都江堰·玉垒山",
+      "intro": "离堆公园站紧邻都江堰景区，车窗可见玉垒山与灌县古城屋脊方向。"
+    },
+    {
+      "id": "qingchengshan-front",
+      "lng": 103.562525,
+      "lat": 30.907369,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 12,
+      "name": "青城山（前山）",
+      "intro": "青城山站距前山山门约 2 km，站区车窗可见青城山青翠山体轮廓。"
+    },
+    {
+      "id": "yexianggu-rainforest",
+      "lng": 100.816355,
+      "lat": 21.988327,
+      "visibility": "window",
+      "reason": "audit_v2_verified_20260918",
+      "maxDistKm": 12,
+      "name": "野象谷热带雨林",
+      "intro": "中老铁路野象谷站毗邻亚洲象保护区，以桥代路穿行热带雨林树冠绿意。"
+    },
+    {
+      "id": "lingguanxia-distant",
+      "lng": 106.520834,
+      "lat": 33.909485,
+      "visibility": "on_track",
+      "reason": "audit_v2_verified_20260918",
+      "name": "灵官峡嘉陵江峡谷",
+      "intro": "宝成线过秦岭后沿嘉陵江上游峡谷南下，灵官峡碧水绝壁与峡谷深涧贴窗。"
     }
   ]
 }

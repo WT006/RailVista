@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "note": "策展热门精确路线预热清单（非全量 12306）。warmup 脚本按条调用 /api/rail-geometry/jobs 并 pinned。坐标来自 stations-geo，改站后请同步。",
+  "entries": [
+    {
+      "id": "z8991-xining-lhasa",
+      "trainCode": "Z8991",
+      "pinned": true,
+      "stops": [
+        { "name": "西宁", "lng": 101.814362, "lat": 36.620233 },
+        { "name": "格尔木", "lng": 94.907016, "lat": 36.382567 },
+        { "name": "拉萨", "lng": 91.070434, "lat": 29.623017 }
+      ]
+    },
+    {
+      "id": "g7501-hongqiao-hangzhoudong",
+      "trainCode": "G7501",
+      "pinned": true,
+      "stops": [
+        { "name": "上海虹桥", "lng": 121.3165, "lat": 31.194 },
+        { "name": "杭州东", "lng": 120.21233, "lat": 30.289012 }
+      ]
+    },
+    {
+      "id": "g65-beijingxi-guangzhounan",
+      "trainCode": "G65",
+      "pinned": true,
+      "stops": [
+        { "name": "北京西", "lng": 116.3151056, "lat": 39.8935411 },
+        { "name": "石家庄", "lng": 114.4849, "lat": 38.0095 },
+        { "name": "郑州东", "lng": 113.777, "lat": 34.76 },
+        { "name": "武汉", "lng": 114.4189431, "lat": 30.6098504 },
+        { "name": "长沙南", "lng": 113.0598811, "lat": 28.1500782 },
+        { "name": "广州南", "lng": 113.2640375, "lat": 22.9914143 }
+      ]
+    },
+    {
+      "id": "ty-sjzb-conventional",
+      "trainCode": "K603",
+      "pinned": true,
+      "note": "太原—石家庄北普速样例（截图问题 OD）；需 china-rail.graph PBF 扩图后预热才稳",
+      "stops": [
+        { "name": "太原", "lng": 112.586, "lat": 37.859 },
+        { "name": "石家庄北", "lng": 114.4592385, "lat": 38.065936 }
+      ]
+    },
+    {
+      "id": "k978-yinchuan-lanzhou",
+      "trainCode": "K978",
+      "pinned": true,
+      "note": "普速拒高铁回归样例",
+      "stops": [
+        { "name": "银川", "lng": 106.246566, "lat": 37.98562 },
+        { "name": "兰州", "lng": 103.8485056, "lat": 36.034178 }
+      ]
+    }
+  ]
+}

@@ -4,7 +4,10 @@
  *   node scripts/clean-corridors.mjs              # dry-run 报告
  *   node scripts/clean-corridors.mjs --write       # 写回改进的走廊
  *   node scripts/clean-corridors.mjs --write --id hanghuang
- *   node scripts/clean-corridors.mjs --write --fill-jumps  # 可选：直线 densify（默认关闭，避免冒充断口已修）
+ *   node scripts/clean-corridors.mjs --write --fill-jumps  # 可选：直线 densify（默认关闭）
+ *   node scripts/clean-corridors.mjs --write --aggressive  # 允许 hub 折返/凸出清洗（有 stationsHint 时默认保守）
+ *
+ * 有 stationsHint 的走廊默认保守清洗（只去尖刺+简化），避免把贴站支线当 hub 折返删掉。
  */
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -14,6 +17,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const dir = join(__dirname, '../data/presets/corridors');
 const wantWrite = process.argv.includes('--write');
 const wantFillJumps = process.argv.includes('--fill-jumps');
+const wantAggressive = process.argv.includes('--aggressive');
 const onlyId = (() => {
   const i = process.argv.indexOf('--id');
   return i >= 0 ? process.argv[i + 1] : null;
@@ -228,9 +232,25 @@ function removeHubRetraces(coords) {
   return out;
 }
 
-function cleanRailway(railway) {
+function cleanRailway(railway, { soft = false } = {}) {
   let out = railway.map((c) => [Number(c[0]), Number(c[1])]);
   const before = metrics(out);
+  // 保守：只去尖刺 + 简化，保留贴站几何（齐齐哈尔/九江等曾被 aggressive 洗飞）
+  if (soft) {
+    out = removeSpikes(out, 150);
+    out = simplify(out, 0.35);
+    out = out.map((c) => [Number(c[0].toFixed(6)), Number(c[1].toFixed(6))]);
+    const after = metrics(out);
+    const improved =
+      after &&
+      before &&
+      (after.sharpTurns < before.sharpTurns ||
+        after.backtracks < before.backtracks ||
+        (after.tier !== before.tier &&
+          ['ok', 'light', 'medium', 'heavy'].indexOf(after.tier) <
+            ['ok', 'light', 'medium', 'heavy'].indexOf(before.tier)));
+    return { railway: out, before, after, improved, badShrink: false, soft: true };
+  }
   out = removeSpikes(out, 145);
   out = removeProtrusions(out, 2.0, 2.5);
   out = removeBacktracks(out);
@@ -278,14 +298,18 @@ for (const f of files) {
   if (onlyId && id !== onlyId) continue;
   if (!raw.railway?.length) continue;
 
-  const result = cleanRailway(raw.railway);
+  const protectStations =
+    !wantAggressive &&
+    ((Array.isArray(raw.stationsHint) && raw.stationsHint.length >= 2) ||
+      /protect-stations|station-patch|OSM splice/i.test(String(raw.note || '')));
+  const result = cleanRailway(raw.railway, { soft: protectStations });
   const { before, after, improved, badShrink } = result;
-  rows.push({ id, before, after, improved, badShrink });
+  rows.push({ id, before, after, improved, badShrink, soft: !!result.soft });
   summary[after.tier] = (summary[after.tier] || 0) + 1;
 
   if (wantWrite && improved && !badShrink) {
     raw.railway = result.railway;
-    raw.note = `${raw.note || ''} | cleaned spikes/backtracks`.trim();
+    raw.note = `${raw.note || ''} | cleaned ${result.soft ? 'soft-spikes' : 'spikes/backtracks'}`.trim();
     writeFileSync(path, JSON.stringify(raw));
     summary.written += 1;
   } else if (wantWrite && badShrink) {

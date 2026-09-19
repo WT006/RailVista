@@ -7,7 +7,7 @@
 | 日期 | 2026-09-14 |
 | 相关 | [`rail-geometry-quality-playbook.md`](./rail-geometry-quality-playbook.md) · `rail-route-invariants.mdc` · `rail-corridor-ingest.mdc` · `scenic-railway-lines.md` |
 
-**新窗口先读 playbook**（踩坑、虹桥进路、禁止裸重抽、复跑命令），再改走廊。
+**新窗口先读 playbook + [`corridor-ingest-lessons.md`](./corridor-ingest-lessons.md)**（踩坑、虹桥进路、禁止裸重抽、复跑命令），再改走廊。规则：`.cursor/rules/rail-corridor-ingest.mdc`。
 
 ---
 
@@ -130,7 +130,7 @@
    - 可选：`--pbf tmp/china-latest.osm.pbf`（osmium tags-filter）  
 2. **改 `buildSegmentGeometry` / `railGeometryJob`**  
    - 顺序：本地 HSR 图（G/D/C）或本地普速图（K/T/Z）→（可选）Overpass（`RAIL_OVERPASS=0` 可关）  
-   - 保留质量门与桥接守卫；缓存键 `railseg:v7` / `rail:v7`  
+   - 保留质量门与桥接守卫；缓存键 `railseg:v8` / `rail:v8`（G/D/C 不回退普速 Overpass；失败段 miss 短缓存）  
 3. **匹配逻辑**  
    - G/D → 仅高铁走廊 + HSR 图  
    - C → 高铁 + 普速客运走廊（丽香等）  

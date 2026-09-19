@@ -11,7 +11,23 @@ config.js
 data/station_name.cache.json
 data/cache/
 data/rails/_china-railway.osm.pbf
+data/rails/_china-railway.geojsonseq
+tmp/
 data/presets/corridors/_hsr-rails.geojson
+# scenic calibration / wikidata intermediates (keep truths + patches only)
+data/presets/_scenic-calibration-*
+data/presets/_scenic-stuck-*
+data/presets/_scenic-calibrate-*
+data/presets/_scenic-wikidata-batch-*
+data/presets/_scenic-wikidata-small-*
+data/presets/_scenic-wikidata-batches.json
+data/presets/_scenic-wikidata-combined.url.txt
+# one-off extracts / wikidata raw dumps (not truths)
+data/presets/_tmp-*
+data/presets/_doc-*
+# rail graph rebuild backups
+data/rails/*.bak*
+data/rails/*.bak
 .DS_Store
 .idea
 *.log

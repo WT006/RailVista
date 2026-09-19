@@ -1,12 +1,15 @@
 /**
- * 按 bbox + 名称过滤拉取 OSM ways，Dijkstra 拼精确走廊
+ * 按 bbox + 名称过滤拉取 OSM ways，Dijkstra 拼精确走廊。
+ * 默认先试本地 graph（无公网、更快）；失败或 --force-overpass 再走 Overpass。
  * node scripts/build-corridor-from-osm-bbox.mjs <outId> --name 名 --from lng,lat --to lng,lat [--name-re 正则] [--hint a,b] [--highspeed]
  */
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildCorridorFromGraph } from './lib/build-local-corridor-core.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = join(__dirname, '..');
 const outId = process.argv[2];
 if (!outId) {
   console.error('usage: node scripts/build-corridor-from-osm-bbox.mjs <outId> --from lng,lat --to lng,lat ...');
@@ -36,6 +39,7 @@ const hint = (arg('--hint') || '')
   .map((s) => s.trim())
   .filter(Boolean);
 const wantHs = has('--highspeed');
+const forceOverpass = has('--force-overpass');
 
 function haversine(a, b) {
   const toRad = (d) => (d * Math.PI) / 180;
@@ -65,6 +69,64 @@ function simplify(points, minKm = 0.45) {
   const last = points.at(-1);
   if (dist(out.at(-1), last) > 0.0001) out.push(last);
   return out;
+}
+
+const outDir = join(root, 'data/presets/corridors');
+mkdirSync(outDir, { recursive: true });
+
+function writeMeta(coords, source, note) {
+  const meta = {
+    id: outId,
+    name: displayName,
+    source,
+    sourceNames: [displayName, nameRe].filter(Boolean),
+    note,
+    stationsHint: hint,
+    railway: coords,
+  };
+  writeFileSync(join(outDir, `${outId}.json`), JSON.stringify(meta));
+  console.log('written', outId, source);
+}
+
+// 本地优先：同一套 Dijkstra，无公网延迟；失败再 Overpass
+if (!forceOverpass) {
+  const graphPath = join(
+    root,
+    wantHs ? 'data/rails/china-hsr.graph' : 'data/rails/china-rail.graph',
+  );
+  if (existsSync(graphPath)) {
+    try {
+      console.log('try local graph first', graphPath);
+      const g = JSON.parse(readFileSync(graphPath, 'utf8'));
+      const local = buildCorridorFromGraph(g, {
+        from,
+        to,
+        connectTol: Math.max(CONNECT_TOL, 0.05),
+        log: (...a) => console.log(...a),
+      });
+      const endGap = haversine(
+        { lng: local.coords.at(-1)[0], lat: local.coords.at(-1)[1] },
+        to,
+      );
+      const startGap = haversine(
+        { lng: local.coords[0][0], lat: local.coords[0][1] },
+        from,
+      );
+      if (local.coords.length >= 2 && startGap < 8 && endGap < 8) {
+        writeMeta(
+          local.coords,
+          wantHs ? 'local-hsr-graph' : 'local-rail-graph',
+          `osm-bbox local-first; ${local.method} ${local.km.toFixed(0)}km`,
+        );
+        process.exit(0);
+      }
+      console.warn(
+        `local OD snap weak start=${startGap.toFixed(1)} end=${endGap.toFixed(1)} → overpass`,
+      );
+    } catch (e) {
+      console.warn('local graph miss → overpass', e?.message || e);
+    }
+  }
 }
 
 const south = Math.min(from.lat, to.lat) - pad;
@@ -246,16 +308,8 @@ for (let i = 1; i < simplified.length; i++) km += haversine(simplified[i - 1], s
 const coords = simplified.map((p) => [Number(p.lng.toFixed(6)), Number(p.lat.toFixed(6))]);
 console.log('pts', coords.length, 'km', km.toFixed(1), 'dijkstra', bestEnd.cost.toFixed(1), coords[0], '->', coords.at(-1));
 
-const outDir = join(__dirname, '../data/presets/corridors');
-mkdirSync(outDir, { recursive: true });
-const meta = {
-  id: outId,
-  name: displayName,
-  source: 'osm-bbox',
-  sourceNames: [displayName, nameRe].filter(Boolean),
-  note: `bbox stitch${nameRe ? ` name~${nameRe}` : wantHs ? ' highspeed' : ''}; dijkstra ${bestEnd.cost.toFixed(0)}km`,
-  stationsHint: hint,
-  railway: coords,
-};
-writeFileSync(join(outDir, `${outId}.json`), JSON.stringify(meta));
-console.log('written', outId);
+writeMeta(
+  coords,
+  'osm-bbox',
+  `bbox stitch${nameRe ? ` name~${nameRe}` : wantHs ? ' highspeed' : ''}; dijkstra ${bestEnd.cost.toFixed(0)}km`,
+);

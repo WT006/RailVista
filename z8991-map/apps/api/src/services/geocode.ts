@@ -68,6 +68,14 @@ const STATION_REGION_ANCHORS: Record<string, { lng: number; lat: number; maxKm: 
   桐庐: { lng: 119.727725, lat: 29.791394, maxKm: 20 },
   桐庐东: { lng: 119.75968, lat: 29.85729, maxKm: 20 },
   富阳: { lng: 119.955, lat: 30.003, maxKm: 30 },
+  // 长白山：易被标到景区/旧 OD 南偏 ~7km，须钉在二道白河镇高铁站
+  长白山: { lng: 128.1219234, lat: 42.4605171, maxKm: 5 },
+  // 安图西：曾被 dunbai seed 标飞到敦白南线（偏 ~58km），真站在长珲城际
+  安图西: { lng: 128.8876889, lat: 43.1110361, maxKm: 25 },
+  // 大石头南：同为长珲站，曾被 dunbai seed 标飞
+  大石头南: { lng: 128.4507972, lat: 43.297925, maxKm: 25 },
+  // 襄阳东：东津高铁站（郑渝/武西），勿钉到郑渝北段或旧「襄州/襄阳东」普速站
+  襄阳东: { lng: 112.2903833, lat: 32.0162806, maxKm: 15 },
 };
 
 function haversineKm(a: Point, b: Point): number {
@@ -481,17 +489,67 @@ export async function geocodeStation(name: string): Promise<Point | null> {
   return null;
 }
 
+/** 本地库与入站坐标相差超过此距离时，以 stations-geo 为准（清掉景区/旧 OD 飞点） */
+const LOCAL_GEO_OVERRIDE_KM = 2;
+
+/**
+ * G/D/C 车次：同城普速站名 → 高铁站名（避免黄点落在城南、蓝线走城北）。
+ * K/T/Z 不改写，以免胶济等普速线错位。
+ */
+const HSR_PARALLEL_STATION_PREF: Record<string, string> = {
+  淄博: '淄博北',
+  潍坊: '潍坊北',
+  章丘: '章丘北',
+  临淄: '临淄北',
+  青州: '青州市北',
+  青州市: '青州市北',
+  高密: '高密北',
+};
+
+function isHsrTrainCode(trainCode?: string): boolean {
+  return !!trainCode && /^[GDC]/i.test(String(trainCode).trim());
+}
+
+function preferHsrStationName(name: string, trainCode?: string): string {
+  const key = normalizeStationName(name);
+  if (!isHsrTrainCode(trainCode)) return key;
+  const pref = HSR_PARALLEL_STATION_PREF[key];
+  if (!pref) return key;
+  const geo = loadStationsGeo();
+  if (geo[pref]?.lng != null) return pref;
+  return key;
+}
+
 export async function enrichStopsCoords<
   T extends { name: string; lng?: number; lat?: number },
->(stops: T[]): Promise<T[]> {
+>(stops: T[], opts?: { trainCode?: string }): Promise<T[]> {
+  const trainCode = opts?.trainCode;
   const out: T[] = scrubZigzagLocalCoords(
     stops.map((s) => {
+      const lookupName = preferHsrStationName(s.name, trainCode);
+      const renamed =
+        lookupName !== normalizeStationName(s.name) ? lookupName : s.name;
+      const local = lookupLocalGeo(lookupName) || lookupLocalGeo(s.name);
       // 已有坐标若不在中国可信范围，视为缺失（修复日本「天津」这类脏数据）
       if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) {
-        if (
-          isPlausibleCnRailPoint(Number(s.lng), Number(s.lat)) &&
-          matchesStationRegion(s.name, Number(s.lng), Number(s.lat))
-        ) {
+        const lng = Number(s.lng);
+        const lat = Number(s.lat);
+        if (isPlausibleCnRailPoint(lng, lat) && matchesStationRegion(s.name, lng, lat)) {
+          // 本地权威坐标存在且入站点偏离过远 → 覆盖（长白山曾钉在景区南侧）
+          if (local) {
+            const d = haversineKm({ lng, lat }, local);
+            if (d > LOCAL_GEO_OVERRIDE_KM) {
+              console.warn(
+                `[geocode] prefer local geo ${s.name}→${renamed} over divergent inline d=${d.toFixed(1)}km`,
+                { inline: { lng, lat }, local },
+              );
+              return { ...s, name: renamed, lng: local.lng, lat: local.lat };
+            }
+          }
+          // G/D/C 已对齐本地高铁站坐标时，站名也改成高铁站（淄博→淄博北）
+          if (renamed !== s.name && local) {
+            return { ...s, name: renamed, lng: local.lng, lat: local.lat };
+          }
           return s;
         }
         console.warn(`[geocode] drop implausible stop coords ${s.name}`, {
@@ -499,18 +557,17 @@ export async function enrichStopsCoords<
           lat: s.lat,
         });
       }
-      const local = lookupLocalGeo(s.name);
       if (local) {
-        return { ...s, lng: local.lng, lat: local.lat };
+        return { ...s, name: renamed, lng: local.lng, lat: local.lat };
       }
-      const mem = cache.get<Point>(`geo:osm:${normalizeStationName(s.name)}`);
+      const mem = cache.get<Point>(`geo:osm:${normalizeStationName(lookupName)}`);
       if (
         acceptPoint(mem) &&
-        matchesStationRegion(s.name, mem.lng, mem.lat)
+        matchesStationRegion(renamed, mem.lng, mem.lat)
       ) {
-        return { ...s, lng: mem.lng, lat: mem.lat };
+        return { ...s, name: renamed, lng: mem.lng, lat: mem.lat };
       }
-      return { ...s, lng: undefined, lat: undefined };
+      return { ...s, name: renamed, lng: undefined, lat: undefined };
     }),
   );
 

@@ -378,6 +378,61 @@ describe('matchCorridor', () => {
     assert.equal(hit, null);
   });
 
+  it('Z509 兰州→西宁→乌鲁木齐 matches lanxin HSR (not Hexi lanxinxian)', () => {
+    // Z509 实际走兰新高铁经西宁；普速兰新线河西绕开西宁 ~119km
+    const stops = [
+      { name: '兰州', lng: 103.8485056, lat: 36.034178 },
+      { name: '西宁', lng: 101.814362, lat: 36.620233 },
+      { name: '张掖西', lng: 100.4265546, lat: 38.9225017 },
+      { name: '嘉峪关南', lng: 98.3092476, lat: 39.7167075 },
+      { name: '哈密', lng: 93.5046494, lat: 42.8484396 },
+      { name: '吐鲁番北', lng: 89.1079716, lat: 43.0213639 },
+      { name: '乌鲁木齐', lng: 87.5249702, lat: 43.8379242 },
+    ];
+    const hit = matchCorridor(stops, { trainCode: 'Z509' });
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'lanxin');
+    const sliced = sliceCorridorForStops(hit!.corridor, stops);
+    assert.ok(sliced && sliced.length >= 2);
+    const xn = stops[1];
+    let best = Infinity;
+    for (const xy of sliced!) {
+      best = Math.min(
+        best,
+        haversineKm({ lng: xy[0], lat: xy[1] }, { lng: xn.lng, lat: xn.lat }),
+      );
+    }
+    assert.ok(best < 5, `西宁应贴合切片，实际 ${best.toFixed(1)}km`);
+  });
+
+  it('Z509 short OD 兰州→西宁→乌鲁木齐 still prefers lanxin over lanxinxian', () => {
+    const hit = matchCorridor(
+      [
+        { name: '兰州', lng: 103.8485056, lat: 36.034178 },
+        { name: '西宁', lng: 101.814362, lat: 36.620233 },
+        { name: '乌鲁木齐', lng: 87.5249702, lat: 43.8379242 },
+      ],
+      { trainCode: 'Z509' },
+    );
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'lanxin');
+  });
+
+  it('Hexi conventional Z 兰州→武威→乌鲁木齐 stays on lanxinxian', () => {
+    const hit = matchCorridor(
+      [
+        { name: '兰州', lng: 103.8485056, lat: 36.034178 },
+        { name: '武威', lng: 102.6221806, lat: 37.9036926 },
+        { name: '张掖', lng: 100.5180683, lat: 38.9735459 },
+        { name: '嘉峪关', lng: 98.2539405, lat: 39.7638408 },
+        { name: '乌鲁木齐', lng: 87.5249702, lat: 43.8379242 },
+      ],
+      { trainCode: 'Z40' },
+    );
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'lanxinxian');
+  });
+
   it('still matches G-train 北京西→广州南 on jingguang', () => {
     const hit = matchCorridor(
       [
@@ -666,6 +721,32 @@ describe('matchCorridorNetwork', () => {
         { name: '杭州南', lng: 120.29, lat: 30.1747 },
       ]),
       null,
+    );
+  });
+
+  it('D2206 上海虹桥→南通西 slices hutong with ends on stations', () => {
+    const stops = [
+      { name: '上海虹桥', lng: 121.3162004, lat: 31.1959782 },
+      { name: '太仓南', lng: 121.1476314, lat: 31.4101421 },
+      { name: '太仓', lng: 121.203621, lat: 31.502318 },
+      { name: '常熟', lng: 120.925844, lat: 31.632807 },
+      { name: '张家港', lng: 120.6692114, lat: 31.8193598 },
+      { name: '南通西', lng: 120.761105, lat: 32.103557 },
+    ];
+    const hit = matchCorridor(stops, { trainCode: 'D2206' });
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'hutong');
+    const sliced = sliceCorridorForStops(hit!.corridor, stops);
+    assert.ok(sliced && sliced.length >= 2);
+    const start = sliced![0];
+    const end = sliced![sliced!.length - 1];
+    assert.ok(
+      haversineKm({ lng: start[0], lat: start[1] }, { lng: 121.3162004, lat: 31.1959782 }) < 1,
+      `start gap ${haversineKm({ lng: start[0], lat: start[1] }, { lng: 121.3162004, lat: 31.1959782 })}`,
+    );
+    assert.ok(
+      haversineKm({ lng: end[0], lat: end[1] }, { lng: 120.761105, lat: 32.103557 }) < 1,
+      `end gap ${haversineKm({ lng: end[0], lat: end[1] }, { lng: 120.761105, lat: 32.103557 })}`,
     );
   });
 });

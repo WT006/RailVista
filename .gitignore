@@ -33,3 +33,8 @@ data/rails/*.bak
 *.log
 coverage
 .turbo
+
+# local tooling / IDE backups (not project files)
+.agents/
+.idea.bak-route/
+skills-lock.json

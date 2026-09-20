@@ -67,7 +67,7 @@ type CorridorGraph = {
   fp: string;
 };
 
-const MAX_HOPS = 5;
+const MAX_HOPS = 8;
 const START_NEAR_KM = 40;
 /** 经停桥接最大跨距（合肥南→蚌埠南约 125km）；过大则易乱跳 */
 const BRIDGE_MAX_KM = 280;
@@ -335,6 +335,15 @@ function stopBridgeLinks(
       if (!toPt) continue;
       const d = haversineKm(fromPt, toPt);
       if (d > BRIDGE_MAX_KM) continue;
+      // 禁止跨过「既不在当前廊、也不在目标廊」的中间经停——否则会 上海虹桥→宁波 跳过沪杭，画出站间直线
+      let skipsOrphan = false;
+      for (let k = lastIdx + 1; k < j; k++) {
+        const mid = stops[k];
+        if (stopTouchesCorridor(curC, mid) || stopTouchesCorridor(c, mid)) continue;
+        skipsOrphan = true;
+        break;
+      }
+      if (skipsOrphan) continue;
       seen.add(c.id);
       out.push({
         toId: c.id,

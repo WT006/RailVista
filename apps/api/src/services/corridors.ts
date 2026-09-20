@@ -393,7 +393,8 @@ export function matchCorridor(
 
   const first = stops[0];
   const last = stops[stops.length - 1];
-  let best: { corridor: CorridorPreset; score: number; hit: number } | null = null;
+  type BestHit = { corridor: CorridorPreset; score: number; hit: number };
+  let best: BestHit | null = null;
 
   const consider = (c: CorridorPreset) => {
     const scored = scoreCorridorCandidate(c, stops, first, last);
@@ -421,15 +422,16 @@ export function matchCorridor(
 
   // K/T/Z：普速命中后，若时刻表像「跑在高铁上」（西宁孤点 / 张掖西…），再比高铁候选
   if (filterKind === 'conventional') {
-    const convBest = best?.corridor ?? null;
+    const convBest = best as BestHit | null;
     for (const c of corridors) {
       if (!isHsrCorridor(c)) continue;
-      if (!stopsEvidenceHsrOverride(stops, c, convBest)) continue;
+      if (!stopsEvidenceHsrOverride(stops, c, convBest?.corridor ?? null)) continue;
       consider(c);
     }
   }
 
-  return best ? { corridor: best.corridor, score: best.score } : null;
+  const winner = best as BestHit | null;
+  return winner ? { corridor: winner.corridor, score: winner.score } : null;
 }
 
 /** 截取后校验：多数有坐标的经停站应落在走廊附近 */

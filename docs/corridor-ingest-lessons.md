@@ -53,6 +53,9 @@
 | 24 | 蓝线绕开**安图西**（长珲行程，站在南边孤点） | `stations-geo` 被 `corridor:dunbai` seed 错钉到敦白南线（偏 ~58km）；安图西是**长珲**站 | 钉回 `changhui`/wiki + 区域锚点；`dunbai` hints **勿挂**长珲专用站；`verify` 报 `SEED`/`midFar` | 共线名站跨走廊复用 snap |
 | 25 | D2206 沪通蓝线两端悬空（虹桥/南通西） | `hutong` OSM 名过滤抽线两端不到站；`attachOdApproaches` 只补 ≤8km | via-legs / OD patch 至门禁；`stationsHint` 用真实 OD（虹桥→南通西）；`--strict` 拦 OD&gt;5 | 裸 bbox 入库、指望运行时自动连站 |
 | 26 | 汉十蓝线在**襄阳东**北冲再折回成 V；站标偏北 | `stations-geo` 被 `corridor:zhengyu` 钉到郑渝**北段**（~32.26°N），真站在**东津**（wiki ~32.016°N / 112.29°E，偏 ~27km）；旧名「襄阳东」=今襄州（普速）易混；重建脚本用「最近轨点 / 北瞄 cut」且覆盖 wiki | ① 对照 wiki 钉东津 + `STATION_REGION_ANCHORS`；② 走廊走**武西过站**，禁止郑渝北段 spur；③ `source:wiki` **禁止**被 `corridor:*` 静默覆盖；④ 中间站 V 尖刺 → **先查站坐标** | 以为 seed 贴合郑渝（&lt;12km）就对；用北段最近点当站房 |
+| 27 | 平齐等 OSM Dijkstra 出现 **50–100km 假空洞**（relation ways 实为单连通） | `build-corridor-from-osm-relation` / local-core 等：从 way **head** 出口接邻边时 `reverse` 标志写反 → 几何反向拼接，`slice(1)` 后出现伪巨跳 | head 出口：`aHead≈bTail → reverse:true`；`aHead≈bHead → reverse:false`（与 tail 出口对称）。已修 6 处脚本 | 把伪跳当源数据断口去 densify / 暂缓 |
+| 28 | 哈佳「绕开南岔」被当成失败 | 南岔属**绥佳**；哈佳快铁走松花江南岸（宾州/方正/依兰），本地 `哈佳线` 正是此线 | hints 用真站序；勿把绥佳站硬塞进哈佳 midFar | 凭站名印象改 OD |
+| 29 | 锁边测 `5801`/`D6983`/`G7461`：站间直线 +「偏离铁路较远」；走廊 JSON 已在 | ① 运行 `dist` **过旧**：非 G/D/C `matchCorridor` 直接 `null`；② 路网经停桥接允许 ≤280km，`上海虹桥→宁波` 跳过沪杭 | ① 改匹配后必须 `apps/api` **rebuild + 重启**；② 禁止跨「孤儿中间站」桥接；③ `MAX_HOPS` 放宽；④ bump `railseg`/`rail` 版本 | 只改源码不 rebuild；以为 verify 过就能锁边 |
 
 **本批（P0 A+B）审计（2026-09-17）：**
 

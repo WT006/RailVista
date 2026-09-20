@@ -157,8 +157,8 @@ export function buildCorridorFromGraph(g, opts) {
           bT = b.points.at(-1);
         if (dist(aT, bH) < connectTol) adj[i].tail.push({ j, enter: 'head', reverse: false });
         if (dist(aT, bT) < connectTol) adj[i].tail.push({ j, enter: 'tail', reverse: true });
-        if (dist(aH, bT) < connectTol) adj[i].head.push({ j, enter: 'tail', reverse: false });
-        if (dist(aH, bH) < connectTol) adj[i].head.push({ j, enter: 'head', reverse: true });
+        if (dist(aH, bT) < connectTol) adj[i].head.push({ j, enter: 'tail', reverse: true });
+        if (dist(aH, bH) < connectTol) adj[i].head.push({ j, enter: 'head', reverse: false });
       }
     }
     const key = (wayIdx, exitEnd) => `${wayIdx}:${exitEnd}`;

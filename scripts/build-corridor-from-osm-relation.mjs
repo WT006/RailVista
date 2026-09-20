@@ -1,9 +1,10 @@
 /**
  * 从 OSM relation 构建走廊 JSON（精确折线入库）
  * 用法:
- *   node scripts/build-corridor-from-osm-relation.mjs <relationId> <outId> [--name 中文名] [--from lng,lat] [--to lng,lat] [--hint 站1,站2,...]
+ *   node scripts/build-corridor-from-osm-relation.mjs <relationId> <outId> [--name 中文名] [--from lng,lat] [--to lng,lat] [--via lng,lat;...] [--hint 站1,站2,...]
  *
- * 有 --from/--to 时用 Dijkstra 拼接（适合杂乱 member）；否则按 relation member 顺序拼接。
+ * 有 --from/--to 时用 Dijkstra 拼接（适合杂乱 member）；`--via` 可拆多段防双线震荡/U 形误报。
+ * 否则按 relation member 顺序拼接。
  */
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -14,7 +15,7 @@ const relationId = process.argv[2];
 const outId = process.argv[3];
 if (!relationId || !outId) {
   console.error(
-    'usage: node scripts/build-corridor-from-osm-relation.mjs <relationId> <outId> [--name ...] [--from lng,lat] [--to lng,lat] [--hint a,b,c]',
+    'usage: node scripts/build-corridor-from-osm-relation.mjs <relationId> <outId> [--name ...] [--from lng,lat] [--to lng,lat] [--via a;b;...] [--hint a,b,c]',
   );
   process.exit(1);
 }
@@ -34,6 +35,7 @@ const stationsHint = hintArg
   : [];
 const fromArg = argValue('--from');
 const toArg = argValue('--to');
+const viaArg = argValue('--via');
 const CONNECT_TOL = Number(argValue('--tol') || 0.004);
 
 function haversine(a, b) {
@@ -110,8 +112,9 @@ function stitchDijkstra(wayList, origin, dest) {
       const bTail = b.points.at(-1);
       if (dist(aTail, bHead) < CONNECT_TOL) adj[i].tail.push({ j, enter: 'head', reverse: false });
       if (dist(aTail, bTail) < CONNECT_TOL) adj[i].tail.push({ j, enter: 'tail', reverse: true });
-      if (dist(aHead, bTail) < CONNECT_TOL) adj[i].head.push({ j, enter: 'tail', reverse: false });
-      if (dist(aHead, bHead) < CONNECT_TOL) adj[i].head.push({ j, enter: 'head', reverse: true });
+      // enter at B's endpoint facing away from join: head→forward, tail→reverse
+      if (dist(aHead, bTail) < CONNECT_TOL) adj[i].head.push({ j, enter: 'tail', reverse: true });
+      if (dist(aHead, bHead) < CONNECT_TOL) adj[i].head.push({ j, enter: 'head', reverse: false });
     }
   }
 
@@ -183,11 +186,10 @@ function stitchDijkstra(wayList, origin, dest) {
 
   const pathWays = [];
   let st = bestEnd.state;
-  while (st && st.prev !== undefined) {
+  while (st) {
     pathWays.unshift({ wayIdx: st.wayIdx, reversed: st.reversed });
     st = st.prev;
   }
-  pathWays.unshift({ wayIdx: start.way, reversed: st?.reversed ?? false });
 
   let line = [];
   pathWays.forEach(({ wayIdx, reversed }, i) => {
@@ -195,6 +197,28 @@ function stitchDijkstra(wayList, origin, dest) {
     if (i > 0) pts = pts.slice(1);
     line = line.concat(pts);
   });
+  // clip to OD nearest points（避免整段 way 伸出站外）
+  if (line.length >= 2) {
+    let i0 = 0;
+    let i1 = line.length - 1;
+    let best0 = Infinity;
+    let best1 = Infinity;
+    for (let i = 0; i < line.length; i++) {
+      const d0 = dist(line[i], origin);
+      const d1 = dist(line[i], dest);
+      if (d0 < best0) {
+        best0 = d0;
+        i0 = i;
+      }
+      if (d1 < best1) {
+        best1 = d1;
+        i1 = i;
+      }
+    }
+    if (i0 > i1) [i0, i1] = [i1, i0];
+    const sliced = line.slice(i0, i1 + 1);
+    if (sliced.length >= 2) line = sliced;
+  }
   return { line, km: bestEnd.cost };
 }
 
@@ -259,6 +283,12 @@ let method = 'member-order';
 if (fromArg && toArg) {
   const origin = parseLL(fromArg);
   const dest = parseLL(toArg);
+  const vias = (viaArg || '')
+    .split(/[;|]/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map(parseLL);
+  const waypoints = [origin, ...vias, dest];
   const wayList = [];
   for (const m of rel.members || []) {
     if (m.type !== 'way') continue;
@@ -267,11 +297,20 @@ if (fromArg && toArg) {
     const points = way.nodes.map((id) => nodes.get(id)).filter(Boolean);
     if (points.length >= 2) wayList.push({ id: way.id, points });
   }
-  console.log('dijkstra ways', wayList.length);
-  const r = stitchDijkstra(wayList, origin, dest);
-  line = r.line;
-  method = 'dijkstra';
-  console.log('dijkstra km ~', r.km.toFixed(1));
+  console.log('dijkstra ways', wayList.length, 'legs', waypoints.length - 1);
+  line = [];
+  let kmSum = 0;
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const r = stitchDijkstra(wayList, waypoints[i], waypoints[i + 1]);
+    kmSum += r.km;
+    if (!line.length) line.push(...r.line);
+    else line.push(...r.line.slice(1));
+    console.log(
+      `  leg ${i}: ${waypoints[i].lng},${waypoints[i].lat} → ${waypoints[i + 1].lng},${waypoints[i + 1].lat} ~${r.km.toFixed(1)}km pts=${r.line.length}`,
+    );
+  }
+  method = vias.length ? `dijkstra+via(${vias.length})` : 'dijkstra';
+  console.log('dijkstra km ~', kmSum.toFixed(1));
 } else {
   line = stitchByMembers(rel, ways, nodes);
 }

@@ -189,8 +189,8 @@ for (let i = 0; i < wayList.length; i++) {
       bT = b.points.at(-1);
     if (dist(aT, bH) < CONNECT_TOL) adj[i].tail.push({ j, enter: 'head', reverse: false });
     if (dist(aT, bT) < CONNECT_TOL) adj[i].tail.push({ j, enter: 'tail', reverse: true });
-    if (dist(aH, bT) < CONNECT_TOL) adj[i].head.push({ j, enter: 'tail', reverse: false });
-    if (dist(aH, bH) < CONNECT_TOL) adj[i].head.push({ j, enter: 'head', reverse: true });
+    if (dist(aH, bT) < CONNECT_TOL) adj[i].head.push({ j, enter: 'tail', reverse: true });
+    if (dist(aH, bH) < CONNECT_TOL) adj[i].head.push({ j, enter: 'head', reverse: false });
   }
 }
 function nearestWay(target) {

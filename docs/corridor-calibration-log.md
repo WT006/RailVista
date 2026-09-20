@@ -46,7 +46,7 @@ node scripts/verify-corridor-geometry.mjs --strict
 | 热门 cache | `trainCode+站序指纹` → `data/cache/precise/` |
 | 渝贵终点 | `贵阳东`≈`贵阳北`：末端贴合放行 + hints；避免 OSM 锯齿首段 |
 
-详见 `docs/TECH-rail-geometry-quality.md` §5.2、`docs/demo-phase2-precise-ux.html`。
+详见 `docs/TECH-rail-geometry-quality.md` §5.2。
 
 ---
 
@@ -133,3 +133,103 @@ node scripts/verify-corridor-geometry.mjs --strict
 | 2026-09-19 06:34:18 | xuanhang | od-approach-reject | medium->medium bt 26->26; start +14pts 10.1km→宣城 mode=bbox-bridge2.5; end +30pts 13.0km→杭州 mode=bbox-all |
 | 2026-09-19 06:37:31 | ningwu | od-approach-reject | ok->medium bt 1->17; start ok 0.37km; end +11pts 5.9km→芜湖 mode=bbox-all |
 | 2026-09-19 07:13:26 | ningwu | od-approach-reject | medium->medium bt 11->27; start ok 0.37km; end +11pts 5.9km→芜湖 mode=bbox-all |
+| 2026-09-19 14:04:39 | handan | od-approach | skip missing-geo 汉口/丹江口 |
+| 2026-09-19 14:07:24 | handan | od-approach | skip missing-geo 汉口/丹江口 |
+| 2026-09-19 14:18:09 | handan | od-approach | skip missing-geo 汉口/丹江口 |
+| 2026-09-19 14:40:18 | xuanhang | od-approach | start +14pts 10.1km→宣城 mode=bbox-bridge2.5; end +30pts 13.0km→杭州 mode=bbox-all |
+| 2026-09-19 14:41:46 | qiangui | od-approach-reject | heavy->heavy bt 42->38; start +8pts 36.1km→贵阳 mode=single-gap-bridge gap=34.1; end ok 0.08km |
+| 2026-09-19 15:19:21 | suiyu | densify-jumps | jump 9.1→6.9 +1pts ok→ok |
+| 2026-09-19 15:19:22 | neikun | od-approach | start +4pts 6.6km→内江 mode=single-gap-bridge gap=4.1; end light 1.02km |
+| 2026-09-19 15:19:32 | guikun | od-approach | start +3pts 0.2km→贵阳 mode=bbox-all; end ok 0.12km |
+| 2026-09-20 01:57:32 | baozhong | od-approach | start FAIL 12.9km off-graph s=4.7 t=11.1; end +18pts 21.0km→中卫 mode=single-gap-bridge gap=10.1 |
+| 2026-09-20 02:00:25 | wangang | od-approach-reject | heavy->heavy bt 36->38; start +17pts 9.9km→芜湖 mode=bbox-all; end light 0.73km |
+| 2026-09-20 02:02:32 | wangang | od-approach | start +17pts 9.9km→芜湖 mode=bbox-all; end ok 0.00km |
+| 2026-09-20 02:46:36 | luobao | densify-jumps | jump 22.7→5.7 +10pts medium→ok |
+| 2026-09-20 02:47:16 | luobao | densify-jumps | jump 22.7→5.7 +8pts medium→ok |
+| 2026-09-20 02:50:03 | ningqi | densify-jumps | jump 21.8→5.6 +43pts medium→ok |
+| 2026-09-20 02:54:44 | wushi | densify-jumps | jump 20.3→5.3 +13pts medium→ok |
+| 2026-09-20 02:54:44 | wushi | od-approach | skip missing-geo 武昌/黄石 |
+| 2026-09-20 02:55:44 | wushi | densify-jumps | jump 19.8→5.3 +12pts medium→ok |
+| 2026-09-20 02:55:44 | wushi | od-approach | skip missing-geo 武昌/黄石 |
+
+## DEFER 清零（2026-09-20）
+
+| id | 说明 |
+|----|------|
+| `guangzhan` | OSM r17137172；`--strict` PASS |
+| `jingbin` | 已开通宝坻南→北辰（r11898040）；北辰→滨海西在建 |
+| `fowan` | OSM r9161560 广州南→麻涌；`--strict` PASS |
+| `guangfohuan` | 南环开通段 番禺→北滘西；西环在建未接佛山西 |
+| 陇海—兰新 / 同蒲—太焦—焦柳 | 组合名映射 `longhai` / `tongpu`（分干线已入库） |
+
+进度：`gapDone=164 pending=0 defer=0`（`gen-corridor-ingest-progress.mjs`）
+
+## 校准债分批（2026-09-20）
+
+计划全文：[`corridor-calibration-plan.md`](./corridor-calibration-plan.md)
+
+| 批次 | 结果 |
+|---|---|
+| A | 安图西/大石头南/长白山→wiki；`changhui`/`dunbai` PASS；seedFail 2→0 |
+| B | hangchang hints→杭黄昌；yinxi 撤平凉/灵武北；肇庆东/三水南 wiki；anjiu 撤池州+OD；yinlan 暂撤灵武北/河东机场 |
+| C | 襄阳东/丹江口 wiki；建德 hanghuang-stitch（hangqu/jinjian）；太谷西/临海/泉州/南京南/林芝/青岛等 |
+| D | baozhong/dunhuang OD slice；jitong 化德→通辽（集宁端未贴合）；jinghuxian 撤济南；qingrong→青岛北、qinglian→日照西、jiaojikezhuan→潍坊；jiqing 青岛进路；hangqu 撤衢州+densify |
+| E | `jingjiu` `clean --write`→light；jinjian densify |
+
+**门禁收尾：** `node scripts/verify-corridor-geometry.mjs --strict` → **PASS**  
+`ok=185 light=56 medium=0 heavy=0 stationFail=0 seedFail=0`
+
+### F 批 light 收敛（2026-09-20）
+
+| 动作 | 说明 |
+|---|---|
+| densify jump-only | `densify-corridor-jumps --write` + 手工 densify jump>8（changtu/hukunxian/…） |
+| soft clean | 热点/高尖刺：baolan/xulan→ok；jingjiu/yuhuai/… 降 sharp |
+| **坑** | `--aggressive` 把 light 挖成 heavy（大跳 30–300km）；已在 `clean-corridors` 增加 jump/tier 恶化拒绝 |
+| 恢复 | `fill-corridor-local-gaps` 补 guangmeishan/neikun/taizhongyin/wuda；jier densify；guangmeishan 撤梅州西 hint |
+| 结果 | light **56→48**，ok **185→193**；`--strict` 仍 PASS |
+
+后续：剩余 ~48 条多为 sharp=1～2 真弯/双线锯齿，不宜再 aggressive；站距 2–5km 可按客运热点继续 wiki 精校。
+
+### F2 / G 收尾（2026-09-20）
+
+| 动作 | 说明 |
+|---|---|
+| soft clean 全 light | + spike140 安全尖刺；light **48→28**，ok **193→213** |
+| hints | 武汉→武昌、长兴→长兴南、烟台→烟台南、咸阳北→咸阳西、杭州→杭州西；撤错挂中间站 |
+| 成渝 | densify→重庆西；拒用重庆北顶替 |
+| 郑太 | 太谷西属大西，hints 改太谷东；太谷西挂回 daxi |
+| 集二 | OSM r1108769 Dijkstra 重抽 集宁南→二连 |
+| G | guangzhan 广州白云 densify 进路（~4.3→0） |
+| 余债 | light=28（真弯）；nanguang 肇庆东 wiki 距正线~9km（<12） |
+
+**验收：** `--strict` PASS · `ok=213 light=28 medium=0 stationFail=0 seedFail=0`
+
+### 锁边实测回归（2026-09-20 晚）
+
+截图：`5801` 乌→阿、`D6983` 哈→齐南、`G7461` 连云港→苍南 — 站间直线 +「偏离铁路较远」。
+
+| 根因 | 修复 |
+|---|---|
+| 运行中 `apps/api/dist` **过旧**：非 G/D/C 直接 `matchCorridor→null`，普速全退站间弦 | `npm run build`；源码已按 conventional/hsr 分流 |
+| `G7461` 路网经停桥接 `上海虹桥→宁波`（≤280km）跳过沪杭 | `corridorNetwork`：禁止跨「孤儿中间站」桥接；`MAX_HOPS` 5→8 |
+| 缓存 | `railseg`/`rail` → **v9** |
+| 站 | `双河市` 投影北疆线；`haqi` densify→齐齐哈尔南 |
+
+匹配冒烟（源码）：
+- `5801` → `beijiang`
+- `D6983`（哈尔滨）→ `haqi`
+- `G7461` → `lianzhen→jinghu→huhang→hangyong→yongtaiwen→wenfu`
+
+**须重启 API**（`npm run dev` / 重启 `node dist`）后再锁边验证。
+| 2026-09-20 05:33:07 | beijiang | densify-jumps | jump 8.9→7.9 +1pts ok→ok |
+| 2026-09-20 05:33:07 | guangzhan | densify-jumps | jump 8.2→7.5 +1pts ok→ok |
+| 2026-09-20 05:33:07 | hajia | densify-jumps | jump 9.0→7.8 +2pts ok→ok |
+| 2026-09-20 05:33:07 | linha | densify-jumps | jump 12.0→8.0 +16pts light→ok |
+| 2026-09-20 05:33:07 | ningan | densify-jumps | jump 9.0→5.9 +1pts ok→ok |
+| 2026-09-20 05:33:07 | pingqi | densify-jumps | jump 8.8→7.8 +1pts ok→ok |
+| 2026-09-20 09:24:31 | jier | densify-jumps | jump 10.4→7.7 +1pts light→ok |
+| 2026-09-20 09:24:31 | ningrong | densify-jumps | jump 9.1→7.9 +3pts ok→ok |
+| 2026-09-20 09:43:28 | stations-geo | audit-fix | 许昌北 193.9km; 鄢陵南 150.2km; 扶沟南 103.9km; 西华 47.9km; 项城 52.9km; 沈丘北 88.6km; 界首南 141.2km; 临泉 181.0km; 棋子湾 45.7km; 金月湾 67.3km; 银滩 6.1km; 山阴南 1226.3km; 玉山南 165.0km; 海阳 454.2km; 鹤壁 122.6km; 宣威北 303.5km |
+| 2026-09-20 | stations-geo | audit-pipeline | 新增 `audit-stations-geo.mjs`（进度倒挂/软飞点/锚点/方位对）；郑阜反序 seed 整段纠正；海南西环棋子湾/金月湾；山阴南/玉山南/海阳/鹤壁飞点；zhengfu hints 项城→淮阳南；hainanxi/jitong 站序；xiangqian hints 对齐客专（新化南/溆浦南）；区域锚点扩写 |
+| 2026-09-20 09:58:47 | stations-geo | soft-leftover-fix | 新乡南/新余北/宜昌北 wiki |

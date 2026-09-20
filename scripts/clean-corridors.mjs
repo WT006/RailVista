@@ -50,12 +50,14 @@ function metrics(railway) {
   if (!railway || railway.length < 2) return null;
   let lengthKm = 0;
   let maxJump = 0;
+  const arc = [0];
   for (let i = 1; i < railway.length; i++) {
     const d = haversine(
       { lng: railway[i - 1][0], lat: railway[i - 1][1] },
       { lng: railway[i][0], lat: railway[i][1] },
     );
     lengthKm += d;
+    arc.push(arc[i - 1] + d);
     if (d > maxJump) maxJump = d;
   }
   let sharpTurns = 0;
@@ -65,15 +67,20 @@ function metrics(railway) {
     if (deg > maxTurn) maxTurn = deg;
     if (deg >= 150) sharpTurns += 1;
   }
-  const start = { lng: railway[0][0], lat: railway[0][1] };
-  const end = { lng: railway.at(-1)[0], lat: railway.at(-1)[1] };
-  const chord = haversine(start, end) || 1;
-  let maxProg = 0;
+  // 空间折返（与 verify-corridor-geometry 对齐）；不用 chord 进度（U 形干线假阳性）
   let backtracks = 0;
-  for (const p of railway) {
-    const prog = 1 - haversine({ lng: p[0], lat: p[1] }, end) / chord;
-    if (prog < maxProg - 0.01) backtracks += 1;
-    maxProg = Math.max(maxProg, prog);
+  for (let i = 1; i < railway.length; i++) {
+    for (let j = 0; j < i; j++) {
+      if (arc[i] - arc[j] < 25) continue;
+      const d = haversine(
+        { lng: railway[i][0], lat: railway[i][1] },
+        { lng: railway[j][0], lat: railway[j][1] },
+      );
+      if (d < 1.5) {
+        backtracks += 1;
+        break;
+      }
+    }
   }
   let tier = 'ok';
   if (sharpTurns >= 30 || backtracks >= 40 || maxJump > 40) tier = 'heavy';
@@ -107,19 +114,38 @@ function removeSpikes(coords, turnThreshold = 145) {
   return out;
 }
 
-/** 相对终点单调前进，丢掉明显折返点（保留端点） */
+/** 去掉真空间折返点（沿程已走过却回到近处）；不做 chord 进度裁切（会砍弯道造跳） */
 function removeBacktracks(coords) {
   if (coords.length < 4) return coords;
-  const end = { lng: coords.at(-1)[0], lat: coords.at(-1)[1] };
-  const start = { lng: coords[0][0], lat: coords[0][1] };
-  const startToDest = haversine(start, end) || 1;
+  const arc = [0];
+  for (let i = 1; i < coords.length; i++) {
+    arc.push(
+      arc[i - 1] +
+        haversine(
+          { lng: coords[i - 1][0], lat: coords[i - 1][1] },
+          { lng: coords[i][0], lat: coords[i][1] },
+        ),
+    );
+  }
   const cleaned = [coords[0]];
-  let maxProg = 0;
+  const keptIdx = [0];
   for (let i = 1; i < coords.length - 1; i++) {
-    const prog = 1 - haversine({ lng: coords[i][0], lat: coords[i][1] }, end) / startToDest;
-    if (prog >= maxProg - 0.006) {
+    let revisit = false;
+    for (const j of keptIdx) {
+      if (arc[i] - arc[j] < 25) continue;
+      if (
+        haversine(
+          { lng: coords[i][0], lat: coords[i][1] },
+          { lng: coords[j][0], lat: coords[j][1] },
+        ) < 1.5
+      ) {
+        revisit = true;
+        break;
+      }
+    }
+    if (!revisit) {
       cleaned.push(coords[i]);
-      maxProg = Math.max(maxProg, prog);
+      keptIdx.push(i);
     }
   }
   cleaned.push(coords.at(-1));
@@ -273,16 +299,29 @@ function cleanRailway(railway, { soft = false } = {}) {
     before &&
     after.lengthKm < before.lengthKm * 0.75 &&
     !backtrackFixed;
+  // 尖刺/折返下降却挖出大跳 / 等级变差 → 拒绝写回（aggressive 曾把 light→heavy）
+  const tierRank = { ok: 0, light: 1, medium: 2, heavy: 3 };
+  const jumpWorsened =
+    after && before && after.maxJump > Math.max(15, before.maxJump * 1.5 + 2);
+  const tierWorsened =
+    after && before && (tierRank[after.tier] ?? 9) > (tierRank[before.tier] ?? 9);
+  const rejectQuality = jumpWorsened || tierWorsened;
   const improved =
     after &&
     before &&
     !badShrink &&
+    !rejectQuality &&
     (after.sharpTurns < before.sharpTurns ||
       after.backtracks < before.backtracks ||
       (after.tier !== before.tier &&
-        ['ok', 'light', 'medium', 'heavy'].indexOf(after.tier) <
-          ['ok', 'light', 'medium', 'heavy'].indexOf(before.tier)));
-  return { railway: out, before, after, improved, badShrink };
+        tierRank[after.tier] < tierRank[before.tier]));
+  return {
+    railway: out,
+    before,
+    after,
+    improved,
+    badShrink: badShrink || rejectQuality,
+  };
 }
 
 const files = readdirSync(dir).filter(

@@ -125,7 +125,7 @@ Overpass 还经常 504 / fetch failed。
 | `scripts/extract-corridor-from-hsr.mjs` | 从 `_hsr-rails` 抽干线（须 axis；抽完必清洗） |
 | `scripts/build-corridor-from-osm-relation.mjs` | OSM relation；**必须** `--from/--to` |
 | `tmp/corridor-demo-backup/*.json` | 清洗前备份（restore 会丢掉虹桥补丁，需再跑 demo） |
-| `docs/demo-corridor-rebuild-report.md` | 数字前后对比（demo 会覆盖表格） |
+| `node scripts/demo-corridor-rebuild.mjs` | 复跑清洗+虹桥进路；报告可写到 stdout / 自选路径 |
 
 ---
 

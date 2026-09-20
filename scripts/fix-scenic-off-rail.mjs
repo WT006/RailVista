@@ -222,7 +222,7 @@ function main() {
     }
   }
 
-  const logPath = join(root, 'docs/scenic-off-rail-fix-log.md');
+  const logPath = join(root, 'tmp/scenic-off-rail-fix-log.md');
   const lines = [
     '# 景点离轨修正日志',
     '',
@@ -258,7 +258,7 @@ function main() {
   if (WRITE) {
     spotsDoc.updated = '2026-09-15';
     spotsDoc.note =
-      '策展+校准+离轨修正：具名钉本体，大面积适度靠轨（禁止贴轨面）。见 docs/scenic-off-rail-fix-log.md';
+      '策展+校准+离轨修正：具名钉本体，大面积适度靠轨（禁止贴轨面）。';
     writeFileSync(join(root, 'data/presets/scenic-spots.json'), JSON.stringify(spotsDoc, null, 2) + '\n', 'utf8');
 
     const patchPath = join(root, 'data/presets/scenic-spot-calibration-patches.json');
@@ -278,7 +278,7 @@ function main() {
     }
     patchDoc.patches = [...byId.values()];
     patchDoc.updated = '2026-09-15';
-    patchDoc.note = 'includes off-rail fix 2026-09-15; see docs/scenic-off-rail-fix-log.md';
+    patchDoc.note = 'includes off-rail fix 2026-09-15';
     writeFileSync(patchPath, JSON.stringify(patchDoc, null, 2) + '\n', 'utf8');
     console.log(`updated scenic-spots.json + patches (${changes.length})`);
   }

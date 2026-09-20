@@ -192,7 +192,7 @@ node scripts/demo-corridor-rebuild.mjs
 node scripts/verify-corridor-geometry.mjs
 ```
 
-`demo-corridor-rebuild.mjs` 现会：备份 → `clean-corridors --write`（含枢纽 U 形短岔）→ `patch-hukun-hongqiao-approach.mjs` → 门禁 → 写 `docs/demo-corridor-rebuild-report.md`。
+`demo-corridor-rebuild.mjs` 现会：备份 → `clean-corridors --write`（含枢纽 U 形短岔）→ `patch-hukun-hongqiao-approach.mjs` → 门禁（可选写报告到 `tmp/`）。
 
 `--restore` 只恢复清洗前备份，**不会**保留虹桥进路；restore 后必须再跑一遍 demo（或单独跑虹桥脚本）。
 

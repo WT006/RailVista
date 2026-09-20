@@ -35,6 +35,8 @@ if (legs.length < 2) {
 }
 
 const useHsr = process.argv.includes('--hsr');
+const noPrefer = process.argv.includes('--no-prefer');
+const preferName = noPrefer ? null : arg('--prefer') || null;
 const graphPath = join(
   root,
   useHsr ? 'data/rails/china-hsr.graph' : 'data/rails/china-rail.graph',
@@ -64,6 +66,8 @@ for (let i = 0; i < legs.length - 1; i++) {
       from,
       to,
       connectTol: tol,
+      preferName: preferName || undefined,
+      noPrefer,
       log: (...a) => console.log(...a),
     });
   } catch (e) {

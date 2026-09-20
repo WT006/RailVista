@@ -403,7 +403,7 @@ function pathOnGraph(
 function cacheKey(stops: LngLat[], trainCode?: string): string {
   const raw = `${trainCode || ''}|${stops.map((s) => `${s.lng.toFixed(3)},${s.lat.toFixed(3)}`).join('|')}`;
   // v8：G/D/C 不再回退普速 Overpass（保精度 + 加速）
-  return `rail:v8:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
+  return `rail:v9:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
 }
 
 export function isHighspeedTrain(trainCode?: string): boolean {
@@ -496,7 +496,7 @@ function segmentCacheKey(from: LngLat, to: LngLat, preferHs: boolean): string {
   const r = (p: LngLat) => `${p.lng.toFixed(3)},${p.lat.toFixed(3)}`;
   const raw = `${preferHs ? 'hs' : 'conv'}|${r(from)}|${r(to)}`;
   // v8：分轨本地图 + HS 不回退普速 Overpass + miss 短缓存
-  return `railseg:v8:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
+  return `railseg:v9:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
 }
 
 function pathFromWays(ways: OsmWay[], from: LngLat, to: LngLat): LngLat[] | null {

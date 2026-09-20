@@ -193,7 +193,7 @@ node scripts/build-scenic-spots-curated.mjs
 
 人工仍须抽检：`reject_or_manual` / `keep_bad_truth_rejected` 列表见 report。
 
-离轨修正（2026-09-15）：`node scripts/fix-scenic-off-rail.mjs --write` → 日志 `docs/scenic-off-rail-fix-log.md`（非 `on_track` 且离轨 &lt; 0.8 km 的侧向挪开；已准点不动）。
+离轨修正：`node scripts/fix-scenic-off-rail.mjs --write`（非 `on_track` 且离轨 &lt; 0.8 km 的侧向挪开；已准点不动；可写日志到 stdout）。
 
 ---
 

@@ -46,12 +46,14 @@ function analyze(railway) {
   let lengthKm = 0;
   let maxJump = 0;
   let sharpTurns = 0;
+  const arc = [0];
   for (let i = 1; i < railway.length; i++) {
     const d = haversine(
       { lng: railway[i - 1][0], lat: railway[i - 1][1] },
       { lng: railway[i][0], lat: railway[i][1] },
     );
     lengthKm += d;
+    arc.push(arc[i - 1] + d);
     if (d > maxJump) maxJump = d;
   }
   for (let i = 1; i < railway.length - 1; i++) {
@@ -67,14 +69,21 @@ function analyze(railway) {
     if (deg > 180) deg = 360 - deg;
     if (deg >= 150) sharpTurns += 1;
   }
-  const end = { lng: railway.at(-1)[0], lat: railway.at(-1)[1] };
-  const chord = haversine({ lng: railway[0][0], lat: railway[0][1] }, end) || 1;
-  let maxProg = 0;
+  // 空间折返（真绕圈/双线来回）：沿程 >25km 却回到 <1.5km 内。
+  // 不用「距终点 chord 进度」——成渝等 U 形干线会假阳性几十次。
   let backtracks = 0;
-  for (const p of railway) {
-    const prog = 1 - haversine({ lng: p[0], lat: p[1] }, end) / chord;
-    if (prog < maxProg - 0.01) backtracks += 1;
-    maxProg = Math.max(maxProg, prog);
+  for (let i = 1; i < railway.length; i++) {
+    for (let j = 0; j < i; j++) {
+      if (arc[i] - arc[j] < 25) continue;
+      const d = haversine(
+        { lng: railway[i][0], lat: railway[i][1] },
+        { lng: railway[j][0], lat: railway[j][1] },
+      );
+      if (d < 1.5) {
+        backtracks += 1;
+        break;
+      }
+    }
   }
   let tier = 'ok';
   if (sharpTurns >= 30 || backtracks >= 40 || maxJump > 40) tier = 'heavy';

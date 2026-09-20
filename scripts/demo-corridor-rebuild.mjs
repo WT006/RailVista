@@ -10,7 +10,7 @@
  *
  * 写入：
  *   tmp/corridor-demo-backup/*.json
- *   docs/demo-corridor-rebuild-report.md
+ *   tmp/demo-corridor-rebuild-report.md
  */
 import {
   readFileSync,
@@ -28,7 +28,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const corridorsDir = join(root, 'data/presets/corridors');
 const backupDir = join(root, 'tmp/corridor-demo-backup');
-const reportPath = join(root, 'docs/demo-corridor-rebuild-report.md');
+const reportPath = join(root, 'tmp/demo-corridor-rebuild-report.md');
 const restore = process.argv.includes('--restore');
 
 /** 门禁 heavy/medium 样例 + 对照精品线 */

@@ -212,6 +212,29 @@ function nearCorridor(
   return proj.distKm <= maxKm;
 }
 
+/** 站到走廊折线的投影（距离 + 沿线进度）；无坐标返回 null */
+function corridorProjection(
+  corridor: CorridorPreset,
+  stop: CorridorStop,
+): { distKm: number; progress: number } | null {
+  if (stop.lng == null || stop.lat == null) return null;
+  const { path, lengthKm } = buildRailwayMetrics(corridor.railway);
+  if (lengthKm <= 0) return null;
+  const proj = projectToRailway(path, lengthKm, Number(stop.lng), Number(stop.lat));
+  return { distKm: proj.distKm, progress: proj.progress };
+}
+
+/**
+ * 同城异站冲突站的「贴线中段」放行（B1：珠海北/杭州南/吐鲁番北类）。
+ * 冲突站贴线 ≤15km 且投影进度落在走廊中段（0.03–0.97）时不可能来自
+ * 「平行线误套」——平行站不会贴线 15km 内；端点 12km 内仍走 terminus 规则。
+ */
+function onCorridorMidway(corridor: CorridorPreset, stop: CorridorStop): boolean {
+  const proj = corridorProjection(corridor, stop);
+  if (!proj) return false;
+  return proj.distKm <= 15 && proj.progress >= 0.03 && proj.progress <= 0.97;
+}
+
 /** 是否贴近走廊折线首/末端（同城异站终点：贵阳东≈贵阳北） */
 function nearCorridorTerminus(
   corridor: CorridorPreset,
@@ -241,7 +264,10 @@ function endpointsBelong(
   const endOk = (stop: CorridorStop) => {
     if (onHints(stop.name, hints)) return true;
     if (hasDirectionalConflict(stop.name, hints)) {
-      return nearCorridorTerminus(corridor, stop, 12) && nearCorridor(corridor, stop, 15);
+      return (
+        (nearCorridorTerminus(corridor, stop, 12) && nearCorridor(corridor, stop, 15)) ||
+        onCorridorMidway(corridor, stop)
+      );
     }
     return nearCorridor(corridor, stop, 15);
   };
@@ -255,8 +281,11 @@ function geoFitScore(corridor: CorridorPreset, stops: CorridorStop[], hints: str
   let eligible = 0;
   for (const s of withCoord) {
     if (hasDirectionalConflict(s.name, hints)) {
-      // 终点同城异站：贴末端仍计入贴合（否则双站 OD 贵阳东会把 geoScore 打成 0）
+      // 终点同城异站：贴末端或贴线中段仍计入贴合（珠海北/杭州南/吐鲁番北类，B1）
       if (nearCorridorTerminus(corridor, s, 12) && nearCorridor(corridor, s, 15)) {
+        eligible += 1;
+        near += 1;
+      } else if (onCorridorMidway(corridor, s)) {
         eligible += 1;
         near += 1;
       }
@@ -284,8 +313,8 @@ function directionalConflictRatio(
     if (!hasDirectionalConflict(s.name, hints)) continue;
     if (
       corridor &&
-      nearCorridorTerminus(corridor, s, 12) &&
-      nearCorridor(corridor, s, 15)
+      ((nearCorridorTerminus(corridor, s, 12) && nearCorridor(corridor, s, 15)) ||
+        onCorridorMidway(corridor, s))
     ) {
       continue;
     }

@@ -74,14 +74,31 @@ railGeometryRoute.post('/jobs', async (c) => {
   }
 
   const { enriched } = await resolveStops(body);
+  const unresolvedStops = enriched
+    .filter((s) => s.lng == null || s.lat == null || !Number.isFinite(Number(s.lng)) || !Number.isFinite(Number(s.lat)))
+    .map((s) => s.name)
+    .filter(Boolean);
+  if (unresolvedStops.length) {
+    // B4：不再静默丢弃——明确记录哪些站没定位到坐标
+    console.warn(
+      `[rail-geometry] unresolved stops (no coords): ${unresolvedStops.join(', ')}`,
+    );
+  }
   const namedStops = enriched
     .filter((s) => s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat))
     .map((s) => ({ name: s.name, lng: Number(s.lng), lat: Number(s.lat) }));
   if (namedStops.length < 2) {
+    const missing = unresolvedStops.join('、') || '未知';
     return c.json(
       {
         ok: false,
-        error: { code: 'BAD_REQUEST', message: '至少需要 2 个可定位的经停站' },
+        error: {
+          code: 'BAD_REQUEST',
+          message:
+            namedStops.length === 0
+              ? `至少需要 2 个可定位的经停站（未能定位：${missing}）`
+              : `可定位的经停站不足 2 个（未能定位：${missing}）`,
+        },
       },
       400,
     );
@@ -92,12 +109,15 @@ railGeometryRoute.post('/jobs', async (c) => {
       stops: namedStops,
       trainCode: body.trainCode,
       clientKey: clientKeyFromRequest((n) => c.req.header(n)),
+      unresolvedStops,
       retryFailedOnly: !!body.retryFailedOnly,
     });
     return c.json({
       ok: true,
       data: {
         ...job,
+        // B4：回传未能定位的站名，前端可提示「某站暂缺坐标」而非凭空消失
+        unresolvedStops,
         // 回传全部 enrich 结果（含站名），前端按名合并，禁止按下标写坐标
         stops: enriched.map((s) => ({
           name: s.name,

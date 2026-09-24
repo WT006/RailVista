@@ -495,8 +495,8 @@ function sampleCorridor(from: LngLat, to: LngLat, stepKm = 35): LngLat[] {
 function segmentCacheKey(from: LngLat, to: LngLat, preferHs: boolean): string {
   const r = (p: LngLat) => `${p.lng.toFixed(3)},${p.lat.toFixed(3)}`;
   const raw = `${preferHs ? 'hs' : 'conv'}|${r(from)}|${r(to)}`;
-  // v8：分轨本地图 + HS 不回退普速 Overpass + miss 短缓存
-  return `railseg:v9:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
+  // v10：B1/B2/B3 拼线规则调整（中段站放行 + 同走廊兜底 + 几何枢纽），bump 避免脏缓存
+  return `railseg:v10:${createHash('sha1').update(raw).digest('hex').slice(0, 16)}`;
 }
 
 function pathFromWays(ways: OsmWay[], from: LngLat, to: LngLat): LngLat[] | null {

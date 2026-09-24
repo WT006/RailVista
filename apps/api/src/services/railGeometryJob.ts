@@ -33,6 +33,8 @@ export type RailJobSnapshot = {
   trainCode?: string;
   /** 校正后的经停坐标（必须带站名，供前端按名合并） */
   stops?: NamedStop[];
+  /** B4：geocode 失败未能定位的经停站名（不再静默丢弃，供前端提示与审计） */
+  unresolvedStops?: string[];
   /** 按当前 coords 过滤的风景点 */
   scenicSpots?: ScenicSpot[];
 };
@@ -41,6 +43,7 @@ type SegSlot = { coords: LngLat[]; ok: boolean; reason?: string } | null;
 
 type RailJob = Omit<RailJobSnapshot, 'stops'> & {
   stops: NamedStop[];
+  unresolvedStops: string[];
   slots: SegSlot[];
   clientKey: string;
   stopsFp: string;
@@ -51,9 +54,15 @@ type RailJob = Omit<RailJobSnapshot, 'stops'> & {
 };
 
 const JOB_TTL_MS = 30 * 60 * 1000;
-/** 整趟精确任务墙钟上限：超时后用已有结果收尾，避免卡在 Overpass */
-function jobMaxMs() {
-  return Number(process.env.RAIL_JOB_MAX_MS || 50_000);
+/**
+ * 整趟精确任务墙钟上限：超时后用已有结果收尾，避免卡在 Overpass。
+ * B5：默认提到 120s，长途车（段数>10 的 K/T/Z）按 10s/段放宽，减少「超时降级示意线」长尾。
+ */
+function jobMaxMs(job?: { segmentsTotal: number }) {
+  const base = Number(process.env.RAIL_JOB_MAX_MS || 0);
+  if (base > 0) return base;
+  const bySegments = job ? job.segmentsTotal * 10_000 : 0;
+  return Math.max(120_000, bySegments);
 }
 /** 同时真正跑 runJob 的上限（多人共享） */
 function maxInflightJobs() {
@@ -80,7 +89,7 @@ function finishedKey(clientKey: string, stopsFp: string) {
 }
 
 function jobTimedOut(job: RailJob): boolean {
-  return Date.now() - job.createdAt >= jobMaxMs();
+  return Date.now() - job.createdAt >= jobMaxMs(job);
 }
 
 function shouldStopJob(job: RailJob): boolean {
@@ -219,6 +228,7 @@ function snapshot(job: RailJob): RailJobSnapshot {
     qualityTier: job.qualityTier,
     trainCode: job.trainCode,
     stops: job.stops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat })),
+    unresolvedStops: job.unresolvedStops?.length ? job.unresolvedStops : undefined,
     scenicSpots: matchScenicSpotsForRailway(job.coords),
   };
 }
@@ -402,7 +412,7 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
 
   // 超时：不再补缝 / 整趟 Overpass，直接友好收尾
   if (jobTimedOut(job)) {
-    console.warn('[rail-job] deadline after segments', job.jobId, `${jobMaxMs()}ms`);
+    console.warn('[rail-job] deadline after segments', job.jobId, `${jobMaxMs(job)}ms`);
     // 未写完的槽位按示意失败占位，保证 segmentsDone 完整
     for (let i = 0; i < job.segmentsTotal; i++) {
       if (job.slots[i] == null) {
@@ -599,6 +609,8 @@ export function createRailGeometryJob(params: {
   stops: Array<{ name?: string; lng: number; lat: number }>;
   trainCode?: string;
   clientKey: string;
+  /** B4：未能定位坐标的经停站名（明确记录，不静默丢弃） */
+  unresolvedStops?: string[];
   /** 仅重算上一趟失败段，保留已成功的精确段 */
   retryFailedOnly?: boolean;
 }): RailJobSnapshot {
@@ -689,6 +701,7 @@ export function createRailGeometryJob(params: {
     qualityTier: seedCoords ? seedTier : 'station',
     trainCode: params.trainCode,
     stops,
+    unresolvedStops: params.unresolvedStops || [],
     slots,
     clientKey: params.clientKey,
     stopsFp: fp,

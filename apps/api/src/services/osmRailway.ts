@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { cache } from './cache.js';
 import { buildLocalSegment } from './localRails.js';
 import * as overpassTracker from './overpassTracker.js';
+import { findCorridorSliceForSegment } from './corridors.js';
 
 export type LngLat = { lng: number; lat: number };
 
@@ -627,6 +628,28 @@ export async function buildSegmentGeometry(
     }
   } catch (e) {
     console.warn('[rail-seg] local failed', e);
+  }
+
+  // 1b) S7 走廊切片兜底：本地分轨图失败后、公网前——两端同走廊时从走廊折线切片
+  try {
+    const slice = findCorridorSliceForSegment(from, to);
+    if (slice?.coords && slice.coords.length >= 2) {
+      const simplifiedSlice = simplify(
+        slice.coords.map(([lng, lat]) => ({ lng, lat })),
+        0.45,
+      );
+      const sliceGate = acceptSegmentGeometry(simplifiedSlice, from, to);
+      if (sliceGate.ok) {
+        cache.set(key, simplifiedSlice, SEGMENT_CACHE_TTL_SEC);
+        console.log(
+          `[rail-seg] ok via corridor-slice:${slice.corridorId} pts=${simplifiedSlice.length}`,
+        );
+        return { coords: simplifiedSlice, ok: true, fromCache: false, reason: 'corridor-slice' };
+      }
+      console.warn(`[rail-seg] corridor-slice rejected ${sliceGate.reason}`);
+    }
+  } catch (e) {
+    console.warn('[rail-seg] corridor-slice failed', e);
   }
 
   // 2) Overpass 可选兜底

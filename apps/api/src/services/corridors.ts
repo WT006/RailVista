@@ -16,6 +16,7 @@ export type CorridorPreset = {
   name: string;
   osmRelation?: number;
   source: string;
+  sourceNames?: string[];
   stationsHint: string[];
   railway: [number, number][];
   island?: boolean;
@@ -580,4 +581,72 @@ function attachOdApproaches(
     out.push([Number(to.lng.toFixed(6)), Number(to.lat.toFixed(6))]);
   }
   return out;
+}
+
+/** S7.1 段级走廊切片兜底：走廊 bbox 缓存（预筛加速） */
+const corridorBBoxCache = new Map<string, { minLng: number; minLat: number; maxLng: number; maxLat: number }>();
+
+function corridorBBoxOf(c: CorridorPreset) {
+  let b = corridorBBoxCache.get(c.id);
+  if (b) return b;
+  let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+  for (const [lng, lat] of c.railway) {
+    if (lng < minLng) minLng = lng;
+    if (lat < minLat) minLat = lat;
+    if (lng > maxLng) maxLng = lng;
+    if (lat > maxLat) maxLat = lat;
+  }
+  b = { minLng, minLat, maxLng, maxLat };
+  corridorBBoxCache.set(c.id, b);
+  return b;
+}
+
+function nearestDistToRailwayKm(railway: [number, number][], pt: { lng: number; lat: number }): number {
+  let best = Infinity;
+  for (const p of railway) {
+    const d = haversineKm(pt, { lng: p[0], lat: p[1] });
+    if (d < best) best = d;
+    if (best <= 1) return best;
+  }
+  return best;
+}
+
+/** 段两端点是否都贴近该走廊折线（bbox ±0.12° 预筛 + 20km 投影归属，仅用于归属判定） */
+function segmentBelongs(c: CorridorPreset, from: { lng: number; lat: number }, to: { lng: number; lat: number }, padDeg = 0.12, maxKm = 20): boolean {
+  const b = corridorBBoxOf(c);
+  const inBox = (p: { lng: number; lat: number }) =>
+    p.lng >= b.minLng - padDeg && p.lng <= b.maxLng + padDeg && p.lat >= b.minLat - padDeg && p.lat <= b.maxLat + padDeg;
+  if (!inBox(from) || !inBox(to)) return false;
+  if (nearestDistToRailwayKm(c.railway, from) > maxKm) return false;
+  if (nearestDistToRailwayKm(c.railway, to) > maxKm) return false;
+  return true;
+}
+
+/**
+ * S7 段级走廊切片兜底：两端站可归属同一条走廊时，从走廊折线切出该段几何。
+ * 归属阈值放宽至 20 km；切片退化（p1−p0 < 0.0005）/异常一律吞掉返回 null。
+ * 质量过滤不在此处（调用方统一过 acceptSegmentGeometry 门禁）。
+ */
+export function findCorridorSliceForSegment(
+  from: { lng: number; lat: number },
+  to: { lng: number; lat: number },
+): { coords: [number, number][]; corridorId: string } | null {
+  try {
+    if (!Number.isFinite(from.lng) || !Number.isFinite(from.lat)) return null;
+    if (!Number.isFinite(to.lng) || !Number.isFinite(to.lat)) return null;
+    const corridors = loadCorridors();
+    for (const c of corridors) {
+      if (!c.railway || c.railway.length < 10) continue;
+      if (!segmentBelongs(c, from, to)) continue;
+      const sliced = slicePolylineByOd(c.railway, from, to);
+      if (!sliced || sliced.length < 2) continue;
+      const p0 = sliced[0];
+      const p1 = sliced[sliced.length - 1];
+      if (Math.abs(p1[0] - p0[0]) < 0.0005 && Math.abs(p1[1] - p0[1]) < 0.0005) continue;
+      return { coords: sliced, corridorId: c.id };
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }

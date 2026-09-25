@@ -582,6 +582,13 @@ export function buildLocalSegment(
   const kind: LocalRailKind = preferHs ? 'hsr' : 'rail';
   const catalog = loadLocalRails(kind);
   const spanKm = haversineKm(from, to);
+  const LONG_TRIP_SPAN_KM = Number(process.env.LONG_TRIP_SPAN_KM || 2000);
+  if (spanKm > LONG_TRIP_SPAN_KM) {
+    console.log(
+      `[local-rails] skip greedy stitch: spanKm=${spanKm.toFixed(0)} > ${LONG_TRIP_SPAN_KM} (need full stops)`,
+    );
+    return null;
+  }
   const samples: LngLat[] = [];
   const n = Math.min(16, Math.max(2, Math.ceil(spanKm / 40)));
   for (let i = 0; i <= n; i++) {
@@ -610,4 +617,46 @@ export function buildLocalSegment(
   const narrow = spanKm < 80 ? 0.12 : spanKm < 250 ? 0.15 : 0.18;
   const wide = spanKm < 80 ? 0.16 : spanKm < 250 ? 0.2 : 0.26;
   return tryPad(narrow) || (wide > narrow + 0.01 ? tryPad(wide) : null);
+}
+/**
+ * 整趟本地图全局寻路：不受段长限制，用更多采样点 + 更大 pad 在轨网上一次拼出全程折线。
+ * 贪心拼线降级为段内精修时，此函数为整趟 OD 提供全图寻路兜底。
+ */
+export function findWholeTripLocalPath(
+  from: LngLat,
+  to: LngLat,
+  opts?: { highspeed?: boolean },
+): LngLat[] | null {
+  const preferHs = opts?.highspeed !== false;
+  const kind: LocalRailKind = preferHs ? 'hsr' : 'rail';
+  const catalog = loadLocalRails(kind);
+  const spanKm = haversineKm(from, to);
+  const samples: LngLat[] = [];
+  const n = Math.min(48, Math.max(4, Math.ceil(spanKm / 30)));
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    samples.push({
+      lng: from.lng + (to.lng - from.lng) * t,
+      lat: from.lat + (to.lat - from.lat) * t,
+    });
+  }
+
+  const tryPad = (padDeg: number) => {
+    const ways = queryLocalWaysAlong(samples, {
+      padDeg,
+      kind,
+      highspeedOnly: preferHs,
+    });
+    console.log(
+      `[local-rails] whole-trip query kind=${kind} ways=${ways.length} spanKm=${spanKm.toFixed(0)} samples=${samples.length} pad=${padDeg}`,
+    );
+    if (ways.length < 1) return null;
+    const preferred = stitchLocalOd(from, to, ways, { allowPrefer: true, allWays: catalog });
+    if (preferred) return preferred;
+    return stitchLocalOd(from, to, ways, { allowPrefer: false, allWays: catalog });
+  };
+
+  const narrow = 0.18;
+  const wide = 0.26;
+  return tryPad(narrow) || tryPad(wide);
 }

@@ -8,7 +8,7 @@ import {
 } from '@railvista/shared';
 import { toRaw } from 'vue';
 
-export const TRIP_CACHE_VERSION = 1;
+export const TRIP_CACHE_VERSION = 2;
 export const MAX_RECENT_TRIPS = 10;
 export const EXPIRE_DAYS_AFTER_ARRIVAL = 2;
 const EXPIRE_MS = EXPIRE_DAYS_AFTER_ARRIVAL * 24 * 60 * 60 * 1000;

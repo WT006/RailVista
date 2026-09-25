@@ -8,6 +8,8 @@ import { presetsRoute } from './routes/presets.js';
 import { railGeometryRoute } from './routes/railGeometry.js';
 import { loadStationIndex } from './services/stationIndex.js';
 import { trustedClientIp } from './lib/clientIdentity.js';
+import { buildVersionFingerprint, type VersionFingerprint } from './services/versionFingerprint.js';
+import { ensureSingleInstance } from './services/singleInstance.js';
 
 const app = new Hono().basePath('/api');
 
@@ -72,13 +74,19 @@ app.use('*', async (c, next) => {
   await next();
 });
 
-app.get('/health', (c) => c.json({ ok: true, data: { status: 'up' } }));
+const versionFingerprint: VersionFingerprint = buildVersionFingerprint();
+
+app.get('/health', (c) =>
+  c.json({ ok: true, data: { status: 'up', version: versionFingerprint } }),
+);
 app.route('/stations', stationsRoute);
 app.route('/trains', trainsRoute);
 app.route('/presets', presetsRoute);
 app.route('/rail-geometry', railGeometryRoute);
 
 const port = Number(process.env.PORT || 3000);
+
+ensureSingleInstance(port);
 
 await loadStationIndex();
 const { loadLocalHsrRails } = await import('./services/localRails.js');

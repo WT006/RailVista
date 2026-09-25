@@ -287,7 +287,11 @@ export const useTripStore = defineStore('trip', () => {
     railwayCoords.value = JSON.parse(JSON.stringify(snap.railwayCoords));
     railwaySource.value = snap.railwaySource;
     polylineHint.value = snap.polylineHint;
-    canUpgradePrecise.value = snap.canUpgradePrecise;
+    if (snap.railwaySource === 'station') {
+      canUpgradePrecise.value = true;
+    } else {
+      canUpgradePrecise.value = snap.canUpgradePrecise;
+    }
     preciseLoading.value = false;
     preciseError.value = '';
     const resumeId =

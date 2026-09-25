@@ -11,6 +11,8 @@ import { matchCorridor, sliceCorridorForStops } from './corridors.js';
 import { matchCorridorNetwork } from './corridorNetwork.js';
 import { matchScenicSpotsForRailway } from './scenicSpots.js';
 import { getPreciseHotCache, savePreciseHotCache } from './preciseRouteCache.js';
+import { findWholeTripLocalPath } from './localRails.js';
+import * as overpassTracker from './overpassTracker.js';
 
 export type RailJobStatus = 'queued' | 'running' | 'done' | 'partial' | 'failed';
 
@@ -363,6 +365,34 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
   if (job.abandoned) return;
 
   const preferHs = isHighspeedTrain(job.trainCode);
+
+  // 1b) 整趟本地图全局寻路（全图一次拼线，覆盖全国任意 OD）
+  if (!opts?.onlyFailed) {
+    try {
+      const odFrom = job.stops[0];
+      const odTo = job.stops[job.stops.length - 1];
+      const wholePath = findWholeTripLocalPath(odFrom, odTo, { highspeed: preferHs });
+      if (wholePath && wholePath.length >= 2) {
+        if (job.abandoned) return;
+        for (let i = 0; i < job.segmentsTotal; i++) {
+          job.slots[i] = { coords: [], ok: true, reason: 'local:whole' };
+        }
+        job.segmentsDone = job.segmentsTotal;
+        job.segmentsOk = job.segmentsTotal;
+        job.coords = wholePath.map((p) => [p.lng, p.lat] as [number, number]);
+        job.source = 'osm';
+        job.qualityTier = 'local';
+        job.status = 'done';
+        job.message = '真实轨道线（本地图全局寻路）';
+        job.updatedAt = Date.now();
+        finishJob(job);
+        return;
+      }
+    } catch (e) {
+      console.warn('[rail-job] whole-trip local path failed', job.jobId, e);
+    }
+  }
+
   const pending: number[] = [];
   for (let i = 0; i < job.segmentsTotal; i++) {
     if (opts?.onlyFailed) {
@@ -448,9 +478,9 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
   // 仍有缺口：短途才整 OD Overpass（长途如广州南→南京南会拖死）
   if (job.segmentsOk < job.segmentsTotal) {
     const longTrip = job.segmentsTotal >= 8 || job.stops.length >= 10;
-    if (longTrip) {
+    if (longTrip || overpassTracker.isLocalOnly()) {
       console.log(
-        `[rail-job] skip whole-trip Overpass (long trip segs=${job.segmentsTotal})`,
+        `[rail-job] skip whole-trip Overpass (long trip segs=${job.segmentsTotal} localOnly=${overpassTracker.isLocalOnly()})`,
         job.jobId,
       );
     } else {

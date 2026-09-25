@@ -24,8 +24,9 @@ const cachePath = join(root, 'data/station_name.cache.json');
 
 const ENDPOINT_MAX_KM = 12;
 const MIN_HINTS = 5;
-const COVERAGE_THRESHOLD = 0.95;
+const COVERAGE_THRESHOLD = Number(process.env.PATROL_COVERAGE_THRESHOLD || 0.99);
 const CROSS_LINK_MAX_KM = 3;
+const CORRIDOR_ISLAND_MAX_KM = Number(process.env.CORRIDOR_ISLAND_MAX_KM || 12);
 
 function haversine(a, b) {
   const toRad = (d) => (d * Math.PI) / 180;
@@ -187,6 +188,49 @@ for (let i = 0; i < withBBox.length; i++) {
         detail: `折线最近点 ${near.distKm.toFixed(2)}km ≤ ${CROSS_LINK_MAX_KM}km 但无共享 hint`,
       });
     }
+  }
+}
+
+// ── Check 5: Corridor connectivity (island detection) ──
+const islandCorridors = [];
+for (let i = 0; i < withBBox.length; i++) {
+  const a = withBBox[i];
+  let minDistToOther = Infinity;
+  const hintsA = new Set((a.c.stationsHint || []).map(normalize));
+  for (let j = 0; j < withBBox.length; j++) {
+    if (i === j) continue;
+    const b = withBBox[j];
+    if (!boxesOverlap(a.bbox, b.bbox, 0.15)) continue;
+    const hintsB = new Set((b.c.stationsHint || []).map(normalize));
+    const shared = [...hintsA].filter((h) => hintsB.has(h));
+    if (shared.length > 0) {
+      minDistToOther = 0;
+      break;
+    }
+    const near = nearestPointsBetween(a.c.railway, b.c.railway, 40);
+    if (near.distKm < minDistToOther) {
+      minDistToOther = near.distKm;
+    }
+  }
+  if (minDistToOther > CORRIDOR_ISLAND_MAX_KM) {
+    islandCorridors.push(a.c.id);
+    alerts.push({
+      level: 'WARN',
+      check: 'island-corridor',
+      corridor: a.c.id,
+      detail: `走廊与主干网最近距离 ${minDistToOther.toFixed(1)}km > ${CORRIDOR_ISLAND_MAX_KM}km（孤岛）`,
+    });
+  }
+}
+
+// 写入孤岛标记到走廊 JSON 文件
+for (const c of corridors) {
+  const filePath = join(corrDir, `${c.id}.json`);
+  if (!existsSync(filePath)) continue;
+  const shouldIsland = islandCorridors.includes(c.id);
+  if ((!!c.island) !== shouldIsland) {
+    c.island = shouldIsland;
+    writeFileSync(filePath, JSON.stringify(c, null, 2) + '\n', 'utf8');
   }
 }
 

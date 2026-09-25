@@ -107,7 +107,9 @@ const showPreciseAction = computed(() => {
   if (trip.preciseLoading) return true;
   if (trip.canUpgradePrecise) return true;
   const st = trip.preciseJob?.status;
-  return st === 'partial' || st === 'failed';
+  if (st === 'partial' || st === 'failed') return true;
+  if (trip.railwaySource === 'precise' && trip.railwayCoords.length >= 2) return true;
+  return false;
 });
 
 const preciseActionLabel = computed(() => {

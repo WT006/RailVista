@@ -73,7 +73,7 @@ async function auditTrain(train, verbose) {
     { name: train.to },
   ];
 
-  const url = `${API_BASE}/rail-geometry`;
+  const url = `${API_BASE}/api/rail-geometry`;
   try {
     const res = await fetch(url, {
       method: 'POST',
@@ -191,23 +191,40 @@ async function main() {
 
   lines.push('## 逐车次结果');
   lines.push('');
-  lines.push('| # | 车次 | 区间 | qualityTier | 走廊 | 段 | 丢站 | 根因 | 原诊断 |');
-  lines.push('|---|---|---|---|---|---|---|---|---|');
+  lines.push('| # | 车次 | 区间 | qualityTier | 走廊 | 段 | 段完成率 | 达标 | 丢站 | 根因 | 原诊断 |');
+  lines.push('|---|---|---|---|---|---|---|---|---|---|---|');
+  const PASS_THRESHOLD = 0.8;
+  const notPassing = [];
   for (let i = 0; i < results.length; i++) {
     const r = results[i];
     const label = `${r.train.code || '?'} ${r.train.from}→${r.train.to}`;
     const seg = r.segmentsOk != null ? `${r.segmentsOk}/${r.segmentsTotal}` : '—';
     const unresolved = (r.unresolvedStops || []).join(',') || '—';
     const cause = r.rootCause || (r.qualityTier === 'corridor' || r.qualityTier === 'network' ? '✓' : '?');
-    lines.push(`| ${i + 1} | ${r.train.code || '—'} | ${label} | ${r.qualityTier} | ${r.corridorId || '—'} | ${seg} | ${unresolved} | ${cause} | ${r.train.issue} |`);
+    const ratio = r.segmentsTotal > 0 ? (r.segmentsOk / r.segmentsTotal) : 0;
+    const ratioStr = r.segmentsTotal > 0 ? ratio.toFixed(2) : '—';
+    const passing = r.status === 'OK' && ratio >= PASS_THRESHOLD;
+    const passMark = r.status === 'OK' ? (passing ? '✅' : '❌') : '—';
+    if (r.status === 'OK' && !passing) notPassing.push(label);
+    lines.push(`| ${i + 1} | ${r.train.code || '—'} | ${label} | ${r.qualityTier} | ${r.corridorId || '—'} | ${seg} | ${ratioStr} | ${passMark} | ${unresolved} | ${cause} | ${r.train.issue} |`);
   }
   lines.push('');
+
+  if (notPassing.length) {
+    lines.push('## 未达标车次（段完成率 < 0.8）');
+    lines.push('');
+    for (const l of notPassing) lines.push(`- ${l}`);
+    lines.push('');
+  }
 
   writeFileSync(reportPath, lines.join('\n'));
   console.log(`\nReport written to ${reportPath}`);
 
   const ok = results.filter((r) => r.qualityTier === 'corridor' || r.qualityTier === 'network').length;
-  console.log(`Summary: ${ok}/${results.length} corridor/network quality`);
+  const passing = results.filter(
+    (r) => r.status === 'OK' && r.segmentsTotal > 0 && r.segmentsOk / r.segmentsTotal >= 0.8,
+  ).length;
+  console.log(`Summary: ${ok}/${results.length} corridor/network quality, ${passing}/${results.length} segment-ratio >= 0.8`);
 }
 
 main().catch((e) => {

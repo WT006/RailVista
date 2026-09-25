@@ -58,6 +58,27 @@ export type RailGeometryJob = {
 };
 
 export const api = {
+  async getHealth(): Promise<{
+    status: 'up' | 'down';
+    version?: { commit: string; corridorCount: number; buildTime: string };
+  }> {
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 3000);
+      const res = await fetch(`${BASE}/health`, { signal: ctrl.signal });
+      clearTimeout(timer);
+      const json = (await res.json()) as ApiResponse<{
+        status: string;
+        version?: { commit: string; corridorCount: number; buildTime: string };
+      }>;
+      if (json.ok && json.data?.status === 'up') {
+        return { status: 'up', version: json.data.version };
+      }
+      return { status: 'down' };
+    } catch {
+      return { status: 'down' };
+    }
+  },
   suggestStations(q: string) {
     return request<{ stations: { name: string; telecode: string }[] }>(
       `/stations/suggest?q=${encodeURIComponent(q)}`,

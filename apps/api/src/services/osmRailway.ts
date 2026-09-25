@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { cache } from './cache.js';
 import { buildLocalSegment } from './localRails.js';
+import * as overpassTracker from './overpassTracker.js';
 
 export type LngLat = { lng: number; lat: number };
 
@@ -505,8 +506,9 @@ function pathFromWays(ways: OsmWay[], from: LngLat, to: LngLat): LngLat[] | null
   return pathOnGraph(ways, adj, from, to, MAX_SNAP_KM);
 }
 
-/** Overpass 可选：RAIL_OVERPASS=0 时跳过（弱网/离线） */
+/** Overpass 可选：RAIL_OVERPASS=0 时跳过（弱网/离线）；overpassTracker 降级时也跳过 */
 export function isOverpassEnabled(): boolean {
+  if (overpassTracker.isLocalOnly()) return false;
   const v = String(process.env.RAIL_OVERPASS ?? '1').trim().toLowerCase();
   return !(v === '0' || v === 'false' || v === 'off' || v === 'no');
 }
@@ -523,7 +525,7 @@ async function fetchWaysForSegment(from: LngLat, to: LngLat, preferHs: boolean):
   // 走廊半径：短段紧一点，长段放宽以覆盖弯道偏离直线采样
   const radiusM = spanKm < 80 ? 12000 : spanKm < 200 ? 15000 : 18000;
   const samples = sampleCorridor(from, to, spanKm < 120 ? 30 : 40);
-  const fetchTimeout = 12_000;
+  const fetchTimeout = 25_000;
   // 段级只打 1 个镜像，避免 3×18s 拖死整趟 job
   const opOpts = { maxMirrors: 1 };
 
@@ -535,7 +537,7 @@ async function fetchWaysForSegment(from: LngLat, to: LngLat, preferHs: boolean):
   try {
     const around = aroundChain(samples, radiusM);
     const query = `
-[out:json][timeout:12];
+[out:json][timeout:25];
 (
   way["railway"="rail"]${hs}(${around});
 );
@@ -553,7 +555,7 @@ out geom;
       const bbox = bboxOfStops([from, to], pad);
       const { south, west, north, east } = bbox;
       const query = `
-[out:json][timeout:12];
+[out:json][timeout:25];
 (
   way["railway"="rail"]${hs}(${south},${west},${north},${east});
 );
@@ -638,11 +640,13 @@ export async function buildSegmentGeometry(
     const ways = await fetchWaysForSegment(from, to, hs);
     if (ways.length < 1) {
       lastReason = 'overpass_empty';
+      overpassTracker.recordFail();
       return null;
     }
     const line = pathFromWays(ways, from, to);
     if (!line || line.length < 2) {
       lastReason = 'path_unconnected';
+      overpassTracker.recordFail();
       return null;
     }
     return line;
@@ -662,9 +666,11 @@ export async function buildSegmentGeometry(
   if (!gate.ok) {
     console.warn(`[rail-seg] osm rejected ${gate.reason}`);
     cache.set(missKey, 1, SEGMENT_MISS_TTL_SEC);
+    overpassTracker.recordFail();
     return { coords: [from, to], ok: false, fromCache: false, reason: gate.reason };
   }
   cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
+  overpassTracker.recordSuccess();
   console.log(`[rail-seg] ok via osm pts=${simplified.length}`);
   return { coords: simplified, ok: true, fromCache: false, reason: 'osm' };
 }

@@ -18,6 +18,7 @@ export type CorridorPreset = {
   source: string;
   stationsHint: string[];
   railway: [number, number][];
+  island?: boolean;
 };
 
 export type CorridorStop = { name: string; lng?: number; lat?: number };

@@ -8,6 +8,7 @@ import { matchCorridor, sliceCorridorForStops, loadCorridors } from '../services
 import { matchCorridorNetwork } from '../services/corridorNetwork.js';
 import { createRailGeometryJob, getRailGeometryJob } from '../services/railGeometryJob.js';
 import { loadScenicSpots, matchScenicSpotsForRailway } from '../services/scenicSpots.js';
+import { ensureFullStops } from '../services/stopsAutocomplete.js';
 import { clientKeyFromRequest } from '../lib/clientIdentity.js';
 import { slicePolylineByOd } from '@railvista/shared';
 
@@ -71,6 +72,11 @@ railGeometryRoute.post('/jobs', async (c) => {
       { ok: false, error: { code: 'BAD_REQUEST', message: '需要 JSON body' } },
       400,
     );
+  }
+
+  const autocomplete = await ensureFullStops(body.stops || [], body.trainCode);
+  if (autocomplete.completed) {
+    body = { ...body, stops: autocomplete.stops };
   }
 
   const { enriched } = await resolveStops(body);
@@ -164,6 +170,11 @@ railGeometryRoute.post('/', async (c) => {
       { ok: false, error: { code: 'BAD_REQUEST', message: '需要 JSON body' } },
       400,
     );
+  }
+
+  const autocompleteSync = await ensureFullStops(body.stops || [], body.trainCode);
+  if (autocompleteSync.completed) {
+    body = { ...body, stops: autocompleteSync.stops };
   }
 
   const { enriched, stops } = await resolveStops(body);

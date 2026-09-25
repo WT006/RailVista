@@ -7,13 +7,37 @@ import {
   isHighspeedTrain,
   type LngLat,
 } from './osmRailway.js';
-import { matchCorridor, sliceCorridorForStops } from './corridors.js';
+import { matchCorridor, sliceCorridorForStops, loadCorridors } from './corridors.js';
 import { matchCorridorNetwork } from './corridorNetwork.js';
 import { matchScenicSpotsForRailway } from './scenicSpots.js';
 import { getPreciseHotCache, savePreciseHotCache } from './preciseRouteCache.js';
 import { findWholeTripLocalPath } from './localRails.js';
 import * as overpassTracker from './overpassTracker.js';
 import { validateWholeTripPath } from './wholeTripGate.js';
+import {
+  isTopologyEnabled,
+  loadTopology,
+  routeStops as topoRouteStops,
+  lineNameIds,
+} from './railTopology.js';
+
+/** 收集任务经停站命中的走廊线路名集合 → 拓扑边权 id 集合（线路名加权防串线） */
+function collectLineNamesForStops(stops: Array<{ name: string }>): Set<number> {
+  const names = new Set(stops.map((s) => (s.name || '').replace(/站$/, '').trim()).filter(Boolean));
+  if (!names.size) return new Set();
+  const lineNames: string[] = [];
+  try {
+    for (const c of loadCorridors()) {
+      const hits = (c.stationsHint || []).some((h) => names.has((h || '').replace(/站$/, '').trim()));
+      if (!hits) continue;
+      if (c.name) lineNames.push(c.name);
+      if (Array.isArray(c.sourceNames)) lineNames.push(...c.sourceNames);
+    }
+  } catch {
+    /* 走廊加载失败不阻塞拓扑寻路 */
+  }
+  return lineNameIds(lineNames);
+}
 
 export type RailJobStatus = 'queued' | 'running' | 'done' | 'partial' | 'failed';
 
@@ -367,8 +391,65 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
 
   const preferHs = isHighspeedTrain(job.trainCode);
 
-  // 1b) 整趟本地图全局寻路（全图一次拼线，覆盖全国任意 OD）——必须过质量门禁
-  if (!opts?.onlyFailed) {
+  // 1b) 整趟寻路：拓扑优先（真·全图逐段，经停全在线）→ 贪心兜底（须过 S1 门禁）
+  let topoPartialDone = false;
+  let greedyFallbackAllowed = false;
+  if (isTopologyEnabled()) {
+    if (loadTopology()) {
+      try {
+        const lineHitSet = collectLineNamesForStops(job.stops);
+        const routed = topoRouteStops(job.stops, { highspeed: preferHs, lineHitSet });
+        if (routed.failures.length === 0 && routed.coords.length >= 2) {
+          if (job.abandoned) return;
+          for (let i = 0; i < job.segmentsTotal; i++) {
+            job.slots[i] = { coords: [], ok: true, reason: 'topo' };
+          }
+          job.segmentsDone = job.segmentsTotal;
+          job.segmentsOk = job.segmentsTotal;
+          job.coords = routed.coords;
+          job.source = 'local';
+          job.qualityTier = 'local';
+          job.status = 'done';
+          job.message = '真实轨道线（全图拓扑逐段寻路）';
+          job.updatedAt = Date.now();
+          finishJob(job);
+          return;
+        }
+        let okCount = 0;
+        for (let i = 0; i < routed.segResults.length && i < job.segmentsTotal; i++) {
+          const sr = routed.segResults[i];
+          if (sr.ok) {
+            job.slots[i] = {
+              coords: sr.coords.map(([lng, lat]) => ({ lng, lat })),
+              ok: true,
+              reason: 'topo',
+            };
+            okCount++;
+          }
+        }
+        if (okCount > 0) {
+          // 部分成功：成功段写槽位，失败段交给既有逐段流程（走廊切片/公网兜底）
+          topoPartialDone = true;
+          console.log(
+            `[rail-topology] partial ${okCount}/${job.segmentsTotal}, failures=${routed.failures.map((f) => f.reason).join(',')}`,
+            job.jobId,
+          );
+        }
+        // 全部段失败：不再执行老贪心整趟（防绕过逐段精度），直接落逐段流程
+      } catch (e) {
+        console.warn('[rail-topology] routeStops failed, fallback to greedy', job.jobId, e);
+        greedyFallbackAllowed = true;
+      }
+    } else {
+      console.warn('[rail-topology] load failed, fallback to greedy', job.jobId);
+      greedyFallbackAllowed = true;
+    }
+  } else {
+    greedyFallbackAllowed = true;
+  }
+
+  // 老贪心整趟兜底（仅拓扑未启用/加载失败/抛错时）——必须过 S1 质量门禁
+  if (greedyFallbackAllowed && !opts?.onlyFailed) {
     try {
       const odFrom = job.stops[0];
       const odTo = job.stops[job.stops.length - 1];
@@ -402,7 +483,7 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
 
   const pending: number[] = [];
   for (let i = 0; i < job.segmentsTotal; i++) {
-    if (opts?.onlyFailed) {
+    if (opts?.onlyFailed || topoPartialDone) {
       if (!job.slots[i]?.ok) pending.push(i);
     } else {
       pending.push(i);

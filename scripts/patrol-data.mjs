@@ -12,7 +12,7 @@
  *   node scripts/patrol-data.mjs --json out.json  # 输出 JSON
  *   node scripts/patrol-data.mjs --strict     # 有告警则 exit(1)
  */
-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 

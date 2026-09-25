@@ -13,6 +13,7 @@ import { matchScenicSpotsForRailway } from './scenicSpots.js';
 import { getPreciseHotCache, savePreciseHotCache } from './preciseRouteCache.js';
 import { findWholeTripLocalPath } from './localRails.js';
 import * as overpassTracker from './overpassTracker.js';
+import { validateWholeTripPath } from './wholeTripGate.js';
 
 export type RailJobStatus = 'queued' | 'running' | 'done' | 'partial' | 'failed';
 
@@ -28,7 +29,7 @@ export type RailJobSnapshot = {
   segmentsDone: number;
   segmentsOk: number;
   coords: [number, number][];
-  source: 'osm' | 'mixed' | 'station';
+  source: 'osm' | 'mixed' | 'station' | 'local';
   message: string;
   /** 精度层级，供 UI 区分文案 */
   qualityTier?: RailQualityTier;
@@ -366,27 +367,33 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
 
   const preferHs = isHighspeedTrain(job.trainCode);
 
-  // 1b) 整趟本地图全局寻路（全图一次拼线，覆盖全国任意 OD）
+  // 1b) 整趟本地图全局寻路（全图一次拼线，覆盖全国任意 OD）——必须过质量门禁
   if (!opts?.onlyFailed) {
     try {
       const odFrom = job.stops[0];
       const odTo = job.stops[job.stops.length - 1];
       const wholePath = findWholeTripLocalPath(odFrom, odTo, { highspeed: preferHs });
       if (wholePath && wholePath.length >= 2) {
-        if (job.abandoned) return;
-        for (let i = 0; i < job.segmentsTotal; i++) {
-          job.slots[i] = { coords: [], ok: true, reason: 'local:whole' };
+        const gate = validateWholeTripPath(wholePath, job.stops, { trainCode: job.trainCode });
+        if (!gate.ok) {
+          console.warn(`[rail-job] whole-trip rejected: ${gate.stage} ${gate.detail || ''}`, job.jobId);
+        } else if (job.abandoned) {
+          return;
+        } else {
+          for (let i = 0; i < job.segmentsTotal; i++) {
+            job.slots[i] = { coords: [], ok: true, reason: 'local:whole' };
+          }
+          job.segmentsDone = job.segmentsTotal;
+          job.segmentsOk = job.segmentsTotal;
+          job.coords = wholePath.map((p) => [p.lng, p.lat] as [number, number]);
+          job.source = 'local';
+          job.qualityTier = 'local';
+          job.status = 'done';
+          job.message = '真实轨道线（本地图全局寻路）';
+          job.updatedAt = Date.now();
+          finishJob(job);
+          return;
         }
-        job.segmentsDone = job.segmentsTotal;
-        job.segmentsOk = job.segmentsTotal;
-        job.coords = wholePath.map((p) => [p.lng, p.lat] as [number, number]);
-        job.source = 'osm';
-        job.qualityTier = 'local';
-        job.status = 'done';
-        job.message = '真实轨道线（本地图全局寻路）';
-        job.updatedAt = Date.now();
-        finishJob(job);
-        return;
       }
     } catch (e) {
       console.warn('[rail-job] whole-trip local path failed', job.jobId, e);

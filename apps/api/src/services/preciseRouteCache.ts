@@ -18,7 +18,7 @@ export type PreciseHotEntry = {
   trainCode?: string;
   stopsFp: string;
   coords: [number, number][];
-  source: 'osm' | 'mixed' | 'station';
+  source: 'osm' | 'mixed' | 'station' | 'local';
   qualityTier?: string;
   message?: string;
   segmentsOk: number;
@@ -28,11 +28,14 @@ export type PreciseHotEntry = {
   pinned?: boolean;
 };
 
+/** 几何算法版本：fingerprint 输出前缀，算法/门禁变更时 bump 使旧条目失配 */
+export const GEOM_VERSION = 2;
+
 export function fingerprint(
   trainCode: string | undefined,
   stops: Array<{ name: string; lng: number; lat: number }>,
 ): string {
-  return `${trainCode || ''}|${stops.map((s) => `${s.name}:${s.lng.toFixed(3)},${s.lat.toFixed(3)}`).join('|')}`;
+  return `g${GEOM_VERSION}|${trainCode || ''}|${stops.map((s) => `${s.name}:${s.lng.toFixed(3)},${s.lat.toFixed(3)}`).join('|')}`;
 }
 
 export function diskKey(fp: string): string {
@@ -40,7 +43,7 @@ export function diskKey(fp: string): string {
 }
 
 function memKey(fp: string): string {
-  return `precise-hot:v3:${diskKey(fp)}`;
+  return `precise-hot:v4:${diskKey(fp)}`;
 }
 
 function ensureDir() {
@@ -108,7 +111,7 @@ export function savePreciseHotCache(input: {
   trainCode?: string;
   stops: Array<{ name: string; lng: number; lat: number }>;
   coords: [number, number][];
-  source: 'osm' | 'mixed' | 'station';
+  source: 'osm' | 'mixed' | 'station' | 'local';
   qualityTier?: string;
   message?: string;
   segmentsOk: number;

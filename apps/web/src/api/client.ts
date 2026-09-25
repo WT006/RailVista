@@ -22,7 +22,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export type RailGeometryData = {
   coords: [number, number][];
   stops?: Array<{ name: string; lng?: number; lat?: number }>;
-  source: 'osm' | 'mixed' | 'station' | 'none';
+  source: 'osm' | 'mixed' | 'station' | 'local' | 'none';
   segmentsOk: number;
   segmentsTotal: number;
   fromPreset?: boolean;
@@ -49,7 +49,7 @@ export type RailGeometryJob = {
   segmentsDone: number;
   segmentsOk: number;
   coords: [number, number][];
-  source: 'osm' | 'mixed' | 'station';
+  source: 'osm' | 'mixed' | 'station' | 'local';
   message: string;
   qualityTier?: RailQualityTier;
   trainCode?: string;

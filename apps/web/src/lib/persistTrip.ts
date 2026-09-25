@@ -9,6 +9,8 @@ import { usePrefsStore } from '../stores/prefsStore';
 import { useTripStore } from '../stores/tripStore';
 
 function preciseStatusOf(trip: ReturnType<typeof useTripStore>): PreciseCacheStatus {
+  // S2.3：客户端硬超时态——不固化为 partial 最终结果，下次进入视为可自动重试
+  if (trip.preciseTimedOut) return 'timeout';
   const st = trip.preciseJob?.status;
   if (st === 'done') return 'done';
   if (st === 'partial') return 'partial';

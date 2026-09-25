@@ -76,8 +76,20 @@ app.use('*', async (c, next) => {
 
 const versionFingerprint: VersionFingerprint = buildVersionFingerprint();
 
+function autoUpgradeFlag(): boolean {
+  const v = String(process.env.RAIL_AUTO_UPGRADE ?? '1').trim().toLowerCase();
+  return !(v === '0' || v === 'false' || v === 'off' || v === 'no');
+}
+
 app.get('/health', (c) =>
-  c.json({ ok: true, data: { status: 'up', version: versionFingerprint } }),
+  c.json({
+    ok: true,
+    data: {
+      status: 'up',
+      version: versionFingerprint,
+      features: { autoUpgrade: autoUpgradeFlag() },
+    },
+  }),
 );
 app.route('/stations', stationsRoute);
 app.route('/trains', trainsRoute);
@@ -86,7 +98,7 @@ app.route('/rail-geometry', railGeometryRoute);
 
 const port = Number(process.env.PORT || 3000);
 
-ensureSingleInstance(port);
+await ensureSingleInstance(port);
 
 await loadStationIndex();
 const { loadLocalHsrRails } = await import('./services/localRails.js');

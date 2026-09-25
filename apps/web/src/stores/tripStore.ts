@@ -39,8 +39,80 @@ export const useTripStore = defineStore('trip', () => {
   /** 换行程 / 新任务时递增，用于丢弃过期 create/poll 回写 */
   let preciseEpoch = 0;
   let activeJobId: string | null = null;
-  /** 前端硬超时：服务端若卡在补缝/Overpass，仍要给出友好结束态 */
-  const CLIENT_PRECISE_TIMEOUT_MS = 55_000;
+  /** 前端硬超时：与服务端预算 max(120s, 10s×段数) 对齐，避免长线被 55s 截断落盘 */
+  const CLIENT_PRECISE_TIMEOUT_MS = 180_000;
+
+  // ── S2 自动精准升级：行程键防循环（会话内 ≤2 次） ──
+  const AUTO_UPGRADE_MAX = 2;
+  const autoUpgradeEnabled = ref(true);
+  const autoUpgradeCounts = new Map<string, number>();
+  const autoRetryTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  /** 客户端硬超时后的超时态：不固化为 partial 最终结果，可自动重试 */
+  const preciseTimedOut = ref(false);
+
+  function currentTripKey(): string {
+    const seg = segment.value;
+    if (!seg) return '';
+    const names = seg.stops?.map((s) => s.name) || [];
+    return `${seg.trainCode || ''}|${seg.date || ''}|${names[0] || ''}|${names[names.length - 1] || ''}`;
+  }
+
+  async function loadAutoUpgradeFlag() {
+    try {
+      const h = await api.getHealth();
+      autoUpgradeEnabled.value = h.status === 'up' ? h.features?.autoUpgrade !== false : false;
+    } catch {
+      autoUpgradeEnabled.value = false;
+    }
+  }
+  void loadAutoUpgradeFlag();
+
+  /**
+   * 自动升级统一入口（S2）：零点击触发精确升级。
+   * 五连判：开关开 ∧ 行程键计数 <2 ∧（示意线 ∨ 可升级）∧ 非已完成精确态 ∧ 无进行中任务。
+   */
+  function maybeAutoUpgradePrecise(): void {
+    if (!autoUpgradeEnabled.value) return;
+    if (isDemo.value) return;
+    const seg = segment.value;
+    if (!seg) return;
+    const key = currentTripKey();
+    if (!key) return;
+    if ((autoUpgradeCounts.get(key) || 0) >= AUTO_UPGRADE_MAX) return;
+    if (preciseLoading.value) return;
+    if (
+      preciseJob.value &&
+      (preciseJob.value.status === 'queued' || preciseJob.value.status === 'running')
+    ) {
+      return;
+    }
+    if (preciseJob.value?.status === 'done') return;
+    const isPlainStation =
+      railwaySource.value === 'station' && !(railwayCoords.value.length > seg.stops.length + 2);
+    if (!isPlainStation && !canUpgradePrecise.value) return;
+    if (railwaySource.value === 'precise' && !canUpgradePrecise.value) return;
+    autoUpgradeCounts.set(key, (autoUpgradeCounts.get(key) || 0) + 1);
+    void upgradePrecise();
+  }
+
+  /** partial 自动重试：3s 后定向重试失败段一次（计入行程键配额） */
+  function scheduleAutoPartialRetry(): void {
+    if (!autoUpgradeEnabled.value) return;
+    const key = currentTripKey();
+    if (!key) return;
+    if ((autoUpgradeCounts.get(key) || 0) >= AUTO_UPGRADE_MAX) return;
+    if (autoRetryTimers.has(key)) return;
+    const timer = setTimeout(() => {
+      autoRetryTimers.delete(key);
+      if (!segment.value || currentTripKey() !== key) return;
+      const st = preciseJob.value?.status;
+      if (st !== 'partial' && st !== 'failed') return;
+      if (preciseLoading.value) return;
+      autoUpgradeCounts.set(key, (autoUpgradeCounts.get(key) || 0) + 1);
+      void upgradePrecise();
+    }, 3000);
+    autoRetryTimers.set(key, timer);
+  }
 
   function stopPrecisePoll() {
     if (pollTimer != null) {
@@ -226,6 +298,7 @@ export const useTripStore = defineStore('trip', () => {
     preciseLoading.value = false;
     preciseError.value = '';
     bestPrecise = null;
+    preciseTimedOut.value = false;
     isDemo.value = !!params.isDemo;
 
     stopsAll.value = params.stops;
@@ -273,6 +346,9 @@ export const useTripStore = defineStore('trip', () => {
         });
       });
     }
+
+    // 选车进入行程的公共路径：自动升级入口（S2）
+    maybeAutoUpgradePrecise();
   }
 
   function hydrateFromSnapshot(snap: TripSnapshot) {
@@ -281,6 +357,7 @@ export const useTripStore = defineStore('trip', () => {
     lastProgressPersistAt = 0;
     lastProgressPersistSeg = -1;
     bestPrecise = null;
+    preciseTimedOut.value = false;
     segment.value = JSON.parse(JSON.stringify(snap.segment));
     stopsAll.value = JSON.parse(JSON.stringify(snap.stopsAll));
     scenicSpots.value = JSON.parse(JSON.stringify(snap.scenicSpots));
@@ -369,6 +446,14 @@ export const useTripStore = defineStore('trip', () => {
         }, 1500);
         armClientPreciseTimeout(resumeId, epoch);
       });
+    } else if (snap.preciseStatus === 'timeout') {
+      // 超时态快照：视为可升级，新会话计数从 0 开始允许自动重试
+      preciseTimedOut.value = true;
+      canUpgradePrecise.value = true;
+      maybeAutoUpgradePrecise();
+    } else {
+      // 快照恢复后的自动升级入口（示意线 / 可升级快照）
+      maybeAutoUpgradePrecise();
     }
   }
 
@@ -393,6 +478,7 @@ export const useTripStore = defineStore('trip', () => {
     const epoch = preciseEpoch;
     preciseLoading.value = true;
     preciseError.value = '';
+    preciseTimedOut.value = false;
 
     const retryFailedOnly =
       preciseJob.value?.status === 'partial' || preciseJob.value?.status === 'failed';
@@ -436,6 +522,17 @@ export const useTripStore = defineStore('trip', () => {
     } catch (e) {
       if (epoch !== preciseEpoch) return;
       preciseLoading.value = false;
+      // S2.5：服务端队列满（BUSY）静默降级——收起状态条、保留手动按钮，不打扰旅客
+      const code = (e as { code?: string }).code;
+      const status = (e as { status?: number }).status;
+      if (code === 'BUSY' || status === 503) {
+        preciseJob.value = null;
+        preciseError.value = '';
+        canUpgradePrecise.value = true;
+        polylineHint.value =
+          railwaySource.value === 'precise' ? polylineHint.value : '示意线（服务繁忙，可稍后手动获取精准路线）';
+        return;
+      }
       preciseError.value = e instanceof Error ? e.message : '创建精确路线任务失败';
     }
   }
@@ -445,6 +542,8 @@ export const useTripStore = defineStore('trip', () => {
     const prev = preciseJob.value;
     stopPrecisePoll();
     preciseLoading.value = false;
+    // S2.3：超时态——不把截断结果固化为 partial 最终结果，可自动重试
+    preciseTimedOut.value = true;
     canUpgradePrecise.value = true;
     const ok = Math.max(prev?.segmentsOk ?? 0, bestPrecise?.segmentsOk ?? 0);
     const total = prev?.segmentsTotal || bestPrecise?.segmentsTotal || 1;
@@ -465,8 +564,8 @@ export const useTripStore = defineStore('trip', () => {
     } as RailGeometryJob);
     const msg =
       ok > 0
-        ? `部分精确 ${ok}/${total}（加载超时），已保留已加载路段，可重试缺口`
-        : '精确路线加载超时，仍为示意线，可稍后重试';
+        ? `部分精确 ${ok}/${total}（加载超时），已保留已加载路段，即将自动重试缺口`
+        : '精确路线加载超时，仍为示意线，即将自动重试';
     preciseJob.value = {
       jobId: prev?.jobId || jobId,
       status: 'partial',
@@ -487,6 +586,8 @@ export const useTripStore = defineStore('trip', () => {
     }
     preciseError.value = '';
     schedulePersist({ bumpOpenedAt: false, setResume: false });
+    // 超时也算一次未完成：延迟 3s 自动重试（计入行程键配额）
+    scheduleAutoPartialRetry();
   }
 
   function armClientPreciseTimeout(jobId: string, epoch: number) {
@@ -639,8 +740,13 @@ export const useTripStore = defineStore('trip', () => {
       canUpgradePrecise.value = true;
     }
     preciseError.value = '';
-    if (job.status === 'done' || job.status === 'partial') {
+    if (job.status === 'done') {
+      preciseTimedOut.value = false;
       schedulePersist({ bumpOpenedAt: false, setResume: false });
+    } else if (job.status === 'partial') {
+      schedulePersist({ bumpOpenedAt: false, setResume: false });
+      // S2.4：partial 且存在缺口 → 延迟 3s 自动定向重试一次（计入行程键配额）
+      scheduleAutoPartialRetry();
     }
   }
 
@@ -660,6 +766,7 @@ export const useTripStore = defineStore('trip', () => {
     preciseLoading.value = false;
     preciseError.value = '';
     isDemo.value = false;
+    preciseTimedOut.value = false;
   }
 
   return {
@@ -674,10 +781,12 @@ export const useTripStore = defineStore('trip', () => {
     preciseLoading,
     preciseError,
     isDemo,
+    preciseTimedOut,
     setTrip,
     hydrateFromSnapshot,
     applyPreciseCoords,
     upgradePrecise,
+    maybeAutoUpgradePrecise,
     stopPrecisePoll,
     flushPrecisePersist,
     clear,

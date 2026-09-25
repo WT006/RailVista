@@ -123,20 +123,20 @@ const preciseActionLabel = computed(() => {
     if (msg && !/^加载中\s+\d+\/\d+/.test(msg)) {
       return msg.endsWith('…') || msg.endsWith('...') ? msg : `${msg}…`;
     }
-    return `加载中 ${job.segmentsDone}/${job.segmentsTotal}…`;
+    return `正在生成精准路线 ${job.segmentsDone}/${job.segmentsTotal}…`;
   }
-  if (trip.preciseLoading) return '加载中…';
-  if (job?.status === 'partial') {
+  if (trip.preciseLoading) return '正在生成精准路线…';
+  if (job?.status === 'partial' || trip.preciseTimedOut) {
     if (ok > 0 && total > 0) {
-      return `部分精确 ${ratio} · 重试缺口`;
+      return `部分精确 ${ratio} · 重新获取精准路线`;
     }
-    return '重试精确路线';
+    return '重新获取精准路线';
   }
   if (job?.status === 'failed') {
-    if (ok > 0 && total > 0) return `已保留 ${ratio} · 重试`;
-    return '重试精确路线';
+    if (ok > 0 && total > 0) return `已保留 ${ratio} · 重新获取精准路线`;
+    return '重新获取精准路线';
   }
-  return '获取精确路线';
+  return '获取精准路线';
 });
 
 /** 定位文案拆成主状态 + 括号备注，避免挤在一行难读 */

@@ -14,7 +14,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
   const json = (await res.json()) as ApiResponse<T>;
   if (!json.ok) {
-    throw new Error(json.error?.message || `请求失败 ${res.status}`);
+    throw Object.assign(new Error(json.error?.message || `请求失败 ${res.status}`), {
+      code: json.error?.code,
+      status: res.status,
+    });
   }
   return json.data;
 }
@@ -61,6 +64,7 @@ export const api = {
   async getHealth(): Promise<{
     status: 'up' | 'down';
     version?: { commit: string; corridorCount: number; buildTime: string };
+    features?: { autoUpgrade: boolean };
   }> {
     try {
       const ctrl = new AbortController();
@@ -70,9 +74,14 @@ export const api = {
       const json = (await res.json()) as ApiResponse<{
         status: string;
         version?: { commit: string; corridorCount: number; buildTime: string };
+        features?: { autoUpgrade?: boolean };
       }>;
       if (json.ok && json.data?.status === 'up') {
-        return { status: 'up', version: json.data.version };
+        return {
+          status: 'up',
+          version: json.data.version,
+          features: { autoUpgrade: json.data.features?.autoUpgrade === true },
+        };
       }
       return { status: 'down' };
     } catch {

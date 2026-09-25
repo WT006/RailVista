@@ -20,8 +20,8 @@ const STORE = 'snapshots';
 const INDEX_KEY = 'railvista:recentTrips';
 const RESUME_KEY = 'railvista:autoResumeTripKey';
 
-/** partial：完成但有缺口，或加载中途已落盘的精确折线 */
-export type PreciseCacheStatus = 'done' | 'partial' | null;
+/** partial：完成但有缺口，或加载中途已落盘的精确折线；timeout：客户端硬超时，未固化结果 */
+export type PreciseCacheStatus = 'done' | 'partial' | 'timeout' | null;
 
 export type TripSnapshotPrefs = {
   departureIso: string | null;

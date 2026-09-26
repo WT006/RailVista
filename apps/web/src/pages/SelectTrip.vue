@@ -17,6 +17,7 @@ import {
 } from '../lib/tripCache';
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import ApiVersionBadge from '../components/ApiVersionBadge.vue';
+import RailProgressLoader from '../components/RailProgressLoader.vue';
 import { useTripStore } from '../stores/tripStore';
 
 const router = useRouter();
@@ -44,22 +45,17 @@ const step = ref<'search' | 'od'>('search');
 const recent = ref<TripIndexEntry[]>([]);
 const currentEntry = ref<TripIndexEntry | null>(null);
 
-const loadingCopy = computed(() => {
-  switch (loadingPhase.value) {
-    case 'search':
-      return { title: '正在查询直达车次', detail: '向 12306 拉取车次列表，通常几秒内完成' };
-    case 'stops':
-      return { title: '正在加载经停站', detail: '拉取时刻与车站坐标，请稍候' };
-    case 'enter':
-      return { title: '正在进入行程地图', detail: '整理站点与路线数据' };
-    case 'demo':
-      return { title: '正在加载演示线路', detail: 'Z8991 青藏线预置数据' };
-    case 'resume':
-      return { title: '正在恢复上次行程', detail: '从本机缓存打开' };
-    default:
-      return { title: '加载中', detail: '请稍候…' };
-  }
-});
+/** 请求序号：新请求发出后，旧请求的迟到响应一律丢弃（取消 / 重新发车用） */
+let requestSeq = 0;
+function nextSeq(): number {
+  return ++requestSeq;
+}
+function isStale(seq: number): boolean {
+  return seq !== requestSeq;
+}
+
+/** 「重新发车」要重跑的动作 */
+const retryFn = ref<(() => void) | null>(null);
 
 function beginLoading(phase: 'search' | 'stops' | 'enter' | 'demo' | 'resume') {
   loadingPhase.value = phase;
@@ -69,6 +65,17 @@ function beginLoading(phase: 'search' | 'stops' | 'enter' | 'demo' | 'resume') {
 function endLoading() {
   loading.value = false;
   loadingPhase.value = null;
+}
+
+function onRetry() {
+  const fn = retryFn.value;
+  endLoading();
+  if (fn) fn();
+}
+
+function onCancel() {
+  requestSeq += 1;
+  endLoading();
 }
 
 function defaultDate() {
@@ -243,23 +250,38 @@ async function search() {
     error.value = '请填写出发站、到达站和出发日期后再查询。';
     return;
   }
+  const seq = nextSeq();
+  retryFn.value = () => void search();
   beginLoading('search');
   trains.value = [];
   step.value = 'search';
   selected.value = null;
   try {
     const res = await api.searchTrains(from.value, to.value, date.value);
+    if (isStale(seq)) return;
     trains.value = res.trains;
-    if (!trains.value.length) error.value = '未找到直达车次，可换日期或试试演示线路。';
+    if (!trains.value.length) error.value = '这个区间暂时没有查到直达车次。';
   } catch (e) {
+    if (isStale(seq)) return;
     error.value = e instanceof Error ? e.message : '查询失败';
   } finally {
-    endLoading();
+    if (!isStale(seq)) endLoading();
   }
+}
+
+/** 空态：换一天重新查 */
+function retryWithDateShift(days: number) {
+  const base = date.value || defaultDate();
+  const d = new Date(`${base}T00:00:00+08:00`);
+  d.setDate(d.getDate() + days);
+  date.value = d.toISOString().slice(0, 10);
+  void search();
 }
 
 async function pickTrain(t: TrainSummary) {
   selected.value = t;
+  const seq = nextSeq();
+  retryFn.value = () => void pickTrain(t);
   beginLoading('stops');
   error.value = '';
   try {
@@ -270,6 +292,7 @@ async function pickTrain(t: TrainSummary) {
       to: t.to.telecode,
       date: t.date,
     });
+    if (isStale(seq)) return;
     stops.value = res.stops;
     boardFrom.value = from.value;
     boardTo.value = to.value;
@@ -286,9 +309,10 @@ async function pickTrain(t: TrainSummary) {
     }
     step.value = 'od';
   } catch (e) {
+    if (isStale(seq)) return;
     error.value = e instanceof Error ? e.message : '经停加载失败';
   } finally {
-    endLoading();
+    if (!isStale(seq)) endLoading();
   }
 }
 
@@ -484,6 +508,67 @@ const showHomeLists = computed(() => step.value === 'search' && trains.value.len
 
 const showBackBtn = computed(() => step.value === 'od' || trains.value.length > 0);
 
+/** 空态：查过但没有结果 */
+const showEmptyState = computed(
+  () => !loading.value && step.value === 'search' && trains.value.length === 0 && !!error.value,
+);
+
+/** 车次类型色条：G/D 蓝、C 青、Z/T/K 灰绿 */
+function trainKind(code: string): 'hsr' | 'intercity' | 'conventional' | 'other' {
+  const c = String(code || '').trim().toUpperCase();
+  if (/^[GD]/.test(c)) return 'hsr';
+  if (/^C/.test(c)) return 'intercity';
+  if (/^[ZTK]/.test(c)) return 'conventional';
+  return 'other';
+}
+
+/** ISO 或 HH:mm 统一取 HH:mm */
+function hm(v: string | null | undefined): string {
+  if (!v) return '';
+  const m = /T(\d{2}:\d{2})/.exec(v);
+  if (m) return m[1] as string;
+  return v.length >= 5 ? v.slice(0, 5) : v;
+}
+
+function stopoverText(s: Stop): string {
+  if (!s.arriveTime || !s.departTime) return '';
+  const ta = Date.parse(s.arriveTime);
+  const td = Date.parse(s.departTime);
+  if (!Number.isFinite(ta) || !Number.isFinite(td)) return '';
+  const min = Math.round((td - ta) / 60000);
+  return min > 0 ? `停 ${min} 分` : '';
+}
+
+/** 上下车区间在经停序列中的位置 */
+const odRange = computed(() => {
+  const names = stops.value.map((s) => s.name);
+  let iFrom = names.indexOf(boardFrom.value);
+  let iTo = names.indexOf(boardTo.value);
+  if (iFrom < 0) iFrom = 0;
+  if (iTo < 0) iTo = Math.max(0, names.length - 1);
+  if (iFrom > iTo) [iFrom, iTo] = [iTo, iFrom];
+  return { iFrom, iTo };
+});
+
+const timeline = computed(() =>
+  stops.value.map((s, i) => ({
+    name: s.name,
+    seq: s.seq,
+    arrive: hm(s.arriveTime),
+    depart: hm(s.departTime),
+    stopover: stopoverText(s),
+    dayOffset: s.dayOffset ?? 0,
+    inRange: i >= odRange.value.iFrom && i <= odRange.value.iTo,
+    isBoard: i === odRange.value.iFrom,
+    isAlight: i === odRange.value.iTo,
+  })),
+);
+
+const tripDurationHint = computed(() => {
+  const t = selected.value;
+  return t?.duration ? `历时 ${t.duration}` : '';
+});
+
 function goBack() {
   if (loading.value) return;
   if (step.value === 'od') {
@@ -626,7 +711,19 @@ function goBack() {
       </div>
     </form>
 
-    <p v-if="error" class="error">{{ error }}</p>
+    <p v-if="error && !showEmptyState" class="error">{{ error }}</p>
+
+    <section v-if="showEmptyState" class="empty-state">
+      <p class="empty-state__title">这个区间暂时没有查到直达车次</p>
+      <p class="empty-state__desc">可以换一天看看，或者先体验青藏线 demo。</p>
+      <div class="empty-state__actions">
+        <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(-1)">
+          前一天
+        </button>
+        <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(1)">后一天</button>
+        <button type="button" class="btn primary btn-sm" @click="loadDemo">试试演示线路</button>
+      </div>
+    </section>
 
     <section v-if="recent.length && showHomeLists" class="recent-list">
       <h2>最近访问</h2>
@@ -654,52 +751,363 @@ function goBack() {
     </section>
 
     <section v-if="trains.length && step === 'search'" class="train-list">
-      <h2>直达车次</h2>
-      <button
-        v-for="t in trains"
-        :key="t.trainNo + t.departTime"
-        type="button"
-        class="train-card"
-        :disabled="loading"
-        @click="pickTrain(t)"
-      >
-        <strong>{{ t.trainCode }}</strong>
-        <span>{{ t.departTime }} → {{ t.arriveTime }}</span>
-        <span class="muted">{{ t.from.name }} → {{ t.to.name }} · 历时 {{ t.duration }}</span>
-      </button>
+      <h2 class="train-list__title">
+        直达车次
+        <span class="train-list__count">{{ trains.length }} 趟</span>
+      </h2>
+      <div class="train-grid">
+        <button
+          v-for="(t, i) in trains"
+          :key="t.trainNo + t.departTime"
+          type="button"
+          class="train-card"
+          :class="`train-card--${trainKind(t.trainCode)}`"
+          :style="{ '--i': Math.min(i, 8) }"
+          :disabled="loading"
+          @click="pickTrain(t)"
+        >
+          <span class="train-card__code">{{ t.trainCode }}</span>
+          <span class="train-card__time">
+            <span>{{ t.departTime }}</span>
+            <span class="train-card__arrow" aria-hidden="true">→</span>
+            <span>{{ t.arriveTime }}</span>
+          </span>
+          <span class="train-card__meta">
+            {{ t.from.name }} → {{ t.to.name }}
+            <template v-if="t.duration"> · 历时 {{ t.duration }}</template>
+          </span>
+        </button>
+      </div>
     </section>
 
     <section v-if="step === 'od' && selected" class="od-panel">
       <h2>确认上下车站</h2>
-      <p class="muted">{{ selected.trainCode }} · {{ selected.date }}</p>
-      <label>
-        <span>上车站</span>
-        <select v-model="boardFrom">
-          <option v-for="n in odOptions" :key="'f' + n" :value="n">{{ n }}</option>
-        </select>
-      </label>
-      <label>
-        <span>下车站</span>
-        <select v-model="boardTo">
-          <option v-for="n in odOptions" :key="'t' + n" :value="n">{{ n }}</option>
-        </select>
-      </label>
-      <button type="button" class="btn primary" :disabled="loading" @click="enterTrip">
-        进入行程地图
-      </button>
-      <button type="button" class="btn ghost" :disabled="loading" @click="step = 'search'">
-        返回列表
-      </button>
+      <p class="muted">
+        {{ selected.trainCode }} · {{ selected.date }}
+        <template v-if="tripDurationHint"> · {{ tripDurationHint }}</template>
+      </p>
+      <div class="od-panel__pick">
+        <label>
+          <span>上车站</span>
+          <select v-model="boardFrom">
+            <option v-for="n in odOptions" :key="'f' + n" :value="n">{{ n }}</option>
+          </select>
+        </label>
+        <label>
+          <span>下车站</span>
+          <select v-model="boardTo">
+            <option v-for="n in odOptions" :key="'t' + n" :value="n">{{ n }}</option>
+          </select>
+        </label>
+      </div>
+
+      <ol class="tl">
+        <li
+          v-for="s in timeline"
+          :key="s.seq + s.name"
+          class="tl__item"
+          :class="{
+            'is-range': s.inRange,
+            'is-board': s.isBoard,
+            'is-alight': s.isAlight,
+          }"
+        >
+          <span class="tl__dot" aria-hidden="true" />
+          <span class="tl__name">{{ s.name }}</span>
+          <span class="tl__time">
+            <template v-if="s.arrive && s.depart">{{ s.arrive }} / {{ s.depart }}</template>
+            <template v-else-if="s.depart">{{ s.depart }} 发</template>
+            <template v-else-if="s.arrive">{{ s.arrive }} 到</template>
+          </span>
+          <span v-if="s.stopover" class="tl__stop">{{ s.stopover }}</span>
+          <span v-if="s.dayOffset > 0" class="tl__day">+{{ s.dayOffset }}天</span>
+        </li>
+      </ol>
+
+      <div class="od-panel__actions">
+        <button type="button" class="btn primary" :disabled="loading" @click="enterTrip">
+          进入行程地图
+        </button>
+        <button type="button" class="btn ghost" :disabled="loading" @click="step = 'search'">
+          返回列表
+        </button>
+      </div>
     </section>
 
     <p class="footnote">时刻数据来自公开查询，仅供参考。行程缓存在本机浏览器。</p>
 
-    <div v-if="loading" class="select-loading" role="status" aria-live="polite" aria-busy="true">
-      <div class="select-loading__card">
-        <div class="select-loading__spinner" aria-hidden="true" />
-        <p class="select-loading__title">{{ loadingCopy.title }}</p>
-        <p class="select-loading__detail">{{ loadingCopy.detail }}</p>
-      </div>
-    </div>
+    <RailProgressLoader
+      :active="loading"
+      :phase="loadingPhase"
+      @retry="onRetry"
+      @cancel="onCancel"
+    />
   </div>
 </template>
+
+<style scoped>
+/* ── 车次列表：自适应网格 + 类型色条 + 入场错峰 ── */
+.train-list__title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.train-list__count {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.train-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.train-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+  padding: 13px 14px 13px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(15, 23, 42, 0.72);
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+  overflow: hidden;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.train-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #94a3b8;
+}
+
+.train-card--hsr::before {
+  background: #38bdf8;
+}
+
+.train-card--intercity::before {
+  background: #22d3ee;
+}
+
+.train-card--conventional::before {
+  background: #94a3b8;
+}
+
+.train-card--other::before {
+  background: #64748b;
+}
+
+.train-card:hover:not(:disabled) {
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(30, 41, 59, 0.78);
+}
+
+.train-card:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.train-card:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.train-card__code {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #f1f5f9;
+}
+
+.train-card__time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #e2e8f0;
+  font-variant-numeric: tabular-nums;
+}
+
+.train-card__arrow {
+  color: #64748b;
+  font-weight: 400;
+}
+
+.train-card__meta {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .train-card {
+    animation: tc-in 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+}
+
+@keyframes tc-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── 空态 ── */
+.empty-state {
+  max-width: 560px;
+  margin: 0 auto 14px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.5);
+  text-align: center;
+}
+
+.empty-state__title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.empty-state__desc {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.empty-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ── 经停时间轴 ── */
+.od-panel__pick {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 10px 0 4px;
+}
+
+.tl {
+  list-style: none;
+  margin: 14px 0 4px;
+  padding: 4px 0 4px 18px;
+  position: relative;
+  max-height: 46vh;
+  overflow-y: auto;
+}
+
+.tl::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  border-radius: 2px;
+  background: rgba(148, 163, 184, 0.25);
+}
+
+.tl__item {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 0;
+  color: #94a3b8;
+  transition: color 0.18s ease;
+}
+
+.tl__dot {
+  position: absolute;
+  left: -18px;
+  top: 11px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #334155;
+  border: 2px solid #0f172a;
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tl__item.is-range {
+  color: #e2e8f0;
+}
+
+.tl__item.is-range .tl__dot {
+  background: #38bdf8;
+}
+
+.tl__item.is-board .tl__dot,
+.tl__item.is-alight .tl__dot {
+  background: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+}
+
+.tl__name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tl__time {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: #7dd3fc;
+}
+
+.tl__item:not(.is-range) .tl__time {
+  color: #64748b;
+}
+
+.tl__stop,
+.tl__day {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.16);
+  color: #94a3b8;
+}
+
+.tl__day {
+  background: rgba(251, 191, 36, 0.16);
+  color: #fbbf24;
+}
+
+.od-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+@media (max-width: 560px) {
+  .train-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tl {
+    max-height: 40vh;
+  }
+}
+</style>

@@ -1,7 +1,7 @@
 {
-  "version": 1,
-  "updated": "2026-09-18",
-  "note": "策展+校准：具名钉本体，大面积适当靠轨；patches 见 scenic-spot-calibration-patches.json。规范 docs/scenic-spots-spec.md / scenic-spots-location-verify.md；2026-09-18 审查 A/B/D 已回写",
+  "version": 3,
+  "updated": "2026-09-27",
+  "note": "v3 纯扩展：六维分类/线路归属/左右侧/时段/可核验来源；v2 老数据语义不变（docs/scenic-schema-v3.md）。patches 见 scenic-spot-calibration-patches.json",
   "spots": [
     {
       "id": "qinghai-lake",
@@ -4116,6 +4116,839 @@
       "source": "curated",
       "maxDistKm": 4,
       "category": "other"
+    },
+    {
+      "id": "xiangshawan-dunes",
+      "name": "响沙湾沙丘（库布齐沙漠东端）",
+      "lng": 109.927,
+      "lat": 40.243,
+      "intro": "库布齐沙漠东端的百米月牙沙山，包西线包头至达拉特西段右侧沙带贴窗掠过，列车在沙丘间穿行约十分钟，5—10月晴日沙色最亮。",
+      "visibility": "window",
+      "source": "ai_reviewed",
+      "maxDistKm": 3,
+      "category": "desert",
+      "viewScale": "near",
+      "viewMinutes": 8,
+      "dimensions": [
+        "geo"
+      ],
+      "subtype": "desert_gobi",
+      "tags": [
+        "库布齐沙漠",
+        "沙丘",
+        "5A景区",
+        "响沙"
+      ],
+      "bestView": {
+        "months": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "5—10月风沙较小；雨后沙不鸣，连续晴日沙色最亮"
+      },
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "https://www.ixsw.cn/xsw/about/about-1.html",
+          "quote": "中国AAAAA级旅游景区，坐落在达拉特旗的库布其沙漠中",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "news",
+          "level": "B",
+          "ref": "https://m.thepaper.cn/newsDetail_forward_4976736",
+          "quote": "响沙湾站处于库布齐沙漠，是包西线五大装车基地之一",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "http://www.bigemap.net/city-6137.html",
+          "quote": "经度109.956058 纬度40.244043（GCJ-02，已转WGS84）",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "景区官网+铁路官方可见性+GCJ02转WGS84+走廊投影1.9km"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "right",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 43.8,
+          "distKm": 1.9,
+          "alongKmTo": 48,
+          "nearStations": [
+            "达拉特西",
+            "东胜西"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
+    },
+    {
+      "id": "maowusu-sandy-land",
+      "name": "毛乌素沙地（鄂尔多斯—榆林段）",
+      "lng": 109.8829,
+      "lat": 39.3009,
+      "intro": "鄂尔多斯至榆林段列车纵贯毛乌素沙地，窗下沙柳、樟子松固沙林与金黄沙丘交错，塞北地貌连绵约半小时，夏秋绿意最盛。",
+      "visibility": "window",
+      "source": "ai_reviewed",
+      "maxDistKm": 8,
+      "category": "desert",
+      "viewScale": "mid",
+      "viewMinutes": 30,
+      "dimensions": [
+        "geo"
+      ],
+      "subtype": "desert_gobi",
+      "tags": [
+        "毛乌素沙地",
+        "治沙生态",
+        "沙柳樟子松"
+      ],
+      "bestView": {
+        "months": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "夏秋固沙林绿意与沙丘对比最强"
+      },
+      "sources": [
+        {
+          "type": "news",
+          "level": "B",
+          "ref": "http://8.134.116.66:8060/Content-36569.html",
+          "quote": "跨越毛乌素沙漠、陕北黄土高原和关中平原三个截然不同的地理环境",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "https://www.sxsm.gov.cn/xwzx/tzgg/202210/t20221014_1073363.html",
+          "quote": "在毛乌素沙地东缘风沙区相对低洼处",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "官方开通稿确认穿行+地貌代表点贴走廊选取，投影3.1km"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "left",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 150,
+          "distKm": 3.1,
+          "alongKmTo": 165,
+          "nearStations": [
+            "鄂尔多斯",
+            "榆林"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
+    },
+    {
+      "id": "hongjiannao-lake",
+      "name": "红碱淖",
+      "lng": 109.91,
+      "lat": 39.105,
+      "intro": "中国最大沙漠淡水湖在铁路右侧铺展，鄂尔多斯至榆林段右侧可望蓝湖嵌于沙海，4—8月遗鸥栖息，晨昏鸟群起落最壮观。",
+      "visibility": "window",
+      "source": "ai_reviewed",
+      "maxDistKm": 12,
+      "category": "lake",
+      "viewScale": "mid",
+      "viewMinutes": 10,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "subtype": "lake",
+      "tags": [
+        "沙漠淡水湖",
+        "国家级自然保护区",
+        "国家重要湿地",
+        "遗鸥"
+      ],
+      "bestView": {
+        "months": [
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "4—8月遗鸥繁殖期，晨昏鸟群起落最壮观"
+      },
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "https://www.sxsm.gov.cn/xwzx/tzgg/202210/t20221014_1073363.html",
+          "quote": "地理坐标北纬39°04′—39°08′，东经109°50′—109°56′",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "news",
+          "level": "B",
+          "ref": "https://www.news.cn/ci/20260319/45429a25695f4f9085fe894baa7fe3a2/c.html",
+          "quote": "中国最大的沙漠淡水湖，4-8月遗鸥在这里繁衍生息",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "news",
+          "level": "B",
+          "ref": "http://sn.people.com.cn/n2/2024/0927/c226647-40991772.html",
+          "quote": "全球最大的遗鸥繁殖栖息地；2023年11月列为国家重要湿地",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "政府公告湖域坐标框内选近轨代表点+新华网/人民网独立二源"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "right",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 171.6,
+          "distKm": 8.4,
+          "nearStations": [
+            "中鸡",
+            "神木西"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
+    },
+    {
+      "id": "zhenbeitai-great-wall",
+      "name": "镇北台（万里长城第一台）",
+      "lng": 109.7292,
+      "lat": 38.3397,
+      "intro": "万里长城第一台矗立榆林城北红山，鄂尔多斯至榆林段左侧晴空可远眺三十米高方形墩台，空气通透的秋冬最清晰。",
+      "visibility": "distant",
+      "source": "ai_reviewed",
+      "category": "other",
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "dimensions": [
+        "history"
+      ],
+      "subtype": "great_wall",
+      "tags": [
+        "明长城",
+        "全国重点文保",
+        "万里长城第一台",
+        "世界文化遗产"
+      ],
+      "bestView": {
+        "months": [
+          3,
+          4,
+          5,
+          9,
+          10,
+          11
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "晴好空气通透时远眺；秋冬晨昏墩台轮廓最清晰"
+      },
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "http://wwj.shaanxi.gov.cn/wbxx/bkydww/wwbhdw/index_77.html",
+          "quote": "5-0442-3-248-8 镇北台 明 榆阳区 国保 第五批",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "academic",
+          "level": "B",
+          "ref": "https://greatwallforum.com/location-shaanxi-zhenbeitai.html",
+          "quote": "Coordinates: 38°20′23″N 109°43′45″E，about 6.5km north of Yulin",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "news",
+          "level": "B",
+          "ref": "https://toutiao.cnwest.com/data/sxtt/share/news/2025/12/15/content_2950594.html",
+          "quote": "2001年6月国务院公布镇北台为第五批全国重点文物保护单位",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "S级国保名录+独立WGS坐标交叉；政府页转载DMS坐标系错误，未采用"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "left",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 271,
+          "distKm": 21.9,
+          "nearStations": [
+            "鄂尔多斯",
+            "榆林"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
+    },
+    {
+      "id": "hongshi-gorge-yulin",
+      "name": "红石峡（塞上碑林）",
+      "lng": 109.717,
+      "lat": 38.3355,
+      "intro": "榆林城北榆溪河切出的红石峡谷，镇北台南侧，鄂尔多斯至榆林段左侧远眺红岩夹河，塞上碑林摩崖与长城相连。",
+      "visibility": "distant",
+      "source": "ai_reviewed",
+      "category": "gorge",
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "history"
+      ],
+      "subtype": "gorge",
+      "tags": [
+        "摩崖石刻",
+        "塞上碑林",
+        "榆溪河",
+        "陕西省文保"
+      ],
+      "bestView": {
+        "months": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "晴日红岩与峡口林带可辨"
+      },
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "https://yl.gov.cn/mlyl/zjyl/fjms/201902/t20190213_17513.html",
+          "quote": "榆林城北三公里，榆溪河穿峡而过，东西两崖题刻达160多块",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "https://ditu.amap.com/place/B039000014",
+          "quote": "地理坐标：38.336034,109.722622（GCJ-02，已转WGS84）",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "B",
+          "ref": "https://yuyang.gov.cn/zfxxgk/fdzdgknr/shgysyjs/wrfz/202108/P020240725384494862714.pdf",
+          "quote": "建设地块位于红石峡遗址南、镇北台遗址西",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "政府景区资料+高德POI（GCJ转WGS84）+政府环评交叉"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "left",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 271,
+          "distKm": 22,
+          "nearStations": [
+            "鄂尔多斯",
+            "榆林"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
+    },
+    {
+      "id": "loess-plateau-gullies",
+      "name": "黄土高原梁峁沟壑（子长—延安段）",
+      "lng": 109.0768,
+      "lat": 37.5385,
+      "intro": "子长至延安段列车穿行黄土高原梁峁沟壑，窑洞、梯田与千沟万壑在两窗层叠，雨后或日落时梁峁明暗最富层次。",
+      "visibility": "window",
+      "source": "ai_reviewed",
+      "maxDistKm": 8,
+      "category": "grassland",
+      "viewScale": "mid",
+      "viewMinutes": 50,
+      "dimensions": [
+        "geo"
+      ],
+      "subtype": "plain_basin",
+      "tags": [
+        "黄土高原",
+        "梁峁沟壑",
+        "梯田窑洞"
+      ],
+      "bestView": {
+        "months": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "雨后放晴或日落时梁峁明暗层次最丰富"
+      },
+      "sources": [
+        {
+          "type": "news",
+          "level": "B",
+          "ref": "http://8.134.116.66:8060/Content-36569.html",
+          "quote": "跨越毛乌素沙漠、陕北黄土高原和关中平原三个地理环境",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "http://snsm.mnr.gov.cn/uploadfile/20130724/20130724173652697.pdf",
+          "quote": "陕西省地貌分类；陕北、关中、陕南分布及区域面积",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "官方开通稿确认穿行黄土高原；代表点贴走廊选于真实梁峁区"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "left",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 430,
+          "distKm": 2.5,
+          "alongKmTo": 480,
+          "nearStations": [
+            "子长",
+            "延安"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
+    },
+    {
+      "id": "yan-river-yanan",
+      "name": "延河（延安入城段）",
+      "lng": 109.5104,
+      "lat": 36.6145,
+      "intro": "延河在延安城边与南川河汇流，列车入城前沿河谷行进，左侧近窗可见河滩柳林与三山夹峙谷地，晨昏光影最佳。",
+      "visibility": "window",
+      "source": "ai_reviewed",
+      "maxDistKm": 8,
+      "category": "gorge",
+      "viewScale": "near",
+      "viewMinutes": 8,
+      "dimensions": [
+        "geo"
+      ],
+      "subtype": "river",
+      "tags": [
+        "延河",
+        "黄土河谷",
+        "三山二水"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "晨昏河谷光影好，冬季结冰另有一色"
+      },
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "https://www.yanan.gov.cn/gk/fdzdgknr/shgy/wtly/yzya/zmjd/1570765644759146498.html",
+          "quote": "山下延河与南川河合流东去，三山鼎峙，二水合流",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "news",
+          "level": "B",
+          "ref": "http://union.china.com.cn/zhuanti/txt/2018-12/18/content_40617777.html",
+          "quote": "宝塔山与凤凰山、清凉山鼎足而立，山下延河与南川河合流东去",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "政府/媒体确认河流与城轨关系；河槽近轨点0.8km"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "left",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 545,
+          "distKm": 0.8,
+          "alongKmTo": 552,
+          "nearStations": [
+            "延安"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
+    },
+    {
+      "id": "baota-pagoda-yanan",
+      "name": "宝塔山（岭山寺塔）",
+      "lng": 109.49,
+      "lat": 36.5958,
+      "intro": "革命圣地标志岭山寺塔雄踞延安城东嘉岭山巅，列车进延安段右侧近窗可见九层唐塔约五分钟，入夜亮灯亦醒目。",
+      "visibility": "window",
+      "source": "ai_reviewed",
+      "maxDistKm": 3,
+      "category": "other",
+      "viewScale": "near",
+      "viewMinutes": 5,
+      "dimensions": [
+        "history",
+        "architecture"
+      ],
+      "subtype": "revolutionary",
+      "tags": [
+        "延安革命旧址",
+        "岭山寺塔",
+        "革命圣地标志",
+        "全国重点文保"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "any",
+        "light": "any",
+        "note": "入城段全天可见，夜间宝塔山体亮灯亦醒目"
+      },
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "http://jingqu.yagmjnd.gov.cn/WebFE/web/scenic.aspx",
+          "quote": "宝塔是革命圣地延安的标志和象征；1996年公布为全国重点文物保护单位",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "https://wlj.yanan.gov.cn/zjya/lyjq/1570765644759146498.html",
+          "quote": "宝塔山位于延安城东，延河之滨；岭山寺塔八角九级高约44米",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "https://map.bmcx.com/baotashan__map/",
+          "quote": "109.495356,36.595922（腾讯地图GCJ-02，已转WGS84）",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "S级国保+政府景区+GCJ02转WGS84；投影0.7km"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "right",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 547.4,
+          "distKm": 0.7,
+          "nearStations": [
+            "延安"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
+    },
+    {
+      "id": "huangdi-mausoleum-qiaoshan",
+      "name": "黄帝陵（桥山）",
+      "lng": 109.2661,
+      "lat": 35.5856,
+      "intro": "天下第一陵在黄陵县城北桥山，富县东至蒲城东段右侧远眺，可见桥山八万株古柏凝成的墨绿山块，四季常青。",
+      "visibility": "distant",
+      "source": "ai_reviewed",
+      "category": "other",
+      "viewScale": "far",
+      "viewMinutes": 5,
+      "dimensions": [
+        "history"
+      ],
+      "subtype": "ruins_site",
+      "tags": [
+        "黄帝陵",
+        "古墓葬第一号",
+        "桥山古柏",
+        "5A景区",
+        "公祭"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "桥山八万株古柏四季常青；清明公祭期与秋冬柏色最显"
+      },
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "http://www.huangling.gov.cn/zjhl/hlly/1556482848049885185.html",
+          "quote": "第一批全国重点文物保护单位，编为古墓葬第一号，第一批5A级景区",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "https://www.sxlib.org.cn/dfzy/sxdwljgb/dwlgs/yhdl/201704/t20170426_699856.html",
+          "quote": "位于黄陵县城北1公里处的桥山之巅，北纬35°34′东经109°15′",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "http://www.bigemap.net/city-16991.html",
+          "quote": "109.271227,35.585284（GCJ-02，已转WGS84）",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "verified",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "S级国保+省文物局资料+GCJ02转WGS84；投影12.4km远眺"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "right",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 658.8,
+          "distKm": 12.4,
+          "nearStations": [
+            "黄陵南",
+            "富县东"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
+    },
+    {
+      "id": "guanzhong-plain",
+      "name": "关中平原（蒲城东—西安段）",
+      "lng": 109.4178,
+      "lat": 34.7022,
+      "intro": "黄陵以南列车下塬进入关中平原，蒲城东至西安段两侧麦田果园与村落平铺天际，5、6月麦黄与秋收季最鲜明。",
+      "visibility": "window",
+      "source": "ai_reviewed",
+      "maxDistKm": 8,
+      "category": "grassland",
+      "viewScale": "far",
+      "viewMinutes": 35,
+      "dimensions": [
+        "geo"
+      ],
+      "subtype": "plain_basin",
+      "tags": [
+        "关中平原",
+        "渭北田园",
+        "麦田果园"
+      ],
+      "bestView": {
+        "months": [
+          5,
+          6,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "5、6月麦黄与9、10月秋收季田野色块最鲜明"
+      },
+      "sources": [
+        {
+          "type": "news",
+          "level": "B",
+          "ref": "http://8.134.116.66:8060/Content-36569.html",
+          "quote": "跨越毛乌素沙漠、陕北黄土高原和关中平原三个地理环境",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "http://xadfz.xa.gov.cn/xadq/xagk/sqjj/2048647687336742914.html",
+          "quote": "西安市位于黄河流域中部关中平原",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "官方开通稿+地方志确认；平原代表点贴走廊选取"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "left",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 770,
+          "distKm": 2.6,
+          "alongKmTo": 820,
+          "nearStations": [
+            "蒲城东",
+            "西安"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
+    },
+    {
+      "id": "xian-city-wall-jiefang",
+      "name": "西安城墙（解放门·火车站北墙段）",
+      "lng": 108.9585,
+      "lat": 34.2763,
+      "intro": "中国现存最完整明城垣，列车抵西安站前贴北墙滑行，左侧解放门桥拱城墙迎面而来，是坐火车进西安第一门。",
+      "visibility": "window",
+      "source": "ai_reviewed",
+      "maxDistKm": 3,
+      "category": "other",
+      "viewScale": "near",
+      "viewMinutes": 4,
+      "dimensions": [
+        "architecture"
+      ],
+      "subtype": "historic_building",
+      "tags": [
+        "西安城墙",
+        "第一批国保",
+        "解放门",
+        "桥型城墙",
+        "西安站"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "any",
+        "light": "any",
+        "note": "K4161约傍晚抵西安，城墙亮灯时段最醒目"
+      },
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "https://wwj.shaanxi.gov.cn/wbxx/bkydww/wwbhdw/index.html",
+          "quote": "1-0104-3-057 西安城墙 明 国保 第一批",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "news",
+          "level": "B",
+          "ref": "http://culture.people.com.cn/n/2015/0306/c172318-26650715.html",
+          "quote": "2004年12月最后一个豁口即西安火车站广场处通过桥型城墙连接",
+          "checkedAt": "2026-09-27"
+        },
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "http://www.chinaxiancitywall.com/list.php?cid=42&pid=2",
+          "quote": "解放门1934年因陇海铁路建西安火车站而新辟，2004年成桥拱形城门",
+          "checkedAt": "2026-09-27"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-09-27",
+        "checkedBy": "ai+2026-09-v3-batch1",
+        "method": "国保+人民网+城墙官网确认车站贴北墙；点位据官方相对位置标定"
+      },
+      "reviewedAt": "2026-09-27",
+      "reviewRound": "2026-09-v3-batch1",
+      "side": "left",
+      "lines": [
+        {
+          "corridorId": "baoxi",
+          "alongKmFrom": 836.9,
+          "distKm": 0.5,
+          "nearStations": [
+            "西安"
+          ]
+        }
+      ],
+      "sideRefDirection": "line_forward",
+      "status": "active"
     },
     {
       "id": "siberian-tiger-park-harbin",

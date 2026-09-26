@@ -10,7 +10,30 @@ export const SCENIC_DEFAULT_MAX_DIST_KM: Record<SpotVisibility, number> = {
 
 export type ScenicSpotInput = Pick<
   ScenicSpot,
-  'id' | 'name' | 'lng' | 'lat' | 'intro' | 'visibility' | 'maxDistKm' | 'category' | 'nightOnly' | 'side' | 'source'
+  | 'id'
+  | 'name'
+  | 'lng'
+  | 'lat'
+  | 'intro'
+  | 'visibility'
+  | 'maxDistKm'
+  | 'category'
+  | 'nightOnly'
+  | 'side'
+  | 'source'
+  | 'viewScale'
+  | 'viewMinutes'
+  | 'dimensions'
+  | 'subtype'
+  | 'tags'
+  | 'lines'
+  | 'sideRefDirection'
+  | 'bestView'
+  | 'sources'
+  | 'verification'
+  | 'reviewedAt'
+  | 'reviewRound'
+  | 'status'
 >;
 
 function maxDistFor(spot: ScenicSpotInput): number {
@@ -53,6 +76,20 @@ export function filterSpotsAlongRailway(
       distKm: Math.round(proj.distKm * 100) / 100,
       progressKm: Math.round(proj.progress * lengthKm * 100) / 100,
       source: spot.source || 'curated',
+      // v3 扩展字段原样透传（v2 数据为 undefined，读取端按可选处理）
+      viewScale: spot.viewScale,
+      viewMinutes: spot.viewMinutes,
+      dimensions: spot.dimensions,
+      subtype: spot.subtype,
+      tags: spot.tags,
+      lines: spot.lines,
+      sideRefDirection: spot.sideRefDirection,
+      bestView: spot.bestView,
+      sources: spot.sources,
+      verification: spot.verification,
+      reviewedAt: spot.reviewedAt,
+      reviewRound: spot.reviewRound,
+      status: spot.status,
     });
   }
 

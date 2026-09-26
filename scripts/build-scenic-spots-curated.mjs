@@ -3913,6 +3913,87 @@ spots.push(
   }),
 );
 
+// —— 补充批次 2026-09-27：风景高铁线 + 高校窗景（坐标核真，公开资料可查）——
+spots.push(
+  spot({
+    id: 'mogao-grottoes-dunhuang',
+    name: '莫高窟',
+    lng: 94.8097,
+    lat: 40.0421,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 30,
+    intro:
+      '敦煌东南 25 公里鸣沙山东麓，中国石窟艺术巅峰；列车入敦煌段可远眺鸣沙山，莫高窟在其山麓。',
+  }),
+  spot({
+    id: 'mingsha-mountain-dunhuang',
+    name: '鸣沙山月牙泉',
+    lng: 94.669,
+    lat: 40.089,
+    visibility: 'distant',
+    category: 'desert',
+    maxDistKm: 6,
+    intro:
+      '敦煌城南 5 公里沙山与清泉共生的奇观，月牙泉嵌于沙山之间，列车入敦煌段右侧可望沙山轮廓。',
+  }),
+  spot({
+    id: 'jiayuguan-great-wall',
+    name: '嘉峪关关城',
+    lng: 98.2894,
+    lat: 39.8018,
+    visibility: 'distant',
+    category: 'other',
+    maxDistKm: 12,
+    intro:
+      '明长城西端第一关「天下雄关」，兰新线嘉峪关站北侧可远眺，关城在戈壁与祁连雪山之间独立，雄浑醒目。',
+  }),
+  spot({
+    id: 'hutiao-gorge',
+    name: '虎跳峡',
+    lng: 100.0946,
+    lat: 27.2572,
+    visibility: 'distant',
+    category: 'gorge',
+    maxDistKm: 30,
+    intro:
+      '金沙江深切玉龙雪山与哈巴雪山之间的世界最深峡谷之一；丽香铁路跨金沙江特大桥即在其下游，车过大桥左窗可望峡谷奔流。',
+  }),
+  spot({
+    id: 'lashihai-wetland',
+    name: '拉市海',
+    lng: 100.1342,
+    lat: 26.8608,
+    visibility: 'window',
+    category: 'lake',
+    maxDistKm: 8,
+    intro:
+      '丽江拉市海高原湿地，候鸟越冬地；丽香铁路穿拉市海西侧，左侧车窗外可见湖水与候鸟群起。',
+  }),
+  spot({
+    id: 'wuyi-mountain-distant',
+    name: '武夷山（远眺）',
+    lng: 117.9959,
+    lat: 27.7261,
+    visibility: 'distant',
+    category: 'mountain',
+    maxDistKm: 15,
+    intro:
+      '世界双遗产，合福高铁经武夷山北站，左窗可望丹霞峰林与九曲溪方向；晴日峰影连绵，雨后云海尤为壮观。',
+  }),
+  spot({
+    id: 'sichuan-university-jiangan',
+    name: '四川大学江安校区',
+    lng: 104.0064,
+    lat: 30.5589,
+    visibility: 'window',
+    category: 'other',
+    maxDistKm: 4,
+    intro:
+      '四川大学江安校区现代化校园，占地 3400 亩；成贵高铁成都东站出站后左侧可见校园建筑群与湖面景观。',
+  }),
+);
+
 // —— V2 审查核真补录（2026-09-18，仅收录已核坐标）——
 spots.push(
   spot({

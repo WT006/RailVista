@@ -19,7 +19,12 @@ import {
   shiftDate,
   toDatetimeLocalValue,
   fromDatetimeLocalValue,
+  approachWindow,
+  honorLabels,
+  withinApproach,
   type CalibrationRecord,
+  type ScenicSpot,
+  type SpotSide,
   type Stop,
 } from '@railvista/shared';
 import { api } from '../api/client';
@@ -34,6 +39,8 @@ import {
 import { loadAmap } from '../map/amap';
 import { readSimulatedProgress, useGeolocation, useNow } from '../composables/useGeolocation';
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
+import SideBadge from '../components/SideBadge.vue';
+import SpotApproachCard from '../components/SpotApproachCard.vue';
 import { usePrefsStore } from '../stores/prefsStore';
 import { useTripStore } from '../stores/tripStore';
 
@@ -104,6 +111,44 @@ const schedule = computed(() => {
   if (!seg) return null;
   return resolveSchedule(seg.baseDepartureIso, seg.baseArrivalIso, prefs.departureIso);
 });
+
+/** 列车当前里程（沿本次行程折线），用于临近景点判定 */
+const currentKm = computed(() => progress.value * pathMetrics.lengthKm);
+
+/**
+ * 当前处于「临近窗口」内的景点：进入点前 5km 起提示，过境 2km 后淡出（§4.3）。
+ * 多个同时命中时取最先到达的那个。
+ */
+const approachingSpot = computed<ScenicSpot | null>(() => {
+  if (!prefs.layers.spot) return null;
+  const list = trip.scenicSpots;
+  if (!list?.length) return null;
+  const km = currentKm.value;
+  for (const s of list) {
+    const enterKm = s.progressKm ?? 0;
+    if (withinApproach(approachWindow({ alongKm: enterKm }), km)) return s;
+  }
+  return null;
+});
+
+/** 图例用：左右侧含义说明 */
+const SIDE_LEGEND: Array<{ side: SpotSide; text: string }> = [
+  { side: 'left', text: '列车左侧' },
+  { side: 'right', text: '列车右侧' },
+  { side: 'both', text: '两侧均可' },
+];
+
+/**
+ * 地图标记配色用的侧别键（§4.6）。与 SideBadge 保持一致：
+ * 「两侧均可」但垂距 > 8km 时按「待确认」的灰色虚线处理。
+ */
+function spotSideKey(spot: ScenicSpot): SpotSide {
+  if (spot.sideNeedsReview) return 'unknown';
+  const s = spot.sideRuntime ?? spot.side;
+  const base: SpotSide = s && s !== 'unknown' ? s : 'unknown';
+  if (base === 'both' && (spot.distKm ?? 0) > 8) return 'unknown';
+  return base;
+}
 
 const showPreciseAction = computed(() => {
   if (trip.preciseLoading) return true;
@@ -517,12 +562,13 @@ async function initMap() {
     map.add(railLine);
   }
 
-  spotMarkers = trip.scenicSpots.map((spot, idx) => {
+spotMarkers = trip.scenicSpots.map((spot, idx) => {
+    const sideKey = spotSideKey(spot);
     const marker = new AMap.Marker({
       position: [spot.lng, spot.lat],
       title: spot.name,
       anchor: 'bottom-center',
-      content: `<div class="spot-marker${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
+      content: `<div class="spot-marker spot-marker--${sideKey}${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
     });
     marker.on('click', () => {
       const visLabel =
@@ -540,7 +586,22 @@ async function initMap() {
       const timeLabel = spot.at
         ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
         : spot.timeLabel || '';
+      const sideBadgeHtml = (() => {
+        const key = spotSideKey(spot);
+        const text =
+          key === 'left' ? '列车左侧' : key === 'right' ? '列车右侧' : key === 'both' ? '两侧均可' : '方位待确认';
+        const arrow = key === 'left' ? '←' : key === 'right' ? '→' : key === 'both' ? '↔' : '?';
+        return `<span class="map-info-card__badge map-info-card__badge--side map-info-card__badge--side-${key}">${arrow} ${text}</span>`;
+      })();
+      const honors = honorLabels(spot.honors);
+      const honorHtml = honors.length
+        ? `<div class="map-info-card__honors">${honors
+            .slice(0, 4)
+            .map((h) => `<span class="map-info-card__honor">${escHtml(h)}</span>`)
+            .join('')}${honors.length > 4 ? `<span class="map-info-card__honor map-info-card__honor--more">+${honors.length - 4}</span>` : ''}</div>`
+        : '';
       const badges = [
+        sideBadgeHtml,
         visLabel && visClass
           ? `<span class="map-info-card__badge map-info-card__badge--${visClass}">${escHtml(visLabel)}</span>`
           : '',
@@ -549,6 +610,9 @@ async function initMap() {
           : '',
         timeLabel
           ? `<span class="map-info-card__badge map-info-card__badge--time">${escHtml(timeLabel)}</span>`
+          : '',
+        spot.sideConfidence === 'low'
+          ? `<span class="map-info-card__badge map-info-card__badge--lowSide">低置信度</span>`
           : '',
       ]
         .filter(Boolean)
@@ -561,6 +625,7 @@ async function initMap() {
           <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
           <div class="map-info-card__title">${escHtml(spot.name)}</div>
           ${badges ? `<div class="map-info-card__meta">${badges}</div>` : ''}
+          ${honorHtml}
           ${spot.intro ? `<p class="map-info-card__intro">${escHtml(spot.intro)}</p>` : ''}
           <div class="map-info-card__arrow" aria-hidden="true"></div>
         </div>`,
@@ -1016,7 +1081,20 @@ onUnmounted(() => {
             ]
           }}
         </button>
+        <div v-if="legendOpen" class="legend-side">
+          <span class="legend-side__title">车窗方位</span>
+          <SideBadge v-for="item in SIDE_LEGEND" :key="item.side" :side="item.side" compact />
+          <SideBadge side="unknown" compact />
+          <span class="legend-side__note">按本次车次行进方向判定</span>
+        </div>
       </div>
+
+      <SpotApproachCard
+        v-if="approachingSpot"
+        :spot="approachingSpot"
+        :current-km="currentKm"
+        :compact="compact"
+      />
 
       <footer class="bottom-panel">
         <section class="location-card">

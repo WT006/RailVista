@@ -57,6 +57,17 @@ export type SpotSide = 'left' | 'right' | 'both' | 'unknown';
 /** 车窗可见性：决定默认贴线距离阈值 */
 export type SpotVisibility = 'on_track' | 'window' | 'distant';
 
+/**
+ * side 的参考方向基准，见 docs/scenic-supplement-20260928.md §3.2。
+ * - line_forward：以 `lines[].corridorId` 走廊折线的首点→末点为正方向；
+ * - up_direction：以上行方向为正方向；
+ * - toward_xxx：以驶向某个终点站的方向为正方向。
+ */
+export type SpotRefDirection = 'line_forward' | 'up_direction' | `toward_${string}`;
+
+/** 运行时定侧置信度，见 §4.5 */
+export type SpotSideConfidence = 'high' | 'low';
+
 /** v3 六维分类，见 docs/scenic-schema-v3.md §3 */
 export type SpotDimension =
   | 'geo'
@@ -127,8 +138,8 @@ export interface ScenicSpot {
   subtype?: string;
   tags?: string[];
   lines?: SpotLineRef[];
-  /** side 方向约定，v3 固定 line_forward */
-  sideRefDirection?: 'line_forward';
+  /** side 的方向基准，见 docs/scenic-supplement-20260928.md §3.2 */
+  sideRefDirection?: 'line_forward' | 'up_direction' | `toward_${string}`;
   bestView?: SpotBestView;
   sources?: SpotSource[];
   verification?: {
@@ -140,6 +151,23 @@ export interface ScenicSpot {
   reviewedAt?: string;
   reviewRound?: string;
   status?: 'active' | 'deprecated';
+  /** 资质荣誉标签代码，取值见 shared/schedule/spotSide.ts HONOR_LABELS（§2.2） */
+  honors?: string[];
+
+  // —— 运行时自动定侧结果（由 filterSpotsAlongRailway 填充，不由数据文件维护）——
+  /** 自动判定的左/右侧（已按当前车次实际方向换算） */
+  sideRuntime?: SpotSide;
+  sideConfidence?: SpotSideConfidence;
+  /** 当前行程方向相对 sideRefDirection 是否相反 */
+  sideFlipped?: boolean;
+  /** 投影落到端点外等情形，需人工复核（§3.5） */
+  sideNeedsReview?: boolean;
+  sideReason?: string;
+  /** 在当前线路上的里程区间，来自 lines[] 命中项 */
+  alongKmFrom?: number;
+  alongKmTo?: number;
+  /** 命中走廊 id */
+  matchedCorridorId?: string;
 }
 
 export interface LayerVisibility {

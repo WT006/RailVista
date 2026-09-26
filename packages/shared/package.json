@@ -1,6 +1,6 @@
 {
   "name": "@railvista/shared",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",
@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
-    "test": "tsx --test src/index.test.ts",
+    "test": "tsx --test src/index.test.ts src/spotSide.test.ts",
     "prepare": "tsc -p tsconfig.json"
   },
   "devDependencies": {

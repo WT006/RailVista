@@ -97,9 +97,9 @@ describe('左右互换 — §3.2', () => {
     const b = resolveSpotSide({ path: rev.path, lengthKm: rev.lengthKm, lng: 101.0, lat: 30.05, ...stored });
     assert.equal(a?.side, 'left');
     assert.equal(b?.side, 'right', '反向车次必须左右互换，不能被数据侧自我抵消');
-    // 与数据侧冲突时降级为 low 并给出原因，但不强行翻面
+    // 反向行驶本就会与「按正方向存储」的 side 相反，属正常现象，不应降级置信度
     assert.equal(a?.confidence, 'high');
-    assert.equal(b?.confidence, 'low');
+    assert.equal(b?.confidence, 'high');
     assert.match(b?.reason ?? '', /不一致/);
   });
 
@@ -113,14 +113,16 @@ describe('左右互换 — §3.2', () => {
 });
 
 describe('退化规则 — §3.3', () => {
-  it('贴线景点（≤0.3km）判定为 both 且 low', () => {
+  it('贴线景点（≤0.3km）判定为 both，且是 high 置信度', () => {
     const { path, lengthKm } = forwardMetrics();
     const r = resolveSpotSide({ path, lengthKm, lng: 101.0, lat: 30.000002 });
     assert.equal(r?.side, 'both');
-    assert.equal(r?.confidence, 'low');
+    // 贴线/正侧通过是「两边都看得到」的确定结论，不是没把握
+    assert.equal(r?.confidence, 'high');
+    assert.equal(r?.needsReview, false);
   });
 
-  it('延展型景观（跨度 > 10km）判定为 both', () => {
+  it('延展型景观（跨度 > 10km）判定为 both，且是 high 置信度', () => {
     const { path, lengthKm } = forwardMetrics();
     const r = resolveSpotSide({
       path,
@@ -130,13 +132,34 @@ describe('退化规则 — §3.3', () => {
       lineRef: { alongKmFrom: 10, alongKmTo: 10 + EXTENDED_SPAN_KM + 5 },
     });
     assert.equal(r?.side, 'both');
-    assert.equal(r?.confidence, 'low');
+    assert.equal(r?.confidence, 'high');
+    assert.equal(r?.needsReview, false);
   });
 
-  it('投影落到端点外 → both + needsReview', () => {
+  it('「两侧均可」不等于低置信度（回归保护）', () => {
+    const { path, lengthKm } = forwardMetrics();
+    const cases = [
+      resolveSpotSide({ path, lengthKm, lng: 101.0, lat: 30.000002 }),
+      resolveSpotSide({
+        path,
+        lengthKm,
+        lng: 101.0,
+        lat: 30.05,
+        lineRef: { alongKmFrom: 10, alongKmTo: 40 },
+      }),
+    ];
+    for (const r of cases) {
+      assert.equal(r?.side, 'both');
+      assert.notEqual(r?.confidence, 'low', 'both 是正常结论，不应被标为低置信度');
+    }
+  });
+
+  it('投影落到端点外 → unknown + low + needsReview（不是 both）', () => {
     const { path, lengthKm } = forwardMetrics();
     const r = resolveSpotSide({ path, lengthKm, lng: 99.0, lat: 30.05 });
-    assert.equal(r?.side, 'both');
+    // 点位在走廊覆盖范围外 = 判断不了在哪一侧，不是「两侧都能看」
+    assert.equal(r?.side, 'unknown');
+    assert.equal(r?.confidence, 'low');
     assert.equal(r?.needsReview, true);
   });
 

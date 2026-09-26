@@ -139,15 +139,15 @@ const SIDE_LEGEND: Array<{ side: SpotSide; text: string }> = [
 ];
 
 /**
- * 地图标记配色用的侧别键（§4.6）。与 SideBadge 保持一致：
- * 「两侧均可」但垂距 > 8km 时按「待确认」的灰色虚线处理。
+ * 地图标记**不按左右分色**（颜色统一），左右侧只在点开详情后展示，
+ * 避免在地图上铺开一片难辨含义的多色点阵。
+ * 唯一例外：`unknown` 用虚线空心 —— 那表示「方位待人工复核」的数据问题，
+ * 语义上属于数据质量提示，不是方位表达。
  */
 function spotSideKey(spot: ScenicSpot): SpotSide {
   if (spot.sideNeedsReview) return 'unknown';
   const s = spot.sideRuntime ?? spot.side;
-  const base: SpotSide = s && s !== 'unknown' ? s : 'unknown';
-  if (base === 'both' && (spot.distKm ?? 0) > 8) return 'unknown';
-  return base;
+  return s && s !== 'unknown' ? s : 'unknown';
 }
 
 const showPreciseAction = computed(() => {
@@ -563,12 +563,13 @@ async function initMap() {
   }
 
 spotMarkers = trip.scenicSpots.map((spot, idx) => {
-    const sideKey = spotSideKey(spot);
+    // 只有「方位待确认」才换样式，左/右/两侧均使用统一的景点色
+    const reviewStyle = spotSideKey(spot) === 'unknown' ? ' spot-marker--unknown' : '';
     const marker = new AMap.Marker({
       position: [spot.lng, spot.lat],
       title: spot.name,
       anchor: 'bottom-center',
-      content: `<div class="spot-marker spot-marker--${sideKey}${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
+      content: `<div class="spot-marker${reviewStyle}${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
     });
     marker.on('click', () => {
       const visLabel =
@@ -1082,10 +1083,12 @@ onUnmounted(() => {
           }}
         </button>
         <div v-if="legendOpen" class="legend-side">
-          <span class="legend-side__title">车窗方位</span>
+          <span class="legend-side__title">车窗方位徽标（点开景点可见）</span>
           <SideBadge v-for="item in SIDE_LEGEND" :key="item.side" :side="item.side" compact />
           <SideBadge side="unknown" compact />
-          <span class="legend-side__note">按本次车次行进方向判定</span>
+          <span class="legend-side__note">
+            按本次车次行进方向判定；地图上的虚线空心点 = 方位待人工复核
+          </span>
         </div>
       </div>
 

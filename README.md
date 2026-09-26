@@ -2,7 +2,7 @@
 
 铁路旅客的车上沿途风景与行程定位伴侣（MVP）。
 
-> **当前版本 `0.1.1`** — 变更记录见根目录 [`CHANGELOG.md`](./CHANGELOG.md)。
+> **当前版本 `0.1.2`** — 变更记录见根目录 [`CHANGELOG.md`](./CHANGELOG.md)。
 > 后续每次改动都必须同步更新该文件，并在需要时递增 `packages/shared/src/version.ts` 中的版本号。
 
 ## 本地开发

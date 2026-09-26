@@ -39,15 +39,12 @@ const resolved = computed<SpotSide>(() => {
   return s && s !== 'unknown' ? s : 'unknown';
 });
 
-/** 「两侧均可」但离得很远 ⇒ 实际看不清，降级为待确认 */
-const bothButFar = computed(
-  () => resolved.value === 'both' && props.distKm != null && props.distKm > 8,
-);
-
-const effective = computed<SpotSide>(() => {
-  if (props.needsReview) return 'unknown';
-  return bothButFar.value ? 'unknown' : resolved.value;
-});
+/**
+ * 只有「方位确实判断不出来」才显示为待确认。
+ * 注意：不要用垂距把 `both` 降级成待确认 —— 看得清看不清是**可见性**问题，
+ * 已由 visibility / distKm 表达，与**方位**的可信度是两件事，不能混为一谈。
+ */
+const effective = computed<SpotSide>(() => (props.needsReview ? 'unknown' : resolved.value));
 
 const label = computed(() => sideLabel(effective.value));
 const arrow = computed(() => sideArrow(effective.value));
@@ -61,9 +58,9 @@ const fillSide = computed<'left' | 'right' | 'full' | 'none'>(() => {
 
 const title = computed(() => {
   if (props.needsReview) return '方位无法可靠判定，已标记待人工复核';
-  if (bothButFar.value) return `距轨约 ${props.distKm} km，超出车窗可靠识别范围`;
-  if (props.low) return '方位为低置信度推断（贴线 / 延展型景观 / 推断翻转）';
-  return `按本次车次行进方向判定：${label.value}`;
+  if (props.low) return '方位为低置信度：几何判定与数据记录不一致，建议人工复核';
+  const dist = props.distKm == null ? '' : `（距轨约 ${props.distKm} km）`;
+  return `按本次车次行进方向判定：${label.value}${dist}`;
 });
 </script>
 
@@ -152,9 +149,10 @@ const title = computed(() => {
   --side-bg: rgba(242, 163, 60, 0.16);
 }
 
+/* 两侧均可：正向色（青绿），与左/右同等「可信」，不再用灰色暗示不可靠 */
 .side-badge--both {
-  --side-color: #8a8f98;
-  --side-bg: rgba(138, 143, 152, 0.14);
+  --side-color: #2dd4bf;
+  --side-bg: rgba(45, 212, 191, 0.16);
 }
 
 /* 待确认：虚线边框，避免与「两侧均可」的实线灰混淆 */

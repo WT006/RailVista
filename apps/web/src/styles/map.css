@@ -1304,24 +1304,12 @@ body {
   }
 }
 
-/* ===== 车窗观赏方位（0.1.1） ===== */
-/* 地图标记按左右侧着色，取代原先统一橙色；颜色之外另配图例与文字，色觉障碍也可读 */
-.spot-marker--left {
-  background: linear-gradient(160deg, #7aa5f5, #5b8def);
-  box-shadow: 0 4px 12px rgba(91, 141, 239, 0.4);
-}
-
-.spot-marker--right {
-  background: linear-gradient(160deg, #f7bb6d, #f2a33c);
-  box-shadow: 0 4px 12px rgba(242, 163, 60, 0.4);
-}
-
-.spot-marker--both {
-  background: linear-gradient(160deg, #a3a8b0, #8a8f98);
-  box-shadow: 0 4px 12px rgba(138, 143, 152, 0.35);
-}
-
-/* 方位待确认：空心 + 虚线，提示数据需人工复核 */
+/* ===== 车窗观赏方位（0.1.2） ===== */
+/*
+ * 地图标记**统一使用景点色**（即 .spot-marker 自身的橙色），左/右/两侧不再分色：
+ * 地图上铺开多色点阵含义难辨，方位信息统一在点开详情后以徽标展示。
+ * 唯一例外是「方位待确认」——它表达的是数据待复核，不是方位本身。
+ */
 .spot-marker--unknown {
   background: rgba(15, 23, 42, 0.72);
   border-style: dashed;
@@ -1343,9 +1331,10 @@ body {
   background: rgba(242, 163, 60, 0.16);
 }
 
+/* 两侧均可：正向色（青绿），与左/右同等可信，不用灰色 */
 .map-info-card__badge--side-both {
-  color: #b6bbc2;
-  background: rgba(138, 143, 152, 0.14);
+  color: #5eead4;
+  background: rgba(45, 212, 191, 0.16);
 }
 
 .map-info-card__badge--side-unknown {

@@ -252,18 +252,25 @@ export function resolveSpotSide(params: ResolveSpotSideParams): SpotRuntimeSide 
   let needsReview = projection.clampedOutside;
   let reason: string | undefined;
 
-  if (distKm <= SIDE_BOTH_DIST_KM) {
-    side = 'both';
+  // 判定顺序很重要：先处理「判断不出来」，再处理「两侧都能看」。
+  //
+  // 关键语义（易错点）：`both` 是一个**正常的、确定的方位结论**，不等于「没把握」。
+  // 贴线通过、延展型景观（河流/山脉/平原段落本来就是一路两边都能看到）都是可信结论，
+  // 置信度应为 high；只有真正无法判定（投影落到走廊覆盖范围之外）才判 unknown + low。
+  // 否则会把一大片本来清晰的景点涂成灰色「低置信度」，反而误导用户。
+  if (projection.clampedOutside) {
+    // 点位在走廊覆盖范围的端点之外 —— 根本判断不了它在哪一侧，不是「两侧均可」
+    side = 'unknown';
     confidence = 'low';
+    reason = '投影落在线路起终点之外，点位在走廊覆盖范围外侧，方位无法判定';
+  } else if (distKm <= SIDE_BOTH_DIST_KM) {
+    side = 'both';
+    confidence = 'high';
     reason = `距轨 ${distKm} km，贴线/正侧通过，两侧均可`;
   } else if (extended) {
     side = 'both';
-    confidence = 'low';
-    reason = '延展型景观（里程跨度 > 10 km），单点定侧会失真';
-  } else if (projection.clampedOutside) {
-    side = 'both';
-    confidence = 'low';
-    reason = '投影落在线路起终点之外，点位在走廊覆盖范围外侧';
+    confidence = 'high';
+    reason = '延展型景观（里程跨度 > 10 km），沿途两侧均可观赏';
   } else {
     side = projection.crossKm2 > 0 ? 'left' : 'right';
     confidence = 'high';
@@ -277,17 +284,21 @@ export function resolveSpotSide(params: ResolveSpotSideParams): SpotRuntimeSide 
   // 结果变成永远盲信数据，左右侧对行程方向失去敏感性（往返同一区间方位不变）。
   const flipped = params.reversed === true;
 
-  // 数据与几何冲突时只降级、不翻面：几何以「本次车次实际行进方向」为准；
-  // 冲突说明数据侧可能有误或基准方向尚未标定，交由人工复核。
+  // 几何优先：方位结论以「本次车次实际行进方向」的叉积结果为准，不迁就数据侧。
+  //
+  // 与数据侧不一致时**只记录原因、不降置信度**：反向行驶本来就会让几何结果与
+  // 按走廊正方向存储的 side 相反，那是正常现象而非数据错误；若据此降级，
+  // 会把反向车次上的所有景点一律染成「低置信度」，制造大面积假告警。
+  // 真正该降级的只有「判断不出来」（已在上文判为 unknown）。
   if (
     params.storedSide &&
     params.storedSide !== 'unknown' &&
     params.storedSide !== 'both' &&
     side !== 'both' &&
+    side !== 'unknown' &&
     params.storedSide !== side
   ) {
-    confidence = 'low';
-    const conflict = `几何判定 ${side} 与数据侧 ${params.storedSide} 不一致`;
+    const conflict = `几何判定 ${side} 与数据侧 ${params.storedSide} 不一致（多为反向行驶，可核对）`;
     reason = reason ? `${reason}；${conflict}` : conflict;
   }
 

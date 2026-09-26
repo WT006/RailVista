@@ -8,7 +8,11 @@ import {
   type LngLat,
 } from './osmRailway.js';
 import { matchCorridor, sliceCorridorForStops, loadCorridors } from './corridors.js';
-import { matchCorridorNetwork } from './corridorNetwork.js';
+import {
+  matchCorridorNetwork,
+  validateStopsOnCoords,
+  anchorSliceEndpoints,
+} from './corridorNetwork.js';
 import { matchScenicSpotsForRailway } from './scenicSpots.js';
 import { getPreciseHotCache, savePreciseHotCache } from './preciseRouteCache.js';
 import { findWholeTripLocalPath } from './localRails.js';
@@ -37,6 +41,54 @@ function collectLineNamesForStops(stops: Array<{ name: string }>): Set<number> {
     /* 走廊加载失败不阻塞拓扑寻路 */
   }
   return lineNameIds(lineNames);
+}
+
+type CorridorShortcut = {
+  coords: [number, number][];
+  reason: string;
+  tier: Extract<RailQualityTier, 'corridor' | 'network'>;
+  message: string;
+};
+
+/**
+ * 精品走廊/路网整段短路（v3 P0-2：从「首道短路」降为拓扑之后的兜底）。
+ * 单走廊切片首尾锚定 OD 站坐标后必须过站级硬门禁；路网结果在 matchCorridorNetwork
+ * 内部已过同一门禁。任一经停投影超阈即返回 null，让位给拓扑/逐段 OSM。
+ */
+function tryCorridorShortcut(stops: NamedStop[], trainCode?: string): CorridorShortcut | null {
+  try {
+    const single = matchCorridor(stops, { trainCode });
+    const sliced = single ? sliceCorridorForStops(single.corridor, stops) : null;
+    if (single && sliced && sliced.length >= 2) {
+      const anchored = anchorSliceEndpoints(sliced, stops[0], stops[stops.length - 1]);
+      const gate = validateStopsOnCoords(anchored, stops, { trainCode, seams: [] });
+      if (gate.ok) {
+        return {
+          coords: anchored,
+          reason: `corridor:${single.corridor.id}`,
+          tier: 'corridor',
+          message: `真实轨道线（精品走廊 ${single.corridor.name}）`,
+        };
+      }
+      console.warn(
+        `[rail-job] corridor slice rejected by strict gate: ${gate.reason}`,
+        gate.worstStop || '',
+        gate.worstKm != null ? Number(gate.worstKm).toFixed(1) : '',
+      );
+    }
+    const networked = matchCorridorNetwork(stops, { trainCode });
+    if (networked?.coords && networked.coords.length >= 2) {
+      return {
+        coords: networked.coords,
+        reason: `network:${networked.corridorIds.join('+')}`,
+        tier: 'network',
+        message: `真实轨道线（精品路网 ${networked.corridorNames.join(' + ')}）`,
+      };
+    }
+  } catch (e) {
+    console.warn('[rail-job] corridor shortcut failed', e);
+  }
+  return null;
 }
 
 export type RailJobStatus = 'queued' | 'running' | 'done' | 'partial' | 'failed';
@@ -313,7 +365,20 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
   // 0) 热门指纹缓存（含真实轨段的成功/部分结果）
   if (!opts?.onlyFailed) {
     const hot = getPreciseHotCache(job.trainCode, job.stops);
-    if (hot && hot.coords.length >= 2) {
+    // v3：热缓存回放前必须过站级硬门禁。缓存条目不携带 seams，
+    // 接缝处按段内阈值判（更严；误杀仅损失缓存收益，触发重算，不会放出坏线）。
+    const hotGate =
+      hot && hot.coords.length >= 2
+        ? validateStopsOnCoords(hot.coords, job.stops, { trainCode: job.trainCode })
+        : null;
+    if (hot && hotGate && !hotGate.ok) {
+      console.warn(
+        `[rail-job] hot cache rejected by strict gate: ${hotGate.reason}`,
+        hotGate.worstStop || '',
+        hotGate.worstKm != null ? Number(hotGate.worstKm).toFixed(1) : '',
+      );
+    }
+    if (hot && hot.coords.length >= 2 && hotGate?.ok) {
       if (job.abandoned) return;
       const okCount = Math.min(hot.segmentsOk, job.segmentsTotal);
       for (let i = 0; i < job.segmentsTotal; i++) {
@@ -339,59 +404,15 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
     }
   }
 
-  // 1) 先尝试精品走廊 / 路网拼接（整段精确，避免站间 OSM 部分失败）
-  if (!opts?.onlyFailed) {
-    try {
-      const corridorStops = job.stops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat }));
-      const single = matchCorridor(corridorStops, { trainCode: job.trainCode });
-      const sliced = single ? sliceCorridorForStops(single.corridor, corridorStops) : null;
-      if (sliced && sliced.length >= 2) {
-        if (job.abandoned) return;
-        for (let i = 0; i < job.segmentsTotal; i++) {
-          job.slots[i] = { coords: [], ok: true, reason: `corridor:${single!.corridor.id}` };
-        }
-        job.segmentsDone = job.segmentsTotal;
-        job.segmentsOk = job.segmentsTotal;
-        job.coords = sliced;
-        job.source = 'osm';
-        job.qualityTier = 'corridor';
-        job.status = 'done';
-        job.message = `真实轨道线（精品走廊 ${single!.corridor.name}）`;
-        job.updatedAt = Date.now();
-        finishJob(job);
-        return;
-      }
-      const networked = matchCorridorNetwork(corridorStops, { trainCode: job.trainCode });
-      if (networked?.coords && networked.coords.length >= 2) {
-        if (job.abandoned) return;
-        for (let i = 0; i < job.segmentsTotal; i++) {
-          job.slots[i] = {
-            coords: [],
-            ok: true,
-            reason: `network:${networked.corridorIds.join('+')}`,
-          };
-        }
-        job.segmentsDone = job.segmentsTotal;
-        job.segmentsOk = job.segmentsTotal;
-        job.coords = networked.coords;
-        job.source = 'osm';
-        job.qualityTier = 'network';
-        job.status = 'done';
-        job.message = `真实轨道线（精品路网 ${networked.corridorNames.join(' + ')}）`;
-        job.updatedAt = Date.now();
-        finishJob(job);
-        return;
-      }
-    } catch (e) {
-      console.warn('[rail-job] corridor shortcut failed', job.jobId, e);
-    }
-  }
-
   if (job.abandoned) return;
 
   const preferHs = isHighspeedTrain(job.trainCode);
 
-  // 1b) 整趟寻路：拓扑优先（真·全图逐段，经停全在线）→ 贪心兜底（须过 S1 门禁）
+  // 1) 拓扑优先（v3 P0-2：真·全图逐段，经停锚定在线；实测 K771 逐站投影 0.0km）。
+  //    旧顺序里走廊/路网短路在拓扑之前，宽松门禁（45km/55%/280km）会截胡拓扑，
+  //    放出偏离站坐标 9~112km 的坏拼线。现改为：拓扑全成功 → done；
+  //    部分成功 → 成功段写槽位，失败段先走廊按段兜底再逐段 OSM；
+  //    拓扑未启用/加载失败/抛错 → 保持原「走廊整段 → 贪心整趟 → 逐段」兜底链。
   let topoPartialDone = false;
   let greedyFallbackAllowed = false;
   if (isTopologyEnabled()) {
@@ -399,7 +420,12 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
       try {
         const lineHitSet = collectLineNamesForStops(job.stops);
         const routed = topoRouteStops(job.stops, { highspeed: preferHs, lineHitSet });
-        if (routed.failures.length === 0 && routed.coords.length >= 2) {
+        // 拓扑结果同样必须过站级硬门禁（实测 C650 拓扑绕路：折线 628km / 站序弦长 228km）
+        const wholeGate =
+          routed.failures.length === 0 && routed.coords.length >= 2
+            ? validateStopsOnCoords(routed.coords, job.stops, { trainCode: job.trainCode })
+            : null;
+        if (wholeGate?.ok) {
           if (job.abandoned) return;
           for (let i = 0; i < job.segmentsTotal; i++) {
             job.slots[i] = { coords: [], ok: true, reason: 'topo' };
@@ -415,10 +441,27 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
           finishJob(job);
           return;
         }
-        let okCount = 0;
-        for (let i = 0; i < routed.segResults.length && i < job.segmentsTotal; i++) {
-          const sr = routed.segResults[i];
-          if (sr.ok) {
+        if (wholeGate && !wholeGate.ok) {
+          // 整图绕路/折返/离线：丢弃全部拓扑段，走「整段走廊兜底 → 按段走廊 → 逐段 OSM」
+          console.warn(
+            `[rail-topology] whole result rejected by strict gate: ${wholeGate.reason}`,
+            wholeGate.worstStop || '',
+            wholeGate.worstKm != null ? Number(wholeGate.worstKm).toFixed(1) : '',
+            job.jobId,
+          );
+          greedyFallbackAllowed = true;
+        } else {
+          let okCount = 0;
+          for (let i = 0; i < routed.segResults.length && i < job.segmentsTotal; i++) {
+            const sr = routed.segResults[i];
+            if (!sr.ok) continue;
+            // 部分成功的拓扑段也要逐段过门禁（离线/跳变段不写槽，交走廊/OSM 重算）
+            const segGate = validateStopsOnCoords(
+              sr.coords as [number, number][],
+              [job.stops[i], job.stops[i + 1]],
+              { trainCode: job.trainCode, seams: [] },
+            );
+            if (!segGate.ok) continue;
             job.slots[i] = {
               coords: sr.coords.map(([lng, lat]) => ({ lng, lat })),
               ok: true,
@@ -426,16 +469,16 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
             };
             okCount++;
           }
+          if (okCount > 0) {
+            // 部分成功：成功段写槽位，失败段交给既有逐段流程（走廊切片/公网兜底）
+            topoPartialDone = true;
+            console.log(
+              `[rail-topology] partial ${okCount}/${job.segmentsTotal}, failures=${routed.failures.map((f) => f.reason).join(',')}`,
+              job.jobId,
+            );
+          }
+          // 全部段失败：不再执行老贪心整趟（防绕过逐段精度），直接落逐段流程
         }
-        if (okCount > 0) {
-          // 部分成功：成功段写槽位，失败段交给既有逐段流程（走廊切片/公网兜底）
-          topoPartialDone = true;
-          console.log(
-            `[rail-topology] partial ${okCount}/${job.segmentsTotal}, failures=${routed.failures.map((f) => f.reason).join(',')}`,
-            job.jobId,
-          );
-        }
-        // 全部段失败：不再执行老贪心整趟（防绕过逐段精度），直接落逐段流程
       } catch (e) {
         console.warn('[rail-topology] routeStops failed, fallback to greedy', job.jobId, e);
         greedyFallbackAllowed = true;
@@ -448,7 +491,27 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
     greedyFallbackAllowed = true;
   }
 
-  // 老贪心整趟兜底（仅拓扑未启用/加载失败/抛错时）——必须过 S1 质量门禁
+  // 2) 拓扑不可用/整图被门禁拒绝时的整段精品走廊/路网短路（v3 P0-2：降为兜底，且必须过站级硬门禁）
+  if (greedyFallbackAllowed && !opts?.onlyFailed) {
+    const shortcut = tryCorridorShortcut(job.stops, job.trainCode);
+    if (shortcut && !job.abandoned) {
+      for (let i = 0; i < job.segmentsTotal; i++) {
+        job.slots[i] = { coords: [], ok: true, reason: shortcut.reason };
+      }
+      job.segmentsDone = job.segmentsTotal;
+      job.segmentsOk = job.segmentsTotal;
+      job.coords = shortcut.coords;
+      job.source = 'osm';
+      job.qualityTier = shortcut.tier;
+      job.status = 'done';
+      job.message = shortcut.message;
+      job.updatedAt = Date.now();
+      finishJob(job);
+      return;
+    }
+  }
+
+  // 3) 老贪心整趟兜底（仅拓扑未启用/加载失败/抛错时）——必须过 S1 质量门禁
   if (greedyFallbackAllowed && !opts?.onlyFailed) {
     try {
       const odFrom = job.stops[0];
@@ -481,13 +544,43 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
     }
   }
 
-  const pending: number[] = [];
+  // 4) 拓扑部分成功/整图被拒：各失败段先尝试走廊「按段」切片（两站 OD + 硬门禁），
+  //    走廊也无的段再进入逐段 OSM worker。
+  const segCorridorFill =
+    topoPartialDone || (greedyFallbackAllowed && !opts?.onlyFailed);
+  let pending: number[] = [];
   for (let i = 0; i < job.segmentsTotal; i++) {
     if (opts?.onlyFailed || topoPartialDone) {
       if (!job.slots[i]?.ok) pending.push(i);
     } else {
       pending.push(i);
     }
+  }
+  if (segCorridorFill && pending.length && !job.abandoned) {
+    const rest: number[] = [];
+    let corridorFilled = 0;
+    for (const i of pending) {
+      if (job.abandoned) return;
+      const segShortcut = tryCorridorShortcut([job.stops[i], job.stops[i + 1]], job.trainCode);
+      if (segShortcut) {
+        job.slots[i] = {
+          coords: segShortcut.coords.map(([lng, lat]) => ({ lng, lat })),
+          ok: true,
+          reason: segShortcut.reason,
+        };
+        corridorFilled += 1;
+      } else {
+        rest.push(i);
+      }
+    }
+    if (corridorFilled > 0) {
+      console.log(
+        `[rail-job] topo partial: corridor filled ${corridorFilled}/${pending.length}`,
+        job.jobId,
+      );
+      refreshJobDerived(job);
+    }
+    pending = rest;
   }
 
   let next = 0;

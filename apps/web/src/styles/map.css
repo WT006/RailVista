@@ -389,6 +389,44 @@ body {
   line-height: 1.35;
 }
 
+.rail-unresolved-hint {
+  margin: 0;
+  font-size: 11px;
+  color: #cbd5e1;
+  line-height: 1.35;
+}
+
+/* P0-4：无坐标经停的灰色空心占位（区别于黄色真实站标） */
+.station-marker--unresolved .station-dot--unresolved {
+  width: 12px;
+  height: 12px;
+  background: rgba(148, 163, 184, 0.25);
+  border: 2px dashed #94a3b8;
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.station-marker--unresolved.station-marker--compact .station-dot--unresolved {
+  width: 10px;
+  height: 10px;
+}
+
+.station-marker--unresolved .station-label {
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(148, 163, 184, 0.45);
+}
+
+.station-label__pending {
+  margin-left: 4px;
+  padding: 0 3px;
+  font-size: 9px;
+  font-style: normal;
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  border-radius: 3px;
+}
+
 .schedule-dialog {
   position: fixed;
   inset: 0;

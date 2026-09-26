@@ -28,8 +28,12 @@ export type PreciseHotEntry = {
   pinned?: boolean;
 };
 
-/** 几何算法版本：fingerprint 输出前缀，算法/门禁变更时 bump 使旧条目失配 */
-export const GEOM_VERSION = 2;
+/**
+ * 几何算法版本：fingerprint 输出前缀，算法/门禁变更时 bump 使旧条目失配。
+ * v3（经停绘制修复）：拓扑优先 + validateStopsOnCoords 站级硬门禁上线，
+ * 旧 45km/55%/280km 时代固化的坏拼线（实测偏离 9~112km）必须整体失效。
+ */
+export const GEOM_VERSION = 3;
 
 export function fingerprint(
   trainCode: string | undefined,

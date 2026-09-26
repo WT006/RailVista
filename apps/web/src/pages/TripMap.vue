@@ -88,6 +88,8 @@ let trainMarker: any;
 let gpsMarker: any;
 let spotMarkers: any[] = [];
 let stationMarkers: any[] = [];
+/** P0-4：无坐标经停的灰色空心占位标记（位置为前后站间近似插值） */
+let unresolvedMarkers: any[] = [];
 let pathMetrics = { path: [] as ReturnType<typeof buildRailwayMetrics>['path'], lengthKm: 0 };
 
 const segment = computed(() => trip.segment);
@@ -393,7 +395,54 @@ function applyLayers() {
   if (railLine) prefs.layers.rail ? railLine.show() : railLine.hide();
   spotMarkers.forEach((m) => (prefs.layers.spot ? m.show() : m.hide()));
   stationMarkers.forEach((m) => (prefs.layers.station ? m.show() : m.hide()));
+  unresolvedMarkers.forEach((m) => (prefs.layers.station ? m.show() : m.hide()));
   if (trainMarker) prefs.layers.train ? trainMarker.show() : trainMarker.hide();
+}
+
+/**
+ * P0-4：无真实坐标的经停站不允许凭空消失。在前后最近两个有坐标站之间按站序
+ * 线性插值，并向弦的法向偏移约 5km，避免占位圈与蓝线/真实站标重叠。
+ */
+function placeholderPosition(stops: Stop[], idx: number): [number, number] | null {
+  let p = idx - 1;
+  while (p >= 0 && (stops[p].lng == null || stops[p].lat == null)) p -= 1;
+  let n = idx + 1;
+  while (n < stops.length && (stops[n].lng == null || stops[n].lat == null)) n += 1;
+  if (p < 0 || n >= stops.length) return null;
+  const a = stops[p];
+  const b = stops[n];
+  const f = (idx - p) / (n - p);
+  const lng = a.lng! + (b.lng! - a.lng!) * f;
+  const lat = a.lat! + (b.lat! - a.lat!) * f;
+  const dx = b.lng! - a.lng!;
+  const dy = b.lat! - a.lat!;
+  const len = Math.hypot(dx, dy) || 1;
+  // 法向偏移：经度 0.05°（35°N 约 4.5km）、纬度 0.045°（约 5km）
+  return [lng + (-dy / len) * 0.05, lat + (dx / len) * 0.045];
+}
+
+function rebuildUnresolvedMarkers() {
+  const seg = segment.value;
+  if (!map || !AMapRef || !seg) return;
+  unresolvedMarkers.forEach((m) => map.remove(m));
+  unresolvedMarkers = [];
+  const unresolvedNames = new Set(trip.unresolvedStops);
+  seg.stops.forEach((s, i) => {
+    if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) return;
+    // 仅渲染服务端明确标注未解析的站；服务端走廊 hint 兜底补到坐标后自动消失
+    if (unresolvedNames.size && !unresolvedNames.has(s.name)) return;
+    const pos = placeholderPosition(seg.stops, i);
+    if (!pos) return;
+    const marker = new AMapRef.Marker({
+      position: pos,
+      title: `${s.name}（坐标待补，当前为近似占位）`,
+      content: `<div class="station-marker station-marker--unresolved${compact.value ? ' station-marker--compact' : ''}"><span class="station-dot station-dot--unresolved"></span><span class="station-label">${escHtml(s.name)}<em class="station-label__pending">坐标待补</em></span></div>`,
+      anchor: 'center',
+      zIndex: 140,
+    });
+    if (prefs.layers.station) map.add(marker);
+    unresolvedMarkers.push(marker);
+  });
 }
 
 function railStrokeOptions() {
@@ -556,6 +605,9 @@ async function initMap() {
     if (s.lng != null && s.lat != null) map.add(marker);
     return marker;
   });
+
+  // P0-4：缺坐标经停的灰色占位（applyLayers 会统一控制显隐）
+  rebuildUnresolvedMarkers();
 
   trainMarker = new AMap.Marker({
     position: coords[0] || [104, 35],
@@ -722,6 +774,8 @@ function refreshStationMarkers() {
       if (!prefs.layers.station) marker.hide();
     }
   });
+  // 服务端补坐标 / unresolved 清单变化时，重建灰色占位标记
+  rebuildUnresolvedMarkers();
 }
 
 async function onUpgradePrecise() {
@@ -781,6 +835,13 @@ watch(
   () => segment.value?.stops.map((s) => `${s.name}:${s.lng},${s.lat}`).join('|'),
   () => {
     refreshStationMarkers();
+  },
+);
+
+watch(
+  () => trip.unresolvedStops.join('|'),
+  () => {
+    rebuildUnresolvedMarkers();
   },
 );
 
@@ -889,6 +950,9 @@ onUnmounted(() => {
                 </button>
               </div>
               <p v-if="trip.preciseError" class="rail-upgrade-error">{{ trip.preciseError }}</p>
+              <p v-if="trip.unresolvedStops.length" class="rail-unresolved-hint">
+                {{ trip.unresolvedStops.join('、') }} 坐标待补，地图上为灰色近似占位
+              </p>
             </template>
           </div>
 

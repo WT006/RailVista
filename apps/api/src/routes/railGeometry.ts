@@ -5,7 +5,11 @@ import { fileURLToPath } from 'node:url';
 import { buildRailGeometry, type LngLat } from '../services/osmRailway.js';
 import { enrichStopsCoords } from '../services/geocode.js';
 import { matchCorridor, sliceCorridorForStops, loadCorridors } from '../services/corridors.js';
-import { matchCorridorNetwork } from '../services/corridorNetwork.js';
+import {
+  matchCorridorNetwork,
+  validateStopsOnCoords,
+  anchorSliceEndpoints,
+} from '../services/corridorNetwork.js';
 import { createRailGeometryJob, getRailGeometryJob } from '../services/railGeometryJob.js';
 import { loadScenicSpots, matchScenicSpotsForRailway } from '../services/scenicSpots.js';
 import { ensureFullStops } from '../services/stopsAutocomplete.js';
@@ -225,12 +229,21 @@ railGeometryRoute.post('/', async (c) => {
   // 普速车（K/T/Z…）禁止套高铁走廊，避免「安阳/鹤壁」贴上「安阳东/鹤壁东」平行线
   const matched = matchCorridor(enriched, { trainCode: body.trainCode });
   if (matched) {
-    const sliced = sliceCorridorForStops(matched.corridor, enriched);
-    if (sliced && sliced.length >= 2) {
+    const slicedRaw = sliceCorridorForStops(matched.corridor, enriched);
+    // P0-1/P0-3：首尾锚定真实站坐标 + 逐站硬门禁；不过则降级（路网/OSM/示意），
+    // 不再让 55%/40km 的宽松切片直接返回给前端。
+    const anchored =
+      slicedRaw && slicedRaw.length >= 2
+        ? anchorSliceEndpoints(slicedRaw, enriched[0], enriched[enriched.length - 1])
+        : null;
+    const gate = anchored
+      ? validateStopsOnCoords(anchored, enriched, { trainCode: body.trainCode, seams: [] })
+      : null;
+    if (anchored && gate?.ok) {
       return c.json({
         ok: true,
         data: attachScenic({
-          coords: sliced,
+          coords: anchored,
           stops: enriched,
           source: 'osm' as const,
           segmentsOk: stops.length - 1,
@@ -242,6 +255,13 @@ railGeometryRoute.post('/', async (c) => {
           matchScore: matched.score,
         }),
       });
+    }
+    if (anchored && gate && !gate.ok) {
+      console.warn(
+        `[rail-geometry] preset corridor rejected by strict gate: ${gate.reason}`,
+        gate.worstStop || '',
+        gate.worstKm != null ? Number(gate.worstKm).toFixed(1) : '',
+      );
     }
   }
 

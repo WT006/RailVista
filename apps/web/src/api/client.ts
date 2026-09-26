@@ -57,6 +57,8 @@ export type RailGeometryJob = {
   qualityTier?: RailQualityTier;
   trainCode?: string;
   stops?: Array<{ name?: string; lng?: number; lat?: number }>;
+  /** B4/P0-4：未能定位坐标的经停站名（前端渲染占位提示，不再凭空消失） */
+  unresolvedStops?: string[];
   scenicSpots?: import('@railvista/shared').ScenicSpot[];
 };
 

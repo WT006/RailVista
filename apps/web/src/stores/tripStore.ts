@@ -39,8 +39,17 @@ export const useTripStore = defineStore('trip', () => {
   /** 换行程 / 新任务时递增，用于丢弃过期 create/poll 回写 */
   let preciseEpoch = 0;
   let activeJobId: string | null = null;
-  /** 前端硬超时：与服务端预算 max(120s, 10s×段数) 对齐，避免长线被 55s 截断落盘 */
+  /**
+   * 前端硬超时（P2-7-3）：与服务端预算 max(120s, 10s×段数) 同源对齐。
+   * 默认 180s；长线（段数 >15，如 K771 呼市→福州 30+ 站、拓扑冷算）放宽到 300s，
+   * 避免拓扑优先策略下长线在客户端被提前掐断、固化成 partial。
+   */
   const CLIENT_PRECISE_TIMEOUT_MS = 180_000;
+  const CLIENT_PRECISE_TIMEOUT_LONG_MS = 300_000;
+  function clientPreciseTimeoutMs(): number {
+    const segCount = Math.max(0, (segment.value?.stops.length || 0) - 1);
+    return segCount > 15 ? CLIENT_PRECISE_TIMEOUT_LONG_MS : CLIENT_PRECISE_TIMEOUT_MS;
+  }
 
   // ── S2 自动精准升级：行程键防循环（会话内 ≤2 次） ──
   const AUTO_UPGRADE_MAX = 2;
@@ -49,6 +58,8 @@ export const useTripStore = defineStore('trip', () => {
   const autoRetryTimers = new Map<string, ReturnType<typeof setTimeout>>();
   /** 客户端硬超时后的超时态：不固化为 partial 最终结果，可自动重试 */
   const preciseTimedOut = ref(false);
+  /** P0-4：服务端未能定位坐标的经停站名（地图渲染灰色占位 + 面板提示） */
+  const unresolvedStops = ref<string[]>([]);
 
   function currentTripKey(): string {
     const seg = segment.value;
@@ -218,6 +229,11 @@ export const useTripStore = defineStore('trip', () => {
     }
   }
 
+  /** P0-4：同步服务端回传的缺坐标经停站名清单 */
+  function applyUnresolved(job: RailGeometryJob) {
+    unresolvedStops.value = job.unresolvedStops ? [...job.unresolvedStops] : [];
+  }
+
   function rememberBestPrecise(job: RailGeometryJob, coords: [number, number][]) {
     if (coords.length < 2) return;
     if (!(job.segmentsOk > 0) || job.source === 'station') return;
@@ -299,6 +315,7 @@ export const useTripStore = defineStore('trip', () => {
     preciseError.value = '';
     bestPrecise = null;
     preciseTimedOut.value = false;
+    unresolvedStops.value = [];
     isDemo.value = !!params.isDemo;
 
     stopsAll.value = params.stops;
@@ -358,6 +375,7 @@ export const useTripStore = defineStore('trip', () => {
     lastProgressPersistSeg = -1;
     bestPrecise = null;
     preciseTimedOut.value = false;
+    unresolvedStops.value = [];
     segment.value = JSON.parse(JSON.stringify(snap.segment));
     stopsAll.value = JSON.parse(JSON.stringify(snap.stopsAll));
     scenicSpots.value = JSON.parse(JSON.stringify(snap.scenicSpots));
@@ -498,6 +516,7 @@ export const useTripStore = defineStore('trip', () => {
       }
       activeJobId = job.jobId;
       preciseJob.value = job;
+      applyUnresolved(job);
       if (job.stops?.length) applyStopCoords(job.stops);
       if (shouldApplyJobCoords(job)) {
         applyPreciseCoords(job.coords, {
@@ -578,7 +597,9 @@ export const useTripStore = defineStore('trip', () => {
       qualityTier: ok > 0 ? 'mixed' : 'station',
       trainCode: prev?.trainCode || segment.value?.trainCode,
       stops: prev?.stops,
+      unresolvedStops: prev?.unresolvedStops,
     };
+    applyUnresolved(preciseJob.value);
     if (kept.length >= 2 && ok > 0) {
       applyPreciseCoords(kept, { hint: msg, source: 'precise', canUpgrade: true });
     } else {
@@ -594,7 +615,7 @@ export const useTripStore = defineStore('trip', () => {
     if (clientTimeoutTimer != null) clearTimeout(clientTimeoutTimer);
     clientTimeoutTimer = setTimeout(() => {
       applyClientPreciseTimeout(jobId, epoch);
-    }, CLIENT_PRECISE_TIMEOUT_MS);
+    }, clientPreciseTimeoutMs());
   }
 
   function hintForJob(job: RailGeometryJob): string {
@@ -628,6 +649,7 @@ export const useTripStore = defineStore('trip', () => {
         return;
       }
       preciseJob.value = job;
+      applyUnresolved(job);
       if (job.stops?.length) applyStopCoords(job.stops);
       if (shouldApplyJobCoords(job)) {
         const stillRunning = job.status === 'queued' || job.status === 'running';
@@ -682,6 +704,7 @@ export const useTripStore = defineStore('trip', () => {
     }
     stopPrecisePoll();
     preciseLoading.value = false;
+    applyUnresolved(job);
 
     const displayCoords = coordsForJobDisplay(job);
     const keptBest =
@@ -767,6 +790,7 @@ export const useTripStore = defineStore('trip', () => {
     preciseError.value = '';
     isDemo.value = false;
     preciseTimedOut.value = false;
+    unresolvedStops.value = [];
   }
 
   return {
@@ -782,6 +806,7 @@ export const useTripStore = defineStore('trip', () => {
     preciseError,
     isDemo,
     preciseTimedOut,
+    unresolvedStops,
     setTrip,
     hydrateFromSnapshot,
     applyPreciseCoords,

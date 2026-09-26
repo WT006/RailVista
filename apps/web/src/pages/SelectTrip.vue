@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import type { Stop, TrainSummary } from '@railvista/shared';
 import { api } from '../api/client';
 import { hydrateFromSnapshot } from '../lib/persistTrip';
@@ -19,9 +19,11 @@ import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import ApiVersionBadge from '../components/ApiVersionBadge.vue';
 import AppVersionBadge from '../components/AppVersionBadge.vue';
 import RailProgressLoader from '../components/RailProgressLoader.vue';
+import RankingsSection from '../components/rankings/RankingsSection.vue';
 import { useTripStore } from '../stores/tripStore';
 
 const router = useRouter();
+const route = useRoute();
 const trip = useTripStore();
 
 const from = ref('');
@@ -139,6 +141,11 @@ async function removeRecent(key: string) {
 
 onMounted(async () => {
   date.value = defaultDate();
+  // 线路详情页「进入实时地图」带 from/to 回来：预填 OD 输入框（零回归：仅赋值，不触发查询）
+  const qFrom = route.query.from;
+  const qTo = route.query.to;
+  if (typeof qFrom === 'string' && qFrom.trim()) from.value = qFrom.trim();
+  if (typeof qTo === 'string' && qTo.trim()) to.value = qTo.trim();
   try {
     const hint = sessionStorage.getItem('railvista:resumeHint');
     if (hint) {
@@ -172,6 +179,10 @@ onMounted(async () => {
       clearAutoResume();
       resumeHint.value = '无法恢复上次行程';
       refreshRecentUi();
+    }
+    // 线路详情页「Z8991 演示」：?demo=z8991 → 走既有 /api/presets/z8991 演示链路
+    if (route.query.demo === 'z8991') {
+      await loadDemo();
     }
   } finally {
     endLoading();
@@ -751,6 +762,8 @@ function goBack() {
         </button>
       </div>
     </section>
+
+    <RankingsSection v-if="showHomeLists" />
 
     <section v-if="trains.length && step === 'search'" class="train-list">
       <h2 class="train-list__title">

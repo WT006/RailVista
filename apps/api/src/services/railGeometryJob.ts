@@ -120,6 +120,13 @@ export type RailJobSnapshot = {
 
 type SegSlot = { coords: LngLat[]; ok: boolean; reason?: string } | null;
 
+/**
+ * F3 [P1] 景点匹配记忆化：每次轮询都把 432 个景点对整条折线重算一遍，
+ * 实测 14ms(576点) ~ 183ms(10327点)，1.5s 轮询下持续阻塞事件循环。
+ * 这里按「coords 签名 + 任务状态」缓存结果，只有折线真的变了才重算。
+ */
+type SpotMemo = { sig: string; spots: ScenicSpot[]; ms: number };
+
 type RailJob = Omit<RailJobSnapshot, 'stops'> & {
   stops: NamedStop[];
   unresolvedStops: string[];
@@ -130,7 +137,33 @@ type RailJob = Omit<RailJobSnapshot, 'stops'> & {
   updatedAt: number;
   /** 被同客户端新 OD 任务取代后不再写缓存 / 进度 */
   abandoned?: boolean;
+  spotMemo?: SpotMemo;
 };
+
+/**
+ * 折线签名：点数 + 成功段数 + 5 个等距采样点。
+ * 宁可贵一点重算，也不能拿旧签名返回旧景点——采样点覆盖首尾与三个四分位，
+ * 任何实质性折线变化（长度变化或中段改线）都会被捕捉。
+ */
+function coordsSignature(coords: [number, number][], segmentsOk: number): string {
+  const n = coords.length;
+  if (!n) return `0|${segmentsOk}`;
+  const picks = [0, Math.floor(n / 4), Math.floor(n / 2), Math.floor((3 * n) / 4), n - 1];
+  const samples = picks.map((i) => {
+    const p = coords[Math.max(0, Math.min(n - 1, i))];
+    return `${p[0].toFixed(4)},${p[1].toFixed(4)}`;
+  });
+  return `${n}|${segmentsOk}|${samples.join(';')}`;
+}
+
+function jobScenicSpots(job: RailJob): ScenicSpot[] {
+  const sig = `${job.status}|${coordsSignature(job.coords, job.segmentsOk)}`;
+  if (job.spotMemo && job.spotMemo.sig === sig) return job.spotMemo.spots;
+  const t0 = Date.now();
+  const spots = matchScenicSpotsForRailway(job.coords);
+  job.spotMemo = { sig, spots, ms: Date.now() - t0 };
+  return spots;
+}
 
 const JOB_TTL_MS = 30 * 60 * 1000;
 /**
@@ -308,7 +341,7 @@ function snapshot(job: RailJob): RailJobSnapshot {
     trainCode: job.trainCode,
     stops: job.stops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat })),
     unresolvedStops: job.unresolvedStops?.length ? job.unresolvedStops : undefined,
-    scenicSpots: matchScenicSpotsForRailway(job.coords),
+    scenicSpots: jobScenicSpots(job),
   };
 }
 
@@ -931,4 +964,15 @@ export function getRailGeometryJob(jobId: string): RailJobSnapshot | null {
   pruneJobs();
   const job = jobs.get(jobId);
   return job ? snapshot(job) : null;
+}
+
+/**
+ * U1：前端「取消」时显式废弃任务——停止后续真实计算、释放排队位、
+ * 不再写热缓存，并让仍在等待的 worker 尽快退出。
+ */
+export function abandonRailGeometryJob(jobId: string): boolean {
+  const job = jobs.get(jobId);
+  if (!job) return false;
+  abandonJob(job);
+  return true;
 }

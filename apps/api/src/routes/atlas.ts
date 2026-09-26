@@ -1,0 +1,472 @@
+/**
+ * 全国铁路景点地图（/atlas）只读聚合路由。
+ *
+ * 严格只读：仅 readFileSync 读取 data/presets/**，**不修改任何数据文件**。
+ * 模式照抄 routes/presets.ts。
+ *
+ * - GET /api/atlas/overview   → 全部走廊（折线抽稀 ≤300 点）+ 全量景点 + 景点↔线路归属统计
+ * - GET /api/atlas/corridor/:id → 单条走廊完整折线（线路详情页小地图用）
+ */
+import { Hono } from 'hono';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { loadScenicSpots } from '../services/scenicSpots.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const presetsDir = join(__dirname, '../../../../data/presets');
+const corridorsDir = join(presetsDir, 'corridors');
+const spotsPath = join(presetsDir, 'scenic-spots.json');
+
+export const atlasRoute = new Hono();
+
+/** 每条走廊抽稀后的最大点数（等距抽样，必含首尾） */
+const MAX_POLYLINE_POINTS = 300;
+/** 几何归属判定：默认半径（km），按景点自身 maxDistKm 覆盖并夹在区间内 */
+const GEO_MIN_KM = 5;
+const GEO_MAX_KM = 40;
+const GEO_DEFAULT_KM = 20;
+/** 网格索引cell 边长（度），约 25km */
+const GRID_CELL_DEG = 0.25;
+/** 聚合结果缓存时长（ms）——数据文件是静态的，缓存只为避免每次请求重算几何归属 */
+const OVERVIEW_TTL_MS = 60_000;
+
+type CorridorFile = {
+  id?: string;
+  name?: string;
+  stationsHint?: string[];
+  railway?: Array<[number, number]>;
+  note?: string;
+};
+
+export type AtlasCorridor = {
+  id: string;
+  name: string;
+  stationsHint: string[];
+  polyline: [number, number][];
+  /** 景点 lines[].corridorId 明确标注的数量 */
+  lineSpotCount: number;
+  /** 按沿线距离推算得到的景点数量 */
+  geoSpotCount: number;
+  /** 综合展示用：line 优先，无 line 时用 geo */
+  spotCount: number;
+  spotIds: string[];
+  lengthKm: number;
+};
+
+export type AtlasSpot = {
+  id: string;
+  name: string;
+  lng: number;
+  lat: number;
+  intro?: string;
+  category?: string;
+  dimensions?: string[];
+  lines?: Array<{ corridorId?: string; alongKmFrom?: number; alongKmTo?: number; distKm?: number }>;
+  /** 所属走廊（line 标注优先，其次几何推算） */
+  corridorIds: string[];
+  /** line = 数据明确标注；geo = 按沿线距离推算；null = 未归属 */
+  matchKind: 'line' | 'geo' | null;
+};
+
+/** 线路详情页用：景点在该走廊上的里程位置 */
+export type AtlasCorridorSpot = {
+  id: string;
+  name: string;
+  lng: number;
+  lat: number;
+  intro?: string;
+  category?: string;
+  dimensions: string[];
+  /** line = 数据明确标注；geo = 按沿线距离推算 */
+  matchKind: 'line' | 'geo' | null;
+  /** 距线路起点的沿线里程（km） */
+  alongKm: number;
+  /** 到线路的最近距离（km） */
+  distKm: number;
+};
+
+export type AtlasOverview = {
+  corridors: AtlasCorridor[];
+  spots: AtlasSpot[];
+  meta: {
+    corridorCount: number;
+    spotCount: number;
+    generatedAt: string;
+    buildMs: number;
+  };
+};
+
+function round4(n: number): number {
+  return Math.round(n * 1e4) / 1e4;
+}
+
+/** 等距抽样抽稀到 maxPoints，必含首尾点 */
+function thinPolyline(points: Array<[number, number]>, maxPoints: number): Array<[number, number]> {
+  const valid = (points || []).filter(
+    (p) => Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1]),
+  );
+  if (valid.length <= maxPoints) return valid.map(([lng, lat]) => [round4(lng), round4(lat)] as [number, number]);
+  const out: Array<[number, number]> = [];
+  const step = (valid.length - 1) / (maxPoints - 1);
+  for (let i = 0; i < maxPoints; i += 1) {
+    const idx = Math.round(i * step);
+    const p = valid[Math.min(valid.length - 1, idx)];
+    out.push([round4(p[0]), round4(p[1])]);
+  }
+  return out;
+}
+
+function haversineKm(lng1: number, lat1: number, lng2: number, lat2: number): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
+
+function polylineLengthKm(points: Array<[number, number]>): number {
+  let sum = 0;
+  for (let i = 1; i < points.length; i += 1) {
+    sum += haversineKm(points[i - 1][0], points[i - 1][1], points[i][0], points[i][1]);
+  }
+  return sum;
+}
+
+/**
+ * 把景点投影到走廊折线上，得到「沿线里程 + 离线距离」。
+ * 局部切平面近似（与 shared/schedule 的定侧算法同一套 KM_PER_DEG 常数），
+ * 仅在展示层用于排序与「距线 X km」提示，不参与任何几何/行程计算。
+ */
+function projectAlongKm(
+  poly: Array<[number, number]>,
+  lng: number,
+  lat: number,
+): { alongKm: number; distKm: number } {
+  if (poly.length < 2) return { alongKm: 0, distKm: 0 };
+  const cosLat = Math.max(0.2, Math.cos((lat * Math.PI) / 180));
+  const kx = 111.32 * cosLat;
+  const ky = 110.574;
+  let acc = 0;
+  let bestAlong = 0;
+  let bestDist = Number.POSITIVE_INFINITY;
+  for (let i = 1; i < poly.length; i += 1) {
+    const [x1, y1] = poly[i - 1]!;
+    const [x2, y2] = poly[i]!;
+    const segKm = haversineKm(x1, y1, x2, y2);
+    const vx = (x2 - x1) * kx;
+    const vy = (y2 - y1) * ky;
+    const px = (lng - x1) * kx;
+    const py = (lat - y1) * ky;
+    const len2 = vx * vx + vy * vy;
+    let t = len2 > 0 ? (px * vx + py * vy) / len2 : 0;
+    t = t < 0 ? 0 : t > 1 ? 1 : t;
+    const cx = x1 + (x2 - x1) * t;
+    const cy = y1 + (y2 - y1) * t;
+    const d = haversineKm(lng, lat, cx, cy);
+    if (d < bestDist) {
+      bestDist = d;
+      bestAlong = acc + segKm * t;
+    }
+    acc += segKm;
+  }
+  return { alongKm: Math.round(bestAlong * 10) / 10, distKm: Math.round(bestDist * 10) / 10 };
+}
+
+function listCorridorFiles(): string[] {
+  if (!existsSync(corridorsDir)) return [];
+  return readdirSync(corridorsDir).filter((f) => f.endsWith('.json') && !f.startsWith('_'));
+}
+
+function readCorridor(file: string): CorridorFile | null {
+  try {
+    return JSON.parse(readFileSync(join(corridorsDir, file), 'utf8')) as CorridorFile;
+  } catch {
+    return null;
+  }
+}
+
+function geoRadiusKm(maxDistKm?: number): number {
+  const raw = Number.isFinite(maxDistKm) && (maxDistKm as number) > 0 ? (maxDistKm as number) : GEO_DEFAULT_KM;
+  return Math.min(GEO_MAX_KM, Math.max(GEO_MIN_KM, raw));
+}
+
+type RawSpot = {
+  id?: string;
+  name?: string;
+  lng?: number;
+  lat?: number;
+  intro?: string;
+  category?: string;
+  dimensions?: string[];
+  maxDistKm?: number;
+  lines?: Array<{ corridorId?: string; alongKmFrom?: number; alongKmTo?: number; distKm?: number }>;
+};
+
+/**
+ * 用网格索引把景点几何归属到走廊：
+ * 全部走廊折线点入格 → 每个景点只查半径内的格子，避免 432 × 248 × 300 的全量比对。
+ */
+function buildGeoIndex(corridors: Array<{ id: string; polyline: Array<[number, number]> }>) {
+  const grid = new Map<string, Array<{ cid: string; lng: number; lat: number }>>();
+  for (const c of corridors) {
+    for (const [lng, lat] of c.polyline) {
+      const key = `${Math.floor(lng / GRID_CELL_DEG)}:${Math.floor(lat / GRID_CELL_DEG)}`;
+      const bucket = grid.get(key);
+      if (bucket) bucket.push({ cid: c.id, lng, lat });
+      else grid.set(key, [{ cid: c.id, lng, lat }]);
+    }
+  }
+  return grid;
+}
+
+function geoMatch(
+  grid: ReturnType<typeof buildGeoIndex>,
+  lng: number,
+  lat: number,
+  radiusKm: number,
+): Map<string, number> {
+  const best = new Map<string, number>();
+  const dLat = radiusKm / 111;
+  const cosLat = Math.max(0.2, Math.cos((lat * Math.PI) / 180));
+  const dLng = radiusKm / (111 * cosLat);
+  const x0 = Math.floor((lng - dLng) / GRID_CELL_DEG);
+  const x1 = Math.floor((lng + dLng) / GRID_CELL_DEG);
+  const y0 = Math.floor((lat - dLat) / GRID_CELL_DEG);
+  const y1 = Math.floor((lat + dLat) / GRID_CELL_DEG);
+  for (let cx = x0; cx <= x1; cx += 1) {
+    for (let cy = y0; cy <= y1; cy += 1) {
+      const bucket = grid.get(`${cx}:${cy}`);
+      if (!bucket) continue;
+      for (const p of bucket) {
+        const d = haversineKm(lng, lat, p.lng, p.lat);
+        if (d > radiusKm) continue;
+        const prev = best.get(p.cid);
+        if (prev == null || d < prev) best.set(p.cid, d);
+      }
+    }
+  }
+  return best;
+}
+
+let overviewCache: { at: number; data: AtlasOverview } | null = null;
+let cacheStamp = '';
+
+function stamp(): string {
+  let spotsMtime = 0;
+  try {
+    spotsMtime = existsSync(spotsPath) ? statSync(spotsPath).mtimeMs : 0;
+  } catch {
+    spotsMtime = 0;
+  }
+  let corridorCount = 0;
+  let corridorMtime = 0;
+  try {
+    const files = listCorridorFiles();
+    corridorCount = files.length;
+    for (const f of files) {
+      const st = statSync(join(corridorsDir, f)).mtimeMs;
+      if (st > corridorMtime) corridorMtime = st;
+    }
+  } catch {
+    /* ignore */
+  }
+  return `${spotsMtime}|${corridorCount}|${corridorMtime}`;
+}
+
+function buildOverview(): AtlasOverview {
+  const t0 = Date.now();
+  const files = listCorridorFiles();
+  const corridors: Array<{ id: string; name: string; stationsHint: string[]; polyline: Array<[number, number]>; lengthKm: number; full: Array<[number, number]> }> = [];
+
+  for (const file of files) {
+    const raw = readCorridor(file);
+    if (!raw) continue;
+    const id = String(raw.id || file.replace(/\.json$/, ''));
+    const full = Array.isArray(raw.railway) ? raw.railway : [];
+    if (full.length < 2) continue;
+    const polyline = thinPolyline(full, MAX_POLYLINE_POINTS);
+    corridors.push({
+      id,
+      name: String(raw.name || id),
+      stationsHint: Array.isArray(raw.stationsHint) ? raw.stationsHint.slice(0, 40) : [],
+      polyline,
+      lengthKm: Math.round(polylineLengthKm(full)),
+      full,
+    });
+  }
+
+  const rawSpots = (loadScenicSpots() as unknown as RawSpot[]) || [];
+  const grid = buildGeoIndex(corridors);
+
+  const lineIdsByCorridor = new Map<string, string[]>();
+  const geoIdsByCorridor = new Map<string, string[]>();
+  const spots: AtlasSpot[] = [];
+
+  for (const s of rawSpots) {
+    const lng = Number(s.lng);
+    const lat = Number(s.lat);
+    const id = String(s.id || s.name || '');
+    if (!Number.isFinite(lng) || !Number.isFinite(lat) || !id) continue;
+
+    // 1) 数据明确标注（权威）
+    const lineIds: string[] = [];
+    for (const l of s.lines || []) {
+      const cid = l?.corridorId ? String(l.corridorId) : '';
+      if (cid && !lineIds.includes(cid)) lineIds.push(cid);
+    }
+    // 2) 几何推算（数据尚未标注 lines 时的兜底，供「哪些地方景点多」统计）
+    const geo = geoMatch(grid, lng, lat, geoRadiusKm(s.maxDistKm));
+    const geoIds = [...geo.keys()];
+
+    const merged: string[] = [];
+    for (const cid of [...lineIds, ...geoIds]) {
+      if (!merged.includes(cid)) merged.push(cid);
+    }
+
+    for (const cid of lineIds) {
+      const arr = lineIdsByCorridor.get(cid);
+      if (arr) arr.push(id);
+      else lineIdsByCorridor.set(cid, [id]);
+    }
+    for (const cid of geoIds) {
+      const arr = geoIdsByCorridor.get(cid);
+      if (arr) arr.push(id);
+      else geoIdsByCorridor.set(cid, [id]);
+    }
+
+    spots.push({
+      id,
+      name: String(s.name || id),
+      lng: round4(lng),
+      lat: round4(lat),
+      intro: s.intro,
+      category: s.category,
+      dimensions: Array.isArray(s.dimensions) ? s.dimensions : undefined,
+      lines: s.lines,
+      corridorIds: merged,
+      matchKind: lineIds.length ? 'line' : geoIds.length ? 'geo' : null,
+    });
+  }
+
+  const out: AtlasCorridor[] = corridors.map((c) => {
+    const lineIds = lineIdsByCorridor.get(c.id) || [];
+    const geoIds = (geoIdsByCorridor.get(c.id) || []).filter((x) => !lineIds.includes(x));
+    return {
+      id: c.id,
+      name: c.name,
+      stationsHint: c.stationsHint,
+      polyline: c.polyline,
+      lineSpotCount: lineIds.length,
+      geoSpotCount: geoIds.length,
+      spotCount: lineIds.length || geoIds.length,
+      spotIds: lineIds.length ? lineIds : geoIds,
+      lengthKm: c.lengthKm,
+    };
+  });
+
+  return {
+    corridors: out,
+    spots,
+    meta: {
+      corridorCount: out.length,
+      spotCount: spots.length,
+      generatedAt: new Date().toISOString(),
+      buildMs: Date.now() - t0,
+    },
+  };
+}
+
+function getOverview(): AtlasOverview {
+  const now = Date.now();
+  const cur = stamp();
+  if (overviewCache && cacheStamp === cur && now - overviewCache.at < OVERVIEW_TTL_MS) {
+    return overviewCache.data;
+  }
+  const data = buildOverview();
+  overviewCache = { at: now, data };
+  cacheStamp = cur;
+  return data;
+}
+
+atlasRoute.get('/overview', (c) => {
+  try {
+    const data = getOverview();
+    return c.json({ ok: true, data });
+  } catch (e) {
+    return c.json(
+      { ok: false, error: { code: 'ATLAS_FAIL', message: e instanceof Error ? e.message : '聚合失败' } },
+      500,
+    );
+  }
+});
+
+atlasRoute.get('/corridor/:id', (c) => {
+  const id = String(c.req.param('id') || '').trim();
+  if (!id) {
+    return c.json({ ok: false, error: { code: 'BAD_REQUEST', message: '缺少 corridorId' } }, 400);
+  }
+  const file = join(corridorsDir, `${id}.json`);
+  if (!existsSync(file)) {
+    return c.json(
+      { ok: false, error: { code: 'NOT_FOUND', message: `走廊不存在：${id}` } },
+      404,
+    );
+  }
+  try {
+    const raw = readCorridor(`${id}.json`);
+    const railway = Array.isArray(raw?.railway) ? raw!.railway! : [];
+    const overview = getOverview();
+    const hit = overview.corridors.find((x) => x.id === id);
+    const spotIds = hit?.spotIds || [];
+
+    // 详情页景点：数据 lines 标注优先，其次几何推算；统一按沿线里程升序
+    const idSet = new Set(spotIds);
+    const corridorSpots: AtlasCorridorSpot[] = [];
+    for (const s of overview.spots) {
+      if (!idSet.has(s.id)) continue;
+      const lineRef = (s.lines || []).find((l) => l?.corridorId === id);
+      const proj = projectAlongKm(railway, s.lng, s.lat);
+      corridorSpots.push({
+        id: s.id,
+        name: s.name,
+        lng: s.lng,
+        lat: s.lat,
+        intro: s.intro,
+        category: s.category,
+        dimensions: Array.isArray(s.dimensions) ? s.dimensions : [],
+        matchKind: s.matchKind,
+        // lines 里写了里程就以数据为准，否则用投影推算
+        alongKm:
+          lineRef && Number.isFinite(lineRef.alongKmFrom)
+            ? Number(lineRef.alongKmFrom)
+            : proj.alongKm,
+        distKm: Number.isFinite(lineRef?.distKm) ? Number(lineRef!.distKm) : proj.distKm,
+      });
+    }
+    corridorSpots.sort((a, b) => a.alongKm - b.alongKm);
+
+    return c.json({
+      ok: true,
+      data: {
+        id,
+        name: String(raw?.name || id),
+        stationsHint: Array.isArray(raw?.stationsHint) ? raw!.stationsHint : [],
+        note: raw?.note,
+        railway: railway.map(([lng, lat]) => [round4(lng), round4(lat)] as [number, number]),
+        lengthKm: hit?.lengthKm ?? Math.round(polylineLengthKm(railway)),
+        spotIds,
+        lineSpotCount: hit?.lineSpotCount || 0,
+        geoSpotCount: hit?.geoSpotCount || 0,
+        spots: corridorSpots,
+      },
+    });
+  } catch (e) {
+    return c.json(
+      { ok: false, error: { code: 'ATLAS_FAIL', message: e instanceof Error ? e.message : '读取失败' } },
+      500,
+    );
+  }
+});

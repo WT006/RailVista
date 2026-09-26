@@ -10,7 +10,11 @@ import {
   validateStopsOnCoords,
   anchorSliceEndpoints,
 } from '../services/corridorNetwork.js';
-import { createRailGeometryJob, getRailGeometryJob } from '../services/railGeometryJob.js';
+import {
+  abandonRailGeometryJob,
+  createRailGeometryJob,
+  getRailGeometryJob,
+} from '../services/railGeometryJob.js';
 import { loadScenicSpots, matchScenicSpotsForRailway } from '../services/scenicSpots.js';
 import { ensureFullStops } from '../services/stopsAutocomplete.js';
 import { clientKeyFromRequest } from '../lib/clientIdentity.js';
@@ -163,6 +167,13 @@ railGeometryRoute.get('/jobs/:jobId', async (c) => {
     );
   }
   return c.json({ ok: true, data: job });
+});
+
+/** U1：取消进行中/排队中的任务（前端精度面板「取消」按钮） */
+railGeometryRoute.post('/jobs/:jobId/abandon', (c) => {
+  const jobId = c.req.param('jobId');
+  const done = abandonRailGeometryJob(jobId);
+  return c.json({ ok: true, data: { jobId, abandoned: done } });
 });
 
 railGeometryRoute.post('/', async (c) => {

@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.1.2`**（2026-09-27）
+**当前版本：`0.1.3`**（2026-09-28）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,96 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.1.3] — 2026-09-28
+
+本次同时落地两项需求（对应两份需求文档）：
+
+- 《精准路线生成-性能加速与景点刷新修复及UI改版报告-20260927.md》→ 下面第 1、2 部分
+- 《RailVista主页改版_AI生成指令_20260927.md》→ 下面第 3 部分
+
+**数据文件零改动**：`git status` 不出现 `data/` 变更，`data/presets/**`、`data/rails/**`、
+`data/stations-geo.json` 均未触碰。
+
+---
+
+### 需求一 A：精准路线生成性能加速
+
+改动动机：整程 Overpass 串行试镜像最长约 75s、段结果只在内存里（重启即失）、
+每次轮询都重算一次景点匹配（14ms~183ms/次，随点数增长）阻塞事件循环。
+
+| 项 | 改动 | 涉及文件 |
+| --- | --- | --- |
+| F1 | Overpass 改为**多镜像并发竞速**：单请求 10s 超时、整程总预算 12s、镜像错峰 1.2s 发车，首个非空结果即胜出并 abort 其余；全失败且曾拿到空结果时返回空而非报错 | `apps/api/src/services/osmRailway.ts`（新增 `raceOverpass` / `overpassHost` / `sleep`） |
+| F1 | way 抓取由「串行 + 每段 sleep 200ms」改为**有界并发池**（默认 3） | 同上（新增 `runPool`） |
+| F2 | 段几何**落盘缓存** `data/cache/railseg/`（已 gitignore）：命中/负结果分别持久化，负结果按原因分级 TTL（超时/网络/5xx 45s，其余 20min），避免瞬时故障被长时间缓存 | 新增 `apps/api/src/services/segmentCache.ts` |
+| F2 | 空闲**热门 OD 预热**（默认仅本地库、不访问公共 Overpass、不写负缓存） | 新增 `apps/api/src/services/segmentPrewarm.ts`，`apps/api/src/index.ts` 注册 |
+| F3 | `snapshot()` 的景点匹配按 job **记忆化**（折线签名不变则复用，含耗时统计），消除轮询期的重复计算 | `apps/api/src/services/railGeometryJob.ts`（`SpotMemo` / `coordsSignature` / `jobScenicSpots`） |
+| F4 | Overpass 查询 **in-flight 去重**（sha1(query+镜像数) 为键），并发同查询只发一次网络请求 | `apps/api/src/services/osmRailway.ts` |
+| 附带 | `buildAdj` 由 O(W²) 两两比对改为**空间网格分桶**（3×3 邻域，语义与连边结果不变）；`acceptSegmentGeometry` 去掉 `Math.min(...arr)` 展开（大数组有爆栈风险） | 同上 |
+
+### 需求一 B：景点刷新修复（刷新结果稳定、交互无异常）
+
+| 缺陷 | 根因 | 修复 |
+| --- | --- | --- |
+| B1 折线刷新了、景点标记不刷新 | `TripMap.vue` 景点标记只在 `initMap()` 里构建一次，没有 watch | 抽出 `buildSpotMarker()` / `rebuildSpotMarkers()`，并新增对 `trip.scenicSpots`（id+side+progress 签名）的 watch；`onPreciseRefresh()` 统一在刷新后重建标记 |
+| B2 景点只会越刷越少 | `tripStore.applyPreciseCoords()` 拿**旧的**景点集去过滤**新的**折线 | 新增 `spotLibrary`（景点全集累积，按 id 合并，后写覆盖）：应用精准坐标时从**全集重算**，景点既能增加也能减少；确实只能走降级路径时置 `spotsStale=true` 并在面板提示 |
+| U1 精度状态只有一个拥挤的小按钮 | 旧 `.status-actions` 按钮承载了全部状态 | 新增 `apps/web/src/components/PreciseRoutePanel.vue`：`idle/queued/running/bridging/done/partial/failed/offline` 状态机 + 已耗时（>8s 视为慢）+ 进度条 + 数据来源 + 完成后折叠为一行摘要 + **进行中可取消** |
+
+取消链路端到端打通：面板 ✕ → `tripStore.cancelPrecise()` → `api.abandonRailGeometryJob()`
+→ `POST /api/rail-geometry/jobs/:id/abandon` → `abandonRailGeometryJob()`。
+
+### 需求二：主页排行榜改造 + 线路详情页 + 全国铁路景点地图
+
+- 新增 `apps/web/src/data/beautifulRailings.ts`：4 个榜单（世界旅游轨道大会票选 / 新华网专题 /
+  国铁官媒 / 编辑精选），逐条核对 `corridorId`；`null` 表示仓库暂无该线路几何。
+  **关于「按搜索量排名」**：前端拿不到真实全网搜索量，**不伪造热度**，本期用 localStorage
+  「我的关注」本机点击计数 + `Ranking.rankingType` 扩展位，后续接真实统计只需替换 `readFocusCounts`。
+- 新增 `apps/web/src/components/rankings/RankingsSection.vue` 并挂到主页（`SelectTrip.vue`，
+  仅在无查询结果时展示）：胶囊 Tab（200ms 淡入/位移）、前三名金/银/铜大卡、第 4 名起紧凑列表行、
+  无线路条目弱化且不跳转、来源脚注外链。
+- 新增 `apps/web/src/pages/RouteDetail.vue`（`/route/:corridorId`，支持 `?from=&to=`）：
+  头部（起讫徽章 / 里程 / 通车年 / 所属榜单徽章）→ 高德静态小地图（走廊折线 + `fitView`，
+  from/to 走「最近顶点投影 + 索引区间」粗略切片，**仅展示、不落盘**）→ 景点按六维分组（按 alongKm 排序）
+  → 「进入实时地图」（回首页预填 OD）/ 青藏线额外「Z8991 演示」按钮。
+- 新增 `apps/web/src/pages/AtlasMap.vue`（`/atlas`）+ `apps/api/src/routes/atlas.ts`（**只读聚合**，
+  照抄 `presets.ts` 的 readFileSync 模式，不改任何数据文件）：
+  - `GET /api/atlas/overview`：248 条走廊（折线等距抽稀 ≤300 点）+ 432 处景点 + 归属统计，60s 缓存；
+  - `GET /api/atlas/corridor/:id`：单条完整折线 + 沿线景点（含沿线里程/离距）。
+  - 图层：L1 全量铁路网（细银灰、只响应 click）→ L2 景点 MarkerCluster 聚合（按六维着色，图例在侧栏）
+    → L3 AMap HeatMap 可开关 → L4 选中走廊加粗高亮 + fitView、点景点弹 InfoWindow。
+  - 侧栏可折叠：搜索（线路/景点）、六维多选筛选、沿线景点最多 Top10、排行榜快捷入口。
+  - 插件（MarkerCluster / HeatMap）加载失败自动降级为普通 Marker 并隐藏热力开关。
+- 新增 `apps/web/src/data/spotDimensions.ts`：六维展示元数据（颜色/短标签），两个页面共用。
+- 改 `apps/web/src/router/index.ts`：新增 `/route/:corridorId`、`/atlas` 两条路由。
+- 改 `apps/web/src/pages/SelectTrip.vue`：`onMounted` 读取 `?from=&to=` 预填 OD（零回归，仅赋值）、
+  `?demo=z8991` 触发既有演示链路。
+
+### 验证
+
+| 项 | 结果 |
+| --- | --- |
+| `pnpm --filter @railvista/shared build` | 通过 |
+| `pnpm --filter @railvista/api build` | 通过 |
+| `pnpm --filter @railvista/web build`（含 `vue-tsc --noEmit`） | 通过（仅既有 chunk 提示） |
+| `pnpm test`（shared） | 25/25 通过 |
+| api 单测（本次改动涉及的 4 个文件：osmRailway / railGeometryJob / preciseRouteCache / wholeTripGate） | 17/17 通过 |
+| api 单测（corridors / scenicSpots） | 46 pass / 9 fail，**与改动前 HEAD 完全一致**（既有失败，未回归） |
+| `node scripts/verify-corridor-geometry.mjs --strict` | `geom=0 (heavy+medium) seed=0` 通过；29 条 station hint 告警为既有数据问题（本次未改 `data/`），与 HEAD 一致 |
+| `curl /api/atlas/overview` | `ok:true`，`corridorCount=248`、`spotCount=432`、`buildMs=89` |
+| `curl /api/atlas/corridor/qingzang` | `ok:true`，2205 点折线、17 处景点含青海湖（186.8km）/察尔汗盐湖（675.4km） |
+| `curl /api/atlas/corridor/not-exist-xxx` | `{"ok":false,"code":"NOT_FOUND"}`，前端走友好空态 |
+
+### 已知限制 / 回滚
+
+- 段缓存与负缓存落在 `data/cache/railseg/`（gitignore），删除该目录即回到纯内存行为。
+- 热门预热默认 `RAIL_SEG_PREWARM_NETWORK=0`（只用本地库，不访问公共 Overpass）；
+  设 `RAIL_SEG_PREWARM_DELAY_MS=-1` 可完全关闭预热。
+- 景点↔线路归属：数据里有 `lines[].corridorId` 的以数据为准（`matchKind='line'`），
+  其余按沿线距离推算（`matchKind='geo'`），页面上有「距离推算」标记，不是伪造的权威归属。
+- 回滚：整体 revert 本 commit 即可，无数据迁移、无 schema 变更。
 
 ---
 

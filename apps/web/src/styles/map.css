@@ -1396,3 +1396,213 @@ body {
   color: #64748b;
   font-size: 10.5px;
 }
+
+/* ── U1 精度状态面板（PreciseRoutePanel）─────────────────────────────────
+   与 .status-card 同一语言：12–14 圆角、1px 描边、低饱和底色；
+   主色 #38bdf8 / 成功 #2dd4bf / 警示 #fbbf24 / 失败 #f87171 / 离线 #94a3b8。 */
+.precise-panel {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 10px 9px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.66));
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.precise-panel--compact {
+  padding: 7px 8px 8px;
+  gap: 5px;
+}
+
+.precise-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.precise-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+}
+
+.precise-panel--done .precise-dot {
+  background: #2dd4bf;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.16);
+}
+.precise-panel--partial .precise-dot,
+.precise-panel--bridging .precise-dot {
+  background: #fbbf24;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.16);
+}
+.precise-panel--failed .precise-dot {
+  background: #f87171;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.16);
+}
+.precise-panel--offline .precise-dot {
+  background: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.14);
+}
+
+.precise-panel__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #e2e8f0;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.precise-panel__ratio,
+.precise-tier {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: #94a3b8;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.precise-tier {
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.precise-panel--done .precise-tier {
+  color: #5eead4;
+  background: rgba(45, 212, 191, 0.12);
+}
+
+.precise-panel__toggle,
+.precise-panel__cancel {
+  flex-shrink: 0;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(148, 163, 184, 0.1);
+  color: #cbd5e1;
+  border-radius: 8px;
+  height: 22px;
+  min-width: 22px;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.precise-panel__cancel:hover {
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.12);
+}
+
+.precise-progress {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.precise-progress__track {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+  overflow: hidden;
+}
+
+.precise-progress__bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+  transition: width 0.35s ease;
+}
+
+.precise-panel--bridging .precise-progress__bar {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.precise-progress__pct {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: #94a3b8;
+  min-width: 30px;
+  text-align: right;
+}
+
+.precise-panel__note,
+.precise-panel__desc,
+.precise-panel__stale {
+  margin: 0;
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.precise-panel__stale {
+  color: #fbbf24;
+}
+
+.precise-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.precise-btn {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.precise-btn--primary {
+  background: linear-gradient(180deg, #0ea5e9, #0284c7);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #f0f9ff;
+  font-weight: 600;
+}
+
+.precise-btn--primary:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.precise-btn--ghost {
+  background: rgba(148, 163, 184, 0.1);
+  border-color: rgba(148, 163, 184, 0.24);
+  color: #cbd5e1;
+}
+
+.precise-panel--done .precise-btn--primary {
+  background: linear-gradient(180deg, rgba(45, 212, 191, 0.18), rgba(45, 212, 191, 0.08));
+  border-color: rgba(45, 212, 191, 0.35);
+  color: #5eead4;
+}
+
+.precise-panel__summary {
+  display: flex;
+}
+
+.precise-panel__summary-text {
+  font-size: 11px;
+  color: #5eead4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .precise-panel,
+  .precise-progress__bar,
+  .precise-btn {
+    transition: none;
+  }
+}

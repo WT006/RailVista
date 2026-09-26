@@ -62,6 +62,65 @@ export type RailGeometryJob = {
   scenicSpots?: import('@railvista/shared').ScenicSpot[];
 };
 
+/** /api/atlas/overview 的走廊条目（折线已抽稀 ≤300 点） */
+export type AtlasCorridorLite = {
+  id: string;
+  name: string;
+  stationsHint: string[];
+  polyline: [number, number][];
+  lineSpotCount: number;
+  geoSpotCount: number;
+  spotCount: number;
+  spotIds: string[];
+  lengthKm: number;
+};
+
+/** /api/atlas/overview 的景点条目 */
+export type AtlasSpotLite = {
+  id: string;
+  name: string;
+  lng: number;
+  lat: number;
+  intro?: string;
+  category?: string;
+  dimensions?: string[];
+  corridorIds: string[];
+  matchKind: 'line' | 'geo' | null;
+};
+
+export type AtlasOverviewData = {
+  corridors: AtlasCorridorLite[];
+  spots: AtlasSpotLite[];
+  meta: { corridorCount: number; spotCount: number; generatedAt: string; buildMs: number };
+};
+
+/** 线路详情页景点：带沿线里程 */
+export type AtlasCorridorSpot = {
+  id: string;
+  name: string;
+  lng: number;
+  lat: number;
+  intro?: string;
+  category?: string;
+  dimensions: string[];
+  matchKind: 'line' | 'geo' | null;
+  alongKm: number;
+  distKm: number;
+};
+
+export type AtlasCorridorDetail = {
+  id: string;
+  name: string;
+  stationsHint: string[];
+  note?: string;
+  railway: [number, number][];
+  lengthKm: number;
+  spotIds: string[];
+  lineSpotCount: number;
+  geoSpotCount: number;
+  spots: AtlasCorridorSpot[];
+};
+
 export const api = {
   async getHealth(): Promise<{
     status: 'up' | 'down';
@@ -137,5 +196,19 @@ export const api = {
   },
   getRailGeometryJob(jobId: string) {
     return request<RailGeometryJob>(`/rail-geometry/jobs/${encodeURIComponent(jobId)}`);
+  },
+  abandonRailGeometryJob(jobId: string) {
+    return request<{ jobId: string; abandoned: boolean }>(
+      `/rail-geometry/jobs/${encodeURIComponent(jobId)}/abandon`,
+      { method: 'POST' },
+    );
+  },
+  /** 全国铁路景点地图：全部走廊（抽稀折线）+ 全量景点，只读聚合，60s 服务端缓存 */
+  getAtlasOverview() {
+    return request<AtlasOverviewData>('/atlas/overview');
+  },
+  /** 线路详情页：单条走廊完整折线 + 沿线景点（含里程） */
+  getAtlasCorridor(id: string) {
+    return request<AtlasCorridorDetail>(`/atlas/corridor/${encodeURIComponent(id)}`);
   },
 };

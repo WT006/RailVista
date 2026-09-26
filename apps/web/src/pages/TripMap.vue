@@ -39,6 +39,7 @@ import {
 import { loadAmap } from '../map/amap';
 import { readSimulatedProgress, useGeolocation, useNow } from '../composables/useGeolocation';
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
+import PreciseRoutePanel from '../components/PreciseRoutePanel.vue';
 import SideBadge from '../components/SideBadge.vue';
 import SpotApproachCard from '../components/SpotApproachCard.vue';
 import { usePrefsStore } from '../stores/prefsStore';
@@ -98,6 +99,8 @@ let stationMarkers: any[] = [];
 /** P0-4：无坐标经停的灰色空心占位标记（位置为前后站间近似插值） */
 let unresolvedMarkers: any[] = [];
 let pathMetrics = { path: [] as ReturnType<typeof buildRailwayMetrics>['path'], lengthKm: 0 };
+/** pathMetrics 不是响应式对象，单独用 ref 暴露里程给精度面板 */
+const railLengthKm = ref(0);
 
 const segment = computed(() => trip.segment);
 const resumeKeyNow = ref<string | null>(getAutoResumeTripKey());
@@ -149,42 +152,6 @@ function spotSideKey(spot: ScenicSpot): SpotSide {
   const s = spot.sideRuntime ?? spot.side;
   return s && s !== 'unknown' ? s : 'unknown';
 }
-
-const showPreciseAction = computed(() => {
-  if (trip.preciseLoading) return true;
-  if (trip.canUpgradePrecise) return true;
-  const st = trip.preciseJob?.status;
-  if (st === 'partial' || st === 'failed') return true;
-  if (trip.railwaySource === 'precise' && trip.railwayCoords.length >= 2) return true;
-  return false;
-});
-
-const preciseActionLabel = computed(() => {
-  const job = trip.preciseJob;
-  const ok = job?.segmentsOk ?? 0;
-  const total = job?.segmentsTotal ?? 0;
-  const ratio = total > 0 ? `${ok}/${total}` : '';
-
-  if (trip.preciseLoading && job) {
-    const msg = (job.message || '').trim();
-    if (msg && !/^加载中\s+\d+\/\d+/.test(msg)) {
-      return msg.endsWith('…') || msg.endsWith('...') ? msg : `${msg}…`;
-    }
-    return `正在生成精准路线 ${job.segmentsDone}/${job.segmentsTotal}…`;
-  }
-  if (trip.preciseLoading) return '正在生成精准路线…';
-  if (job?.status === 'partial' || trip.preciseTimedOut) {
-    if (ok > 0 && total > 0) {
-      return `部分精确 ${ratio} · 重新获取精准路线`;
-    }
-    return '重新获取精准路线';
-  }
-  if (job?.status === 'failed') {
-    if (ok > 0 && total > 0) return `已保留 ${ratio} · 重新获取精准路线`;
-    return '重新获取精准路线';
-  }
-  return '获取精准路线';
-});
 
 /** 定位文案拆成主状态 + 括号备注，避免挤在一行难读 */
 const modeParts = computed(() => {
@@ -521,6 +488,120 @@ function toggleSatellite() {
   applySatelliteLayers();
 }
 
+/**
+ * 景点标记工厂：单个景点 → Marker（含点开后的详情气泡）。
+ * 抽成函数是为了 B1：折线升级为精准路线后能整体重建标记层。
+ */
+function buildSpotMarker(spot: ScenicSpot, idx: number) {
+  const AMap = AMapRef;
+  // 只有「方位待确认」才换样式，左/右/两侧均使用统一的景点色
+  const reviewStyle = spotSideKey(spot) === 'unknown' ? ' spot-marker--unknown' : '';
+  const marker = new AMap.Marker({
+    position: [spot.lng, spot.lat],
+    title: spot.name,
+    anchor: 'bottom-center',
+    content: `<div class="spot-marker${reviewStyle}${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
+  });
+  marker.on('click', () => {
+    const visLabel =
+      spot.visibility === 'distant'
+        ? '远眺'
+        : spot.visibility === 'on_track'
+          ? '穿行'
+          : spot.visibility === 'window'
+            ? '窗外'
+            : '';
+    const visClass =
+      spot.visibility === 'distant' || spot.visibility === 'on_track' || spot.visibility === 'window'
+        ? spot.visibility
+        : '';
+    const timeLabel = spot.at
+      ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
+      : spot.timeLabel || '';
+    const sideBadgeHtml = (() => {
+      const key = spotSideKey(spot);
+      const text =
+        key === 'left'
+          ? '列车左侧'
+          : key === 'right'
+            ? '列车右侧'
+            : key === 'both'
+              ? '两侧均可'
+              : '方位待确认';
+      const arrow = key === 'left' ? '←' : key === 'right' ? '→' : key === 'both' ? '↔' : '?';
+      return `<span class="map-info-card__badge map-info-card__badge--side map-info-card__badge--side-${key}">${arrow} ${text}</span>`;
+    })();
+    const honors = honorLabels(spot.honors);
+    const honorHtml = honors.length
+      ? `<div class="map-info-card__honors">${honors
+          .slice(0, 4)
+          .map((h) => `<span class="map-info-card__honor">${escHtml(h)}</span>`)
+          .join('')}${honors.length > 4 ? `<span class="map-info-card__honor map-info-card__honor--more">+${honors.length - 4}</span>` : ''}</div>`
+      : '';
+    const badges = [
+      sideBadgeHtml,
+      visLabel && visClass
+        ? `<span class="map-info-card__badge map-info-card__badge--${visClass}">${escHtml(visLabel)}</span>`
+        : '',
+      spot.nightOnly ? `<span class="map-info-card__badge map-info-card__badge--night">夜间</span>` : '',
+      timeLabel
+        ? `<span class="map-info-card__badge map-info-card__badge--time">${escHtml(timeLabel)}</span>`
+        : '',
+      spot.sideConfidence === 'low'
+        ? `<span class="map-info-card__badge map-info-card__badge--lowSide">低置信度</span>`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('');
+    const info = new AMap.InfoWindow({
+      isCustom: true,
+      autoMove: true,
+      closeWhenClickMap: true,
+      content: `<div class="map-info-card">
+          <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
+          <div class="map-info-card__title">${escHtml(spot.name)}</div>
+          ${badges ? `<div class="map-info-card__meta">${badges}</div>` : ''}
+          ${honorHtml}
+          ${spot.intro ? `<p class="map-info-card__intro">${escHtml(spot.intro)}</p>` : ''}
+          <div class="map-info-card__arrow" aria-hidden="true"></div>
+        </div>`,
+      offset: new AMap.Pixel(0, -34),
+    });
+    info.open(map, marker.getPosition());
+  });
+  return marker;
+}
+
+/**
+ * B1 [P0] 重建整层景点标记。
+ * 旧实现只在 initMap() 里建一次且没有监听，导致「折线刷新了、景点还是示意线那一组」。
+ * 这里采用与 rebuildUnresolvedMarkers 一致的整体重建策略：稳健、无残留。
+ */
+function rebuildSpotMarkers() {
+  if (!map || !AMapRef) return;
+  // 重建前关掉已打开的气泡，避免它停在已失效的位置
+  try {
+    map.clearInfoWindow?.();
+  } catch {
+    /* ignore */
+  }
+  for (const m of spotMarkers) {
+    try {
+      map.remove(m);
+    } catch {
+      /* ignore */
+    }
+  }
+  spotMarkers = [];
+  trip.scenicSpots.forEach((spot, idx) => {
+    if (!Number.isFinite(spot.lng) || !Number.isFinite(spot.lat)) return;
+    const marker = buildSpotMarker(spot, idx);
+    map.add(marker);
+    if (!prefs.layers.spot) marker.hide();
+    spotMarkers.push(marker);
+  });
+}
+
 async function initMap() {
   const key = import.meta.env.VITE_AMAP_KEY;
   if (!key) {
@@ -537,6 +618,7 @@ async function initMap() {
           .filter((s) => s.lng != null && s.lat != null)
           .map((s) => [s.lng!, s.lat!] as [number, number]);
   pathMetrics = buildRailwayMetrics(coords);
+  railLengthKm.value = pathMetrics.lengthKm;
   compact.value = window.matchMedia('(max-width: 640px)').matches;
 
   if (coords.length < 2) {
@@ -562,81 +644,7 @@ async function initMap() {
     map.add(railLine);
   }
 
-spotMarkers = trip.scenicSpots.map((spot, idx) => {
-    // 只有「方位待确认」才换样式，左/右/两侧均使用统一的景点色
-    const reviewStyle = spotSideKey(spot) === 'unknown' ? ' spot-marker--unknown' : '';
-    const marker = new AMap.Marker({
-      position: [spot.lng, spot.lat],
-      title: spot.name,
-      anchor: 'bottom-center',
-      content: `<div class="spot-marker${reviewStyle}${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
-    });
-    marker.on('click', () => {
-      const visLabel =
-        spot.visibility === 'distant'
-          ? '远眺'
-          : spot.visibility === 'on_track'
-            ? '穿行'
-            : spot.visibility === 'window'
-              ? '窗外'
-              : '';
-      const visClass =
-        spot.visibility === 'distant' || spot.visibility === 'on_track' || spot.visibility === 'window'
-          ? spot.visibility
-          : '';
-      const timeLabel = spot.at
-        ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
-        : spot.timeLabel || '';
-      const sideBadgeHtml = (() => {
-        const key = spotSideKey(spot);
-        const text =
-          key === 'left' ? '列车左侧' : key === 'right' ? '列车右侧' : key === 'both' ? '两侧均可' : '方位待确认';
-        const arrow = key === 'left' ? '←' : key === 'right' ? '→' : key === 'both' ? '↔' : '?';
-        return `<span class="map-info-card__badge map-info-card__badge--side map-info-card__badge--side-${key}">${arrow} ${text}</span>`;
-      })();
-      const honors = honorLabels(spot.honors);
-      const honorHtml = honors.length
-        ? `<div class="map-info-card__honors">${honors
-            .slice(0, 4)
-            .map((h) => `<span class="map-info-card__honor">${escHtml(h)}</span>`)
-            .join('')}${honors.length > 4 ? `<span class="map-info-card__honor map-info-card__honor--more">+${honors.length - 4}</span>` : ''}</div>`
-        : '';
-      const badges = [
-        sideBadgeHtml,
-        visLabel && visClass
-          ? `<span class="map-info-card__badge map-info-card__badge--${visClass}">${escHtml(visLabel)}</span>`
-          : '',
-        spot.nightOnly
-          ? `<span class="map-info-card__badge map-info-card__badge--night">夜间</span>`
-          : '',
-        timeLabel
-          ? `<span class="map-info-card__badge map-info-card__badge--time">${escHtml(timeLabel)}</span>`
-          : '',
-        spot.sideConfidence === 'low'
-          ? `<span class="map-info-card__badge map-info-card__badge--lowSide">低置信度</span>`
-          : '',
-      ]
-        .filter(Boolean)
-        .join('');
-      const info = new AMap.InfoWindow({
-        isCustom: true,
-        autoMove: true,
-        closeWhenClickMap: true,
-        content: `<div class="map-info-card">
-          <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
-          <div class="map-info-card__title">${escHtml(spot.name)}</div>
-          ${badges ? `<div class="map-info-card__meta">${badges}</div>` : ''}
-          ${honorHtml}
-          ${spot.intro ? `<p class="map-info-card__intro">${escHtml(spot.intro)}</p>` : ''}
-          <div class="map-info-card__arrow" aria-hidden="true"></div>
-        </div>`,
-        offset: new AMap.Pixel(0, -34),
-      });
-      info.open(map, marker.getPosition());
-    });
-    map.add(marker);
-    return marker;
-  });
+  rebuildSpotMarkers();
 
   stationMarkers = seg.stops.map((s) => {
     const marker = new AMap.Marker({
@@ -820,6 +828,7 @@ function refreshRailLine() {
   if (coords.length < 2) return;
   railLine.setPath(coords);
   pathMetrics = buildRailwayMetrics(coords);
+  railLengthKm.value = pathMetrics.lengthKm;
   tick();
 }
 
@@ -844,21 +853,31 @@ function refreshStationMarkers() {
   rebuildUnresolvedMarkers();
 }
 
-async function onUpgradePrecise() {
-  await trip.upgradePrecise();
+/**
+ * U1 面板操作（获取 / 重试 / 取消）结束后同步地图：折线 + 景点标记 + 视野 + 结果提示。
+ * 终态才提示，避免进行中的每次刷新都弹 toast。
+ */
+function onPreciseRefresh() {
   refreshStationMarkers();
   refreshRailLine();
+  rebuildSpotMarkers();
   if (trip.railwayCoords.length >= 2) {
     map?.setFitView(null, false, getMapPadding());
   }
-  if (trip.preciseError) showToast(trip.preciseError);
-  else if (trip.preciseJob?.status === 'done') {
-    const tier = trip.preciseJob.qualityTier;
+  const st = trip.preciseJob?.status;
+  if (trip.preciseError) {
+    showToast(trip.preciseError);
+    return;
+  }
+  if (st === 'done') {
+    const tier = trip.preciseJob?.qualityTier;
     if (tier === 'soft') showToast('近似轨道已加载（跨站补缝）');
     else if (tier === 'corridor' || tier === 'network') showToast('精品精确路线已加载');
     else if (tier === 'local') showToast('本地轨网路线已加载');
     else showToast('精确路线已加载');
-  } else if (trip.preciseJob?.status === 'partial') showToast(trip.preciseJob.message);
+  } else if (st === 'partial') {
+    showToast(trip.preciseJob?.message || '部分精确，缺口为示意');
+  }
 }
 
 function onPageHidePersist() {
@@ -895,6 +914,20 @@ watch(
     refreshRailLine();
   },
   { deep: true },
+);
+
+/**
+ * B1 景点签名：成员/顺序/方位/里程任一变化即重建标记层。
+ * 用 id 为主键，避免每次轮询都整体重建（轮询只改 coords，不改景点集合）。
+ */
+watch(
+  () =>
+    trip.scenicSpots
+      .map((s) => `${s.id}:${s.sideRuntime ?? s.side ?? ''}:${Math.round(s.progressKm ?? 0)}`)
+      .join('|'),
+  () => {
+    rebuildSpotMarkers();
+  },
 );
 
 watch(
@@ -1005,17 +1038,12 @@ onUnmounted(() => {
                 </button>
               </div>
 
-              <div v-if="showPreciseAction" class="status-actions">
-                <button
-                  type="button"
-                  class="rail-upgrade-btn"
-                  :disabled="trip.preciseLoading"
-                  @click="onUpgradePrecise"
-                >
-                  {{ preciseActionLabel }}
-                </button>
-              </div>
-              <p v-if="trip.preciseError" class="rail-upgrade-error">{{ trip.preciseError }}</p>
+              <PreciseRoutePanel
+                :length-km="railLengthKm"
+                :spot-count="trip.scenicSpots.length"
+                :compact="compact"
+                @refresh="onPreciseRefresh"
+              />
               <p v-if="trip.unresolvedStops.length" class="rail-unresolved-hint">
                 {{ trip.unresolvedStops.join('、') }} 坐标待补，地图上为灰色近似占位
               </p>

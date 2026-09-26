@@ -24,7 +24,36 @@ export const useTripStore = defineStore('trip', () => {
     coords: [number, number][];
     segmentsOk: number;
     segmentsTotal: number;
+    /** B2：与该折线对应的权威景点集合（后端全量库匹配结果） */
+    scenicSpots?: ScenicSpot[];
   } | null = null;
+
+  /**
+   * B2 [P1] 景点权威库（会话内累积的并集）。
+   *
+   * 旧实现 `applyPreciseCoords` 在未拿到后端景点时，会拿「旧景点集合」对新折线再过滤，
+   * 该操作只能**剔除**、永远无法**新增**（新折线进入视野的景点永远补不回来）。
+   * 这里把后端每次返回的结果并入库，之后重算就是「全量库 × 新折线」，
+   * 既可能减少也可能增加，语义与后端 `matchScenicSpotsForRailway` 一致。
+   */
+  const spotLibrary = ref<ScenicSpot[]>([]);
+  /** 拿不到后端权威结果、只能沿用旧集合时置 true，供 UI 说明「景点可能未更新」 */
+  const spotsStale = ref(false);
+
+  function mergeSpotLibrary(list: ScenicSpot[] | undefined | null) {
+    if (!list || !list.length) return;
+    if (!spotLibrary.value.length) {
+      spotLibrary.value = list.slice();
+      return;
+    }
+    const byId = new Map(spotLibrary.value.map((s) => [s.id, s]));
+    for (const s of list) {
+      if (!s?.id) continue;
+      // 后到的结果带最新运行时方位判定，覆盖旧的
+      byId.set(s.id, s);
+    }
+    spotLibrary.value = [...byId.values()];
+  }
 
   function schedulePersist(opts?: { bumpOpenedAt?: boolean; setResume?: boolean }) {
     void import('../lib/persistTrip').then(({ persistActiveTrip }) => {
@@ -242,6 +271,7 @@ export const useTripStore = defineStore('trip', () => {
         coords: coords.slice() as [number, number][],
         segmentsOk: job.segmentsOk,
         segmentsTotal: job.segmentsTotal,
+        scenicSpots: job.scenicSpots ? job.scenicSpots.slice() : bestPrecise?.scenicSpots,
       };
     }
   }
@@ -286,9 +316,22 @@ export const useTripStore = defineStore('trip', () => {
     if (opts?.hint) polylineHint.value = opts.hint;
     if (opts?.canUpgrade != null) canUpgradePrecise.value = opts.canUpgrade;
     if (opts?.scenicSpots != null) {
+      // 后端权威结果：并入景点库后用同一条折线重算（与后端语义一致）
+      mergeSpotLibrary(opts.scenicSpots);
       scenicSpots.value = filterSpotsAlongRailway(opts.scenicSpots, coords);
-    } else if (scenicSpots.value.length) {
+      spotsStale.value = false;
+      return;
+    }
+    if (spotLibrary.value.length) {
+      // B2：用累积的全量库重算——新折线既能剔除也能新增景点
+      scenicSpots.value = filterSpotsAlongRailway(spotLibrary.value, coords);
+      spotsStale.value = false;
+      return;
+    }
+    if (scenicSpots.value.length) {
+      // 退化路径（既无后端结果也无库）：只能剔除，明确标注结果不完整
       scenicSpots.value = filterSpotsAlongRailway(scenicSpots.value, coords);
+      spotsStale.value = true;
     }
   }
 
@@ -349,9 +392,12 @@ export const useTripStore = defineStore('trip', () => {
 
     // 服务端已按折线过滤；再用最终 OD 折线收紧一次（Z8991 全线预置等）
     const incoming = params.spots || [];
+    // B2：入库，供后续精确线刷新时做「全量库 × 新折线」重算
+    mergeSpotLibrary(incoming);
     scenicSpots.value = incoming.length
       ? filterSpotsAlongRailway(incoming, resolved.coords)
       : [];
+    spotsStale.value = false;
 
     if (!isDemo.value) {
       void import('./prefsStore').then(({ usePrefsStore }) => {
@@ -379,6 +425,8 @@ export const useTripStore = defineStore('trip', () => {
     segment.value = JSON.parse(JSON.stringify(snap.segment));
     stopsAll.value = JSON.parse(JSON.stringify(snap.stopsAll));
     scenicSpots.value = JSON.parse(JSON.stringify(snap.scenicSpots));
+    mergeSpotLibrary(scenicSpots.value);
+    spotsStale.value = false;
     railwayCoords.value = JSON.parse(JSON.stringify(snap.railwayCoords));
     railwaySource.value = snap.railwaySource;
     polylineHint.value = snap.polylineHint;
@@ -475,10 +523,11 @@ export const useTripStore = defineStore('trip', () => {
     }
   }
 
-  async function upgradePrecise() {
+  async function upgradePrecise(opts?: { force?: boolean }) {
     const seg = segment.value;
     if (!seg || preciseLoading.value) return;
-    if (!canUpgradePrecise.value && railwaySource.value === 'precise') return;
+    // force：U1 面板「重新生成」——已完成状态下也允许整趟重算
+    if (!opts?.force && !canUpgradePrecise.value && railwaySource.value === 'precise') return;
 
     // 提交全部经停（含缺坐标），由服务端 enrich；禁止只传「当前有坐标子集」导致段数随重试膨胀
     const stops = seg.stops.map((s) => ({
@@ -556,6 +605,30 @@ export const useTripStore = defineStore('trip', () => {
     }
   }
 
+  /**
+   * U1：显式取消——前端停止轮询并作废回写，同时通知服务端废弃 Job，
+   * 避免后端继续算一个没人要的结果（沿用 preciseEpoch / abandonJob 机制）。
+   */
+  function cancelPrecise() {
+    const jobId = activeJobId || preciseJob.value?.jobId || '';
+    invalidatePreciseWriters();
+    preciseLoading.value = false;
+    preciseError.value = '';
+    preciseTimedOut.value = false;
+    canUpgradePrecise.value = true;
+    if (jobId && !String(jobId).startsWith('cached:')) {
+      void api
+        .abandonRailGeometryJob(String(jobId))
+        .catch(() => {
+          /* 取消是尽力而为：服务端已过期也无所谓 */
+        });
+    }
+    preciseJob.value = null;
+    if (railwaySource.value !== 'precise') {
+      polylineHint.value = '已取消精准路线生成，仍为示意线';
+    }
+  }
+
   function applyClientPreciseTimeout(jobId: string, epoch: number) {
     if (!isActivePreciseWriter(jobId, epoch)) return;
     const prev = preciseJob.value;
@@ -601,7 +674,12 @@ export const useTripStore = defineStore('trip', () => {
     };
     applyUnresolved(preciseJob.value);
     if (kept.length >= 2 && ok > 0) {
-      applyPreciseCoords(kept, { hint: msg, source: 'precise', canUpgrade: true });
+      applyPreciseCoords(kept, {
+        hint: msg,
+        source: 'precise',
+        canUpgrade: true,
+        scenicSpots: bestPrecise?.scenicSpots,
+      });
     } else {
       polylineHint.value = msg;
     }
@@ -750,11 +828,15 @@ export const useTripStore = defineStore('trip', () => {
     }
 
     if (displayCoords.length >= 2 && ok > 0) {
+      // B2：最终态始终用「该折线对应的权威景点集合」，而不是拿旧集合再过滤
+      const finalSpots = shouldApplyJobCoords(job)
+        ? job.scenicSpots
+        : bestPrecise?.scenicSpots || job.scenicSpots;
       applyPreciseCoords(displayCoords, {
         hint: message,
         source: 'precise',
         canUpgrade: job.status === 'partial' || keptBest,
-        scenicSpots: shouldApplyJobCoords(job) ? job.scenicSpots : undefined,
+        scenicSpots: finalSpots,
       });
       if (shouldApplyJobCoords(job)) rememberBestPrecise(job, job.coords);
       else if (bestPrecise) rememberBestPrecise({ ...job, segmentsOk: ok, coords: displayCoords }, displayCoords);
@@ -781,6 +863,8 @@ export const useTripStore = defineStore('trip', () => {
     segment.value = null;
     stopsAll.value = [];
     scenicSpots.value = [];
+    // spotLibrary 是「景点目录缓存」而非本趟状态，跨行程保留以提升刷新完整性
+    spotsStale.value = false;
     railwayCoords.value = [];
     railwaySource.value = 'station';
     polylineHint.value = '示意线（站点连线），非真实轨道';
@@ -807,10 +891,13 @@ export const useTripStore = defineStore('trip', () => {
     isDemo,
     preciseTimedOut,
     unresolvedStops,
+    spotLibrary,
+    spotsStale,
     setTrip,
     hydrateFromSnapshot,
     applyPreciseCoords,
     upgradePrecise,
+    cancelPrecise,
     maybeAutoUpgradePrecise,
     stopPrecisePoll,
     flushPrecisePersist,

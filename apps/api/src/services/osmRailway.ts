@@ -1,5 +1,12 @@
 import { createHash } from 'node:crypto';
 import { cache } from './cache.js';
+import {
+  getSegmentDisk,
+  getSegmentMissDisk,
+  missTtlSec,
+  saveSegmentDisk,
+  saveSegmentMissDisk,
+} from './segmentCache.js';
 import { buildLocalSegment } from './localRails.js';
 import * as overpassTracker from './overpassTracker.js';
 import { findCorridorSliceForSegment } from './corridors.js';
@@ -19,6 +26,35 @@ const OVERPASS_URLS = [
   'https://lz4.overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
 ];
+
+/**
+ * F1 [P0] 并发竞速 + 总预算：
+ * 旧实现是「镜像串行试探」，首个镜像挂到 25s 才换下一个，一次逻辑查询最坏 3×25s ≈ 75s。
+ * 现改为：镜像错峰并发发出，谁先返回非空结果谁赢；整体受单一总预算约束。
+ */
+/** 单个镜像请求超时（旧 25s → 默认 10s） */
+const OVERPASS_SINGLE_TIMEOUT_MS = Number(process.env.RAIL_OVERPASS_SINGLE_MS || 10_000);
+/** 一次逻辑查询的总预算（含错峰等待） */
+const OVERPASS_TOTAL_BUDGET_MS = Number(process.env.RAIL_OVERPASS_BUDGET_MS || 12_000);
+/** 并发竞速时镜像之间的错峰间隔：快的镜像直接赢，就不会惊动后续镜像 */
+const OVERPASS_STAGGER_MS = Number(process.env.RAIL_OVERPASS_STAGGER_MS || 1_200);
+/** 整趟 way 拉取（bbox + 各 chunk）并发上限 */
+const WAY_FETCH_CONCURRENCY = Math.max(1, Number(process.env.RAIL_WAY_FETCH_CONCURRENCY || 3));
+
+/** F4 [P1]：相同 query 的 in-flight 请求合并，避免相邻段/并发重复打公网 */
+const inflightOverpass = new Map<string, Promise<OsmWay[]>>();
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function overpassHost(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
+}
 
 /** 山区轨断口略放宽（约 800～1200m） */
 const CONNECT_TOL = 0.012;
@@ -51,51 +87,167 @@ function wayLengthKm(points: LngLat[]): number {
   return sum;
 }
 
-async function overpass(
+function parseOsmWays(json: unknown): OsmWay[] {
+  const elements = (json as { elements?: Array<Record<string, unknown>> } | null)?.elements || [];
+  const ways: OsmWay[] = [];
+  for (const el of elements) {
+    if (el.type !== 'way' || !Array.isArray(el.geometry) || el.geometry.length < 2) continue;
+    const tags = (el.tags || {}) as Record<string, string>;
+    const geometry = el.geometry as Array<{ lon: number; lat: number }>;
+    if (!Number.isFinite(geometry[0]?.lon) || !Number.isFinite(geometry[0]?.lat)) continue;
+    ways.push({
+      id: Number(el.id),
+      highspeed: tags.highspeed === 'yes',
+      points: geometry.map((g) => ({ lng: g.lon, lat: g.lat })),
+    });
+  }
+  return ways;
+}
+
+/**
+ * 镜像并发竞速：错峰发出 → 首个「非空」结果即胜出并中止其余请求；
+ * 全部失败/超时/空结果时，按「有空结果则回空数组，否则抛错」收尾（与旧语义一致）。
+ */
+function raceOverpass(
   query: string,
-  timeoutMs = 25000,
-  opts?: { maxMirrors?: number },
+  mirrors: string[],
+  timeoutMs: number,
+  budgetMs: number,
 ): Promise<OsmWay[]> {
-  let lastErr: unknown;
-  const mirrors = OVERPASS_URLS.slice(0, Math.max(1, opts?.maxMirrors ?? OVERPASS_URLS.length));
-  for (const url of mirrors) {
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-          'User-Agent': 'RailVista/0.1 (railway geometry; educational)',
-        },
-        body: `data=${encodeURIComponent(query)}`,
-        signal: AbortSignal.timeout(timeoutMs),
-      });
-      if (!res.ok) {
-        lastErr = new Error(`Overpass HTTP ${res.status}`);
-        continue;
+  return new Promise<OsmWay[]>((resolve, reject) => {
+    let finished = false;
+    let settled = 0;
+    let sawEmpty = false;
+    const notes: string[] = [];
+    const controllers = new Set<AbortController>();
+
+    const abortAll = () => {
+      for (const c of controllers) {
+        try {
+          c.abort();
+        } catch {
+          /* ignore */
+        }
       }
-      const json = (await res.json()) as {
-        elements?: Array<{
-          type: string;
-          id: number;
-          tags?: Record<string, string>;
-          geometry?: Array<{ lon: number; lat: number }>;
-        }>;
-      };
-      const ways: OsmWay[] = [];
-      for (const el of json.elements || []) {
-        if (el.type !== 'way' || !el.geometry || el.geometry.length < 2) continue;
-        ways.push({
-          id: el.id,
-          highspeed: el.tags?.highspeed === 'yes',
-          points: el.geometry.map((g) => ({ lng: g.lon, lat: g.lat })),
+      controllers.clear();
+    };
+    const settle = (fn: () => void) => {
+      if (finished) return;
+      finished = true;
+      abortAll();
+      fn();
+    };
+
+    // 总预算：到点还没拿到非空结果就直接放弃，不再无意义地等公网
+    const budgetTimer = setTimeout(() => {
+      settle(() =>
+        reject(
+          Object.assign(
+            new Error(
+              `OSM 查询超出总预算 ${budgetMs}ms（${notes.slice(0, 3).join('; ') || '无响应'}）`,
+            ),
+            { code: 'OVERPASS_BUDGET' },
+          ),
+        ),
+      );
+    }, budgetMs);
+
+    const attempt = async (url: string, delayMs: number) => {
+      if (delayMs > 0) await sleep(delayMs);
+      if (finished) return;
+      const ctrl = new AbortController();
+      controllers.add(ctrl);
+      const singleTimer = setTimeout(() => ctrl.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            'User-Agent': 'RailVista/0.1 (railway geometry; educational)',
+          },
+          body: `data=${encodeURIComponent(query)}`,
+          signal: ctrl.signal,
+        });
+        if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`);
+        const ways = parseOsmWays(await res.json());
+        if (ways.length) {
+          clearTimeout(budgetTimer);
+          settle(() => resolve(ways));
+          return;
+        }
+        // 空结果可能是镜像故障，也可能是这里真的没轨：不抢胜，留给后续镜像
+        sawEmpty = true;
+        notes.push(`${overpassHost(url)}:empty`);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        const isAbort = /abort/i.test(msg);
+        notes.push(`${overpassHost(url)}:${isAbort ? 'timeout' : msg}`);
+      } finally {
+        clearTimeout(singleTimer);
+        controllers.delete(ctrl);
+      }
+      settled += 1;
+      if (!finished && settled >= mirrors.length) {
+        clearTimeout(budgetTimer);
+        settle(() => {
+          if (sawEmpty) resolve([]);
+          else
+            reject(
+              Object.assign(
+                new Error(`OSM 查询失败：${notes.slice(0, 3).join('; ') || '未知错误'}`),
+                { code: 'OSM_FAIL' },
+              ),
+            );
         });
       }
-      return ways;
-    } catch (e) {
-      lastErr = e;
+    };
+
+    mirrors.forEach((url, i) => {
+      // 单镜像（段级）立即发；多镜像错峰，避免瞬时 3 倍公网压力
+      const delay = mirrors.length === 1 ? 0 : i * OVERPASS_STAGGER_MS;
+      void attempt(url, delay);
+    });
+  });
+}
+
+async function overpass(
+  query: string,
+  timeoutMs = OVERPASS_SINGLE_TIMEOUT_MS,
+  opts?: { maxMirrors?: number; budgetMs?: number },
+): Promise<OsmWay[]> {
+  const mirrors = OVERPASS_URLS.slice(0, Math.max(1, opts?.maxMirrors ?? OVERPASS_URLS.length));
+  const singleMs = Math.max(2_000, Math.min(Number(timeoutMs) || OVERPASS_SINGLE_TIMEOUT_MS, OVERPASS_SINGLE_TIMEOUT_MS));
+  const budgetMs = Math.max(singleMs + 500, Number(opts?.budgetMs) || OVERPASS_TOTAL_BUDGET_MS);
+
+  // F4：in-flight 去重（含并发上限镜像数，避免不同 maxMirrors 互相污染）
+  const key = createHash('sha1').update(`${mirrors.length}|${query}`).digest('hex').slice(0, 24);
+  const running = inflightOverpass.get(key);
+  if (running) return running;
+
+  const task = raceOverpass(query, mirrors, singleMs, budgetMs).finally(() => {
+    inflightOverpass.delete(key);
+  });
+  inflightOverpass.set(key, task);
+  return task;
+}
+
+/** 有界并发执行任务队列（替代旧的「串行 + 每段 sleep 200ms」） */
+async function runPool(tasks: Array<() => Promise<void>>, limit: number): Promise<void> {
+  if (!tasks.length) return;
+  let cursor = 0;
+  const workers = Array.from({ length: Math.min(limit, tasks.length) }, async () => {
+    for (;;) {
+      const idx = cursor;
+      cursor += 1;
+      if (idx >= tasks.length) return;
+      try {
+        await tasks[idx]();
+      } catch {
+        /* 单个任务失败已在其内部捕获 */
+      }
     }
-  }
-  throw Object.assign(new Error(`OSM 查询失败：${String(lastErr)}`), { code: 'OSM_FAIL' });
+  });
+  await Promise.all(workers);
 }
 
 function aroundChain(stops: LngLat[], radiusM: number): string {
@@ -158,19 +310,11 @@ async function fetchWaysAlongRoute(stops: LngLat[], preferHighspeed: boolean): P
     { lng: bbox.east, lat: bbox.north },
   );
 
-  // 1) 短程才用整段 bbox；长跨度（如太原→沪）bbox 过大又慢，还会混入无关干线
-  if (spanKm < 650) {
-    try {
-      const bboxWays = await overpass(buildBboxQuery(bbox, preferHighspeed));
-      for (const w of bboxWays) byId.set(w.id, w);
-    } catch (e) {
-      console.warn('[rail] bbox fetch failed', e);
-    }
-  } else {
-    console.log(`[rail] skip bbox spanKm=${spanKm.toFixed(0)} (use corridor chunks)`);
-  }
+  const merge = (ways: OsmWay[]) => {
+    for (const w of ways) byId.set(w.id, w);
+  };
 
-  // 2) 分块走廊沿站序拉取（长线主路径）
+  // 分块走廊沿站序拉取（长线主路径）
   const chunks: LngLat[][] = [];
   if (stops.length <= CHUNK_STATIONS) {
     chunks.push(stops);
@@ -181,37 +325,93 @@ async function fetchWaysAlongRoute(stops: LngLat[], preferHighspeed: boolean): P
     }
   }
 
-  for (let ci = 0; ci < chunks.length; ci += 1) {
-    try {
-      const ways = await overpass(buildCorridorQuery(chunks[ci], preferHighspeed));
-      for (const w of ways) byId.set(w.id, w);
-    } catch (e) {
-      console.warn('[rail] corridor chunk failed', ci, e);
-    }
-    if (ci < chunks.length - 1) await new Promise((r) => setTimeout(r, 200));
+  // F1：bbox 与各 chunk 改为有界并发（旧实现串行 + 每段固定 sleep 200ms）
+  const tasks: Array<() => Promise<void>> = [];
+  // 1) 短程才用整段 bbox；长跨度（如太原→沪）bbox 过大又慢，还会混入无关干线
+  if (spanKm < 650) {
+    tasks.push(async () => {
+      try {
+        merge(await overpass(buildBboxQuery(bbox, preferHighspeed)));
+      } catch (e) {
+        console.warn('[rail] bbox fetch failed', e);
+      }
+    });
+  } else {
+    console.log(`[rail] skip bbox spanKm=${spanKm.toFixed(0)} (use corridor chunks)`);
   }
+  chunks.forEach((chunk, ci) => {
+    tasks.push(async () => {
+      try {
+        merge(await overpass(buildCorridorQuery(chunk, preferHighspeed)));
+      } catch (e) {
+        console.warn('[rail] corridor chunk failed', ci, e);
+      }
+    });
+  });
+
+  const t0 = Date.now();
+  await runPool(tasks, WAY_FETCH_CONCURRENCY);
 
   console.log(
-    `[rail] ways=${byId.size} hs=${preferHighspeed} stops=${stops.length} spanKm=${spanKm.toFixed(0)}`,
+    `[rail] ways=${byId.size} hs=${preferHighspeed} stops=${stops.length} spanKm=${spanKm.toFixed(0)} tasks=${tasks.length} ${Date.now() - t0}ms`,
   );
   return [...byId.values()];
 }
 
+type EndpointRef = { wayIdx: number; end: 'head' | 'tail'; point: LngLat };
+
+/**
+ * 端点邻接：用 CONNECT_TOL 网格分桶替代 O(W²) 全比对（整趟大 bbox 时 W 可达数千）。
+ * 语义与旧实现完全一致（同一阈值、同一方向判定），只是候选从「全部 way」缩到 3×3 邻域。
+ */
 function buildAdj(ways: OsmWay[]): Array<{ head: AdjEdge[]; tail: AdjEdge[] }> {
   const adj = ways.map(() => ({ head: [] as AdjEdge[], tail: [] as AdjEdge[] }));
+  if (ways.length < 2) return adj;
+
+  const cellKey = (cx: number, cy: number) => `${cx}:${cy}`;
+  const grid = new Map<string, EndpointRef[]>();
+  const push = (ref: EndpointRef) => {
+    const k = cellKey(Math.floor(ref.point.lng / CONNECT_TOL), Math.floor(ref.point.lat / CONNECT_TOL));
+    const bucket = grid.get(k);
+    if (bucket) bucket.push(ref);
+    else grid.set(k, [ref]);
+  };
   for (let i = 0; i < ways.length; i += 1) {
-    for (let j = 0; j < ways.length; j += 1) {
-      if (i === j) continue;
-      const a = ways[i];
-      const b = ways[j];
-      const aHead = a.points[0];
-      const aTail = a.points[a.points.length - 1];
-      const bHead = b.points[0];
-      const bTail = b.points[b.points.length - 1];
-      if (dist(aTail, bHead) < CONNECT_TOL) adj[i].tail.push({ j, enter: 'head', reverse: false });
-      if (dist(aTail, bTail) < CONNECT_TOL) adj[i].tail.push({ j, enter: 'tail', reverse: true });
-      if (dist(aHead, bTail) < CONNECT_TOL) adj[i].head.push({ j, enter: 'tail', reverse: false });
-      if (dist(aHead, bHead) < CONNECT_TOL) adj[i].head.push({ j, enter: 'head', reverse: true });
+    const pts = ways[i].points;
+    if (!pts.length) continue;
+    push({ wayIdx: i, end: 'head', point: pts[0] });
+    push({ wayIdx: i, end: 'tail', point: pts[pts.length - 1] });
+  }
+
+  for (let i = 0; i < ways.length; i += 1) {
+    const pts = ways[i].points;
+    if (!pts.length) continue;
+    const ends: Array<{ end: 'head' | 'tail'; point: LngLat }> = [
+      { end: 'head', point: pts[0] },
+      { end: 'tail', point: pts[pts.length - 1] },
+    ];
+    for (const { end, point } of ends) {
+      const cx = Math.floor(point.lng / CONNECT_TOL);
+      const cy = Math.floor(point.lat / CONNECT_TOL);
+      for (let dx = -1; dx <= 1; dx += 1) {
+        for (let dy = -1; dy <= 1; dy += 1) {
+          const bucket = grid.get(cellKey(cx + dx, cy + dy));
+          if (!bucket) continue;
+          for (const cand of bucket) {
+            if (cand.wayIdx === i) continue;
+            if (dist(point, cand.point) >= CONNECT_TOL) continue;
+            if (end === 'tail' && cand.end === 'head') {
+              adj[i].tail.push({ j: cand.wayIdx, enter: 'head', reverse: false });
+            } else if (end === 'tail' && cand.end === 'tail') {
+              adj[i].tail.push({ j: cand.wayIdx, enter: 'tail', reverse: true });
+            } else if (end === 'head' && cand.end === 'tail') {
+              adj[i].head.push({ j: cand.wayIdx, enter: 'tail', reverse: false });
+            } else if (end === 'head' && cand.end === 'head') {
+              adj[i].head.push({ j: cand.wayIdx, enter: 'head', reverse: true });
+            }
+          }
+        }
+      }
     }
   }
   return adj;
@@ -453,8 +653,15 @@ export function acceptSegmentGeometry(
   if (len > chord * MAX_LENGTH_RATIO && len - chord > 25) {
     return { ok: false, reason: `detour_ratio:${(len / chord).toFixed(2)}` };
   }
-  const dFrom = Math.min(...line.map((p) => haversineKm(p, from)));
-  const dTo = Math.min(...line.map((p) => haversineKm(p, to)));
+  // 用循环求最小值：超长折线时 Math.min(...arr) 有展开开销与栈溢出风险
+  let dFrom = Infinity;
+  let dTo = Infinity;
+  for (const p of line) {
+    const d0 = haversineKm(p, from);
+    if (d0 < dFrom) dFrom = d0;
+    const d1 = haversineKm(p, to);
+    if (d1 < dTo) dTo = d1;
+  }
   if (dFrom > MAX_ENDPOINT_DIST_KM || dTo > MAX_ENDPOINT_DIST_KM) {
     return { ok: false, reason: 'endpoint_far' };
   }
@@ -588,7 +795,7 @@ function toCoordPairs(points: LngLat[]): [number, number][] {
 export async function buildSegmentGeometry(
   from: LngLat,
   to: LngLat,
-  opts?: { preferHighspeed?: boolean },
+  opts?: { preferHighspeed?: boolean; /** false：只走本地/磁盘，不打公网（预热用） */ network?: boolean },
 ): Promise<SegmentGeometryResult> {
   if (
     !Number.isFinite(from.lng) ||
@@ -613,6 +820,18 @@ export async function buildSegmentGeometry(
     return { coords: [from, to], ok: false, fromCache: true, reason: 'cached_miss' };
   }
 
+  // F2：内存未命中 → 查落盘命中（进程重启后依然有效）
+  const diskHit = getSegmentDisk(key);
+  if (diskHit && diskHit.length >= 2) {
+    cache.set(key, diskHit, SEGMENT_CACHE_TTL_SEC);
+    return { coords: diskHit, ok: true, fromCache: true };
+  }
+  const diskMiss = getSegmentMissDisk(key);
+  if (diskMiss) {
+    cache.set(missKey, 1, Math.max(5, missTtlSec(diskMiss)));
+    return { coords: [from, to], ok: false, fromCache: true, reason: 'cached_miss' };
+  }
+
   // 1) 本地轨网（分轨）
   try {
     const localLine = tryLocalSegment(from, to, preferHs);
@@ -621,6 +840,7 @@ export async function buildSegmentGeometry(
       const gate = acceptSegmentGeometry(simplified, from, to);
       if (gate.ok) {
         cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
+        saveSegmentDisk(key, simplified, SEGMENT_CACHE_TTL_SEC);
         console.log(`[rail-seg] ok via local-${preferHs ? 'hsr' : 'rail'} pts=${simplified.length}`);
         return { coords: simplified, ok: true, fromCache: false, reason: 'local' };
       }
@@ -641,6 +861,7 @@ export async function buildSegmentGeometry(
       const sliceGate = acceptSegmentGeometry(simplifiedSlice, from, to);
       if (sliceGate.ok) {
         cache.set(key, simplifiedSlice, SEGMENT_CACHE_TTL_SEC);
+        saveSegmentDisk(key, simplifiedSlice, SEGMENT_CACHE_TTL_SEC);
         console.log(
           `[rail-seg] ok via corridor-slice:${slice.corridorId} pts=${simplifiedSlice.length}`,
         );
@@ -653,8 +874,13 @@ export async function buildSegmentGeometry(
   }
 
   // 2) Overpass 可选兜底
+  if (opts?.network === false) {
+    // 预热模式：只填本地/走廊结果，不打公网，也不写负缓存（避免挡住真实请求）
+    return { coords: [from, to], ok: false, fromCache: false, reason: 'local_only_prewarm' };
+  }
   if (!isOverpassEnabled()) {
     cache.set(missKey, 1, SEGMENT_MISS_TTL_SEC);
+    saveSegmentMissDisk(key, 'overpass_disabled', SEGMENT_MISS_TTL_SEC);
     return { coords: [from, to], ok: false, fromCache: false, reason: 'overpass_disabled' };
   }
 
@@ -681,6 +907,7 @@ export async function buildSegmentGeometry(
 
   if (!line || line.length < 2) {
     cache.set(missKey, 1, SEGMENT_MISS_TTL_SEC);
+    saveSegmentMissDisk(key, lastReason, missTtlSec(lastReason));
     return { coords: [from, to], ok: false, fromCache: false, reason: lastReason };
   }
 
@@ -689,10 +916,12 @@ export async function buildSegmentGeometry(
   if (!gate.ok) {
     console.warn(`[rail-seg] osm rejected ${gate.reason}`);
     cache.set(missKey, 1, SEGMENT_MISS_TTL_SEC);
+    saveSegmentMissDisk(key, gate.reason, missTtlSec(gate.reason));
     overpassTracker.recordFail();
     return { coords: [from, to], ok: false, fromCache: false, reason: gate.reason };
   }
   cache.set(key, simplified, SEGMENT_CACHE_TTL_SEC);
+  saveSegmentDisk(key, simplified, SEGMENT_CACHE_TTL_SEC);
   overpassTracker.recordSuccess();
   console.log(`[rail-seg] ok via osm pts=${simplified.length}`);
   return { coords: simplified, ok: true, fromCache: false, reason: 'osm' };

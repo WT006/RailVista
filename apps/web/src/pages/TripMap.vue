@@ -51,6 +51,7 @@ import SideBadge from '../components/SideBadge.vue';
 import SpotApproachCard from '../components/SpotApproachCard.vue';
 import { usePrefsStore } from '../stores/prefsStore';
 import { useTripStore } from '../stores/tripStore';
+import { useSmoothMarker } from '../composables/useSmoothMarker';
 
 const route = useRoute();
 const router = useRouter();
@@ -103,6 +104,8 @@ let roadNetLayer: any;
 let railLine: any;
 let trainMarker: any;
 let gpsMarker: any;
+const trainTarget = ref<[number, number] | null>(null);
+const gpsTarget = ref<[number, number] | null>(null);
 let spotMarkers: any[] = [];
 let stationMarkers: any[] = [];
 /** P0-4：无坐标经停的灰色空心占位标记（位置为前后站间近似插值） */
@@ -382,13 +385,13 @@ function tick() {
     etasRef.value = [];
   }
   const point = pointAtProgress(pathMetrics.path, pathMetrics.lengthKm, result.progress);
-  if (trainMarker) trainMarker.setPosition([point.lng, point.lat]);
+  if (trainMarker) trainTarget.value = [point.lng, point.lat];
   if (gpsMarker) {
     const g = gps.value;
     const stale = !gpsAvailable.value || !g || Date.now() - g.timestamp > 120000;
     if (stale || !prefs.layers.gps) gpsMarker.hide();
     else {
-      gpsMarker.setPosition([g!.lng, g!.lat]);
+      gpsTarget.value = [g!.lng, g!.lat];
       gpsMarker.show();
     }
   }
@@ -523,8 +526,8 @@ function rebuildUnresolvedMarkers() {
 
 function railStrokeOptions() {
   return satelliteOn.value
-    ? { strokeColor: '#67e8f9', strokeOpacity: 0.95 }
-    : { strokeColor: '#38bdf8', strokeOpacity: 0.85 };
+    ? { strokeColor: '#efc577', strokeOpacity: 0.95 }
+    : { strokeColor: '#e4b25c', strokeOpacity: 0.85 };
 }
 
 function applySatelliteLayers() {
@@ -702,7 +705,7 @@ async function initMap() {
     zoom: 5,
     center: coords[0] || [104, 35],
     viewMode: '2D',
-    mapStyle: 'amap://styles/grey',
+    mapStyle: 'amap://styles/dark',
   });
 
   if (coords.length >= 2) {
@@ -770,6 +773,11 @@ async function initMap() {
   });
   map.add(gpsMarker);
   gpsMarker.hide();
+
+  trainTarget.value = (coords[0] as [number, number]) || [104, 35];
+  gpsTarget.value = trainTarget.value;
+  useSmoothMarker(trainTarget, (p) => trainMarker?.setPosition(p), 0.12);
+  useSmoothMarker(gpsTarget, (p) => gpsMarker?.setPosition(p), 0.18);
 
   map.getContainer().addEventListener('click', (event: MouseEvent) => {
     const t = event.target as HTMLElement;
@@ -1080,10 +1088,11 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <template v-if="!statusCollapsed">
+            <Transition name="status-expand">
+              <div v-if="!statusCollapsed" class="status-body">
               <div class="status-progress" :aria-label="`行程进度 ${progressPct}%`">
                 <div class="status-progress__track">
-                  <div class="status-progress__bar" :style="{ width: `${progressPct}%` }" />
+                  <div class="status-progress__bar" :style="{ transform: `scaleX(${progress})` }" />
                 </div>
                 <span class="status-progress__pct">{{ progressPct }}%</span>
               </div>
@@ -1118,7 +1127,8 @@ onUnmounted(() => {
               <p v-if="trip.unresolvedStops.length" class="rail-unresolved-hint">
                 {{ trip.unresolvedStops.join('、') }} 坐标待补，地图上为灰色近似占位
               </p>
-            </template>
+              </div>
+            </Transition>
           </div>
 
           <div v-if="calibrateOpen && !statusCollapsed" class="calibrate-popover">
@@ -1218,7 +1228,7 @@ onUnmounted(() => {
             <template v-if="upcoming?.timeLabel">计划 {{ upcoming.timeLabel }} · </template>
             {{ upcoming?.reason }}
           </div>
-          <div class="progress-track"><div class="progress-bar" :style="{ width: `${progress * 100}%` }" /></div>
+          <div class="progress-track"><div class="progress-bar" :style="{ transform: `scaleX(${progress})` }" /></div>
         </section>
       </footer>
     </template>

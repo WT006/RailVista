@@ -24,9 +24,9 @@ const info = appVersionInfo();
   gap: 6px;
   padding: 4px 9px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(148, 163, 184, 0.1);
-  color: #94a3b8;
+  border: 1px solid var(--border-default);
+  background: var(--border-hairline);
+  color: var(--text-muted);
   font-size: 11.5px;
   line-height: 1;
   white-space: nowrap;
@@ -41,7 +41,7 @@ const info = appVersionInfo();
 
 .app-version-badge__num {
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
 

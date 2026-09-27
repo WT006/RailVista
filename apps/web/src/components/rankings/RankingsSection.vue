@@ -230,11 +230,11 @@ function onFocusClick(rankingId: string, item: RankItem) {
   gap: 12px;
   padding: 16px 14px 14px;
   border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.55), rgba(15, 23, 42, 0.72));
+  border: 1px solid var(--border-default);
+  background: linear-gradient(180deg, var(--bg-elevated), var(--bg-raised));
   box-shadow:
     0 18px 40px rgba(0, 0, 0, 0.28),
-    inset 0 1px 0 rgba(148, 163, 184, 0.08);
+    inset 0 1px 0 var(--border-hairline);
 }
 
 .rankings__head {
@@ -247,7 +247,7 @@ function onFocusClick(rankingId: string, item: RankItem) {
   font-size: 10.5px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #38bdf8;
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -255,13 +255,13 @@ function onFocusClick(rankingId: string, item: RankItem) {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .rankings__sub {
   margin: 0;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-muted);
   line-height: 1.45;
 }
 
@@ -275,30 +275,30 @@ function onFocusClick(rankingId: string, item: RankItem) {
 .rankings__tab {
   padding: 5px 11px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(148, 163, 184, 0.08);
-  color: #94a3b8;
+  border: 1px solid var(--border-default);
+  background: var(--border-hairline);
+  color: var(--text-muted);
   font-size: 12px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
 }
 
 .rankings__tab:hover {
-  color: #e2e8f0;
-  border-color: rgba(148, 163, 184, 0.4);
+  color: var(--text-secondary);
+  border-color: var(--border-strong);
 }
 
 .rankings__tab.is-active {
-  background: linear-gradient(180deg, rgba(56, 189, 248, 0.28), rgba(14, 165, 233, 0.18));
-  border-color: rgba(56, 189, 248, 0.55);
-  color: #e0f2fe;
+  background: linear-gradient(180deg, var(--accent-container), var(--accent-container));
+  border-color: var(--accent-border);
+  color: var(--accent-hover);
   font-weight: 600;
 }
 
 /* 切换动画：200ms 淡入 + 位移 */
 .rank-swap-enter-active,
 .rank-swap-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
 .rank-swap-enter-from {
   opacity: 0;
@@ -317,7 +317,7 @@ function onFocusClick(rankingId: string, item: RankItem) {
 .rankings__source {
   margin: 0;
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-muted);
   line-height: 1.5;
 }
 
@@ -326,8 +326,8 @@ function onFocusClick(rankingId: string, item: RankItem) {
   margin-right: 6px;
   padding: 1px 6px;
   border-radius: 999px;
-  background: rgba(56, 189, 248, 0.12);
-  color: #7dd3fc;
+  background: var(--accent-container);
+  color: var(--accent-hover);
   font-size: 10.5px;
 }
 
@@ -343,10 +343,10 @@ function onFocusClick(rankingId: string, item: RankItem) {
   gap: 5px;
   padding: 11px 12px 11px 14px;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--border-default);
+  background: var(--bg-inset);
   cursor: pointer;
-  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
 
 .rank-card::before {
@@ -360,19 +360,19 @@ function onFocusClick(rankingId: string, item: RankItem) {
 }
 
 .rank-card--gold::before {
-  background: linear-gradient(180deg, #fde68a, #f59e0b);
+  background: linear-gradient(180deg, var(--warning), var(--warning));
 }
 .rank-card--silver::before {
-  background: linear-gradient(180deg, #e2e8f0, #94a3b8);
+  background: linear-gradient(180deg, var(--text-secondary), var(--text-muted));
 }
 .rank-card--bronze::before {
-  background: linear-gradient(180deg, #fdba74, #c2703c);
+  background: linear-gradient(180deg, var(--warning), var(--accent-press));
 }
 
 .rank-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(148, 163, 184, 0.38);
-  background: rgba(30, 41, 59, 0.66);
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
 }
 
 .rank-card.is-muted {
@@ -391,17 +391,17 @@ function onFocusClick(rankingId: string, item: RankItem) {
   font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: #0f172a;
+  color: var(--bg-base);
 }
 
 .rank-card--gold .rank-card__badge {
-  background: linear-gradient(135deg, #fde68a, #f59e0b);
+  background: linear-gradient(135deg, var(--warning), var(--warning));
 }
 .rank-card--silver .rank-card__badge {
-  background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
+  background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
 }
 .rank-card--bronze .rank-card__badge {
-  background: linear-gradient(135deg, #fed7aa, #c2703c);
+  background: linear-gradient(135deg, var(--warning), var(--accent-press));
 }
 
 .rank-card__name {
@@ -409,23 +409,23 @@ function onFocusClick(rankingId: string, item: RankItem) {
   padding-right: 30px;
   font-size: 14px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .rank-od {
   justify-self: start;
   padding: 1px 7px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(148, 163, 184, 0.1);
-  color: #cbd5e1;
+  border: 1px solid var(--border-default);
+  background: var(--border-hairline);
+  color: var(--text-secondary);
   font-size: 11px;
 }
 
 .rank-card__tagline {
   margin: 0;
   font-size: 12px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
@@ -435,36 +435,36 @@ function onFocusClick(rankingId: string, item: RankItem) {
   flex-wrap: wrap;
   gap: 8px;
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
 .rank-card__focus {
-  color: #7dd3fc;
+  color: var(--accent-hover);
 }
 
 .rank-card__go {
   font-size: 11.5px;
-  color: #38bdf8;
+  color: var(--accent);
   font-weight: 600;
 }
 
 .rank-card__none {
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .rank-card__note {
   margin: 0;
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--text-muted);
   line-height: 1.5;
 }
 
 /* 渐变分隔线 */
 .rankings__divider {
   height: 1px;
-  background: linear-gradient(90deg, rgba(56, 189, 248, 0.35), rgba(148, 163, 184, 0.05));
+  background: linear-gradient(90deg, var(--accent-container), var(--border-hairline));
 }
 
 /* ── 第 4 名起：紧凑列表行 ── */
@@ -484,13 +484,13 @@ function onFocusClick(rankingId: string, item: RankItem) {
   border-radius: 10px;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  transition: transform var(--dur-micro) var(--ease-out), background var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
 }
 
 .rank-row:hover {
   transform: translateY(-1px);
-  background: rgba(148, 163, 184, 0.1);
-  border-color: rgba(148, 163, 184, 0.26);
+  background: var(--border-hairline);
+  border-color: var(--border-default);
 }
 
 .rank-row.is-muted {
@@ -498,8 +498,8 @@ function onFocusClick(rankingId: string, item: RankItem) {
 }
 
 .rank-row.is-open {
-  background: rgba(148, 163, 184, 0.1);
-  border-color: rgba(148, 163, 184, 0.24);
+  background: var(--border-hairline);
+  border-color: var(--border-default);
   opacity: 1;
 }
 
@@ -510,8 +510,8 @@ function onFocusClick(rankingId: string, item: RankItem) {
   display: grid;
   place-items: center;
   border-radius: 6px;
-  background: rgba(148, 163, 184, 0.14);
-  color: #cbd5e1;
+  background: var(--border-hairline);
+  color: var(--text-secondary);
   font-size: 11px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -534,19 +534,19 @@ function onFocusClick(rankingId: string, item: RankItem) {
 .rank-row__name {
   font-size: 12.5px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--text-secondary);
 }
 
 .rank-row__tagline {
   font-size: 11.5px;
-  color: #94a3b8;
+  color: var(--text-muted);
   line-height: 1.45;
 }
 
 .rank-row__note {
   margin-top: 2px;
   font-size: 11px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   line-height: 1.45;
 }
 
@@ -555,15 +555,15 @@ function onFocusClick(rankingId: string, item: RankItem) {
   align-self: center;
   padding: 1px 6px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.1);
-  color: #64748b;
+  background: var(--border-hairline);
+  color: var(--text-muted);
   font-size: 10.5px;
 }
 
 .rank-row__go {
   flex-shrink: 0;
   align-self: center;
-  color: #38bdf8;
+  color: var(--accent);
   font-size: 14px;
   line-height: 1;
 }
@@ -572,21 +572,21 @@ function onFocusClick(rankingId: string, item: RankItem) {
 .rankings__focus {
   padding: 9px 10px;
   border-radius: 10px;
-  border: 1px dashed rgba(56, 189, 248, 0.3);
-  background: rgba(14, 165, 233, 0.06);
+  border: 1px dashed var(--accent-container);
+  background: var(--accent-container);
 }
 
 .rankings__focus-title {
   margin: 0 0 6px;
   font-size: 11.5px;
   font-weight: 700;
-  color: #7dd3fc;
+  color: var(--accent-hover);
 }
 
 .rankings__focus-hint {
   margin-left: 4px;
   font-weight: 400;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 10.5px;
 }
 
@@ -607,14 +607,14 @@ function onFocusClick(rankingId: string, item: RankItem) {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-size: 11.5px;
   cursor: pointer;
   text-align: left;
 }
 
 .rankings__focus-btn:hover:not(:disabled) {
-  background: rgba(56, 189, 248, 0.1);
+  background: var(--accent-container);
 }
 
 .rankings__focus-btn:disabled {
@@ -625,7 +625,7 @@ function onFocusClick(rankingId: string, item: RankItem) {
 .rankings__focus-no {
   width: 16px;
   text-align: center;
-  color: #64748b;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -634,13 +634,13 @@ function onFocusClick(rankingId: string, item: RankItem) {
 }
 
 .rankings__focus-count {
-  color: #7dd3fc;
+  color: var(--accent-hover);
   font-variant-numeric: tabular-nums;
 }
 
 .rankings__focus-src {
   margin-left: auto;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 10.5px;
 }
 
@@ -652,16 +652,16 @@ function onFocusClick(rankingId: string, item: RankItem) {
   gap: 12px;
   padding: 12px 13px;
   border-radius: 12px;
-  border: 1px solid rgba(56, 189, 248, 0.32);
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.16), rgba(30, 41, 59, 0.6));
-  color: #e0f2fe;
+  border: 1px solid var(--accent-container);
+  background: linear-gradient(135deg, var(--accent-container), var(--bg-elevated));
+  color: var(--accent-hover);
   cursor: pointer;
-  transition: transform 0.18s ease, border-color 0.18s ease;
+  transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
 }
 
 .atlas-entry:hover {
   transform: translateY(-2px);
-  border-color: rgba(56, 189, 248, 0.55);
+  border-color: var(--accent-border);
 }
 
 .atlas-entry__main {
@@ -677,13 +677,13 @@ function onFocusClick(rankingId: string, item: RankItem) {
 
 .atlas-entry__desc {
   font-size: 11.5px;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .atlas-entry__go {
   flex-shrink: 0;
   font-size: 12px;
-  color: #38bdf8;
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -692,13 +692,13 @@ function onFocusClick(rankingId: string, item: RankItem) {
   display: grid;
   gap: 4px;
   padding-top: 8px;
-  border-top: 1px solid rgba(148, 163, 184, 0.16);
+  border-top: 1px solid var(--border-hairline);
 }
 
 .rankings__sources-title {
   margin: 0;
   font-size: 10.5px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .rankings__sources ul {
@@ -711,7 +711,7 @@ function onFocusClick(rankingId: string, item: RankItem) {
 
 .rankings__sources a {
   font-size: 10.5px;
-  color: #7dd3fc;
+  color: var(--accent-hover);
   text-decoration: none;
   line-height: 1.5;
 }
@@ -723,7 +723,7 @@ function onFocusClick(rankingId: string, item: RankItem) {
 .rankings__sources-note {
   margin: 2px 0 0;
   font-size: 10.5px;
-  color: #475569;
+  color: var(--text-muted);
   line-height: 1.5;
 }
 

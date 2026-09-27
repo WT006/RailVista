@@ -24,6 +24,9 @@ import {
   type DimensionMeta,
 } from '../data/spotDimensions';
 import { loadAmap } from '../map/amap';
+import { useLenis } from '../composables/useLenis';
+
+useLenis();
 
 const route = useRoute();
 const router = useRouter();
@@ -161,7 +164,7 @@ async function drawMap() {
 
   const line = new AMapRef.Polyline({
     path,
-    strokeColor: '#38bdf8',
+    strokeColor: 'var(--accent)',
     strokeWeight: 4,
     strokeOpacity: 0.95,
     strokeStyle: 'solid',
@@ -445,8 +448,8 @@ watch(corridorId, async () => {
 .route-page {
   min-height: 100%;
   padding: 14px 14px 40px;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: var(--bg-base);
+  color: var(--text-secondary);
 }
 
 .route-top {
@@ -466,7 +469,7 @@ watch(corridorId, async () => {
   margin: 0;
   font-size: 10px;
   letter-spacing: 0.22em;
-  color: #38bdf8;
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -480,9 +483,9 @@ watch(corridorId, async () => {
   flex-shrink: 0;
   padding: 5px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  background: rgba(148, 163, 184, 0.1);
-  color: #cbd5e1;
+  border: 1px solid var(--border-default);
+  background: var(--border-hairline);
+  color: var(--text-secondary);
   font-size: 11.5px;
   cursor: pointer;
 }
@@ -497,15 +500,15 @@ watch(corridorId, async () => {
 .route-tip {
   margin: 0;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .route-empty,
 .route-warn {
   padding: 14px;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid var(--border-default);
+  background: var(--bg-elevated);
 }
 
 .route-empty h2 {
@@ -516,14 +519,14 @@ watch(corridorId, async () => {
 .route-empty p {
   margin: 0 0 10px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .route-warn {
   font-size: 12px;
-  color: #fbbf24;
-  border-color: rgba(251, 191, 36, 0.32);
-  background: rgba(251, 191, 36, 0.08);
+  color: var(--warning);
+  border-color: rgba(223, 179, 87, 0.32);
+  background: rgba(223, 179, 87, 0.08);
 }
 
 /* ── 头部信息条 ── */
@@ -532,8 +535,8 @@ watch(corridorId, async () => {
   gap: 6px;
   padding: 12px 13px;
   border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.72));
+  border: 1px solid var(--border-default);
+  background: linear-gradient(180deg, var(--bg-elevated), var(--bg-raised));
 }
 
 .route-head__od {
@@ -546,9 +549,9 @@ watch(corridorId, async () => {
 .route-od {
   padding: 2px 9px;
   border-radius: 999px;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  background: rgba(56, 189, 248, 0.12);
-  color: #bae6fd;
+  border: 1px solid var(--accent-container);
+  background: var(--accent-container);
+  color: var(--accent-hover);
   font-size: 12px;
   font-weight: 600;
 }
@@ -556,8 +559,8 @@ watch(corridorId, async () => {
 .route-chip {
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.12);
-  color: #94a3b8;
+  background: var(--border-hairline);
+  color: var(--text-muted);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
@@ -572,22 +575,22 @@ watch(corridorId, async () => {
 
 .route-head__ranks-label {
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .route-rank-badge {
   padding: 2px 8px;
   border-radius: 999px;
-  border: 1px solid rgba(251, 191, 36, 0.32);
-  background: rgba(251, 191, 36, 0.1);
-  color: #fcd34d;
+  border: 1px solid rgba(223, 179, 87, 0.32);
+  background: rgba(223, 179, 87, 0.1);
+  color: var(--warning);
   font-size: 11px;
 }
 
 .route-head__tagline {
   margin: 0;
   font-size: 12px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
@@ -595,8 +598,8 @@ watch(corridorId, async () => {
 .route-map-card {
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-default);
+  background: var(--bg-inset);
 }
 
 .route-map {
@@ -608,15 +611,15 @@ watch(corridorId, async () => {
   margin: 0;
   padding: 16px 13px;
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .route-map-stations {
   margin: 0;
   padding: 8px 12px;
-  border-top: 1px solid rgba(148, 163, 184, 0.16);
+  border-top: 1px solid var(--border-hairline);
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-muted);
   line-height: 1.5;
 }
 
@@ -634,7 +637,7 @@ watch(corridorId, async () => {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.15s ease, filter 0.15s ease;
+  transition: transform var(--dur-micro) var(--ease-out), filter var(--dur-micro) var(--ease-out);
 }
 
 .route-btn:hover {
@@ -642,14 +645,14 @@ watch(corridorId, async () => {
 }
 
 .route-btn--primary {
-  background: linear-gradient(180deg, #38bdf8, #0ea5e9);
-  color: #04121f;
+  background: linear-gradient(180deg, var(--accent), var(--accent-press));
+  color: var(--bg-base);
 }
 
 .route-btn--ghost {
-  border-color: rgba(148, 163, 184, 0.32);
-  background: rgba(148, 163, 184, 0.1);
-  color: #e2e8f0;
+  border-color: var(--border-strong);
+  background: var(--border-hairline);
+  color: var(--text-secondary);
 }
 
 /* ── 景点分组 ── */
@@ -670,14 +673,14 @@ watch(corridorId, async () => {
 .route-spots__count {
   font-size: 11px;
   font-weight: 400;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .route-group {
   padding: 10px 11px;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background: rgba(30, 41, 59, 0.42);
+  border: 1px solid var(--border-hairline);
+  background: var(--bg-elevated);
 }
 
 .route-group__title {
@@ -687,20 +690,20 @@ watch(corridorId, async () => {
   gap: 6px;
   font-size: 12.5px;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-secondary);
 }
 
 .route-dot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: var(--dot, #94a3b8);
+  background: var(--dot, var(--text-muted));
 }
 
 .route-group__count {
   font-size: 10.5px;
   font-weight: 400;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .route-group__list {
@@ -714,8 +717,8 @@ watch(corridorId, async () => {
 .route-spot {
   padding: 8px 9px;
   border-radius: 10px;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: var(--bg-inset);
+  border: 1px solid var(--border-hairline);
 }
 
 .route-spot__head {
@@ -728,20 +731,20 @@ watch(corridorId, async () => {
 .route-spot__name {
   font-size: 12.5px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .route-spot__km {
   flex-shrink: 0;
   font-size: 11px;
-  color: #7dd3fc;
+  color: var(--accent-hover);
   font-variant-numeric: tabular-nums;
 }
 
 .route-spot__intro {
   margin: 3px 0 0;
   font-size: 11.5px;
-  color: #94a3b8;
+  color: var(--text-muted);
   line-height: 1.55;
 }
 
@@ -751,11 +754,11 @@ watch(corridorId, async () => {
   flex-wrap: wrap;
   gap: 8px;
   font-size: 10.5px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .route-spot__infer {
-  color: #fbbf24;
+  color: var(--warning);
 }
 
 @media (max-width: 480px) {
@@ -779,10 +782,10 @@ watch(corridorId, async () => {
   gap: 4px;
   padding: 2px 7px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: var(--bg-base);
+  border: 1px solid var(--border-strong);
   font-size: 11px;
-  color: #e2e8f0;
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
@@ -790,11 +793,11 @@ watch(corridorId, async () => {
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: #38bdf8;
+  background: var(--accent);
 }
 
 .route-pin--end .route-pin__dot {
-  background: #fbbf24;
+  background: var(--warning);
 }
 
 .route-spot-dot {
@@ -802,17 +805,17 @@ watch(corridorId, async () => {
   width: 9px;
   height: 9px;
   border-radius: 999px;
-  background: var(--dot, #94a3b8);
-  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.75);
+  background: var(--dot, var(--text-muted));
+  box-shadow: 0 0 0 2px var(--bg-raised);
 }
 
 .route-iw {
   max-width: 230px;
   padding: 9px 11px;
   border-radius: 10px;
-  background: rgba(15, 23, 42, 0.96);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  color: #e2e8f0;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
 }
 
 .route-iw__name {
@@ -824,7 +827,7 @@ watch(corridorId, async () => {
 .route-iw__meta {
   margin: 3px 0 0;
   font-size: 10.5px;
-  color: #7dd3fc;
+  color: var(--accent-hover);
 }
 
 .route-iw__dims {
@@ -836,8 +839,8 @@ watch(corridorId, async () => {
 .iw-dim {
   padding: 1px 6px;
   border-radius: 999px;
-  background: var(--dot, #94a3b8);
-  color: #0f172a;
+  background: var(--dot, var(--text-muted));
+  color: var(--bg-base);
   font-size: 10px;
   font-weight: 700;
 }
@@ -845,7 +848,7 @@ watch(corridorId, async () => {
 .route-iw__intro {
   margin: 5px 0 0;
   font-size: 11px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 </style>

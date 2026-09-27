@@ -132,7 +132,7 @@ const pct = computed(() => Math.round(progress.value));
           <div
             class="rv-loader__fill"
             :class="{ 'is-hold': isHold, 'is-done': done }"
-            :style="{ width: pct + '%' }"
+            :style="{ transform: `scaleX(${pct / 100})` }"
           />
         </div>
         <span
@@ -157,40 +157,40 @@ const pct = computed(() => Math.round(progress.value));
           <span class="rv-loader__dash rv-loader__dash--1" />
           <span class="rv-loader__dash rv-loader__dash--2" />
           <svg class="rv-loader__cr" viewBox="0 0 62 24" aria-hidden="true">
-            <rect x="7" y="17.6" width="15" height="3.6" rx="1.4" fill="#475569" />
-            <rect x="33" y="17.6" width="13" height="3.6" rx="1.4" fill="#475569" />
+            <rect x="7" y="17.6" width="15" height="3.6" rx="1.4" fill="var(--text-muted)" />
+            <rect x="33" y="17.6" width="13" height="3.6" rx="1.4" fill="var(--text-muted)" />
             <g class="rv-loader__wheel" style="transform-origin: 12px 21.4px">
-              <circle cx="12" cy="21.4" r="2" fill="#94a3b8" />
-              <circle cx="12" cy="21.4" r="0.7" fill="#0f172a" />
+              <circle cx="12" cy="21.4" r="2" fill="var(--text-muted)" />
+              <circle cx="12" cy="21.4" r="0.7" fill="var(--bg-base)" />
             </g>
             <g class="rv-loader__wheel" style="transform-origin: 19px 21.4px">
-              <circle cx="19" cy="21.4" r="2" fill="#94a3b8" />
-              <circle cx="19" cy="21.4" r="0.7" fill="#0f172a" />
+              <circle cx="19" cy="21.4" r="2" fill="var(--text-muted)" />
+              <circle cx="19" cy="21.4" r="0.7" fill="var(--bg-base)" />
             </g>
             <g class="rv-loader__wheel" style="transform-origin: 37px 21.4px">
-              <circle cx="37" cy="21.4" r="2" fill="#94a3b8" />
-              <circle cx="37" cy="21.4" r="0.7" fill="#0f172a" />
+              <circle cx="37" cy="21.4" r="2" fill="var(--text-muted)" />
+              <circle cx="37" cy="21.4" r="0.7" fill="var(--bg-base)" />
             </g>
             <g class="rv-loader__wheel" style="transform-origin: 43px 21.4px">
-              <circle cx="43" cy="21.4" r="2" fill="#94a3b8" />
-              <circle cx="43" cy="21.4" r="0.7" fill="#0f172a" />
+              <circle cx="43" cy="21.4" r="2" fill="var(--text-muted)" />
+              <circle cx="43" cy="21.4" r="0.7" fill="var(--bg-base)" />
             </g>
             <path
               d="M2.6 5H33c11.5 0 19.5 3.3 25 7.7 1.8 1.4 1.8 2.8 0 4.2C52.5 18.1 45 18.6 36 18.6H5Q2.6 18.6 2.6 16V7.6Q2.6 5 2.6 5Z"
-              fill="#dfe6ee"
+              fill="var(--text-secondary)"
             />
-            <path d="M2.6 15.8H36c7 .2 13.5 .9 18.6 1.7H5Q2.6 17.5 2.6 15.8Z" fill="#c3ccd8" />
+            <path d="M2.6 15.8H36c7 .2 13.5 .9 18.6 1.7H5Q2.6 17.5 2.6 15.8Z" fill="var(--text-muted)" />
             <path
               d="M6.5 7.3H37c8 .2 14.5 2.4 18.6 5l-1.7 1.5c-3.9-2.6-9.4-4.4-16.9-4.6H6.5Z"
-              fill="#16213a"
+              fill="var(--bg-elevated)"
             />
-            <rect x="4" y="13.6" width="45" height="1.3" rx="0.65" fill="#e03131" />
+            <rect x="4" y="13.6" width="45" height="1.3" rx="0.65" fill="var(--danger)" />
             <ellipse
               cx="56.2"
               cy="13.9"
               rx="1.8"
               ry="1.1"
-              :fill="isHold ? '#fbbf24' : done ? '#5eead4' : '#fde68a'"
+              :fill="isHold ? 'var(--warning)' : done ? 'var(--info)' : 'var(--warning)'"
             />
           </svg>
           <span v-if="isHold" class="rv-loader__signal" />
@@ -223,10 +223,10 @@ const pct = computed(() => Math.round(progress.value));
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: rgba(2, 6, 23, 0.72);
+  background: var(--bg-raised);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  animation: rv-fade 0.18s ease-out both;
+  animation: rv-fade var(--dur-fast) var(--ease-out) both;
 }
 
 .rv-loader__card {
@@ -234,13 +234,13 @@ const pct = computed(() => Math.round(progress.value));
   width: min(92vw, 340px);
   padding: 20px 22px 18px;
   border-radius: 16px;
-  background: linear-gradient(165deg, #152033 0%, #0f172a 100%);
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: linear-gradient(165deg, var(--bg-raised) 0%, var(--bg-base) 100%);
+  border: 1px solid var(--accent-container);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
 }
 
 .rv-loader__card.is-hold {
-  border-color: rgba(251, 191, 36, 0.45);
+  border-color: rgba(223, 179, 87, 0.45);
 }
 
 .rv-loader__eyebrow {
@@ -248,7 +248,7 @@ const pct = computed(() => Math.round(progress.value));
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .rv-loader__track {
@@ -264,23 +264,25 @@ const pct = computed(() => Math.round(progress.value));
   top: 24px;
   height: 6px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.22);
+  background: var(--border-default);
   overflow: hidden;
 }
 
 .rv-loader__fill {
   height: 100%;
+  width: 100%;
+  transform-origin: 0 50%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #38bdf8 0%, #7dd3fc 100%);
-  transition: width 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
+  transition: transform var(--dur-slow) var(--ease-out);
 }
 
 .rv-loader__fill.is-hold {
-  background: #475569;
+  background: var(--text-muted);
 }
 
 .rv-loader__fill.is-done {
-  background: linear-gradient(90deg, #38bdf8 0%, #5eead4 100%);
+  background: linear-gradient(90deg, var(--accent) 0%, var(--info) 100%);
 }
 
 .rv-loader__sleeper {
@@ -289,7 +291,7 @@ const pct = computed(() => Math.round(progress.value));
   width: 2px;
   height: 10px;
   border-radius: 1px;
-  background: rgba(148, 163, 184, 0.28);
+  background: var(--border-default);
   transform: translateX(-50%);
 }
 
@@ -300,16 +302,16 @@ const pct = computed(() => Math.round(progress.value));
   height: 8px;
   border-radius: 50%;
   transform: translateX(-50%);
-  background: #475569;
-  transition: background 0.3s ease;
+  background: var(--text-muted);
+  transition: background var(--dur-base) var(--ease-out);
 }
 
 .rv-loader__milestone.is-on {
-  background: #38bdf8;
+  background: var(--accent);
 }
 
 .rv-loader__milestone.is-end.is-done {
-  background: #5eead4;
+  background: var(--info);
 }
 
 /* 列车：translateX(-100%) 让车头（SVG 右端鼻尖）对齐进度位置 */
@@ -318,7 +320,7 @@ const pct = computed(() => Math.round(progress.value));
   top: 6px;
   transform: translateX(-86%);
   margin-left: 4px;
-  transition: left 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition: left var(--dur-slow) var(--ease-out);
   display: flex;
   align-items: center;
 }
@@ -334,7 +336,7 @@ const pct = computed(() => Math.round(progress.value));
   right: calc(100% - 4px);
   height: 1.5px;
   border-radius: 2px;
-  background: rgba(125, 211, 252, 0.5);
+  background: var(--accent-border);
 }
 
 .rv-loader__dash--1 {
@@ -353,7 +355,7 @@ const pct = computed(() => Math.round(progress.value));
   left: 40px;
   width: 2px;
   height: 10px;
-  background: #475569;
+  background: var(--text-muted);
 }
 
 .rv-loader__signal::before {
@@ -364,7 +366,7 @@ const pct = computed(() => Math.round(progress.value));
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #fbbf24;
+  background: var(--warning);
 }
 
 .rv-loader__row {
@@ -378,32 +380,32 @@ const pct = computed(() => Math.round(progress.value));
   margin: 0;
   font-size: 17px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--text-primary);
   letter-spacing: 0.02em;
 }
 
 .rv-loader__pct {
   margin: 0;
   font-size: 12px;
-  color: #7dd3fc;
+  color: var(--accent-hover);
   font-variant-numeric: tabular-nums;
 }
 
 .rv-loader__pct.is-hold {
-  color: #fbbf24;
+  color: var(--warning);
 }
 
 .rv-loader__detail {
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.5;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .rv-loader__hint {
   margin: 10px 0 0;
   font-size: 12px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .rv-loader__actions {
@@ -415,9 +417,9 @@ const pct = computed(() => Math.round(progress.value));
 .rv-loader__btn {
   flex: 1;
   appearance: none;
-  border: 1px solid rgba(56, 189, 248, 0.45);
-  background: rgba(56, 189, 248, 0.14);
-  color: #7dd3fc;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-container);
+  color: var(--accent-hover);
   font-size: 13px;
   font-weight: 600;
   padding: 8px 10px;
@@ -426,13 +428,13 @@ const pct = computed(() => Math.round(progress.value));
 }
 
 .rv-loader__btn:hover {
-  background: rgba(56, 189, 248, 0.22);
+  background: var(--accent-container);
 }
 
 .rv-loader__btn--ghost {
-  border-color: rgba(148, 163, 184, 0.35);
+  border-color: var(--border-strong);
   background: transparent;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 @keyframes rv-fade {
@@ -464,13 +466,13 @@ const pct = computed(() => Math.round(progress.value));
 
 @media (prefers-reduced-motion: no-preference) {
   .rv-loader__wheel {
-    animation: rv-wheel 0.6s linear infinite;
+    animation: rv-wheel var(--dur-slow) linear infinite;
   }
   .rv-loader__train {
-    animation: rv-bob 1.2s ease-in-out infinite;
+    animation: rv-bob var(--dur-slower) var(--ease-in-out) infinite;
   }
   .rv-loader__dash {
-    animation: rv-dash 0.9s ease-in-out infinite;
+    animation: rv-dash var(--dur-slow) var(--ease-in-out) infinite;
   }
   .rv-loader__dash--2 {
     animation-delay: 0.15s;

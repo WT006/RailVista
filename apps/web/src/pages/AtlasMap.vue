@@ -271,10 +271,10 @@ function renderHeat() {
     radius: 26,
     opacity: [0, 0.75],
     gradient: {
-      0.2: '#0ea5e9',
-      0.45: '#2dd4bf',
-      0.65: '#fbbf24',
-      1: '#f87171',
+      0.2: 'var(--accent-press)',
+      0.45: 'var(--info)',
+      0.65: 'var(--warning)',
+      1: 'var(--danger)',
     },
     zooms: [3, 18],
   });
@@ -290,7 +290,7 @@ function renderNetwork() {
     if (c.polyline.length < 2) continue;
     const line = new AMapRef.Polyline({
       path: c.polyline,
-      strokeColor: '#cbd5e1',
+      strokeColor: 'var(--text-secondary)',
       strokeWeight: 1.4,
       strokeOpacity: 0.38,
       strokeStyle: 'solid',
@@ -322,7 +322,7 @@ function focusCorridor(id: string) {
   }
   highlightLine = new AMapRef.Polyline({
     path: target.polyline,
-    strokeColor: '#38bdf8',
+    strokeColor: 'var(--accent)',
     strokeWeight: 4,
     strokeOpacity: 0.95,
     lineJoin: 'round',
@@ -571,7 +571,7 @@ watch(heatOn, () => renderHeat());
                 <span class="atlas-top-row__bar">
                   <span
                     class="atlas-top-row__fill"
-                    :style="{ width: `${Math.round((c.spotCount / maxSpotCount) * 100)}%` }"
+                    :style="{ transform: `scaleX(${c.spotCount / maxSpotCount})` }"
                   ></span>
                 </span>
                 <span class="atlas-top-row__num">{{ c.spotCount }}</span>
@@ -634,8 +634,8 @@ watch(heatOn, () => renderHeat());
   position: fixed;
   inset: 0;
   overflow: hidden;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: var(--bg-base);
+  color: var(--text-secondary);
 }
 
 .atlas-map {
@@ -656,8 +656,8 @@ watch(heatOn, () => renderHeat());
   gap: 8px;
   padding: 8px 10px;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(15, 23, 42, 0.86);
+  border: 1px solid var(--border-default);
+  background: var(--bg-raised);
   backdrop-filter: blur(8px);
 }
 
@@ -670,7 +670,7 @@ watch(heatOn, () => renderHeat());
   margin: 0;
   font-size: 9.5px;
   letter-spacing: 0.22em;
-  color: #38bdf8;
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -687,17 +687,17 @@ watch(heatOn, () => renderHeat());
   flex-shrink: 0;
   padding: 5px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  background: rgba(148, 163, 184, 0.1);
-  color: #cbd5e1;
+  border: 1px solid var(--border-default);
+  background: var(--border-hairline);
+  color: var(--text-secondary);
   font-size: 11.5px;
   cursor: pointer;
 }
 
 .atlas-toggle.is-on {
-  border-color: rgba(56, 189, 248, 0.55);
-  background: rgba(56, 189, 248, 0.16);
-  color: #bae6fd;
+  border-color: var(--accent-border);
+  background: var(--accent-container);
+  color: var(--accent-hover);
 }
 
 .atlas-toggle:disabled {
@@ -717,12 +717,12 @@ watch(heatOn, () => renderHeat());
   overflow-y: auto;
   overscroll-behavior: contain;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-default);
+  background: var(--bg-raised);
   display: grid;
   gap: 10px;
   align-content: start;
+  transition: width var(--dur-base) var(--ease-out), padding var(--dur-base) var(--ease-out);
 }
 
 .atlas-side.is-collapsed {
@@ -736,8 +736,8 @@ watch(heatOn, () => renderHeat());
   height: 40px;
   border: none;
   border-radius: 8px;
-  background: rgba(148, 163, 184, 0.14);
-  color: #e2e8f0;
+  background: var(--border-hairline);
+  color: var(--text-secondary);
   font-size: 18px;
   cursor: pointer;
 }
@@ -747,27 +747,27 @@ watch(heatOn, () => renderHeat());
   gap: 6px;
   padding: 9px 10px;
   border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  background: rgba(30, 41, 59, 0.42);
+  border: 1px solid var(--border-hairline);
+  background: var(--bg-elevated);
 }
 
 .atlas-block--sel {
-  border-color: rgba(56, 189, 248, 0.38);
-  background: rgba(14, 165, 233, 0.1);
+  border-color: var(--accent-border);
+  background: var(--accent-container);
 }
 
 .atlas-block__title {
   margin: 0;
   font-size: 12px;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-secondary);
 }
 
 .atlas-block__hint {
   margin-left: 4px;
   font-weight: 400;
   font-size: 10.5px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 /* ── 搜索 ── */
@@ -777,12 +777,12 @@ watch(heatOn, () => renderHeat());
   gap: 6px;
   padding: 6px 9px;
   border-radius: 9px;
-  border: 1px solid rgba(148, 163, 184, 0.26);
-  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--border-default);
+  background: var(--bg-raised);
 }
 
 .atlas-search__icon {
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 14px;
 }
 
@@ -792,7 +792,7 @@ watch(heatOn, () => renderHeat());
   border: none;
   outline: none;
   background: transparent;
-  color: #e2e8f0;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
@@ -815,20 +815,20 @@ watch(heatOn, () => renderHeat());
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   text-align: left;
   cursor: pointer;
 }
 
 .atlas-result:hover {
-  background: rgba(56, 189, 248, 0.12);
+  background: var(--accent-container);
 }
 
 .atlas-result__kind {
   padding: 1px 5px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.16);
-  color: #94a3b8;
+  background: var(--border-hairline);
+  color: var(--text-muted);
   font-size: 10px;
   align-self: center;
 }
@@ -836,13 +836,13 @@ watch(heatOn, () => renderHeat());
 .atlas-result__name {
   font-size: 12px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .atlas-result__desc {
   grid-column: 2;
   font-size: 10.5px;
-  color: #64748b;
+  color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -851,7 +851,7 @@ watch(heatOn, () => renderHeat());
 .atlas-none {
   margin: 0;
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 /* ── 维度筛选 ── */
@@ -867,17 +867,17 @@ watch(heatOn, () => renderHeat());
   gap: 5px;
   padding: 4px 9px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(148, 163, 184, 0.08);
-  color: #cbd5e1;
+  border: 1px solid var(--border-default);
+  background: var(--border-hairline);
+  color: var(--text-secondary);
   font-size: 11.5px;
   cursor: pointer;
 }
 
 .atlas-dim.is-on {
-  border-color: var(--dot, #38bdf8);
-  background: rgba(56, 189, 248, 0.14);
-  color: #e0f2fe;
+  border-color: var(--dot, var(--accent));
+  background: var(--accent-container);
+  color: var(--accent-hover);
   font-weight: 600;
 }
 
@@ -885,7 +885,7 @@ watch(heatOn, () => renderHeat());
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: var(--dot, #94a3b8);
+  background: var(--dot, var(--text-muted));
 }
 
 .atlas-dim-actions {
@@ -897,14 +897,14 @@ watch(heatOn, () => renderHeat());
 
 .atlas-count {
   font-size: 10.5px;
-  color: #64748b;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
 .atlas-link {
   border: none;
   background: none;
-  color: #38bdf8;
+  color: var(--accent);
   font-size: 11px;
   cursor: pointer;
   padding: 0;
@@ -930,19 +930,19 @@ watch(heatOn, () => renderHeat());
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   text-align: left;
   cursor: pointer;
 }
 
 .atlas-top-row:hover,
 .atlas-top-row.is-active {
-  background: rgba(56, 189, 248, 0.12);
+  background: var(--accent-container);
 }
 
 .atlas-top-row__no {
   font-size: 10.5px;
-  color: #64748b;
+  color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -956,20 +956,23 @@ watch(heatOn, () => renderHeat());
 .atlas-top-row__bar {
   height: 5px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.16);
+  background: var(--border-hairline);
   overflow: hidden;
 }
 
 .atlas-top-row__fill {
   display: block;
   height: 100%;
+  width: 100%;
+  transform-origin: 0 50%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #38bdf8, #2dd4bf);
+  background: linear-gradient(90deg, var(--accent), var(--info));
+  transition: transform var(--dur-slow) var(--ease-out);
 }
 
 .atlas-top-row__num {
   font-size: 10.5px;
-  color: #7dd3fc;
+  color: var(--accent-hover);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -990,14 +993,14 @@ watch(heatOn, () => renderHeat());
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   text-align: left;
   cursor: pointer;
 }
 
 .atlas-rank-row:hover,
 .atlas-rank-row.is-active {
-  background: rgba(56, 189, 248, 0.12);
+  background: var(--accent-container);
 }
 
 .atlas-rank-row__name {
@@ -1010,14 +1013,14 @@ watch(heatOn, () => renderHeat());
 .atlas-rank-row__src {
   flex-shrink: 0;
   font-size: 10px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 /* ── 选中卡片 ── */
 .atlas-sel-meta {
   margin: 0;
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .atlas-sel-actions {
@@ -1031,8 +1034,8 @@ watch(heatOn, () => renderHeat());
   padding: 6px 12px;
   border-radius: 9px;
   border: none;
-  background: linear-gradient(180deg, #38bdf8, #0ea5e9);
-  color: #04121f;
+  background: linear-gradient(180deg, var(--accent), var(--accent-press));
+  color: var(--bg-base);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -1041,7 +1044,7 @@ watch(heatOn, () => renderHeat());
 .atlas-foot {
   margin: 0;
   font-size: 10px;
-  color: #475569;
+  color: var(--text-muted);
   line-height: 1.5;
 }
 
@@ -1055,20 +1058,20 @@ watch(heatOn, () => renderHeat());
   margin: 0;
   padding: 7px 14px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
   font-size: 11.5px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .atlas-status--err {
-  border-color: rgba(248, 113, 113, 0.4);
-  color: #fca5a5;
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 .atlas-status--warn {
-  border-color: rgba(251, 191, 36, 0.36);
-  color: #fcd34d;
+  border-color: rgba(223, 179, 87, 0.36);
+  color: var(--warning);
 }
 
 @media (max-width: 720px) {
@@ -1094,17 +1097,17 @@ watch(heatOn, () => renderHeat());
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: var(--dot, #94a3b8);
-  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.7);
+  background: var(--dot, var(--text-muted));
+  box-shadow: 0 0 0 2px var(--bg-raised);
 }
 
 .atlas-cluster {
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: rgba(14, 165, 233, 0.22);
-  border: 1px solid rgba(56, 189, 248, 0.65);
-  color: #e0f2fe;
+  background: var(--accent-container);
+  border: 1px solid var(--accent-border);
+  color: var(--accent-hover);
   font-size: 11px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -1114,9 +1117,9 @@ watch(heatOn, () => renderHeat());
   max-width: 240px;
   padding: 9px 11px;
   border-radius: 10px;
-  background: rgba(15, 23, 42, 0.96);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  color: #e2e8f0;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
 }
 
 .atlas-iw__name {
@@ -1128,7 +1131,7 @@ watch(heatOn, () => renderHeat());
 .atlas-iw__line {
   margin: 3px 0 0;
   font-size: 10.5px;
-  color: #7dd3fc;
+  color: var(--accent-hover);
 }
 
 .atlas-iw__dims {
@@ -1141,8 +1144,8 @@ watch(heatOn, () => renderHeat());
 .atlas-iw-dim {
   padding: 1px 6px;
   border-radius: 999px;
-  background: var(--dot, #94a3b8);
-  color: #0f172a;
+  background: var(--dot, var(--text-muted));
+  color: var(--bg-base);
   font-size: 10px;
   font-weight: 700;
 }
@@ -1150,7 +1153,7 @@ watch(heatOn, () => renderHeat());
 .atlas-iw__intro {
   margin: 5px 0 0;
   font-size: 11px;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 </style>

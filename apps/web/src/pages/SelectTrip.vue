@@ -22,6 +22,9 @@ import RailProgressLoader from '../components/RailProgressLoader.vue';
 import RankingsSection from '../components/rankings/RankingsSection.vue';
 import BrandLogo from '../components/BrandLogo.vue';
 import { useTripStore } from '../stores/tripStore';
+import { useLenis } from '../composables/useLenis';
+
+useLenis();
 
 const router = useRouter();
 const route = useRoute();
@@ -771,7 +774,7 @@ function goBack() {
         直达车次
         <span class="train-list__count">{{ trains.length }} 趟</span>
       </h2>
-      <div class="train-grid">
+      <div class="train-grid" v-auto-animate>
         <button
           v-for="(t, i) in trains"
           :key="t.trainNo + t.departTime"
@@ -817,7 +820,7 @@ function goBack() {
         </label>
       </div>
 
-      <ol class="tl">
+      <ol class="tl" v-auto-animate>
         <li
           v-for="s in timeline"
           :key="s.seq + s.name"
@@ -873,7 +876,7 @@ function goBack() {
 
 .train-list__count {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-weight: 400;
 }
 
@@ -891,13 +894,13 @@ function goBack() {
   text-align: left;
   padding: 13px 14px 13px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid var(--border-default);
+  background: var(--bg-raised);
   color: inherit;
   cursor: pointer;
   font-family: inherit;
   overflow: hidden;
-  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
 
 .train-card::before {
@@ -907,28 +910,28 @@ function goBack() {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: #94a3b8;
+  background: var(--text-muted);
 }
 
 .train-card--hsr::before {
-  background: #38bdf8;
+  background: var(--accent);
 }
 
 .train-card--intercity::before {
-  background: #22d3ee;
+  background: var(--info);
 }
 
 .train-card--conventional::before {
-  background: #94a3b8;
+  background: var(--text-muted);
 }
 
 .train-card--other::before {
-  background: #64748b;
+  background: var(--text-muted);
 }
 
 .train-card:hover:not(:disabled) {
-  border-color: rgba(56, 189, 248, 0.5);
-  background: rgba(30, 41, 59, 0.78);
+  border-color: var(--accent-border);
+  background: var(--bg-elevated);
 }
 
 .train-card:active:not(:disabled) {
@@ -944,7 +947,7 @@ function goBack() {
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .train-card__time {
@@ -953,23 +956,23 @@ function goBack() {
   gap: 6px;
   font-size: 15px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
 .train-card__arrow {
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 400;
 }
 
 .train-card__meta {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .train-card {
-    animation: tc-in 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    animation: tc-in var(--dur-base) var(--ease-out) both;
     animation-delay: calc(var(--i, 0) * 40ms);
   }
 }
@@ -991,8 +994,8 @@ function goBack() {
   margin: 0 auto 14px;
   padding: 16px 18px;
   border-radius: 12px;
-  border: 1px dashed rgba(148, 163, 184, 0.35);
-  background: rgba(15, 23, 42, 0.5);
+  border: 1px dashed var(--border-strong);
+  background: var(--bg-inset);
   text-align: center;
 }
 
@@ -1000,13 +1003,13 @@ function goBack() {
   margin: 0 0 4px;
   font-size: 15px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--text-secondary);
 }
 
 .empty-state__desc {
   margin: 0 0 12px;
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .empty-state__actions {
@@ -1041,7 +1044,7 @@ function goBack() {
   bottom: 10px;
   width: 2px;
   border-radius: 2px;
-  background: rgba(148, 163, 184, 0.25);
+  background: var(--border-default);
 }
 
 .tl__item {
@@ -1051,8 +1054,8 @@ function goBack() {
   align-items: baseline;
   gap: 8px;
   padding: 6px 0;
-  color: #94a3b8;
-  transition: color 0.18s ease;
+  color: var(--text-muted);
+  transition: color var(--dur-fast) var(--ease-out);
 }
 
 .tl__dot {
@@ -1062,23 +1065,23 @@ function goBack() {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #334155;
-  border: 2px solid #0f172a;
-  transition: background 0.18s ease, box-shadow 0.18s ease;
+  background: var(--bg-elevated);
+  border: 2px solid var(--bg-base);
+  transition: background var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
 }
 
 .tl__item.is-range {
-  color: #e2e8f0;
+  color: var(--text-secondary);
 }
 
 .tl__item.is-range .tl__dot {
-  background: #38bdf8;
+  background: var(--accent);
 }
 
 .tl__item.is-board .tl__dot,
 .tl__item.is-alight .tl__dot {
-  background: #38bdf8;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-container);
 }
 
 .tl__name {
@@ -1089,11 +1092,11 @@ function goBack() {
 .tl__time {
   font-size: 13px;
   font-variant-numeric: tabular-nums;
-  color: #7dd3fc;
+  color: var(--accent-hover);
 }
 
 .tl__item:not(.is-range) .tl__time {
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .tl__stop,
@@ -1101,13 +1104,13 @@ function goBack() {
   font-size: 11px;
   padding: 1px 6px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.16);
-  color: #94a3b8;
+  background: var(--border-hairline);
+  color: var(--text-muted);
 }
 
 .tl__day {
-  background: rgba(251, 191, 36, 0.16);
-  color: #fbbf24;
+  background: rgba(223, 179, 87, 0.16);
+  color: var(--warning);
 }
 
 .od-panel__actions {

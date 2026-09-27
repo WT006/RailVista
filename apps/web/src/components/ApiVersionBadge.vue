@@ -46,15 +46,15 @@ onMounted(async () => {
   white-space: nowrap;
 }
 .badge.loading {
-  color: #94a3b8;
-  background: #f1f5f9;
+  color: var(--text-muted);
+  background: var(--text-primary);
 }
 .badge.ok {
-  color: #16a34a;
-  background: #f0fdf4;
+  color: var(--success);
+  background: var(--success-container);
 }
 .badge.down {
-  color: #dc2626;
-  background: #fef2f2;
+  color: var(--danger);
+  background: var(--danger-container);
 }
 </style>

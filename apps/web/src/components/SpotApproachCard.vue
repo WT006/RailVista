@@ -7,6 +7,7 @@
  */
 import { computed } from 'vue';
 import { honorLabels, type ScenicSpot } from '@railvista/shared';
+import { AlertTriangle } from 'lucide-vue-next';
 import SideBadge from './SideBadge.vue';
 
 const props = withDefaults(
@@ -108,7 +109,7 @@ const countdownText = computed(() => {
         </span>
       </div>
 
-      <p v-if="blocks.length" class="approach-card__blocked">⚠ {{ blocks.join(' · ') }}</p>
+      <p v-if="blocks.length" class="approach-card__blocked"><AlertTriangle :size="14" /> {{ blocks.join(' · ') }}</p>
     </section>
   </Transition>
 </template>
@@ -122,10 +123,10 @@ const countdownText = computed(() => {
   z-index: 40;
   padding: 10px 12px 11px;
   border-radius: 14px;
-  background: linear-gradient(165deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.97));
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: linear-gradient(165deg, rgba(30, 41, 59, 0.96), var(--bg-base));
+  border: 1px solid var(--border-default);
   box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
-  color: #e2e8f0;
+  color: var(--text-secondary);
   font-size: 12.5px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -145,14 +146,14 @@ const countdownText = computed(() => {
 }
 
 .approach-card__kicker {
-  color: #7dd3fc;
+  color: var(--accent-hover);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
 }
 
 .approach-card__countdown {
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
@@ -168,7 +169,7 @@ const countdownText = computed(() => {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-primary);
 }
 
 .approach-card__meta {
@@ -181,9 +182,9 @@ const countdownText = computed(() => {
 .approach-card__chip {
   padding: 1px 7px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  background: rgba(148, 163, 184, 0.12);
-  color: #cbd5e1;
+  border: 1px solid var(--border-default);
+  background: var(--border-hairline);
+  color: var(--text-secondary);
   font-size: 11px;
   font-weight: 600;
 }
@@ -193,14 +194,14 @@ const countdownText = computed(() => {
 }
 
 .approach-card__chip--night {
-  color: #fcd34d;
-  border-color: rgba(251, 191, 36, 0.4);
-  background: rgba(245, 158, 11, 0.14);
+  color: var(--warning);
+  border-color: rgba(223, 179, 87, 0.4);
+  background: rgba(223, 179, 87, 0.14);
 }
 
 .approach-card__intro {
   margin: 6px 0 0;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 12px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -219,22 +220,22 @@ const countdownText = computed(() => {
 .approach-card__honor {
   padding: 1px 6px;
   border-radius: 6px;
-  background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.26);
-  color: #7dd3fc;
+  background: var(--accent-container);
+  border: 1px solid var(--accent-container);
+  color: var(--accent-hover);
   font-size: 10.5px;
   font-weight: 600;
 }
 
 .approach-card__honor--more {
-  background: rgba(148, 163, 184, 0.12);
-  border-color: rgba(148, 163, 184, 0.24);
-  color: #cbd5e1;
+  background: var(--border-hairline);
+  border-color: var(--border-default);
+  color: var(--text-secondary);
 }
 
 .approach-card__blocked {
   margin: 7px 0 0;
-  color: #fca5a5;
+  color: var(--danger);
   font-size: 11.5px;
   font-weight: 600;
 }
@@ -242,8 +243,8 @@ const countdownText = computed(() => {
 .approach-enter-active,
 .approach-leave-active {
   transition:
-    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.24s ease;
+    transform var(--dur-base) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out);
 }
 
 .approach-enter-from {

@@ -218,7 +218,7 @@ watch(state, (next, prev) => {
 
     <div v-if="showProgress" class="precise-progress" role="progressbar" :aria-valuenow="pct" aria-valuemin="0" aria-valuemax="100">
       <div class="precise-progress__track">
-        <div class="precise-progress__bar" :style="{ width: `${pct}%` }" />
+        <div class="precise-progress__bar" :style="{ transform: `scaleX(${pct / 100})` }" />
       </div>
       <span class="precise-progress__pct">{{ pct }}%</span>
     </div>

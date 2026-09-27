@@ -19,6 +19,7 @@ import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import ApiVersionBadge from '../components/ApiVersionBadge.vue';
 import AppVersionBadge from '../components/AppVersionBadge.vue';
 import RailProgressLoader from '../components/RailProgressLoader.vue';
+import HeyWorldLogo from '../components/HeyWorldLogo.vue';
 import RankingsSection from '../components/rankings/RankingsSection.vue';
 import { useTripStore } from '../stores/tripStore';
 
@@ -622,8 +623,13 @@ function goBack() {
     </div>
 
     <header class="select-hero">
-      <p class="brand">RailVista</p>
-      <h1>车上风景与行程定位</h1>
+      <div class="select-hero__logo-row">
+        <HeyWorldLogo :size="72" />
+        <div>
+          <p class="brand">RailVista</p>
+          <h1>车上风景与行程定位</h1>
+        </div>
+      </div>
       <p class="sub">选择出发站、到达站与日期，进入行程地图</p>
       <AppVersionBadge class="select-hero__appversion" />
       <ApiVersionBadge class="select-hero__version" />

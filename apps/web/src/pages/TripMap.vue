@@ -17,6 +17,7 @@ import {
   getStationAnchorTime,
   getUpcoming,
   isNearScheduledArrival,
+  isNightAt,
   pointAtProgress,
   profileForTrain,
   resolveProgress,
@@ -317,7 +318,25 @@ function formatEtaLabel(eta: SpotEta, departure: Date): string {
   const prefix = isNextDay ? '次日 ' : '';
   const sigma = eta.sigmaMin != null ? ` ±${Math.round(eta.sigmaMin)} 分钟` : '';
   const conf = eta.confidence ? ` [${eta.confidence === 'high' ? '高' : eta.confidence === 'mid' ? '中' : '低'}]` : '';
-  return `${prefix}${etaTime}${sigma}${conf}`;
+  const basisLabel = basisDescription(eta.basis);
+  return `${prefix}${etaTime}${sigma}${conf} · 依据：${basisLabel}`;
+}
+
+function basisDescription(basis: SpotEta['basis']): string {
+  switch (basis) {
+    case 'schedule': return '时刻表';
+    case 'gps': return 'GPS 实测';
+    case 'calibrated': return '已校准';
+    case 'mixed': return 'GPS 实测 + 时刻表';
+    default: return '时刻表';
+  }
+}
+
+function spotNight(spot: ScenicSpot, eta: SpotEta | undefined): boolean {
+  if (eta?.etaIso) {
+    return isNightAt({ lng: spot.lng, lat: spot.lat, isoTime: eta.etaIso, nightOnly: spot.nightOnly });
+  }
+  return spot.nightOnly ?? false;
 }
 
 function tick() {
@@ -567,6 +586,8 @@ function buildSpotMarker(spot: ScenicSpot, idx: number) {
       : spot.at
         ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
         : spot.timeLabel || '';
+    const isNight = spotNight(spot, eta);
+    const isDegraded = eta?.basis === 'schedule' && eta?.confidence === 'low';
     const sideBadgeHtml = (() => {
       const key = spotSideKey(spot);
       const text =
@@ -592,7 +613,8 @@ function buildSpotMarker(spot: ScenicSpot, idx: number) {
       visLabel && visClass
         ? `<span class="map-info-card__badge map-info-card__badge--${visClass}">${escHtml(visLabel)}</span>`
         : '',
-      spot.nightOnly ? `<span class="map-info-card__badge map-info-card__badge--night">夜间</span>` : '',
+      isNight ? `<span class="map-info-card__badge map-info-card__badge--night">夜间 🌙</span>` : '',
+      isDegraded ? `<span class="map-info-card__badge map-info-card__badge--degraded">按时刻表推算</span>` : '',
       timeLabel
         ? `<span class="map-info-card__badge map-info-card__badge--time">${escHtml(timeLabel)}</span>`
         : '',

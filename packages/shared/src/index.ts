@@ -10,5 +10,6 @@ export * from './schedule/scheduleCurve.js';
 export * from './schedule/spotEta.js';
 export * from './schedule/fusion.js';
 export * from './schedule/delayField.js';
+export * from './schedule/solar.js';
 export * from './schedule/scenic.js';
 export * from './schedule/spotSide.js';

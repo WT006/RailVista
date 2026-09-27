@@ -20,6 +20,7 @@ import ApiVersionBadge from '../components/ApiVersionBadge.vue';
 import AppVersionBadge from '../components/AppVersionBadge.vue';
 import RailProgressLoader from '../components/RailProgressLoader.vue';
 import RankingsSection from '../components/rankings/RankingsSection.vue';
+import BrandLogo from '../components/BrandLogo.vue';
 import { useTripStore } from '../stores/tripStore';
 
 const router = useRouter();
@@ -622,7 +623,7 @@ function goBack() {
     </div>
 
     <header class="select-hero">
-      <p class="brand">RailVista</p>
+      <BrandLogo class="select-hero__logo" :height="48" />
       <h1>车上风景与行程定位</h1>
       <p class="sub">选择出发站、到达站与日期，进入行程地图</p>
       <AppVersionBadge class="select-hero__appversion" />

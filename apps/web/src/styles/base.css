@@ -318,14 +318,8 @@ body:has(.route-page) {
   }
 }
 
-.brand {
-  font-size: clamp(1.35rem, 3.6vw, 1.75rem);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #38bdf8;
-  font-weight: 800;
-  margin: 0 0 14px;
-  text-shadow: 0 0 28px rgba(56, 189, 248, 0.35);
+.select-hero__logo {
+  margin: 0 0 16px;
 }
 
 .select-hero h1 {

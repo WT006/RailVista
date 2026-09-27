@@ -125,7 +125,7 @@ const pct = computed(() => Math.round(progress.value));
     aria-busy="true"
   >
     <div class="rv-loader__card" :class="{ 'is-hold': isHold }">
-      <p class="rv-loader__eyebrow">RailVista</p>
+      <p class="rv-loader__eyebrow">万里路书</p>
 
       <div class="rv-loader__track">
         <div class="rv-loader__groove">

@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
-    "test": "tsx --test src/index.test.ts src/spotSide.test.ts src/schedule/mileage.test.ts src/schedule/kinematics.test.ts src/schedule/scheduleCurve.test.ts src/schedule/trainProfile.test.ts",
+    "test": "tsx --test src/index.test.ts src/spotSide.test.ts src/schedule/mileage.test.ts src/schedule/kinematics.test.ts src/schedule/scheduleCurve.test.ts src/schedule/trainProfile.test.ts src/schedule/fusion.test.ts src/schedule/delayField.test.ts",
     "prepare": "tsc -p tsconfig.json"
   },
   "devDependencies": {

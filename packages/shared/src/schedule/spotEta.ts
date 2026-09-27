@@ -1,6 +1,8 @@
 import type { ScenicSpot, SpotEta } from '../types.js';
 import type { TrainProfile } from './trainProfile.js';
 import type { ScheduleCurve } from './scheduleCurve.js';
+import type { DelayField } from './delayField.js';
+import { deltaAt } from './delayField.js';
 
 /** 融合状态（Phase 2 卡尔曼输出，Phase 1 可用简化版） */
 export interface FusionState {
@@ -15,6 +17,9 @@ export interface FusionState {
   /** 依据来源 */
   basis: 'schedule' | 'gps' | 'calibrated' | 'mixed';
 }
+
+/** 双通道外推时间常数 τ ≈ 25min = 0.42h */
+const TAU_H = 0.42;
 
 /**
  * 置信半宽合成：σ² = σ_plan² + σ_geo_t² + σ_gap²
@@ -55,21 +60,35 @@ export function estimateSpotEtas(params: {
   fusion?: FusionState;
   prof: TrainProfile;
   geoSigma: number;
-  /** 延误场（Phase 2 接入） */
-  delays?: unknown;
+  delays?: DelayField;
 }): SpotEta[] {
-  const { curve, spots, now, fusion, prof, geoSigma } = params;
+  const { curve, spots, now, fusion, prof, geoSigma, delays } = params;
 
   return spots.map((spot) => {
     const km = (spot.progressKm ?? 0) * 1000;
     const tPlan = curve.timeAtKm(km);
 
     const etaPlanIso = new Date(tPlan).toISOString();
-    const etaIso = etaPlanIso;
 
     const fusionS = fusion?.s ?? 0;
     const fusionT = fusion?.t ?? now;
     const dTPlanH = Math.abs(tPlan - fusionT) / 3_600_000;
+
+    let etaMs = tPlan;
+    if (fusion && delays && delays.anchors.length > 0) {
+      const dField = deltaAt(delays, km, curve, prof, now);
+      const tSpeed = fusionT + ((km - fusion.s) / Math.max(fusion.v, 1)) * 1000;
+      const dSpeed = tSpeed - tPlan;
+      const w = Math.exp(-dTPlanH / TAU_H);
+      etaMs = tPlan + (w * dSpeed + (1 - w) * dField);
+    } else if (fusion) {
+      const tSpeed = fusionT + ((km - fusion.s) / Math.max(fusion.v, 1)) * 1000;
+      const dSpeed = tSpeed - tPlan;
+      const w = Math.exp(-dTPlanH / TAU_H);
+      etaMs = tPlan + w * dSpeed;
+    }
+
+    const etaIso = new Date(etaMs).toISOString();
     const sigmaMin = computeSigma({
       prof,
       dTPlanH,

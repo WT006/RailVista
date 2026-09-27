@@ -434,6 +434,7 @@ export class Cr12306Source implements TrainDataSource {
           arriveTime: arrive,
           departTime: depart,
           type,
+          stopoverMin: r.stopover_time && r.stopover_time !== '----' ? Number(r.stopover_time) : undefined,
         },
         geo,
       );

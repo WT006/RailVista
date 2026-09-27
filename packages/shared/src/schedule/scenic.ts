@@ -41,6 +41,13 @@ export type ScenicSpotInput = Pick<
   | 'reviewedAt'
   | 'reviewRound'
   | 'status'
+  | 'etaPlanIso'
+  | 'etaIso'
+  | 'sigmaMin'
+  | 'confidence'
+  | 'basis'
+  | 'passed'
+  | 'night'
 >;
 
 function maxDistFor(spot: ScenicSpotInput): number {
@@ -170,6 +177,14 @@ export function filterSpotsAlongRailway(
       alongKmFrom: lineRef?.alongKmFrom,
       alongKmTo: lineRef?.alongKmTo,
       matchedCorridorId: lineRef?.corridorId,
+      // ETA 字段透传（由 spotEta 模块填充）
+      etaPlanIso: spot.etaPlanIso,
+      etaIso: spot.etaIso,
+      sigmaMin: spot.sigmaMin,
+      confidence: spot.confidence,
+      basis: spot.basis,
+      passed: spot.passed,
+      night: spot.night,
     });
   }
 

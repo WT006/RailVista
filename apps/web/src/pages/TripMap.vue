@@ -3,17 +3,22 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
   buildRailwayMetrics,
+  buildMileageAxis,
+  buildScheduleCurve,
   computeCalibrationOffset,
+  estimateSpotEtas,
   formatDepartBadge,
   formatOffsetLabel,
   formatSpotTimeLabel,
   formatStationSchedule,
   formatTime,
+  geoSigmaFor,
   getCalibratableStations,
   getStationAnchorTime,
   getUpcoming,
   isNearScheduledArrival,
   pointAtProgress,
+  profileForTrain,
   resolveProgress,
   resolveSchedule,
   shiftDate,
@@ -24,6 +29,7 @@ import {
   withinApproach,
   type CalibrationRecord,
   type ScenicSpot,
+  type SpotEta,
   type SpotSide,
   type Stop,
 } from '@railvista/shared';
@@ -57,6 +63,8 @@ const error = ref('');
 const compact = ref(false);
 const progress = ref(0);
 const mode = ref('时刻表估算');
+const stationKmRef = ref<number[]>([]);
+const etasRef = ref<SpotEta[]>([]);
 const legendOpen = ref(false);
 const calibrateOpen = ref(false);
 const STATUS_COLLAPSE_KEY = 'railvista:map:statusCollapsed';
@@ -301,11 +309,28 @@ function getMapPadding() {
   return [top, side, bottom, side];
 }
 
+function formatEtaLabel(eta: SpotEta, departure: Date): string {
+  if (!eta.etaIso) return '—';
+  const etaDate = new Date(eta.etaIso);
+  const etaTime = formatTime(etaDate);
+  const isNextDay = etaDate.getDate() !== departure.getDate();
+  const prefix = isNextDay ? '次日 ' : '';
+  const sigma = eta.sigmaMin != null ? ` ±${Math.round(eta.sigmaMin)} 分钟` : '';
+  const conf = eta.confidence ? ` [${eta.confidence === 'high' ? '高' : eta.confidence === 'mid' ? '中' : '低'}]` : '';
+  return `${prefix}${etaTime}${sigma}${conf}`;
+}
+
 function tick() {
   const seg = segment.value;
   const sch = schedule.value;
   if (!seg || !sch) return;
   const forceSchedule = pathMetrics.path.length < 2;
+  const mileage = buildMileageAxis({
+    stops: seg.stops,
+    path: pathMetrics.path,
+    lengthKm: pathMetrics.lengthKm,
+  });
+  stationKmRef.value = mileage.stationKm;
   const result = resolveProgress({
     now: now.value,
     departure: sch.departure,
@@ -318,9 +343,25 @@ function tick() {
     lengthKm: pathMetrics.lengthKm,
     simulatedProgress: readSimulatedProgress(),
     forceSchedule,
+    stationKm: mileage.stationKm,
+    railwaySource: 'station',
   });
   progress.value = result.progress;
   mode.value = result.mode;
+
+  try {
+    const prof = profileForTrain(seg.trainCode);
+    const curve = buildScheduleCurve({ stops: seg.stops, stationKm: mileage.stationKm, prof });
+    etasRef.value = estimateSpotEtas({
+      curve,
+      spots: trip.scenicSpots,
+      now: now.value.getTime(),
+      prof,
+      geoSigma: geoSigmaFor('station', 0),
+    });
+  } catch {
+    etasRef.value = [];
+  }
   const point = pointAtProgress(pathMetrics.path, pathMetrics.lengthKm, result.progress);
   if (trainMarker) trainMarker.setPosition([point.lng, point.lat]);
   if (gpsMarker) {
@@ -349,9 +390,13 @@ const upcoming = computed(() => {
     stops: seg.stops,
     path: pathMetrics.path,
     lengthKm: pathMetrics.lengthKm,
+    etas: etasRef.value,
   });
   const spot = trip.scenicSpots.find((s) => s.name === u.name);
-  const timeLabel = spot?.at
+  const eta = etasRef.value.find((e) => e.spotId === String(spot?.id));
+  const timeLabel = eta?.etaIso
+    ? formatEtaLabel(eta, sch.departure)
+    : spot?.at
     ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
     : u.timeLabel;
   return { ...u, timeLabel };
@@ -515,9 +560,13 @@ function buildSpotMarker(spot: ScenicSpot, idx: number) {
       spot.visibility === 'distant' || spot.visibility === 'on_track' || spot.visibility === 'window'
         ? spot.visibility
         : '';
-    const timeLabel = spot.at
-      ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
-      : spot.timeLabel || '';
+    const eta = etasRef.value.find((e) => e.spotId === String(spot.id));
+    const sch = schedule.value;
+    const timeLabel = eta?.etaIso && sch
+      ? formatEtaLabel(eta, sch.departure)
+      : spot.at
+        ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
+        : spot.timeLabel || '';
     const sideBadgeHtml = (() => {
       const key = spotSideKey(spot);
       const text =

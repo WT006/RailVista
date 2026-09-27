@@ -170,6 +170,22 @@ export interface ScenicSpot {
   alongKmTo?: number;
   /** 命中走廊 id */
   matchedCorridorId?: string;
+
+  // —— ETA 预估字段（由 spotEta 模块填充，全部可选）——
+  /** 图定预计时刻 ISO */
+  etaPlanIso?: string;
+  /** 实时修正后预计时刻 ISO */
+  etaIso?: string;
+  /** 1σ 置信半宽（分钟） */
+  sigmaMin?: number;
+  /** 置信度分档 */
+  confidence?: 'high' | 'mid' | 'low';
+  /** 依据来源 */
+  basis?: 'schedule' | 'gps' | 'calibrated' | 'mixed';
+  /** 是否已通过 */
+  passed?: boolean;
+  /** 是否夜间经过（实时计算） */
+  night?: boolean;
 }
 
 export interface LayerVisibility {

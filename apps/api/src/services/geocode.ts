@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gcj02ToWgs84 } from '@railvista/shared';
 import { cache } from './cache.js';
 import { lookupStopCoordFromCorridors } from './corridorNetwork.js';
 
@@ -401,7 +402,8 @@ async function amapStation(name: string): Promise<Point | null> {
       const lng = Number(loc[0]);
       const lat = Number(loc[1]);
       if (!isPlausibleCnRailPoint(lng, lat)) continue;
-      return { lng, lat };
+      const wgs = gcj02ToWgs84(lng, lat);
+      return { lng: wgs.lng, lat: wgs.lat };
     }
     return null;
   } catch {

@@ -36,6 +36,8 @@ export interface Stop {
   at?: string;
   arrive?: string;
   depart?: string;
+  /** 站停时长（分钟），来自 12306 stopover_time，用于曲线构建校验与技术停车识别 */
+  stopoverMin?: number;
 }
 
 /** 用户截取后的行程 */
@@ -198,6 +200,10 @@ export interface GpsSample {
   lat: number;
   accuracy: number;
   timestamp: number;
+  /** GPS 速度（m/s），来自 coords.speed，用于卡尔曼融合与状态机 */
+  speed?: number;
+  /** GPS 航向（度），来自 coords.heading，用于卡尔曼融合与状态机 */
+  heading?: number;
 }
 
 export interface LngLat {
@@ -213,6 +219,33 @@ export interface RailwayPoint extends LngLat {
 export interface ProgressResult {
   progress: number;
   mode: string;
+  /** 里程坐标（m），传入里程轴时填充 */
+  km?: number;
+  /** 速度（m/s），卡尔曼融合输出 */
+  v?: number;
+  /** 1σ 置信半宽（m），卡尔曼融合输出 */
+  sigma?: number;
+}
+
+/** 景点 ETA 预估结果（带置信度） */
+export interface SpotEta {
+  spotId: string;
+  /** 里程坐标（m） */
+  km: number;
+  /** 图定时刻 ISO */
+  etaPlanIso: string;
+  /** 实时修正后时刻 ISO */
+  etaIso: string;
+  /** 1σ 置信半宽（分钟） */
+  sigmaMin: number;
+  /** 置信度分档 */
+  confidence: 'high' | 'mid' | 'low';
+  /** 依据来源 */
+  basis: 'schedule' | 'gps' | 'calibrated' | 'mixed';
+  /** 是否已通过 */
+  passed: boolean;
+  /** 是否夜间经过（实时计算） */
+  night: boolean;
 }
 
 export interface ApiOk<T> {

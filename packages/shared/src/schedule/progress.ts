@@ -1,4 +1,4 @@
-import type { GpsSample, LngLat, ProgressResult, RailwayPoint, ScenicSpot, Stop } from '../types.js';
+import type { GpsSample, LngLat, ProgressResult, RailwayPoint, ScenicSpot, SpotEta, Stop } from '../types.js';
 import { effectiveScheduleDate, formatDepartLong, formatTime, shiftDate } from './index.js';
 import type { CalibrationRecord } from '../types.js';
 
@@ -209,12 +209,17 @@ export function scheduleProgress(params: {
   arrival: Date;
   stops: Stop[];
   offsetMs: number;
+  /** 里程轴（m），传入时按里程域插值替代站序比例（修 P0-1） */
+  stationKm?: number[];
 }): number {
-  const { now, departure, arrival, stops, offsetMs } = params;
+  const { now, departure, arrival, stops, offsetMs, stationKm } = params;
   const shifted = (iso: string) => shiftDate(iso, offsetMs);
 
   if (now <= departure) return 0;
   if (now >= arrival) return 1;
+
+  const hasMileage = stationKm && stationKm.length >= 2 && stationKm[stationKm.length - 1] > 0;
+  const totalL = hasMileage ? stationKm![stationKm!.length - 1] : 0;
 
   const timeline: { at: Date; name: string }[] = [];
   stops.forEach((s) => {
@@ -239,8 +244,12 @@ export function scheduleProgress(params: {
       const localT = (now.getTime() - cur.at.getTime()) / span;
       const idxA = stops.findIndex((s) => cur.name.startsWith(s.name));
       const idxB = stops.findIndex((s) => next.name.startsWith(s.name));
-      const a = idxA >= 0 ? idxA / (stops.length - 1) : i / (timeline.length - 1);
-      const b = idxB >= 0 ? idxB / (stops.length - 1) : (i + 1) / (timeline.length - 1);
+      const a = idxA >= 0
+        ? (hasMileage && idxA < stationKm!.length ? stationKm![idxA] / totalL : idxA / (stops.length - 1))
+        : i / (timeline.length - 1);
+      const b = idxB >= 0
+        ? (hasMileage && idxB < stationKm!.length ? stationKm![idxB] / totalL : idxB / (stops.length - 1))
+        : (i + 1) / (timeline.length - 1);
       return a + (b - a) * localT;
     }
   }
@@ -259,6 +268,14 @@ export function resolveProgress(params: {
   lengthKm: number;
   simulatedProgress?: number | null;
   forceSchedule?: boolean;
+  /** 里程轴（m），传入时量纲统一至里程域（修 P0-3） */
+  stationKm?: number[];
+  /** 图定曲线（Phase 2 卡尔曼融合接入） */
+  curve?: unknown;
+  /** 车型参数（Phase 2 卡尔曼融合接入） */
+  prof?: unknown;
+  /** 几何来源（决定垂距门放宽倍率，示意线 ×1.5） */
+  railwaySource?: 'precise' | 'corridor' | 'local' | 'soft' | 'station';
 }): ProgressResult {
   const {
     now,
@@ -272,6 +289,8 @@ export function resolveProgress(params: {
     lengthKm,
     simulatedProgress,
     forceSchedule,
+    stationKm,
+    railwaySource,
   } = params;
 
   if (simulatedProgress != null) {
@@ -285,6 +304,7 @@ export function resolveProgress(params: {
     arrival,
     stops,
     offsetMs,
+    stationKm,
   });
   const calibrated = !!calibration;
   const scheduleMode = calibrated ? '时刻表估算（已校准）' : '时刻表估算';
@@ -294,7 +314,7 @@ export function resolveProgress(params: {
   }
 
   const ageMs = now.getTime() - gps.timestamp;
-  if (ageMs > 120000 || gps.accuracy > 800) {
+  if (ageMs > 120000 || gps.accuracy > 300) {
     return {
       progress: scheduleP,
       mode: calibrated ? '时刻表估算（已校准·GPS 弱）' : '时刻表估算（GPS 信号弱）',
@@ -302,7 +322,11 @@ export function resolveProgress(params: {
   }
 
   const projected = projectToRailway(path, lengthKm, gps.lng, gps.lat);
-  if (projected.distKm > 8) {
+  const accM = Math.max(gps.accuracy, 1);
+  let distGateM = Math.min(Math.max(3 * accM + 500, 800), 5000);
+  if (railwaySource === 'station') distGateM *= 1.5;
+  const distGateKm = distGateM / 1000;
+  if (projected.distKm > distGateKm) {
     return {
       progress: scheduleP,
       mode: calibrated ? '时刻表估算（已校准·偏离）' : '时刻表估算（偏离铁路较远）',
@@ -313,6 +337,7 @@ export function resolveProgress(params: {
   return {
     progress: blended,
     mode: calibrated ? 'GPS + 时刻表（已校准）' : 'GPS + 时刻表',
+    km: projected.progress * lengthKm * 1000,
   };
 }
 
@@ -336,22 +361,45 @@ export function getUpcoming(params: {
   stops: Stop[];
   path: RailwayPoint[];
   lengthKm: number;
+  /** 景点 ETA 列表，传入时优先用 etaIso 判定即将到达（修 P0-2） */
+  etas?: SpotEta[];
 }): { name: string; timeLabel?: string; intro?: string; reason: string; kind: 'spot' | 'station' | 'end' } {
-  const { now, departure, arrival, progress, offsetMs, calibration, spots, stops, path, lengthKm } =
+  const { now, departure, arrival, progress, offsetMs, calibration, spots, stops, path, lengthKm, etas } =
     params;
   const shifted = (iso: string) => shiftDate(iso, offsetMs);
   const effectiveNow = effectiveScheduleDate(now, calibration);
 
   const sortedSpots = [...spots].filter((s) => s.at).sort((a, b) => shifted(a.at!).getTime() - shifted(b.at!).getTime());
 
-  if (progress <= 0 && now < departure && sortedSpots[0]) {
-    return {
-      name: sortedSpots[0].name,
-      timeLabel: sortedSpots[0].timeLabel,
-      intro: sortedSpots[0].intro,
-      reason: `${formatDepartLong(departure)} 发车 · 首个计划风景点`,
-      kind: 'spot',
-    };
+  const findUpcomingSpotByEta = (): ScenicSpot | null => {
+    if (!etas || etas.length === 0) return null;
+    const upcoming = etas
+      .filter((e) => !e.passed && new Date(e.etaIso).getTime() >= effectiveNow.getTime())
+      .sort((a, b) => new Date(a.etaIso).getTime() - new Date(b.etaIso).getTime())[0];
+    if (!upcoming) return null;
+    return spots.find((s) => String(s.id) === upcoming.spotId) || null;
+  };
+
+  const findFirstSpotByEta = (): ScenicSpot | null => {
+    if (!etas || etas.length === 0) return null;
+    const first = etas
+      .filter((e) => !e.passed)
+      .sort((a, b) => new Date(a.etaIso).getTime() - new Date(b.etaIso).getTime())[0];
+    if (!first) return null;
+    return spots.find((s) => String(s.id) === first.spotId) || null;
+  };
+
+  if (progress <= 0 && now < departure) {
+    const firstSpot = findFirstSpotByEta() || sortedSpots[0];
+    if (firstSpot) {
+      return {
+        name: firstSpot.name,
+        timeLabel: firstSpot.timeLabel,
+        intro: firstSpot.intro,
+        reason: `${formatDepartLong(departure)} 发车 · 首个计划风景点`,
+        kind: 'spot',
+      };
+    }
   }
 
   if (progress >= 1) {
@@ -362,6 +410,18 @@ export function getUpcoming(params: {
       intro: last?.intro,
       reason: '行程已结束',
       kind: 'end',
+    };
+  }
+
+  const upcomingEtaSpot = findUpcomingSpotByEta();
+  if (upcomingEtaSpot) {
+    const eta = etas!.find((e) => String(e.spotId) === String(upcomingEtaSpot.id))!;
+    return {
+      name: upcomingEtaSpot.name,
+      timeLabel: upcomingEtaSpot.timeLabel,
+      intro: upcomingEtaSpot.intro,
+      reason: formatEta(new Date(eta.etaIso), effectiveNow),
+      kind: 'spot',
     };
   }
 

@@ -307,17 +307,6 @@ body:has(.route-page) {
   animation: hero-in 0.55s ease-out both;
 }
 
-.select-hero__logo-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 14px;
-}
-
-.select-hero__logo-row .brand {
-  margin-bottom: 4px;
-}
-
 @keyframes hero-in {
   from {
     opacity: 0;

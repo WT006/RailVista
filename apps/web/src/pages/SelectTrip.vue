@@ -16,15 +16,10 @@ import {
   type TripIndexEntry,
 } from '../lib/tripCache';
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
-import ApiVersionBadge from '../components/ApiVersionBadge.vue';
-import AppVersionBadge from '../components/AppVersionBadge.vue';
 import RailProgressLoader from '../components/RailProgressLoader.vue';
 import RankingsSection from '../components/rankings/RankingsSection.vue';
 import BrandLogo from '../components/BrandLogo.vue';
 import { useTripStore } from '../stores/tripStore';
-import { useLenis } from '../composables/useLenis';
-
-useLenis();
 
 const router = useRouter();
 const route = useRoute();
@@ -629,8 +624,6 @@ function goBack() {
       <BrandLogo class="select-hero__logo" :height="48" />
       <h1>车上风景与行程定位</h1>
       <p class="sub">选择出发站、到达站与日期，进入行程地图</p>
-      <AppVersionBadge class="select-hero__appversion" />
-      <ApiVersionBadge class="select-hero__version" />
     </header>
 
     <section v-if="currentEntry && showHomeLists" class="current-trip">

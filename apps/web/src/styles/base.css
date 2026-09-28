@@ -361,15 +361,6 @@ body:has(.route-page) {
   max-width: 34em;
 }
 
-/* 首页版本徽标排布（0.1.1）：版本号在上，API 健康状态在下 */
-.select-hero__appversion {
-  margin-top: 14px;
-}
-
-.select-hero__version {
-  margin-top: 8px;
-}
-
 .select-form,
 .train-list,
 .od-panel,

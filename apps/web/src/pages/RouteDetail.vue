@@ -24,9 +24,6 @@ import {
   type DimensionMeta,
 } from '../data/spotDimensions';
 import { loadAmap } from '../map/amap';
-import { useLenis } from '../composables/useLenis';
-
-useLenis();
 
 const route = useRoute();
 const router = useRouter();

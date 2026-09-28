@@ -5,11 +5,11 @@
  * 并在需要时按 SemVer 递增这里的 APP_VERSION（小迭代递增修订号）。
  * 前端首页显示的版本号直接读取本文件，因此不会出现文档与界面不一致。
  */
-export const APP_VERSION = '0.2.0';
+export const APP_VERSION = '0.2.1';
 
 /** 版本对应的发布/变更摘要，便于 UI 展示（与 CHANGELOG.md 首条一致） */
 export const APP_VERSION_SUMMARY =
-  '主界面 UI 整体重构：鸿蒙设计令牌体系、12 列栅格双栏、离线中国地图背景、滚动链修复';
+  '按车次号直达查询 + 最近访问折叠收纳；主界面 UI 整体重构（鸿蒙令牌/双栏/离线地图背景）';
 
 /** ISO 日期：本次版本号最后一次递增的日期 */
 export const APP_VERSION_DATE = '2026-09-28';

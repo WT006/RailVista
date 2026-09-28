@@ -224,6 +224,8 @@ export interface StopsQuery {
 export interface TrainDataSource {
   searchTrains(from: string, to: string, date: string): Promise<TrainSummary[]>;
   getStops(query: StopsQuery): Promise<Stop[]>;
+  /** 按公开车次号（如 Z8991 / G87）查全程时刻表，返回经停序列与 12306 内部 trainNo */
+  queryByCode(code: string, date: string): Promise<{ stops: Stop[]; trainNo: string }>;
   /** 强制完整补全坐标（无最后期限），供「重新发车」/手动重试 */
   enrichStopsNow(query: StopsQuery): Promise<Stop[]>;
 }
@@ -354,6 +356,98 @@ export class Cr12306Source implements TrainDataSource {
       timedOut: r.timedOut,
     });
     return final;
+  }
+
+  /**
+   * 按公开车次号查全程时刻表。
+   * 两步走：
+   *   1. 12306 公开搜索服务（search.12306.cn，无需会话）按 keyword 命中候选，
+   *      取"车次号精确相等"的一条，拿到内部 train_no 与首末站；
+   *   2. 复用 kyfw czxx/queryByTrainNo 链路（fetchStopsBase）取完整经停序列，
+   *      解析 / 坐标 / 绝对时间与 getStops 完全一致。
+   * 注：搜索服务只覆盖预售期（约 15 天）内的开行日，超期自然返回 NOT_FOUND。
+   */
+  async queryByCode(code: string, date: string): Promise<{ stops: Stop[]; trainNo: string }> {
+    const t0 = Date.now();
+    const norm = code.trim().toUpperCase();
+    if (!/^[A-Z]?\d{1,6}$/.test(norm)) {
+      throw Object.assign(new Error('车次号格式不正确，例如 Z8991 或 G87'), { code: 'BAD_CODE' });
+    }
+
+    const cacheKey = `bycode:${norm}:${date}`;
+    const cached = trainCache.getWithAge<{ stops: Stop[]; trainNo: string }>(cacheKey);
+    if (cached) {
+      logMetric('bycode.cacheHit', { key: cacheKey, ms: Date.now() - t0 });
+      return cached.value;
+    }
+
+    try {
+      const result = await this.fetchByCode(norm, date);
+      trainCache.set(cacheKey, result, stopsTtlSec(result.stops));
+      logMetric('bycode.fetch', { key: cacheKey, ms: Date.now() - t0, stops: result.stops.length });
+      return result;
+    } catch (e) {
+      const err = e as Error & { code?: string };
+      trainCache.setNegative(
+        cacheKey,
+        { code: err.code || 'UPSTREAM_FAIL', message: err.message || '车次查询失败' },
+        negativeTtlSec(),
+      );
+      throw e;
+    }
+  }
+
+  /** 第一步：公开搜索接口命中精确车次 → 内部 train_no + 首末站电码 */
+  private async fetchByCode(
+    code: string,
+    date: string,
+  ): Promise<{ stops: Stop[]; trainNo: string }> {
+    const t0 = Date.now();
+    const params = new URLSearchParams({ keyword: code, date: date.replaceAll('-', '') });
+    const url = `https://search.12306.cn/search/v1/train/search?${params}`;
+    const res = await fetchWithTimeout(
+      url,
+      { headers: { 'User-Agent': UA, Referer: 'https://www.12306.cn/' } },
+      { timeoutMs: httpTimeoutMs(), label: '12306 车次号查询' },
+    );
+    if (!res.ok) {
+      throw Object.assign(new Error(`车次号查询失败 HTTP ${res.status}`), { code: 'UPSTREAM_FAIL' });
+    }
+    const body = await withDeadline(res.json() as Promise<unknown>, httpTimeoutMs());
+    if (body.value == null) {
+      throw Object.assign(new HttpTimeoutError('12306 车次号查询', httpTimeoutMs()), {
+        code: 'UPSTREAM_TIMEOUT',
+      });
+    }
+    const json = body.value as {
+      status?: boolean;
+      data?: Array<{
+        station_train_code?: string;
+        train_no?: string;
+        from_station?: string;
+        to_station?: string;
+      }>;
+    };
+    // keyword 会模糊命中 G87 → G870/G871 等一串，必须精确相等才算数
+    const hit = (json.data || []).find(
+      (r) => (r.station_train_code || '').toUpperCase() === code,
+    );
+    if (!hit?.train_no) {
+      throw Object.assign(new Error('未查到该车次，请核对车次号与日期（仅支持预售期内开行的车次）'), {
+        code: 'NOT_FOUND',
+      });
+    }
+
+    const fromSt = resolveTelecode(hit.from_station || '');
+    const toSt = resolveTelecode(hit.to_station || '');
+    if (!fromSt || !toSt) {
+      throw Object.assign(new Error('车次首末站无法识别'), { code: 'BAD_STATION' });
+    }
+
+    // 第二步：与 getStops 共用同一条经停查询链路（kyfw czxx/queryByTrainNo）
+    const stops = await this.fetchStopsBase({ trainNo: hit.train_no, date }, fromSt.telecode, toSt.telecode);
+    logMetric('bycode.upstream', { ms: Date.now() - t0, stops: stops.length, trainNo: hit.train_no });
+    return { stops, trainNo: hit.train_no };
   }
 
   /** 强制完整补坐标：忽略最后期限，等远程补点全部完成后再返回 */

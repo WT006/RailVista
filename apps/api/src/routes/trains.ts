@@ -33,6 +33,34 @@ trainsRoute.get('/', async (c) => {
   }
 });
 
+/** 按公开车次号查全程时刻表（如 Z8991 / G87），含内部 trainNo */
+trainsRoute.get('/by-code', async (c) => {
+  const code = c.req.query('code') || '';
+  const date = c.req.query('date') || '';
+  if (!code.trim() || !date) {
+    return c.json(
+      { ok: false, error: { code: 'BAD_REQUEST', message: '请填写车次号和乘车日期后再查询' } },
+      400,
+    );
+  }
+  const startedAt = Date.now();
+  try {
+    const { stops, trainNo } = await trainSource.queryByCode(code, date);
+    return c.json({ ok: true, data: { stops, trainNo, meta: { elapsedMs: Date.now() - startedAt } } });
+  } catch (e) {
+    const err = e as Error & { code?: string };
+    const status = err.code === 'BAD_CODE' || err.code === 'NOT_FOUND' ? 404 : 502;
+    return c.json(
+      {
+        ok: false,
+        error: { code: err.code || 'UPSTREAM_FAIL', message: err.message || '车次查询失败' },
+        meta: { elapsedMs: Date.now() - startedAt },
+      },
+      status,
+    );
+  }
+});
+
 trainsRoute.get('/stops', async (c) => {
   const trainNo = c.req.query('trainNo') || '';
   const trainCode = c.req.query('trainCode') || '';

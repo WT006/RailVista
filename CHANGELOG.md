@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.2.0`**（2026-09-28）
+**当前版本：`0.2.1`**（2026-09-28）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,30 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.2.1] — 2026-09-28
+
+**按车次号直达查询 + 最近访问折叠收纳**（分支 `feat/ui-rebuild-20260928`）。
+
+### 1. 新功能：按车次号搜索
+
+- **动机**：用户已知车次时，OD 两步查询多余；直接输车次号进时刻表再选上下车站更快。
+- **后端**：新增 `GET /api/trains/by-code?code=Z8991&date=2026-10-20`，数据源为 12306 公开搜索服务（`search.12306.cn/search/v1/train/search`，无需 kyfw 会话）；返回行即全程经停序列（含内部 `train_no`），解析规则与 `getStops` 一致（`----`→null、首末站类型、本地坐标补全、`attachAbsoluteTimes`）；带缓存 + 负缓存（`bycode:` 键）；车次号格式校验（`BAD_CODE`）与未查到（`NOT_FOUND` → 404）分级。
+- **前端**：查询表单底部新增次级入口「或按车次号直达」（细分隔线 + 单行输入 + 查时刻按钮，复用同一乘车日期字段）；回车/点击后跳过 OD 查询直接进「确认上下车站」，默认上下车站为始发/终到，OD 输入框同步为首末站（保证「重新发车」与预设轨道匹配链路一致）。
+- **涉及**：`apps/api/src/services/cr12306.ts`（`queryByCode`/`fetchByCode`）、`apps/api/src/routes/trains.ts`（`/by-code`）、`apps/web/src/api/client.ts`（`searchTrainByCode`）、`apps/web/src/pages/SelectTrip.vue`（`searchByCode` + 模板）、`apps/web/src/styles/base.css`（`.code-search`）。
+- **已知限制**：车次号需按乘车日存在且为公开车次号（如 Z8991/G87），不支持站内模糊匹配。
+
+### 2. 最近访问折叠收纳（推翻 0.2.0 反馈轮的"竖屏前置"方案）
+
+- **需求变更**：用户明确"把最近访问折叠起来到查询直达车次下面"——0.2.0 反馈轮把竖屏最近访问用 `order:-1` 提到了表单之上，本版按新需求回退该方案（删除竖屏 order 覆盖），改为：**模块固定在查询表单下方，默认收起**，标题行即开关（44px 热区 + 数量徽标 + 箭头旋转指示），点击展开行程列表。
+- **涉及**：`apps/web/src/pages/SelectTrip.vue`（折叠模板 + `recentOpen`）、`apps/web/src/styles/base.css`（`.recent-list__toggle/__count/__chevron/__body`，删除竖屏 order 块）。
+
+### 验证
+
+- `vue-tsc --noEmit` 通过；`pnpm build` 通过。
+- `curl /api/trains/by-code?code=Z8991&date=...` 实测返回全程经停（含 trainNo）；UI 探针复核三断点布局与折叠交互。
 
 ---
 

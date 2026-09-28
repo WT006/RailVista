@@ -51,6 +51,10 @@ const boardTo = ref('');
 const step = ref<'search' | 'od'>('search');
 const recent = ref<TripIndexEntry[]>([]);
 const currentEntry = ref<TripIndexEntry | null>(null);
+/** 「最近访问」折叠态：默认收起，点击标题展开 */
+const recentOpen = ref(false);
+/** 按车次号直达的输入 */
+const codeQuery = ref('');
 
 /** 请求序号：新请求发出后，旧请求的迟到响应一律丢弃（取消 / 重新发车用） */
 let requestSeq = 0;
@@ -224,8 +228,18 @@ function onSuggest(which: 'from' | 'to', q: string) {
   }, 250);
 }
 
-watch(from, (q) => onSuggest('from', q));
-watch(to, (q) => onSuggest('to', q));
+/** 程序化回填 OD（车次直达）时静音联想：watch 是微任务异步触发，
+ * 置位期间到达的联想请求一律丢弃，否则回填后下拉框会意外弹出 */
+let muteSuggest = false;
+
+watch(from, (q) => {
+  if (muteSuggest) return;
+  onSuggest('from', q);
+});
+watch(to, (q) => {
+  if (muteSuggest) return;
+  onSuggest('to', q);
+});
 
 function pickStation(which: 'from' | 'to', name: string) {
   if (which === 'from') {
@@ -292,6 +306,68 @@ function retryWithDateShift(days: number) {
   d.setDate(d.getDate() + days);
   date.value = d.toISOString().slice(0, 10);
   void search();
+}
+
+/** 按公开车次号直达：跳过 OD 查询，直接拉全程时刻表进入「确认上下车站」 */
+async function searchByCode() {
+  error.value = '';
+  const code = codeQuery.value.trim().toUpperCase();
+  if (!code) {
+    error.value = '请输入车次号，例如 Z8991。';
+    return;
+  }
+  if (!date.value) {
+    error.value = '请先选择乘车日期。';
+    return;
+  }
+  const seq = nextSeq();
+  retryFn.value = () => void searchByCode();
+  beginLoading('stops');
+  trains.value = [];
+  selected.value = null;
+  try {
+    const res = await api.searchTrainByCode(code, date.value);
+    if (isStale(seq)) return;
+    const list = res.stops;
+    if (!list.length) {
+      error.value = '未查到该车次，请核对车次号与日期。';
+      return;
+    }
+    stops.value = list;
+    const first = list[0]!;
+    const last = list[list.length - 1]!;
+    // 车次查询返回的是"全程"时刻表：默认上下车站为始发/终到，用户可在下方改选任意区间
+    selected.value = {
+      trainCode: code,
+      trainNo: res.trainNo || code,
+      from: { name: first.name, telecode: first.telecode || first.name },
+      to: { name: last.name, telecode: last.telecode || last.name },
+      departTime: hm(first.departTime || first.arriveTime),
+      arriveTime: hm(last.arriveTime || last.departTime),
+      duration: '',
+      date: date.value,
+    };
+    boardFrom.value = first.name;
+    boardTo.value = last.name;
+    // 同步 OD 输入框：保持与后续「重新发车」/预设轨道匹配所用的 OD 一致。
+    // 注意静音联想，避免回填触发站名下拉弹出。
+    muteSuggest = true;
+    from.value = first.name;
+    to.value = last.name;
+    fromSuggest.value = [];
+    toSuggest.value = [];
+    fromOpen.value = false;
+    toOpen.value = false;
+    window.setTimeout(() => {
+      muteSuggest = false;
+    }, 0);
+    step.value = 'od';
+  } catch (e) {
+    if (isStale(seq)) return;
+    error.value = e instanceof Error ? e.message : '车次查询失败';
+  } finally {
+    if (!isStale(seq)) endLoading();
+  }
 }
 
 async function pickTrain(t: TrainSummary) {
@@ -729,6 +805,28 @@ function goBack() {
                 演示：Z8991 青藏线
               </button>
             </div>
+
+            <!-- 按车次号直达：已知车次时跳过 OD 查询，直接进时刻表选区间 -->
+            <div class="code-search">
+              <span class="code-search__label">或按车次号直达</span>
+              <div class="code-search__row">
+                <input
+                  v-model="codeQuery"
+                  class="code-search__input"
+                  autocomplete="off"
+                  placeholder="输入车次号，例如 Z8991"
+                  @keydown.enter.prevent="searchByCode"
+                />
+                <button
+                  type="button"
+                  class="btn ghost btn-sm"
+                  :disabled="loading"
+                  @click="searchByCode"
+                >
+                  查时刻
+                </button>
+              </div>
+            </div>
           </form>
 
           <p v-if="error && !showEmptyState" class="error">{{ error }}</p>
@@ -747,37 +845,55 @@ function goBack() {
             </div>
           </section>
 
+          <!-- 最近访问：默认折叠在查询表单之下，点击标题展开；
+               高频操作区（查询）保持首屏完整可见，历史行程按需展开 -->
           <section
             v-if="recent.length && showHomeLists"
             class="recent-list rv-card"
             data-spotlight
           >
-            <h2 class="rv-head__title">最近访问</h2>
-            <div v-for="item in recent" :key="item.key" class="recent-row">
-              <button
-                type="button"
-                class="recent-card"
-                :disabled="loading"
-                @click="openCachedTrip(item.key)"
+            <button
+              type="button"
+              class="recent-list__toggle"
+              :aria-expanded="recentOpen"
+              @click="recentOpen = !recentOpen"
+            >
+              <h2 class="rv-head__title">最近访问</h2>
+              <span class="recent-list__count">{{ recent.length }}</span>
+              <span
+                class="recent-list__chevron"
+                :class="{ 'is-open': recentOpen }"
+                aria-hidden="true"
+                >›</span
               >
-                <span class="recent-card__main">
-                  <strong>{{ item.trainCode }}</strong>
-                  <span>{{ item.fromName }} → {{ item.toName }}</span>
-                </span>
-                <span class="recent-card__meta">
-                  {{ item.date }}
-                  <template v-if="item.hasPrecise"> · 已缓存精确线</template>
-                </span>
-              </button>
-              <button
-                type="button"
-                class="recent-delete"
-                title="从最近访问删除"
-                :disabled="loading"
-                @click="removeRecent(item.key)"
-              >
-                删除
-              </button>
+            </button>
+            <div v-show="recentOpen" class="recent-list__body">
+              <div v-for="item in recent" :key="item.key" class="recent-row">
+                <button
+                  type="button"
+                  class="recent-card"
+                  :disabled="loading"
+                  @click="openCachedTrip(item.key)"
+                >
+                  <span class="recent-card__main">
+                    <strong>{{ item.trainCode }}</strong>
+                    <span>{{ item.fromName }} → {{ item.toName }}</span>
+                  </span>
+                  <span class="recent-card__meta">
+                    {{ item.date }}
+                    <template v-if="item.hasPrecise"> · 已缓存精确线</template>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  class="recent-delete"
+                  title="从最近访问删除"
+                  :disabled="loading"
+                  @click="removeRecent(item.key)"
+                >
+                  删除
+                </button>
+              </div>
             </div>
           </section>
 

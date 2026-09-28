@@ -651,17 +651,71 @@ html {
   }
 }
 
-/* —— 最近访问 —— */
+/* —— 最近访问（折叠卡）——
+ * 模块固定在查询表单之下，默认收起：标题行即开关（44px 触控热区），
+ * 右侧数量徽标 + 箭头指示展开方向。 */
 .recent-list {
   display: grid;
   gap: var(--space-2);
 }
 
-.recent-list > h2 {
+.recent-list__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  margin: calc(-1 * var(--space-2));
+  padding: var(--space-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .recent-list__toggle:hover {
+    background: var(--fill-subtle);
+  }
+}
+
+.recent-list__toggle > h2 {
   margin: 0;
   font-size: var(--fs-h2);
   font-weight: 700;
   color: var(--text-1);
+}
+
+/* 数量徽标：告诉用户"折着几条行程"，不展开也有信息量 */
+.recent-list__count {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.recent-list__chevron {
+  margin-left: auto;
+  color: var(--text-3);
+  font-size: var(--fs-h3);
+  transform: rotate(90deg);
+  transition: transform var(--dur-fast) var(--ease-standard);
+}
+
+.recent-list__chevron.is-open {
+  transform: rotate(-90deg);
+}
+
+.recent-list__body {
+  display: grid;
+  gap: var(--space-2);
 }
 
 .recent-row {
@@ -741,18 +795,36 @@ html {
   border-color: var(--danger);
 }
 
-/* 竖屏（<600px）：「最近访问」前置。
- * 手机竖屏上查询表单很高，最近访问排在其后会被挤出首屏，
- * 观感上等于"没有最近访问"。利用 .rv-col--main 的 grid 布局
- * 把条目顺序调整为：当前行程 → 最近访问 → 查询表单，
- * 「继续上次行程」这一高频动作直接出现在标题下方。 */
-@media (max-width: 599px) {
-  .recent-list {
-    order: -1;
-  }
+/* —— 按车次号直达（查询表单内的次级入口）——
+ * 视觉上弱化为主查询的"另一种方式"：细分隔线 + 小号标签 + 单行输入。
+ * 复用同一个日期字段的乘车日。 */
+.code-search {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line-hairline);
+}
 
-  .current-trip {
-    order: -2;
+.code-search__label {
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+}
+
+.code-search__row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.code-search__input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 横屏两列表单：车次直达跨整行 */
+@media (orientation: landscape) and (max-height: 560px) {
+  .select-form > .code-search {
+    grid-column: 1 / -1;
   }
 }
 

@@ -15,16 +15,37 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* 全局基础排版：只做"字体 / 配色 / 触控"三件事。
+   注意：绝不可在此处全局设置 height:100% + overflow:hidden ——
+   那会把 html 锁成不可滚动，而 document.scrollingElement 恒为 html，
+   导致选行程页 / 线路详情页的键盘滚动（PageDown / Space / Home / End）全部失效。
+   地图类页面的全屏锁见文件下方的按页路由规则。 */
 html,
 body {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-0);
+  color: var(--text-1);
+  touch-action: manipulation;
+}
+
+/* ── 地图类页面：全屏不滚的壳，按页路由锁定根滚动容器 ──────────────────────
+   - .trip-page  行程地图（Leaflet/高德全屏）
+   - .atlas-page 全国铁路景点地图（position:fixed; inset:0）
+   文档流页面（.select-page / .route-page）不在此列，保持正常滚动。 */
+html:has(.trip-page),
+html:has(.atlas-page),
+body:has(.trip-page),
+body:has(.atlas-page) {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
-  font-family: var(--font-sans);
-  font-variant-numeric: tabular-nums;
-  background: var(--bg-base);
-  color: var(--text-primary);
-  touch-action: manipulation;
+}
+
+/* #app 的高度锁同样只在页面级地图生效：.trip-page{height:100%} 需要父级有确定高度 */
+html:has(.trip-page) #app,
+html:has(.atlas-page) #app {
+  height: 100%;
 }
 
 #map {

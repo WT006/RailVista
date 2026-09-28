@@ -371,6 +371,39 @@ watch(
   border: 1px solid var(--border-default);
 }
 
+/* 短视口横屏：面板高度 ~280px，向下弹必然超出视口下缘（390px 高的横屏
+ * 里日期字段已在中部），改为向上弹出；同时紧凑化日历（当前值已在触发器
+ * 里展示，"当前选择"条冗余），保证整个面板在 390px 高的视口内完整可见。 */
+@media (orientation: landscape) and (max-height: 560px) {
+  .dtf:not(.dtf--inline) .dtf-panel {
+    top: auto;
+    bottom: calc(100% + 8px);
+    margin-top: 0;
+  }
+
+  .dtf:not(.dtf--inline) .dtf-selected {
+    display: none;
+  }
+
+  .dtf:not(.dtf--inline) .dtf-cal {
+    padding: 4px 6px;
+  }
+
+  .dtf:not(.dtf--inline) .dtf-cal__head {
+    margin-bottom: 2px;
+  }
+
+  .dtf:not(.dtf--inline) .dtf-day {
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .dtf:not(.dtf--inline) .dtf-week span {
+    font-size: 9px;
+    padding: 0;
+  }
+}
+
 .dtf-selected {
   display: flex;
   align-items: baseline;

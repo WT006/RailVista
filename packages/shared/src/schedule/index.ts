@@ -5,6 +5,9 @@ import type {
   Stop,
   UserSegment,
 } from '../types.js';
+import type { DelayField } from './delayField.js';
+import { addAnchor } from './delayField.js';
+import type { ScheduleCurve } from './scheduleCurve.js';
 
 export const CALIBRATE_WINDOW_MS = 45 * 60 * 1000;
 
@@ -68,6 +71,43 @@ export function getStationAnchorTime(
 
 export function computeCalibrationOffset(now: Date, anchorTime: Date): number {
   return now.getTime() - anchorTime.getTime();
+}
+
+/**
+ * 校准改锚点：将手动校准记录转为延误场高可信锚点（spec §5.7.7，修 P1-4）。
+ *
+ * 旧语义：全局平移 offsetMs（所有站点 ETA 统一加 offsetMs）。
+ * 新语义：在校准站里程处落高可信锚点，延误 δ = offsetMs/1000（秒），
+ * 后续 ETA 由延误场外推（含赶点恢复折扣），而非全局平移。
+ *
+ * 保留 CalibrationRecord.offsetMs 字段兼容旧数据读取。
+ */
+export function calibrateToAnchor(params: {
+  calibration: CalibrationRecord;
+  field: DelayField;
+  stops: Stop[];
+  stationKm: number[];
+  curve: ScheduleCurve;
+}): DelayField {
+  const { calibration, field, stops, stationKm } = params;
+
+  const idx = stops.findIndex(
+    (s) => s.name === calibration.stationName || s.name.startsWith(calibration.stationName),
+  );
+
+  const u = idx >= 0 && idx < stationKm.length ? stationKm[idx] : 0;
+  const delta = calibration.offsetMs / 1000;
+  const t = new Date(calibration.anchorIso || calibration.calibratedAt).getTime();
+
+  addAnchor(field, {
+    u,
+    delta,
+    t,
+    credibility: 'high',
+    recoverable: true,
+  });
+
+  return field;
 }
 
 export function formatOffsetLabel(offsetMs: number): string {

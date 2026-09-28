@@ -318,28 +318,28 @@ watch(
   width: 100%;
   padding: 12px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  background: rgba(15, 23, 42, 0.75);
-  color: #f8fafc;
+  border: 1px solid var(--border-default);
+  background: var(--bg-raised);
+  color: var(--text-primary);
   font-size: 16px;
   font-family: inherit;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
 }
 
 .dtf-trigger:hover,
 .dtf--open .dtf-trigger {
-  border-color: rgba(56, 189, 248, 0.45);
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.12);
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 1px var(--accent-container);
 }
 
 .dtf-trigger__text.is-placeholder {
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .dtf-trigger__icon {
-  color: #7dd3fc;
+  color: var(--accent-hover);
   display: inline-flex;
   opacity: 0.9;
 }
@@ -348,11 +348,11 @@ watch(
   z-index: 50;
   margin-top: 8px;
   border-radius: 12px;
-  background: rgba(15, 23, 42, 0.98);
-  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
   box-shadow:
     0 18px 48px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(56, 189, 248, 0.06) inset;
+    0 0 0 1px var(--accent-container) inset;
   overflow: hidden;
 }
 
@@ -367,8 +367,8 @@ watch(
 .dtf--inline .dtf-panel {
   margin-top: 0;
   box-shadow: none;
-  background: rgba(2, 6, 23, 0.45);
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: var(--bg-scrim);
+  border: 1px solid var(--border-default);
 }
 
 .dtf-selected {
@@ -377,13 +377,13 @@ watch(
   justify-content: space-between;
   gap: 10px;
   padding: 8px 10px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
-  background: rgba(56, 189, 248, 0.08);
+  border-bottom: 1px solid var(--border-hairline);
+  background: var(--accent-container);
 }
 
 .dtf-selected__label {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--text-muted);
   letter-spacing: 0.04em;
   flex-shrink: 0;
 }
@@ -391,7 +391,7 @@ watch(
 .dtf-selected__value {
   font-size: 14px;
   font-weight: 700;
-  color: #e0f2fe;
+  color: var(--accent-hover);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
 }
@@ -446,17 +446,17 @@ watch(
 .dtf-cal__label {
   font-size: 12px;
   font-weight: 650;
-  color: #e2e8f0;
+  color: var(--text-secondary);
   letter-spacing: 0.02em;
 }
 
 .dtf-nav {
   width: 26px;
   height: 26px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  border: 1px solid var(--border-default);
   border-radius: 6px;
-  background: rgba(30, 41, 59, 0.7);
-  color: #cbd5e1;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
@@ -464,7 +464,7 @@ watch(
 
 .dtf-nav:hover {
   border-color: rgba(56, 189, 248, 0.4);
-  color: #7dd3fc;
+  color: var(--accent-hover);
 }
 
 .dtf-week {
@@ -477,7 +477,7 @@ watch(
 .dtf-week span {
   text-align: center;
   font-size: 10px;
-  color: #64748b;
+  color: var(--text-muted);
   padding: 2px 0;
 }
 
@@ -491,7 +491,7 @@ watch(
   appearance: none;
   border: 1px solid transparent;
   background: transparent;
-  color: #e2e8f0;
+  color: var(--text-secondary);
   font-size: 12px;
   font-family: inherit;
   height: 28px;
@@ -500,22 +500,22 @@ watch(
 }
 
 .dtf-day:hover {
-  background: rgba(56, 189, 248, 0.12);
+  background: var(--accent-container);
 }
 
 .dtf-day.is-muted {
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .dtf-day.is-today:not(.is-selected) {
-  border-color: rgba(56, 189, 248, 0.45);
-  color: #7dd3fc;
+  border-color: var(--accent-border);
+  color: var(--accent-hover);
 }
 
 .dtf-day.is-selected {
-  background: rgba(56, 189, 248, 0.22);
-  border-color: rgba(56, 189, 248, 0.55);
-  color: #e0f2fe;
+  background: var(--accent-container);
+  border-color: var(--accent-border);
+  color: var(--accent-hover);
   font-weight: 650;
 }
 
@@ -529,7 +529,7 @@ watch(
 .dtf-link {
   border: none;
   background: transparent;
-  color: #38bdf8;
+  color: var(--accent);
   font-size: 12px;
   font-family: inherit;
   cursor: pointer;
@@ -537,15 +537,15 @@ watch(
 }
 
 .dtf-link:hover {
-  color: #7dd3fc;
+  color: var(--accent-hover);
 }
 
 .dtf-time {
   display: flex;
   flex: 0 0 96px;
   width: 96px;
-  border-left: 1px solid rgba(148, 163, 184, 0.18);
-  background: rgba(2, 6, 23, 0.35);
+  border-left: 1px solid var(--border-hairline);
+  background: var(--bg-scrim);
 }
 
 .dtf-time-col {
@@ -560,9 +560,9 @@ watch(
   text-align: center;
   font-size: 11px;
   font-weight: 700;
-  color: #7dd3fc;
+  color: var(--accent-hover);
   padding: 6px 0 4px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  border-bottom: 1px solid var(--border-hairline);
   letter-spacing: 0.06em;
 }
 
@@ -573,7 +573,7 @@ watch(
   overscroll-behavior: contain;
   padding: 4px 3px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(100, 116, 139, 0.5) transparent;
+  scrollbar-color: var(--text-muted) transparent;
 }
 
 .dtf-time-item {
@@ -584,7 +584,7 @@ watch(
   border: 1px solid transparent;
   border-radius: 5px;
   background: transparent;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   font-family: inherit;
@@ -593,14 +593,14 @@ watch(
 }
 
 .dtf-time-item:hover {
-  background: rgba(56, 189, 248, 0.1);
-  color: #e2e8f0;
+  background: var(--accent-container);
+  color: var(--text-secondary);
 }
 
 .dtf-time-item.is-active {
-  background: rgba(56, 189, 248, 0.2);
-  border-color: rgba(56, 189, 248, 0.45);
-  color: #e0f2fe;
+  background: var(--accent-container);
+  border-color: var(--accent-border);
+  color: var(--accent-hover);
   font-weight: 650;
 }
 
@@ -613,7 +613,7 @@ watch(
     width: 100%;
     flex-basis: auto;
     border-left: none;
-    border-top: 1px solid rgba(148, 163, 184, 0.18);
+    border-top: 1px solid var(--border-hairline);
   }
 
   .dtf-time-scroll {

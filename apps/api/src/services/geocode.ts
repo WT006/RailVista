@@ -1,7 +1,9 @@
 import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gcj02ToWgs84 } from '@railvista/shared';
 import { cache } from './cache.js';
+import { lookupStopCoordFromCorridors } from './corridorNetwork.js';
 
 type Point = { lng: number; lat: number };
 
@@ -400,7 +402,8 @@ async function amapStation(name: string): Promise<Point | null> {
       const lng = Number(loc[0]);
       const lat = Number(loc[1]);
       if (!isPlausibleCnRailPoint(lng, lat)) continue;
-      return { lng, lat };
+      const wgs = gcj02ToWgs84(lng, lat);
+      return { lng: wgs.lng, lat: wgs.lat };
     }
     return null;
   } catch {
@@ -599,6 +602,27 @@ export async function enrichStopsCoords<
   // 远程补点后可能再次引入飞点，出口统一再 scrub 一次
   if (!missing.length) return scrubZigzagLocalCoords(out);
 
+  // P0-4：本地/Overpass 都没命中后，用走廊 stationsHint 兜底补坐标（投影/插值点），
+  // 避免经停站在前端凭空消失；属低置信度坐标，拼线时仍受站级硬门禁约束。
+  const fillCorridorHints = (rows: T[]): T[] =>
+    rows.map((s) => {
+      if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) {
+        return s;
+      }
+      try {
+        const hint = lookupStopCoordFromCorridors(s.name);
+        if (hint) {
+          console.warn(
+            `[geocode] corridor-hint fallback coord for ${s.name} via ${hint.corridorId}`,
+          );
+          return { ...s, lng: hint.lng, lat: hint.lat };
+        }
+      } catch {
+        /* 走廊加载失败不阻塞主流程 */
+      }
+      return s;
+    });
+
   const batch = await overpassStationsByNames(missing.map((s) => s.name));
   const still: T[] = [];
   const result = out.map((s) => {
@@ -678,15 +702,18 @@ export async function enrichStopsCoords<
       if (hit) rememberGeo(hit.name, hit.point);
     }
     return scrubZigzagLocalCoords(
-      result.map((s) => {
-        if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) {
-          return s;
-        }
-        const point = byName.get(normalizeStationName(s.name));
-        return point ? { ...s, lng: point.lng, lat: point.lat } : s;
-      }),
+      fillCorridorHints(
+        result.map((s) => {
+          if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) {
+            return s;
+          }
+          const point = byName.get(normalizeStationName(s.name));
+          return point ? { ...s, lng: point.lng, lat: point.lat } : s;
+        }),
+      ),
     );
   }
 
-  return scrubZigzagLocalCoords(result);
+  // 远程补点未排上预算：仍尝试走廊 hint 兜底
+  return scrubZigzagLocalCoords(fillCorridorHints(result));
 }

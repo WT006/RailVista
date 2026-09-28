@@ -16,9 +16,9 @@ import {
   type CorridorPreset,
   type CorridorStop,
   loadCorridors,
-  corridorFitsStops,
   isHsrCorridor,
   isConventionalCorridor,
+  isHsrTrainCode,
 } from './corridors.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -48,6 +48,8 @@ export type NetworkMatch = {
   corridorIds: string[];
   corridorNames: string[];
   transferHubs: string[];
+  /** 接缝在 coords 中的下标（这些下标处的跳变适用接缝阈值而非段内阈值，P0-1） */
+  seams: number[];
   /** 路网路径走廊跳数（含起终走廊） */
   hops: number;
   score: number;
@@ -58,6 +60,9 @@ type HubLink = {
   hub: string;
   /** 估计换乘代价（km），同站名视为 0 */
   transferKm: number;
+  /** 几何接驳（__geo_）枢纽的最近点对：本走廊点 → 对面走廊点（B3） */
+  geoPt?: [number, number];
+  geoPtTo?: [number, number];
 };
 
 type CorridorGraph = {
@@ -71,11 +76,27 @@ const MAX_HOPS = 8;
 const START_NEAR_KM = 40;
 /** 经停桥接最大跨距（合肥南→蚌埠南约 125km）；过大则易乱跳 */
 const BRIDGE_MAX_KM = 280;
+/** B3 几何枢纽：bbox 粗筛的膨胀角（约 5km） */
+const B3_BBOX_PAD_DEG = 0.05;
 /**
- * 拼线相对经停示意折线的最大偏离（km）。
- * 合福/京沪正线通常 <90；绕沪昆经上海可达 300+。
+ * 站级质量门禁阈值（v3 修复方案 §3/§4-P0-1）。
+ * 用户可感知的「视觉漏站」阈值是 8~10km，旧值 45km/55%/280km/140km 只拦灾难级错误，
+ * 实测把偏离 9~112km 的坏拼线全部放行。走廊/路网短路结果必须逐站过硬门禁，
+ * 不过则让位给全图拓扑引擎（实测拓扑逐站投影可全 0.0km）。
  */
-const MAX_SCHEMATIC_DEV_KM = 140;
+const VIA_STRICT_KM = 10; // K/T/Z 经停站投影
+const VIA_HSR_KM = 6; // G/D/C 经停站投影
+const OD_STRICT_KM = 12; // K/T/Z 起终点投影
+const OD_HSR_KM = 8; // G/D/C 起终点投影
+const INTRA_JUMP_STRICT_KM = 60; // K/T/Z 段内相邻点跳变
+const INTRA_JUMP_HSR_KM = 40; // G/D/C 段内相邻点跳变
+const SEAM_JUMP_STRICT_KM = 120; // K/T/Z 段间接缝（仅标注 transferHubs 处）
+const SEAM_JUMP_HSR_KM = 80; // G/D/C 段间接缝
+/** 折返：投影进度回退超过站间弦长 10% 且超过 3km 即拒绝（方案 §3-3） */
+const BACKTRACK_MIN_KM = 3;
+const BACKTRACK_RATIO = 0.1;
+/** 里程比门禁仅在站序弦长累计 ≥50km 时生效，短途弦长噪声大 */
+const RATIO_MIN_STATION_KM = 50;
 
 function normalize(name: string): string {
   return name.replace(/站$/g, '').trim();
@@ -123,6 +144,12 @@ function stopTouchesCorridor(c: CorridorPreset, stop: CorridorStop): boolean {
   return nearCorridor(c, stop, START_NEAR_KM);
 }
 
+/** B2 用：忽略方位冲突的纯几何贴线判断（OD 已被单走廊拒收，这里只关心可达性） */
+function touchesCorridorGeo(c: CorridorPreset, stop: CorridorStop): boolean {
+  if (onHintsExact(stop.name, hintKeys(c))) return true;
+  return nearCorridor(c, stop, START_NEAR_KM);
+}
+
 function sharedHubs(a: CorridorPreset, b: CorridorPreset): string[] {
   const sa = new Set(hintKeys(a));
   const out: string[] = [];
@@ -130,6 +157,75 @@ function sharedHubs(a: CorridorPreset, b: CorridorPreset): string[] {
     if (sa.has(h)) out.push(h);
   }
   return out;
+}
+
+function polylineBBox(railway: [number, number][]): {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+} {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [x, y] of railway) {
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+  }
+  return { minX, minY, maxX, maxY };
+}
+
+function boxesOverlap(
+  a: { minX: number; minY: number; maxX: number; maxY: number },
+  b: { minX: number; minY: number; maxX: number; maxY: number },
+  padDeg: number,
+): boolean {
+  return (
+    a.minX - padDeg <= b.maxX &&
+    b.minX - padDeg <= a.maxX &&
+    a.minY - padDeg <= b.maxY &&
+    b.minY - padDeg <= a.maxY
+  );
+}
+
+/** 等距圆柱近似平方距离（km²），仅用于 B3 采样粗筛 */
+function approxDistSq(a: [number, number], b: [number, number]): number {
+  const dx = (a[0] - b[0]) * 111.32 * Math.cos((((a[1] + b[1]) / 2) * Math.PI) / 180);
+  const dy = (a[1] - b[1]) * 110.57;
+  return dx * dx + dy * dy;
+}
+
+/** 两条折线的最近点对（采样近似 + 邻域细化）；精确 haversine 判定 ≤maxKm 才返回 */
+function nearestPointsBetween(
+  a: [number, number][],
+  b: [number, number][],
+  maxKm: number,
+): { dKm: number; pa: [number, number]; pb: [number, number] } | null {
+  if (a.length < 2 || b.length < 2) return null;
+  let best = { dSq: Infinity, ai: -1, bi: -1 };
+  const step = Math.max(1, Math.floor(Math.max(a.length, b.length) / 120));
+  for (let i = 0; i < a.length; i += step) {
+    for (let j = 0; j < b.length; j += step) {
+      const dSq = approxDistSq(a[i], b[j]);
+      if (dSq < best.dSq) best = { dSq, ai: i, bi: j };
+    }
+  }
+  if (best.ai < 0) return null;
+  const span = step;
+  for (let i = Math.max(0, best.ai - span); i <= Math.min(a.length - 1, best.ai + span); i++) {
+    for (let j = Math.max(0, best.bi - span); j <= Math.min(b.length - 1, best.bi + span); j++) {
+      const dSq = approxDistSq(a[i], b[j]);
+      if (dSq < best.dSq) best = { dSq, ai: i, bi: j };
+    }
+  }
+  const pa = a[best.ai];
+  const pb = b[best.bi];
+  const dKm = haversineKm({ lng: pa[0], lat: pa[1] }, { lng: pb[0], lat: pb[1] });
+  if (dKm > maxKm) return null;
+  return { dKm, pa, pb };
 }
 
 function hubPointOnCorridor(
@@ -170,6 +266,34 @@ export function clearCorridorNetworkCache(): void {
   graphCacheHsr = null;
   graphCacheConv = null;
   graphCacheAll = null;
+}
+
+/**
+ * P0-4：无坐标站兜底。stationsHint 精确名命中时取该站在走廊上的点：
+ * stations-geo 有真实坐标 → 投影到走廊折线（≤45km）；否则按 hint 站序在折线上插值。
+ * 仅在 geocode 本地/远程全部失败后使用，让经停站不再从前端凭空消失；
+ * 拼线结果仍由 validateStopsOnCoords 站级门禁把关，插值点离群会被拒绝。
+ */
+export function lookupStopCoordFromCorridors(
+  name: string,
+): { lng: number; lat: number; corridorId: string } | null {
+  const n = normalize(name);
+  if (!n) return null;
+  // 缺坐标站本身不知道该上高铁还是普速走廊，全库找；择优取投影离真实坐标最近的
+  const g = getGraph('all');
+  let best: { lng: number; lat: number; corridorId: string; d: number } | null = null;
+  for (const c of g.byId.values()) {
+    if (!onHintsExact(n, hintKeys(c))) continue;
+    const pt = hubPointOnCorridor(c, n);
+    if (!pt) continue;
+    const geo = loadStationsGeo()[n];
+    const d =
+      geo?.lng != null && geo?.lat != null
+        ? haversineKm(pt, { lng: Number(geo.lng), lat: Number(geo.lat) })
+        : 0;
+    if (!best || d < best.d) best = { lng: pt.lng, lat: pt.lat, corridorId: c.id, d };
+  }
+  return best ? { lng: best.lng, lat: best.lat, corridorId: best.corridorId } : null;
 }
 
 function buildGraph(corridors: CorridorPreset[]): CorridorGraph {
@@ -220,6 +344,36 @@ function buildGraph(corridors: CorridorPreset[]): CorridorGraph {
     }
   }
 
+  // B3：几何枢纽自动发现——无共享 hint 的走廊对，折线最近点对 ≤3km 自动建边。
+  // 即使 hints 未补全，京广∩沪昆(株洲)、河茂∩黎湛(河唇)也能自动连通。
+  // 粗筛（bbox）+ 采样近似 + 邻域细化，避免 O(n²) 全量 haversine。
+  const boxes = corridors.map((c) => polylineBBox(c.railway));
+  for (let i = 0; i < corridors.length; i++) {
+    for (let j = i + 1; j < corridors.length; j++) {
+      const a = corridors[i];
+      const b = corridors[j];
+      if (adj.get(a.id)!.some((l) => l.toId === b.id)) continue;
+      if (!boxesOverlap(boxes[i], boxes[j], B3_BBOX_PAD_DEG)) continue;
+      const near = nearestPointsBetween(a.railway, b.railway, 3);
+      if (!near) continue;
+      const hub = `__geo_${a.id}_${b.id}`;
+      adj.get(a.id)!.push({
+        toId: b.id,
+        hub,
+        transferKm: near.dKm,
+        geoPt: near.pa,
+        geoPtTo: near.pb,
+      });
+      adj.get(b.id)!.push({
+        toId: a.id,
+        hub,
+        transferKm: near.dKm,
+        geoPt: near.pb,
+        geoPtTo: near.pa,
+      });
+    }
+  }
+
   return {
     adj,
     byId,
@@ -253,6 +407,8 @@ type PathNode = {
   id: string;
   ids: string[];
   hubs: Array<string | null>;
+  /** 与 hubs 对齐：__geo_ 枢纽的最近点对（B3），其余为 null */
+  geoTrail: Array<{ pa: [number, number]; pb: [number, number] } | null>;
   hops: number;
   costKm: number;
   tip: { lng: number; lat: number } | null;
@@ -264,6 +420,9 @@ type ExpandLink = {
   transferKm: number;
   /** 经停桥接：下一段入口投影点 */
   entryTip?: { lng: number; lat: number } | null;
+  /** B3 几何接驳：最近点对（本走廊 → 对面走廊） */
+  geoPt?: [number, number];
+  geoPtTo?: [number, number];
 };
 
 /** 走廊覆盖的经停下标（名命中或贴线） */
@@ -404,7 +563,11 @@ function findCorridorPath(
   endIds: Set<string>,
   stops: CorridorStop[],
   kind: GraphKind = 'all',
-): { ids: string[]; hubs: Array<string | null> } | null {
+): {
+  ids: string[];
+  hubs: Array<string | null>;
+  geoTrail: Array<{ pa: [number, number]; pb: [number, number] } | null>;
+} | null {
   const g = getGraph(kind);
   const first = stops[0];
   const last = stops[stops.length - 1];
@@ -432,6 +595,7 @@ function findCorridorPath(
       id,
       ids: [id],
       hubs: [null],
+      geoTrail: [null],
       hops: 1,
       costKm: cost0,
       tip: startTip,
@@ -455,6 +619,8 @@ function findCorridorPath(
       toId: l.toId,
       hub: l.hub,
       transferKm: l.transferKm,
+      geoPt: l.geoPt,
+      geoPtTo: l.geoPtTo,
     }));
     const bridges = stopBridgeLinks(cur.id, cur.ids, stops, g.byId);
     // 桥接优先于同名图边重复目标时的劣质绕行，一并扩展
@@ -479,17 +645,22 @@ function findCorridorPath(
         hubPt =
           hubPointOnCorridor(curC, hubKey) || hubPointOnCorridor(nextC, hubKey);
       } else if (link.hub.startsWith('__geo_')) {
-        let bestPair = { d: Infinity, pt: curC.railway.at(-1)! };
-        for (const pa of [curC.railway[0], curC.railway.at(-1)!]) {
-          for (const pb of [nextC.railway[0], nextC.railway.at(-1)!]) {
-            const d = haversineKm(
-              { lng: pa[0], lat: pa[1] },
-              { lng: pb[0], lat: pb[1] },
-            );
-            if (d < bestPair.d) bestPair = { d, pt: pa };
+        // B3：优先用建边时记录的最近点对；端点建边退回端点最近对
+        if (link.geoPt && link.geoPtTo) {
+          hubPt = { lng: link.geoPt[0], lat: link.geoPt[1] };
+        } else {
+          let bestPair = { d: Infinity, pt: curC.railway.at(-1)! };
+          for (const pa of [curC.railway[0], curC.railway.at(-1)!]) {
+            for (const pb of [nextC.railway[0], nextC.railway.at(-1)!]) {
+              const d = haversineKm(
+                { lng: pa[0], lat: pa[1] },
+                { lng: pb[0], lat: pb[1] },
+              );
+              if (d < bestPair.d) bestPair = { d, pt: pa };
+            }
           }
+          hubPt = { lng: bestPair.pt[0], lat: bestPair.pt[1] };
         }
-        hubPt = { lng: bestPair.pt[0], lat: bestPair.pt[1] };
       }
 
       const geoStep =
@@ -516,6 +687,10 @@ function findCorridorPath(
         id: link.toId,
         ids: [...cur.ids, link.toId],
         hubs: [...cur.hubs, link.hub],
+        geoTrail: [
+          ...cur.geoTrail,
+          link.geoPt && link.geoPtTo ? { pa: link.geoPt, pb: link.geoPtTo } : null,
+        ],
         hops: cur.hops + 1,
         costKm: nextCost,
         tip: hubPt,
@@ -525,7 +700,7 @@ function findCorridorPath(
 
   if (!goals.length) return null;
   goals.sort((a, b) => a.costKm - b.costKm || a.hops - b.hops);
-  return { ids: goals[0].ids, hubs: goals[0].hubs };
+  return { ids: goals[0].ids, hubs: goals[0].hubs, geoTrail: goals[0].geoTrail };
 }
 
 function resolveStopPoint(
@@ -565,68 +740,215 @@ function appendUnique(out: [number, number][], segment: [number, number][]): voi
   }
 }
 
-/** 拼线相对经停示意折线的最大偏离，用于拒绝沪昆三角绕行等大弯 */
-function maxDeviationFromStopSchematic(
-  coords: [number, number][],
-  stops: CorridorStop[],
-): number {
-  const schem = stops
-    .filter((s) => s.lng != null && s.lat != null)
-    .map((s) => [Number(s.lng), Number(s.lat)] as [number, number]);
-  if (schem.length < 2 || coords.length < 2) return Infinity;
-  const { path, lengthKm } = buildRailwayMetrics(schem);
-  if (lengthKm <= 0) return Infinity;
-  let maxD = 0;
-  const step = Math.max(1, Math.floor(coords.length / 100));
-  for (let i = 0; i < coords.length; i += step) {
-    const d = projectToRailway(path, lengthKm, coords[i][0], coords[i][1]).distKm;
-    if (d > maxD) maxD = d;
+/**
+ * P0-3：切片首尾强制锚定真实站坐标。
+ * slicePolylineByOd 切出的首/尾是走廊上的投影点；站坐标离走廊稍远时站标必然悬空。
+ * 锚定后段折线语义与拓扑 routeStops 一致：[站A, …轨道点, 站B]。
+ * 若站坐标与走廊根本不搭（偏差 >VIA 阈值），由 validateStopsOnCoords 拒绝。
+ */
+export function anchorSliceEndpoints(
+  seg: [number, number][],
+  anchorFrom?: { lng?: number; lat?: number } | null,
+  anchorTo?: { lng?: number; lat?: number } | null,
+): [number, number][] {
+  if (seg.length < 2) return seg;
+  const out = seg.slice();
+  if (anchorFrom?.lng != null && anchorFrom?.lat != null) {
+    out[0] = [Number(anchorFrom.lng), Number(anchorFrom.lat)];
   }
-  // 始终检查终点
-  const last = coords[coords.length - 1];
-  maxD = Math.max(
-    maxD,
-    projectToRailway(path, lengthKm, last[0], last[1]).distKm,
-  );
-  return maxD;
+  if (anchorTo?.lng != null && anchorTo?.lat != null) {
+    out[out.length - 1] = [Number(anchorTo.lng), Number(anchorTo.lat)];
+  }
+  return out;
 }
 
-/** 相邻点最大跳跃（km）；桥接换乘允许到 BRIDGE_MAX_KM，方向拼错会出现 800km+ */
-function maxAdjacentJumpKm(coords: [number, number][]): number {
-  let maxD = 0;
+export type StopsGateVerdict = {
+  ok: boolean;
+  /** reject 原因：od_anchor | stop_off_path | backtrack | jump | length_ratio | bad_input */
+  reason?: string;
+  /** 触发拒绝的经停站名（jump 时为 coords 下标） */
+  worstStop?: string;
+  /** 触发拒绝的偏离/回退/跳变/里程比数值（km 或比值） */
+  worstKm?: number;
+};
+
+type GateStop = { name: string; lng?: number; lat?: number };
+
+function hasCoord(s: GateStop): s is GateStop & { lng: number; lat: number } {
+  return s.lng != null && s.lat != null && Number.isFinite(Number(s.lng)) && Number.isFinite(Number(s.lat));
+}
+
+/**
+ * 站级质量门禁（v3 P0-1，替代旧 validateNetworkCoords 的灾难级阈值）：
+ * 1. 起终点投影 ≤ OD_STRICT/HSR_KM；
+ * 2. 每个有坐标经停站逐站硬校验投影 ≤ VIA_STRICT/HSR_KM（一个超即 fail，
+ *    不再用「55% 比例」——比例语义只属于 corridorFitsStops 的 touch 判定）；
+ * 3. 投影进度回退 > max(3km, 站间弦长 10%) 判折返（覆盖全部有坐标站，
+ *    不再像旧 stopsProgressMostlyMonotonic 那样把 >45km 的站 continue 免检）；
+ * 4. 相邻点跳变分段内 60/40km 与接缝 120/80km（seams 为接缝后首个点下标）；
+ * 5. 折线里程/站间弦长和 ∈ [1.0, 1.7]（普速）/ [1.0, 1.5]（高铁）。
+ */
+export function validateStopsOnCoords(
+  coords: [number, number][],
+  stops: GateStop[],
+  opts?: { trainCode?: string; seams?: number[] },
+): StopsGateVerdict {
+  if (!coords || coords.length < 2) return { ok: false, reason: 'bad_input', worstKm: coords?.length || 0 };
+  const withCoord = stops.filter(hasCoord);
+  if (withCoord.length < 2) return { ok: false, reason: 'bad_input', worstStop: 'withCoord<2' };
+
+  const hsr = isHsrTrainCode(opts?.trainCode);
+  const viaKm = hsr ? VIA_HSR_KM : VIA_STRICT_KM;
+  const odKm = hsr ? OD_HSR_KM : OD_STRICT_KM;
+  const intraKm = hsr ? INTRA_JUMP_HSR_KM : INTRA_JUMP_STRICT_KM;
+  const seamKm = hsr ? SEAM_JUMP_HSR_KM : SEAM_JUMP_STRICT_KM;
+  const maxRatio = hsr ? 1.5 : 1.7;
+
+  // ① OD 必须锚定（P0-3 后切片首尾已替换为站坐标，正常应为 0）
+  const first = stops[0];
+  const last = stops[stops.length - 1];
+  if (hasCoord(first)) {
+    const d0 = haversineKm(
+      { lng: coords[0][0], lat: coords[0][1] },
+      { lng: Number(first.lng), lat: Number(first.lat) },
+    );
+    if (d0 > odKm) return { ok: false, reason: 'od_anchor', worstStop: first.name, worstKm: d0 };
+  }
+  if (hasCoord(last)) {
+    const d1 = haversineKm(
+      { lng: coords[coords.length - 1][0], lat: coords[coords.length - 1][1] },
+      { lng: Number(last.lng), lat: Number(last.lat) },
+    );
+    if (d1 > odKm) return { ok: false, reason: 'od_anchor', worstStop: last.name, worstKm: d1 };
+  }
+
+  const { path, lengthKm } = buildRailwayMetrics(coords);
+  if (lengthKm <= 0) return { ok: false, reason: 'bad_input', worstKm: 0 };
+
+  // ②③ 逐站投影硬校验 + 全站点折返检查
+  let stationKm = 0;
+  let prevProjKm: number | null = null;
+  let prevStop: GateStop | null = null;
+  for (const s of withCoord) {
+    const proj = projectToRailway(path, lengthKm, Number(s.lng), Number(s.lat));
+    if (proj.distKm > viaKm) {
+      return { ok: false, reason: 'stop_off_path', worstStop: s.name, worstKm: proj.distKm };
+    }
+    const projKm = proj.progress * lengthKm;
+    if (prevProjKm != null && prevStop && hasCoord(prevStop)) {
+      const regressKm = prevProjKm - projKm;
+      const chordKm = haversineKm(
+        { lng: Number(prevStop.lng), lat: Number(prevStop.lat) },
+        { lng: Number(s.lng), lat: Number(s.lat) },
+      );
+      stationKm += chordKm;
+      if (regressKm > Math.max(BACKTRACK_MIN_KM, chordKm * BACKTRACK_RATIO)) {
+        return { ok: false, reason: 'backtrack', worstStop: s.name, worstKm: regressKm };
+      }
+    }
+    prevProjKm = projKm;
+    prevStop = s;
+  }
+
+  // ④ 相邻点跳变：接缝下标用接缝阈值，其余用段内阈值
+  const seamSet = new Set(opts?.seams || []);
   for (let i = 1; i < coords.length; i++) {
     const d = haversineKm(
       { lng: coords[i - 1][0], lat: coords[i - 1][1] },
       { lng: coords[i][0], lat: coords[i][1] },
     );
-    if (d > maxD) maxD = d;
+    const limit = seamSet.has(i) ? seamKm : intraKm;
+    if (d > limit) {
+      return { ok: false, reason: 'jump', worstStop: String(i), worstKm: d };
+    }
   }
-  return maxD;
+
+  // ⑤ 里程比（仅站序弦长累计足够大时）
+  if (stationKm >= RATIO_MIN_STATION_KM) {
+    const ratio = lengthKm / stationKm;
+    if (ratio < 1.0 || ratio > maxRatio) {
+      return { ok: false, reason: 'length_ratio', worstKm: ratio };
+    }
+  }
+
+  return { ok: true };
+}
+
+/** 布尔包装：拼线内部守卫，拒绝时打日志便于排查走的是哪条支路 */
+function validateNetworkCoords(
+  coords: [number, number][],
+  stops: CorridorStop[],
+  opts?: { trainCode?: string; seams?: number[] },
+): boolean {
+  const verdict = validateStopsOnCoords(coords, stops, opts);
+  if (!verdict.ok) {
+    console.warn(
+      `[corridor-network] strict gate reject: ${verdict.reason}`,
+      verdict.worstStop || '',
+      verdict.worstKm != null ? Number(verdict.worstKm).toFixed(1) : '',
+    );
+    return false;
+  }
+  return true;
 }
 
 /**
- * 有坐标经停在折线上的投影进度应大致沿行程单调。
- * 方向拼反会出现「福州南 0、厦门北 0.05、合肥南 0.2、北京南 0.8、蚌埠南 1」类乱序。
+ * B2：起终同走廊兜底。走到这里说明单走廊匹配已失败（matchCorridor/slice 均未成），
+ * 原逻辑直接 return null 会与单走廊逻辑形成「让位死锁」（珠海北/吐鲁番北/杭州南类）。
+ * 现改为：把该走廊作为唯一链路，OD 站直接投影切片（等效把 OD 投到走廊再 slice）。
  */
-function stopsProgressMostlyMonotonic(
-  coords: [number, number][],
+function matchSameCorridorDirect(
+  sharedIds: string[],
+  g: CorridorGraph,
   stops: CorridorStop[],
-  maxKm = 45,
-): boolean {
-  const { path, lengthKm } = buildRailwayMetrics(coords);
-  if (lengthKm <= 0) return false;
-  let last = -0.02;
-  let counted = 0;
-  for (const s of stops) {
-    if (s.lng == null || s.lat == null) continue;
-    const proj = projectToRailway(path, lengthKm, Number(s.lng), Number(s.lat));
-    if (proj.distKm > maxKm) continue;
-    counted += 1;
-    // 允许少量投影噪声（联络线/平行线），禁止明显折返
-    if (proj.progress + 0.04 < last) return false;
-    last = Math.max(last, proj.progress);
+  first: CorridorStop,
+  last: CorridorStop,
+  trainCode?: string,
+): NetworkMatch | null {
+  let best: { c: CorridorPreset; coords: [number, number][]; d: number } | null = null;
+  for (const id of sharedIds) {
+    const c = g.byId.get(id);
+    if (!c) continue;
+    let from0 = resolveStopPoint(first, c);
+    if (!from0) {
+      // OD 站贴线兜底：投影点作为切入点（贴线 ≤ START_NEAR_KM 才会进入此分支上游）
+      if (first.lng == null || first.lat == null) continue;
+      const { path, lengthKm } = buildRailwayMetrics(c.railway);
+      if (lengthKm <= 0) continue;
+      const proj = projectToRailway(path, lengthKm, Number(first.lng), Number(first.lat));
+      if (proj.distKm > START_NEAR_KM) continue;
+      from0 = { lng: proj.point.lng, lat: proj.point.lat };
+    }
+    let toLast = resolveStopPoint(last, c);
+    if (!toLast) {
+      if (last.lng == null || last.lat == null) continue;
+      const { path, lengthKm } = buildRailwayMetrics(c.railway);
+      if (lengthKm <= 0) continue;
+      const proj = projectToRailway(path, lengthKm, Number(last.lng), Number(last.lat));
+      if (proj.distKm > START_NEAR_KM) continue;
+      toLast = { lng: proj.point.lng, lat: proj.point.lat };
+    }
+    const slicedRaw = sliceBetween(c, from0, toLast);
+    if (!slicedRaw || slicedRaw.length < 2) continue;
+    // P0-3：首尾锚定真实站坐标，保证站标落在段折线端点上
+    const sliced = anchorSliceEndpoints(slicedRaw, first, last);
+    const odGap = Math.max(
+      haversineKm(from0, { lng: Number(first.lng), lat: Number(first.lat) }),
+      haversineKm(toLast, { lng: Number(last.lng), lat: Number(last.lat) }),
+    );
+    if (!best || odGap < best.d) best = { c, coords: sliced, d: odGap };
   }
-  return counted >= 2;
+  if (!best) return null;
+  if (!validateNetworkCoords(best.coords, stops, { trainCode, seams: [] })) return null;
+  return {
+    coords: best.coords,
+    corridorIds: [best.c.id],
+    corridorNames: [best.c.name],
+    transferHubs: [],
+    seams: [],
+    hops: 1,
+    score: 1,
+  };
 }
 
 /**
@@ -659,8 +981,21 @@ export function matchCorridorNetwork(
   );
   if (!startIds.length || !endIds.size) return null;
 
-  // 起终落在同一走廊：交给单走廊逻辑，避免路网抢答
-  if (startIds.some((id) => endIds.has(id))) return null;
+  // 起终落在同一走廊：走到这里说明单走廊匹配已失败，不再直接让位（B2 解除死锁），
+  // 以 OD 投影切片兜底（珠海北/吐鲁番北/杭州南类端点站）。
+  // 严格交集优先（touch 判定通过更可信）；方位冲突导致 touch 失败时用纯几何贴线再试。
+  const sharedCorridorIds = startIds.filter((id) => endIds.has(id));
+  if (sharedCorridorIds.length) {
+    const direct = matchSameCorridorDirect(sharedCorridorIds, g, stops, first, last, code);
+    if (direct) return direct;
+  }
+  const sharedGeoIds = corridors
+    .filter((c) => touchesCorridorGeo(c, first) && touchesCorridorGeo(c, last))
+    .map((c) => c.id);
+  if (sharedGeoIds.length) {
+    const direct = matchSameCorridorDirect(sharedGeoIds, g, stops, first, last, code);
+    if (direct) return direct;
+  }
 
   const path = findCorridorPath(startIds, endIds, stops, kind);
   if (!path || path.ids.length < 2) return null;
@@ -708,6 +1043,15 @@ export function matchCorridorNetwork(
       if (!onPrev || !onNext) return null;
       transfers.push({ onPrev, onNext });
     } else {
+      // B3：优先用建边时记录的最近点对（中段几何枢纽）；端点建边退回端点最近对
+      const geoPair = path.geoTrail?.[i + 1];
+      if (geoPair) {
+        transfers.push({
+          onPrev: { lng: geoPair.pa[0], lat: geoPair.pa[1] },
+          onNext: { lng: geoPair.pb[0], lat: geoPair.pb[1] },
+        });
+        continue;
+      }
       const a = chain[i];
       const b = chain[i + 1];
       let best = {
@@ -732,67 +1076,38 @@ export function matchCorridorNetwork(
   }
 
   const coords: [number, number][] = [];
+  // 接缝下标：每段 append 前的 coords.length 即最终数组中「前段末点→本段首点」的下标
+  const seams: number[] = [];
   for (let i = 0; i < chain.length; i++) {
     const fromPt = i === 0 ? from0 : transfers[i - 1].onNext;
     const toPt = i === chain.length - 1 ? toLast : transfers[i].onPrev;
-    const seg = sliceBetween(chain[i], fromPt, toPt);
-    if (!seg) return null;
+    const segRaw = sliceBetween(chain[i], fromPt, toPt);
+    if (!segRaw) return null;
     // 段与段接缝：同站换乘应贴合；桥接允许 BRIDGE_MAX_KM；方向拼错会出现数百公里跳跃
-    if (coords.length && seg.length) {
+    if (coords.length && segRaw.length) {
       const gap = haversineKm(
         { lng: coords[coords.length - 1][0], lat: coords[coords.length - 1][1] },
-        { lng: seg[0][0], lat: seg[0][1] },
+        { lng: segRaw[0][0], lat: segRaw[0][1] },
       );
       if (gap > BRIDGE_MAX_KM) return null;
+      seams.push(coords.length);
     }
+    // P0-3：仅首段首点/末段末点锚定真实 OD 站坐标；中段端点是换乘投影，保持投影语义
+    const seg = anchorSliceEndpoints(
+      segRaw,
+      i === 0 ? first : null,
+      i === chain.length - 1 ? last : null,
+    );
     appendUnique(coords, seg);
   }
-  if (coords.length < 4) return null;
-
-  // 起终点必须贴近行程 OD（方向拼反时常见起点落在换乘枢纽）
-  if (first.lng != null && first.lat != null) {
-    const d0 = haversineKm(
-      { lng: coords[0][0], lat: coords[0][1] },
-      { lng: Number(first.lng), lat: Number(first.lat) },
-    );
-    if (d0 > 45) return null;
-  }
-  if (last.lng != null && last.lat != null) {
-    const d1 = haversineKm(
-      { lng: coords[coords.length - 1][0], lat: coords[coords.length - 1][1] },
-      { lng: Number(last.lng), lat: Number(last.lat) },
-    );
-    if (d1 > 45) return null;
-  }
-
-  if (!corridorFitsStops(coords, stops, 45)) return null;
-  if (maxAdjacentJumpKm(coords) > BRIDGE_MAX_KM) return null;
-  if (!stopsProgressMostlyMonotonic(coords, stops)) return null;
-
-  const withCoord = stops.filter((s) => s.lng != null && s.lat != null);
-  const stationKm = withCoord.reduce((sum, s, i) => {
-    if (i === 0) return 0;
-    const prev = withCoord[i - 1];
-    return (
-      sum +
-      haversineKm(
-        { lng: Number(prev.lng), lat: Number(prev.lat) },
-        { lng: Number(s.lng), lat: Number(s.lat) },
-      )
-    );
-  }, 0);
-  const { lengthKm: railKm } = buildRailwayMetrics(coords);
-  // 示意里程比不可靠（走廊折线本身弯曲大）；用相对经停折线的最大偏离拦绕行
-  if (maxDeviationFromStopSchematic(coords, withCoord) > MAX_SCHEMATIC_DEV_KM) return null;
-  if (stationKm > 80 && railKm < stationKm * 0.4) return null;
-  // 方向/折返错误时折线里程会远超站间弦长之和
-  if (stationKm > 80 && railKm > stationKm * 2.2) return null;
+  if (!validateNetworkCoords(coords, stops, { trainCode: code, seams })) return null;
 
   return {
     coords,
     corridorIds: path.ids,
     corridorNames: path.ids.map((id) => g.byId.get(id)!.name),
     transferHubs,
+    seams,
     hops: path.ids.length,
     score: 1 / path.ids.length,
   };

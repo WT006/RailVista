@@ -5,9 +5,18 @@ import { fileURLToPath } from 'node:url';
 import { buildRailGeometry, type LngLat } from '../services/osmRailway.js';
 import { enrichStopsCoords } from '../services/geocode.js';
 import { matchCorridor, sliceCorridorForStops, loadCorridors } from '../services/corridors.js';
-import { matchCorridorNetwork } from '../services/corridorNetwork.js';
-import { createRailGeometryJob, getRailGeometryJob } from '../services/railGeometryJob.js';
+import {
+  matchCorridorNetwork,
+  validateStopsOnCoords,
+  anchorSliceEndpoints,
+} from '../services/corridorNetwork.js';
+import {
+  abandonRailGeometryJob,
+  createRailGeometryJob,
+  getRailGeometryJob,
+} from '../services/railGeometryJob.js';
 import { loadScenicSpots, matchScenicSpotsForRailway } from '../services/scenicSpots.js';
+import { ensureFullStops } from '../services/stopsAutocomplete.js';
 import { clientKeyFromRequest } from '../lib/clientIdentity.js';
 import { slicePolylineByOd } from '@railvista/shared';
 
@@ -73,15 +82,37 @@ railGeometryRoute.post('/jobs', async (c) => {
     );
   }
 
+  const autocomplete = await ensureFullStops(body.stops || [], body.trainCode);
+  if (autocomplete.completed) {
+    body = { ...body, stops: autocomplete.stops };
+  }
+
   const { enriched } = await resolveStops(body);
+  const unresolvedStops = enriched
+    .filter((s) => s.lng == null || s.lat == null || !Number.isFinite(Number(s.lng)) || !Number.isFinite(Number(s.lat)))
+    .map((s) => s.name)
+    .filter(Boolean);
+  if (unresolvedStops.length) {
+    // B4：不再静默丢弃——明确记录哪些站没定位到坐标
+    console.warn(
+      `[rail-geometry] unresolved stops (no coords): ${unresolvedStops.join(', ')}`,
+    );
+  }
   const namedStops = enriched
     .filter((s) => s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat))
     .map((s) => ({ name: s.name, lng: Number(s.lng), lat: Number(s.lat) }));
   if (namedStops.length < 2) {
+    const missing = unresolvedStops.join('、') || '未知';
     return c.json(
       {
         ok: false,
-        error: { code: 'BAD_REQUEST', message: '至少需要 2 个可定位的经停站' },
+        error: {
+          code: 'BAD_REQUEST',
+          message:
+            namedStops.length === 0
+              ? `至少需要 2 个可定位的经停站（未能定位：${missing}）`
+              : `可定位的经停站不足 2 个（未能定位：${missing}）`,
+        },
       },
       400,
     );
@@ -92,12 +123,15 @@ railGeometryRoute.post('/jobs', async (c) => {
       stops: namedStops,
       trainCode: body.trainCode,
       clientKey: clientKeyFromRequest((n) => c.req.header(n)),
+      unresolvedStops,
       retryFailedOnly: !!body.retryFailedOnly,
     });
     return c.json({
       ok: true,
       data: {
         ...job,
+        // B4：回传未能定位的站名，前端可提示「某站暂缺坐标」而非凭空消失
+        unresolvedStops,
         // 回传全部 enrich 结果（含站名），前端按名合并，禁止按下标写坐标
         stops: enriched.map((s) => ({
           name: s.name,
@@ -135,6 +169,13 @@ railGeometryRoute.get('/jobs/:jobId', async (c) => {
   return c.json({ ok: true, data: job });
 });
 
+/** U1：取消进行中/排队中的任务（前端精度面板「取消」按钮） */
+railGeometryRoute.post('/jobs/:jobId/abandon', (c) => {
+  const jobId = c.req.param('jobId');
+  const done = abandonRailGeometryJob(jobId);
+  return c.json({ ok: true, data: { jobId, abandoned: done } });
+});
+
 railGeometryRoute.post('/', async (c) => {
   let body: Body = {};
   try {
@@ -144,6 +185,11 @@ railGeometryRoute.post('/', async (c) => {
       { ok: false, error: { code: 'BAD_REQUEST', message: '需要 JSON body' } },
       400,
     );
+  }
+
+  const autocompleteSync = await ensureFullStops(body.stops || [], body.trainCode);
+  if (autocompleteSync.completed) {
+    body = { ...body, stops: autocompleteSync.stops };
   }
 
   const { enriched, stops } = await resolveStops(body);
@@ -194,12 +240,21 @@ railGeometryRoute.post('/', async (c) => {
   // 普速车（K/T/Z…）禁止套高铁走廊，避免「安阳/鹤壁」贴上「安阳东/鹤壁东」平行线
   const matched = matchCorridor(enriched, { trainCode: body.trainCode });
   if (matched) {
-    const sliced = sliceCorridorForStops(matched.corridor, enriched);
-    if (sliced && sliced.length >= 2) {
+    const slicedRaw = sliceCorridorForStops(matched.corridor, enriched);
+    // P0-1/P0-3：首尾锚定真实站坐标 + 逐站硬门禁；不过则降级（路网/OSM/示意），
+    // 不再让 55%/40km 的宽松切片直接返回给前端。
+    const anchored =
+      slicedRaw && slicedRaw.length >= 2
+        ? anchorSliceEndpoints(slicedRaw, enriched[0], enriched[enriched.length - 1])
+        : null;
+    const gate = anchored
+      ? validateStopsOnCoords(anchored, enriched, { trainCode: body.trainCode, seams: [] })
+      : null;
+    if (anchored && gate?.ok) {
       return c.json({
         ok: true,
         data: attachScenic({
-          coords: sliced,
+          coords: anchored,
           stops: enriched,
           source: 'osm' as const,
           segmentsOk: stops.length - 1,
@@ -211,6 +266,13 @@ railGeometryRoute.post('/', async (c) => {
           matchScore: matched.score,
         }),
       });
+    }
+    if (anchored && gate && !gate.ok) {
+      console.warn(
+        `[rail-geometry] preset corridor rejected by strict gate: ${gate.reason}`,
+        gate.worstStop || '',
+        gate.worstKm != null ? Number(gate.worstKm).toFixed(1) : '',
+      );
     }
   }
 

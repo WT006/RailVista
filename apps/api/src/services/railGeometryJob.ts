@@ -7,10 +7,89 @@ import {
   isHighspeedTrain,
   type LngLat,
 } from './osmRailway.js';
-import { matchCorridor, sliceCorridorForStops } from './corridors.js';
-import { matchCorridorNetwork } from './corridorNetwork.js';
+import { matchCorridor, sliceCorridorForStops, loadCorridors } from './corridors.js';
+import {
+  matchCorridorNetwork,
+  validateStopsOnCoords,
+  anchorSliceEndpoints,
+} from './corridorNetwork.js';
 import { matchScenicSpotsForRailway } from './scenicSpots.js';
 import { getPreciseHotCache, savePreciseHotCache } from './preciseRouteCache.js';
+import { findWholeTripLocalPath } from './localRails.js';
+import * as overpassTracker from './overpassTracker.js';
+import { validateWholeTripPath } from './wholeTripGate.js';
+import {
+  isTopologyEnabled,
+  loadTopology,
+  routeStops as topoRouteStops,
+  lineNameIds,
+} from './railTopology.js';
+
+/** 收集任务经停站命中的走廊线路名集合 → 拓扑边权 id 集合（线路名加权防串线） */
+function collectLineNamesForStops(stops: Array<{ name: string }>): Set<number> {
+  const names = new Set(stops.map((s) => (s.name || '').replace(/站$/, '').trim()).filter(Boolean));
+  if (!names.size) return new Set();
+  const lineNames: string[] = [];
+  try {
+    for (const c of loadCorridors()) {
+      const hits = (c.stationsHint || []).some((h) => names.has((h || '').replace(/站$/, '').trim()));
+      if (!hits) continue;
+      if (c.name) lineNames.push(c.name);
+      if (Array.isArray(c.sourceNames)) lineNames.push(...c.sourceNames);
+    }
+  } catch {
+    /* 走廊加载失败不阻塞拓扑寻路 */
+  }
+  return lineNameIds(lineNames);
+}
+
+type CorridorShortcut = {
+  coords: [number, number][];
+  reason: string;
+  tier: Extract<RailQualityTier, 'corridor' | 'network'>;
+  message: string;
+};
+
+/**
+ * 精品走廊/路网整段短路（v3 P0-2：从「首道短路」降为拓扑之后的兜底）。
+ * 单走廊切片首尾锚定 OD 站坐标后必须过站级硬门禁；路网结果在 matchCorridorNetwork
+ * 内部已过同一门禁。任一经停投影超阈即返回 null，让位给拓扑/逐段 OSM。
+ */
+function tryCorridorShortcut(stops: NamedStop[], trainCode?: string): CorridorShortcut | null {
+  try {
+    const single = matchCorridor(stops, { trainCode });
+    const sliced = single ? sliceCorridorForStops(single.corridor, stops) : null;
+    if (single && sliced && sliced.length >= 2) {
+      const anchored = anchorSliceEndpoints(sliced, stops[0], stops[stops.length - 1]);
+      const gate = validateStopsOnCoords(anchored, stops, { trainCode, seams: [] });
+      if (gate.ok) {
+        return {
+          coords: anchored,
+          reason: `corridor:${single.corridor.id}`,
+          tier: 'corridor',
+          message: `真实轨道线（精品走廊 ${single.corridor.name}）`,
+        };
+      }
+      console.warn(
+        `[rail-job] corridor slice rejected by strict gate: ${gate.reason}`,
+        gate.worstStop || '',
+        gate.worstKm != null ? Number(gate.worstKm).toFixed(1) : '',
+      );
+    }
+    const networked = matchCorridorNetwork(stops, { trainCode });
+    if (networked?.coords && networked.coords.length >= 2) {
+      return {
+        coords: networked.coords,
+        reason: `network:${networked.corridorIds.join('+')}`,
+        tier: 'network',
+        message: `真实轨道线（精品路网 ${networked.corridorNames.join(' + ')}）`,
+      };
+    }
+  } catch (e) {
+    console.warn('[rail-job] corridor shortcut failed', e);
+  }
+  return null;
+}
 
 export type RailJobStatus = 'queued' | 'running' | 'done' | 'partial' | 'failed';
 
@@ -26,21 +105,31 @@ export type RailJobSnapshot = {
   segmentsDone: number;
   segmentsOk: number;
   coords: [number, number][];
-  source: 'osm' | 'mixed' | 'station';
+  source: 'osm' | 'mixed' | 'station' | 'local';
   message: string;
   /** 精度层级，供 UI 区分文案 */
   qualityTier?: RailQualityTier;
   trainCode?: string;
   /** 校正后的经停坐标（必须带站名，供前端按名合并） */
   stops?: NamedStop[];
+  /** B4：geocode 失败未能定位的经停站名（不再静默丢弃，供前端提示与审计） */
+  unresolvedStops?: string[];
   /** 按当前 coords 过滤的风景点 */
   scenicSpots?: ScenicSpot[];
 };
 
 type SegSlot = { coords: LngLat[]; ok: boolean; reason?: string } | null;
 
+/**
+ * F3 [P1] 景点匹配记忆化：每次轮询都把 432 个景点对整条折线重算一遍，
+ * 实测 14ms(576点) ~ 183ms(10327点)，1.5s 轮询下持续阻塞事件循环。
+ * 这里按「coords 签名 + 任务状态」缓存结果，只有折线真的变了才重算。
+ */
+type SpotMemo = { sig: string; spots: ScenicSpot[]; ms: number };
+
 type RailJob = Omit<RailJobSnapshot, 'stops'> & {
   stops: NamedStop[];
+  unresolvedStops: string[];
   slots: SegSlot[];
   clientKey: string;
   stopsFp: string;
@@ -48,12 +137,44 @@ type RailJob = Omit<RailJobSnapshot, 'stops'> & {
   updatedAt: number;
   /** 被同客户端新 OD 任务取代后不再写缓存 / 进度 */
   abandoned?: boolean;
+  spotMemo?: SpotMemo;
 };
 
+/**
+ * 折线签名：点数 + 成功段数 + 5 个等距采样点。
+ * 宁可贵一点重算，也不能拿旧签名返回旧景点——采样点覆盖首尾与三个四分位，
+ * 任何实质性折线变化（长度变化或中段改线）都会被捕捉。
+ */
+function coordsSignature(coords: [number, number][], segmentsOk: number): string {
+  const n = coords.length;
+  if (!n) return `0|${segmentsOk}`;
+  const picks = [0, Math.floor(n / 4), Math.floor(n / 2), Math.floor((3 * n) / 4), n - 1];
+  const samples = picks.map((i) => {
+    const p = coords[Math.max(0, Math.min(n - 1, i))];
+    return `${p[0].toFixed(4)},${p[1].toFixed(4)}`;
+  });
+  return `${n}|${segmentsOk}|${samples.join(';')}`;
+}
+
+function jobScenicSpots(job: RailJob): ScenicSpot[] {
+  const sig = `${job.status}|${coordsSignature(job.coords, job.segmentsOk)}`;
+  if (job.spotMemo && job.spotMemo.sig === sig) return job.spotMemo.spots;
+  const t0 = Date.now();
+  const spots = matchScenicSpotsForRailway(job.coords);
+  job.spotMemo = { sig, spots, ms: Date.now() - t0 };
+  return spots;
+}
+
 const JOB_TTL_MS = 30 * 60 * 1000;
-/** 整趟精确任务墙钟上限：超时后用已有结果收尾，避免卡在 Overpass */
-function jobMaxMs() {
-  return Number(process.env.RAIL_JOB_MAX_MS || 50_000);
+/**
+ * 整趟精确任务墙钟上限：超时后用已有结果收尾，避免卡在 Overpass。
+ * B5：默认提到 120s，长途车（段数>10 的 K/T/Z）按 10s/段放宽，减少「超时降级示意线」长尾。
+ */
+function jobMaxMs(job?: { segmentsTotal: number }) {
+  const base = Number(process.env.RAIL_JOB_MAX_MS || 0);
+  if (base > 0) return base;
+  const bySegments = job ? job.segmentsTotal * 10_000 : 0;
+  return Math.max(120_000, bySegments);
 }
 /** 同时真正跑 runJob 的上限（多人共享） */
 function maxInflightJobs() {
@@ -80,7 +201,7 @@ function finishedKey(clientKey: string, stopsFp: string) {
 }
 
 function jobTimedOut(job: RailJob): boolean {
-  return Date.now() - job.createdAt >= jobMaxMs();
+  return Date.now() - job.createdAt >= jobMaxMs(job);
 }
 
 function shouldStopJob(job: RailJob): boolean {
@@ -219,7 +340,8 @@ function snapshot(job: RailJob): RailJobSnapshot {
     qualityTier: job.qualityTier,
     trainCode: job.trainCode,
     stops: job.stops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat })),
-    scenicSpots: matchScenicSpotsForRailway(job.coords),
+    unresolvedStops: job.unresolvedStops?.length ? job.unresolvedStops : undefined,
+    scenicSpots: jobScenicSpots(job),
   };
 }
 
@@ -276,7 +398,20 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
   // 0) 热门指纹缓存（含真实轨段的成功/部分结果）
   if (!opts?.onlyFailed) {
     const hot = getPreciseHotCache(job.trainCode, job.stops);
-    if (hot && hot.coords.length >= 2) {
+    // v3：热缓存回放前必须过站级硬门禁。缓存条目不携带 seams，
+    // 接缝处按段内阈值判（更严；误杀仅损失缓存收益，触发重算，不会放出坏线）。
+    const hotGate =
+      hot && hot.coords.length >= 2
+        ? validateStopsOnCoords(hot.coords, job.stops, { trainCode: job.trainCode })
+        : null;
+    if (hot && hotGate && !hotGate.ok) {
+      console.warn(
+        `[rail-job] hot cache rejected by strict gate: ${hotGate.reason}`,
+        hotGate.worstStop || '',
+        hotGate.worstKm != null ? Number(hotGate.worstKm).toFixed(1) : '',
+      );
+    }
+    if (hot && hot.coords.length >= 2 && hotGate?.ok) {
       if (job.abandoned) return;
       const okCount = Math.min(hot.segmentsOk, job.segmentsTotal);
       for (let i = 0; i < job.segmentsTotal; i++) {
@@ -302,64 +437,183 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
     }
   }
 
-  // 1) 先尝试精品走廊 / 路网拼接（整段精确，避免站间 OSM 部分失败）
-  if (!opts?.onlyFailed) {
-    try {
-      const corridorStops = job.stops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat }));
-      const single = matchCorridor(corridorStops, { trainCode: job.trainCode });
-      const sliced = single ? sliceCorridorForStops(single.corridor, corridorStops) : null;
-      if (sliced && sliced.length >= 2) {
-        if (job.abandoned) return;
-        for (let i = 0; i < job.segmentsTotal; i++) {
-          job.slots[i] = { coords: [], ok: true, reason: `corridor:${single!.corridor.id}` };
-        }
-        job.segmentsDone = job.segmentsTotal;
-        job.segmentsOk = job.segmentsTotal;
-        job.coords = sliced;
-        job.source = 'osm';
-        job.qualityTier = 'corridor';
-        job.status = 'done';
-        job.message = `真实轨道线（精品走廊 ${single!.corridor.name}）`;
-        job.updatedAt = Date.now();
-        finishJob(job);
-        return;
-      }
-      const networked = matchCorridorNetwork(corridorStops, { trainCode: job.trainCode });
-      if (networked?.coords && networked.coords.length >= 2) {
-        if (job.abandoned) return;
-        for (let i = 0; i < job.segmentsTotal; i++) {
-          job.slots[i] = {
-            coords: [],
-            ok: true,
-            reason: `network:${networked.corridorIds.join('+')}`,
-          };
-        }
-        job.segmentsDone = job.segmentsTotal;
-        job.segmentsOk = job.segmentsTotal;
-        job.coords = networked.coords;
-        job.source = 'osm';
-        job.qualityTier = 'network';
-        job.status = 'done';
-        job.message = `真实轨道线（精品路网 ${networked.corridorNames.join(' + ')}）`;
-        job.updatedAt = Date.now();
-        finishJob(job);
-        return;
-      }
-    } catch (e) {
-      console.warn('[rail-job] corridor shortcut failed', job.jobId, e);
-    }
-  }
-
   if (job.abandoned) return;
 
   const preferHs = isHighspeedTrain(job.trainCode);
-  const pending: number[] = [];
+
+  // 1) 拓扑优先（v3 P0-2：真·全图逐段，经停锚定在线；实测 K771 逐站投影 0.0km）。
+  //    旧顺序里走廊/路网短路在拓扑之前，宽松门禁（45km/55%/280km）会截胡拓扑，
+  //    放出偏离站坐标 9~112km 的坏拼线。现改为：拓扑全成功 → done；
+  //    部分成功 → 成功段写槽位，失败段先走廊按段兜底再逐段 OSM；
+  //    拓扑未启用/加载失败/抛错 → 保持原「走廊整段 → 贪心整趟 → 逐段」兜底链。
+  let topoPartialDone = false;
+  let greedyFallbackAllowed = false;
+  if (isTopologyEnabled()) {
+    if (loadTopology()) {
+      try {
+        const lineHitSet = collectLineNamesForStops(job.stops);
+        const routed = topoRouteStops(job.stops, { highspeed: preferHs, lineHitSet });
+        // 拓扑结果同样必须过站级硬门禁（实测 C650 拓扑绕路：折线 628km / 站序弦长 228km）
+        const wholeGate =
+          routed.failures.length === 0 && routed.coords.length >= 2
+            ? validateStopsOnCoords(routed.coords, job.stops, { trainCode: job.trainCode })
+            : null;
+        if (wholeGate?.ok) {
+          if (job.abandoned) return;
+          for (let i = 0; i < job.segmentsTotal; i++) {
+            job.slots[i] = { coords: [], ok: true, reason: 'topo' };
+          }
+          job.segmentsDone = job.segmentsTotal;
+          job.segmentsOk = job.segmentsTotal;
+          job.coords = routed.coords;
+          job.source = 'local';
+          job.qualityTier = 'local';
+          job.status = 'done';
+          job.message = '真实轨道线（全图拓扑逐段寻路）';
+          job.updatedAt = Date.now();
+          finishJob(job);
+          return;
+        }
+        if (wholeGate && !wholeGate.ok) {
+          // 整图绕路/折返/离线：丢弃全部拓扑段，走「整段走廊兜底 → 按段走廊 → 逐段 OSM」
+          console.warn(
+            `[rail-topology] whole result rejected by strict gate: ${wholeGate.reason}`,
+            wholeGate.worstStop || '',
+            wholeGate.worstKm != null ? Number(wholeGate.worstKm).toFixed(1) : '',
+            job.jobId,
+          );
+          greedyFallbackAllowed = true;
+        } else {
+          let okCount = 0;
+          for (let i = 0; i < routed.segResults.length && i < job.segmentsTotal; i++) {
+            const sr = routed.segResults[i];
+            if (!sr.ok) continue;
+            // 部分成功的拓扑段也要逐段过门禁（离线/跳变段不写槽，交走廊/OSM 重算）
+            const segGate = validateStopsOnCoords(
+              sr.coords as [number, number][],
+              [job.stops[i], job.stops[i + 1]],
+              { trainCode: job.trainCode, seams: [] },
+            );
+            if (!segGate.ok) continue;
+            job.slots[i] = {
+              coords: sr.coords.map(([lng, lat]) => ({ lng, lat })),
+              ok: true,
+              reason: 'topo',
+            };
+            okCount++;
+          }
+          if (okCount > 0) {
+            // 部分成功：成功段写槽位，失败段交给既有逐段流程（走廊切片/公网兜底）
+            topoPartialDone = true;
+            console.log(
+              `[rail-topology] partial ${okCount}/${job.segmentsTotal}, failures=${routed.failures.map((f) => f.reason).join(',')}`,
+              job.jobId,
+            );
+          }
+          // 全部段失败：不再执行老贪心整趟（防绕过逐段精度），直接落逐段流程
+        }
+      } catch (e) {
+        console.warn('[rail-topology] routeStops failed, fallback to greedy', job.jobId, e);
+        greedyFallbackAllowed = true;
+      }
+    } else {
+      console.warn('[rail-topology] load failed, fallback to greedy', job.jobId);
+      greedyFallbackAllowed = true;
+    }
+  } else {
+    greedyFallbackAllowed = true;
+  }
+
+  // 2) 拓扑不可用/整图被门禁拒绝时的整段精品走廊/路网短路（v3 P0-2：降为兜底，且必须过站级硬门禁）
+  if (greedyFallbackAllowed && !opts?.onlyFailed) {
+    const shortcut = tryCorridorShortcut(job.stops, job.trainCode);
+    if (shortcut && !job.abandoned) {
+      for (let i = 0; i < job.segmentsTotal; i++) {
+        job.slots[i] = { coords: [], ok: true, reason: shortcut.reason };
+      }
+      job.segmentsDone = job.segmentsTotal;
+      job.segmentsOk = job.segmentsTotal;
+      job.coords = shortcut.coords;
+      job.source = 'osm';
+      job.qualityTier = shortcut.tier;
+      job.status = 'done';
+      job.message = shortcut.message;
+      job.updatedAt = Date.now();
+      finishJob(job);
+      return;
+    }
+  }
+
+  // 3) 老贪心整趟兜底（仅拓扑未启用/加载失败/抛错时）——必须过 S1 质量门禁
+  if (greedyFallbackAllowed && !opts?.onlyFailed) {
+    try {
+      const odFrom = job.stops[0];
+      const odTo = job.stops[job.stops.length - 1];
+      const wholePath = findWholeTripLocalPath(odFrom, odTo, { highspeed: preferHs });
+      if (wholePath && wholePath.length >= 2) {
+        const gate = validateWholeTripPath(wholePath, job.stops, { trainCode: job.trainCode });
+        if (!gate.ok) {
+          console.warn(`[rail-job] whole-trip rejected: ${gate.stage} ${gate.detail || ''}`, job.jobId);
+        } else if (job.abandoned) {
+          return;
+        } else {
+          for (let i = 0; i < job.segmentsTotal; i++) {
+            job.slots[i] = { coords: [], ok: true, reason: 'local:whole' };
+          }
+          job.segmentsDone = job.segmentsTotal;
+          job.segmentsOk = job.segmentsTotal;
+          job.coords = wholePath.map((p) => [p.lng, p.lat] as [number, number]);
+          job.source = 'local';
+          job.qualityTier = 'local';
+          job.status = 'done';
+          job.message = '真实轨道线（本地图全局寻路）';
+          job.updatedAt = Date.now();
+          finishJob(job);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('[rail-job] whole-trip local path failed', job.jobId, e);
+    }
+  }
+
+  // 4) 拓扑部分成功/整图被拒：各失败段先尝试走廊「按段」切片（两站 OD + 硬门禁），
+  //    走廊也无的段再进入逐段 OSM worker。
+  const segCorridorFill =
+    topoPartialDone || (greedyFallbackAllowed && !opts?.onlyFailed);
+  let pending: number[] = [];
   for (let i = 0; i < job.segmentsTotal; i++) {
-    if (opts?.onlyFailed) {
+    if (opts?.onlyFailed || topoPartialDone) {
       if (!job.slots[i]?.ok) pending.push(i);
     } else {
       pending.push(i);
     }
+  }
+  if (segCorridorFill && pending.length && !job.abandoned) {
+    const rest: number[] = [];
+    let corridorFilled = 0;
+    for (const i of pending) {
+      if (job.abandoned) return;
+      const segShortcut = tryCorridorShortcut([job.stops[i], job.stops[i + 1]], job.trainCode);
+      if (segShortcut) {
+        job.slots[i] = {
+          coords: segShortcut.coords.map(([lng, lat]) => ({ lng, lat })),
+          ok: true,
+          reason: segShortcut.reason,
+        };
+        corridorFilled += 1;
+      } else {
+        rest.push(i);
+      }
+    }
+    if (corridorFilled > 0) {
+      console.log(
+        `[rail-job] topo partial: corridor filled ${corridorFilled}/${pending.length}`,
+        job.jobId,
+      );
+      refreshJobDerived(job);
+    }
+    pending = rest;
   }
 
   let next = 0;
@@ -402,7 +656,7 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
 
   // 超时：不再补缝 / 整趟 Overpass，直接友好收尾
   if (jobTimedOut(job)) {
-    console.warn('[rail-job] deadline after segments', job.jobId, `${jobMaxMs()}ms`);
+    console.warn('[rail-job] deadline after segments', job.jobId, `${jobMaxMs(job)}ms`);
     // 未写完的槽位按示意失败占位，保证 segmentsDone 完整
     for (let i = 0; i < job.segmentsTotal; i++) {
       if (job.slots[i] == null) {
@@ -438,9 +692,9 @@ async function runJob(job: RailJob, opts?: { onlyFailed?: boolean }) {
   // 仍有缺口：短途才整 OD Overpass（长途如广州南→南京南会拖死）
   if (job.segmentsOk < job.segmentsTotal) {
     const longTrip = job.segmentsTotal >= 8 || job.stops.length >= 10;
-    if (longTrip) {
+    if (longTrip || overpassTracker.isLocalOnly()) {
       console.log(
-        `[rail-job] skip whole-trip Overpass (long trip segs=${job.segmentsTotal})`,
+        `[rail-job] skip whole-trip Overpass (long trip segs=${job.segmentsTotal} localOnly=${overpassTracker.isLocalOnly()})`,
         job.jobId,
       );
     } else {
@@ -599,6 +853,8 @@ export function createRailGeometryJob(params: {
   stops: Array<{ name?: string; lng: number; lat: number }>;
   trainCode?: string;
   clientKey: string;
+  /** B4：未能定位坐标的经停站名（明确记录，不静默丢弃） */
+  unresolvedStops?: string[];
   /** 仅重算上一趟失败段，保留已成功的精确段 */
   retryFailedOnly?: boolean;
 }): RailJobSnapshot {
@@ -689,6 +945,7 @@ export function createRailGeometryJob(params: {
     qualityTier: seedCoords ? seedTier : 'station',
     trainCode: params.trainCode,
     stops,
+    unresolvedStops: params.unresolvedStops || [],
     slots,
     clientKey: params.clientKey,
     stopsFp: fp,
@@ -707,4 +964,15 @@ export function getRailGeometryJob(jobId: string): RailJobSnapshot | null {
   pruneJobs();
   const job = jobs.get(jobId);
   return job ? snapshot(job) : null;
+}
+
+/**
+ * U1：前端「取消」时显式废弃任务——停止后续真实计算、释放排队位、
+ * 不再写热缓存，并让仍在等待的 worker 尽快退出。
+ */
+export function abandonRailGeometryJob(jobId: string): boolean {
+  const job = jobs.get(jobId);
+  if (!job) return false;
+  abandonJob(job);
+  return true;
 }

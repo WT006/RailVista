@@ -32,9 +32,21 @@ importers:
 
   apps/web:
     dependencies:
+      '@fontsource/outfit':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/space-grotesk':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@formkit/auto-animate':
+        specifier: ^0.10.0
+        version: 0.10.0
       '@railvista/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      lucide-vue-next:
+        specifier: ^1.0.0
+        version: 1.0.0(vue@3.5.42(typescript@5.9.3))
       pinia:
         specifier: ^3.0.1
         version: 3.0.4(typescript@5.9.3)(vue@3.5.42(typescript@5.9.3))
@@ -398,6 +410,15 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@fontsource/outfit@5.3.0':
+    resolution: {integrity: sha512-0AVHzTTVJSxWDOxPKSfMeHhZeBFDU3cmgrcOb76ZEyhGo0+xgyG3GsLF3h9+X8w0IX7G4jzjJgFQEBiWdX6VgA==}
+
+  '@fontsource/space-grotesk@5.3.0':
+    resolution: {integrity: sha512-ksnGizDPXIDuvqcTYTSrmZ+evx9sDlS8rp7+42BQ7wU+spt3twEoXfbJz672C+5CLg6VeUQwRy5RXshWb67LcQ==}
+
+  '@formkit/auto-animate@0.10.0':
+    resolution: {integrity: sha512-KGomRttjUfORuPUaR/ZGQw+6xfMrTM+sxnILv7JAd9AmabU9rg9i6gF/iC0Ih+QpKCubJpCA/1DX9UHKE8cX+A==}
+
   '@hono/node-server@1.19.17':
     resolution: {integrity: sha512-dSneS5qhiauZWGDCeK4o695Xd9nUNjviSZCMQrj10eetr8Uln1ucn6bbphOM6UynAMMtNIzZNSpL9vnASJwrPQ==}
     engines: {node: '>=18.14.1'}
@@ -687,6 +708,12 @@ packages:
 
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
+
+  lucide-vue-next@1.0.0:
+    resolution: {integrity: sha512-V6SPvx1IHTj/UY+FrIYWV5faISsPSb8BnWSFDxAtezWKvWc9ZZ40PDrdu1/Qb5vg4lHWr1hs1BAMGVGm6V1Xdg==}
+    deprecated: Package deprecated. Please use @lucide/vue instead.
+    peerDependencies:
+      vue: '>=3.0.1'
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -1002,6 +1029,12 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
+  '@fontsource/outfit@5.3.0': {}
+
+  '@fontsource/space-grotesk@5.3.0': {}
+
+  '@formkit/auto-animate@0.10.0': {}
+
   '@hono/node-server@1.19.17(hono@4.13.7)':
     dependencies:
       hono: 4.13.7
@@ -1291,6 +1324,10 @@ snapshots:
   hono@4.13.7: {}
 
   hookable@5.5.3: {}
+
+  lucide-vue-next@1.0.0(vue@3.5.42(typescript@5.9.3)):
+    dependencies:
+      vue: 3.5.42(typescript@5.9.3)
 
   magic-string@0.30.21:
     dependencies:

@@ -1,0 +1,91 @@
+:root {
+  /* —— 中性表面（暖调墨黑，按高度递增）—— */
+  --bg-base:     #0d0f0e;
+  --bg-raised:   #151817;
+  --bg-elevated: #1c201e;
+  --bg-inset:    #101312;
+  --bg-scrim:    rgba(5, 7, 6, 0.66);
+
+  /* —— 分隔线 —— */
+  --border-hairline: rgba(255, 255, 255, 0.07);
+  --border-default:  rgba(255, 255, 255, 0.10);
+  --border-strong:   rgba(255, 255, 255, 0.16);
+
+  /* —— 文本 —— */
+  --text-primary:   #eceeec;
+  --text-secondary: #a9afa9;
+  --text-muted:     #71786f;
+  --text-on-accent: #1c1506;
+
+  /* —— 品牌强调色（信号金 / 藏红花）—— */
+  --accent:            #e4b25c;
+  --accent-hover:      #efc577;
+  --accent-press:      #cd9a47;
+  --accent-container:  rgba(228, 178, 92, 0.14);
+  --accent-border:     rgba(228, 178, 92, 0.38);
+
+  /* —— 语义色（统一降饱和）—— */
+  --success: #79c587;  --success-container: rgba(121, 197, 135, 0.14);
+  --spot:    #de8a50;
+  --station: #e2c463;
+  --train:   #74bd89;
+  --info:    #83b4c4;
+  --warning: #dfb357;
+  --danger:  #d9826b;  --danger-container: rgba(217, 130, 107, 0.14);
+
+  /* —— 字体 —— */
+  --font-sans: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  /* —— 字号 / 行高 —— */
+  --text-display: clamp(1.6rem, 1.2rem + 2vw, 2.2rem);
+  --text-h1: clamp(1.4rem, 1.1rem + 1.4vw, 1.9rem);
+  --text-h2: 1.0625rem;
+  --text-h3: 0.875rem;
+  --text-body: 0.9375rem;
+  --text-sm: 0.8125rem;
+  --text-caption: 0.6875rem;
+  --text-code: 1.125rem;
+
+  /* —— 间距（4pt 基准）—— */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+  --space-14: 56px; --space-18: 72px; --space-24: 96px;
+
+  /* —— 圆角 —— */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 999px;
+
+  /* —— 阴影 —— */
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --elev-2: 0 6px 16px rgba(0, 0, 0, 0.28);
+  --elev-3: 0 16px 40px rgba(0, 0, 0, 0.38);
+  --elev-4: 0 28px 72px rgba(0, 0, 0, 0.50);
+  --inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  /* —— 动效时长 —— */
+  --dur-micro: 120ms;
+  --dur-fast:  180ms;
+  --dur-base:  240ms;
+  --dur-slow:  360ms;
+  --dur-slower: 520ms;
+  --dur-enter: 720ms;
+
+  /* —— 缓动曲线 —— */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -3,23 +3,35 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
   buildRailwayMetrics,
+  buildMileageAxis,
+  buildScheduleCurve,
   computeCalibrationOffset,
+  estimateSpotEtas,
   formatDepartBadge,
   formatOffsetLabel,
   formatSpotTimeLabel,
   formatStationSchedule,
   formatTime,
+  geoSigmaFor,
   getCalibratableStations,
   getStationAnchorTime,
   getUpcoming,
   isNearScheduledArrival,
+  isNightAt,
   pointAtProgress,
+  profileForTrain,
   resolveProgress,
   resolveSchedule,
   shiftDate,
   toDatetimeLocalValue,
   fromDatetimeLocalValue,
+  approachWindow,
+  honorLabels,
+  withinApproach,
   type CalibrationRecord,
+  type ScenicSpot,
+  type SpotEta,
+  type SpotSide,
   type Stop,
 } from '@railvista/shared';
 import { api } from '../api/client';
@@ -34,8 +46,12 @@ import {
 import { loadAmap } from '../map/amap';
 import { readSimulatedProgress, useGeolocation, useNow } from '../composables/useGeolocation';
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
+import PreciseRoutePanel from '../components/PreciseRoutePanel.vue';
+import SideBadge from '../components/SideBadge.vue';
+import SpotApproachCard from '../components/SpotApproachCard.vue';
 import { usePrefsStore } from '../stores/prefsStore';
 import { useTripStore } from '../stores/tripStore';
+import { useSmoothMarker } from '../composables/useSmoothMarker';
 
 const route = useRoute();
 const router = useRouter();
@@ -49,6 +65,8 @@ const error = ref('');
 const compact = ref(false);
 const progress = ref(0);
 const mode = ref('时刻表估算');
+const stationKmRef = ref<number[]>([]);
+const etasRef = ref<SpotEta[]>([]);
 const legendOpen = ref(false);
 const calibrateOpen = ref(false);
 const STATUS_COLLAPSE_KEY = 'railvista:map:statusCollapsed';
@@ -86,9 +104,15 @@ let roadNetLayer: any;
 let railLine: any;
 let trainMarker: any;
 let gpsMarker: any;
+const trainTarget = ref<[number, number] | null>(null);
+const gpsTarget = ref<[number, number] | null>(null);
 let spotMarkers: any[] = [];
 let stationMarkers: any[] = [];
+/** P0-4：无坐标经停的灰色空心占位标记（位置为前后站间近似插值） */
+let unresolvedMarkers: any[] = [];
 let pathMetrics = { path: [] as ReturnType<typeof buildRailwayMetrics>['path'], lengthKm: 0 };
+/** pathMetrics 不是响应式对象，单独用 ref 暴露里程给精度面板 */
+const railLengthKm = ref(0);
 
 const segment = computed(() => trip.segment);
 const resumeKeyNow = ref<string | null>(getAutoResumeTripKey());
@@ -103,39 +127,43 @@ const schedule = computed(() => {
   return resolveSchedule(seg.baseDepartureIso, seg.baseArrivalIso, prefs.departureIso);
 });
 
-const showPreciseAction = computed(() => {
-  if (trip.preciseLoading) return true;
-  if (trip.canUpgradePrecise) return true;
-  const st = trip.preciseJob?.status;
-  return st === 'partial' || st === 'failed';
+/** 列车当前里程（沿本次行程折线），用于临近景点判定 */
+const currentKm = computed(() => progress.value * pathMetrics.lengthKm);
+
+/**
+ * 当前处于「临近窗口」内的景点：进入点前 5km 起提示，过境 2km 后淡出（§4.3）。
+ * 多个同时命中时取最先到达的那个。
+ */
+const approachingSpot = computed<ScenicSpot | null>(() => {
+  if (!prefs.layers.spot) return null;
+  const list = trip.scenicSpots;
+  if (!list?.length) return null;
+  const km = currentKm.value;
+  for (const s of list) {
+    const enterKm = s.progressKm ?? 0;
+    if (withinApproach(approachWindow({ alongKm: enterKm }), km)) return s;
+  }
+  return null;
 });
 
-const preciseActionLabel = computed(() => {
-  const job = trip.preciseJob;
-  const ok = job?.segmentsOk ?? 0;
-  const total = job?.segmentsTotal ?? 0;
-  const ratio = total > 0 ? `${ok}/${total}` : '';
+/** 图例用：左右侧含义说明 */
+const SIDE_LEGEND: Array<{ side: SpotSide; text: string }> = [
+  { side: 'left', text: '列车左侧' },
+  { side: 'right', text: '列车右侧' },
+  { side: 'both', text: '两侧均可' },
+];
 
-  if (trip.preciseLoading && job) {
-    const msg = (job.message || '').trim();
-    if (msg && !/^加载中\s+\d+\/\d+/.test(msg)) {
-      return msg.endsWith('…') || msg.endsWith('...') ? msg : `${msg}…`;
-    }
-    return `加载中 ${job.segmentsDone}/${job.segmentsTotal}…`;
-  }
-  if (trip.preciseLoading) return '加载中…';
-  if (job?.status === 'partial') {
-    if (ok > 0 && total > 0) {
-      return `部分精确 ${ratio} · 重试缺口`;
-    }
-    return '重试精确路线';
-  }
-  if (job?.status === 'failed') {
-    if (ok > 0 && total > 0) return `已保留 ${ratio} · 重试`;
-    return '重试精确路线';
-  }
-  return '获取精确路线';
-});
+/**
+ * 地图标记**不按左右分色**（颜色统一），左右侧只在点开详情后展示，
+ * 避免在地图上铺开一片难辨含义的多色点阵。
+ * 唯一例外：`unknown` 用虚线空心 —— 那表示「方位待人工复核」的数据问题，
+ * 语义上属于数据质量提示，不是方位表达。
+ */
+function spotSideKey(spot: ScenicSpot): SpotSide {
+  if (spot.sideNeedsReview) return 'unknown';
+  const s = spot.sideRuntime ?? spot.side;
+  return s && s !== 'unknown' ? s : 'unknown';
+}
 
 /** 定位文案拆成主状态 + 括号备注，避免挤在一行难读 */
 const modeParts = computed(() => {
@@ -285,11 +313,46 @@ function getMapPadding() {
   return [top, side, bottom, side];
 }
 
+function formatEtaLabel(eta: SpotEta, departure: Date): string {
+  if (!eta.etaIso) return '—';
+  const etaDate = new Date(eta.etaIso);
+  const etaTime = formatTime(etaDate);
+  const isNextDay = etaDate.getDate() !== departure.getDate();
+  const prefix = isNextDay ? '次日 ' : '';
+  const sigma = eta.sigmaMin != null ? ` ±${Math.round(eta.sigmaMin)} 分钟` : '';
+  const conf = eta.confidence ? ` [${eta.confidence === 'high' ? '高' : eta.confidence === 'mid' ? '中' : '低'}]` : '';
+  const basisLabel = basisDescription(eta.basis);
+  return `${prefix}${etaTime}${sigma}${conf} · 依据：${basisLabel}`;
+}
+
+function basisDescription(basis: SpotEta['basis']): string {
+  switch (basis) {
+    case 'schedule': return '时刻表';
+    case 'gps': return 'GPS 实测';
+    case 'calibrated': return '已校准';
+    case 'mixed': return 'GPS 实测 + 时刻表';
+    default: return '时刻表';
+  }
+}
+
+function spotNight(spot: ScenicSpot, eta: SpotEta | undefined): boolean {
+  if (eta?.etaIso) {
+    return isNightAt({ lng: spot.lng, lat: spot.lat, isoTime: eta.etaIso, nightOnly: spot.nightOnly });
+  }
+  return spot.nightOnly ?? false;
+}
+
 function tick() {
   const seg = segment.value;
   const sch = schedule.value;
   if (!seg || !sch) return;
   const forceSchedule = pathMetrics.path.length < 2;
+  const mileage = buildMileageAxis({
+    stops: seg.stops,
+    path: pathMetrics.path,
+    lengthKm: pathMetrics.lengthKm,
+  });
+  stationKmRef.value = mileage.stationKm;
   const result = resolveProgress({
     now: now.value,
     departure: sch.departure,
@@ -302,17 +365,33 @@ function tick() {
     lengthKm: pathMetrics.lengthKm,
     simulatedProgress: readSimulatedProgress(),
     forceSchedule,
+    stationKm: mileage.stationKm,
+    railwaySource: 'station',
   });
   progress.value = result.progress;
   mode.value = result.mode;
+
+  try {
+    const prof = profileForTrain(seg.trainCode);
+    const curve = buildScheduleCurve({ stops: seg.stops, stationKm: mileage.stationKm, prof });
+    etasRef.value = estimateSpotEtas({
+      curve,
+      spots: trip.scenicSpots,
+      now: now.value.getTime(),
+      prof,
+      geoSigma: geoSigmaFor('station', 0),
+    });
+  } catch {
+    etasRef.value = [];
+  }
   const point = pointAtProgress(pathMetrics.path, pathMetrics.lengthKm, result.progress);
-  if (trainMarker) trainMarker.setPosition([point.lng, point.lat]);
+  if (trainMarker) trainTarget.value = [point.lng, point.lat];
   if (gpsMarker) {
     const g = gps.value;
     const stale = !gpsAvailable.value || !g || Date.now() - g.timestamp > 120000;
     if (stale || !prefs.layers.gps) gpsMarker.hide();
     else {
-      gpsMarker.setPosition([g!.lng, g!.lat]);
+      gpsTarget.value = [g!.lng, g!.lat];
       gpsMarker.show();
     }
   }
@@ -333,9 +412,13 @@ const upcoming = computed(() => {
     stops: seg.stops,
     path: pathMetrics.path,
     lengthKm: pathMetrics.lengthKm,
+    etas: etasRef.value,
   });
   const spot = trip.scenicSpots.find((s) => s.name === u.name);
-  const timeLabel = spot?.at
+  const eta = etasRef.value.find((e) => e.spotId === String(spot?.id));
+  const timeLabel = eta?.etaIso
+    ? formatEtaLabel(eta, sch.departure)
+    : spot?.at
     ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
     : u.timeLabel;
   return { ...u, timeLabel };
@@ -391,13 +474,60 @@ function applyLayers() {
   if (railLine) prefs.layers.rail ? railLine.show() : railLine.hide();
   spotMarkers.forEach((m) => (prefs.layers.spot ? m.show() : m.hide()));
   stationMarkers.forEach((m) => (prefs.layers.station ? m.show() : m.hide()));
+  unresolvedMarkers.forEach((m) => (prefs.layers.station ? m.show() : m.hide()));
   if (trainMarker) prefs.layers.train ? trainMarker.show() : trainMarker.hide();
+}
+
+/**
+ * P0-4：无真实坐标的经停站不允许凭空消失。在前后最近两个有坐标站之间按站序
+ * 线性插值，并向弦的法向偏移约 5km，避免占位圈与蓝线/真实站标重叠。
+ */
+function placeholderPosition(stops: Stop[], idx: number): [number, number] | null {
+  let p = idx - 1;
+  while (p >= 0 && (stops[p].lng == null || stops[p].lat == null)) p -= 1;
+  let n = idx + 1;
+  while (n < stops.length && (stops[n].lng == null || stops[n].lat == null)) n += 1;
+  if (p < 0 || n >= stops.length) return null;
+  const a = stops[p];
+  const b = stops[n];
+  const f = (idx - p) / (n - p);
+  const lng = a.lng! + (b.lng! - a.lng!) * f;
+  const lat = a.lat! + (b.lat! - a.lat!) * f;
+  const dx = b.lng! - a.lng!;
+  const dy = b.lat! - a.lat!;
+  const len = Math.hypot(dx, dy) || 1;
+  // 法向偏移：经度 0.05°（35°N 约 4.5km）、纬度 0.045°（约 5km）
+  return [lng + (-dy / len) * 0.05, lat + (dx / len) * 0.045];
+}
+
+function rebuildUnresolvedMarkers() {
+  const seg = segment.value;
+  if (!map || !AMapRef || !seg) return;
+  unresolvedMarkers.forEach((m) => map.remove(m));
+  unresolvedMarkers = [];
+  const unresolvedNames = new Set(trip.unresolvedStops);
+  seg.stops.forEach((s, i) => {
+    if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) return;
+    // 仅渲染服务端明确标注未解析的站；服务端走廊 hint 兜底补到坐标后自动消失
+    if (unresolvedNames.size && !unresolvedNames.has(s.name)) return;
+    const pos = placeholderPosition(seg.stops, i);
+    if (!pos) return;
+    const marker = new AMapRef.Marker({
+      position: pos,
+      title: `${s.name}（坐标待补，当前为近似占位）`,
+      content: `<div class="station-marker station-marker--unresolved${compact.value ? ' station-marker--compact' : ''}"><span class="station-dot station-dot--unresolved"></span><span class="station-label">${escHtml(s.name)}<em class="station-label__pending">坐标待补</em></span></div>`,
+      anchor: 'center',
+      zIndex: 140,
+    });
+    if (prefs.layers.station) map.add(marker);
+    unresolvedMarkers.push(marker);
+  });
 }
 
 function railStrokeOptions() {
   return satelliteOn.value
-    ? { strokeColor: '#67e8f9', strokeOpacity: 0.95 }
-    : { strokeColor: '#38bdf8', strokeOpacity: 0.85 };
+    ? { strokeColor: '#efc577', strokeOpacity: 0.95 }
+    : { strokeColor: '#e4b25c', strokeOpacity: 0.85 };
 }
 
 function applySatelliteLayers() {
@@ -425,6 +555,127 @@ function toggleSatellite() {
   applySatelliteLayers();
 }
 
+/**
+ * 景点标记工厂：单个景点 → Marker（含点开后的详情气泡）。
+ * 抽成函数是为了 B1：折线升级为精准路线后能整体重建标记层。
+ */
+function buildSpotMarker(spot: ScenicSpot, idx: number) {
+  const AMap = AMapRef;
+  // 只有「方位待确认」才换样式，左/右/两侧均使用统一的景点色
+  const reviewStyle = spotSideKey(spot) === 'unknown' ? ' spot-marker--unknown' : '';
+  const marker = new AMap.Marker({
+    position: [spot.lng, spot.lat],
+    title: spot.name,
+    anchor: 'bottom-center',
+    content: `<div class="spot-marker${reviewStyle}${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
+  });
+  marker.on('click', () => {
+    const visLabel =
+      spot.visibility === 'distant'
+        ? '远眺'
+        : spot.visibility === 'on_track'
+          ? '穿行'
+          : spot.visibility === 'window'
+            ? '窗外'
+            : '';
+    const visClass =
+      spot.visibility === 'distant' || spot.visibility === 'on_track' || spot.visibility === 'window'
+        ? spot.visibility
+        : '';
+    const eta = etasRef.value.find((e) => e.spotId === String(spot.id));
+    const sch = schedule.value;
+    const timeLabel = eta?.etaIso && sch
+      ? formatEtaLabel(eta, sch.departure)
+      : spot.at
+        ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
+        : spot.timeLabel || '';
+    const isNight = spotNight(spot, eta);
+    const isDegraded = eta?.basis === 'schedule' && eta?.confidence === 'low';
+    const sideBadgeHtml = (() => {
+      const key = spotSideKey(spot);
+      const text =
+        key === 'left'
+          ? '列车左侧'
+          : key === 'right'
+            ? '列车右侧'
+            : key === 'both'
+              ? '两侧均可'
+              : '方位待确认';
+      const arrow = key === 'left' ? '←' : key === 'right' ? '→' : key === 'both' ? '↔' : '?';
+      return `<span class="map-info-card__badge map-info-card__badge--side map-info-card__badge--side-${key}">${arrow} ${text}</span>`;
+    })();
+    const honors = honorLabels(spot.honors);
+    const honorHtml = honors.length
+      ? `<div class="map-info-card__honors">${honors
+          .slice(0, 4)
+          .map((h) => `<span class="map-info-card__honor">${escHtml(h)}</span>`)
+          .join('')}${honors.length > 4 ? `<span class="map-info-card__honor map-info-card__honor--more">+${honors.length - 4}</span>` : ''}</div>`
+      : '';
+    const badges = [
+      sideBadgeHtml,
+      visLabel && visClass
+        ? `<span class="map-info-card__badge map-info-card__badge--${visClass}">${escHtml(visLabel)}</span>`
+        : '',
+      isNight ? `<span class="map-info-card__badge map-info-card__badge--night">夜间 🌙</span>` : '',
+      isDegraded ? `<span class="map-info-card__badge map-info-card__badge--degraded">按时刻表推算</span>` : '',
+      timeLabel
+        ? `<span class="map-info-card__badge map-info-card__badge--time">${escHtml(timeLabel)}</span>`
+        : '',
+      spot.sideConfidence === 'low'
+        ? `<span class="map-info-card__badge map-info-card__badge--lowSide">低置信度</span>`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('');
+    const info = new AMap.InfoWindow({
+      isCustom: true,
+      autoMove: true,
+      closeWhenClickMap: true,
+      content: `<div class="map-info-card">
+          <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
+          <div class="map-info-card__title">${escHtml(spot.name)}</div>
+          ${badges ? `<div class="map-info-card__meta">${badges}</div>` : ''}
+          ${honorHtml}
+          ${spot.intro ? `<p class="map-info-card__intro">${escHtml(spot.intro)}</p>` : ''}
+          <div class="map-info-card__arrow" aria-hidden="true"></div>
+        </div>`,
+      offset: new AMap.Pixel(0, -34),
+    });
+    info.open(map, marker.getPosition());
+  });
+  return marker;
+}
+
+/**
+ * B1 [P0] 重建整层景点标记。
+ * 旧实现只在 initMap() 里建一次且没有监听，导致「折线刷新了、景点还是示意线那一组」。
+ * 这里采用与 rebuildUnresolvedMarkers 一致的整体重建策略：稳健、无残留。
+ */
+function rebuildSpotMarkers() {
+  if (!map || !AMapRef) return;
+  // 重建前关掉已打开的气泡，避免它停在已失效的位置
+  try {
+    map.clearInfoWindow?.();
+  } catch {
+    /* ignore */
+  }
+  for (const m of spotMarkers) {
+    try {
+      map.remove(m);
+    } catch {
+      /* ignore */
+    }
+  }
+  spotMarkers = [];
+  trip.scenicSpots.forEach((spot, idx) => {
+    if (!Number.isFinite(spot.lng) || !Number.isFinite(spot.lat)) return;
+    const marker = buildSpotMarker(spot, idx);
+    map.add(marker);
+    if (!prefs.layers.spot) marker.hide();
+    spotMarkers.push(marker);
+  });
+}
+
 async function initMap() {
   const key = import.meta.env.VITE_AMAP_KEY;
   if (!key) {
@@ -441,6 +692,7 @@ async function initMap() {
           .filter((s) => s.lng != null && s.lat != null)
           .map((s) => [s.lng!, s.lat!] as [number, number]);
   pathMetrics = buildRailwayMetrics(coords);
+  railLengthKm.value = pathMetrics.lengthKm;
   compact.value = window.matchMedia('(max-width: 640px)').matches;
 
   if (coords.length < 2) {
@@ -453,7 +705,7 @@ async function initMap() {
     zoom: 5,
     center: coords[0] || [104, 35],
     viewMode: '2D',
-    mapStyle: 'amap://styles/grey',
+    mapStyle: 'amap://styles/dark',
   });
 
   if (coords.length >= 2) {
@@ -466,60 +718,7 @@ async function initMap() {
     map.add(railLine);
   }
 
-  spotMarkers = trip.scenicSpots.map((spot, idx) => {
-    const marker = new AMap.Marker({
-      position: [spot.lng, spot.lat],
-      title: spot.name,
-      anchor: 'bottom-center',
-      content: `<div class="spot-marker${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
-    });
-    marker.on('click', () => {
-      const visLabel =
-        spot.visibility === 'distant'
-          ? '远眺'
-          : spot.visibility === 'on_track'
-            ? '穿行'
-            : spot.visibility === 'window'
-              ? '窗外'
-              : '';
-      const visClass =
-        spot.visibility === 'distant' || spot.visibility === 'on_track' || spot.visibility === 'window'
-          ? spot.visibility
-          : '';
-      const timeLabel = spot.at
-        ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
-        : spot.timeLabel || '';
-      const badges = [
-        visLabel && visClass
-          ? `<span class="map-info-card__badge map-info-card__badge--${visClass}">${escHtml(visLabel)}</span>`
-          : '',
-        spot.nightOnly
-          ? `<span class="map-info-card__badge map-info-card__badge--night">夜间</span>`
-          : '',
-        timeLabel
-          ? `<span class="map-info-card__badge map-info-card__badge--time">${escHtml(timeLabel)}</span>`
-          : '',
-      ]
-        .filter(Boolean)
-        .join('');
-      const info = new AMap.InfoWindow({
-        isCustom: true,
-        autoMove: true,
-        closeWhenClickMap: true,
-        content: `<div class="map-info-card">
-          <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
-          <div class="map-info-card__title">${escHtml(spot.name)}</div>
-          ${badges ? `<div class="map-info-card__meta">${badges}</div>` : ''}
-          ${spot.intro ? `<p class="map-info-card__intro">${escHtml(spot.intro)}</p>` : ''}
-          <div class="map-info-card__arrow" aria-hidden="true"></div>
-        </div>`,
-        offset: new AMap.Pixel(0, -34),
-      });
-      info.open(map, marker.getPosition());
-    });
-    map.add(marker);
-    return marker;
-  });
+  rebuildSpotMarkers();
 
   stationMarkers = seg.stops.map((s) => {
     const marker = new AMap.Marker({
@@ -555,6 +754,9 @@ async function initMap() {
     return marker;
   });
 
+  // P0-4：缺坐标经停的灰色占位（applyLayers 会统一控制显隐）
+  rebuildUnresolvedMarkers();
+
   trainMarker = new AMap.Marker({
     position: coords[0] || [104, 35],
     content: `<div class="train-marker-wrap"><div class="train-marker${compact.value ? ' train-marker--compact' : ''}"></div><span class="train-marker-label">列车</span></div>`,
@@ -571,6 +773,11 @@ async function initMap() {
   });
   map.add(gpsMarker);
   gpsMarker.hide();
+
+  trainTarget.value = (coords[0] as [number, number]) || [104, 35];
+  gpsTarget.value = trainTarget.value;
+  useSmoothMarker(trainTarget, (p) => trainMarker?.setPosition(p), 0.12);
+  useSmoothMarker(gpsTarget, (p) => gpsMarker?.setPosition(p), 0.18);
 
   map.getContainer().addEventListener('click', (event: MouseEvent) => {
     const t = event.target as HTMLElement;
@@ -700,6 +907,7 @@ function refreshRailLine() {
   if (coords.length < 2) return;
   railLine.setPath(coords);
   pathMetrics = buildRailwayMetrics(coords);
+  railLengthKm.value = pathMetrics.lengthKm;
   tick();
 }
 
@@ -720,23 +928,35 @@ function refreshStationMarkers() {
       if (!prefs.layers.station) marker.hide();
     }
   });
+  // 服务端补坐标 / unresolved 清单变化时，重建灰色占位标记
+  rebuildUnresolvedMarkers();
 }
 
-async function onUpgradePrecise() {
-  await trip.upgradePrecise();
+/**
+ * U1 面板操作（获取 / 重试 / 取消）结束后同步地图：折线 + 景点标记 + 视野 + 结果提示。
+ * 终态才提示，避免进行中的每次刷新都弹 toast。
+ */
+function onPreciseRefresh() {
   refreshStationMarkers();
   refreshRailLine();
+  rebuildSpotMarkers();
   if (trip.railwayCoords.length >= 2) {
     map?.setFitView(null, false, getMapPadding());
   }
-  if (trip.preciseError) showToast(trip.preciseError);
-  else if (trip.preciseJob?.status === 'done') {
-    const tier = trip.preciseJob.qualityTier;
+  const st = trip.preciseJob?.status;
+  if (trip.preciseError) {
+    showToast(trip.preciseError);
+    return;
+  }
+  if (st === 'done') {
+    const tier = trip.preciseJob?.qualityTier;
     if (tier === 'soft') showToast('近似轨道已加载（跨站补缝）');
     else if (tier === 'corridor' || tier === 'network') showToast('精品精确路线已加载');
     else if (tier === 'local') showToast('本地轨网路线已加载');
     else showToast('精确路线已加载');
-  } else if (trip.preciseJob?.status === 'partial') showToast(trip.preciseJob.message);
+  } else if (st === 'partial') {
+    showToast(trip.preciseJob?.message || '部分精确，缺口为示意');
+  }
 }
 
 function onPageHidePersist() {
@@ -775,10 +995,31 @@ watch(
   { deep: true },
 );
 
+/**
+ * B1 景点签名：成员/顺序/方位/里程任一变化即重建标记层。
+ * 用 id 为主键，避免每次轮询都整体重建（轮询只改 coords，不改景点集合）。
+ */
+watch(
+  () =>
+    trip.scenicSpots
+      .map((s) => `${s.id}:${s.sideRuntime ?? s.side ?? ''}:${Math.round(s.progressKm ?? 0)}`)
+      .join('|'),
+  () => {
+    rebuildSpotMarkers();
+  },
+);
+
 watch(
   () => segment.value?.stops.map((s) => `${s.name}:${s.lng},${s.lat}`).join('|'),
   () => {
     refreshStationMarkers();
+  },
+);
+
+watch(
+  () => trip.unresolvedStops.join('|'),
+  () => {
+    rebuildUnresolvedMarkers();
   },
 );
 
@@ -847,10 +1088,11 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <template v-if="!statusCollapsed">
+            <Transition name="status-expand">
+              <div v-if="!statusCollapsed" class="status-body">
               <div class="status-progress" :aria-label="`行程进度 ${progressPct}%`">
                 <div class="status-progress__track">
-                  <div class="status-progress__bar" :style="{ width: `${progressPct}%` }" />
+                  <div class="status-progress__bar" :style="{ transform: `scaleX(${progress})` }" />
                 </div>
                 <span class="status-progress__pct">{{ progressPct }}%</span>
               </div>
@@ -876,18 +1118,17 @@ onUnmounted(() => {
                 </button>
               </div>
 
-              <div v-if="showPreciseAction" class="status-actions">
-                <button
-                  type="button"
-                  class="rail-upgrade-btn"
-                  :disabled="trip.preciseLoading"
-                  @click="onUpgradePrecise"
-                >
-                  {{ preciseActionLabel }}
-                </button>
+              <PreciseRoutePanel
+                :length-km="railLengthKm"
+                :spot-count="trip.scenicSpots.length"
+                :compact="compact"
+                @refresh="onPreciseRefresh"
+              />
+              <p v-if="trip.unresolvedStops.length" class="rail-unresolved-hint">
+                {{ trip.unresolvedStops.join('、') }} 坐标待补，地图上为灰色近似占位
+              </p>
               </div>
-              <p v-if="trip.preciseError" class="rail-upgrade-error">{{ trip.preciseError }}</p>
-            </template>
+            </Transition>
           </div>
 
           <div v-if="calibrateOpen && !statusCollapsed" class="calibrate-popover">
@@ -950,7 +1191,22 @@ onUnmounted(() => {
             ]
           }}
         </button>
+        <div v-if="legendOpen" class="legend-side">
+          <span class="legend-side__title">车窗方位徽标（点开景点可见）</span>
+          <SideBadge v-for="item in SIDE_LEGEND" :key="item.side" :side="item.side" compact />
+          <SideBadge side="unknown" compact />
+          <span class="legend-side__note">
+            按本次车次行进方向判定；地图上的虚线空心点 = 方位待人工复核
+          </span>
+        </div>
       </div>
+
+      <SpotApproachCard
+        v-if="approachingSpot"
+        :spot="approachingSpot"
+        :current-km="currentKm"
+        :compact="compact"
+      />
 
       <footer class="bottom-panel">
         <section class="location-card">
@@ -972,7 +1228,7 @@ onUnmounted(() => {
             <template v-if="upcoming?.timeLabel">计划 {{ upcoming.timeLabel }} · </template>
             {{ upcoming?.reason }}
           </div>
-          <div class="progress-track"><div class="progress-bar" :style="{ width: `${progress * 100}%` }" /></div>
+          <div class="progress-track"><div class="progress-bar" :style="{ transform: `scaleX(${progress})` }" /></div>
         </section>
       </footer>
     </template>

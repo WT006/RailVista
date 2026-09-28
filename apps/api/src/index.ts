@@ -6,8 +6,11 @@ import { stationsRoute } from './routes/stations.js';
 import { trainsRoute } from './routes/trains.js';
 import { presetsRoute } from './routes/presets.js';
 import { railGeometryRoute } from './routes/railGeometry.js';
+import { atlasRoute } from './routes/atlas.js';
 import { loadStationIndex } from './services/stationIndex.js';
 import { trustedClientIp } from './lib/clientIdentity.js';
+import { buildVersionFingerprint, type VersionFingerprint } from './services/versionFingerprint.js';
+import { ensureSingleInstance } from './services/singleInstance.js';
 
 const app = new Hono().basePath('/api');
 
@@ -72,18 +75,47 @@ app.use('*', async (c, next) => {
   await next();
 });
 
-app.get('/health', (c) => c.json({ ok: true, data: { status: 'up' } }));
+const versionFingerprint: VersionFingerprint = buildVersionFingerprint();
+
+function autoUpgradeFlag(): boolean {
+  const v = String(process.env.RAIL_AUTO_UPGRADE ?? '1').trim().toLowerCase();
+  return !(v === '0' || v === 'false' || v === 'off' || v === 'no');
+}
+
+app.get('/health', (c) =>
+  c.json({
+    ok: true,
+    data: {
+      status: 'up',
+      version: versionFingerprint,
+      features: { autoUpgrade: autoUpgradeFlag() },
+    },
+  }),
+);
 app.route('/stations', stationsRoute);
 app.route('/trains', trainsRoute);
 app.route('/presets', presetsRoute);
 app.route('/rail-geometry', railGeometryRoute);
+app.route('/atlas', atlasRoute);
 
 const port = Number(process.env.PORT || 3000);
+
+await ensureSingleInstance(port);
 
 await loadStationIndex();
 const { loadLocalHsrRails } = await import('./services/localRails.js');
 loadLocalHsrRails();
 console.log(`[railvista-api] AMAP_KEY=${process.env.AMAP_KEY ? 'set' : 'missing'} listening on :${port}`);
+
+// F2 ③ 热门 OD 段几何预热：延后到空闲时段，避免与首个真实请求抢资源
+const prewarmDelayMs = Number(process.env.RAIL_SEG_PREWARM_DELAY_MS || 8000);
+if (prewarmDelayMs >= 0) {
+  setTimeout(() => {
+    void import('./services/segmentPrewarm.js')
+      .then((m) => m.prewarmSegments())
+      .catch((e) => console.warn('[seg-prewarm] failed', e));
+  }, prewarmDelayMs).unref?.();
+}
 
 serve({ fetch: app.fetch, port });
 

@@ -56,6 +56,21 @@ const recentOpen = ref(false);
 /** 按车次号直达的输入 */
 const codeQuery = ref('');
 
+/** 车次类型前缀 → 专属颜色（前缀键盘 + 车次列表共用同一色板，保证"对得上"）。
+ * 每类一个可区分色，落在深色玻璃底上均 ≥ 3:1 对比；纯数字普速用中性灰。 */
+const TRAIN_COLORS: Record<string, string> = {
+  G: '#4d9fff', // 高铁 · 蓝
+  D: '#35c2a5', // 动车 · 青绿
+  C: '#7fb4d8', // 城际 · 青蓝
+  Z: '#9d8cf0', // 直达 · 紫
+  T: '#e0915a', // 特快 · 橙
+  K: '#74bd89', // 快速 · 黄绿
+  L: '#8a97a8', // 临客 · 灰蓝
+  S: '#6aa9f0', // 市郊 · 天蓝
+  Y: '#e5769f', // 旅游 · 品红
+  '': '#a3aebd', // 普速(纯数字) · 灰
+};
+
 /** 车次号前缀键盘：字母 / 中文名 / 英文名 / 色别。
  * 覆盖国铁常见车次类型；「纯数字」对应无字母开头的普通旅客列车。 */
 interface TrainPrefix {
@@ -63,18 +78,19 @@ interface TrainPrefix {
   zh: string;
   en: string;
   kind: 'hsr' | 'intercity' | 'conventional' | 'other';
+  color: string;
 }
 const codePrefixes: TrainPrefix[] = [
-  { key: 'G', zh: '高铁', en: 'HSR', kind: 'hsr' },
-  { key: 'D', zh: '动车', en: 'EMU', kind: 'hsr' },
-  { key: 'C', zh: '城际', en: 'Intercity', kind: 'intercity' },
-  { key: 'Z', zh: '直达特快', en: 'Direct', kind: 'conventional' },
-  { key: 'T', zh: '特快', en: 'Express', kind: 'conventional' },
-  { key: 'K', zh: '快速', en: 'Fast', kind: 'conventional' },
-  { key: 'L', zh: '临客', en: 'Temp', kind: 'conventional' },
-  { key: 'S', zh: '市郊', en: 'Suburban', kind: 'other' },
-  { key: 'Y', zh: '旅游', en: 'Tourist', kind: 'other' },
-  { key: '', zh: '普速', en: 'Regular', kind: 'conventional' },
+  { key: 'G', zh: '高铁', en: 'HSR', kind: 'hsr', color: TRAIN_COLORS['G']! },
+  { key: 'D', zh: '动车', en: 'EMU', kind: 'hsr', color: TRAIN_COLORS['D']! },
+  { key: 'C', zh: '城际', en: 'Intercity', kind: 'intercity', color: TRAIN_COLORS['C']! },
+  { key: 'Z', zh: '直达', en: 'Direct', kind: 'conventional', color: TRAIN_COLORS['Z']! },
+  { key: 'T', zh: '特快', en: 'Express', kind: 'conventional', color: TRAIN_COLORS['T']! },
+  { key: 'K', zh: '快速', en: 'Fast', kind: 'conventional', color: TRAIN_COLORS['K']! },
+  { key: 'L', zh: '临客', en: 'Temp', kind: 'conventional', color: TRAIN_COLORS['L']! },
+  { key: 'S', zh: '市郊', en: 'Suburban', kind: 'other', color: TRAIN_COLORS['S']! },
+  { key: 'Y', zh: '旅游', en: 'Tourist', kind: 'other', color: TRAIN_COLORS['Y']! },
+  { key: '', zh: '普速', en: 'Regular', kind: 'conventional', color: TRAIN_COLORS['']! },
 ];
 
 /** 点击前缀：替换车次号首字母（或纯数字时补一个字母前缀）。
@@ -633,7 +649,14 @@ const showEmptyState = computed(
   () => !loading.value && step.value === 'search' && trains.value.length === 0 && !!error.value,
 );
 
-/** 车次类型色条：G/D 蓝、C 青、Z/T/K 灰绿 */
+/** 取车次号首字母对应的颜色（无字母 → 普速灰）。前缀键盘与车次卡都调它。 */
+function trainColor(code: string): string {
+  const c = String(code || '').trim().toUpperCase();
+  const k = /^[A-Z]/.test(c) ? c[0]! : '';
+  return TRAIN_COLORS[k] ?? TRAIN_COLORS['']!;
+}
+
+/** 车次类型（仅用于保留向后兼容的色条分组：hsr/intercity/conventional/other） */
 function trainKind(code: string): 'hsr' | 'intercity' | 'conventional' | 'other' {
   const c = String(code || '').trim().toUpperCase();
   if (/^[GD]/.test(c)) return 'hsr';
@@ -863,6 +886,7 @@ function goBack() {
                   type="button"
                   class="code-prefix__key"
                   :class="`code-prefix__key--${p.kind}`"
+                  :style="{ '--prefix-color': p.color }"
                   :aria-pressed="(codeQuery[0] || '').toUpperCase() === p.key"
                   :title="p.key ? `${p.key} 字头 · ${p.zh}（${p.en}）` : `纯数字车次 · ${p.zh}（${p.en}），无字母开头`"
                   @click="applyPrefix(p)"
@@ -961,7 +985,7 @@ function goBack() {
                 type="button"
                 class="train-card"
                 :class="`train-card--${trainKind(t.trainCode)}`"
-                :style="{ '--i': Math.min(i, 8) }"
+                :style="{ '--i': Math.min(i, 8), '--train-color': trainColor(t.trainCode) }"
                 :disabled="loading"
                 @click="pickTrain(t)"
               >

@@ -860,10 +860,10 @@ html {
 /* —— 车次号前缀键盘 ——
  * 一排可点胶囊：点击即把首字母替换成对应类型（保留已输数字），
  * 每个键带中文名 + 英文名，帮助用户识别 G/D/C/Z/T/K/L/S/Y 与纯数字普速。
- * 色别沿用 train-card 的类型语义（hsr 蓝 / intercity 青 / 其余灰）。 */
+ * 字母色块用各自专属色（--prefix-color），与车次列表的车次号颜色一一对应。 */
 .code-prefix {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
   gap: var(--space-2);
 }
 
@@ -871,8 +871,8 @@ html {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 44px;
-  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-2);
+  min-height: 42px;
+  padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-default);
   background: var(--surface-2);
@@ -888,21 +888,23 @@ html {
 
 .code-prefix__letter {
   flex: none;
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   display: grid;
   place-items: center;
   border-radius: var(--radius-xs);
   background: var(--fill-subtle);
-  font-size: var(--fs-h3);
+  font-size: var(--fs-meta);
   font-weight: 700;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
   color: var(--text-1);
 }
 
 .code-prefix__name {
-  display: grid;
-  gap: 1px;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
   min-width: 0;
 }
 
@@ -915,7 +917,7 @@ html {
 
 .code-prefix__name em {
   font-style: normal;
-  font-size: var(--fs-micro);
+  font-size: 10px;
   line-height: 1.2;
   color: var(--text-3);
   white-space: nowrap;
@@ -923,19 +925,13 @@ html {
   text-overflow: ellipsis;
 }
 
-/* 类型色条：与 train-card 语义一致 */
-.code-prefix__key--hsr .code-prefix__letter {
-  background: var(--accent-soft);
-  color: var(--accent-hover);
-}
-.code-prefix__key--intercity .code-prefix__letter {
-  background: rgba(127, 180, 216, 0.16);
-  color: var(--info);
-}
+/* 字母色块：颜色来自 --prefix-color（每类车次一个专属色，与车次列表一致） */
+.code-prefix__key--hsr .code-prefix__letter,
+.code-prefix__key--intercity .code-prefix__letter,
 .code-prefix__key--conventional .code-prefix__letter,
 .code-prefix__key--other .code-prefix__letter {
-  background: var(--fill-subtle);
-  color: var(--text-2);
+  background: color-mix(in srgb, var(--prefix-color) 16%, transparent);
+  color: var(--prefix-color);
 }
 
 /* 已选中态：当前输入的首字母与该键一致时高亮 */
@@ -1046,17 +1042,19 @@ html {
   background: var(--text-3);
 }
 
+/* 左侧色条：颜色来自 --train-color（每类车次专属色，与前缀键盘一致）。
+ * 兜底：无变量时按旧的分组语义（hsr 蓝 / intercity 青 / 其余灰）。 */
 .train-card--hsr::before {
-  background: var(--accent);
+  background: var(--train-color, var(--accent));
 }
 
 .train-card--intercity::before {
-  background: var(--info);
+  background: var(--train-color, var(--info));
 }
 
 .train-card--conventional::before,
 .train-card--other::before {
-  background: var(--text-3);
+  background: var(--train-color, var(--text-3));
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1076,7 +1074,8 @@ html {
   font-size: var(--fs-h3);
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--text-1);
+  /* 车次号字母染专属色，与左侧色条、前缀键盘三者同色对应 */
+  color: var(--train-color, var(--text-1));
 }
 
 .train-card__time {

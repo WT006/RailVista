@@ -35,7 +35,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
     <div class="rv-shell appbar__inner">
       <div class="appbar__left">
         <!-- 品牌组合图已自带中英文字标，无需再叠副标题 -->
-        <BrandLogo :height="28" />
+        <BrandLogo :height="34" />
       </div>
 
       <div class="appbar__right">
@@ -57,32 +57,30 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   top: 0;
   z-index: 60;
   height: var(--appbar-h);
-  border-bottom: 1px solid var(--line-hairline);
-  /* 渐变半透明导航（鸿蒙展示类规范）：
-   * 顶部较实、向下逐渐通透，配合玻璃模糊构成"渐变玻璃"层次，
-   * 让顶栏悬浮于背景地图之上却不清空下层内容。 */
+  /* 与主页面融为一体：去掉底部硬描边，背景几乎透明，仅保留极淡的玻璃模糊，
+   * 让顶栏像"悬浮在页面之上"而非一块独立的条。滚过内容后才微微加深，给出层级暗示。 */
+  border-bottom: none;
   background: linear-gradient(
     to bottom,
-    rgba(11, 14, 20, 0.82),
-    rgba(11, 14, 20, 0.55) 70%,
-    rgba(11, 14, 20, 0.34)
+    rgba(11, 14, 20, 0.5),
+    rgba(11, 14, 20, 0.24) 72%,
+    rgba(11, 14, 20, 0)
   );
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(10px) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(10px) saturate(var(--glass-saturate));
 }
 
-/* 滚动后增强顶栏实体感：随滚动加深，便于内容从栏下穿过时保持可读 */
+/* 滚动后：轻轻托底，让 Logo 始终可辨，但仍不出现硬边框 */
 .appbar.is-scrolled {
   background: linear-gradient(
     to bottom,
-    rgba(11, 14, 20, 0.92),
-    rgba(11, 14, 20, 0.7) 70%,
-    rgba(11, 14, 20, 0.5)
+    rgba(11, 14, 20, 0.66),
+    rgba(11, 14, 20, 0.38) 72%,
+    rgba(11, 14, 20, 0)
   );
 }
 
 .appbar__inner {
-  --appbar-baseline-nudge: 2px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -92,46 +90,26 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 
 .appbar__left {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
+  align-items: center;
   min-width: 0;
-  /* 光学基线校正：字标字号大于右侧徽标，基线天然偏低 */
-  transform: translateY(calc(-1 * var(--appbar-baseline-nudge)));
-}
-
-.appbar__tagline {
-  font-size: var(--fs-cap);
-  line-height: 1;
-  color: var(--text-3);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .appbar__right {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-2);
   flex-shrink: 0;
 }
 
+/* 版本徽标弱化为纯文字小字，不再带边框盒，减少导航条的"框"感 */
 .appbar__version {
-  padding: 2px var(--space-2);
-  border: 1px solid var(--line-default);
-  border-radius: var(--radius-xs);
-  color: var(--text-2);
+  color: var(--text-3);
   font-size: var(--fs-micro);
-  font-weight: 600;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-  line-height: 1.5;
+  line-height: 1;
   white-space: nowrap;
-}
-
-/* 窄屏：收起副标题与版本徽标，只留品牌标识 */
-@media (max-width: 560px) {
-  .appbar__tagline {
-    display: none;
-  }
+  opacity: 0.75;
 }
 
 @media (max-width: 420px) {

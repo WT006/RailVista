@@ -274,25 +274,40 @@ onBeforeUnmount(() => {
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  /* 边缘径向渐隐：降噪，并让地图不会在四角硬切 */
-  mask-image: radial-gradient(ellipse 86% 82% at 50% 52%, #000 38%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 86% 82% at 50% 52%, #000 38%, transparent 100%);
+  /* 边缘径向渐隐：降噪，并让地图在四角柔和淡出（铺满后中心大、边缘留出呼吸感） */
+  mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, #000 55%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, #000 55%, transparent 100%);
 }
 
 .backdrop__stage {
   position: absolute;
   /*
-   * 定位策略：前景卡片（查询面板 418px 高 + 排行榜）在首屏几乎占满整宽，
-   * 地图若居中会被完全遮住。因此把地图锚定到「卡片下方 + 主栏左基线一带」的开放区：
-   *   - 首屏：从查询卡下缘露出轮廓上缘；
-   *   - 滚动后：粘性主栏上移，地图逐步完整展开。
-   * 这样背景既不会与正文抢注意力，又能被读到"这是一张中国地图"。
+   * 定位策略（铺满）：无论竖屏横屏都让地图轮廓占满整个视口。
+   * 地图按"覆盖式"缩放（object-fit 语义），宽高都 ≥ 视口，中心锚定在视口中部，
+   * 四周溢出部分被 .backdrop 的 overflow:hidden 裁掉 —— 保证任何屏幕比例下
+   * 都"铺满"而非只在某一侧露出一小块。前景是半透明玻璃卡片，地图从卡下透出，
+   * 不会与正文抢注意力。
    */
-  left: 34%;
-  top: 70%;
-  width: min(56vw, 700px);
+  left: 50%;
+  top: 50%;
+  width: 120vmax;
+  max-width: none;
   aspect-ratio: 1000 / 971;
   transform: translate(-50%, -50%);
+}
+
+/* 极窄竖屏（手机）：vmax 偏小，改用更宽的 vw 兜底，确保横向也铺满 */
+@media (max-aspect-ratio: 3 / 4) {
+  .backdrop__stage {
+    width: 150vw;
+  }
+}
+
+/* 短视口横屏：vmax 会取到很宽的 vw，高度反而可能不够，改按 vh 保证纵向铺满 */
+@media (orientation: landscape) and (max-height: 560px) {
+  .backdrop__stage {
+    width: 150vh;
+  }
 }
 
 /* 轮廓剪影：极淡但可辨识。注意有效不透明度 = 本层 opacity × path 的 fill-opacity，
@@ -347,24 +362,6 @@ onBeforeUnmount(() => {
 @media (prefers-reduced-motion: reduce) {
   .backdrop__glow {
     display: none;
-  }
-}
-
-/* 窄屏：单列，卡片下方空间大，地图放大并居中 */
-@media (max-width: 599px) {
-  .backdrop__stage {
-    left: 50%;
-    top: 72%;
-    width: 106vw;
-  }
-}
-
-/* 短视口横屏：视口很矮，地图缩小并让到主栏左侧之外 */
-@media (orientation: landscape) and (max-height: 560px) {
-  .backdrop__stage {
-    left: 34%;
-    top: 74%;
-    width: min(46vw, 420px);
   }
 }
 </style>

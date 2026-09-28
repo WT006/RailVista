@@ -12,14 +12,26 @@
  *   左右两组各自 align-items: baseline。由于字标（约 18px）字号大于版本徽标（12px），
  *   其基线天然低约 2px，故对左组做一次光学校正（见 --appbar-baseline-nudge）。
  */
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { appVersionInfo, APP_VERSION } from '@railvista/shared';
 import BrandLogo from './BrandLogo.vue';
 
 const info = appVersionInfo();
+
+/** 滚动增强：滚过一小段距离后加深顶栏渐变，保证内容从栏下穿过时的可读性 */
+const scrolled = ref(false);
+let onScroll = () => {
+  scrolled.value = (document.scrollingElement?.scrollTop ?? window.scrollY) > 8;
+};
+onMounted(() => {
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+});
+onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 </script>
 
 <template>
-  <header class="appbar">
+  <header class="appbar" :class="{ 'is-scrolled': scrolled }">
     <div class="rv-shell appbar__inner">
       <div class="appbar__left">
         <!-- 品牌组合图已自带中英文字标，无需再叠副标题 -->
@@ -46,11 +58,27 @@ const info = appVersionInfo();
   z-index: 60;
   height: var(--appbar-h);
   border-bottom: 1px solid var(--line-hairline);
-  /* 半透明毛玻璃：先给 rgba 兜底，再让支持的浏览器用 color-mix 动态跟随表面色 */
-  background: rgba(11, 14, 20, 0.78);
-  background: color-mix(in srgb, var(--surface-0) 78%, transparent);
-  backdrop-filter: blur(14px) saturate(1.1);
-  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  /* 渐变半透明导航（鸿蒙展示类规范）：
+   * 顶部较实、向下逐渐通透，配合玻璃模糊构成"渐变玻璃"层次，
+   * 让顶栏悬浮于背景地图之上却不清空下层内容。 */
+  background: linear-gradient(
+    to bottom,
+    rgba(11, 14, 20, 0.82),
+    rgba(11, 14, 20, 0.55) 70%,
+    rgba(11, 14, 20, 0.34)
+  );
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+/* 滚动后增强顶栏实体感：随滚动加深，便于内容从栏下穿过时保持可读 */
+.appbar.is-scrolled {
+  background: linear-gradient(
+    to bottom,
+    rgba(11, 14, 20, 0.92),
+    rgba(11, 14, 20, 0.7) 70%,
+    rgba(11, 14, 20, 0.5)
+  );
 }
 
 .appbar__inner {

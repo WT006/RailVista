@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.2.1`**（2026-09-28）
+**当前版本：`0.2.2`**（2026-09-28）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,47 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.2.2] — 2026-09-28
+
+**背景地图铺满 + 玻璃透明度再降 + 渐变顶栏 + 输入框/动效优化**（鸿蒙展示类设计规范，分支 `feat/ui-rebuild-20260928`）。
+
+### 1. 背景中国地图铺满全屏（竖屏/横屏一致）
+
+- **需求**：地图不再"锚定在卡片下方一角"，而是任何屏幕比例下都铺满整个视口。
+- **方案**：`.backdrop__stage` 改为覆盖式缩放——宽 `120vmax` 中心锚定视口中部，宽高均 ≥ 视口，溢出被 `overflow:hidden` 裁掉；极窄竖屏（`max-aspect-ratio: 3/4`）用 `150vw` 兜底、短视口横屏用 `150vh` 保证纵向铺满；遮罩改为 `ellipse 100% at 50%`、55% 后渐隐，四角柔和淡出。
+- **涉及**：`apps/web/src/components/ChinaBackdropMap.vue`。
+
+### 2. 卡片透明度再降低（鸿蒙沉浸光感玻璃）
+
+- 表面 L1–L3 alpha：0.78/0.72/0.82 → **0.62/0.55/0.66**；sunken 0.85→0.68、scrim 0.72→0.6；描边全线再降（hairline .045→.04、default .07→.06、strong .11→.10、accent .32→.28）。
+- 玻璃参数同步加强：`--glass-blur` 20→26px、`--glass-saturate` 1.35→1.5、tile 档 12→16px，保证更透的同时内容对比度不塌。
+- **涉及**：`apps/web/src/styles/tokens.css`。
+
+### 3. 顶部导航栏改渐变半透明（鸿蒙展示类规范）
+
+- 由单色 rgba + color-mix 改为**纵向渐变玻璃**：顶部 0.82 → 中部 0.55 → 底部 0.34，模糊/饱和提升到全局 `--glass-blur/--glass-saturate` 档；新增 `.is-scrolled` 滚动态（滚过 8px 后加深为 0.92→0.5），内容从栏下穿过时保持可读。
+- **涉及**：`apps/web/src/components/AppTopBar.vue`（含滚动监听）。
+
+### 4. 输入文本框优化
+
+- 输入框/下拉获得玻璃质感（tile 档 backdrop-filter）；新增占位符色（`--text-3`）；焦点态由"实线描边"升级为"强调描边 + 外发光"（`0 0 0 3px accent-soft` + 16px 蓝色柔光）；过渡补齐 box-shadow。
+- **涉及**：`apps/web/src/styles/base.css`（`.select-form input` / `.od-panel select`）。
+
+### 5. 组件入场动效统一（鸿蒙展示类：强调缓动 + 级联错峰）
+
+- 新增 `rv-card-in` 关键帧（上浮 14px + 0.99 缩放 + 强调缓动），所有 `.rv-card` 统一入场；栅格主栏卡片按 DOM 序 20/70/120/170ms 级联、侧栏 100ms，避免整屏同帧弹出；`prefers-reduced-motion` 下仍全局禁用动画。
+- **涉及**：`apps/web/src/styles/base.css`。
+
+### HarmonyOS Developer Knowledge MCP
+
+- `~/.workbuddy/mcp.json` 已注册 `harmonyos_developer_knowledge`（http, connect-api.cloud.huawei.com）；本环境直接对端点完成 MCP `initialize` 握手验证（返回 `DeveloperCommunity` v1.0.0，工具 `searchDocuments` / `getDocumentsById` 就绪），连接正常。
+
+### 验证
+
+- `vue-tsc --noEmit` 通过；UI 探针三断点（1440×900 / 390×844 / 844×390）截图复核：地图铺满、玻璃通透、渐变顶栏、输入框质感全部生效。
 
 ---
 

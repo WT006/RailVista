@@ -399,7 +399,18 @@ html {
   font-family: inherit;
   /* ≥16px：避免 iOS 聚焦时自动放大页面 */
   font-size: var(--fs-input);
-  transition: border-color var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard);
+  /* 输入控件玻璃质感 + 平滑过渡（鸿蒙输入控件规范）：边框 / 底色 / 阴影分档过渡 */
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-fast) var(--ease-standard);
+}
+
+/* 输入框占位符：弱化但保持可辨识 */
+.select-form input::placeholder {
+  color: var(--text-3);
 }
 
 .select-form input:hover,
@@ -412,7 +423,8 @@ html {
   outline: none;
   border-color: var(--accent);
   background: var(--surface-3);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  /* 焦点外发光：柔和的强调光晕，而非硬描边 */
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 16px -4px rgba(77, 159, 255, 0.4);
 }
 
 .station-field__control {
@@ -543,6 +555,30 @@ html {
   }
 }
 
+/* 卡片入场：鸿蒙展示类规范用「强调缓动 + 轻微上浮」，按 DOM 序做 40ms 级联，
+ * 避免整屏同帧弹出；对卡片统一施加，减少各模块各自写动画造成的节奏不一。 */
+@keyframes rv-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rv-card {
+  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) both;
+}
+
+/* 栅格主栏 / 侧栏内的卡片按序轻微错峰 */
+.rv-col--main > .rv-card:nth-child(1) { animation-delay: 20ms; }
+.rv-col--main > .rv-card:nth-child(2) { animation-delay: 70ms; }
+.rv-col--main > .rv-card:nth-child(3) { animation-delay: 120ms; }
+.rv-col--main > .rv-card:nth-child(4) { animation-delay: 170ms; }
+.rv-col--side > .rv-card { animation-delay: 100ms; }
+
 .select-form {
   display: grid;
   gap: var(--gap-stack);
@@ -550,7 +586,7 @@ html {
 
 .select-form--panel {
   gap: var(--space-4);
-  animation: rv-rise var(--dur-enter) var(--ease-standard) 60ms both;
+  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) 60ms both;
 }
 
 /* ── 弹层防遮挡 ──

@@ -56,6 +56,34 @@ const recentOpen = ref(false);
 /** 按车次号直达的输入 */
 const codeQuery = ref('');
 
+/** 车次号前缀键盘：字母 / 中文名 / 英文名 / 色别。
+ * 覆盖国铁常见车次类型；「纯数字」对应无字母开头的普通旅客列车。 */
+interface TrainPrefix {
+  key: string;
+  zh: string;
+  en: string;
+  kind: 'hsr' | 'intercity' | 'conventional' | 'other';
+}
+const codePrefixes: TrainPrefix[] = [
+  { key: 'G', zh: '高铁', en: 'HSR', kind: 'hsr' },
+  { key: 'D', zh: '动车', en: 'EMU', kind: 'hsr' },
+  { key: 'C', zh: '城际', en: 'Intercity', kind: 'intercity' },
+  { key: 'Z', zh: '直达特快', en: 'Direct', kind: 'conventional' },
+  { key: 'T', zh: '特快', en: 'Express', kind: 'conventional' },
+  { key: 'K', zh: '快速', en: 'Fast', kind: 'conventional' },
+  { key: 'L', zh: '临客', en: 'Temp', kind: 'conventional' },
+  { key: 'S', zh: '市郊', en: 'Suburban', kind: 'other' },
+  { key: 'Y', zh: '旅游', en: 'Tourist', kind: 'other' },
+  { key: '', zh: '普速', en: 'Regular', kind: 'conventional' },
+];
+
+/** 点击前缀：替换车次号首字母（或纯数字时补一个字母前缀）。
+ * 保留用户已输入的后续数字，只改开头的"类型"部分，避免清空重打。 */
+function applyPrefix(p: TrainPrefix) {
+  const digits = codeQuery.value.replace(/^[A-Za-z]/, '').trim();
+  codeQuery.value = (p.key + digits).toUpperCase();
+}
+
 /** 请求序号：新请求发出后，旧请求的迟到响应一律丢弃（取消 / 重新发车用） */
 let requestSeq = 0;
 function nextSeq(): number {
@@ -824,6 +852,26 @@ function goBack() {
                   @click="searchByCode"
                 >
                   查时刻
+                </button>
+              </div>
+
+              <!-- 车次号前缀键盘：点击即填入/替换首字母，附带中文名与英文名 -->
+              <div class="code-prefix" role="group" aria-label="车次类型前缀">
+                <button
+                  v-for="p in codePrefixes"
+                  :key="p.key || 'num'"
+                  type="button"
+                  class="code-prefix__key"
+                  :class="`code-prefix__key--${p.kind}`"
+                  :aria-pressed="(codeQuery[0] || '').toUpperCase() === p.key"
+                  :title="p.key ? `${p.key} 字头 · ${p.zh}（${p.en}）` : `纯数字车次 · ${p.zh}（${p.en}），无字母开头`"
+                  @click="applyPrefix(p)"
+                >
+                  <span class="code-prefix__letter">{{ p.key || '#' }}</span>
+                  <span class="code-prefix__name">
+                    <strong>{{ p.zh }}</strong>
+                    <em>{{ p.en }}</em>
+                  </span>
                 </button>
               </div>
             </div>

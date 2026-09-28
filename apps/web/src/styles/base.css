@@ -857,6 +857,101 @@ html {
   min-width: 0;
 }
 
+/* —— 车次号前缀键盘 ——
+ * 一排可点胶囊：点击即把首字母替换成对应类型（保留已输数字），
+ * 每个键带中文名 + 英文名，帮助用户识别 G/D/C/Z/T/K/L/S/Y 与纯数字普速。
+ * 色别沿用 train-card 的类型语义（hsr 蓝 / intercity 青 / 其余灰）。 */
+.code-prefix {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: var(--space-2);
+}
+
+.code-prefix__key {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-default);
+  background: var(--surface-2);
+  color: var(--text-1);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-spring),
+    border-color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard);
+}
+
+.code-prefix__letter {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-xs);
+  background: var(--fill-subtle);
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
+}
+
+.code-prefix__name {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.code-prefix__name strong {
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-1);
+}
+
+.code-prefix__name em {
+  font-style: normal;
+  font-size: var(--fs-micro);
+  line-height: 1.2;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 类型色条：与 train-card 语义一致 */
+.code-prefix__key--hsr .code-prefix__letter {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+.code-prefix__key--intercity .code-prefix__letter {
+  background: rgba(127, 180, 216, 0.16);
+  color: var(--info);
+}
+.code-prefix__key--conventional .code-prefix__letter,
+.code-prefix__key--other .code-prefix__letter {
+  background: var(--fill-subtle);
+  color: var(--text-2);
+}
+
+/* 已选中态：当前输入的首字母与该键一致时高亮 */
+.code-prefix__key[aria-pressed='true'] {
+  border-color: var(--line-accent);
+  background: var(--accent-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .code-prefix__key:hover {
+    transform: translateY(-1px);
+    border-color: var(--line-strong);
+    background: var(--surface-3);
+  }
+}
+
 /* 横屏两列表单：车次直达跨整行 */
 @media (orientation: landscape) and (max-height: 560px) {
   .select-form > .code-search {

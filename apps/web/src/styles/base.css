@@ -908,11 +908,14 @@ html {
   min-width: 0;
 }
 
+/* 中文名绝不换行、绝不压缩——空间不足时由英文名截断让位 */
 .code-prefix__name strong {
+  flex-shrink: 0;
   font-size: var(--fs-cap);
   font-weight: 600;
   line-height: 1.2;
   color: var(--text-1);
+  white-space: nowrap;
 }
 
 .code-prefix__name em {
@@ -923,6 +926,8 @@ html {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
+  flex: 0 1 auto;
 }
 
 /* 字母色块：颜色来自 --prefix-color（每类车次一个专属色，与车次列表一致） */

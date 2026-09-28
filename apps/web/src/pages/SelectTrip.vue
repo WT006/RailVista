@@ -100,6 +100,13 @@ function applyPrefix(p: TrainPrefix) {
   codeQuery.value = (p.key + digits).toUpperCase();
 }
 
+/** 当前输入对应的前缀键：仅当输入非空时才算命中（空输入不高亮任何键） */
+const activePrefixKey = computed<string | null>(() => {
+  const v = codeQuery.value.trim().toUpperCase();
+  if (!v) return null;
+  return /^[A-Z]/.test(v) ? v[0]! : '';
+});
+
 /** 请求序号：新请求发出后，旧请求的迟到响应一律丢弃（取消 / 重新发车用） */
 let requestSeq = 0;
 function nextSeq(): number {
@@ -887,7 +894,7 @@ function goBack() {
                   class="code-prefix__key"
                   :class="`code-prefix__key--${p.kind}`"
                   :style="{ '--prefix-color': p.color }"
-                  :aria-pressed="(codeQuery[0] || '').toUpperCase() === p.key"
+                  :aria-pressed="activePrefixKey !== null && activePrefixKey === p.key"
                   :title="p.key ? `${p.key} 字头 · ${p.zh}（${p.en}）` : `纯数字车次 · ${p.zh}（${p.en}），无字母开头`"
                   @click="applyPrefix(p)"
                 >

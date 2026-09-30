@@ -7,6 +7,7 @@ import { trainsRoute } from './routes/trains.js';
 import { presetsRoute } from './routes/presets.js';
 import { railGeometryRoute } from './routes/railGeometry.js';
 import { atlasRoute } from './routes/atlas.js';
+import { driveRoute } from './routes/drive.js';
 import { loadStationIndex } from './services/stationIndex.js';
 import { trustedClientIp } from './lib/clientIdentity.js';
 import { buildVersionFingerprint, type VersionFingerprint } from './services/versionFingerprint.js';
@@ -97,6 +98,7 @@ app.route('/trains', trainsRoute);
 app.route('/presets', presetsRoute);
 app.route('/rail-geometry', railGeometryRoute);
 app.route('/atlas', atlasRoute);
+app.route('/drive', driveRoute);
 
 const port = Number(process.env.PORT || 3000);
 

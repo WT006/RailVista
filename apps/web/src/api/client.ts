@@ -218,4 +218,27 @@ export const api = {
   getAtlasCorridor(id: string) {
     return request<AtlasCorridorDetail>(`/atlas/corridor/${encodeURIComponent(id)}`);
   },
+  // ── 万里路书 · 精品自驾公路 ─────────────────────────────────────────────
+  /** 自驾线路列表 */
+  getDriveRoutes() {
+    return request<{
+      routes: import('@railvista/shared').DriveRouteLite[];
+      updated: string;
+    }>('/drive/routes');
+  },
+  /** 自驾线路详情（含 geometry + chapters + highlights） */
+  getDriveRoute(id: string) {
+    return request<{
+      route: import('@railvista/shared').DriveRoute;
+      highlights: import('@railvista/shared').DriveHighlight[];
+    }>(`/drive/routes/${encodeURIComponent(id)}`);
+  },
+  getDriveStats() {
+    return request<{
+      routeCount: number;
+      totalKm: number;
+      highlightCount: number;
+      updated: string;
+    }>('/drive/stats');
+  },
 };

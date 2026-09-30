@@ -1,0 +1,478 @@
+/* ══════════════════════════════════════════════════════════════════════════
+ * 万里路书 · 精品自驾公路 —— 页面样式
+ * 沿用 Cinematic Ink 暗色 + 鸿蒙玻璃令牌；中文名永不折行。
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+.drive-page {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  padding-bottom: var(--space-8);
+  background:
+    radial-gradient(ellipse 70% 42% at 10% -8%, var(--accent-soft), transparent 58%),
+    radial-gradient(ellipse 60% 38% at 92% 4%, var(--fill-accent), transparent 55%),
+    var(--surface-0);
+  color: var(--text-1);
+}
+
+.drive-hero {
+  margin: var(--space-4) 0 var(--space-5);
+}
+
+.drive-hero h1 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
+}
+
+.drive-hero .sub {
+  margin: 0;
+  max-width: 36em;
+  font-size: var(--fs-meta);
+  line-height: var(--lh-normal);
+  color: var(--text-2);
+}
+
+/* —— 统计条 —— */
+.drive-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.drive-stat {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+.drive-stat__value {
+  font-size: var(--fs-h1);
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-stat__label {
+  margin-top: var(--space-1);
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+}
+
+/* —— 线路卡片 —— */
+.drive-route-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-3);
+}
+
+.drive-route-card {
+  position: relative;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  text-align: left;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: var(--elev-2);
+  transition:
+    transform var(--dur-base) var(--ease-spring),
+    border-color var(--dur-fast) var(--ease-standard);
+}
+
+.drive-route-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}
+
+.drive-route-card__group {
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent-hover);
+}
+
+.drive-route-card__name {
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-route-card__summary {
+  font-size: var(--fs-cap);
+  line-height: var(--lh-snug);
+  color: var(--text-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.drive-route-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-route-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.drive-tag {
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--fill-subtle);
+  color: var(--text-2);
+  font-size: var(--fs-micro);
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .drive-route-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-accent);
+    box-shadow: var(--elev-3);
+  }
+}
+
+/* —— 路书章节（里程轴 + 卡片流） —— */
+.drive-toc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.drive-chapter {
+  position: relative;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-4) var(--space-4) calc(var(--space-4) + 20px);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--elev-2);
+}
+
+/* 里程轴：左侧竖线 + 圆点（与铁路行程时间轴同源） */
+.drive-chapter::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: var(--space-4);
+  bottom: var(--space-4);
+  width: 2px;
+  border-radius: 2px;
+  background: var(--line-default);
+}
+
+.drive-chapter__dot {
+  position: absolute;
+  left: 10px;
+  top: calc(var(--space-4) + 4px);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.drive-chapter__title {
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  color: var(--text-1);
+  white-space: nowrap;
+}
+
+.drive-chapter__range {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-chapter__summary {
+  font-size: var(--fs-meta);
+  line-height: var(--lh-snug);
+  color: var(--text-2);
+}
+
+/* —— 小确幸卡 —— */
+.drive-highlight {
+  position: relative;
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 6px);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-2);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+}
+
+.drive-highlight::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--hl-color, var(--accent));
+}
+
+.drive-highlight__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.drive-highlight__name {
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  color: var(--text-1);
+  white-space: nowrap;
+}
+
+.drive-highlight__badge {
+  flex-shrink: 0;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--hl-color, var(--accent)) 16%, transparent);
+  color: var(--hl-color, var(--accent));
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.drive-highlight__intro {
+  font-size: var(--fs-body);
+  line-height: 1.7;
+  color: var(--text-1);
+}
+
+.drive-highlight__howto {
+  font-size: var(--fs-cap);
+  line-height: var(--lh-snug);
+  color: var(--text-2);
+}
+
+.drive-highlight__safety {
+  margin: 0;
+  font-size: var(--fs-micro);
+  line-height: 1.4;
+  color: var(--warning);
+}
+
+.drive-highlight__milepost {
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* —— 伴随雷达页 —— */
+.drive-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+}
+
+.drive-navbar__title {
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.drive-navbar__milepost {
+  font-family: var(--font-display);
+  font-size: var(--fs-meta);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.drive-radar {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.drive-radar-card {
+  padding: var(--space-5) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line-accent);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--elev-3);
+  text-align: center;
+}
+
+.drive-radar-card__distance {
+  font-size: var(--fs-display);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--accent-hover);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-radar-card__name {
+  margin-top: var(--space-2);
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  color: var(--text-1);
+  white-space: nowrap;
+}
+
+.drive-radar-card__meta {
+  margin-top: var(--space-1);
+  font-size: var(--fs-meta);
+  color: var(--text-2);
+}
+
+.drive-radar-card__intro {
+  margin-top: var(--space-3);
+  font-size: var(--fs-cap);
+  line-height: var(--lh-snug);
+  color: var(--text-2);
+}
+
+.drive-radar-card.is-empty {
+  border-color: var(--line-default);
+  color: var(--text-3);
+}
+
+/* 进度条 */
+.drive-progress {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.drive-progress__track {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--line-default);
+  overflow: hidden;
+}
+
+.drive-progress__bar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  transition: width var(--dur-base) var(--ease-standard);
+}
+
+.drive-progress__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 车速带 */
+.drive-speed {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+}
+
+.drive-speed__value {
+  font-size: var(--fs-h1);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-speed__unit {
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+}
+
+.drive-speed__band {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.drive-speed__band--fast { background: var(--warning-soft); color: var(--warning); }
+.drive-speed__band--cruise { background: var(--accent-soft); color: var(--accent-hover); }
+.drive-speed__band--slow { background: var(--success-soft); color: var(--success); }
+
+/* 提醒条 */
+.drive-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-snug);
+}
+
+.drive-alert--warn { border-color: var(--warning); background: var(--warning-soft); color: var(--warning); }
+.drive-alert--danger { border-color: var(--danger); background: var(--danger-soft); color: var(--danger); }
+.drive-alert--info { color: var(--text-2); }
+
+.drive-alert__icon {
+  flex-shrink: 0;
+  font-size: var(--fs-h3);
+  line-height: 1;
+}
+
+/* 底部操作条 */
+.drive-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+/* —— 空态 / 错误 —— */
+.drive-empty {
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--line-strong);
+  background: var(--surface-sunken);
+  text-align: center;
+  color: var(--text-2);
+  font-size: var(--fs-meta);
+}

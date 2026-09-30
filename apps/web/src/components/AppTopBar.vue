@@ -36,6 +36,9 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
       <div class="appbar__left">
         <!-- 品牌组合图已自带中英文字标，无需再叠副标题 -->
         <BrandLogo :height="34" />
+        <nav class="appbar__nav" aria-label="主导航">
+          <slot name="nav" />
+        </nav>
       </div>
 
       <div class="appbar__right">
@@ -91,7 +94,21 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 .appbar__left {
   display: flex;
   align-items: center;
+  gap: var(--space-5);
   min-width: 0;
+}
+
+/* 主导航链接组（内容由 slot 注入，AppNavLinks.vue） */
+.appbar__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (max-width: 599px) {
+  .appbar__nav {
+    display: none;
+  }
 }
 
 .appbar__right {

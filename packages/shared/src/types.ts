@@ -313,3 +313,243 @@ export interface PresetPackage {
   railway?: [number, number][];
   railwaySource?: 'osm' | 'station' | 'preset';
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 万里路书 · 精品自驾公路（v0.3.0 新增）
+// 说明：本区块为纯新增类型，与铁路侧类型无耦合；几何数据 [lng, lat, elev?] 第三位
+//       可选高程，向后兼容（现有代码读取前两位不受影响）。
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** 公路行政等级：G 国道 / S 省道 / X 县道 / Y 乡道 / C 村道 / E 高速 */
+export type RoadClass = 'G' | 'S' | 'X' | 'Y' | 'C' | 'E';
+
+/** 公路点：经纬度 + 可选高程（m） */
+export type RoadPoint = [number, number, number?];
+
+/** 自驾线路分组：三环 / 四横 / 五纵 */
+export type DriveGroup = 'ring' | 'horizontal' | 'vertical';
+/** 线路层级：国家级主干线 / 省级精品线 */
+export type DriveTier = 'national' | 'provincial';
+
+/** 骨架点：用于路网成链与章节划分 */
+export interface DriveWaypoint {
+  name: string;
+  lng: number;
+  lat: number;
+  /** 优先走的公路编号 */
+  preferRef?: string;
+  /** 是否章节分界点 */
+  chapterBreak?: boolean;
+  required?: boolean;
+}
+
+/** 路书章节 */
+export interface RoadbookChapter {
+  id: string;
+  index: number;
+  title: string;
+  /** 沿主线的里程区间（km） */
+  fromKm: number;
+  toKm: number;
+  summary: string;
+  roadRefs: string[];
+  towns: string[];
+  elevRange?: [number, number];
+  highlightIds: string[];
+  spotIds: string[];
+  tips: string[];
+  staySuggest?: string[];
+}
+
+/** 小确幸分类 */
+export type HighlightCategory =
+  | 'viewpoint' | 'landform' | 'roadside' | 'engineering' | 'water'
+  | 'pasture' | 'village' | 'ruin' | 'plant' | 'night' | 'food' | 'curve';
+
+/** 车速带：<40 slow ｜ 40~80 cruise ｜ >80 fast */
+export type SpeedBand = 'slow' | 'cruise' | 'fast';
+
+/** 小确幸点位（产品灵魂） */
+export interface DriveHighlight {
+  id: string;
+  routeId: string;
+  name: string;
+  lng: number;
+  lat: number;
+  /** 沿主线的里程桩（km） */
+  alongKm: number;
+  roadRef?: string;
+  stakeMark?: string;
+  side: SpotSide;
+  category: HighlightCategory;
+  /** 车速 >80 时是否值得推送（值得减速） */
+  worthSlowDown: boolean;
+  /** 是否可以停车 */
+  canPark: boolean;
+  stopMinutes?: number;
+  walkMinutes?: number;
+  /** 提前多少公里提示，默认 5 */
+  advanceKm?: number;
+  /** 到达前多少米强提醒，默认 500 */
+  notifyM?: number;
+  direction?: 'forward' | 'backward' | 'both';
+  /** 一句话小确幸 */
+  intro: string;
+  /** 怎么玩 */
+  howToPlay: string;
+  photoHint?: string;
+  safetyNote?: string;
+  bestView?: SpotBestView;
+  dimensions?: SpotDimension[];
+  spotId?: string;
+  verification?: {
+    status: 'verified' | 'probable' | 'unverified' | 'rejected';
+    checkedAt: string;
+    checkedBy?: string;
+    method?: string;
+  };
+  source?: 'preset' | 'curated' | 'ai_generated' | 'ai_reviewed' | 'ugc';
+}
+
+/** 公路故事（进入区间自动播放，TTS 兜底） */
+export interface RoadStory {
+  id: string;
+  routeId: string;
+  title: string;
+  fromKm: number;
+  toKm: number;
+  script: string;
+  ttsText: string;
+  audioUrl?: string;
+  durationSec?: number;
+  highlightIds?: string[];
+  priority?: number;
+}
+
+/** 安全/景观提醒 */
+export type RoadAlertKind =
+  | 'scenic' | 'curve' | 'steep' | 'altitude' | 'rockfall'
+  | 'ice' | 'wind' | 'fog' | 'construction' | 'speedlimit' | 'nocell';
+
+export interface RoadAlert {
+  id: string;
+  routeId: string;
+  kind: RoadAlertKind;
+  fromKm: number;
+  toKm: number;
+  suggestSpeedKmh?: number;
+  advanceKm?: number;
+  text: string;
+  severity: 'info' | 'warn' | 'danger';
+  months?: number[];
+}
+
+/** 自驾线路 */
+export interface DriveRoute {
+  id: string;
+  name: string;
+  alias?: string[];
+  tier: DriveTier;
+  group?: DriveGroup;
+  /** 政策编号，国家级线必填 */
+  policyRef?: string;
+  provinces: string[];
+  summary: string;
+  tags: string[];
+  /** 主线里程（km），由构建脚本回写 */
+  totalKm: number;
+  driveDays: number;
+  bestSeason: number[];
+  difficulty: 1 | 2 | 3 | 4 | 5;
+  roadRefs: string[];
+  startName: string;
+  endName: string;
+  waypoints: DriveWaypoint[];
+  /** 成链后的完整折线 */
+  geometry: RoadPoint[];
+  /** 逐点累计里程（km），与 geometry 等长 */
+  cumKm?: number[];
+  chapters: RoadbookChapter[];
+  highlightIds: string[];
+  spotIds: string[];
+  alerts: RoadAlert[];
+  cover?: string;
+  status: 'draft' | 'geometry_ready' | 'calibrated';
+  updatedAt: string;
+}
+
+/** 轨迹关键点类型 */
+export type TrackPointType = 'start' | 'end' | 'pass' | 'stay' | 'checkin' | 'chapter';
+
+export interface TrackKeyPoint {
+  type: TrackPointType;
+  at: string;
+  lng: number;
+  lat: number;
+  alongKm?: number;
+  heading?: number;
+  speedKmh?: number;
+  elevM?: number;
+  label?: string;
+  highlightId?: string;
+  chapterId?: string;
+  dwellMin?: number;
+}
+
+/** 一条自驾轨迹：只存关键点，不存每秒坐标 */
+export interface DriveTrack {
+  id: string;
+  routeId?: string;
+  title?: string;
+  startedAt: string;
+  endedAt?: string;
+  totalKm: number;
+  driveMin?: number;
+  points: TrackKeyPoint[];
+  checkinCount: number;
+  status: 'recording' | 'finished';
+}
+
+/** 雷达命中条目 */
+export interface RadarHit {
+  highlight: DriveHighlight;
+  /** 前方还有多远（km） */
+  aheadKm: number;
+  /** 按当前车速预计到达秒数 */
+  etaSec: number | null;
+  /** 卡片文案 */
+  cardText: string;
+  /** 是否进入强提醒半径 */
+  notify: boolean;
+  sideText: string;
+}
+
+/** 自驾线路列表项（_index.json 条目，前端列表只读它） */
+export interface DriveRouteLite {
+  id: string;
+  name: string;
+  tier: DriveTier;
+  group?: DriveGroup;
+  provinces: string[];
+  summary?: string;
+  totalKm: number;
+  driveDays: number;
+  difficulty: number;
+  bestSeason: number[];
+  tags: string[];
+  status: string;
+  highlightCount: number;
+  chapterCount: number;
+  file: string;
+}
+
+/** 雷达结果 */
+export interface RadarResult {
+  primary: RadarHit | null;
+  secondary: RadarHit | null;
+  missed: RadarHit | null;
+  alongKm: number;
+  direction: 'forward' | 'backward' | 'unknown';
+  band: SpeedBand;
+  offRouteM: number;
+}

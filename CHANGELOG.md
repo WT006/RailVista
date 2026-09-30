@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.2.6`**（2026-09-29）
+**当前版本：`0.3.0`**（2026-10-01）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,43 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.3.0] — 2026-10-01
+
+**万里路书 · 精品自驾公路（MINOR，新增能力模块）**（分支 `heyworldchannel-20261001`）。
+
+对标交通运输部《精品自驾旅游公路实施方案》（交公路发〔2026〕100号），新增并列于铁路工具的自驾模块，本版以**青甘环线 G315 柴达木段（水上雅丹）为真实 OSM 数据打样**，打通「路书 + 小确幸雷达 + 轨迹记录」闭环。
+
+### 1. 新增能力
+
+- **共享逻辑层**（`packages/shared/src/drive/*`，零框架依赖，Web/鸿蒙共用）：
+  - `geo.ts`：Haversine、折线投影（里程桩/偏离距离/切向角）、行驶方向判定、左右侧判定（叉积）、Douglas-Peucker 简化
+  - `radar.ts`：小确幸雷达——车速感知（>80 只推「值得减速」、<40 只推「可以停车」、40~80 都推）、前瞻距离随车速伸缩、错过检测
+  - `trackSampler.ts`：轨迹关键点采样（起点/途经/停留/打卡/章节/终点，只存关键点省电省流量）
+- **数据基座**：`scripts/build-drive-route.mjs` 按 OSM `ref` 抓取国道（多实例故障转移 + 缓存）→ 端点最近邻双向成链 → DP 简化 → 生成线路 JSON + `_index.json`
+- **后端**：`/api/drive/routes`、`/api/drive/routes/:id`、`/api/drive/stats`（列表只读 `_index.json`）
+- **前端**：新增 `/drive`（线路大厅）、`/drive/:routeId`（路书翻阅）、`/drive/:routeId/nav`（伴随雷达）三页；`AppTopBar` 新增 `nav` slot + `AppNavLinks` 导航链接组
+
+### 2. 涉及文件
+
+- 共享：`packages/shared/src/types.ts`（追加 DriveRoute/RoadbookChapter/DriveHighlight/RoadStory/RoadAlert/DriveTrack/RadarResult 等）、`drive/*`、`index.ts`
+- 后端：`apps/api/src/services/driveRoutes.ts`、`routes/drive.ts`、`index.ts`
+- 前端：`apps/web/src/pages/Drive{Home,Roadbook,Nav}.vue`、`components/AppNavLinks.vue`、`components/AppTopBar.vue`、`composables/useDriveRadar.ts`、`useTrackRecorder.ts`、`data/highlightColors.ts`、`styles/drive.css`、`api/client.ts`、`router/index.ts`
+- 数据：`data/presets/drive-routes/*`、`data/cache/drive/*`
+
+### 3. 验证方式
+
+- 单测：`packages/shared` 新增 `drive/radar.test.ts` + `drive/trackSampler.test.ts`（投影/方向/左右侧/雷达车速规则/采样阈值），总计 153 用例全绿
+- 构建：`pnpm build` 全仓通过；`vue-tsc --noEmit` 0 错误
+- 数据：`node scripts/build-drive-route.mjs` 抓取真实 G315（水上雅丹段）成链 151.6km、3 章节、3 小确幸贴线 <5.3km
+
+### 4. 已知限制
+
+- OSM 国道 `ref` 标签不连续（几十~上百公里缺口），本版聚焦 G315 连续段打样；全线成链需阶段 B 断点补全（见 `docs/PRD-万里路书-精品自驾公路-20261001.md` §5.6）
+- 里程与小确幸坐标待官方线路表发布后校准；鸿蒙端（M6）尚未实现
+- 回滚：`git revert` 本提交即可，无破坏性变更
 
 ---
 

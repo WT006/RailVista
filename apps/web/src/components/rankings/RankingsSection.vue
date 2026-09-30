@@ -269,27 +269,24 @@ function onFocusClick(rankingId: string, item: RankItem) {
 }
 
 /* ── 胶囊 Tab ──
- * 单行横向滚动，不再折行：横屏窄侧栏里 4 个 Tab 折成 3–4 行是
- * 之前观感凌乱的主因；一行胶囊 + 隐藏滚动条更接近 HarmonyOS 分段控件。 */
+ * 折行排列：所有 Tab 直接可见、直接可点，杜绝横向滚动死角
+ * （此前单行滚动 + 隐藏滚动条，窄侧栏里后面的榜单胶囊被截断且无滚动提示，
+ * 导致后面的榜单选不到）。
+ * 触控热区由真实盒子的 padding 保证，不用伪元素扩边：
+ * 折行后伪元素热区会覆盖上/下一行 Tab 的边缘，造成点击误触遮挡。 */
 .rankings__tabs {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: var(--space-2);
-  overflow-x: auto;
-  scrollbar-width: none;
-  /* 微调滚动边界，让胶囊的悬停描边不被裁剪 */
-  padding: 2px;
-  margin: -2px;
-}
-
-.rankings__tabs::-webkit-scrollbar {
-  display: none;
 }
 
 .rankings__tab {
   position: relative;
-  flex-shrink: 0; /* 单行滚动排列：胶囊不被压缩变形 */
-  padding: var(--space-2) var(--space-3);
+  flex-shrink: 0; /* 胶囊不被压缩变形，文字完整展示 */
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
   border: 1px solid var(--line-default);
   background: var(--fill-subtle);
@@ -301,13 +298,6 @@ function onFocusClick(rankingId: string, item: RankItem) {
     background-color var(--dur-fast) var(--ease-standard),
     color var(--dur-fast) var(--ease-standard),
     border-color var(--dur-fast) var(--ease-standard);
-}
-
-/* 触控热区补齐到 44px：视觉尺寸保持紧凑，用伪元素扩大可点区域 */
-.rankings__tab::after {
-  content: '';
-  position: absolute;
-  inset: calc((44px - 100%) / -2) calc(-1 * var(--space-1));
 }
 
 .rankings__tab:hover {

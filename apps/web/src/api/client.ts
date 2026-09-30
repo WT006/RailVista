@@ -158,6 +158,13 @@ export const api = {
     const qs = new URLSearchParams({ from, to, date });
     return request<{ trains: import('@railvista/shared').TrainSummary[] }>(`/trains?${qs}`);
   },
+  /** 按公开车次号（如 Z8991 / G87）查全程时刻表 */
+  searchTrainByCode(code: string, date: string) {
+    const qs = new URLSearchParams({ code, date });
+    return request<{ stops: import('@railvista/shared').Stop[]; trainNo: string }>(
+      `/trains/by-code?${qs}`,
+    );
+  },
   getStops(params: {
     trainNo: string;
     trainCode: string;

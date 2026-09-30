@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.1.3`**（2026-09-28）
+**当前版本：`0.2.6`**（2026-09-29）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,251 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.2.6] — 2026-09-29
+
+**前缀键盘中文名单行修复 + 空输入高亮修正**（分支 `feat/ui-rebuild-20260928`）。
+
+### 1. 中文名强制单行
+
+- **问题**：窄屏下键内「字母块 + 中文名 + 英文名」同行 flex 排列，空间不足时中文名（flex 子项）被压缩折行成两行。
+- **修复**：`.code-prefix__name strong` 加 `flex-shrink: 0` + `white-space: nowrap`（中文名绝不换行、绝不压缩），空间不足由英文名（`flex: 0 1 auto` + ellipsis）截断让位。
+- **验证**：UI 探针在 390×844（3 列）与 1440×900 下实测 10 个键中文名高度均 14px 单行。
+
+### 2. 空输入不高亮任何键
+
+- **问题**：`aria-pressed` 用 `(codeQuery[0] || '').toUpperCase() === p.key` 判定，输入为空时 `'' === ''` 恒真，导致「普速」键被误高亮。
+- **修复**：新增 `activePrefixKey` 计算属性——仅当输入非空时才命中（空输入返回 null）；模板改用它判定。
+- **涉及**：`apps/web/src/pages/SelectTrip.vue`、`apps/web/src/styles/base.css`。
+
+---
+
+## [0.2.5] — 2026-09-28
+
+**车次前缀专属色 + 键盘排版优化**（分支 `feat/ui-rebuild-20260928`）。
+
+### 1. 每类车次一个专属颜色（前缀键盘 ↔ 车次列表对应）
+
+- 新增 `TRAIN_COLORS` 色板：G 高铁蓝 `#4d9fff` / D 动车青绿 `#35c2a5` / C 城际青蓝 `#7fb4d8` / Z 直达紫 `#9d8cf0` / T 特快橙 `#e0915a` / K 快速黄绿 `#74bd89` / L 临客灰蓝 `#8a97a8` / S 市郊天蓝 `#6aa9f0` / Y 旅游品红 `#e5769f` / 纯数字普速灰 `#a3aebd`。
+- **前缀键盘**：字母色块改为 `color-mix(var(--prefix-color) 16%)` 底 + `--prefix-color` 字色，每键一色。
+- **车次列表**：`train-card` 增加 `--train-color`（由 `trainColor(trainCode)` 计算），左侧 3px 色条与车次号文字同步染对应色，与键盘字母**同色对应**；无变量时回退旧分组语义（hsr 蓝 / intercity 青 / 其余灰）。
+- **涉及**：`apps/web/src/pages/SelectTrip.vue`（`TRAIN_COLORS` / `trainColor` + 模板内联变量）、`apps/web/src/styles/base.css`（`.code-prefix__letter` / `.train-card::before` / `.train-card__code`）。
+
+### 2. 键盘排版优化
+
+- Z 中文名「直达特快」→「直达」（更简洁）；键帽更紧凑整齐：网格列宽 88→96px、键高 44→42px、字母色块 26→22px、英文名改 10px 并改为「中文名 + 英文名」基线同行排列（`flex` + `baseline`），视觉上更小更齐。
+
+### 验证
+
+- `vue-tsc --noEmit` 通过；UI 探针实测 10 个前缀键 `--prefix-color` 各不相同且与色板一致；`pnpm build` 通过。
+
+---
+
+## [0.2.4] — 2026-09-28
+
+**车次号前缀键盘**（分支 `feat/ui-rebuild-20260928`）。
+
+### 1. 新增车次类型前缀快捷键盘
+
+- **需求**：车次号首字母类型多（G/D/C/Z/T/K/L/S/Y），还有无字母的纯数字普速车，用户不一定记得全；输入前给出可点选的类型键盘。
+- **实现**：「或按车次号直达」输入框下方新增一排前缀胶囊（auto-fill 网格，窄屏 3 列 / 宽屏更多列），每键包含**字母色块 + 中文名 + 英文名**：
+  - G 高铁 High-speed / D 动车 EMU / C 城际 Intercity（蓝/青色块，与车次卡类型色一致）
+  - Z 直达特快 Direct / T 特快 Express / K 快速 Fast / L 临客 Temp / `#` 普速 Regular（中性色块）
+  - S 市郊 Suburban / Y 旅游 Tourist
+- **交互**：点击即**替换车次号首字母并保留已输数字**（输 `8991` 点 G → `G8991`，再点 Z → `Z8991`，点 `#` → `8991`）；当前输入首字母对应的键以 `aria-pressed` 高亮。
+- **涉及**：`apps/web/src/pages/SelectTrip.vue`（`codePrefixes` / `applyPrefix` + 模板）、`apps/web/src/styles/base.css`（`.code-prefix*`）。
+
+### 验证
+
+- `vue-tsc --noEmit` 通过；UI 探针实测 10 个键渲染齐全（中英文标注正确）、三步替换交互（8991→G8991→Z8991→8991）全部符合预期；竖屏截图确认窄列下无英文截断。
+
+---
+
+## [0.2.3] — 2026-09-28
+
+**导航栏融入页面 + 品牌标识加大**（分支 `feat/ui-rebuild-20260928`）。
+
+### 1. 品牌标识加大
+
+- 顶栏 Logo 高度 28px → **34px**，在 48/56/64 三档栏高内均有足够余量；删去基线光学校正（Logo 改为垂直居中对齐，不再依赖 baseline nudge）。
+- **涉及**：`apps/web/src/components/AppTopBar.vue`。
+
+### 2. 导航条与主页面融为一体
+
+- **去掉底部描边**：不再有横贯全宽的分隔线。
+- **背景更淡**：渐变玻璃由 0.82→0.34 改为 0.5 → 0.24 → **0（底部完全透明）**，模糊降到 10px——顶栏像悬浮在页面/地图之上，而非一块独立的条。
+- **滚动反馈改为"轻托底"**：滚过 8px 后仅加深到 0.66→0（依旧无硬边框），保证 Logo 可辨的同时不破坏融合感。
+- **版本徽标弱化**：去掉边框盒，改为弱化小字（`--text-3` + 75% 不透明度），减少导航条的"框"感；同步清理已无引用的 `.appbar__tagline` 样式与 560px 断点。
+- **涉及**：`apps/web/src/components/AppTopBar.vue`。
+
+### 验证
+
+- `vue-tsc --noEmit` 通过；UI 探针桌面（1440×900）与竖屏（390×844）截图复核：Logo 清晰放大、顶栏无边框且与背景地图自然融合。
+
+---
+
+## [0.2.2] — 2026-09-28
+
+**背景地图铺满 + 玻璃透明度再降 + 渐变顶栏 + 输入框/动效优化**（鸿蒙展示类设计规范，分支 `feat/ui-rebuild-20260928`）。
+
+### 1. 背景中国地图铺满全屏（竖屏/横屏一致）
+
+- **需求**：地图不再"锚定在卡片下方一角"，而是任何屏幕比例下都铺满整个视口。
+- **方案**：`.backdrop__stage` 改为覆盖式缩放——宽 `120vmax` 中心锚定视口中部，宽高均 ≥ 视口，溢出被 `overflow:hidden` 裁掉；极窄竖屏（`max-aspect-ratio: 3/4`）用 `150vw` 兜底、短视口横屏用 `150vh` 保证纵向铺满；遮罩改为 `ellipse 100% at 50%`、55% 后渐隐，四角柔和淡出。
+- **涉及**：`apps/web/src/components/ChinaBackdropMap.vue`。
+
+### 2. 卡片透明度再降低（鸿蒙沉浸光感玻璃）
+
+- 表面 L1–L3 alpha：0.78/0.72/0.82 → **0.62/0.55/0.66**；sunken 0.85→0.68、scrim 0.72→0.6；描边全线再降（hairline .045→.04、default .07→.06、strong .11→.10、accent .32→.28）。
+- 玻璃参数同步加强：`--glass-blur` 20→26px、`--glass-saturate` 1.35→1.5、tile 档 12→16px，保证更透的同时内容对比度不塌。
+- **涉及**：`apps/web/src/styles/tokens.css`。
+
+### 3. 顶部导航栏改渐变半透明（鸿蒙展示类规范）
+
+- 由单色 rgba + color-mix 改为**纵向渐变玻璃**：顶部 0.82 → 中部 0.55 → 底部 0.34，模糊/饱和提升到全局 `--glass-blur/--glass-saturate` 档；新增 `.is-scrolled` 滚动态（滚过 8px 后加深为 0.92→0.5），内容从栏下穿过时保持可读。
+- **涉及**：`apps/web/src/components/AppTopBar.vue`（含滚动监听）。
+
+### 4. 输入文本框优化
+
+- 输入框/下拉获得玻璃质感（tile 档 backdrop-filter）；新增占位符色（`--text-3`）；焦点态由"实线描边"升级为"强调描边 + 外发光"（`0 0 0 3px accent-soft` + 16px 蓝色柔光）；过渡补齐 box-shadow。
+- **涉及**：`apps/web/src/styles/base.css`（`.select-form input` / `.od-panel select`）。
+
+### 5. 组件入场动效统一（鸿蒙展示类：强调缓动 + 级联错峰）
+
+- 新增 `rv-card-in` 关键帧（上浮 14px + 0.99 缩放 + 强调缓动），所有 `.rv-card` 统一入场；栅格主栏卡片按 DOM 序 20/70/120/170ms 级联、侧栏 100ms，避免整屏同帧弹出；`prefers-reduced-motion` 下仍全局禁用动画。
+- **涉及**：`apps/web/src/styles/base.css`。
+
+### HarmonyOS Developer Knowledge MCP
+
+- `~/.workbuddy/mcp.json` 已注册 `harmonyos_developer_knowledge`（http, connect-api.cloud.huawei.com）；本环境直接对端点完成 MCP `initialize` 握手验证（返回 `DeveloperCommunity` v1.0.0，工具 `searchDocuments` / `getDocumentsById` 就绪），连接正常。
+
+### 验证
+
+- `vue-tsc --noEmit` 通过；UI 探针三断点（1440×900 / 390×844 / 844×390）截图复核：地图铺满、玻璃通透、渐变顶栏、输入框质感全部生效。
+
+---
+
+## [0.2.1] — 2026-09-28
+
+**按车次号直达查询 + 最近访问折叠收纳**（分支 `feat/ui-rebuild-20260928`）。
+
+### 1. 新功能：按车次号搜索
+
+- **动机**：用户已知车次时，OD 两步查询多余；直接输车次号进时刻表再选上下车站更快。
+- **后端**：新增 `GET /api/trains/by-code?code=Z8991&date=2026-10-20`，数据源为 12306 公开搜索服务（`search.12306.cn/search/v1/train/search`，无需 kyfw 会话）；返回行即全程经停序列（含内部 `train_no`），解析规则与 `getStops` 一致（`----`→null、首末站类型、本地坐标补全、`attachAbsoluteTimes`）；带缓存 + 负缓存（`bycode:` 键）；车次号格式校验（`BAD_CODE`）与未查到（`NOT_FOUND` → 404）分级。
+- **前端**：查询表单底部新增次级入口「或按车次号直达」（细分隔线 + 单行输入 + 查时刻按钮，复用同一乘车日期字段）；回车/点击后跳过 OD 查询直接进「确认上下车站」，默认上下车站为始发/终到，OD 输入框同步为首末站（保证「重新发车」与预设轨道匹配链路一致）。
+- **涉及**：`apps/api/src/services/cr12306.ts`（`queryByCode`/`fetchByCode`）、`apps/api/src/routes/trains.ts`（`/by-code`）、`apps/web/src/api/client.ts`（`searchTrainByCode`）、`apps/web/src/pages/SelectTrip.vue`（`searchByCode` + 模板）、`apps/web/src/styles/base.css`（`.code-search`）。
+- **已知限制**：车次号需按乘车日存在且为公开车次号（如 Z8991/G87），不支持站内模糊匹配。
+
+### 2. 最近访问折叠收纳（推翻 0.2.0 反馈轮的"竖屏前置"方案）
+
+- **需求变更**：用户明确"把最近访问折叠起来到查询直达车次下面"——0.2.0 反馈轮把竖屏最近访问用 `order:-1` 提到了表单之上，本版按新需求回退该方案（删除竖屏 order 覆盖），改为：**模块固定在查询表单下方，默认收起**，标题行即开关（44px 热区 + 数量徽标 + 箭头旋转指示），点击展开行程列表。
+- **涉及**：`apps/web/src/pages/SelectTrip.vue`（折叠模板 + `recentOpen`）、`apps/web/src/styles/base.css`（`.recent-list__toggle/__count/__chevron/__body`，删除竖屏 order 块）。
+
+### 验证
+
+- `vue-tsc --noEmit` 通过；`pnpm build` 通过。
+- `curl /api/trains/by-code?code=Z8991&date=...` 实测返回全程经停（含 trainNo）；UI 探针复核三断点布局与折叠交互。
+
+---
+
+## [0.2.0] — 2026-09-28
+
+**主界面 UI 整体重构**（对应《docs/UI整体重构设计方案-20260928.md》全量实施，分支 `feat/ui-rebuild-20260928`）。
+
+设计规范来源：HarmonyOS 官方设计规范（宇宙蓝主色 / 雪域灰表面 / 4·8·16·20·32 圆角档位 / 8vp 间距网格 / 200·250·300ms 转场分档）。
+
+**数据文件零改动**：`data/**` 未触碰（背景地图的资源由构建期脚本从高德行政区划接口一次性生成）。
+
+### 1. 修复：滚动链（P0）
+
+- **根因**：`styles/map.css` 给 `html, body` 全局加了 `height:100% + overflow:hidden`（地图页需要），而 `base.css` 首行 `@import './map.css'` 使该锁污染所有页面 → `document.scrollingElement`（恒为 html）被锁死，键盘滚动（PageDown/Space/Home/End）全部失效；此前鼠标滚轮能用，纯靠 `body:has(.select-page){overflow:auto}` 歪打正着。
+- **修复**：锁收回到按页路由（`html:has(.trip-page)` / `html:has(.atlas-page)`），选行程页与线路详情页回归「文档流 + document 单一滚动容器」。
+- **验证**：`scripts/ui-probe.mjs`（CDP 真实输入事件）五档断点全部通过：滚轮 +646~1500、键盘 PageDown +682~1453；`/trip` `/atlas` 仍全屏锁定不回归。
+- **涉及**：`apps/web/src/styles/map.css`、`base.css`。
+
+### 2. 设计令牌重写（tokens.css）
+
+- 配色转向鸿蒙风格中性灰蓝：表面四级雪域灰（`#0b0e14 → #222b38`）+ 宇宙蓝主色（`#4d9fff`）；语义色统一降饱和（30–60%）；清理全部硬编码冷蓝（`#07101c`/`#152033`/`rgba(14,165,233)` 等）。
+- 圆角对齐 HarmonyOS 官方档位（4/8/16/20/32），层级正相关（弹窗 > 按钮 > 卡片 > 列表行）；修复「卡片 16 > 按钮 10」的反向层级。
+- 间距收敛到 8px 基线；模块标题统一为单一字号档（17px）；动效时长改 200/250/300 分档。
+- 保留兼容别名（`--bg-base` → `--surface-0` 等）一个版本，未参与本轮重构的地图页组件平滑过渡。
+- **连带修复**：`TripMap.vue` 轨道线曾硬编码旧品牌金，而图例用 `var(--accent)`，主题变色后两者会脱节——改为运行时读令牌（`--rail` / `--accent-hover`），图例与线路永久同色。
+
+### 3. 栅格与响应式（base.css 重写）
+
+- 引入 `.rv-shell` 单一页面容器 + 12 列栅格（`.rv-grid` / `.rv-col--main` 7 列 / `.rv-col--side` 5 列）：所有模块收进同一容器，左基线从「333/373/433 四条」收敛为**完全重合**（实测差值 0）。
+- 断点矩阵：sm(<600) 单列 / md(≥600) 双栏 / lg(≥840) 双栏+主栏 sticky / xl(≥1200) 收窄 1120px；短视口横屏（`orientation:landscape and max-height:560px`）压缩顶栏、OD 输入框并排、首屏完整可见查询区（实测占用 380/390）。
+- `min-width:0` + 栅格比例自适应，杜绝堆叠溢出（五档断点实测无横向溢出）。
+
+### 4. 顶部导航栏 + Logo 重做
+
+- 新增 `AppTopBar.vue`：sticky 吸顶毛玻璃；高度按断点 48/56/64；Logo 与版本徽标基线对齐（含光学校正）。
+- `BrandLogo.vue` 按用户要求改为**直接使用官方品牌组合图**（`assets/heyworld-brand.png`，图形+中英文字标一体），不再自绘；顶栏移除冗余副标题。
+- hero 移除 Logo 后高度 135px → 68px（桌面）/ 193px → 60px（竖屏）。
+
+### 5. 背景中国地图（离线静态，零运行时请求）
+
+- 新增 `scripts/build-china-backdrop.mjs`：构建期经 dev server 复用已配置的高德 key 抓取国界（含台湾省、南海诸岛、海南岛全部岛屿环），Douglas-Peucker 简化 + Web Mercator 投影，冻结为 `assets/china-outline.svg`（65KB / gzip 22KB，291 环）+ `data/chinaBackdrop.ts`（432 个全国铁路景点热力点，复用 `data/presets/scenic-spots.json`）。
+- 新增 `ChinaBackdropMap.vue`：轮廓 `?raw` **内联进 JS 包**，运行时不发起任何网络请求、不依赖在线地图服务；Canvas 热力层（DPR 感知、空间分桶加速近邻查询）；指针移入径向高光跟随 + 附近景点光点亮起（rAF 合帧，仅写 CSS 变量）；整体不透明度约 8% 感知亮度配平，前景卡片为不透明表面，正文对比度不受影响。
+- **合规**：数据源为高德（白名单服务商）；轮廓含台湾省、南海诸岛环（生成脚本输出明示需人工校核后提交）；无境外瓦片。
+- **降级**：触屏（无 hover）与 `prefers-reduced-motion` 下只渲染静态底图。
+
+### 6. DeepSeek 式悬停三件套
+
+- 新增 `composables/usePointerSpotlight.ts`：事件委托 + rAF 合帧，把指针位置写入 `--mx/--my/--mx-line`。
+- `.rv-card` / `.rv-tile` 悬停：跟随光晕（强度由 `--glow-radius` / `--glow-alpha` 令牌驱动）+ 顶部高光带横向流转 + 微缩放（`translateY(-2px) scale(1.006)` 弹性曲线）+ 描边渐显。
+- 全部包在 `@media (hover:hover) and (pointer:fine)` 内，触屏无 hover 残留；`prefers-reduced-motion` 下禁用。
+
+### 7. 排行榜模块对齐
+
+- `RankingsSection.vue` 进 `.rv-col--side`，宽度/左基线由栅格决定；全部样式改语义令牌；修两处退化渐变（`linear-gradient(a,a)`）；Tab/关注行触控热区补齐到 44px（伪元素扩展，视觉尺寸不变）。
+
+### 8. 首轮评审反馈修正（8 项）
+
+1. **Logo**：改用官方品牌组合图直接渲染（见第 4 节）。
+2. **横屏 hero 下方两模块美化**：榜单胶囊 Tab 由「折行 3–4 行」改为**单行横向滚动**（隐藏滚动条、胶囊不压缩）；「全国铁路景点地图」入口升级为渐变玻璃主入口（宇宙蓝→紫渐变 + 同心圆航线装饰 + 箭头胶囊 + 指针光晕）。
+3. **竖屏没有「最近访问」**：实际有渲染但排在高表单之后被挤出首屏。竖屏（<600px）用 grid `order` 把条目顺序调为「当前行程 → 最近访问 → 查询表单」，高频的「继续上次行程」直接出现在标题下方（种子数据实测 top=140、首屏内）。
+4. **沉浸光感升级为全局设置并增强**：`tokens.css` 新增 `--glass-blur/--glass-saturate/--glow-radius/--glow-alpha`（含 tile 档）令牌；一级卡片与二/三级条目（`.recent-card`/`.train-card`/`.rank-card`/`.rank-row`/`.atlas-entry`）统一「半透明表面 + 指针跟随光晕」，`usePointerSpotlight` 改为「最近匹配」命中条目本身；光晕半径 320px→460px、峰值透明度 0.07→0.13，并叠加宇宙蓝色第二层光晕。
+5. **框体透明度降低**：表面 L1–L3 改半透明（`rgba(19,24,32,.78)` 等），卡片/条目加 `backdrop-filter` 玻璃模糊；描边不透明度整体下调（hairline .06→.045、default .1→.07、strong .16→.11、accent .42→.32）。
+6. **背景中国地图更明显**：`--backdrop-map-opacity` 0.3→0.48，热力层系数 0.6→0.75，桌面舞台放大（52vw/620px→56vw/700px）；配合半透明玻璃卡片，地图从卡下透出。
+7. **横屏日期面板被「最近访问」盖住**：两层修复——① 表单卡含打开面板（`.dtf--open` / 站名建议）时整卡提升 `z-index:30`（`.rv-card` 的 `isolation` 使相邻卡按 DOM 序绘制，必须整卡抬层）；② 短视口横屏面板改**向上弹出**并紧凑化日历（收起冗余「当前选择」条、日格 26px→20px），390px 高视口实测面板 top=6 / bottom=249 完整可见可交互。
+8. 以上全部落在 `feat/ui-rebuild-20260928` 分支。
+
+### 涉及文件清单
+
+| 文件 | 类型 |
+| --- | --- |
+| `apps/web/src/styles/tokens.css` | 重写（设计令牌） |
+| `apps/web/src/styles/base.css` | 重写（栅格+组件系统） |
+| `apps/web/src/styles/map.css` | 修改（滚动锁按页收回） |
+| `apps/web/src/pages/SelectTrip.vue` | 重构（双栏栅格） |
+| `apps/web/src/pages/TripMap.vue` | 修改（轨道线读令牌） |
+| `apps/web/src/components/AppTopBar.vue` | **新增** |
+| `apps/web/src/components/ChinaBackdropMap.vue` | **新增** |
+| `apps/web/src/components/BrandLogo.vue` | 重写（官方品牌图直出） |
+| `apps/web/src/components/DarkDateTimeField.vue` | 修改（横屏面板上弹 + 紧凑日历） |
+| `apps/web/src/components/rankings/RankingsSection.vue` | 修改（令牌对齐 + Tab 单行滚动 + 地图入口美化） |
+| `apps/web/src/composables/usePointerSpotlight.ts` | **新增** |
+| `apps/web/src/assets/china-outline.svg` | **新增**（构建期生成） |
+| `apps/web/src/data/chinaBackdrop.ts` | **新增**（构建期生成） |
+| `scripts/build-china-backdrop.mjs` | **新增**（构建工具） |
+| `scripts/ui-probe.mjs` | **新增**（UI 回归探针） |
+| `packages/shared/src/version.ts`、各 `package.json`、本文件 | 版本 0.2.0 |
+
+### 验证
+
+- `pnpm --filter @railvista/web exec vue-tsc --noEmit` 通过；`pnpm build` 全量通过（web 产物 128.7KB gzip，含内联地图与热力数据）。
+- UI 探针五档断点（390×844 / 844×390 / 834×1112 / 1440×900 / 1920×1080）：滚动（滚轮+键盘）全部恢复；左基线差值 0；无横向溢出；横屏首屏完整可见查询区。
+- 四路由回归：`/`（双栏+背景地图）、`/trip`（全屏锁定+轨道线换色后与图例一致）、`/route/:id`（文档流滚动）、`/atlas`（全屏锁定）。
+- 基线数据与截图存于 `docs/ui-rebuild-20260928/`。
+
+### 已知限制
+
+- `assets/china-outline.svg` 的边界画法生成后需一次人工校核（台湾省/南海诸岛/藏南/钓鱼岛）方可发布——本次已核对轮廓含台湾岛、海南岛与南海诸岛环，发布前建议再走一次人工确认。
+- `tokens.css` 兼容别名将在下一版本移除，届时未迁移的地图页组件需改用语义令牌。
 
 ---
 

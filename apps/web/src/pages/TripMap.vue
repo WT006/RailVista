@@ -524,10 +524,25 @@ function rebuildUnresolvedMarkers() {
   });
 }
 
+/**
+ * 轨道线配色：从设计令牌读取，保证与「图例」里的示意铁路色完全一致。
+ *
+ * 历史坑：这里曾硬编码旧品牌金 `#e4b25c`，而图例用 `var(--accent)`；
+ * 一旦主题色改变（如本轮改为鸿蒙宇宙蓝），硬编码值不会跟随，图例与线路就会"两张皮"。
+ * 因此改为运行时读取 CSS 变量，并保留兜底值以防变量缺失。
+ */
+function readToken(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
+
 function railStrokeOptions() {
+  const rail = readToken('--rail', '#4d9fff');
+  // 卫星底图偏亮，提高不透明度并略微提亮，保证线条仍可辨识
   return satelliteOn.value
-    ? { strokeColor: '#efc577', strokeOpacity: 0.95 }
-    : { strokeColor: '#e4b25c', strokeOpacity: 0.85 };
+    ? { strokeColor: readToken('--accent-hover', '#74b2ff'), strokeOpacity: 0.95 }
+    : { strokeColor: rail, strokeOpacity: 0.85 };
 }
 
 function applySatelliteLayers() {

@@ -1,91 +1,243 @@
+/**
+ * RailVista 设计令牌（Design Tokens）
+ *
+ * 规范来源：HarmonyOS 设计规范
+ *   - 色彩：主色取「宇宙蓝」（HarmonyOS 系统主色调，深色主题适当提亮）；
+ *           表面色取「雪域灰」（带淡蓝色相的中性灰，用作卡片底色衬托层级）。
+ *   - 圆角：官方通用档位 4 / 8 / 16 / 20 / 32 vp，且「层级越高圆角越大」。
+ *   - 间距：8vp 基线网格（取 8 的倍数）。
+ *   - 动效：转场按屏幕尺寸分档 200 / 250 / 300ms；曲线优先弹性。
+ *
+ * 约定：
+ *   1. 业务样式只允许引用本文件令牌，禁止硬编码色值 / 圆角 / 间距 / 时长。
+ *   2. 文件末尾保留一组「兼容别名」，把历史令牌名指向新令牌，
+ *      以便地图页等未参与本轮重构的页面平滑过渡；新代码请直接使用语义令牌。
+ */
+
 :root {
-  /* —— 中性表面（暖调墨黑，按高度递增）—— */
-  --bg-base:     #0d0f0e;
-  --bg-raised:   #151817;
-  --bg-elevated: #1c201e;
-  --bg-inset:    #101312;
-  --bg-scrim:    rgba(5, 7, 6, 0.66);
+  /* ══════════ 表面层级（雪域灰：中性灰 + 淡蓝色相，L0 最低 → L3 最高）══════════
+   * L1–L3 采用半透明表面 + 全局 backdrop-filter（见 base.css「沉浸光感」），
+   * 让背景中国地图在卡片下若隐若现，构成 HarmonyOS 式玻璃材质。
+   * 对比度评估：叠加在 --surface-0 之上后实际亮度与旧不透明色基本一致。 */
+  --surface-0: #0b0e14; /* 页面底（不透明，承载地图层） */
+  --surface-1: rgba(19, 24, 32, 0.62); /* 卡片 */
+  --surface-2: rgba(26, 33, 43, 0.55); /* 卡内条目 / 输入框 */
+  --surface-3: rgba(34, 43, 56, 0.66); /* 悬停抬升态 */
+  --surface-sunken: rgba(14, 19, 27, 0.68); /* 凹陷面（空态、代码块） */
+  --surface-scrim: rgba(4, 6, 10, 0.6); /* 遮罩 */
 
-  /* —— 分隔线 —— */
-  --border-hairline: rgba(255, 255, 255, 0.07);
-  --border-default:  rgba(255, 255, 255, 0.10);
-  --border-strong:   rgba(255, 255, 255, 0.16);
+  /* ══════════ 沉浸光感（Immersive Light，全局设置）══════════
+   * 参考 HarmonyOS 沉浸光感材质规范：玻璃模糊 + 提亮 + 指针跟随光晕。
+   * --glass-*：卡片级玻璃材质参数；--glow-*：指针光晕强度（一/二/三级内容共用）。
+   * 用户可按需整体调强 / 调弱：改这两个令牌即可全局生效。
+   * 本版按"再降低透明度"反馈加大玻璃模糊与饱和，强化通透层次。 */
+  --glass-blur: 26px;
+  --glass-saturate: 1.5;
+  --glass-blur-tile: 16px; /* 二级条目（卡内卡片）用更薄的玻璃 */
+  --glow-radius: 460px;
+  --glow-alpha: 0.13; /* 一级卡片光晕峰值透明度 */
+  --glow-alpha-tile: 0.1; /* 二/三级条目光晕峰值透明度 */
 
-  /* —— 文本 —— */
-  --text-primary:   #eceeec;
-  --text-secondary: #a9afa9;
-  --text-muted:     #71786f;
-  --text-on-accent: #1c1506;
+  /* ══════════ 描边（整体降不透明度：框体更轻盈，突出内容本身）══════════ */
+  --line-hairline: rgba(255, 255, 255, 0.04);
+  --line-default: rgba(255, 255, 255, 0.06);
+  --line-strong: rgba(255, 255, 255, 0.1);
+  --line-accent: rgba(77, 159, 255, 0.28);
+  /* 独立出「弱填充」语义：历史上多处把描边色当填充色用，此处纠正 */
+  --fill-subtle: rgba(255, 255, 255, 0.04);
+  --fill-accent: rgba(77, 159, 255, 0.09);
 
-  /* —— 品牌强调色（信号金 / 藏红花）—— */
-  --accent:            #e4b25c;
-  --accent-hover:      #efc577;
-  --accent-press:      #cd9a47;
-  --accent-container:  rgba(228, 178, 92, 0.14);
-  --accent-border:     rgba(228, 178, 92, 0.38);
+  /* ══════════ 文本层级（深色底上的对比度均 ≥ 4.5:1）══════════ */
+  --text-1: #e7ecf3; /* 主文本 */
+  --text-2: #a3aebd; /* 次要文本 */
+  --text-3: #6d7889; /* 弱化文本 / 说明 */
+  --text-on-accent: #05121f; /* 蓝底上的文字 */
 
-  /* —— 语义色（统一降饱和）—— */
-  --success: #79c587;  --success-container: rgba(121, 197, 135, 0.14);
-  --spot:    #de8a50;
-  --station: #e2c463;
-  --train:   #74bd89;
-  --info:    #83b4c4;
-  --warning: #dfb357;
-  --danger:  #d9826b;  --danger-container: rgba(217, 130, 107, 0.14);
+  /* ══════════ 品牌色（宇宙蓝）══════════ */
+  --accent: #4d9fff;
+  --accent-hover: #74b2ff;
+  --accent-press: #0a84ff;
+  --accent-soft: rgba(77, 159, 255, 0.14);
+  --accent-border: rgba(77, 159, 255, 0.42);
 
-  /* —— 字体 —— */
-  --font-sans: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
-  --font-display: 'Space Grotesk', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  /* ══════════ 语义色（统一降饱和，符合 HarmonyOS 主色饱和度 30–60% 约束）══════════ */
+  --success: #6cc27f;
+  --success-soft: rgba(108, 194, 127, 0.14);
+  --info: #7fb4d8;
+  --warning: #e0b155;
+  --warning-soft: rgba(224, 177, 85, 0.16);
+  --danger: #e0765c;
+  --danger-soft: rgba(224, 118, 92, 0.14);
+  --purple: #9d8cf0;
+  --purple-soft: rgba(157, 140, 240, 0.14);
 
-  /* —— 字号 / 行高 —— */
-  --text-display: clamp(1.6rem, 1.2rem + 2vw, 2.2rem);
-  --text-h1: clamp(1.4rem, 1.1rem + 1.4vw, 1.9rem);
-  --text-h2: 1.0625rem;
-  --text-h3: 0.875rem;
-  --text-body: 0.9375rem;
-  --text-sm: 0.8125rem;
-  --text-caption: 0.6875rem;
-  --text-code: 1.125rem;
+  /* 地图图例色：属"数据语义"而非主题语义，与地图页保持一致，不随主题漂移 */
+  --rail: #4d9fff;
+  --station: #e5ca6a;
+  --spot: #e0915a;
+  --train: #74bd89;
+  --gps: #6aa9f0;
 
-  /* —— 间距（4pt 基准）—— */
-  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
-  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
-  --space-14: 56px; --space-18: 72px; --space-24: 96px;
+  /* ══════════ 字体 ══════════ */
+  --font-sans: 'HarmonyOS Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'HarmonyOS Sans SC', 'PingFang SC', system-ui, sans-serif;
 
-  /* —— 圆角 —— */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 22px;
+  /* ══════════ 字号层级（模块标题全局统一为 --fs-h2，消除"同级不同号"）══════════ */
+  --fs-display: 26px;
+  --fs-h1: 20px;
+  --fs-h2: 17px; /* 所有模块标题 */
+  --fs-h3: 15px;
+  --fs-eyebrow: 11px; /* 英文小标 */
+  --fs-body: 15px;
+  --fs-input: 16px; /* ≥16px，避免 iOS 聚焦自动放大 */
+  --fs-meta: 13px;
+  --fs-cap: 12px;
+  --fs-micro: 11px;
+
+  --lh-tight: 1.25;
+  --lh-normal: 1.5;
+  --lh-snug: 1.45;
+
+  /* ══════════ 间距（8px 基线，对齐 HarmonyOS 8vp 网格）══════════ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+  --space-10: 64px;
+
+  --gap-inline: var(--space-2);
+  --gap-stack: var(--space-3);
+  --gap-card: var(--space-4);
+  --pad-card: var(--space-4);
+  --pad-card-lg: 20px;
+
+  /* ══════════ 圆角（HarmonyOS 官方档位，层级正相关）══════════ */
+  --radius-xs: 4px; /* 标签、角标 */
+  --radius-sm: 8px; /* 图标、列表行、基础控件 */
+  --radius-md: 16px; /* 普通卡片、内容容器 */
+  --radius-lg: 20px; /* 按钮、菜单、选项卡 */
+  --radius-xl: 32px; /* 半模态、弹出框 */
   --radius-full: 999px;
 
-  /* —— 阴影 —— */
-  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.30);
-  --elev-2: 0 6px 16px rgba(0, 0, 0, 0.28);
-  --elev-3: 0 16px 40px rgba(0, 0, 0, 0.38);
-  --elev-4: 0 28px 72px rgba(0, 0, 0, 0.50);
-  --inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  /* ══════════ 阴影（四档 + 内高光，构成"材质"而非"黑影"）══════════ */
+  --elev-0: none;
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --elev-2: 0 8px 24px -6px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --elev-3: 0 20px 48px -12px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --elev-4: 0 32px 80px -16px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --glow-accent: 0 0 0 1px var(--line-accent), 0 12px 36px -10px rgba(77, 159, 255, 0.2);
 
-  /* —— 动效时长 —— */
-  --dur-micro: 120ms;
-  --dur-fast:  180ms;
-  --dur-base:  240ms;
-  --dur-slow:  360ms;
-  --dur-slower: 520ms;
-  --dur-enter: 720ms;
+  /* ══════════ 动效 ══════════ */
+  --dur-micro: 100ms; /* 颜色 / 描边 */
+  --dur-fast: 200ms; /* 小构件状态切换 */
+  --dur-base: 250ms; /* 卡片悬停、Tab 切换 */
+  --dur-slow: 300ms; /* 页面转场 */
+  --dur-slower: 520ms; /* 大块内容进出场 */
+  --dur-enter: 400ms; /* 首屏入场 */
 
-  /* —— 缓动曲线 —— */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.2, 0.64, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-overshoot: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  /* ══════════ 栅格与布局 ══════════ */
+  --gutter: 16px;
+  --shell-max: 100%;
+  --appbar-h: 56px;
+  --col-ratio-main: 7; /* 主栏占 12 栅格中的 7 列 */
+  --col-ratio-side: 5; /* 侧栏占 12 栅格中的 5 列 */
+
+  /* ══════════ 背景中国地图（装饰层）══════════ */
+  /* 轮廓线的基准不透明度：数值按"感知亮度"定，
+     实际可见度 = 本值 × path 的 fill-opacity（见 ChinaBackdropMap.vue）。
+     前景卡片为半透明玻璃材质，地图可透过卡片隐约可见，
+     同时靠 backdrop-filter 保证正文对比度不受影响。 */
+  --backdrop-map-opacity: 0.48;
+  --backdrop-map-color: #b3cfff;
 }
 
+/* ── 断点：sm ≥600 / md ≥840 / lg ≥1200 ────────────────────────────────────
+ * 容器宽度策略：
+ *   <600px 手机竖屏  → 全宽 - 2×16  gutter（单列）
+ *   600–1199        → 全宽 - 2×gutter（双栏，尽量吃满屏幕，不做人为收窄）
+ *   ≥1200 桌面      → 收窄到 1120px，保证双栏阅读宽度与行宽舒适
+ */
+@media (min-width: 600px) {
+  :root {
+    --gutter: 20px;
+    --shell-max: 100%;
+    --appbar-h: 56px;
+  }
+}
+
+@media (min-width: 840px) {
+  :root {
+    --gutter: 24px;
+    --shell-max: 100%;
+    --appbar-h: 64px;
+    --fs-display: 32px;
+    --fs-h1: 22px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --shell-max: 1120px;
+    --pad-card: var(--pad-card-lg);
+  }
+}
+
+/* ── 短视口横屏（手机横屏 / 小平板横屏）：压缩顶栏与纵向节奏 ────────────── */
+@media (orientation: landscape) and (max-height: 560px) {
+  :root {
+    --appbar-h: 48px;
+    --fs-display: 22px;
+    --fs-h1: 18px;
+    --pad-card: 14px;
+    --gap-card: var(--space-3);
+  }
+}
+
+/* ── 无障碍：尊重系统「减少动态效果」───────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * 兼容别名：历史令牌名 → 新语义令牌
+ * 供地图页（TripMap / AtlasMap）、线路详情页等未参与本轮重构的模块继续工作。
+ * 新代码请勿引用本区块。
+ * ══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --bg-base: var(--surface-0);
+  --bg-raised: var(--surface-1);
+  --bg-elevated: var(--surface-2);
+  --bg-inset: var(--surface-sunken);
+  --bg-scrim: var(--surface-scrim);
+
+  --border-hairline: var(--line-hairline);
+  --border-default: var(--line-default);
+  --border-strong: var(--line-strong);
+
+  --text-primary: var(--text-1);
+  --text-secondary: var(--text-2);
+  --text-muted: var(--text-3);
+
+  --accent-container: var(--accent-soft);
+  --success-container: var(--success-soft);
+  --danger-container: var(--danger-soft);
+  --warning-container: var(--warning-soft);
+
+  --ease-out: var(--ease-standard);
 }

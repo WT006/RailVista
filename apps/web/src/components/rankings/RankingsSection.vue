@@ -90,7 +90,9 @@ function onFocusClick(rankingId: string, item: RankItem) {
 </script>
 
 <template>
-  <section class="rankings">
+  <!-- rv-card：统一卡片外观（圆角 / 描边 / 阴影 / 悬停光影）；
+       data-spotlight：把指针位置写入 --mx/--my，供 CSS 绘制光晕与顶部高光流转 -->
+  <section class="rankings rv-card" data-spotlight>
     <header class="rankings__head">
       <p class="rankings__eyebrow">RAIL RANKINGS</p>
       <h2 class="rankings__title">中国最美铁路</h2>
@@ -223,74 +225,99 @@ function onFocusClick(rankingId: string, item: RankItem) {
 </template>
 
 <style scoped>
+/*
+ * 「中国最美铁路」排行榜。
+ *
+ * 布局约定：本模块作为 .rv-card 放进页面的侧栏（.rv-col--side），
+ * 因此不再自行声明 max-width / margin —— 宽度与左基线完全由 .rv-shell + .rv-grid 决定。
+ * 所有色值 / 圆角 / 字号 / 间距 / 时长一律引用 tokens.css 的语义令牌。
+ */
+
 .rankings {
-  max-width: 560px;
-  margin: 0 auto 16px;
   display: grid;
-  gap: 12px;
-  padding: 16px 14px 14px;
-  border-radius: 16px;
-  border: 1px solid var(--border-default);
-  background: linear-gradient(180deg, var(--bg-elevated), var(--bg-raised));
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.28),
-    inset 0 1px 0 var(--border-hairline);
+  gap: var(--space-3);
 }
 
+/* ── 模块头 ── */
 .rankings__head {
   display: grid;
-  gap: 2px;
+  gap: var(--space-1);
 }
 
 .rankings__eyebrow {
   margin: 0;
-  font-size: 10.5px;
-  letter-spacing: 0.22em;
+  font-size: var(--fs-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--accent);
-  font-weight: 700;
 }
 
 .rankings__title {
   margin: 0;
-  font-size: 18px;
+  font-size: var(--fs-h2);
   font-weight: 700;
-  color: var(--text-primary);
+  line-height: var(--lh-tight);
+  color: var(--text-1);
 }
 
 .rankings__sub {
   margin: 0;
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.45;
+  font-size: var(--fs-cap);
+  line-height: var(--lh-snug);
+  color: var(--text-3);
 }
 
-/* ── 胶囊 Tab ── */
+/* ── 胶囊 Tab ──
+ * 单行横向滚动，不再折行：横屏窄侧栏里 4 个 Tab 折成 3–4 行是
+ * 之前观感凌乱的主因；一行胶囊 + 隐藏滚动条更接近 HarmonyOS 分段控件。 */
 .rankings__tabs {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* 微调滚动边界，让胶囊的悬停描边不被裁剪 */
+  padding: 2px;
+  margin: -2px;
+}
+
+.rankings__tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .rankings__tab {
-  padding: 5px 11px;
-  border-radius: 999px;
-  border: 1px solid var(--border-default);
-  background: var(--border-hairline);
-  color: var(--text-muted);
-  font-size: 12px;
+  position: relative;
+  flex-shrink: 0; /* 单行滚动排列：胶囊不被压缩变形 */
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-default);
+  background: var(--fill-subtle);
+  color: var(--text-3);
+  font-family: inherit;
+  font-size: var(--fs-cap);
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard);
+}
+
+/* 触控热区补齐到 44px：视觉尺寸保持紧凑，用伪元素扩大可点区域 */
+.rankings__tab::after {
+  content: '';
+  position: absolute;
+  inset: calc((44px - 100%) / -2) calc(-1 * var(--space-1));
 }
 
 .rankings__tab:hover {
-  color: var(--text-secondary);
-  border-color: var(--border-strong);
+  color: var(--text-2);
+  border-color: var(--line-strong);
 }
 
 .rankings__tab.is-active {
-  background: linear-gradient(180deg, var(--accent-container), var(--accent-container));
-  border-color: var(--accent-border);
+  border-color: var(--line-accent);
+  background: var(--accent-soft);
   color: var(--accent-hover);
   font-weight: 600;
 }
@@ -298,12 +325,14 @@ function onFocusClick(rankingId: string, item: RankItem) {
 /* 切换动画：200ms 淡入 + 位移 */
 .rank-swap-enter-active,
 .rank-swap-leave-active {
-  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  transition: opacity var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
 }
+
 .rank-swap-enter-from {
   opacity: 0;
   transform: translateY(8px);
 }
+
 .rank-swap-leave-to {
   opacity: 0;
   transform: translateY(-6px);
@@ -311,42 +340,45 @@ function onFocusClick(rankingId: string, item: RankItem) {
 
 .rankings__body {
   display: grid;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .rankings__source {
   margin: 0;
-  font-size: 11px;
-  color: var(--text-muted);
-  line-height: 1.5;
+  font-size: var(--fs-micro);
+  line-height: var(--lh-normal);
+  color: var(--text-3);
 }
 
 .rankings__source-nature {
   display: inline-block;
-  margin-right: 6px;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--accent-container);
+  margin-right: var(--space-1);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
   color: var(--accent-hover);
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
 }
 
 /* ── 前三名大卡 ── */
 .rankings__podium {
   display: grid;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .rank-card {
   position: relative;
   display: grid;
-  gap: 5px;
-  padding: 11px 12px 11px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-inset);
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-sunken);
   cursor: pointer;
-  transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+  transition:
+    transform var(--dur-fast) var(--ease-spring),
+    border-color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard);
 }
 
 .rank-card::before {
@@ -356,23 +388,19 @@ function onFocusClick(rankingId: string, item: RankItem) {
   top: 10px;
   bottom: 10px;
   width: 3px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 }
 
 .rank-card--gold::before {
-  background: linear-gradient(180deg, var(--warning), var(--warning));
-}
-.rank-card--silver::before {
-  background: linear-gradient(180deg, var(--text-secondary), var(--text-muted));
-}
-.rank-card--bronze::before {
-  background: linear-gradient(180deg, var(--warning), var(--accent-press));
+  background: linear-gradient(180deg, #f0c976, #c9a24d);
 }
 
-.rank-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-strong);
-  background: var(--bg-elevated);
+.rank-card--silver::before {
+  background: linear-gradient(180deg, #cdd5e0, #8d97a6);
+}
+
+.rank-card--bronze::before {
+  background: linear-gradient(180deg, #d79a6a, #a9703f);
 }
 
 .rank-card.is-muted {
@@ -381,61 +409,63 @@ function onFocusClick(rankingId: string, item: RankItem) {
 
 .rank-card__badge {
   position: absolute;
-  right: 10px;
-  top: 10px;
+  right: var(--space-2);
+  top: var(--space-2);
   width: 22px;
   height: 22px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
-  font-size: 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-on-accent);
+  font-size: var(--fs-cap);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--bg-base);
 }
 
 .rank-card--gold .rank-card__badge {
-  background: linear-gradient(135deg, var(--warning), var(--warning));
+  background: linear-gradient(135deg, #f0c976, #c9a24d);
 }
+
 .rank-card--silver .rank-card__badge {
-  background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+  background: linear-gradient(135deg, #e2e7ee, #9aa4b2);
 }
+
 .rank-card--bronze .rank-card__badge {
-  background: linear-gradient(135deg, var(--warning), var(--accent-press));
+  background: linear-gradient(135deg, #d79a6a, #a9703f);
 }
 
 .rank-card__name {
   margin: 0;
   padding-right: 30px;
-  font-size: 14px;
+  font-size: var(--fs-h3);
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
 }
 
 .rank-od {
   justify-self: start;
-  padding: 1px 7px;
-  border-radius: 999px;
-  border: 1px solid var(--border-default);
-  background: var(--border-hairline);
-  color: var(--text-secondary);
-  font-size: 11px;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-default);
+  background: var(--fill-subtle);
+  color: var(--text-2);
+  font-size: var(--fs-micro);
 }
 
 .rank-card__tagline {
   margin: 0;
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 1.5;
+  font-size: var(--fs-cap);
+  line-height: var(--lh-normal);
+  color: var(--text-2);
 }
 
 .rank-card__meta {
   margin: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  font-size: 11px;
-  color: var(--text-muted);
+  gap: var(--space-2);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
 
@@ -444,27 +474,35 @@ function onFocusClick(rankingId: string, item: RankItem) {
 }
 
 .rank-card__go {
-  font-size: 11.5px;
-  color: var(--accent);
+  font-size: var(--fs-cap);
   font-weight: 600;
+  color: var(--accent);
 }
 
 .rank-card__none {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
 }
 
 .rank-card__note {
   margin: 0;
-  font-size: 11px;
-  color: var(--text-muted);
-  line-height: 1.5;
+  font-size: var(--fs-micro);
+  line-height: var(--lh-normal);
+  color: var(--text-3);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rank-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    background: var(--surface-2);
+  }
 }
 
 /* 渐变分隔线 */
 .rankings__divider {
   height: 1px;
-  background: linear-gradient(90deg, var(--accent-container), var(--border-hairline));
+  background: linear-gradient(90deg, var(--accent-soft), var(--line-hairline));
 }
 
 /* ── 第 4 名起：紧凑列表行 ── */
@@ -473,24 +511,22 @@ function onFocusClick(rankingId: string, item: RankItem) {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .rank-row {
+  position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 9px;
-  padding: 7px 9px;
-  border-radius: 10px;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform var(--dur-micro) var(--ease-out), background var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
-}
-
-.rank-row:hover {
-  transform: translateY(-1px);
-  background: var(--border-hairline);
-  border-color: var(--border-default);
+  transition:
+    transform var(--dur-micro) var(--ease-standard),
+    background-color var(--dur-micro) var(--ease-standard),
+    border-color var(--dur-micro) var(--ease-standard);
 }
 
 .rank-row.is-muted {
@@ -498,9 +534,17 @@ function onFocusClick(rankingId: string, item: RankItem) {
 }
 
 .rank-row.is-open {
-  background: var(--border-hairline);
-  border-color: var(--border-default);
+  background: var(--fill-subtle);
+  border-color: var(--line-default);
   opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rank-row:hover {
+    transform: translateY(-1px);
+    background: var(--fill-subtle);
+    border-color: var(--line-default);
+  }
 }
 
 .rank-row__no {
@@ -509,10 +553,10 @@ function onFocusClick(rankingId: string, item: RankItem) {
   height: 20px;
   display: grid;
   place-items: center;
-  border-radius: 6px;
-  background: var(--border-hairline);
-  color: var(--text-secondary);
-  font-size: 11px;
+  border-radius: var(--radius-xs);
+  background: var(--fill-subtle);
+  color: var(--text-2);
+  font-size: var(--fs-micro);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -521,73 +565,73 @@ function onFocusClick(rankingId: string, item: RankItem) {
   flex: 1;
   min-width: 0;
   display: grid;
-  gap: 2px;
+  gap: var(--space-1);
 }
 
 .rank-row__line {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .rank-row__name {
-  font-size: 12.5px;
+  font-size: var(--fs-meta);
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 
 .rank-row__tagline {
-  font-size: 11.5px;
-  color: var(--text-muted);
-  line-height: 1.45;
+  font-size: var(--fs-micro);
+  line-height: var(--lh-snug);
+  color: var(--text-3);
 }
 
 .rank-row__note {
-  margin-top: 2px;
-  font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1.45;
+  margin-top: var(--space-1);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-snug);
+  color: var(--text-2);
 }
 
 .rank-row__src {
   flex-shrink: 0;
   align-self: center;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--border-hairline);
-  color: var(--text-muted);
-  font-size: 10.5px;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--fill-subtle);
+  color: var(--text-3);
+  font-size: var(--fs-micro);
 }
 
 .rank-row__go {
   flex-shrink: 0;
   align-self: center;
   color: var(--accent);
-  font-size: 14px;
+  font-size: var(--fs-body);
   line-height: 1;
 }
 
 /* ── 我的关注 ── */
 .rankings__focus {
-  padding: 9px 10px;
-  border-radius: 10px;
-  border: 1px dashed var(--accent-container);
-  background: var(--accent-container);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--line-accent);
+  background: var(--accent-soft);
 }
 
 .rankings__focus-title {
-  margin: 0 0 6px;
-  font-size: 11.5px;
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-cap);
   font-weight: 700;
   color: var(--accent-hover);
 }
 
 .rankings__focus-hint {
-  margin-left: 4px;
+  margin-left: var(--space-1);
+  font-size: var(--fs-micro);
   font-weight: 400;
-  color: var(--text-muted);
-  font-size: 10.5px;
+  color: var(--text-3);
 }
 
 .rankings__focus-list {
@@ -595,26 +639,39 @@ function onFocusClick(rankingId: string, item: RankItem) {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 3px;
+  gap: var(--space-1);
 }
 
 .rankings__focus-btn {
+  position: relative;
   width: 100%;
+  min-height: 32px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 6px;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--text-secondary);
-  font-size: 11.5px;
-  cursor: pointer;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: var(--fs-cap);
   text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
 }
 
-.rankings__focus-btn:hover:not(:disabled) {
-  background: var(--accent-container);
+/* 触控热区补齐到 44px */
+.rankings__focus-btn::after {
+  content: '';
+  position: absolute;
+  inset: calc((44px - 100%) / -2) 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rankings__focus-btn:hover:not(:disabled) {
+    background: var(--fill-accent);
+  }
 }
 
 .rankings__focus-btn:disabled {
@@ -625,12 +682,13 @@ function onFocusClick(rankingId: string, item: RankItem) {
 .rankings__focus-no {
   width: 16px;
   text-align: center;
-  color: var(--text-muted);
+  color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
 
 .rankings__focus-name {
   font-weight: 600;
+  color: var(--text-1);
 }
 
 .rankings__focus-count {
@@ -640,65 +698,129 @@ function onFocusClick(rankingId: string, item: RankItem) {
 
 .rankings__focus-src {
   margin-left: auto;
-  color: var(--text-muted);
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
 }
 
-/* ── 全国铁路景点地图入口 ── */
+/* ── 全国铁路景点地图入口 ──
+ * 侧栏的"次级主行动点"：用宇宙蓝渐变玻璃 + 同心圆轨迹装饰，
+ * 与榜单条目拉开层级；悬停时光晕点亮 + 箭头位移。 */
 .atlas-entry {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 13px;
-  border-radius: 12px;
-  border: 1px solid var(--accent-container);
-  background: linear-gradient(135deg, var(--accent-container), var(--bg-elevated));
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-accent);
+  background: linear-gradient(
+    135deg,
+    rgba(77, 159, 255, 0.22),
+    rgba(77, 159, 255, 0.07) 52%,
+    rgba(157, 140, 240, 0.14)
+  );
   color: var(--accent-hover);
+  font-family: inherit;
   cursor: pointer;
-  transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  transition:
+    transform var(--dur-fast) var(--ease-spring),
+    border-color var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-base) var(--ease-standard);
 }
 
-.atlas-entry:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-border);
+/* 装饰：右上角同心圆"航线"纹理（纯 CSS，随容器裁剪） */
+.atlas-entry::before {
+  content: '';
+  position: absolute;
+  right: -26px;
+  top: -30px;
+  width: 104px;
+  height: 104px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(77, 159, 255, 0.28);
+  box-shadow:
+    0 0 0 18px rgba(77, 159, 255, 0.07),
+    0 0 0 36px rgba(77, 159, 255, 0.04);
+  pointer-events: none;
+}
+
+/* 指针光晕（与其他二/三级条目同规格，坐标由 usePointerSpotlight 写入） */
+.atlas-entry::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    calc(var(--glow-radius) * 0.55) circle at var(--mx, 50%) var(--my, 0%),
+    rgba(255, 255, 255, var(--glow-alpha-tile)),
+    transparent 65%
+  );
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .atlas-entry:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    box-shadow: 0 12px 32px -12px rgba(77, 159, 255, 0.35);
+  }
+
+  .atlas-entry:hover::after {
+    opacity: 1;
+  }
+
+  .atlas-entry:hover .atlas-entry__go {
+    transform: translateX(3px);
+  }
 }
 
 .atlas-entry__main {
   display: grid;
-  gap: 2px;
+  gap: var(--space-1);
   text-align: left;
 }
 
 .atlas-entry__title {
-  font-size: 14px;
+  font-size: var(--fs-h3);
   font-weight: 700;
+  color: var(--text-1);
 }
 
 .atlas-entry__desc {
-  font-size: 11.5px;
-  color: var(--text-muted);
+  font-size: var(--fs-cap);
+  color: var(--text-2);
 }
 
 .atlas-entry__go {
   flex-shrink: 0;
-  font-size: 12px;
-  color: var(--accent);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-accent);
+  background: rgba(77, 159, 255, 0.16);
+  font-size: var(--fs-cap);
   font-weight: 600;
+  color: var(--accent-hover);
+  transition: transform var(--dur-fast) var(--ease-spring);
 }
 
 /* ── 来源脚注 ── */
 .rankings__sources {
   display: grid;
-  gap: 4px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border-hairline);
+  gap: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--line-hairline);
 }
 
 .rankings__sources-title {
   margin: 0;
-  font-size: 10.5px;
-  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
 }
 
 .rankings__sources ul {
@@ -706,14 +828,14 @@ function onFocusClick(rankingId: string, item: RankItem) {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 2px;
+  gap: var(--space-1);
 }
 
 .rankings__sources a {
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
+  line-height: var(--lh-normal);
   color: var(--accent-hover);
   text-decoration: none;
-  line-height: 1.5;
 }
 
 .rankings__sources a:hover {
@@ -721,18 +843,14 @@ function onFocusClick(rankingId: string, item: RankItem) {
 }
 
 .rankings__sources-note {
-  margin: 2px 0 0;
-  font-size: 10.5px;
-  color: var(--text-muted);
-  line-height: 1.5;
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-micro);
+  line-height: var(--lh-normal);
+  color: var(--text-3);
 }
 
+/* ── 窄屏：列表行允许换行，来源标签下移 ── */
 @media (max-width: 480px) {
-  .rankings {
-    padding: 13px 11px 12px;
-    border-radius: 14px;
-  }
-
   .rank-row {
     flex-wrap: wrap;
   }
@@ -746,6 +864,7 @@ function onFocusClick(rankingId: string, item: RankItem) {
   .rank-card,
   .rank-row,
   .atlas-entry,
+  .atlas-entry__go,
   .rankings__tab {
     transition: none;
   }

@@ -5,11 +5,11 @@
  * 并在需要时按 SemVer 递增这里的 APP_VERSION（小迭代递增修订号）。
  * 前端首页显示的版本号直接读取本文件，因此不会出现文档与界面不一致。
  */
-export const APP_VERSION = '0.1.3';
+export const APP_VERSION = '0.2.6';
 
 /** 版本对应的发布/变更摘要，便于 UI 展示（与 CHANGELOG.md 首条一致） */
 export const APP_VERSION_SUMMARY =
-  '精准路线生成性能加速 + 景点刷新修复 + 精度状态面板；主页排行榜与全国铁路景点地图';
+  '前缀键盘中文名单行修复 + 空输入高亮修正';
 
 /** ISO 日期：本次版本号最后一次递增的日期 */
 export const APP_VERSION_DATE = '2026-09-28';

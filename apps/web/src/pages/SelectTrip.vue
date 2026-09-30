@@ -18,8 +18,13 @@ import {
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import RailProgressLoader from '../components/RailProgressLoader.vue';
 import RankingsSection from '../components/rankings/RankingsSection.vue';
-import BrandLogo from '../components/BrandLogo.vue';
+import AppTopBar from '../components/AppTopBar.vue';
+import ChinaBackdropMap from '../components/ChinaBackdropMap.vue';
+import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 import { useTripStore } from '../stores/tripStore';
+
+/** 卡片悬停光影（指针位置写入 --mx/--my，由 CSS 绘制光晕与高光流转） */
+usePointerSpotlight();
 
 const router = useRouter();
 const route = useRoute();
@@ -46,6 +51,61 @@ const boardTo = ref('');
 const step = ref<'search' | 'od'>('search');
 const recent = ref<TripIndexEntry[]>([]);
 const currentEntry = ref<TripIndexEntry | null>(null);
+/** 「最近访问」折叠态：默认收起，点击标题展开 */
+const recentOpen = ref(false);
+/** 按车次号直达的输入 */
+const codeQuery = ref('');
+
+/** 车次类型前缀 → 专属颜色（前缀键盘 + 车次列表共用同一色板，保证"对得上"）。
+ * 每类一个可区分色，落在深色玻璃底上均 ≥ 3:1 对比；纯数字普速用中性灰。 */
+const TRAIN_COLORS: Record<string, string> = {
+  G: '#4d9fff', // 高铁 · 蓝
+  D: '#35c2a5', // 动车 · 青绿
+  C: '#7fb4d8', // 城际 · 青蓝
+  Z: '#9d8cf0', // 直达 · 紫
+  T: '#e0915a', // 特快 · 橙
+  K: '#74bd89', // 快速 · 黄绿
+  L: '#8a97a8', // 临客 · 灰蓝
+  S: '#6aa9f0', // 市郊 · 天蓝
+  Y: '#e5769f', // 旅游 · 品红
+  '': '#a3aebd', // 普速(纯数字) · 灰
+};
+
+/** 车次号前缀键盘：字母 / 中文名 / 英文名 / 色别。
+ * 覆盖国铁常见车次类型；「纯数字」对应无字母开头的普通旅客列车。 */
+interface TrainPrefix {
+  key: string;
+  zh: string;
+  en: string;
+  kind: 'hsr' | 'intercity' | 'conventional' | 'other';
+  color: string;
+}
+const codePrefixes: TrainPrefix[] = [
+  { key: 'G', zh: '高铁', en: 'HSR', kind: 'hsr', color: TRAIN_COLORS['G']! },
+  { key: 'D', zh: '动车', en: 'EMU', kind: 'hsr', color: TRAIN_COLORS['D']! },
+  { key: 'C', zh: '城际', en: 'Intercity', kind: 'intercity', color: TRAIN_COLORS['C']! },
+  { key: 'Z', zh: '直达', en: 'Direct', kind: 'conventional', color: TRAIN_COLORS['Z']! },
+  { key: 'T', zh: '特快', en: 'Express', kind: 'conventional', color: TRAIN_COLORS['T']! },
+  { key: 'K', zh: '快速', en: 'Fast', kind: 'conventional', color: TRAIN_COLORS['K']! },
+  { key: 'L', zh: '临客', en: 'Temp', kind: 'conventional', color: TRAIN_COLORS['L']! },
+  { key: 'S', zh: '市郊', en: 'Suburban', kind: 'other', color: TRAIN_COLORS['S']! },
+  { key: 'Y', zh: '旅游', en: 'Tourist', kind: 'other', color: TRAIN_COLORS['Y']! },
+  { key: '', zh: '普速', en: 'Regular', kind: 'conventional', color: TRAIN_COLORS['']! },
+];
+
+/** 点击前缀：替换车次号首字母（或纯数字时补一个字母前缀）。
+ * 保留用户已输入的后续数字，只改开头的"类型"部分，避免清空重打。 */
+function applyPrefix(p: TrainPrefix) {
+  const digits = codeQuery.value.replace(/^[A-Za-z]/, '').trim();
+  codeQuery.value = (p.key + digits).toUpperCase();
+}
+
+/** 当前输入对应的前缀键：仅当输入非空时才算命中（空输入不高亮任何键） */
+const activePrefixKey = computed<string | null>(() => {
+  const v = codeQuery.value.trim().toUpperCase();
+  if (!v) return null;
+  return /^[A-Z]/.test(v) ? v[0]! : '';
+});
 
 /** 请求序号：新请求发出后，旧请求的迟到响应一律丢弃（取消 / 重新发车用） */
 let requestSeq = 0;
@@ -219,8 +279,18 @@ function onSuggest(which: 'from' | 'to', q: string) {
   }, 250);
 }
 
-watch(from, (q) => onSuggest('from', q));
-watch(to, (q) => onSuggest('to', q));
+/** 程序化回填 OD（车次直达）时静音联想：watch 是微任务异步触发，
+ * 置位期间到达的联想请求一律丢弃，否则回填后下拉框会意外弹出 */
+let muteSuggest = false;
+
+watch(from, (q) => {
+  if (muteSuggest) return;
+  onSuggest('from', q);
+});
+watch(to, (q) => {
+  if (muteSuggest) return;
+  onSuggest('to', q);
+});
 
 function pickStation(which: 'from' | 'to', name: string) {
   if (which === 'from') {
@@ -287,6 +357,68 @@ function retryWithDateShift(days: number) {
   d.setDate(d.getDate() + days);
   date.value = d.toISOString().slice(0, 10);
   void search();
+}
+
+/** 按公开车次号直达：跳过 OD 查询，直接拉全程时刻表进入「确认上下车站」 */
+async function searchByCode() {
+  error.value = '';
+  const code = codeQuery.value.trim().toUpperCase();
+  if (!code) {
+    error.value = '请输入车次号，例如 Z8991。';
+    return;
+  }
+  if (!date.value) {
+    error.value = '请先选择乘车日期。';
+    return;
+  }
+  const seq = nextSeq();
+  retryFn.value = () => void searchByCode();
+  beginLoading('stops');
+  trains.value = [];
+  selected.value = null;
+  try {
+    const res = await api.searchTrainByCode(code, date.value);
+    if (isStale(seq)) return;
+    const list = res.stops;
+    if (!list.length) {
+      error.value = '未查到该车次，请核对车次号与日期。';
+      return;
+    }
+    stops.value = list;
+    const first = list[0]!;
+    const last = list[list.length - 1]!;
+    // 车次查询返回的是"全程"时刻表：默认上下车站为始发/终到，用户可在下方改选任意区间
+    selected.value = {
+      trainCode: code,
+      trainNo: res.trainNo || code,
+      from: { name: first.name, telecode: first.telecode || first.name },
+      to: { name: last.name, telecode: last.telecode || last.name },
+      departTime: hm(first.departTime || first.arriveTime),
+      arriveTime: hm(last.arriveTime || last.departTime),
+      duration: '',
+      date: date.value,
+    };
+    boardFrom.value = first.name;
+    boardTo.value = last.name;
+    // 同步 OD 输入框：保持与后续「重新发车」/预设轨道匹配所用的 OD 一致。
+    // 注意静音联想，避免回填触发站名下拉弹出。
+    muteSuggest = true;
+    from.value = first.name;
+    to.value = last.name;
+    fromSuggest.value = [];
+    toSuggest.value = [];
+    fromOpen.value = false;
+    toOpen.value = false;
+    window.setTimeout(() => {
+      muteSuggest = false;
+    }, 0);
+    step.value = 'od';
+  } catch (e) {
+    if (isStale(seq)) return;
+    error.value = e instanceof Error ? e.message : '车次查询失败';
+  } finally {
+    if (!isStale(seq)) endLoading();
+  }
 }
 
 async function pickTrain(t: TrainSummary) {
@@ -524,7 +656,14 @@ const showEmptyState = computed(
   () => !loading.value && step.value === 'search' && trains.value.length === 0 && !!error.value,
 );
 
-/** 车次类型色条：G/D 蓝、C 青、Z/T/K 灰绿 */
+/** 取车次号首字母对应的颜色（无字母 → 普速灰）。前缀键盘与车次卡都调它。 */
+function trainColor(code: string): string {
+  const c = String(code || '').trim().toUpperCase();
+  const k = /^[A-Z]/.test(c) ? c[0]! : '';
+  return TRAIN_COLORS[k] ?? TRAIN_COLORS['']!;
+}
+
+/** 车次类型（仅用于保留向后兼容的色条分组：hsr/intercity/conventional/other） */
 function trainKind(code: string): 'hsr' | 'intercity' | 'conventional' | 'other' {
   const c = String(code || '').trim().toUpperCase();
   if (/^[GD]/.test(c)) return 'hsr';
@@ -596,257 +735,345 @@ function goBack() {
 </script>
 
 <template>
-  <div class="select-page">
-    <div class="select-ambiance" aria-hidden="true">
-      <svg class="select-ambiance__rail" viewBox="0 0 720 280" preserveAspectRatio="xMidYMid slice">
-        <path
-          class="select-ambiance__track"
-          d="M-20 210 C 80 190, 140 120, 220 110 S 360 150, 420 90 S 560 40, 640 70 S 720 130, 760 100"
-        />
-        <path
-          class="select-ambiance__track select-ambiance__track--soft"
-          d="M-40 240 C 60 220, 160 170, 250 165 S 390 200, 470 140 S 610 80, 780 120"
-        />
-        <circle class="select-ambiance__dot select-ambiance__dot--station" cx="220" cy="110" r="4.5" />
-        <circle class="select-ambiance__dot select-ambiance__dot--spot" cx="420" cy="90" r="4" />
-        <circle class="select-ambiance__dot select-ambiance__dot--train" cx="560" cy="55" r="5" />
-      </svg>
-    </div>
+  <div class="select-page rv-page">
+    <!-- 背景层：极淡的中国地图 + 全国铁路景点热力光点。
+         轮廓与点位均为构建期生成的离线静态资源（内联进包），运行时零网络请求，
+         不依赖任何在线地图服务；整层 pointer-events:none，不影响前景交互。 -->
+    <ChinaBackdropMap />
 
-    <div v-if="showBackBtn" class="select-top">
-      <button type="button" class="select-back-btn" :disabled="loading" @click="goBack">
-        <span class="select-back-btn__icon" aria-hidden="true">‹</span>
-        返回
-      </button>
-    </div>
+    <!-- 顶部导航栏：品牌标识 + 版本徽标。sticky 吸顶，与正文共用同一 .rv-shell 栅格。 -->
+    <AppTopBar />
 
-    <header class="select-hero">
-      <BrandLogo class="select-hero__logo" :height="48" />
-      <h1>车上风景与行程定位</h1>
-      <p class="sub">选择出发站、到达站与日期，进入行程地图</p>
-    </header>
+    <div class="rv-shell">
+      <div v-if="showBackBtn" class="select-top">
+        <button type="button" class="select-back-btn" :disabled="loading" @click="goBack">
+          <span class="select-back-btn__icon" aria-hidden="true">‹</span>
+          返回
+        </button>
+      </div>
 
-    <section v-if="currentEntry && showHomeLists" class="current-trip">
-      <div class="current-trip__row">
-        <div class="current-trip__body">
-          <p class="current-trip__label">当前行程</p>
-          <p class="current-trip__title">
-            <strong>{{ currentEntry.trainCode }}</strong>
-            <span>{{ currentEntry.fromName }} → {{ currentEntry.toName }}</span>
-          </p>
-          <p class="current-trip__meta">{{ currentEntry.date }} · 未到站前可继续</p>
-        </div>
-        <div class="current-trip__actions">
-          <button
-            type="button"
-            class="btn primary btn-sm"
-            :disabled="loading"
-            @click="openCachedTrip(currentEntry.key)"
+      <header class="select-hero">
+        <h1>车上风景与行程定位</h1>
+        <p class="sub">选择出发站、到达站与日期，进入行程地图</p>
+      </header>
+
+      <p v-if="resumeHint" class="error">{{ resumeHint }}</p>
+
+      <!-- 12 列栅格：sm 竖屏单列纵向堆叠；≥600px 起主栏 7 列 + 侧栏 5 列 -->
+      <div class="rv-grid">
+        <!-- 主栏：查询与当前行程相关的一切 -->
+        <div class="rv-col rv-col--main">
+          <section v-if="currentEntry && showHomeLists" class="current-trip rv-card" data-spotlight>
+            <div class="current-trip__row">
+              <div class="current-trip__body">
+                <p class="current-trip__label">当前行程</p>
+                <p class="current-trip__title">
+                  <strong>{{ currentEntry.trainCode }}</strong>
+                  <span>{{ currentEntry.fromName }} → {{ currentEntry.toName }}</span>
+                </p>
+                <p class="current-trip__meta">{{ currentEntry.date }} · 未到站前可继续</p>
+              </div>
+              <div class="current-trip__actions">
+                <button
+                  type="button"
+                  class="btn primary btn-sm"
+                  :disabled="loading"
+                  @click="openCachedTrip(currentEntry.key)"
+                >
+                  继续行程
+                </button>
+                <button type="button" class="btn ghost btn-sm" :disabled="loading" @click="startNewTrip">
+                  开始新行程
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <form
+            class="select-form select-form--panel rv-card"
+            :class="{ 'has-suggest-open': fromOpen || toOpen }"
+            data-spotlight
+            @submit.prevent="search"
           >
-            继续行程
-          </button>
-          <button type="button" class="btn ghost btn-sm" :disabled="loading" @click="startNewTrip">
-            开始新行程
-          </button>
-        </div>
-      </div>
-    </section>
+            <div class="rv-head select-form__head">
+              <h2 class="rv-head__title">开始查询</h2>
+              <p class="rv-head__sub">填写 OD 与乘车日，查找直达车次</p>
+            </div>
 
-    <p v-if="resumeHint" class="error">{{ resumeHint }}</p>
+            <label class="station-field">
+              <span>出发站</span>
+              <div class="station-field__control">
+                <input
+                  v-model="from"
+                  autocomplete="off"
+                  placeholder="例如 西宁"
+                  @focus="fromOpen = fromSuggest.length > 0"
+                  @blur="fromOpen = false"
+                  @keydown="onSuggestKey('from', $event)"
+                />
+                <ul v-show="fromOpen && fromSuggest.length" class="station-suggest" role="listbox">
+                  <li
+                    v-for="(s, i) in fromSuggest"
+                    :key="s.telecode"
+                    role="option"
+                    :aria-selected="i === fromActive"
+                    :class="{ 'is-active': i === fromActive }"
+                    @mousedown.prevent="pickStation('from', s.name)"
+                  >
+                    {{ s.name }}
+                  </li>
+                </ul>
+              </div>
+            </label>
 
-    <form class="select-form select-form--panel" @submit.prevent="search">
-      <div class="select-form__head">
-        <h2>开始查询</h2>
-        <p>填写 OD 与乘车日，查找直达车次</p>
-      </div>
-      <label class="station-field">
-        <span>出发站</span>
-        <div class="station-field__control">
-          <input
-            v-model="from"
-            autocomplete="off"
-            placeholder="例如 西宁"
-            @focus="fromOpen = fromSuggest.length > 0"
-            @blur="fromOpen = false"
-            @keydown="onSuggestKey('from', $event)"
-          />
-          <ul v-show="fromOpen && fromSuggest.length" class="station-suggest" role="listbox">
-            <li
-              v-for="(s, i) in fromSuggest"
-              :key="s.telecode"
-              role="option"
-              :aria-selected="i === fromActive"
-              :class="{ 'is-active': i === fromActive }"
-              @mousedown.prevent="pickStation('from', s.name)"
+            <label class="station-field">
+              <span>到达站</span>
+              <div class="station-field__control">
+                <input
+                  v-model="to"
+                  autocomplete="off"
+                  placeholder="例如 拉萨"
+                  @focus="toOpen = toSuggest.length > 0"
+                  @blur="toOpen = false"
+                  @keydown="onSuggestKey('to', $event)"
+                />
+                <ul v-show="toOpen && toSuggest.length" class="station-suggest" role="listbox">
+                  <li
+                    v-for="(s, i) in toSuggest"
+                    :key="s.telecode"
+                    role="option"
+                    :aria-selected="i === toActive"
+                    :class="{ 'is-active': i === toActive }"
+                    @mousedown.prevent="pickStation('to', s.name)"
+                  >
+                    {{ s.name }}
+                  </li>
+                </ul>
+              </div>
+            </label>
+
+            <label class="date-field">
+              <span>乘车日期</span>
+              <DarkDateTimeField v-model="date" mode="date" placeholder="选择乘车日期" />
+            </label>
+
+            <div class="actions">
+              <button type="submit" class="btn primary" :disabled="loading">查询直达车次</button>
+              <button type="button" class="btn ghost" :disabled="loading" @click="loadDemo">
+                演示：Z8991 青藏线
+              </button>
+            </div>
+
+            <!-- 按车次号直达：已知车次时跳过 OD 查询，直接进时刻表选区间 -->
+            <div class="code-search">
+              <span class="code-search__label">或按车次号直达</span>
+              <div class="code-search__row">
+                <input
+                  v-model="codeQuery"
+                  class="code-search__input"
+                  autocomplete="off"
+                  placeholder="输入车次号，例如 Z8991"
+                  @keydown.enter.prevent="searchByCode"
+                />
+                <button
+                  type="button"
+                  class="btn ghost btn-sm"
+                  :disabled="loading"
+                  @click="searchByCode"
+                >
+                  查时刻
+                </button>
+              </div>
+
+              <!-- 车次号前缀键盘：点击即填入/替换首字母，附带中文名与英文名 -->
+              <div class="code-prefix" role="group" aria-label="车次类型前缀">
+                <button
+                  v-for="p in codePrefixes"
+                  :key="p.key || 'num'"
+                  type="button"
+                  class="code-prefix__key"
+                  :class="`code-prefix__key--${p.kind}`"
+                  :style="{ '--prefix-color': p.color }"
+                  :aria-pressed="activePrefixKey !== null && activePrefixKey === p.key"
+                  :title="p.key ? `${p.key} 字头 · ${p.zh}（${p.en}）` : `纯数字车次 · ${p.zh}（${p.en}），无字母开头`"
+                  @click="applyPrefix(p)"
+                >
+                  <span class="code-prefix__letter">{{ p.key || '#' }}</span>
+                  <span class="code-prefix__name">
+                    <strong>{{ p.zh }}</strong>
+                    <em>{{ p.en }}</em>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <p v-if="error && !showEmptyState" class="error">{{ error }}</p>
+
+          <section v-if="showEmptyState" class="empty-state rv-card">
+            <p class="empty-state__title">这个区间暂时没有查到直达车次</p>
+            <p class="empty-state__desc">可以换一天看看，或者先体验青藏线 demo。</p>
+            <div class="empty-state__actions">
+              <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(-1)">
+                前一天
+              </button>
+              <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(1)">
+                后一天
+              </button>
+              <button type="button" class="btn primary btn-sm" @click="loadDemo">试试演示线路</button>
+            </div>
+          </section>
+
+          <!-- 最近访问：默认折叠在查询表单之下，点击标题展开；
+               高频操作区（查询）保持首屏完整可见，历史行程按需展开 -->
+          <section
+            v-if="recent.length && showHomeLists"
+            class="recent-list rv-card"
+            data-spotlight
+          >
+            <button
+              type="button"
+              class="recent-list__toggle"
+              :aria-expanded="recentOpen"
+              @click="recentOpen = !recentOpen"
             >
-              {{ s.name }}
-            </li>
-          </ul>
+              <h2 class="rv-head__title">最近访问</h2>
+              <span class="recent-list__count">{{ recent.length }}</span>
+              <span
+                class="recent-list__chevron"
+                :class="{ 'is-open': recentOpen }"
+                aria-hidden="true"
+                >›</span
+              >
+            </button>
+            <div v-show="recentOpen" class="recent-list__body">
+              <div v-for="item in recent" :key="item.key" class="recent-row">
+                <button
+                  type="button"
+                  class="recent-card"
+                  :disabled="loading"
+                  @click="openCachedTrip(item.key)"
+                >
+                  <span class="recent-card__main">
+                    <strong>{{ item.trainCode }}</strong>
+                    <span>{{ item.fromName }} → {{ item.toName }}</span>
+                  </span>
+                  <span class="recent-card__meta">
+                    {{ item.date }}
+                    <template v-if="item.hasPrecise"> · 已缓存精确线</template>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  class="recent-delete"
+                  title="从最近访问删除"
+                  :disabled="loading"
+                  @click="removeRecent(item.key)"
+                >
+                  删除
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section
+            v-if="trains.length && step === 'search'"
+            class="train-list rv-card"
+            data-spotlight
+          >
+            <h2 class="train-list__title">
+              直达车次
+              <span class="train-list__count">{{ trains.length }} 趟</span>
+            </h2>
+            <div class="train-grid" v-auto-animate>
+              <button
+                v-for="(t, i) in trains"
+                :key="t.trainNo + t.departTime"
+                type="button"
+                class="train-card"
+                :class="`train-card--${trainKind(t.trainCode)}`"
+                :style="{ '--i': Math.min(i, 8), '--train-color': trainColor(t.trainCode) }"
+                :disabled="loading"
+                @click="pickTrain(t)"
+              >
+                <span class="train-card__code">{{ t.trainCode }}</span>
+                <span class="train-card__time">
+                  <span>{{ t.departTime }}</span>
+                  <span class="train-card__arrow" aria-hidden="true">→</span>
+                  <span>{{ t.arriveTime }}</span>
+                </span>
+                <span class="train-card__meta">
+                  {{ t.from.name }} → {{ t.to.name }}
+                  <template v-if="t.duration"> · 历时 {{ t.duration }}</template>
+                </span>
+              </button>
+            </div>
+          </section>
+
+          <section v-if="step === 'od' && selected" class="od-panel rv-card" data-spotlight>
+            <h2 class="rv-head__title">确认上下车站</h2>
+            <p class="muted">
+              {{ selected.trainCode }} · {{ selected.date }}
+              <template v-if="tripDurationHint"> · {{ tripDurationHint }}</template>
+            </p>
+
+            <div class="od-panel__pick">
+              <label>
+                <span>上车站</span>
+                <select v-model="boardFrom">
+                  <option v-for="n in odOptions" :key="'f' + n" :value="n">{{ n }}</option>
+                </select>
+              </label>
+              <label>
+                <span>下车站</span>
+                <select v-model="boardTo">
+                  <option v-for="n in odOptions" :key="'t' + n" :value="n">{{ n }}</option>
+                </select>
+              </label>
+            </div>
+
+            <ol class="tl" v-auto-animate>
+              <li
+                v-for="s in timeline"
+                :key="s.seq + s.name"
+                class="tl__item"
+                :class="{
+                  'is-range': s.inRange,
+                  'is-board': s.isBoard,
+                  'is-alight': s.isAlight,
+                }"
+              >
+                <span class="tl__dot" aria-hidden="true" />
+                <span class="tl__name">{{ s.name }}</span>
+                <span class="tl__time">
+                  <template v-if="s.arrive && s.depart">{{ s.arrive }} / {{ s.depart }}</template>
+                  <template v-else-if="s.depart">{{ s.depart }} 发</template>
+                  <template v-else-if="s.arrive">{{ s.arrive }} 到</template>
+                </span>
+                <span v-if="s.stopover" class="tl__stop">{{ s.stopover }}</span>
+                <span v-if="s.dayOffset > 0" class="tl__day">+{{ s.dayOffset }}天</span>
+              </li>
+            </ol>
+
+            <div class="od-panel__actions">
+              <button type="button" class="btn primary" :disabled="loading" @click="enterTrip">
+                进入行程地图
+              </button>
+              <button type="button" class="btn ghost" :disabled="loading" @click="step = 'search'">
+                返回列表
+              </button>
+            </div>
+          </section>
         </div>
-      </label>
-      <label class="station-field">
-        <span>到达站</span>
-        <div class="station-field__control">
-          <input
-            v-model="to"
-            autocomplete="off"
-            placeholder="例如 拉萨"
-            @focus="toOpen = toSuggest.length > 0"
-            @blur="toOpen = false"
-            @keydown="onSuggestKey('to', $event)"
-          />
-          <ul v-show="toOpen && toSuggest.length" class="station-suggest" role="listbox">
-            <li
-              v-for="(s, i) in toSuggest"
-              :key="s.telecode"
-              role="option"
-              :aria-selected="i === toActive"
-              :class="{ 'is-active': i === toActive }"
-              @mousedown.prevent="pickStation('to', s.name)"
-            >
-              {{ s.name }}
-            </li>
-          </ul>
+
+        <!-- 侧栏：中国最美铁路排行榜（首页态才展示） -->
+        <div class="rv-col rv-col--side">
+          <RankingsSection v-if="showHomeLists" />
         </div>
-      </label>
-      <label>
-        <span>乘车日期</span>
-        <DarkDateTimeField v-model="date" mode="date" placeholder="选择乘车日期" />
-      </label>
-      <div class="actions">
-        <button type="submit" class="btn primary" :disabled="loading">查询直达车次</button>
-        <button type="button" class="btn ghost" :disabled="loading" @click="loadDemo">
-          演示：Z8991 青藏线
-        </button>
-      </div>
-    </form>
-
-    <p v-if="error && !showEmptyState" class="error">{{ error }}</p>
-
-    <section v-if="showEmptyState" class="empty-state">
-      <p class="empty-state__title">这个区间暂时没有查到直达车次</p>
-      <p class="empty-state__desc">可以换一天看看，或者先体验青藏线 demo。</p>
-      <div class="empty-state__actions">
-        <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(-1)">
-          前一天
-        </button>
-        <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(1)">后一天</button>
-        <button type="button" class="btn primary btn-sm" @click="loadDemo">试试演示线路</button>
-      </div>
-    </section>
-
-    <section v-if="recent.length && showHomeLists" class="recent-list">
-      <h2>最近访问</h2>
-      <div v-for="item in recent" :key="item.key" class="recent-row">
-        <button type="button" class="recent-card" :disabled="loading" @click="openCachedTrip(item.key)">
-          <span class="recent-card__main">
-            <strong>{{ item.trainCode }}</strong>
-            <span>{{ item.fromName }} → {{ item.toName }}</span>
-          </span>
-          <span class="recent-card__meta muted">
-            {{ item.date }}
-            <template v-if="item.hasPrecise"> · 已缓存精确线</template>
-          </span>
-        </button>
-        <button
-          type="button"
-          class="recent-delete"
-          title="从最近访问删除"
-          :disabled="loading"
-          @click="removeRecent(item.key)"
-        >
-          删除
-        </button>
-      </div>
-    </section>
-
-    <RankingsSection v-if="showHomeLists" />
-
-    <section v-if="trains.length && step === 'search'" class="train-list">
-      <h2 class="train-list__title">
-        直达车次
-        <span class="train-list__count">{{ trains.length }} 趟</span>
-      </h2>
-      <div class="train-grid" v-auto-animate>
-        <button
-          v-for="(t, i) in trains"
-          :key="t.trainNo + t.departTime"
-          type="button"
-          class="train-card"
-          :class="`train-card--${trainKind(t.trainCode)}`"
-          :style="{ '--i': Math.min(i, 8) }"
-          :disabled="loading"
-          @click="pickTrain(t)"
-        >
-          <span class="train-card__code">{{ t.trainCode }}</span>
-          <span class="train-card__time">
-            <span>{{ t.departTime }}</span>
-            <span class="train-card__arrow" aria-hidden="true">→</span>
-            <span>{{ t.arriveTime }}</span>
-          </span>
-          <span class="train-card__meta">
-            {{ t.from.name }} → {{ t.to.name }}
-            <template v-if="t.duration"> · 历时 {{ t.duration }}</template>
-          </span>
-        </button>
-      </div>
-    </section>
-
-    <section v-if="step === 'od' && selected" class="od-panel">
-      <h2>确认上下车站</h2>
-      <p class="muted">
-        {{ selected.trainCode }} · {{ selected.date }}
-        <template v-if="tripDurationHint"> · {{ tripDurationHint }}</template>
-      </p>
-      <div class="od-panel__pick">
-        <label>
-          <span>上车站</span>
-          <select v-model="boardFrom">
-            <option v-for="n in odOptions" :key="'f' + n" :value="n">{{ n }}</option>
-          </select>
-        </label>
-        <label>
-          <span>下车站</span>
-          <select v-model="boardTo">
-            <option v-for="n in odOptions" :key="'t' + n" :value="n">{{ n }}</option>
-          </select>
-        </label>
       </div>
 
-      <ol class="tl" v-auto-animate>
-        <li
-          v-for="s in timeline"
-          :key="s.seq + s.name"
-          class="tl__item"
-          :class="{
-            'is-range': s.inRange,
-            'is-board': s.isBoard,
-            'is-alight': s.isAlight,
-          }"
-        >
-          <span class="tl__dot" aria-hidden="true" />
-          <span class="tl__name">{{ s.name }}</span>
-          <span class="tl__time">
-            <template v-if="s.arrive && s.depart">{{ s.arrive }} / {{ s.depart }}</template>
-            <template v-else-if="s.depart">{{ s.depart }} 发</template>
-            <template v-else-if="s.arrive">{{ s.arrive }} 到</template>
-          </span>
-          <span v-if="s.stopover" class="tl__stop">{{ s.stopover }}</span>
-          <span v-if="s.dayOffset > 0" class="tl__day">+{{ s.dayOffset }}天</span>
-        </li>
-      </ol>
-
-      <div class="od-panel__actions">
-        <button type="button" class="btn primary" :disabled="loading" @click="enterTrip">
-          进入行程地图
-        </button>
-        <button type="button" class="btn ghost" :disabled="loading" @click="step = 'search'">
-          返回列表
-        </button>
-      </div>
-    </section>
-
-    <p class="footnote">时刻数据来自公开查询，仅供参考。行程缓存在本机浏览器。</p>
+      <p class="footnote">时刻数据来自公开查询，仅供参考。行程缓存在本机浏览器。</p>
+    </div>
 
     <RailProgressLoader
       :active="loading"
@@ -858,268 +1085,17 @@ function goBack() {
 </template>
 
 <style scoped>
-/* ── 车次列表：自适应网格 + 类型色条 + 入场错峰 ── */
-.train-list__title {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-size: 16px;
-  margin-bottom: 4px;
+/*
+ * 首页的模块样式全部位于设计系统层（`src/styles/base.css` 的 .rv-shell / .rv-grid /
+ * .rv-card / .tl / .train-card 等），本页只保留真正属于"页面"的排版微调，
+ * 避免同一套样式在两处重复维护。
+ */
+.select-page .rv-grid {
+  margin-top: var(--space-1);
 }
 
-.train-list__count {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 400;
-}
-
-.train-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 10px;
-}
-
-.train-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  text-align: left;
-  padding: 13px 14px 13px 16px;
-  border-radius: 12px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-raised);
-  color: inherit;
-  cursor: pointer;
-  font-family: inherit;
-  overflow: hidden;
-  transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
-}
-
-.train-card::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--text-muted);
-}
-
-.train-card--hsr::before {
-  background: var(--accent);
-}
-
-.train-card--intercity::before {
-  background: var(--info);
-}
-
-.train-card--conventional::before {
-  background: var(--text-muted);
-}
-
-.train-card--other::before {
-  background: var(--text-muted);
-}
-
-.train-card:hover:not(:disabled) {
-  border-color: var(--accent-border);
-  background: var(--bg-elevated);
-}
-
-.train-card:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-.train-card:disabled {
-  opacity: 0.55;
-  cursor: wait;
-}
-
-.train-card__code {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--text-primary);
-}
-
-.train-card__time {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
-}
-
-.train-card__arrow {
-  color: var(--text-muted);
-  font-weight: 400;
-}
-
-.train-card__meta {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .train-card {
-    animation: tc-in var(--dur-base) var(--ease-out) both;
-    animation-delay: calc(var(--i, 0) * 40ms);
-  }
-}
-
-@keyframes tc-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ── 空态 ── */
-.empty-state {
-  max-width: 560px;
-  margin: 0 auto 14px;
-  padding: 16px 18px;
-  border-radius: 12px;
-  border: 1px dashed var(--border-strong);
-  background: var(--bg-inset);
-  text-align: center;
-}
-
-.empty-state__title {
-  margin: 0 0 4px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.empty-state__desc {
-  margin: 0 0 12px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.empty-state__actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-
-/* ── 经停时间轴 ── */
-.od-panel__pick {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
-  margin: 10px 0 4px;
-}
-
-.tl {
-  list-style: none;
-  margin: 14px 0 4px;
-  padding: 4px 0 4px 18px;
-  position: relative;
-  max-height: 46vh;
-  overflow-y: auto;
-}
-
-.tl::before {
-  content: '';
-  position: absolute;
-  left: 4px;
-  top: 10px;
-  bottom: 10px;
-  width: 2px;
-  border-radius: 2px;
-  background: var(--border-default);
-}
-
-.tl__item {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px;
-  padding: 6px 0;
-  color: var(--text-muted);
-  transition: color var(--dur-fast) var(--ease-out);
-}
-
-.tl__dot {
-  position: absolute;
-  left: -18px;
-  top: 11px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--bg-elevated);
-  border: 2px solid var(--bg-base);
-  transition: background var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
-}
-
-.tl__item.is-range {
-  color: var(--text-secondary);
-}
-
-.tl__item.is-range .tl__dot {
-  background: var(--accent);
-}
-
-.tl__item.is-board .tl__dot,
-.tl__item.is-alight .tl__dot {
-  background: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-container);
-}
-
-.tl__name {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.tl__time {
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent-hover);
-}
-
-.tl__item:not(.is-range) .tl__time {
-  color: var(--text-muted);
-}
-
-.tl__stop,
-.tl__day {
-  font-size: 11px;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--border-hairline);
-  color: var(--text-muted);
-}
-
-.tl__day {
-  background: rgba(223, 179, 87, 0.16);
-  color: var(--warning);
-}
-
-.od-panel__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-@media (max-width: 560px) {
-  .train-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .tl {
-    max-height: 40vh;
-  }
+.select-page .footnote {
+  margin-inline: 0;
 }
 </style>
+

@@ -1,49 +1,35 @@
 <script setup lang="ts">
 /**
- * 万里路书 / RailVista · 双语品牌标识。
+ * RailVista / 万里路书 · 品牌标识。
  *
- * 左侧：HeyWorld 品牌 logo + RailVista 字标；
- * 中间细分隔线；右侧：官方「万里路书」路书 logo。
+ * 直接使用官方提供的品牌组合图（HeyWorld 标 | 分隔线 | 万里路书书法字），
+ * 白色透明底，随主题自动适配深色界面。
  *
- * 全部为白色，透明底，可置于深色界面；按 height 等比缩放。
+ * 基线对齐：图片以行内块形式渲染，底边落在文字基线上，
+ * 因此与同一行内的其它文本（如版本徽标）天然基线对齐。
  */
-import '@fontsource/outfit/600.css'
-import '@fontsource/outfit/700.css'
-import '@fontsource/outfit/800.css'
-import wanliLogo from '../assets/wanli-logo.png'
-import heyworldLogo from '../assets/heyworld-logo.png'
+import brandLockup from '../assets/heyworld-brand.png';
 
 withDefaults(
   defineProps<{
-    /** 整体基准高度(px) */
+    /** 渲染高度(px)，宽度按原图 1894x655 等比换算 */
     height?: number
   }>(),
-  { height: 42 },
+  { height: 30 },
 )
+
+/** 原始素材宽高比，用于等比缩放 */
+const ASPECT = 1894 / 655;
 </script>
 
 <template>
-  <span class="brand-lockup">
-    <!-- 英文：HeyWorld 品牌 logo + RailVista -->
-    <span class="brand-en">
-      <img
-        class="brand-en__mark"
-        :src="heyworldLogo"
-        :style="{ height: `${height}px` }"
-        alt="HeyWorld"
-      />
-      <span class="brand-en__word" :style="{ fontSize: `${height * 0.6}px` }">RailVista</span>
-    </span>
-
-    <!-- 分隔线 -->
-    <span class="brand-divider" :style="{ height: `${height * 0.62}px` }" />
-
-    <!-- 中文：万里路书 -->
+  <span class="brand-lockup" :style="{ height: `${height}px` }">
     <img
-      class="brand-cn"
-      :src="wanliLogo"
-      :style="{ height: `${height * 0.92}px` }"
-      alt="万里路书"
+      class="brand-lockup__img"
+      :src="brandLockup"
+      :style="{ height: `${height}px`, width: `${Math.round(height * ASPECT)}px` }"
+      alt="HeyWorld · RailVista 万里路书"
+      draggable="false"
     />
   </span>
 </template>
@@ -52,57 +38,17 @@ withDefaults(
 .brand-lockup {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
-  color: #f4f6f5;
   line-height: 1;
   user-select: none;
+  /* 深色底上白色素材略微加投影，避免纯白在浅色背景上发虚 */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
-.brand-en {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.brand-en__mark {
+.brand-lockup__img {
   display: block;
   flex: none;
-  width: auto;
-  max-width: 100%;
   object-fit: contain;
-}
-
-.brand-en__word {
-  font-family: 'Outfit', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  color: #f4f6f5;
-}
-
-.brand-divider {
-  width: 1px;
-  flex: none;
-  background: rgba(255, 255, 255, 0.22);
-}
-
-.brand-cn {
-  display: block;
-  width: auto;
-  max-width: 100%;
-}
-
-/* 窄屏纵向堆叠，分隔线转横向 */
-@media (max-width: 430px) {
-  .brand-lockup {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 11px;
-  }
-
-  .brand-divider {
-    width: 132px;
-    height: 1px !important;
-  }
+  /* 视觉微调：素材底部留白略多，上提 1px 更贴合视觉基线 */
+  transform: translateY(-1px);
 }
 </style>

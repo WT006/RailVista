@@ -3,7 +3,6 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
 import AppTopBar from '../components/AppTopBar.vue';
-import AppNavLinks from '../components/AppNavLinks.vue';
 import { highlightColor, highlightLabel } from '../data/highlightColors';
 import type { DriveHighlight, DriveRoute } from '@railvista/shared';
 
@@ -48,9 +47,7 @@ function startNav() {
 
 <template>
   <div class="drive-page">
-    <AppTopBar>
-      <template #nav><AppNavLinks /></template>
-    </AppTopBar>
+    <AppTopBar />
 
     <main class="rv-shell">
       <div v-if="loading" class="drive-empty">正在翻开路书…</div>

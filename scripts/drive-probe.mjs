@@ -85,6 +85,7 @@ const report = await evaluate(`(() => {
     overflowX,
     scrollW: doc.scrollWidth, clientW: doc.clientWidth,
     cardCount: cards,
+    navLinks: [...document.querySelectorAll('.appbar__nav a')].map((a) => ({ text: a.textContent.trim(), href: a.getAttribute('href') })),
     names: names.slice(0, 8),
     folded: names.filter((n) => !n.ok).map((n) => n.text),
     title: document.querySelector('h1')?.textContent?.trim().slice(0, 30) ?? null,

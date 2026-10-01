@@ -3,7 +3,6 @@ import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '../api/client';
 import AppTopBar from '../components/AppTopBar.vue';
-import AppNavLinks from '../components/AppNavLinks.vue';
 import type { DriveRouteLite } from '@railvista/shared';
 
 const router = useRouter();
@@ -41,9 +40,7 @@ function openRoute(id: string) {
 
 <template>
   <div class="drive-page">
-    <AppTopBar>
-      <template #nav><AppNavLinks /></template>
-    </AppTopBar>
+    <AppTopBar />
 
     <main class="rv-shell">
       <header class="drive-hero">

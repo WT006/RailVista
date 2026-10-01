@@ -5,11 +5,11 @@
  * 并在需要时按 SemVer 递增这里的 APP_VERSION（小迭代递增修订号）。
  * 前端首页显示的版本号直接读取本文件，因此不会出现文档与界面不一致。
  */
-export const APP_VERSION = '0.3.0';
+export const APP_VERSION = '0.3.1';
 
 /** 版本对应的发布/变更摘要，便于 UI 展示（与 CHANGELOG.md 首条一致） */
 export const APP_VERSION_SUMMARY =
-  '万里路书 · 精品自驾公路（青甘环线 G315 打样：路书 + 小确幸雷达 + 轨迹）';
+  '自驾导航整合进主程序顶栏（全站统一，移动端可见）';
 
 /** ISO 日期：本次版本号最后一次递增的日期 */
 export const APP_VERSION_DATE = '2026-10-01';

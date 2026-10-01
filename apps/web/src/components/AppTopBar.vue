@@ -15,6 +15,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { appVersionInfo, APP_VERSION } from '@railvista/shared';
 import BrandLogo from './BrandLogo.vue';
+import AppNavLinks from './AppNavLinks.vue';
 
 const info = appVersionInfo();
 
@@ -37,7 +38,8 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
         <!-- 品牌组合图已自带中英文字标，无需再叠副标题 -->
         <BrandLogo :height="34" />
         <nav class="appbar__nav" aria-label="主导航">
-          <slot name="nav" />
+          <!-- 默认全站导航（行程 / 自驾 / 全国地图），页面可用具名 slot 覆盖 -->
+          <slot name="nav"><AppNavLinks /></slot>
         </nav>
       </div>
 
@@ -94,20 +96,26 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 .appbar__left {
   display: flex;
   align-items: center;
-  gap: var(--space-5);
+  gap: var(--space-4);
   min-width: 0;
 }
 
-/* 主导航链接组（内容由 slot 注入，AppNavLinks.vue） */
+/* 主导航链接组（默认内容 AppNavLinks.vue，页面可用具名 slot 覆盖） */
 .appbar__nav {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
+  min-width: 0;
 }
 
+/* 移动端：缩小品牌与导航的间距，导航仍保持可见（提供自驾入口） */
 @media (max-width: 599px) {
+  .appbar__left {
+    gap: var(--space-2);
+  }
+
   .appbar__nav {
-    display: none;
+    gap: 0;
   }
 }
 

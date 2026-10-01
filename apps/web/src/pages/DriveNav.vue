@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from '../api/client';
 import AppTopBar from '../components/AppTopBar.vue';
-import AppNavLinks from '../components/AppNavLinks.vue';
 import { highlightColor, highlightLabel } from '../data/highlightColors';
 import { useDriveRadar, pointOnRoute } from '../composables/useDriveRadar';
 import { useTrackRecorder } from '../composables/useTrackRecorder';
@@ -97,9 +96,7 @@ const speedOptions = [20, 40, 60, 80, 100, 120];
 
 <template>
   <div class="drive-page">
-    <AppTopBar>
-      <template #nav><AppNavLinks /></template>
-    </AppTopBar>
+    <AppTopBar />
 
     <main class="rv-shell">
       <div v-if="loading" class="drive-empty">正在启动伴随导航…</div>

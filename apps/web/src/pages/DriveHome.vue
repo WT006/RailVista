@@ -170,11 +170,17 @@ async function refreshRoadCandidates() {
   }
   roadBusy.value = true;
   try {
-    const data = await api.suggestDrivePlaces(q, 'road', 40);
+    const data = await api.suggestDrivePlaces(q, 'road', 60);
     let hits = data.hits;
     if (needsProvince.value && selectedProvince.value) {
       hits = hits.filter((h) => h.id.startsWith(`${selectedProvince.value}:`));
     }
+    // PRD §4.2：候选按编号数字升序（G3 → G30 → G318）
+    hits.sort((a, b) => {
+      const na = Number(a.name.replace(/\D/g, '')) || 0;
+      const nb = Number(b.name.replace(/\D/g, '')) || 0;
+      return na - nb || a.name.localeCompare(b.name);
+    });
     roadCandidates.value = hits;
   } catch {
     roadCandidates.value = [];

@@ -1,326 +1,412 @@
 {
  "version": 1,
  "updated": "2026-10-01",
- "note": "高置信种子名录（经典 1981 骨架 + 2013 规划已知新增）；全量 301/278 需《国家公路网规划》附表核对",
  "roads": [
   {
    "ref": "G1",
    "name": "京哈高速",
    "fromPlace": "北京",
    "toPlace": "哈尔滨",
-   "provinces": "北京,河北,天津,辽宁,吉林,黑龙江",
+   "provinces": [
+    "北京",
+    "河北",
+    "天津",
+    "辽宁",
+    "吉林",
+    "黑龙江"
+   ],
    "officialLengthKm": 1200
+  },
+  {
+   "ref": "G0111",
+   "fromPlace": "秦皇岛",
+   "toPlace": "滨州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0112",
+   "fromPlace": "长春",
+   "toPlace": "辽源",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0121",
+   "fromPlace": "北京",
+   "toPlace": "秦皇岛",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0122",
+   "fromPlace": "秦皇岛",
+   "toPlace": "沈阳",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G2",
    "name": "京沪高速",
    "fromPlace": "北京",
    "toPlace": "上海",
-   "provinces": "北京,河北,天津,山东,江苏,上海",
+   "provinces": [
+    "北京",
+    "河北",
+    "天津",
+    "山东",
+    "江苏",
+    "上海"
+   ],
    "officialLengthKm": 1210
+  },
+  {
+   "ref": "G0211",
+   "fromPlace": "天津",
+   "toPlace": "石家庄天津滨海新区",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0212",
+   "fromPlace": "武清",
+   "toPlace": "滨海新区",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G3",
    "name": "京台高速",
    "fromPlace": "北京",
    "toPlace": "台北",
-   "provinces": "北京,河北,山东,江苏,安徽,浙江,江西,福建",
+   "provinces": [
+    "北京",
+    "河北",
+    "山东",
+    "江苏",
+    "安徽",
+    "浙江",
+    "江西",
+    "福建"
+   ],
    "officialLengthKm": 2030
+  },
+  {
+   "ref": "G0311",
+   "fromPlace": "济南",
+   "toPlace": "聊城",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0321",
+   "fromPlace": "德州",
+   "toPlace": "上饶",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0322",
+   "fromPlace": "北京",
+   "toPlace": "德州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0323",
+   "fromPlace": "济宁",
+   "toPlace": "合肥",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G4",
    "name": "京港澳高速",
    "fromPlace": "北京",
-   "toPlace": "澳门",
-   "provinces": "北京,河北,河南,湖北,湖南,广东,澳门",
+   "toPlace": "港澳",
+   "provinces": [
+    "北京",
+    "河北",
+    "河南",
+    "湖北",
+    "湖南",
+    "广东",
+    "澳门"
+   ],
    "officialLengthKm": 2285
+  },
+  {
+   "ref": "G0411",
+   "fromPlace": "安阳",
+   "toPlace": "长治",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0412",
+   "fromPlace": "深圳",
+   "toPlace": "南宁",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0413",
+   "fromPlace": "新乐",
+   "toPlace": "忻州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0421",
+   "fromPlace": "许昌",
+   "toPlace": "广州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0422",
+   "fromPlace": "武汉",
+   "toPlace": "深圳",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0423",
+   "fromPlace": "乐昌",
+   "toPlace": "广州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0424",
+   "fromPlace": "北京",
+   "toPlace": "武汉",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0425",
+   "fromPlace": "广州",
+   "toPlace": "澳门",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G5",
    "name": "京昆高速",
    "fromPlace": "北京",
    "toPlace": "昆明",
-   "provinces": "北京,河北,山西,陕西,四川,云南",
+   "provinces": [
+    "北京",
+    "河北",
+    "山西",
+    "陕西",
+    "四川",
+    "云南"
+   ],
    "officialLengthKm": 2865
+  },
+  {
+   "ref": "G0511",
+   "fromPlace": "德阳",
+   "toPlace": "都江堰",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0512",
+   "fromPlace": "成都",
+   "toPlace": "乐山",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0513",
+   "fromPlace": "平遥",
+   "toPlace": "洛阳",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G6",
    "name": "京藏高速",
    "fromPlace": "北京",
    "toPlace": "拉萨",
-   "provinces": "北京,河北,内蒙古,宁夏,甘肃,青海,西藏",
+   "provinces": [
+    "北京",
+    "河北",
+    "内蒙古",
+    "宁夏",
+    "甘肃",
+    "青海",
+    "西藏"
+   ],
    "officialLengthKm": 3710
+  },
+  {
+   "ref": "G0611",
+   "fromPlace": "张掖",
+   "toPlace": "汶川",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0612",
+   "fromPlace": "西宁",
+   "toPlace": "和田",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0613",
+   "fromPlace": "西宁",
+   "toPlace": "丽江",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0615",
+   "fromPlace": "德令哈",
+   "toPlace": "康定",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0616",
+   "fromPlace": "乌拉特前旗",
+   "toPlace": "甘其毛都",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G7",
    "name": "京新高速",
    "fromPlace": "北京",
    "toPlace": "乌鲁木齐",
-   "provinces": "北京,河北,内蒙古,甘肃,新疆",
+   "provinces": [
+    "北京",
+    "河北",
+    "内蒙古",
+    "甘肃",
+    "新疆"
+   ],
    "officialLengthKm": 2768
+  },
+  {
+   "ref": "G0711",
+   "fromPlace": "乌鲁木齐",
+   "toPlace": "若羌",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0712",
+   "fromPlace": "额济纳旗",
+   "toPlace": "策克",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G11",
    "name": "鹤大高速",
    "fromPlace": "鹤岗",
    "toPlace": "大连",
-   "provinces": "黑龙江,吉林,辽宁",
+   "provinces": [
+    "黑龙江",
+    "吉林",
+    "辽宁"
+   ],
    "officialLengthKm": 1390
+  },
+  {
+   "ref": "G1111",
+   "fromPlace": "鹤岗",
+   "toPlace": "哈尔滨",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1112",
+   "fromPlace": "集安",
+   "toPlace": "双辽",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1113",
+   "fromPlace": "丹东",
+   "toPlace": "阜新",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1115",
+   "fromPlace": "鸡西",
+   "toPlace": "建三江",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1116",
+   "fromPlace": "伊春",
+   "toPlace": "北安",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1117",
+   "fromPlace": "绥化",
+   "toPlace": "北安",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1118",
+   "fromPlace": "抚松",
+   "toPlace": "长白",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1119",
+   "fromPlace": "白山",
+   "toPlace": "临江",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1131",
+   "fromPlace": "牡丹江",
+   "toPlace": "延吉",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G15",
    "name": "沈海高速",
    "fromPlace": "沈阳",
    "toPlace": "海口",
-   "provinces": "辽宁,山东,江苏,上海,浙江,福建,广东,海南",
+   "provinces": [
+    "辽宁",
+    "山东",
+    "江苏",
+    "上海",
+    "浙江",
+    "福建",
+    "广东",
+    "海南"
+   ],
    "officialLengthKm": 3710
-  },
-  {
-   "ref": "G25",
-   "name": "长深高速",
-   "fromPlace": "长春",
-   "toPlace": "深圳",
-   "provinces": "吉林,辽宁,内蒙古,河北,天津,山东,江苏,浙江,福建,广东",
-   "officialLengthKm": 3585
-  },
-  {
-   "ref": "G35",
-   "name": "济广高速",
-   "fromPlace": "济南",
-   "toPlace": "广州",
-   "provinces": "山东,河南,安徽,江西,广东",
-   "officialLengthKm": 2100
-  },
-  {
-   "ref": "G45",
-   "name": "大广高速",
-   "fromPlace": "大庆",
-   "toPlace": "广州",
-   "provinces": "黑龙江,吉林,内蒙古,河北,北京,河南,湖北,江西,广东",
-   "officialLengthKm": 3550
-  },
-  {
-   "ref": "G55",
-   "name": "二广高速",
-   "fromPlace": "二连浩特",
-   "toPlace": "广州",
-   "provinces": "内蒙古,山西,河南,湖北,湖南,广东",
-   "officialLengthKm": 2685
-  },
-  {
-   "ref": "G59",
-   "name": "呼北高速",
-   "fromPlace": "呼和浩特",
-   "toPlace": "北海",
-   "provinces": "内蒙古,山西,河南,湖北,湖南,广西",
-   "officialLengthKm": 2600
-  },
-  {
-   "ref": "G65",
-   "name": "包茂高速",
-   "fromPlace": "包头",
-   "toPlace": "茂名",
-   "provinces": "内蒙古,陕西,四川,重庆,湖南,广西,广东",
-   "officialLengthKm": 3010
-  },
-  {
-   "ref": "G75",
-   "name": "兰海高速",
-   "fromPlace": "兰州",
-   "toPlace": "海口",
-   "provinces": "甘肃,四川,重庆,贵州,广西,广东,海南",
-   "officialLengthKm": 2650
-  },
-  {
-   "ref": "G85",
-   "name": "渝昆高速",
-   "fromPlace": "重庆",
-   "toPlace": "昆明",
-   "provinces": "重庆,四川,云南",
-   "officialLengthKm": 1100
-  },
-  {
-   "ref": "G10",
-   "name": "绥满高速",
-   "fromPlace": "绥芬河",
-   "toPlace": "满洲里",
-   "provinces": "黑龙江,内蒙古",
-   "officialLengthKm": 1300
-  },
-  {
-   "ref": "G12",
-   "name": "珲乌高速",
-   "fromPlace": "珲春",
-   "toPlace": "乌兰浩特",
-   "provinces": "吉林,内蒙古",
-   "officialLengthKm": 890
-  },
-  {
-   "ref": "G16",
-   "name": "丹锡高速",
-   "fromPlace": "丹东",
-   "toPlace": "锡林浩特",
-   "provinces": "辽宁,内蒙古",
-   "officialLengthKm": 600
-  },
-  {
-   "ref": "G18",
-   "name": "荣乌高速",
-   "fromPlace": "荣成",
-   "toPlace": "乌海",
-   "provinces": "山东,河北,天津,山西,内蒙古",
-   "officialLengthKm": 1800
-  },
-  {
-   "ref": "G20",
-   "name": "青银高速",
-   "fromPlace": "青岛",
-   "toPlace": "银川",
-   "provinces": "山东,河北,山西,陕西,宁夏",
-   "officialLengthKm": 1580
-  },
-  {
-   "ref": "G22",
-   "name": "青兰高速",
-   "fromPlace": "青岛",
-   "toPlace": "兰州",
-   "provinces": "山东,河北,山西,陕西,甘肃",
-   "officialLengthKm": 1800
-  },
-  {
-   "ref": "G30",
-   "name": "连霍高速",
-   "fromPlace": "连云港",
-   "toPlace": "霍尔果斯",
-   "provinces": "江苏,山东,河南,陕西,甘肃,新疆",
-   "officialLengthKm": 4395
-  },
-  {
-   "ref": "G36",
-   "name": "宁洛高速",
-   "fromPlace": "南京",
-   "toPlace": "洛阳",
-   "provinces": "江苏,安徽,河南",
-   "officialLengthKm": 720
-  },
-  {
-   "ref": "G40",
-   "name": "沪陕高速",
-   "fromPlace": "上海",
-   "toPlace": "西安",
-   "provinces": "上海,江苏,安徽,河南,湖北,陕西",
-   "officialLengthKm": 1490
-  },
-  {
-   "ref": "G42",
-   "name": "沪蓉高速",
-   "fromPlace": "上海",
-   "toPlace": "成都",
-   "provinces": "上海,江苏,安徽,湖北,重庆,四川",
-   "officialLengthKm": 1960
-  },
-  {
-   "ref": "G50",
-   "name": "沪渝高速",
-   "fromPlace": "上海",
-   "toPlace": "重庆",
-   "provinces": "上海,江苏,浙江,安徽,湖北,重庆",
-   "officialLengthKm": 1770
-  },
-  {
-   "ref": "G56",
-   "name": "杭瑞高速",
-   "fromPlace": "杭州",
-   "toPlace": "瑞丽",
-   "provinces": "浙江,安徽,江西,湖北,湖南,贵州,云南",
-   "officialLengthKm": 3405
-  },
-  {
-   "ref": "G60",
-   "name": "沪昆高速",
-   "fromPlace": "上海",
-   "toPlace": "昆明",
-   "provinces": "上海,浙江,江西,湖南,贵州,云南",
-   "officialLengthKm": 2730
-  },
-  {
-   "ref": "G70",
-   "name": "福银高速",
-   "fromPlace": "福州",
-   "toPlace": "银川",
-   "provinces": "福建,江西,湖北,陕西,甘肃,宁夏",
-   "officialLengthKm": 2445
-  },
-  {
-   "ref": "G72",
-   "name": "泉南高速",
-   "fromPlace": "泉州",
-   "toPlace": "南宁",
-   "provinces": "福建,江西,湖南,广西",
-   "officialLengthKm": 1500
-  },
-  {
-   "ref": "G76",
-   "name": "厦蓉高速",
-   "fromPlace": "厦门",
-   "toPlace": "成都",
-   "provinces": "福建,江西,湖南,广西,贵州,四川",
-   "officialLengthKm": 2300
-  },
-  {
-   "ref": "G78",
-   "name": "汕昆高速",
-   "fromPlace": "汕头",
-   "toPlace": "昆明",
-   "provinces": "广东,广西,贵州,云南",
-   "officialLengthKm": 1800
-  },
-  {
-   "ref": "G80",
-   "name": "广昆高速",
-   "fromPlace": "广州",
-   "toPlace": "昆明",
-   "provinces": "广东,广西,云南",
-   "officialLengthKm": 1600
-  },
-  {
-   "ref": "G94",
-   "name": "珠三角环线",
-   "fromPlace": "深圳",
-   "toPlace": "深圳",
-   "provinces": "广东",
-   "officialLengthKm": 200
-  },
-  {
-   "ref": "G98",
-   "name": "海南环线",
-   "fromPlace": "海口",
-   "toPlace": "海口",
-   "provinces": "海南",
-   "officialLengthKm": 613
-  },
-  {
-   "ref": "G0321",
-   "name": "德上高速",
-   "fromPlace": "德州",
-   "toPlace": "上饶",
-   "provinces": "山东,河南,安徽,江西",
-   "officialLengthKm": 1300
-  },
-  {
-   "ref": "G0421",
-   "name": "许广高速",
-   "fromPlace": "许昌",
-   "toPlace": "广州",
-   "provinces": "河南,湖北,湖南,广东",
-   "officialLengthKm": 1100
   },
   {
    "ref": "G1511",
    "name": "日兰高速",
    "fromPlace": "日照",
    "toPlace": "兰考",
-   "provinces": "山东,河南",
+   "provinces": [
+    "山东",
+    "河南"
+   ],
    "officialLengthKm": 470
   },
   {
@@ -328,23 +414,702 @@
    "name": "甬金高速",
    "fromPlace": "宁波",
    "toPlace": "金华",
-   "provinces": "浙江",
+   "provinces": [
+    "浙江"
+   ],
    "officialLengthKm": 180
   },
   {
-   "ref": "G15W",
-   "name": "常台高速",
+   "ref": "G1513",
+   "fromPlace": "温州",
+   "toPlace": "丽水",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1514",
+   "fromPlace": "宁德",
+   "toPlace": "上饶",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1515",
+   "fromPlace": "盐城",
+   "toPlace": "靖江",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1516",
+   "fromPlace": "盐城",
+   "toPlace": "洛阳",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1517",
+   "fromPlace": "莆田",
+   "toPlace": "炎陵",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1518",
+   "fromPlace": "盐城",
+   "toPlace": "蚌埠",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1519",
+   "fromPlace": "南通",
+   "toPlace": "如东",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1521",
+   "fromPlace": "常熟",
+   "toPlace": "嘉善",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1522",
    "fromPlace": "常熟",
    "toPlace": "台州",
-   "provinces": "江苏,浙江",
-   "officialLengthKm": 400
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1523",
+   "fromPlace": "宁波",
+   "toPlace": "东莞",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1531",
+   "fromPlace": "上海",
+   "toPlace": "慈溪",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1532",
+   "fromPlace": "泉州",
+   "toPlace": "梅州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1533",
+   "fromPlace": "泉州",
+   "toPlace": "金门",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1534",
+   "fromPlace": "厦门",
+   "toPlace": "金门",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1535",
+   "fromPlace": "潮州",
+   "toPlace": "南昌",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1536",
+   "fromPlace": "东莞",
+   "toPlace": "广州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G25",
+   "name": "长深高速",
+   "fromPlace": "长春",
+   "toPlace": "深圳",
+   "provinces": [
+    "吉林",
+    "辽宁",
+    "内蒙古",
+    "河北",
+    "天津",
+    "山东",
+    "江苏",
+    "浙江",
+    "福建",
+    "广东"
+   ],
+   "officialLengthKm": 3585
+  },
+  {
+   "ref": "G2511",
+   "fromPlace": "新民",
+   "toPlace": "鲁北",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2512",
+   "fromPlace": "阜新",
+   "toPlace": "锦州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2513",
+   "name": "淮徐高速",
+   "fromPlace": "淮安",
+   "toPlace": "徐州",
+   "provinces": [
+    "江苏"
+   ],
+   "officialLengthKm": 200
+  },
+  {
+   "ref": "G2515",
+   "fromPlace": "鲁北",
+   "toPlace": "霍林郭勒",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2516",
+   "fromPlace": "东营",
+   "toPlace": "吕梁",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2517",
+   "fromPlace": "沙县",
+   "toPlace": "厦门",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2518",
+   "fromPlace": "深圳",
+   "toPlace": "岑溪",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2519",
+   "fromPlace": "康平",
+   "toPlace": "沈阳",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2531",
+   "fromPlace": "杭州",
+   "toPlace": "上饶",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G35",
+   "name": "济广高速",
+   "fromPlace": "济南",
+   "toPlace": "广州",
+   "provinces": [
+    "山东",
+    "河南",
+    "安徽",
+    "江西",
+    "广东"
+   ],
+   "officialLengthKm": 2100
+  },
+  {
+   "ref": "G3511",
+   "fromPlace": "菏泽",
+   "toPlace": "宝鸡",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3512",
+   "fromPlace": "寻乌",
+   "toPlace": "赣州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G45",
+   "name": "大广高速",
+   "fromPlace": "大庆",
+   "toPlace": "广州",
+   "provinces": [
+    "黑龙江",
+    "吉林",
+    "内蒙古",
+    "河北",
+    "北京",
+    "河南",
+    "湖北",
+    "江西",
+    "广东"
+   ],
+   "officialLengthKm": 3550
+  },
+  {
+   "ref": "G4511",
+   "fromPlace": "龙南",
+   "toPlace": "河源",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4512",
+   "fromPlace": "双辽",
+   "toPlace": "嫩江",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4513",
+   "fromPlace": "奈曼旗",
+   "toPlace": "营口",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4515",
+   "fromPlace": "赤峰",
+   "toPlace": "绥中",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G55",
+   "name": "二广高速",
+   "fromPlace": "二连浩特",
+   "toPlace": "广州",
+   "provinces": [
+    "内蒙古",
+    "山西",
+    "河南",
+    "湖北",
+    "湖南",
+    "广东"
+   ],
+   "officialLengthKm": 2685
+  },
+  {
+   "ref": "G5511",
+   "fromPlace": "集宁",
+   "toPlace": "阿荣旗",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5512",
+   "fromPlace": "晋城",
+   "toPlace": "新乡",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5513",
+   "name": "长张高速",
+   "fromPlace": "长沙",
+   "toPlace": "张家界",
+   "provinces": [
+    "湖南"
+   ],
+   "officialLengthKm": 310
+  },
+  {
+   "ref": "G5515",
+   "fromPlace": "张家界",
+   "toPlace": "南充",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5516",
+   "fromPlace": "苏尼特右旗",
+   "toPlace": "张家口",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5517",
+   "fromPlace": "常德",
+   "toPlace": "长沙",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5518",
+   "fromPlace": "晋城",
+   "toPlace": "潼关",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G59",
+   "name": "呼北高速",
+   "fromPlace": "呼和浩特",
+   "toPlace": "北海",
+   "provinces": [
+    "内蒙古",
+    "山西",
+    "河南",
+    "湖北",
+    "湖南",
+    "广西"
+   ],
+   "officialLengthKm": 2600
+  },
+  {
+   "ref": "G5911",
+   "fromPlace": "朔州",
+   "toPlace": "太原",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5912",
+   "fromPlace": "房县",
+   "toPlace": "五峰",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G65",
+   "name": "包茂高速",
+   "fromPlace": "包头",
+   "toPlace": "茂名",
+   "provinces": [
+    "内蒙古",
+    "陕西",
+    "四川",
+    "重庆",
+    "湖南",
+    "广西",
+    "广东"
+   ],
+   "officialLengthKm": 3010
+  },
+  {
+   "ref": "G6511",
+   "fromPlace": "安塞",
+   "toPlace": "清涧",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6512",
+   "fromPlace": "秀山",
+   "toPlace": "从江",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6517",
+   "fromPlace": "梧州",
+   "toPlace": "柳州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6521",
+   "fromPlace": "榆林",
+   "toPlace": "蓝田",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6522",
+   "fromPlace": "延安",
+   "toPlace": "西安",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G69",
+   "name": "银百高速",
+   "fromPlace": "银川",
+   "toPlace": "百色",
+   "provinces": [
+    "宁夏",
+    "甘肃",
+    "陕西",
+    "重庆",
+    "贵州",
+    "广西"
+   ],
+   "officialLengthKm": 2200
+  },
+  {
+   "ref": "G6911",
+   "fromPlace": "安康",
+   "toPlace": "来凤",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G75",
+   "name": "兰海高速",
+   "fromPlace": "兰州",
+   "toPlace": "海口",
+   "provinces": [
+    "甘肃",
+    "四川",
+    "重庆",
+    "贵州",
+    "广西",
+    "广东",
+    "海南"
+   ],
+   "officialLengthKm": 2650
+  },
+  {
+   "ref": "G7511",
+   "fromPlace": "钦州",
+   "toPlace": "东兴",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G7512",
+   "fromPlace": "贵阳",
+   "toPlace": "成都",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G7521",
+   "fromPlace": "重庆",
+   "toPlace": "贵阳",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G7522",
+   "fromPlace": "贵阳",
+   "toPlace": "北海",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G85",
+   "name": "渝昆高速",
+   "fromPlace": "银川",
+   "toPlace": "昆明",
+   "provinces": [
+    "重庆",
+    "四川",
+    "云南"
+   ],
+   "officialLengthKm": 1100
+  },
+  {
+   "ref": "G8511",
+   "fromPlace": "昆明",
+   "toPlace": "磨憨",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G8512",
+   "fromPlace": "景洪",
+   "toPlace": "打洛",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G8513",
+   "fromPlace": "平凉",
+   "toPlace": "绵阳",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G8515",
+   "fromPlace": "广安",
+   "toPlace": "泸州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G8516",
+   "fromPlace": "巴中",
+   "toPlace": "成都",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G8517",
+   "fromPlace": "屏山",
+   "toPlace": "兴义",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G10",
+   "name": "绥满高速",
+   "fromPlace": "绥芬河",
+   "toPlace": "满洲里",
+   "provinces": [
+    "黑龙江",
+    "内蒙古"
+   ],
+   "officialLengthKm": 1300
+  },
+  {
+   "ref": "G1011",
+   "fromPlace": "哈尔滨",
+   "toPlace": "同江",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1012",
+   "fromPlace": "建三江",
+   "toPlace": "黑瞎子岛",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1013",
+   "fromPlace": "海拉尔",
+   "toPlace": "张家口",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1015",
+   "fromPlace": "铁力",
+   "toPlace": "科尔沁右翼中旗",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1016",
+   "fromPlace": "双鸭山",
+   "toPlace": "宝清",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1017",
+   "fromPlace": "海拉尔",
+   "toPlace": "加格达奇",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G12",
+   "name": "珲乌高速",
+   "fromPlace": "珲春",
+   "toPlace": "乌兰浩特",
+   "provinces": [
+    "吉林",
+    "内蒙古"
+   ],
+   "officialLengthKm": 890
+  },
+  {
+   "ref": "G1211",
+   "fromPlace": "吉林",
+   "toPlace": "黑河",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1212",
+   "fromPlace": "沈阳",
+   "toPlace": "吉林",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1213",
+   "fromPlace": "北安",
+   "toPlace": "漠河",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1215",
+   "fromPlace": "松江",
+   "toPlace": "长白山",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1216",
+   "fromPlace": "乌兰浩特",
+   "toPlace": "阿力得尔",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1221",
+   "fromPlace": "延吉",
+   "toPlace": "长春",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G16",
+   "name": "丹锡高速",
+   "fromPlace": "丹东",
+   "toPlace": "锡林浩特",
+   "provinces": [
+    "辽宁",
+    "内蒙古"
+   ],
+   "officialLengthKm": 600
+  },
+  {
+   "ref": "G1611",
+   "fromPlace": "克什克腾",
+   "toPlace": "承德",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1612",
+   "fromPlace": "锡林浩特",
+   "toPlace": "二连浩特",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G18",
+   "name": "荣乌高速",
+   "fromPlace": "荣成",
+   "toPlace": "乌海",
+   "provinces": [
+    "山东",
+    "河北",
+    "天津",
+    "山西",
+    "内蒙古"
+   ],
+   "officialLengthKm": 1800
   },
   {
    "ref": "G1811",
    "name": "黄石高速",
    "fromPlace": "黄骅",
    "toPlace": "石家庄",
-   "provinces": "河北",
+   "provinces": [
+    "河北"
+   ],
    "officialLengthKm": 300
   },
   {
@@ -352,96 +1117,1185 @@
    "name": "沧榆高速",
    "fromPlace": "沧州",
    "toPlace": "榆林",
-   "provinces": "河北,山西,陕西",
+   "provinces": [
+    "河北",
+    "山西",
+    "陕西"
+   ],
    "officialLengthKm": 600
+  },
+  {
+   "ref": "G1813",
+   "fromPlace": "威海",
+   "toPlace": "青岛",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1815",
+   "fromPlace": "潍坊",
+   "toPlace": "日照",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1816",
+   "fromPlace": "乌海",
+   "toPlace": "玛沁",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1817",
+   "fromPlace": "乌海",
+   "toPlace": "银川",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1818",
+   "fromPlace": "滨州",
+   "toPlace": "德州",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G20",
+   "name": "青银高速",
+   "fromPlace": "青岛",
+   "toPlace": "银川",
+   "provinces": [
+    "山东",
+    "河北",
+    "山西",
+    "陕西",
+    "宁夏"
+   ],
+   "officialLengthKm": 1580
+  },
+  {
+   "ref": "G2011",
+   "fromPlace": "青岛",
+   "toPlace": "新河",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G2012",
    "name": "定武高速",
    "fromPlace": "定边",
    "toPlace": "武威",
-   "provinces": "陕西,甘肃,宁夏",
+   "provinces": [
+    "陕西",
+    "甘肃",
+    "宁夏"
+   ],
    "officialLengthKm": 400
   },
   {
-   "ref": "G2513",
-   "name": "淮徐高速",
-   "fromPlace": "淮安",
-   "toPlace": "徐州",
-   "provinces": "江苏",
-   "officialLengthKm": 200
+   "ref": "G22",
+   "name": "青兰高速",
+   "fromPlace": "青岛",
+   "toPlace": "兰州",
+   "provinces": [
+    "山东",
+    "河北",
+    "山西",
+    "陕西",
+    "甘肃"
+   ],
+   "officialLengthKm": 1800
+  },
+  {
+   "ref": "G2211",
+   "fromPlace": "长治",
+   "toPlace": "延安",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G30",
+   "name": "连霍高速",
+   "fromPlace": "连云港",
+   "toPlace": "霍尔果斯",
+   "provinces": [
+    "江苏",
+    "山东",
+    "河南",
+    "陕西",
+    "甘肃",
+    "新疆"
+   ],
+   "officialLengthKm": 4395
   },
   {
    "ref": "G3011",
    "name": "柳格高速",
    "fromPlace": "柳园",
    "toPlace": "格尔木",
-   "provinces": "甘肃,青海",
+   "provinces": [
+    "甘肃",
+    "青海"
+   ],
    "officialLengthKm": 400
+  },
+  {
+   "ref": "G3012",
+   "fromPlace": "吐鲁番",
+   "toPlace": "和田",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3013",
+   "fromPlace": "阿图什",
+   "toPlace": "伊尔克什坦",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3014",
+   "fromPlace": "奎屯",
+   "toPlace": "阿勒泰",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3015",
+   "fromPlace": "奎屯",
+   "toPlace": "塔城",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3016",
+   "fromPlace": "清水河",
+   "toPlace": "伊宁",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3017",
+   "fromPlace": "武威",
+   "toPlace": "金昌",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3018",
+   "fromPlace": "精河",
+   "toPlace": "阿拉山口",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3019",
+   "fromPlace": "博乐",
+   "toPlace": "阿拉山口",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3021",
+   "fromPlace": "临潼",
+   "toPlace": "兴平",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3031",
+   "fromPlace": "商丘",
+   "toPlace": "固始",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3032",
+   "fromPlace": "永登",
+   "toPlace": "海晏",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3033",
+   "fromPlace": "奎屯",
+   "toPlace": "库车",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3035",
+   "fromPlace": "伊宁",
+   "toPlace": "新源",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3036",
+   "fromPlace": "阿克苏",
+   "toPlace": "阿拉尔",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G36",
+   "name": "宁洛高速",
+   "fromPlace": "南京",
+   "toPlace": "洛阳",
+   "provinces": [
+    "江苏",
+    "安徽",
+    "河南"
+   ],
+   "officialLengthKm": 720
+  },
+  {
+   "ref": "G3611",
+   "fromPlace": "南京",
+   "toPlace": "信阳",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3612",
+   "fromPlace": "平顶山",
+   "toPlace": "宜昌",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3613",
+   "fromPlace": "洛阳",
+   "toPlace": "内乡",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3615",
+   "fromPlace": "洛阳",
+   "toPlace": "卢氏",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G40",
+   "name": "沪陕高速",
+   "fromPlace": "上海",
+   "toPlace": "西安",
+   "provinces": [
+    "上海",
+    "江苏",
+    "安徽",
+    "河南",
+    "湖北",
+    "陕西"
+   ],
+   "officialLengthKm": 1490
+  },
+  {
+   "ref": "G4011",
+   "fromPlace": "扬州",
+   "toPlace": "溧阳",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4012",
+   "fromPlace": "溧阳",
+   "toPlace": "宁德",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4013",
+   "fromPlace": "扬州",
+   "toPlace": "乐清",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4015",
+   "fromPlace": "丹凤",
+   "toPlace": "宁陕",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G42",
+   "name": "沪蓉高速",
+   "fromPlace": "上海",
+   "toPlace": "成都",
+   "provinces": [
+    "上海",
+    "江苏",
+    "安徽",
+    "湖北",
+    "重庆",
+    "四川"
+   ],
+   "officialLengthKm": 1960
   },
   {
    "ref": "G4211",
    "name": "宁芜高速",
    "fromPlace": "南京",
    "toPlace": "芜湖",
-   "provinces": "江苏,安徽",
+   "provinces": [
+    "江苏",
+    "安徽"
+   ],
    "officialLengthKm": 60
+  },
+  {
+   "ref": "G4212",
+   "fromPlace": "合肥",
+   "toPlace": "安庆",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4213",
+   "fromPlace": "麻城",
+   "toPlace": "安康",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G4215",
    "name": "蓉遵高速",
    "fromPlace": "成都",
    "toPlace": "遵义",
-   "provinces": "四川,贵州",
+   "provinces": [
+    "四川",
+    "贵州"
+   ],
    "officialLengthKm": 450
+  },
+  {
+   "ref": "G4216",
+   "fromPlace": "成都",
+   "toPlace": "丽江",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4217",
+   "fromPlace": "成都",
+   "toPlace": "昌都",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4218",
+   "fromPlace": "雅安",
+   "toPlace": "叶城",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4219",
+   "fromPlace": "曲水",
+   "toPlace": "乃东",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G4221",
    "name": "沪武高速",
    "fromPlace": "上海",
    "toPlace": "武汉",
-   "provinces": "上海,江苏,安徽,湖北",
+   "provinces": [
+    "上海",
+    "江苏",
+    "安徽",
+    "湖北"
+   ],
    "officialLengthKm": 800
+  },
+  {
+   "ref": "G4222",
+   "fromPlace": "和县",
+   "toPlace": "襄阳",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4223",
+   "fromPlace": "武汉",
+   "toPlace": "重庆",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4231",
+   "fromPlace": "南京",
+   "toPlace": "九江",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G50",
+   "name": "沪渝高速",
+   "fromPlace": "上海",
+   "toPlace": "重庆",
+   "provinces": [
+    "上海",
+    "江苏",
+    "浙江",
+    "安徽",
+    "湖北",
+    "重庆"
+   ],
+   "officialLengthKm": 1770
   },
   {
    "ref": "G5011",
    "name": "芜合高速",
    "fromPlace": "芜湖",
    "toPlace": "合肥",
-   "provinces": "安徽",
+   "provinces": [
+    "安徽"
+   ],
    "officialLengthKm": 100
+  },
+  {
+   "ref": "G5012",
+   "fromPlace": "恩施",
+   "toPlace": "广元",
+   "provinces": [],
+   "officialLengthKm": 0
   },
   {
    "ref": "G5013",
    "name": "渝蓉高速",
    "fromPlace": "重庆",
    "toPlace": "成都",
-   "provinces": "重庆,四川",
+   "provinces": [
+    "重庆",
+    "四川"
+   ],
    "officialLengthKm": 260
   },
   {
-   "ref": "G5513",
-   "name": "长张高速",
-   "fromPlace": "长沙",
-   "toPlace": "张家界",
-   "provinces": "湖南",
-   "officialLengthKm": 310
+   "ref": "G5015",
+   "fromPlace": "武汉",
+   "toPlace": "岳阳",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5016",
+   "fromPlace": "宜昌",
+   "toPlace": "华容",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5021",
+   "fromPlace": "石柱",
+   "toPlace": "重庆",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G56",
+   "name": "杭瑞高速",
+   "fromPlace": "杭州",
+   "toPlace": "瑞丽",
+   "provinces": [
+    "浙江",
+    "安徽",
+    "江西",
+    "湖北",
+    "湖南",
+    "贵州",
+    "云南"
+   ],
+   "officialLengthKm": 3405
   },
   {
    "ref": "G5611",
    "name": "大丽高速",
    "fromPlace": "大理",
    "toPlace": "丽江",
-   "provinces": "云南",
+   "provinces": [
+    "云南"
+   ],
    "officialLengthKm": 260
+  },
+  {
+   "ref": "G5612",
+   "fromPlace": "大理",
+   "toPlace": "临沧",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5613",
+   "fromPlace": "保山",
+   "toPlace": "泸水",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5615",
+   "fromPlace": "天保",
+   "toPlace": "猴桥",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5616",
+   "fromPlace": "安乡",
+   "toPlace": "吉首",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5617",
+   "fromPlace": "临沧",
+   "toPlace": "勐海",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5618",
+   "fromPlace": "临沧",
+   "toPlace": "清水河",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5621",
+   "fromPlace": "昆明",
+   "toPlace": "大理",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G60",
+   "name": "沪昆高速",
+   "fromPlace": "上海",
+   "toPlace": "昆明",
+   "provinces": [
+    "上海",
+    "浙江",
+    "江西",
+    "湖南",
+    "贵州",
+    "云南"
+   ],
+   "officialLengthKm": 2730
+  },
+  {
+   "ref": "G6011",
+   "fromPlace": "南昌",
+   "toPlace": "韶关",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6012",
+   "fromPlace": "曲靖",
+   "toPlace": "弥勒",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6021",
+   "fromPlace": "杭州",
+   "toPlace": "长沙",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6022",
+   "fromPlace": "醴陵",
+   "toPlace": "娄底",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6023",
+   "fromPlace": "南昌",
+   "toPlace": "凤凰",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6025",
+   "fromPlace": "洞口",
+   "toPlace": "三穗",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G70",
+   "name": "福银高速",
+   "fromPlace": "福州",
+   "toPlace": "银川",
+   "provinces": [
+    "福建",
+    "江西",
+    "湖北",
+    "陕西",
+    "甘肃",
+    "宁夏"
+   ],
+   "officialLengthKm": 2445
+  },
+  {
+   "ref": "G7011",
+   "fromPlace": "十堰",
+   "toPlace": "天水",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G7012",
+   "fromPlace": "抚州",
+   "toPlace": "吉安",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G7013",
+   "fromPlace": "沙县",
+   "toPlace": "南平",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G7021",
+   "fromPlace": "宁德",
+   "toPlace": "武汉",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G72",
+   "name": "泉南高速",
+   "fromPlace": "泉州",
+   "toPlace": "南宁",
+   "provinces": [
+    "福建",
+    "江西",
+    "湖南",
+    "广西"
+   ],
+   "officialLengthKm": 1500
   },
   {
    "ref": "G7211",
    "name": "南友高速",
    "fromPlace": "南宁",
    "toPlace": "友谊关",
-   "provinces": "广西",
+   "provinces": [
+    "广西"
+   ],
    "officialLengthKm": 180
+  },
+  {
+   "ref": "G7212",
+   "fromPlace": "柳州",
+   "toPlace": "北海",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G7221",
+   "fromPlace": "衡阳",
+   "toPlace": "南宁",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G76",
+   "name": "厦蓉高速",
+   "fromPlace": "厦门",
+   "toPlace": "成都",
+   "provinces": [
+    "福建",
+    "江西",
+    "湖南",
+    "广西",
+    "贵州",
+    "四川"
+   ],
+   "officialLengthKm": 2300
+  },
+  {
+   "ref": "G7611",
+   "fromPlace": "都匀",
+   "toPlace": "香格里拉",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G7612",
+   "fromPlace": "纳雍",
+   "toPlace": "兴义",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G78",
+   "name": "汕昆高速",
+   "fromPlace": "汕头",
+   "toPlace": "昆明",
+   "provinces": [
+    "广东",
+    "广西",
+    "贵州",
+    "云南"
+   ],
+   "officialLengthKm": 1800
+  },
+  {
+   "ref": "G80",
+   "name": "广昆高速",
+   "fromPlace": "广州",
+   "toPlace": "昆明",
+   "provinces": [
+    "广东",
+    "广西",
+    "云南"
+   ],
+   "officialLengthKm": 1600
+  },
+  {
+   "ref": "G8011",
+   "fromPlace": "开远",
+   "toPlace": "河口",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G8012",
+   "fromPlace": "弥勒",
+   "toPlace": "楚雄",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G8013",
+   "fromPlace": "砚山",
+   "toPlace": "文山",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G91",
+   "name": "辽中环线",
+   "fromPlace": "辽中地区环线",
+   "toPlace": "辽中地区环线",
+   "provinces": [
+    "辽宁"
+   ],
+   "officialLengthKm": 400
+  },
+  {
+   "ref": "G9111",
+   "fromPlace": "本溪",
+   "toPlace": "集安",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G92",
+   "name": "杭州湾环线",
+   "fromPlace": "杭州湾地区环线",
+   "toPlace": "杭州湾地区环线",
+   "provinces": [
+    "浙江"
+   ],
+   "officialLengthKm": 450
+  },
+  {
+   "ref": "G9211",
+   "fromPlace": "宁波",
+   "toPlace": "舟山",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9221",
+   "fromPlace": "杭州",
+   "toPlace": "宁波",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G93",
+   "name": "成渝环线",
+   "fromPlace": "成渝地区环线",
+   "toPlace": "成渝地区环线",
+   "provinces": [
+    "四川",
+    "重庆"
+   ],
+   "officialLengthKm": 1200
+  },
+  {
+   "ref": "G94",
+   "name": "珠三角环线",
+   "fromPlace": "珠江三角洲地区环线",
+   "toPlace": "珠江三角洲地区环线",
+   "provinces": [
+    "广东"
+   ],
+   "officialLengthKm": 200
+  },
+  {
+   "ref": "G9411",
+   "fromPlace": "东莞",
+   "toPlace": "佛山",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G95",
+   "name": "首都地区环线",
+   "fromPlace": "首都地区环线",
+   "toPlace": "首都地区环线",
+   "provinces": [
+    "北京",
+    "河北",
+    "天津"
+   ],
+   "officialLengthKm": 900
+  },
+  {
+   "ref": "G9511",
+   "fromPlace": "涞水",
+   "toPlace": "涞源",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G98",
+   "name": "海南地区环线",
+   "fromPlace": "海南地区环线",
+   "toPlace": "海南地区环线",
+   "provinces": [
+    "海南"
+   ],
+   "officialLengthKm": 613
+  },
+  {
+   "ref": "G9811",
+   "fromPlace": "海口",
+   "toPlace": "乐东",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9812",
+   "fromPlace": "海口",
+   "toPlace": "琼海",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9813",
+   "fromPlace": "万宁",
+   "toPlace": "洋浦",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9901",
+   "fromPlace": "哈尔滨都市圈环线",
+   "toPlace": "哈尔滨都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9902",
+   "fromPlace": "长春都市圈环线",
+   "toPlace": "长春都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9903",
+   "fromPlace": "杭州都市圈环线",
+   "toPlace": "杭州都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9904",
+   "fromPlace": "南京都市圈环线",
+   "toPlace": "南京都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9905",
+   "fromPlace": "郑州都市圈环线",
+   "toPlace": "郑州都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9906",
+   "fromPlace": "武汉都市圈环线",
+   "toPlace": "武汉都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9907",
+   "fromPlace": "长株潭都市圈环线",
+   "toPlace": "长株潭都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9908",
+   "fromPlace": "西安都市圈环线",
+   "toPlace": "西安都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9909",
+   "fromPlace": "重庆都市圈环线",
+   "toPlace": "重庆都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9910",
+   "fromPlace": "成都都市圈环线",
+   "toPlace": "成都都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9911",
+   "fromPlace": "济南都市圈环线",
+   "toPlace": "济南都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G9912",
+   "fromPlace": "合肥都市圈环线",
+   "toPlace": "合肥都市圈环线",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0401",
+   "fromPlace": "长沙市绕城高速",
+   "toPlace": "长沙市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G0601",
+   "fromPlace": "西宁市绕城高速",
+   "toPlace": "西宁市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1501",
+   "fromPlace": "沈阳市绕城高速",
+   "toPlace": "沈阳市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1503",
+   "fromPlace": "上海市绕城高速",
+   "toPlace": "上海市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1504",
+   "fromPlace": "宁波市绕城高速",
+   "toPlace": "宁波市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1505",
+   "fromPlace": "福州市绕城高速",
+   "toPlace": "福州市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1508",
+   "fromPlace": "广州市绕城高速",
+   "toPlace": "广州市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2501",
+   "fromPlace": "长春市绕城高速",
+   "toPlace": "长春市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2502",
+   "fromPlace": "天津市绕城高速",
+   "toPlace": "天津市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2503",
+   "fromPlace": "南京市绕城高速",
+   "toPlace": "南京市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2504",
+   "fromPlace": "杭州市绕城高速",
+   "toPlace": "杭州市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4501",
+   "fromPlace": "北京市绕城高速",
+   "toPlace": "北京市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5901",
+   "fromPlace": "呼和浩特市绕城高速",
+   "toPlace": "呼和浩特市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G1001",
+   "fromPlace": "哈尔滨市绕城高速",
+   "toPlace": "哈尔滨市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2001",
+   "fromPlace": "济南市绕城高速",
+   "toPlace": "济南市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2002",
+   "fromPlace": "石家庄市绕城高速",
+   "toPlace": "石家庄市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2003",
+   "fromPlace": "太原市绕城高速",
+   "toPlace": "太原市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2004",
+   "fromPlace": "银川市绕城高速",
+   "toPlace": "银川市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G2201",
+   "fromPlace": "兰州市绕城高速",
+   "toPlace": "兰州市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3001",
+   "fromPlace": "郑州市绕城高速",
+   "toPlace": "郑州市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3002",
+   "fromPlace": "西安市绕城高速",
+   "toPlace": "西安市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G3003",
+   "fromPlace": "乌鲁木齐市绕城高速",
+   "toPlace": "乌鲁木齐市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4001",
+   "fromPlace": "合肥市绕城高速",
+   "toPlace": "合肥市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4201",
+   "fromPlace": "武汉市绕城高速",
+   "toPlace": "武汉市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G4202",
+   "fromPlace": "成都市绕城高速",
+   "toPlace": "成都市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5001",
+   "fromPlace": "重庆市绕城高速",
+   "toPlace": "重庆市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G5601",
+   "fromPlace": "昆明市绕城高速",
+   "toPlace": "昆明市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6001",
+   "fromPlace": "南昌市绕城高速",
+   "toPlace": "南昌市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G6002",
+   "fromPlace": "贵阳市绕城高速",
+   "toPlace": "贵阳市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
+  },
+  {
+   "ref": "G7201",
+   "fromPlace": "南宁市绕城高速",
+   "toPlace": "南宁市绕城高速",
+   "provinces": [],
+   "officialLengthKm": 0
   }
  ]
 }

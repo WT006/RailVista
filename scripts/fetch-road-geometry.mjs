@@ -31,22 +31,43 @@ const GEOM_DIR = join(__dirname, '../data/roads/geom');
 // 中国大陆 bbox（不含海外争议区，覆盖国道全线）
 const CN_BBOX = [18, 73, 54, 135];
 
-/** 默认旗舰清单：榜单与「最美公路」相关度最高的西部风景线优先 */
+/** 默认旗舰清单：榜单与「最美公路」相关度最高的西部风景线优先 + 第二批经典放射/纵横线 */
 const FLAGSHIP_REFS = [
+  // 第一批：西部风景线（榜单相关）
   'G318', // 沪聂线 · 川藏
   'G109', // 京拉线 · 青藏
   'G315', // 西宁—喀什 · 柴达木/昆仑
   'G217', // 独库公路
   'G227', // 宁张线 · 祁连
   'G312', // 沪霍线 · 丝路
-  'G213', // 兰磨线 · 九寨/若尔盖
-  'G214', // 西景线 · 三江并流
+  'G213', // 策克—磨憨 · 九寨/若尔盖
+  'G214', // 西宁—澜沧 · 三江并流
   'G317', // 成那线 · 川藏北线
   'G219', // 新藏/沿边
   'G331', // 丹阿线 · 沿边
   'G316', // 福兰线 · 秦岭
   'G320', // 沪瑞线 · 滇缅
-  'G212', // 兰渝线 · 甘南
+  'G212', // 兰州—龙邦 · 甘南
+  // 第二批：经典放射线与东中部纵横线
+  'G104', // 北京—平潭
+  'G105', // 北京—澳门
+  'G106', // 北京—广州
+  'G107', // 北京—香港
+  'G108', // 北京—昆明
+  'G110', // 北京—青铜峡
+  'G111', // 北京—漠河
+  'G204', // 烟台—上海
+  'G205', // 山海关—深圳
+  'G206', // 烟台—汕头
+  'G207', // 锡林浩特—海安
+  'G209', // 呼和浩特—北海
+  'G210', // 包头—南宁
+  'G307', // 黄骅—山丹
+  'G309', // 荣成—兰州
+  'G314', // 乌鲁木齐—红其拉甫
+  'G319', // 厦门—成都
+  'G324', // 福州—昆明
+  'G326', // 秀山—河口
 ];
 
 function parseArgs() {
@@ -63,17 +84,19 @@ function parseArgs() {
 /**
  * 多链贪心串接：chainWays 断链后，从剩余池继续开新链，再按 5km 容差把
  * 端点相近的链拼到主链（不动点迭代：拼接延长主链后，原先够不着的段可能够着了）。
+ * officialKm > 0 时全程受「官方里程 × 1.6」封顶（防多编号共线误匹配越串越远）。
  */
-function chainAll(ways) {
+function chainAll(ways, officialKm = 0) {
+  const maxKm = officialKm > 0 ? officialKm * 1.6 : 0;
   let pool = ways.slice();
   const chains = [];
   while (pool.length > 0 && chains.length < 400) {
-    const { chain, remaining } = chainWays(pool, 800);
+    const { chain, remaining } = chainWays(pool, 800, maxKm);
     if (!chain || chain.length < 2 || remaining.length === pool.length) break;
     chains.push(chain);
     pool = remaining;
   }
-  // 按长度排序，主链最长；其余尝试端点并接（≤5km），不动点直到无可拼接
+  // 按长度排序，主链最长；其余尝试端点并接（≤5km 且不超上限），不动点直到无可拼接
   chains.sort((a, b) => totalKm(b) - totalKm(a));
   let main = chains.shift() ?? [];
   let rest = chains;
@@ -82,6 +105,10 @@ function chainAll(ways) {
     let attached = false;
     const next = [];
     for (const c of rest) {
+      if (maxKm > 0 && totalKm(main) + totalKm(c) > maxKm) {
+        next.push(c); // 超上限的段不拼（诚实留给 orphan，verify 会标记偏差）
+        continue;
+      }
       if (tryAttach(main, c)) {
         attached = true;
       } else if (tryAttach(main, c.slice().reverse())) {
@@ -128,8 +155,8 @@ function tryAttachHead(main, piece) {
   return true;
 }
 
-async function fetchOne({ key, ref, bbox, fromPlace, toPlace }) {
-  console.log(`▶ ${key}（${fromPlace} → ${toPlace}）`);
+async function fetchOne({ key, ref, bbox, fromPlace, toPlace, officialKm = 0 }) {
+  console.log(`▶ ${key}（${fromPlace} → ${toPlace}）${officialKm ? ` 官方里程参考 ${officialKm}km` : ''}`);
   const t0 = Date.now();
   const { ways, source } = await fetchWaysForRef(ref, bbox, { timeoutSec: 300 });
   if (ways.length < 3) {
@@ -137,7 +164,7 @@ async function fetchOne({ key, ref, bbox, fromPlace, toPlace }) {
     return null;
   }
   console.log(`  抓到 ${ways.length} ways（${source}），串接中…`);
-  const { chain, orphans } = chainAll(ways);
+  const { chain, orphans } = chainAll(ways, officialKm);
   if (chain.length < 10) {
     console.log(`  ✗ 成链仅 ${chain.length} 点，跳过`);
     return null;
@@ -160,13 +187,21 @@ async function fetchOne({ key, ref, bbox, fromPlace, toPlace }) {
 
 // ── 主流程 ───────────────────────────────────────────────────────────────────
 const args = parseArgs();
-// 索引里取 from/to（写进几何 nodes）
+// 索引取 from/to（写进几何 nodes）；官方里程取权威层（index 的 lengthKm 已被几何回写）
 const indexByRef = new Map();
 for (const f of ['national.json', 'expressway.json', 'provincial.json']) {
   const p = join(__dirname, '../data/roads/index', f);
   if (!existsSync(p)) continue;
   const idx = JSON.parse(readFileSync(p, 'utf8'));
   for (const r of idx.roads) indexByRef.set(r.key, r);
+}
+const officialKmByRef = new Map();
+for (const f of ['national.json', 'expressway.json']) {
+  const p = join(__dirname, '../data/roads/authoritative', f);
+  if (!existsSync(p)) continue;
+  for (const r of JSON.parse(readFileSync(p, 'utf8')).roads ?? []) {
+    officialKmByRef.set(r.ref, r.officialLengthKm ?? 0);
+  }
 }
 
 const jobs = [];
@@ -178,6 +213,7 @@ if (args.key) {
     bbox: args.bbox,
     fromPlace: entry?.fromPlace ?? args.key,
     toPlace: entry?.toPlace ?? args.key,
+    officialKm: officialKmByRef.get(args.key) ?? 0,
   });
 } else {
   const refs = args.refs.length ? args.refs : FLAGSHIP_REFS;
@@ -189,6 +225,7 @@ if (args.key) {
       bbox: CN_BBOX,
       fromPlace: entry?.fromPlace ?? ref,
       toPlace: entry?.toPlace ?? ref,
+      officialKm: officialKmByRef.get(ref) ?? 0,
     });
   }
 }

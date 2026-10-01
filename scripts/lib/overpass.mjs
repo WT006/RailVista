@@ -198,9 +198,11 @@ export function simplifyDP(coords, toleranceM) {
 /**
  * 端点最近邻串接成链：起点取最西端点 way（自西向东），先向后（tail）再向前（head）
  * 双向延伸。toleranceM 默认 800（v1 实测值；PRD Step 2 为 300m 双向串接，调用方可收紧）。
+ * maxKm > 0 时按官方里程封顶（×系数由调用方算好传入），防止多编号共线误匹配导致
+ * 贪心链越串越远（G227 曾串到 2600km+，官方仅 341km）。
  * 返回 { chain, gaps, remaining }——remaining 为未用上的 way 数组（调用方可继续开新链）。
  */
-export function chainWays(ways, toleranceM = 800) {
+export function chainWays(ways, toleranceM = 800, maxKm = 0) {
   if (!ways.length) return { chain: [], gaps: 0, remaining: [] };
   const pool = ways.slice();
   // 起点取最西端点的 way
@@ -215,6 +217,7 @@ export function chainWays(ways, toleranceM = 800) {
   });
   const first = pool.splice(startIdx, 1)[0];
   let chain = first.geom.slice();
+  let chainKm = 0;
 
   const nearestWay = (pt) => {
     let best = null;
@@ -232,6 +235,15 @@ export function chainWays(ways, toleranceM = 800) {
     return best && bestDist <= toleranceM ? best : null;
   };
 
+  const withinCap = (extraKm) => maxKm <= 0 || chainKm + extraKm <= maxKm;
+
+  /** 逐段求和的折线长度（km），含跨接段 */
+  const pieceLenKm = (fromPt, pts) => {
+    let acc = haversineKm(fromPt, pts[0]);
+    for (let i = 1; i < pts.length; i += 1) acc += haversineKm(pts[i - 1], pts[i]);
+    return acc;
+  };
+
   // 向后延伸（tail）
   let guard = pool.length + 2;
   while (guard-- > 0) {
@@ -241,7 +253,10 @@ export function chainWays(ways, toleranceM = 800) {
     const geom = hit.way.geom;
     const forward = geom[0] === hit.end || haversineKm(geom[0], tail) <= haversineKm(geom[geom.length - 1], tail);
     const piece = forward ? geom.slice(1) : geom.slice(0, -1).reverse();
+    const pieceKm = pieceLenKm(tail, piece);
+    if (!withinCap(pieceKm)) break;
     chain = chain.concat(piece);
+    chainKm += pieceKm;
     pool.splice(hit.idx, 1);
   }
   // 向前延伸（head）
@@ -253,7 +268,10 @@ export function chainWays(ways, toleranceM = 800) {
     const geom = hit.way.geom;
     const forward = geom[geom.length - 1] === hit.end || haversineKm(geom[geom.length - 1], head) <= haversineKm(geom[0], head);
     const piece = forward ? geom : geom.slice().reverse();
+    const pieceKm = pieceLenKm(head, piece);
+    if (!withinCap(pieceKm)) break;
     chain = piece.slice(0, -1).concat(chain);
+    chainKm += pieceKm;
     pool.splice(hit.idx, 1);
   }
 

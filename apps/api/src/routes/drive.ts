@@ -1,9 +1,16 @@
 /**
- * 万里路书 · 精品自驾公路 —— API 路由。
+ * 万里路书 · 全国公路旅游网 —— API 路由（PRD §5.5 + v0.3.0 保留端点）。
  *
- *   GET /api/drive/routes           线路列表（读 _index.json）
- *   GET /api/drive/routes/:id       线路详情（含 geometry + chapters + alerts + highlights）
- *   GET /api/drive/stats            全库统计
+ *   GET /api/drive/suggest?q=&kind=&limit=      搜索（四类索引 + geocode 兜底）
+ *   GET /api/drive/road/:key                    单条公路（L1 几何 + 统计）
+ *   GET /api/drive/route?from=&to=&via=&engine= 双引擎 OD 规划
+ *   GET /api/drive/along?from=&to= | road= | route=   沿程：折线 + 景点 + 章节
+ *   GET /api/drive/network/stats                路网覆盖统计（含诚实说明）
+ *   GET /api/drive/network/overview             地图公路图层（抽稀折线）
+ *   GET /api/drive/board                        榜单列表
+ *   GET /api/drive/board/:boardId               单个榜单（含 alsoIn 交叉索引）
+ *   ── v0.3.0 路书层保留 ──
+ *   GET /api/drive/routes | /routes/:id | /stats
  */
 import { Hono } from 'hono';
 import {
@@ -12,9 +19,215 @@ import {
   getDriveRoute,
   driveStats,
 } from '../services/driveRoutes.js';
+import {
+  decimatePoints,
+  getRoadEntry,
+  getRoadGeometry,
+  isValidRoadKey,
+  networkStats,
+  roadNetworkOverview,
+} from '../services/roadNetwork.js';
+import { geocodeFallback, suggestPlaces } from '../services/roadIndex.js';
+import { buildChapters, matchSpotsAlong, roadsideSpotsMeta } from '../services/roadsideSpots.js';
+import { PlaceNotFoundError, planDriveRoute, planRoadRoute } from '../services/roadRouting.js';
+import { boardsAlsoIn, getBoard, itemHasGeometry, listBoards } from '../services/driveBoards.js';
+import { loadRoadTopology, roadTopologyInfo } from '../services/roadTopology.js';
+import type { PlaceKind, RankingBoard, RankingItem, RoadRoute } from '@railvista/shared';
 
 export const driveRoute = new Hono();
 
+function badRequest(c: any, message: string) {
+  return c.json({ ok: false, error: { code: 'BAD_REQUEST', message } }, 400);
+}
+
+// ── 搜索（PRD §4） ───────────────────────────────────────────────────────────
+driveRoute.get('/suggest', async (c) => {
+  const q = c.req.query('q') ?? '';
+  const kindRaw = c.req.query('kind');
+  const limit = Math.min(50, Math.max(1, Number(c.req.query('limit')) || 20));
+  const kind = ['place', 'road', 'spot', 'facility'].includes(kindRaw ?? '')
+    ? (kindRaw as PlaceKind)
+    : undefined;
+  let hits = suggestPlaces(q, kind, limit);
+  // 降级链：本地未命中 → 高德 → Nominatim（PRD §4.3；place 语义才兜底）
+  if (!hits.length && q.trim().length >= 2 && (!kind || kind === 'place')) {
+    const remote = await geocodeFallback(q.trim());
+    if (remote) hits = [remote];
+  }
+  return c.json({ ok: true, data: { q, kind: kind ?? null, hits } });
+});
+
+// ── 单条公路（PRD §2.3 DriveRoad 页数据源） ─────────────────────────────────
+driveRoute.get('/road/:key', (c) => {
+  const key = decodeURIComponent(c.req.param('key'));
+  if (!isValidRoadKey(key)) return badRequest(c, `非法公路主键：${key}`);
+  const entry = getRoadEntry(key);
+  if (!entry) {
+    return c.json({ ok: false, error: { code: 'NOT_FOUND', message: `公路不在册：${key}` } }, 404);
+  }
+  const geom = getRoadGeometry(key);
+  if (!geom) {
+    // 诚实返回：索引在册但几何待补（PRD §3.1 不能装作什么都有）
+    return c.json({
+      ok: true,
+      data: {
+        entry,
+        geometry: null,
+        note: `该编号几何待抓取（node scripts/fetch-road-geometry.mjs --ref ${entry.ref}）`,
+      },
+    });
+  }
+  // 传输抽稀：默认 ≤600 点；?full=1 返回原始几何（含逐点 cumKm）
+  const full = c.req.query('full') === '1';
+  const points = full ? geom.points : decimatePoints(geom.points, 600);
+  const totalKm = geom.cumKm[geom.cumKm.length - 1] ?? entry.lengthKm;
+  return c.json({
+    ok: true,
+    data: {
+      entry,
+      geometry: { key: geom.key, points, nodes: geom.nodes, simplified: geom.simplified },
+      totalKm: Math.round(totalKm * 10) / 10,
+      spotCount: entry.spotCount,
+    },
+  });
+});
+
+// ── OD 规划（PRD §5.1 双引擎） ──────────────────────────────────────────────
+driveRoute.get('/route', async (c) => {
+  const from = c.req.query('from');
+  const to = c.req.query('to');
+  const via = (c.req.query('via') ?? '').split(';').map((s) => s.trim()).filter(Boolean);
+  const engine = c.req.query('engine') === 'local' ? 'local' : 'auto';
+  if (!from || !to) return badRequest(c, '缺少 from / to 参数');
+  try {
+    const route = await planDriveRoute({ from, to, via, engine });
+    return c.json({ ok: true, data: { route } });
+  } catch (e) {
+    if (e instanceof PlaceNotFoundError) {
+      return c.json({ ok: false, error: { code: e.code, message: e.message, field: e.field } }, 404);
+    }
+    throw e;
+  }
+});
+
+// ── 沿程：一次返回折线 + 景点 + 章节（核心端点，PRD §5.5） ───────────────────
+driveRoute.get('/along', async (c) => {
+  const roadKey = c.req.query('road');
+  const routeId = c.req.query('route');
+  const from = c.req.query('from');
+  const to = c.req.query('to');
+  const cat = (c.req.query('cat') ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  const min = Number(c.req.query('min'));
+  const max = Number(c.req.query('max'));
+  const buffer = Number(c.req.query('buffer'));
+
+  let route: RoadRoute | null = null;
+  let legacyHighlights: unknown;
+  let legacyChapters: unknown;
+
+  if (roadKey) {
+    // C2 整条公路
+    if (!isValidRoadKey(roadKey)) return badRequest(c, `非法公路主键：${roadKey}`);
+    route = planRoadRoute(roadKey);
+    if (!route) {
+      return c.json({ ok: false, error: { code: 'NOT_FOUND', message: `公路不在册或几何待补：${roadKey}` } }, 404);
+    }
+    route.engine = 'road-geometry';
+    route.engineNote = '整条公路 L1 几何（OSM 众包还原，里程为估算）';
+  } else if (routeId) {
+    // 榜单 / 路书条目（v1 DriveRoute 打样数据）
+    const legacy = getDriveRoute(routeId);
+    if (!legacy) {
+      return c.json({ ok: false, error: { code: 'NOT_FOUND', message: `路线不存在：${routeId}` } }, 404);
+    }
+    const coords = legacy.geometry.map((p) => [p[0], p[1]] as [number, number, number?]);
+    route = {
+      id: `legacy-${legacy.id}`,
+      name: legacy.name,
+      roadKeys: legacy.roadRefs,
+      provinces: legacy.provinces,
+      lengthKm: legacy.totalKm,
+      coords,
+      chapters: legacy.chapters.map((ch) => ({ title: ch.title, fromKm: ch.fromKm, toKm: ch.toKm })),
+      engine: 'roadbook',
+      engineNote: '精品线路书预置数据（v1 打样）',
+    };
+    legacyHighlights = getDriveHighlights(routeId);
+    legacyChapters = legacy.chapters;
+  } else if (from && to) {
+    // C1 点对点
+    try {
+      route = await planDriveRoute({ from, to, engine: c.req.query('engine') === 'local' ? 'local' : 'auto' });
+    } catch (e) {
+      if (e instanceof PlaceNotFoundError) {
+        return c.json({ ok: false, error: { code: e.code, message: e.message, field: e.field } }, 404);
+      }
+      throw e;
+    }
+  } else {
+    return badRequest(c, '缺少参数：from+to（点对点）/ road=编号（整条公路）/ route=路线ID（路书）');
+  }
+
+  const spots = matchSpotsAlong(route.coords, {
+    categories: cat.length ? cat : undefined,
+    minScore: Number.isFinite(min) ? min : undefined,
+    maxCount: Number.isFinite(max) && max > 0 ? Math.min(max, 500) : 200,
+    bufferKm: Number.isFinite(buffer) && buffer > 0 ? buffer : undefined,
+  });
+
+  return c.json({
+    ok: true,
+    data: {
+      route: {
+        ...route,
+        coords: decimatePoints(route.coords as [number, number, number?][], 600),
+      },
+      spots,
+      chapters: route.chapters ?? buildChapters(route.coords as [number, number, number?][], route.lengthKm),
+      highlights: legacyHighlights,
+      legacyChapters,
+      spotLibrary: roadsideSpotsMeta(),
+    },
+  });
+});
+
+// ── 路网统计与图层（PRD §3.1 诚实边界 + 验收 #6） ────────────────────────────
+driveRoute.get('/network/stats', (c) => {
+  const meta = roadsideSpotsMeta();
+  loadRoadTopology(); // 确保拓扑已尝试加载（懒加载，~11ms）
+  return c.json({
+    ok: true,
+    data: { ...networkStats(meta.count), topology: roadTopologyInfo() },
+  });
+});
+
+driveRoute.get('/network/overview', (c) => {
+  return c.json({ ok: true, data: roadNetworkOverview() });
+});
+
+// ── 榜单（PRD §7） ──────────────────────────────────────────────────────────
+driveRoute.get('/board', (c) => {
+  return c.json({ ok: true, data: listBoards() });
+});
+
+driveRoute.get('/board/:boardId', (c) => {
+  const boardId = c.req.param('boardId');
+  const board = getBoard(boardId);
+  if (!board) {
+    return c.json({ ok: false, error: { code: 'NOT_FOUND', message: `榜单不存在：${boardId}` } }, 404);
+  }
+  // 补齐 alsoIn 交叉索引 + 几何可用性（决定条目走 C2 还是 C1 兜底）
+  const items: RankingItem[] = board.items.map((item) => ({
+    ...item,
+    alsoIn: [
+      ...new Set(item.roadKeys.flatMap((k) => boardsAlsoIn(k)).filter((id) => id !== board.id)),
+    ],
+  }));
+  const enriched: RankingBoard = { ...board, items };
+  return c.json({ ok: true, data: { board: enriched, geomAvailable: items.map(itemHasGeometry) } });
+});
+
+// ── v0.3.0 路书层保留（PRD §8：降级保留，不删） ─────────────────────────────
 driveRoute.get('/routes', (c) => {
   const idx = getDriveIndex();
   return c.json({ ok: true, data: { routes: idx.routes, updated: idx.updated } });

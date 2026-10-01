@@ -1,0 +1,1394 @@
+{
+ "version": 1,
+ "updated": "2026-10-01",
+ "count": 55,
+ "roads": [
+  {
+   "key": "G1",
+   "ref": "G1",
+   "name": "京哈高速",
+   "class": "expressway",
+   "provinces": [
+    "北京",
+    "河北",
+    "天津",
+    "辽宁",
+    "吉林",
+    "黑龙江"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "哈尔滨",
+   "lengthKm": 1200,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G2",
+   "ref": "G2",
+   "name": "京沪高速",
+   "class": "expressway",
+   "provinces": [
+    "北京",
+    "河北",
+    "天津",
+    "山东",
+    "江苏",
+    "上海"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "上海",
+   "lengthKm": 1210,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G3",
+   "ref": "G3",
+   "name": "京台高速",
+   "class": "expressway",
+   "provinces": [
+    "北京",
+    "河北",
+    "山东",
+    "江苏",
+    "安徽",
+    "浙江",
+    "江西",
+    "福建"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "台北",
+   "lengthKm": 2030,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G4",
+   "ref": "G4",
+   "name": "京港澳高速",
+   "class": "expressway",
+   "provinces": [
+    "北京",
+    "河北",
+    "河南",
+    "湖北",
+    "湖南",
+    "广东",
+    "澳门"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "澳门",
+   "lengthKm": 2285,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G5",
+   "ref": "G5",
+   "name": "京昆高速",
+   "class": "expressway",
+   "provinces": [
+    "北京",
+    "河北",
+    "山西",
+    "陕西",
+    "四川",
+    "云南"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "昆明",
+   "lengthKm": 2865,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G6",
+   "ref": "G6",
+   "name": "京藏高速",
+   "class": "expressway",
+   "provinces": [
+    "北京",
+    "河北",
+    "内蒙古",
+    "宁夏",
+    "甘肃",
+    "青海",
+    "西藏"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "拉萨",
+   "lengthKm": 3710,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G7",
+   "ref": "G7",
+   "name": "京新高速",
+   "class": "expressway",
+   "provinces": [
+    "北京",
+    "河北",
+    "内蒙古",
+    "甘肃",
+    "新疆"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "乌鲁木齐",
+   "lengthKm": 2768,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G11",
+   "ref": "G11",
+   "name": "鹤大高速",
+   "class": "expressway",
+   "provinces": [
+    "黑龙江",
+    "吉林",
+    "辽宁"
+   ],
+   "fromPlace": "鹤岗",
+   "toPlace": "大连",
+   "lengthKm": 1390,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G15",
+   "ref": "G15",
+   "name": "沈海高速",
+   "class": "expressway",
+   "provinces": [
+    "辽宁",
+    "山东",
+    "江苏",
+    "上海",
+    "浙江",
+    "福建",
+    "广东",
+    "海南"
+   ],
+   "fromPlace": "沈阳",
+   "toPlace": "海口",
+   "lengthKm": 3710,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G25",
+   "ref": "G25",
+   "name": "长深高速",
+   "class": "expressway",
+   "provinces": [
+    "吉林",
+    "辽宁",
+    "内蒙古",
+    "河北",
+    "天津",
+    "山东",
+    "江苏",
+    "浙江",
+    "福建",
+    "广东"
+   ],
+   "fromPlace": "长春",
+   "toPlace": "深圳",
+   "lengthKm": 3585,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G35",
+   "ref": "G35",
+   "name": "济广高速",
+   "class": "expressway",
+   "provinces": [
+    "山东",
+    "河南",
+    "安徽",
+    "江西",
+    "广东"
+   ],
+   "fromPlace": "济南",
+   "toPlace": "广州",
+   "lengthKm": 2100,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G45",
+   "ref": "G45",
+   "name": "大广高速",
+   "class": "expressway",
+   "provinces": [
+    "黑龙江",
+    "吉林",
+    "内蒙古",
+    "河北",
+    "北京",
+    "河南",
+    "湖北",
+    "江西",
+    "广东"
+   ],
+   "fromPlace": "大庆",
+   "toPlace": "广州",
+   "lengthKm": 3550,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G55",
+   "ref": "G55",
+   "name": "二广高速",
+   "class": "expressway",
+   "provinces": [
+    "内蒙古",
+    "山西",
+    "河南",
+    "湖北",
+    "湖南",
+    "广东"
+   ],
+   "fromPlace": "二连浩特",
+   "toPlace": "广州",
+   "lengthKm": 2685,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G59",
+   "ref": "G59",
+   "name": "呼北高速",
+   "class": "expressway",
+   "provinces": [
+    "内蒙古",
+    "山西",
+    "河南",
+    "湖北",
+    "湖南",
+    "广西"
+   ],
+   "fromPlace": "呼和浩特",
+   "toPlace": "北海",
+   "lengthKm": 2600,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G65",
+   "ref": "G65",
+   "name": "包茂高速",
+   "class": "expressway",
+   "provinces": [
+    "内蒙古",
+    "陕西",
+    "四川",
+    "重庆",
+    "湖南",
+    "广西",
+    "广东"
+   ],
+   "fromPlace": "包头",
+   "toPlace": "茂名",
+   "lengthKm": 3010,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G75",
+   "ref": "G75",
+   "name": "兰海高速",
+   "class": "expressway",
+   "provinces": [
+    "甘肃",
+    "四川",
+    "重庆",
+    "贵州",
+    "广西",
+    "广东",
+    "海南"
+   ],
+   "fromPlace": "兰州",
+   "toPlace": "海口",
+   "lengthKm": 2650,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G85",
+   "ref": "G85",
+   "name": "渝昆高速",
+   "class": "expressway",
+   "provinces": [
+    "重庆",
+    "四川",
+    "云南"
+   ],
+   "fromPlace": "重庆",
+   "toPlace": "昆明",
+   "lengthKm": 1100,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G10",
+   "ref": "G10",
+   "name": "绥满高速",
+   "class": "expressway",
+   "provinces": [
+    "黑龙江",
+    "内蒙古"
+   ],
+   "fromPlace": "绥芬河",
+   "toPlace": "满洲里",
+   "lengthKm": 1300,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G12",
+   "ref": "G12",
+   "name": "珲乌高速",
+   "class": "expressway",
+   "provinces": [
+    "吉林",
+    "内蒙古"
+   ],
+   "fromPlace": "珲春",
+   "toPlace": "乌兰浩特",
+   "lengthKm": 890,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G16",
+   "ref": "G16",
+   "name": "丹锡高速",
+   "class": "expressway",
+   "provinces": [
+    "辽宁",
+    "内蒙古"
+   ],
+   "fromPlace": "丹东",
+   "toPlace": "锡林浩特",
+   "lengthKm": 600,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G18",
+   "ref": "G18",
+   "name": "荣乌高速",
+   "class": "expressway",
+   "provinces": [
+    "山东",
+    "河北",
+    "天津",
+    "山西",
+    "内蒙古"
+   ],
+   "fromPlace": "荣成",
+   "toPlace": "乌海",
+   "lengthKm": 1800,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G20",
+   "ref": "G20",
+   "name": "青银高速",
+   "class": "expressway",
+   "provinces": [
+    "山东",
+    "河北",
+    "山西",
+    "陕西",
+    "宁夏"
+   ],
+   "fromPlace": "青岛",
+   "toPlace": "银川",
+   "lengthKm": 1580,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G22",
+   "ref": "G22",
+   "name": "青兰高速",
+   "class": "expressway",
+   "provinces": [
+    "山东",
+    "河北",
+    "山西",
+    "陕西",
+    "甘肃"
+   ],
+   "fromPlace": "青岛",
+   "toPlace": "兰州",
+   "lengthKm": 1800,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G30",
+   "ref": "G30",
+   "name": "连霍高速",
+   "class": "expressway",
+   "provinces": [
+    "江苏",
+    "山东",
+    "河南",
+    "陕西",
+    "甘肃",
+    "新疆"
+   ],
+   "fromPlace": "连云港",
+   "toPlace": "霍尔果斯",
+   "lengthKm": 4395,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G36",
+   "ref": "G36",
+   "name": "宁洛高速",
+   "class": "expressway",
+   "provinces": [
+    "江苏",
+    "安徽",
+    "河南"
+   ],
+   "fromPlace": "南京",
+   "toPlace": "洛阳",
+   "lengthKm": 720,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G40",
+   "ref": "G40",
+   "name": "沪陕高速",
+   "class": "expressway",
+   "provinces": [
+    "上海",
+    "江苏",
+    "安徽",
+    "河南",
+    "湖北",
+    "陕西"
+   ],
+   "fromPlace": "上海",
+   "toPlace": "西安",
+   "lengthKm": 1490,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G42",
+   "ref": "G42",
+   "name": "沪蓉高速",
+   "class": "expressway",
+   "provinces": [
+    "上海",
+    "江苏",
+    "安徽",
+    "湖北",
+    "重庆",
+    "四川"
+   ],
+   "fromPlace": "上海",
+   "toPlace": "成都",
+   "lengthKm": 1960,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G50",
+   "ref": "G50",
+   "name": "沪渝高速",
+   "class": "expressway",
+   "provinces": [
+    "上海",
+    "江苏",
+    "浙江",
+    "安徽",
+    "湖北",
+    "重庆"
+   ],
+   "fromPlace": "上海",
+   "toPlace": "重庆",
+   "lengthKm": 1770,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G56",
+   "ref": "G56",
+   "name": "杭瑞高速",
+   "class": "expressway",
+   "provinces": [
+    "浙江",
+    "安徽",
+    "江西",
+    "湖北",
+    "湖南",
+    "贵州",
+    "云南"
+   ],
+   "fromPlace": "杭州",
+   "toPlace": "瑞丽",
+   "lengthKm": 3405,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G60",
+   "ref": "G60",
+   "name": "沪昆高速",
+   "class": "expressway",
+   "provinces": [
+    "上海",
+    "浙江",
+    "江西",
+    "湖南",
+    "贵州",
+    "云南"
+   ],
+   "fromPlace": "上海",
+   "toPlace": "昆明",
+   "lengthKm": 2730,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G70",
+   "ref": "G70",
+   "name": "福银高速",
+   "class": "expressway",
+   "provinces": [
+    "福建",
+    "江西",
+    "湖北",
+    "陕西",
+    "甘肃",
+    "宁夏"
+   ],
+   "fromPlace": "福州",
+   "toPlace": "银川",
+   "lengthKm": 2445,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G72",
+   "ref": "G72",
+   "name": "泉南高速",
+   "class": "expressway",
+   "provinces": [
+    "福建",
+    "江西",
+    "湖南",
+    "广西"
+   ],
+   "fromPlace": "泉州",
+   "toPlace": "南宁",
+   "lengthKm": 1500,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G76",
+   "ref": "G76",
+   "name": "厦蓉高速",
+   "class": "expressway",
+   "provinces": [
+    "福建",
+    "江西",
+    "湖南",
+    "广西",
+    "贵州",
+    "四川"
+   ],
+   "fromPlace": "厦门",
+   "toPlace": "成都",
+   "lengthKm": 2300,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G78",
+   "ref": "G78",
+   "name": "汕昆高速",
+   "class": "expressway",
+   "provinces": [
+    "广东",
+    "广西",
+    "贵州",
+    "云南"
+   ],
+   "fromPlace": "汕头",
+   "toPlace": "昆明",
+   "lengthKm": 1800,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G80",
+   "ref": "G80",
+   "name": "广昆高速",
+   "class": "expressway",
+   "provinces": [
+    "广东",
+    "广西",
+    "云南"
+   ],
+   "fromPlace": "广州",
+   "toPlace": "昆明",
+   "lengthKm": 1600,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G94",
+   "ref": "G94",
+   "name": "珠三角环线",
+   "class": "expressway",
+   "provinces": [
+    "广东"
+   ],
+   "fromPlace": "深圳",
+   "toPlace": "深圳",
+   "lengthKm": 200,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G98",
+   "ref": "G98",
+   "name": "海南环线",
+   "class": "expressway",
+   "provinces": [
+    "海南"
+   ],
+   "fromPlace": "海口",
+   "toPlace": "海口",
+   "lengthKm": 613,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G0321",
+   "ref": "G0321",
+   "name": "德上高速",
+   "class": "expressway",
+   "provinces": [
+    "山东",
+    "河南",
+    "安徽",
+    "江西"
+   ],
+   "fromPlace": "德州",
+   "toPlace": "上饶",
+   "lengthKm": 1300,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G0421",
+   "ref": "G0421",
+   "name": "许广高速",
+   "class": "expressway",
+   "provinces": [
+    "河南",
+    "湖北",
+    "湖南",
+    "广东"
+   ],
+   "fromPlace": "许昌",
+   "toPlace": "广州",
+   "lengthKm": 1100,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G1511",
+   "ref": "G1511",
+   "name": "日兰高速",
+   "class": "expressway",
+   "provinces": [
+    "山东",
+    "河南"
+   ],
+   "fromPlace": "日照",
+   "toPlace": "兰考",
+   "lengthKm": 470,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G1512",
+   "ref": "G1512",
+   "name": "甬金高速",
+   "class": "expressway",
+   "provinces": [
+    "浙江"
+   ],
+   "fromPlace": "宁波",
+   "toPlace": "金华",
+   "lengthKm": 180,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G15W",
+   "ref": "G15W",
+   "name": "常台高速",
+   "class": "expressway",
+   "provinces": [
+    "江苏",
+    "浙江"
+   ],
+   "fromPlace": "常熟",
+   "toPlace": "台州",
+   "lengthKm": 400,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G1811",
+   "ref": "G1811",
+   "name": "黄石高速",
+   "class": "expressway",
+   "provinces": [
+    "河北"
+   ],
+   "fromPlace": "黄骅",
+   "toPlace": "石家庄",
+   "lengthKm": 300,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G1812",
+   "ref": "G1812",
+   "name": "沧榆高速",
+   "class": "expressway",
+   "provinces": [
+    "河北",
+    "山西",
+    "陕西"
+   ],
+   "fromPlace": "沧州",
+   "toPlace": "榆林",
+   "lengthKm": 600,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G2012",
+   "ref": "G2012",
+   "name": "定武高速",
+   "class": "expressway",
+   "provinces": [
+    "陕西",
+    "甘肃",
+    "宁夏"
+   ],
+   "fromPlace": "定边",
+   "toPlace": "武威",
+   "lengthKm": 400,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G2513",
+   "ref": "G2513",
+   "name": "淮徐高速",
+   "class": "expressway",
+   "provinces": [
+    "江苏"
+   ],
+   "fromPlace": "淮安",
+   "toPlace": "徐州",
+   "lengthKm": 200,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G3011",
+   "ref": "G3011",
+   "name": "柳格高速",
+   "class": "expressway",
+   "provinces": [
+    "甘肃",
+    "青海"
+   ],
+   "fromPlace": "柳园",
+   "toPlace": "格尔木",
+   "lengthKm": 400,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G4211",
+   "ref": "G4211",
+   "name": "宁芜高速",
+   "class": "expressway",
+   "provinces": [
+    "江苏",
+    "安徽"
+   ],
+   "fromPlace": "南京",
+   "toPlace": "芜湖",
+   "lengthKm": 60,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G4215",
+   "ref": "G4215",
+   "name": "蓉遵高速",
+   "class": "expressway",
+   "provinces": [
+    "四川",
+    "贵州"
+   ],
+   "fromPlace": "成都",
+   "toPlace": "遵义",
+   "lengthKm": 450,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G4221",
+   "ref": "G4221",
+   "name": "沪武高速",
+   "class": "expressway",
+   "provinces": [
+    "上海",
+    "江苏",
+    "安徽",
+    "湖北"
+   ],
+   "fromPlace": "上海",
+   "toPlace": "武汉",
+   "lengthKm": 800,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G5011",
+   "ref": "G5011",
+   "name": "芜合高速",
+   "class": "expressway",
+   "provinces": [
+    "安徽"
+   ],
+   "fromPlace": "芜湖",
+   "toPlace": "合肥",
+   "lengthKm": 100,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G5013",
+   "ref": "G5013",
+   "name": "渝蓉高速",
+   "class": "expressway",
+   "provinces": [
+    "重庆",
+    "四川"
+   ],
+   "fromPlace": "重庆",
+   "toPlace": "成都",
+   "lengthKm": 260,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G5513",
+   "ref": "G5513",
+   "name": "长张高速",
+   "class": "expressway",
+   "provinces": [
+    "湖南"
+   ],
+   "fromPlace": "长沙",
+   "toPlace": "张家界",
+   "lengthKm": 310,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G5611",
+   "ref": "G5611",
+   "name": "大丽高速",
+   "class": "expressway",
+   "provinces": [
+    "云南"
+   ],
+   "fromPlace": "大理",
+   "toPlace": "丽江",
+   "lengthKm": 260,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G7211",
+   "ref": "G7211",
+   "name": "南友高速",
+   "class": "expressway",
+   "provinces": [
+    "广西"
+   ],
+   "fromPlace": "南宁",
+   "toPlace": "友谊关",
+   "lengthKm": 180,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  }
+ ]
+}

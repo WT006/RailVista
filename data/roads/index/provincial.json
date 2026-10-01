@@ -1,0 +1,259 @@
+{
+ "version": 1,
+ "updated": "2026-10-01",
+ "count": 12,
+ "roads": [
+  {
+   "key": "青海:S101",
+   "ref": "S101",
+   "class": "provincial",
+   "provinces": [
+    "青海"
+   ],
+   "fromPlace": "西宁",
+   "toPlace": "久治",
+   "lengthKm": 400,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "青海:S102",
+   "ref": "S102",
+   "class": "provincial",
+   "provinces": [
+    "青海"
+   ],
+   "fromPlace": "西宁",
+   "toPlace": "平安",
+   "lengthKm": 40,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "青海:S202",
+   "ref": "S202",
+   "class": "provincial",
+   "provinces": [
+    "青海"
+   ],
+   "fromPlace": "恰卜恰",
+   "toPlace": "贵德",
+   "lengthKm": 100,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "四川:S211",
+   "ref": "S211",
+   "class": "provincial",
+   "provinces": [
+    "四川"
+   ],
+   "fromPlace": "丹巴",
+   "toPlace": "小金",
+   "lengthKm": 60,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "四川:S217",
+   "ref": "S217",
+   "class": "provincial",
+   "provinces": [
+    "四川"
+   ],
+   "fromPlace": "甘孜",
+   "toPlace": "白玉",
+   "lengthKm": 300,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "四川:S303",
+   "ref": "S303",
+   "class": "provincial",
+   "provinces": [
+    "四川"
+   ],
+   "fromPlace": "映秀",
+   "toPlace": "卧龙",
+   "lengthKm": 45,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "云南:S308",
+   "ref": "S308",
+   "class": "provincial",
+   "provinces": [
+    "云南"
+   ],
+   "fromPlace": "丽江",
+   "toPlace": "香格里拉",
+   "lengthKm": 180,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "新疆:S101",
+   "ref": "S101",
+   "class": "provincial",
+   "provinces": [
+    "新疆"
+   ],
+   "fromPlace": "乌鲁木齐",
+   "toPlace": "巴仑台",
+   "lengthKm": 300,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "西藏:S301",
+   "ref": "S301",
+   "class": "provincial",
+   "provinces": [
+    "西藏"
+   ],
+   "fromPlace": "拉萨",
+   "toPlace": "羊八井",
+   "lengthKm": 80,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "甘肃:S301",
+   "ref": "S301",
+   "class": "provincial",
+   "provinces": [
+    "甘肃"
+   ],
+   "fromPlace": "兰州",
+   "toPlace": "刘家峡",
+   "lengthKm": 80,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "湖南:S228",
+   "ref": "S228",
+   "class": "provincial",
+   "provinces": [
+    "湖南"
+   ],
+   "fromPlace": "张家界",
+   "toPlace": "武陵源",
+   "lengthKm": 40,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  },
+  {
+   "key": "河北:S272",
+   "ref": "S272",
+   "class": "provincial",
+   "provinces": [
+    "河北"
+   ],
+   "fromPlace": "张北",
+   "toPlace": "沽源",
+   "lengthKm": 90,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "osm_only",
+   "status": "unverified"
+  }
+ ]
+}

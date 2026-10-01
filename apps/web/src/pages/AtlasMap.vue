@@ -31,6 +31,12 @@ import {
   isKnownDimension,
 } from '../data/spotDimensions';
 import { loadAmap } from '../map/amap';
+import { roadColor } from '../data/roadColors';
+
+const props = defineProps<{
+  /** 公路图层模式（/drive/atlas 复用本页，PRD §2.1：公路图层与铁路图层共存、可切换） */
+  drive?: boolean;
+}>();
 
 const router = useRouter();
 
@@ -59,6 +65,58 @@ let baseLines: any[] = [];
 let plainMarkers: any[] = [];
 /** corridorId → 折线，供点击/搜索后 fitView */
 const lineByCorridor = new Map<string, any>();
+
+// ── 公路图层（/drive/atlas）：与铁路图层共存，独立开关 ────────────────────────
+const roadLayerOn = ref(false);
+const roadLines = ref<Array<{ key: string; ref: string; name?: string; class: string; polyline: [number, number][]; lengthKm: number }>>([]);
+let roadPolylines: any[] = [];
+
+async function loadRoadLayer() {
+  if (roadLines.value.length) return;
+  try {
+    const data = await api.getDriveNetworkOverview();
+    roadLines.value = data.roads;
+  } catch {
+    /* 公路图层加载失败不影响铁路图 */
+  }
+}
+
+function renderRoadLayer() {
+  if (!map || !AMapRef) return;
+  for (const l of roadPolylines) {
+    try {
+      map.remove(l);
+    } catch {
+      /* ignore */
+    }
+  }
+  roadPolylines = [];
+  if (!roadLayerOn.value) return;
+  for (const r of roadLines.value) {
+    if (r.polyline.length < 2) continue;
+    const line = new AMapRef.Polyline({
+      path: r.polyline,
+      strokeColor: roadColor(r.class),
+      strokeWeight: 2.2,
+      strokeOpacity: 0.8,
+      lineJoin: 'round',
+      zIndex: 28,
+      bubble: true,
+      cursor: 'pointer',
+    });
+    line.on('click', () => {
+      void router.push(`/drive/road/${encodeURIComponent(r.key)}`);
+    });
+    map.add(line);
+    roadPolylines.push(line);
+  }
+}
+
+async function toggleRoadLayer() {
+  roadLayerOn.value = !roadLayerOn.value;
+  if (roadLayerOn.value) await loadRoadLayer();
+  renderRoadLayer();
+}
 
 const corridorName = computed(() => {
   const map = new Map<string, string>();
@@ -435,6 +493,12 @@ async function load() {
 onMounted(async () => {
   await load();
   await initMap();
+  // /drive/atlas 模式：默认打开公路图层（铁路图层共存，可再手动切换）
+  if (props.drive && map) {
+    roadLayerOn.value = true;
+    await loadRoadLayer();
+    renderRoadLayer();
+  }
 });
 
 onUnmounted(() => {
@@ -452,6 +516,14 @@ onUnmounted(() => {
     }
   }
   baseLines = [];
+  for (const l of roadPolylines) {
+    try {
+      map?.remove(l);
+    } catch {
+      /* ignore */
+    }
+  }
+  roadPolylines = [];
   lineByCorridor.clear();
   if (highlightLine) {
     try {
@@ -492,9 +564,18 @@ watch(heatOn, () => renderHeat());
     <header class="atlas-top">
       <button type="button" class="back-link" aria-label="返回首页" @click="goBack">‹</button>
       <div class="atlas-top__title">
-        <p class="atlas-top__eyebrow">RAIL ATLAS</p>
-        <h1>全国铁路景点地图</h1>
+        <p class="atlas-top__eyebrow">{{ drive ? 'ROAD ATLAS' : 'RAIL ATLAS' }}</p>
+        <h1>{{ drive ? '全国公路旅游网' : '全国铁路景点地图' }}</h1>
       </div>
+      <button
+        type="button"
+        class="atlas-toggle"
+        :class="{ 'is-on': roadLayerOn }"
+        :disabled="!!mapError"
+        @click="toggleRoadLayer"
+      >
+        公路图层 {{ roadLayerOn ? '开' : '关' }}
+      </button>
       <button
         type="button"
         class="atlas-toggle"

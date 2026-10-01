@@ -4,8 +4,11 @@ import TripMap from '../pages/TripMap.vue';
 import RouteDetail from '../pages/RouteDetail.vue';
 import AtlasMap from '../pages/AtlasMap.vue';
 import DriveHome from '../pages/DriveHome.vue';
+import DriveTrip from '../pages/DriveTrip.vue';
+import DriveRoad from '../pages/DriveRoad.vue';
+import DriveRankings from '../pages/DriveRankings.vue';
+import DriveBoard from '../pages/DriveBoard.vue';
 import DriveRoadbook from '../pages/DriveRoadbook.vue';
-import DriveNav from '../pages/DriveNav.vue';
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -14,8 +17,25 @@ export const router = createRouter({
     { path: '/trip', name: 'trip', component: TripMap },
     { path: '/route/:corridorId', name: 'route-detail', component: RouteDetail },
     { path: '/atlas', name: 'atlas', component: AtlasMap },
+    // ── 万里路书 · 全国公路旅游网（PRD §2.1 路由表） ─────────────────────────
     { path: '/drive', name: 'drive-home', component: DriveHome },
-    { path: '/drive/:routeId', name: 'drive-roadbook', component: DriveRoadbook },
-    { path: '/drive/:routeId/nav', name: 'drive-nav', component: DriveNav },
+    { path: '/drive/trip', name: 'drive-trip', component: DriveTrip },
+    { path: '/drive/road/:code', name: 'drive-road', component: DriveRoad },
+    // /drive/atlas 复用全国地图（公路图层与铁路图层共存）
+    {
+      path: '/drive/atlas',
+      name: 'drive-atlas',
+      component: AtlasMap,
+      props: { drive: true },
+    },
+    { path: '/drive/rankings', name: 'drive-rankings', component: DriveRankings },
+    { path: '/drive/rankings/:boardId', name: 'drive-board', component: DriveBoard },
+    { path: '/drive/roadbook/:routeId', name: 'drive-roadbook', component: DriveRoadbook },
+    // v0.3.0 旧路径兼容：/drive/:id → 路书页；/drive/:id/nav → 沿程页实时态
+    { path: '/drive/:routeId', redirect: (to) => `/drive/roadbook/${to.params.routeId}` },
+    {
+      path: '/drive/:routeId/nav',
+      redirect: (to) => `/drive/trip?route=${to.params.routeId}&mode=live`,
+    },
   ],
 });

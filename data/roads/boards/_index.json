@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "updated": "2026-10-01",
+  "boards": [
+    {
+      "id": "mot-2026-12",
+      "title": "国家精品自驾旅游公路",
+      "subtitle": "三环 · 四横 · 五纵 主骨架（约 6 万公里，以普通国道为主体）",
+      "level": "national",
+      "org": "交通运输部",
+      "publishedAt": "2026-08",
+      "itemCount": 12
+    },
+    {
+      "id": "cng-beautiful-roads",
+      "title": "中国最美公路",
+      "subtitle": "历年评选条目（媒体榜单，非官方）",
+      "level": "media",
+      "org": "中国国家地理",
+      "publishedAt": "历年",
+      "itemCount": 10
+    },
+    {
+      "id": "other-best-drives",
+      "title": "其他最美自驾路线",
+      "subtitle": "多来源聚合样例（全量 251 条乡村线路 / 12 条冰雪线路待录入）",
+      "level": "media",
+      "org": "文旅部 · 各地文旅厅 · 媒体",
+      "publishedAt": "2024-2025",
+      "itemCount": 6
+    },
+    {
+      "id": "province-best",
+      "title": "分省精品自驾线",
+      "subtitle": "各省最美自驾路上榜线路（扩展位）",
+      "level": "provincial",
+      "org": "各省交通运输厅 / 文旅厅",
+      "publishedAt": "历年",
+      "itemCount": 5
+    }
+  ]
+}

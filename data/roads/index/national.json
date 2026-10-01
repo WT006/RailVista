@@ -1,0 +1,1865 @@
+{
+ "version": 1,
+ "updated": "2026-10-01",
+ "count": 75,
+ "roads": [
+  {
+   "key": "G101",
+   "ref": "G101",
+   "name": "京沈线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "河北",
+    "辽宁"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "沈阳",
+   "lengthKm": 909,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G102",
+   "ref": "G102",
+   "name": "京哈线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "河北",
+    "天津",
+    "辽宁",
+    "吉林",
+    "黑龙江"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "抚远",
+   "lengthKm": 1337,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G103",
+   "ref": "G103",
+   "name": "京塘线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "天津"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "天津滨海新区",
+   "lengthKm": 143,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G104",
+   "ref": "G104",
+   "name": "京福线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "河北",
+    "天津",
+    "山东",
+    "江苏",
+    "安徽",
+    "浙江",
+    "福建"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "福州",
+   "lengthKm": 2420,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G105",
+   "ref": "G105",
+   "name": "京珠线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "河北",
+    "山东",
+    "河南",
+    "安徽",
+    "湖北",
+    "江西",
+    "广东",
+    "澳门"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "澳门",
+   "lengthKm": 2285,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G106",
+   "ref": "G106",
+   "name": "京广线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "河北",
+    "山东",
+    "河南",
+    "湖北",
+    "湖南",
+    "广东"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "广州",
+   "lengthKm": 2292,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G107",
+   "ref": "G107",
+   "name": "京深线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "河北",
+    "河南",
+    "湖北",
+    "湖南",
+    "广东"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "深圳",
+   "lengthKm": 2490,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G108",
+   "ref": "G108",
+   "name": "京昆线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "河北",
+    "山西",
+    "陕西",
+    "四川",
+    "云南"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "昆明",
+   "lengthKm": 3228,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G109",
+   "ref": "G109",
+   "name": "京拉线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "河北",
+    "山西",
+    "内蒙古",
+    "宁夏",
+    "甘肃",
+    "青海",
+    "西藏"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "拉萨",
+   "lengthKm": 1596,
+   "bbox": [
+    91.6725118,
+    31.4663555,
+    101.2710514,
+    36.7920455
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G110",
+   "ref": "G110",
+   "name": "京银线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "河北",
+    "内蒙古",
+    "宁夏"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "青铜峡",
+   "lengthKm": 1156,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G111",
+   "ref": "G111",
+   "name": "京加线",
+   "class": "national",
+   "provinces": [
+    "北京",
+    "河北",
+    "内蒙古",
+    "黑龙江"
+   ],
+   "fromPlace": "北京",
+   "toPlace": "漠河",
+   "lengthKm": 1996,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G112",
+   "ref": "G112",
+   "class": "national",
+   "provinces": [
+    "天津",
+    "河北"
+   ],
+   "fromPlace": "天津",
+   "toPlace": "宣化",
+   "lengthKm": 1085,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G201",
+   "ref": "G201",
+   "name": "鹤大线",
+   "class": "national",
+   "provinces": [
+    "黑龙江",
+    "吉林",
+    "辽宁"
+   ],
+   "fromPlace": "鹤岗",
+   "toPlace": "大连",
+   "lengthKm": 1964,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G202",
+   "ref": "G202",
+   "name": "黑大线",
+   "class": "national",
+   "provinces": [
+    "黑龙江",
+    "吉林",
+    "辽宁"
+   ],
+   "fromPlace": "黑河",
+   "toPlace": "旅顺",
+   "lengthKm": 1818,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G203",
+   "ref": "G203",
+   "name": "明沈线",
+   "class": "national",
+   "provinces": [
+    "黑龙江",
+    "吉林",
+    "辽宁",
+    "内蒙古"
+   ],
+   "fromPlace": "明水",
+   "toPlace": "沈阳",
+   "lengthKm": 700,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G204",
+   "ref": "G204",
+   "name": "烟上线",
+   "class": "national",
+   "provinces": [
+    "山东",
+    "江苏",
+    "上海"
+   ],
+   "fromPlace": "烟台",
+   "toPlace": "上海",
+   "lengthKm": 966,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G205",
+   "ref": "G205",
+   "name": "山深线",
+   "class": "national",
+   "provinces": [
+    "河北",
+    "天津",
+    "山东",
+    "江苏",
+    "安徽",
+    "浙江",
+    "福建",
+    "广东"
+   ],
+   "fromPlace": "山海关",
+   "toPlace": "深圳",
+   "lengthKm": 2984,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G206",
+   "ref": "G206",
+   "name": "烟汕线",
+   "class": "national",
+   "provinces": [
+    "山东",
+    "江苏",
+    "安徽",
+    "江西",
+    "广东"
+   ],
+   "fromPlace": "烟台",
+   "toPlace": "汕头",
+   "lengthKm": 2324,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G207",
+   "ref": "G207",
+   "name": "锡海线",
+   "class": "national",
+   "provinces": [
+    "内蒙古",
+    "河北",
+    "山西",
+    "河南",
+    "湖北",
+    "湖南",
+    "广西",
+    "广东"
+   ],
+   "fromPlace": "锡林浩特",
+   "toPlace": "徐闻",
+   "lengthKm": 3738,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G208",
+   "ref": "G208",
+   "class": "national",
+   "provinces": [
+    "内蒙古",
+    "山西",
+    "河南"
+   ],
+   "fromPlace": "二连浩特",
+   "toPlace": "淅川",
+   "lengthKm": 990,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G209",
+   "ref": "G209",
+   "name": "呼北线",
+   "class": "national",
+   "provinces": [
+    "内蒙古",
+    "山西",
+    "河南",
+    "湖北",
+    "湖南",
+    "广西"
+   ],
+   "fromPlace": "呼和浩特",
+   "toPlace": "北海",
+   "lengthKm": 3312,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G210",
+   "ref": "G210",
+   "name": "包南线",
+   "class": "national",
+   "provinces": [
+    "内蒙古",
+    "陕西",
+    "四川",
+    "重庆",
+    "贵州",
+    "广西"
+   ],
+   "fromPlace": "包头",
+   "toPlace": "南宁",
+   "lengthKm": 3047,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G211",
+   "ref": "G211",
+   "class": "national",
+   "provinces": [
+    "宁夏",
+    "甘肃",
+    "陕西",
+    "重庆"
+   ],
+   "fromPlace": "银川",
+   "toPlace": "重庆",
+   "lengthKm": 1000,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G212",
+   "ref": "G212",
+   "name": "兰渝线",
+   "class": "national",
+   "provinces": [
+    "甘肃",
+    "四川",
+    "重庆",
+    "贵州",
+    "广西"
+   ],
+   "fromPlace": "兰州",
+   "toPlace": "龙邦",
+   "lengthKm": 546.3,
+   "bbox": [
+    104.0494098,
+    32.3833868,
+    105.7784111,
+    34.4783182
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G213",
+   "ref": "G213",
+   "name": "兰磨线",
+   "class": "national",
+   "provinces": [
+    "甘肃",
+    "四川",
+    "云南"
+   ],
+   "fromPlace": "兰州",
+   "toPlace": "磨憨",
+   "lengthKm": 1097.9,
+   "bbox": [
+    101.4799885,
+    30.6380641,
+    103.914529,
+    36.2531375
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G214",
+   "ref": "G214",
+   "name": "西景线",
+   "class": "national",
+   "provinces": [
+    "青海",
+    "西藏",
+    "云南"
+   ],
+   "fromPlace": "西宁",
+   "toPlace": "勐腊",
+   "lengthKm": 2027.5,
+   "bbox": [
+    96.2784344,
+    27.791734,
+    101.2296643,
+    36.5853773
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G215",
+   "ref": "G215",
+   "name": "柳格线",
+   "class": "national",
+   "provinces": [
+    "甘肃",
+    "青海"
+   ],
+   "fromPlace": "马鬃山",
+   "toPlace": "格尔木",
+   "lengthKm": 660,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G216",
+   "ref": "G216",
+   "class": "national",
+   "provinces": [
+    "新疆"
+   ],
+   "fromPlace": "阿勒泰",
+   "toPlace": "库尔勒",
+   "lengthKm": 970,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G217",
+   "ref": "G217",
+   "name": "阿库线",
+   "class": "national",
+   "provinces": [
+    "新疆"
+   ],
+   "fromPlace": "阿勒泰",
+   "toPlace": "库车",
+   "lengthKm": 1247.8,
+   "bbox": [
+    77.2240032,
+    38.3980195,
+    84.8829777,
+    44.3202546
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G218",
+   "ref": "G218",
+   "name": "伊若线",
+   "class": "national",
+   "provinces": [
+    "新疆"
+   ],
+   "fromPlace": "伊宁",
+   "toPlace": "若羌",
+   "lengthKm": 1067,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G219",
+   "ref": "G219",
+   "name": "新藏线",
+   "class": "national",
+   "provinces": [
+    "新疆",
+    "西藏",
+    "云南",
+    "广西"
+   ],
+   "fromPlace": "喀纳斯",
+   "toPlace": "东兴",
+   "lengthKm": 2522,
+   "bbox": [
+    76.8793098,
+    28.1585559,
+    90.1988573,
+    37.8772417
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G220",
+   "ref": "G220",
+   "class": "national",
+   "provinces": [
+    "山东",
+    "河南",
+    "安徽",
+    "湖北",
+    "江西",
+    "广东"
+   ],
+   "fromPlace": "东营",
+   "toPlace": "深圳",
+   "lengthKm": 2600,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G221",
+   "ref": "G221",
+   "name": "哈同线",
+   "class": "national",
+   "provinces": [
+    "黑龙江"
+   ],
+   "fromPlace": "哈尔滨",
+   "toPlace": "同江",
+   "lengthKm": 558,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G222",
+   "ref": "G222",
+   "name": "哈伊线",
+   "class": "national",
+   "provinces": [
+    "黑龙江"
+   ],
+   "fromPlace": "哈尔滨",
+   "toPlace": "伊春",
+   "lengthKm": 333,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G223",
+   "ref": "G223",
+   "name": "海榆东线",
+   "class": "national",
+   "provinces": [
+    "海南"
+   ],
+   "fromPlace": "海口",
+   "toPlace": "三亚",
+   "lengthKm": 323,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G224",
+   "ref": "G224",
+   "name": "海榆中线",
+   "class": "national",
+   "provinces": [
+    "海南"
+   ],
+   "fromPlace": "海口",
+   "toPlace": "三亚",
+   "lengthKm": 309,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G225",
+   "ref": "G225",
+   "name": "海榆西线",
+   "class": "national",
+   "provinces": [
+    "海南"
+   ],
+   "fromPlace": "海口",
+   "toPlace": "三亚",
+   "lengthKm": 429,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G227",
+   "ref": "G227",
+   "name": "宁张线",
+   "class": "national",
+   "provinces": [
+    "青海",
+    "甘肃"
+   ],
+   "fromPlace": "西宁",
+   "toPlace": "张掖",
+   "lengthKm": 2613.3,
+   "bbox": [
+    99.656245,
+    24.0351302,
+    102.115296,
+    36.5082921
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G228",
+   "ref": "G228",
+   "class": "national",
+   "provinces": [
+    "辽宁",
+    "河北",
+    "天津",
+    "山东",
+    "江苏",
+    "上海",
+    "浙江",
+    "福建",
+    "广东",
+    "广西"
+   ],
+   "fromPlace": "丹东",
+   "toPlace": "东兴",
+   "lengthKm": 6800,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G240",
+   "ref": "G240",
+   "class": "national",
+   "provinces": [
+    "河北",
+    "山东",
+    "河南",
+    "湖北",
+    "湖南",
+    "广东"
+   ],
+   "fromPlace": "保定",
+   "toPlace": "台山",
+   "lengthKm": 2200,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G331",
+   "ref": "G331",
+   "name": "丹阿线",
+   "class": "national",
+   "provinces": [
+    "辽宁",
+    "吉林",
+    "黑龙江",
+    "内蒙古",
+    "新疆"
+   ],
+   "fromPlace": "丹东",
+   "toPlace": "阿勒泰",
+   "lengthKm": 1357.5,
+   "bbox": [
+    124.3610839,
+    40.1093899,
+    130.327723,
+    43.0254893
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G332",
+   "ref": "G332",
+   "class": "national",
+   "provinces": [
+    "黑龙江",
+    "内蒙古"
+   ],
+   "fromPlace": "虎林",
+   "toPlace": "额尔古纳",
+   "lengthKm": 1000,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G301",
+   "ref": "G301",
+   "name": "绥满线",
+   "class": "national",
+   "provinces": [
+    "黑龙江",
+    "内蒙古"
+   ],
+   "fromPlace": "绥芬河",
+   "toPlace": "满洲里",
+   "lengthKm": 1580,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G302",
+   "ref": "G302",
+   "name": "珲乌线",
+   "class": "national",
+   "provinces": [
+    "吉林",
+    "内蒙古"
+   ],
+   "fromPlace": "珲春",
+   "toPlace": "乌兰浩特",
+   "lengthKm": 1000,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G303",
+   "ref": "G303",
+   "name": "集锡线",
+   "class": "national",
+   "provinces": [
+    "吉林",
+    "辽宁",
+    "内蒙古"
+   ],
+   "fromPlace": "集安",
+   "toPlace": "锡林浩特",
+   "lengthKm": 1000,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G304",
+   "ref": "G304",
+   "name": "丹霍线",
+   "class": "national",
+   "provinces": [
+    "辽宁",
+    "内蒙古"
+   ],
+   "fromPlace": "丹东",
+   "toPlace": "霍林郭勒",
+   "lengthKm": 850,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G305",
+   "ref": "G305",
+   "class": "national",
+   "provinces": [
+    "辽宁",
+    "内蒙古"
+   ],
+   "fromPlace": "庄河",
+   "toPlace": "林西",
+   "lengthKm": 700,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G306",
+   "ref": "G306",
+   "class": "national",
+   "provinces": [
+    "辽宁",
+    "内蒙古"
+   ],
+   "fromPlace": "绥中",
+   "toPlace": "克什克腾旗",
+   "lengthKm": 500,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G307",
+   "ref": "G307",
+   "name": "歧银线",
+   "class": "national",
+   "provinces": [
+    "河北",
+    "山西",
+    "陕西",
+    "宁夏"
+   ],
+   "fromPlace": "黄骅",
+   "toPlace": "银川",
+   "lengthKm": 1350,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G308",
+   "ref": "G308",
+   "name": "青石线",
+   "class": "national",
+   "provinces": [
+    "山东",
+    "河北"
+   ],
+   "fromPlace": "青岛",
+   "toPlace": "石家庄",
+   "lengthKm": 700,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G309",
+   "ref": "G309",
+   "name": "荣兰线",
+   "class": "national",
+   "provinces": [
+    "山东",
+    "河北",
+    "山西",
+    "陕西",
+    "甘肃",
+    "宁夏"
+   ],
+   "fromPlace": "荣成",
+   "toPlace": "兰州",
+   "lengthKm": 2200,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G310",
+   "ref": "G310",
+   "name": "连天线",
+   "class": "national",
+   "provinces": [
+    "江苏",
+    "山东",
+    "河南",
+    "陕西",
+    "甘肃",
+    "青海"
+   ],
+   "fromPlace": "连云港",
+   "toPlace": "共和",
+   "lengthKm": 1600,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G311",
+   "ref": "G311",
+   "name": "徐西线",
+   "class": "national",
+   "provinces": [
+    "江苏",
+    "安徽",
+    "河南"
+   ],
+   "fromPlace": "徐州",
+   "toPlace": "西峡",
+   "lengthKm": 700,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G312",
+   "ref": "G312",
+   "name": "沪霍线",
+   "class": "national",
+   "provinces": [
+    "上海",
+    "江苏",
+    "安徽",
+    "河南",
+    "湖北",
+    "陕西",
+    "甘肃",
+    "宁夏",
+    "新疆"
+   ],
+   "fromPlace": "上海",
+   "toPlace": "霍尔果斯",
+   "lengthKm": 473.5,
+   "bbox": [
+    95.1320111,
+    39.7542028,
+    98.4782438,
+    41.7963551
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G314",
+   "ref": "G314",
+   "name": "乌红线",
+   "class": "national",
+   "provinces": [
+    "新疆"
+   ],
+   "fromPlace": "乌鲁木齐",
+   "toPlace": "红其拉甫",
+   "lengthKm": 1948,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G315",
+   "ref": "G315",
+   "name": "西莎线",
+   "class": "national",
+   "provinces": [
+    "青海",
+    "新疆"
+   ],
+   "fromPlace": "西宁",
+   "toPlace": "喀什",
+   "lengthKm": 1216.9,
+   "bbox": [
+    79.5701179,
+    36.7930969,
+    90.26793,
+    39.2131523
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G316",
+   "ref": "G316",
+   "name": "福兰线",
+   "class": "national",
+   "provinces": [
+    "福建",
+    "江西",
+    "湖北",
+    "陕西",
+    "甘肃",
+    "青海"
+   ],
+   "fromPlace": "福州",
+   "toPlace": "同仁",
+   "lengthKm": 964.7,
+   "bbox": [
+    102.0268958,
+    33.1156184,
+    107.0401449,
+    35.6320439
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G317",
+   "ref": "G317",
+   "name": "成那线",
+   "class": "national",
+   "provinces": [
+    "四川",
+    "西藏"
+   ],
+   "fromPlace": "成都",
+   "toPlace": "噶尔",
+   "lengthKm": 1944.2,
+   "bbox": [
+    92.0438839,
+    30.7765687,
+    103.987192,
+    31.9830754
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G318",
+   "ref": "G318",
+   "name": "沪聂线",
+   "class": "national",
+   "provinces": [
+    "上海",
+    "江苏",
+    "浙江",
+    "安徽",
+    "湖北",
+    "重庆",
+    "四川",
+    "西藏"
+   ],
+   "fromPlace": "上海",
+   "toPlace": "聂拉木",
+   "lengthKm": 1953.5,
+   "bbox": [
+    91.2630636,
+    29.4817185,
+    103.5777115,
+    30.4937388
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G319",
+   "ref": "G319",
+   "name": "厦成线",
+   "class": "national",
+   "provinces": [
+    "福建",
+    "江西",
+    "湖南",
+    "重庆",
+    "四川"
+   ],
+   "fromPlace": "厦门",
+   "toPlace": "成都",
+   "lengthKm": 2631,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G320",
+   "ref": "G320",
+   "name": "沪瑞线",
+   "class": "national",
+   "provinces": [
+    "上海",
+    "浙江",
+    "江西",
+    "湖南",
+    "贵州",
+    "云南"
+   ],
+   "fromPlace": "上海",
+   "toPlace": "瑞丽",
+   "lengthKm": 484.2,
+   "bbox": [
+    113.4590094,
+    27.6119952,
+    115.3467484,
+    28.4252424
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G321",
+   "ref": "G321",
+   "name": "广成线",
+   "class": "national",
+   "provinces": [
+    "广东",
+    "广西",
+    "贵州",
+    "四川"
+   ],
+   "fromPlace": "广州",
+   "toPlace": "成都",
+   "lengthKm": 2220,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G322",
+   "ref": "G322",
+   "class": "national",
+   "provinces": [
+    "浙江",
+    "江西",
+    "湖南",
+    "广西"
+   ],
+   "fromPlace": "瑞安",
+   "toPlace": "友谊关",
+   "lengthKm": 2300,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G323",
+   "ref": "G323",
+   "name": "瑞临线",
+   "class": "national",
+   "provinces": [
+    "江西",
+    "广东",
+    "广西",
+    "云南"
+   ],
+   "fromPlace": "瑞金",
+   "toPlace": "清水河",
+   "lengthKm": 2919,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G324",
+   "ref": "G324",
+   "name": "福昆线",
+   "class": "national",
+   "provinces": [
+    "福建",
+    "广东",
+    "广西",
+    "贵州",
+    "云南"
+   ],
+   "fromPlace": "福州",
+   "toPlace": "昆明",
+   "lengthKm": 2800,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G325",
+   "ref": "G325",
+   "name": "广南线",
+   "class": "national",
+   "provinces": [
+    "广东",
+    "广西"
+   ],
+   "fromPlace": "广州",
+   "toPlace": "南宁",
+   "lengthKm": 900,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G326",
+   "ref": "G326",
+   "name": "秀河线",
+   "class": "national",
+   "provinces": [
+    "重庆",
+    "贵州",
+    "云南"
+   ],
+   "fromPlace": "秀山",
+   "toPlace": "河口",
+   "lengthKm": 1000,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G327",
+   "ref": "G327",
+   "class": "national",
+   "provinces": [
+    "山东",
+    "江苏"
+   ],
+   "fromPlace": "菏泽",
+   "toPlace": "连云港",
+   "lengthKm": 500,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G328",
+   "ref": "G328",
+   "name": "宁启线",
+   "class": "national",
+   "provinces": [
+    "江苏"
+   ],
+   "fromPlace": "南京",
+   "toPlace": "启东",
+   "lengthKm": 350,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G329",
+   "ref": "G329",
+   "name": "杭沈线",
+   "class": "national",
+   "provinces": [
+    "浙江"
+   ],
+   "fromPlace": "杭州",
+   "toPlace": "朱家尖",
+   "lengthKm": 250,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G330",
+   "ref": "G330",
+   "name": "温寿线",
+   "class": "national",
+   "provinces": [
+    "浙江"
+   ],
+   "fromPlace": "温州",
+   "toPlace": "寿昌",
+   "lengthKm": 330,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G345",
+   "ref": "G345",
+   "class": "national",
+   "provinces": [
+    "江苏",
+    "安徽",
+    "河南",
+    "湖北",
+    "陕西",
+    "甘肃",
+    "四川",
+    "青海",
+    "西藏"
+   ],
+   "fromPlace": "启东",
+   "toPlace": "那曲",
+   "lengthKm": 3800,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G346",
+   "ref": "G346",
+   "class": "national",
+   "provinces": [
+    "上海",
+    "江苏",
+    "安徽",
+    "湖北",
+    "陕西"
+   ],
+   "fromPlace": "上海",
+   "toPlace": "安康",
+   "lengthKm": 2000,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G347",
+   "ref": "G347",
+   "class": "national",
+   "provinces": [
+    "江苏",
+    "安徽",
+    "河南",
+    "湖北",
+    "陕西",
+    "甘肃",
+    "青海"
+   ],
+   "fromPlace": "南京",
+   "toPlace": "德令哈",
+   "lengthKm": 2500,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  },
+  {
+   "key": "G348",
+   "ref": "G348",
+   "class": "national",
+   "provinces": [
+    "湖北",
+    "重庆",
+    "四川",
+    "云南"
+   ],
+   "fromPlace": "武汉",
+   "toPlace": "大理",
+   "lengthKm": 2500,
+   "bbox": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "spotCount": 0,
+   "hasGeom": false,
+   "source": "authoritative",
+   "status": "ok"
+  }
+ ]
+}

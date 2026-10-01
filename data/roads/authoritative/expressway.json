@@ -1,0 +1,447 @@
+{
+ "version": 1,
+ "updated": "2026-10-01",
+ "note": "高置信种子名录（经典 1981 骨架 + 2013 规划已知新增）；全量 301/278 需《国家公路网规划》附表核对",
+ "roads": [
+  {
+   "ref": "G1",
+   "name": "京哈高速",
+   "fromPlace": "北京",
+   "toPlace": "哈尔滨",
+   "provinces": "北京,河北,天津,辽宁,吉林,黑龙江",
+   "officialLengthKm": 1200
+  },
+  {
+   "ref": "G2",
+   "name": "京沪高速",
+   "fromPlace": "北京",
+   "toPlace": "上海",
+   "provinces": "北京,河北,天津,山东,江苏,上海",
+   "officialLengthKm": 1210
+  },
+  {
+   "ref": "G3",
+   "name": "京台高速",
+   "fromPlace": "北京",
+   "toPlace": "台北",
+   "provinces": "北京,河北,山东,江苏,安徽,浙江,江西,福建",
+   "officialLengthKm": 2030
+  },
+  {
+   "ref": "G4",
+   "name": "京港澳高速",
+   "fromPlace": "北京",
+   "toPlace": "澳门",
+   "provinces": "北京,河北,河南,湖北,湖南,广东,澳门",
+   "officialLengthKm": 2285
+  },
+  {
+   "ref": "G5",
+   "name": "京昆高速",
+   "fromPlace": "北京",
+   "toPlace": "昆明",
+   "provinces": "北京,河北,山西,陕西,四川,云南",
+   "officialLengthKm": 2865
+  },
+  {
+   "ref": "G6",
+   "name": "京藏高速",
+   "fromPlace": "北京",
+   "toPlace": "拉萨",
+   "provinces": "北京,河北,内蒙古,宁夏,甘肃,青海,西藏",
+   "officialLengthKm": 3710
+  },
+  {
+   "ref": "G7",
+   "name": "京新高速",
+   "fromPlace": "北京",
+   "toPlace": "乌鲁木齐",
+   "provinces": "北京,河北,内蒙古,甘肃,新疆",
+   "officialLengthKm": 2768
+  },
+  {
+   "ref": "G11",
+   "name": "鹤大高速",
+   "fromPlace": "鹤岗",
+   "toPlace": "大连",
+   "provinces": "黑龙江,吉林,辽宁",
+   "officialLengthKm": 1390
+  },
+  {
+   "ref": "G15",
+   "name": "沈海高速",
+   "fromPlace": "沈阳",
+   "toPlace": "海口",
+   "provinces": "辽宁,山东,江苏,上海,浙江,福建,广东,海南",
+   "officialLengthKm": 3710
+  },
+  {
+   "ref": "G25",
+   "name": "长深高速",
+   "fromPlace": "长春",
+   "toPlace": "深圳",
+   "provinces": "吉林,辽宁,内蒙古,河北,天津,山东,江苏,浙江,福建,广东",
+   "officialLengthKm": 3585
+  },
+  {
+   "ref": "G35",
+   "name": "济广高速",
+   "fromPlace": "济南",
+   "toPlace": "广州",
+   "provinces": "山东,河南,安徽,江西,广东",
+   "officialLengthKm": 2100
+  },
+  {
+   "ref": "G45",
+   "name": "大广高速",
+   "fromPlace": "大庆",
+   "toPlace": "广州",
+   "provinces": "黑龙江,吉林,内蒙古,河北,北京,河南,湖北,江西,广东",
+   "officialLengthKm": 3550
+  },
+  {
+   "ref": "G55",
+   "name": "二广高速",
+   "fromPlace": "二连浩特",
+   "toPlace": "广州",
+   "provinces": "内蒙古,山西,河南,湖北,湖南,广东",
+   "officialLengthKm": 2685
+  },
+  {
+   "ref": "G59",
+   "name": "呼北高速",
+   "fromPlace": "呼和浩特",
+   "toPlace": "北海",
+   "provinces": "内蒙古,山西,河南,湖北,湖南,广西",
+   "officialLengthKm": 2600
+  },
+  {
+   "ref": "G65",
+   "name": "包茂高速",
+   "fromPlace": "包头",
+   "toPlace": "茂名",
+   "provinces": "内蒙古,陕西,四川,重庆,湖南,广西,广东",
+   "officialLengthKm": 3010
+  },
+  {
+   "ref": "G75",
+   "name": "兰海高速",
+   "fromPlace": "兰州",
+   "toPlace": "海口",
+   "provinces": "甘肃,四川,重庆,贵州,广西,广东,海南",
+   "officialLengthKm": 2650
+  },
+  {
+   "ref": "G85",
+   "name": "渝昆高速",
+   "fromPlace": "重庆",
+   "toPlace": "昆明",
+   "provinces": "重庆,四川,云南",
+   "officialLengthKm": 1100
+  },
+  {
+   "ref": "G10",
+   "name": "绥满高速",
+   "fromPlace": "绥芬河",
+   "toPlace": "满洲里",
+   "provinces": "黑龙江,内蒙古",
+   "officialLengthKm": 1300
+  },
+  {
+   "ref": "G12",
+   "name": "珲乌高速",
+   "fromPlace": "珲春",
+   "toPlace": "乌兰浩特",
+   "provinces": "吉林,内蒙古",
+   "officialLengthKm": 890
+  },
+  {
+   "ref": "G16",
+   "name": "丹锡高速",
+   "fromPlace": "丹东",
+   "toPlace": "锡林浩特",
+   "provinces": "辽宁,内蒙古",
+   "officialLengthKm": 600
+  },
+  {
+   "ref": "G18",
+   "name": "荣乌高速",
+   "fromPlace": "荣成",
+   "toPlace": "乌海",
+   "provinces": "山东,河北,天津,山西,内蒙古",
+   "officialLengthKm": 1800
+  },
+  {
+   "ref": "G20",
+   "name": "青银高速",
+   "fromPlace": "青岛",
+   "toPlace": "银川",
+   "provinces": "山东,河北,山西,陕西,宁夏",
+   "officialLengthKm": 1580
+  },
+  {
+   "ref": "G22",
+   "name": "青兰高速",
+   "fromPlace": "青岛",
+   "toPlace": "兰州",
+   "provinces": "山东,河北,山西,陕西,甘肃",
+   "officialLengthKm": 1800
+  },
+  {
+   "ref": "G30",
+   "name": "连霍高速",
+   "fromPlace": "连云港",
+   "toPlace": "霍尔果斯",
+   "provinces": "江苏,山东,河南,陕西,甘肃,新疆",
+   "officialLengthKm": 4395
+  },
+  {
+   "ref": "G36",
+   "name": "宁洛高速",
+   "fromPlace": "南京",
+   "toPlace": "洛阳",
+   "provinces": "江苏,安徽,河南",
+   "officialLengthKm": 720
+  },
+  {
+   "ref": "G40",
+   "name": "沪陕高速",
+   "fromPlace": "上海",
+   "toPlace": "西安",
+   "provinces": "上海,江苏,安徽,河南,湖北,陕西",
+   "officialLengthKm": 1490
+  },
+  {
+   "ref": "G42",
+   "name": "沪蓉高速",
+   "fromPlace": "上海",
+   "toPlace": "成都",
+   "provinces": "上海,江苏,安徽,湖北,重庆,四川",
+   "officialLengthKm": 1960
+  },
+  {
+   "ref": "G50",
+   "name": "沪渝高速",
+   "fromPlace": "上海",
+   "toPlace": "重庆",
+   "provinces": "上海,江苏,浙江,安徽,湖北,重庆",
+   "officialLengthKm": 1770
+  },
+  {
+   "ref": "G56",
+   "name": "杭瑞高速",
+   "fromPlace": "杭州",
+   "toPlace": "瑞丽",
+   "provinces": "浙江,安徽,江西,湖北,湖南,贵州,云南",
+   "officialLengthKm": 3405
+  },
+  {
+   "ref": "G60",
+   "name": "沪昆高速",
+   "fromPlace": "上海",
+   "toPlace": "昆明",
+   "provinces": "上海,浙江,江西,湖南,贵州,云南",
+   "officialLengthKm": 2730
+  },
+  {
+   "ref": "G70",
+   "name": "福银高速",
+   "fromPlace": "福州",
+   "toPlace": "银川",
+   "provinces": "福建,江西,湖北,陕西,甘肃,宁夏",
+   "officialLengthKm": 2445
+  },
+  {
+   "ref": "G72",
+   "name": "泉南高速",
+   "fromPlace": "泉州",
+   "toPlace": "南宁",
+   "provinces": "福建,江西,湖南,广西",
+   "officialLengthKm": 1500
+  },
+  {
+   "ref": "G76",
+   "name": "厦蓉高速",
+   "fromPlace": "厦门",
+   "toPlace": "成都",
+   "provinces": "福建,江西,湖南,广西,贵州,四川",
+   "officialLengthKm": 2300
+  },
+  {
+   "ref": "G78",
+   "name": "汕昆高速",
+   "fromPlace": "汕头",
+   "toPlace": "昆明",
+   "provinces": "广东,广西,贵州,云南",
+   "officialLengthKm": 1800
+  },
+  {
+   "ref": "G80",
+   "name": "广昆高速",
+   "fromPlace": "广州",
+   "toPlace": "昆明",
+   "provinces": "广东,广西,云南",
+   "officialLengthKm": 1600
+  },
+  {
+   "ref": "G94",
+   "name": "珠三角环线",
+   "fromPlace": "深圳",
+   "toPlace": "深圳",
+   "provinces": "广东",
+   "officialLengthKm": 200
+  },
+  {
+   "ref": "G98",
+   "name": "海南环线",
+   "fromPlace": "海口",
+   "toPlace": "海口",
+   "provinces": "海南",
+   "officialLengthKm": 613
+  },
+  {
+   "ref": "G0321",
+   "name": "德上高速",
+   "fromPlace": "德州",
+   "toPlace": "上饶",
+   "provinces": "山东,河南,安徽,江西",
+   "officialLengthKm": 1300
+  },
+  {
+   "ref": "G0421",
+   "name": "许广高速",
+   "fromPlace": "许昌",
+   "toPlace": "广州",
+   "provinces": "河南,湖北,湖南,广东",
+   "officialLengthKm": 1100
+  },
+  {
+   "ref": "G1511",
+   "name": "日兰高速",
+   "fromPlace": "日照",
+   "toPlace": "兰考",
+   "provinces": "山东,河南",
+   "officialLengthKm": 470
+  },
+  {
+   "ref": "G1512",
+   "name": "甬金高速",
+   "fromPlace": "宁波",
+   "toPlace": "金华",
+   "provinces": "浙江",
+   "officialLengthKm": 180
+  },
+  {
+   "ref": "G15W",
+   "name": "常台高速",
+   "fromPlace": "常熟",
+   "toPlace": "台州",
+   "provinces": "江苏,浙江",
+   "officialLengthKm": 400
+  },
+  {
+   "ref": "G1811",
+   "name": "黄石高速",
+   "fromPlace": "黄骅",
+   "toPlace": "石家庄",
+   "provinces": "河北",
+   "officialLengthKm": 300
+  },
+  {
+   "ref": "G1812",
+   "name": "沧榆高速",
+   "fromPlace": "沧州",
+   "toPlace": "榆林",
+   "provinces": "河北,山西,陕西",
+   "officialLengthKm": 600
+  },
+  {
+   "ref": "G2012",
+   "name": "定武高速",
+   "fromPlace": "定边",
+   "toPlace": "武威",
+   "provinces": "陕西,甘肃,宁夏",
+   "officialLengthKm": 400
+  },
+  {
+   "ref": "G2513",
+   "name": "淮徐高速",
+   "fromPlace": "淮安",
+   "toPlace": "徐州",
+   "provinces": "江苏",
+   "officialLengthKm": 200
+  },
+  {
+   "ref": "G3011",
+   "name": "柳格高速",
+   "fromPlace": "柳园",
+   "toPlace": "格尔木",
+   "provinces": "甘肃,青海",
+   "officialLengthKm": 400
+  },
+  {
+   "ref": "G4211",
+   "name": "宁芜高速",
+   "fromPlace": "南京",
+   "toPlace": "芜湖",
+   "provinces": "江苏,安徽",
+   "officialLengthKm": 60
+  },
+  {
+   "ref": "G4215",
+   "name": "蓉遵高速",
+   "fromPlace": "成都",
+   "toPlace": "遵义",
+   "provinces": "四川,贵州",
+   "officialLengthKm": 450
+  },
+  {
+   "ref": "G4221",
+   "name": "沪武高速",
+   "fromPlace": "上海",
+   "toPlace": "武汉",
+   "provinces": "上海,江苏,安徽,湖北",
+   "officialLengthKm": 800
+  },
+  {
+   "ref": "G5011",
+   "name": "芜合高速",
+   "fromPlace": "芜湖",
+   "toPlace": "合肥",
+   "provinces": "安徽",
+   "officialLengthKm": 100
+  },
+  {
+   "ref": "G5013",
+   "name": "渝蓉高速",
+   "fromPlace": "重庆",
+   "toPlace": "成都",
+   "provinces": "重庆,四川",
+   "officialLengthKm": 260
+  },
+  {
+   "ref": "G5513",
+   "name": "长张高速",
+   "fromPlace": "长沙",
+   "toPlace": "张家界",
+   "provinces": "湖南",
+   "officialLengthKm": 310
+  },
+  {
+   "ref": "G5611",
+   "name": "大丽高速",
+   "fromPlace": "大理",
+   "toPlace": "丽江",
+   "provinces": "云南",
+   "officialLengthKm": 260
+  },
+  {
+   "ref": "G7211",
+   "name": "南友高速",
+   "fromPlace": "南宁",
+   "toPlace": "友谊关",
+   "provinces": "广西",
+   "officialLengthKm": 180
+  }
+ ]
+}

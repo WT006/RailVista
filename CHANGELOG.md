@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.3.1`**（2026-10-01）
+**当前版本：`0.4.0`**（2026-10-01）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,49 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.4.0] — 2026-10-01
+
+### feat(drive): 万里路书 v2 · 全国公路旅游网（PRD-万里路书-全国公路旅游网-20261001）
+
+**动机**：v1 把「12 条精品线」当模块主体、只做单条预置路线，被需求方否决。v2 与铁路版同构：
+全国公路网 + 路线搜索 + 任意 OD 的沿程景点，12 条线降为排行榜榜单之一。
+
+**主功能（与铁路一一对应）**：
+
+- **A 全国公路网**：L0 索引（`data/roads/index/`，国道 75/301 + 高速 55/278 + 省道 12 的高置信种子）、
+  L1 几何（`data/roads/geom/`，Overpass 实抓 14 条旗舰线：G318/G109/G315/G217/G227/G312/G213/G214/G317/G219/G331/G316/G320/G212）、
+  L2 拓扑（`data/roads/china-road-topo.bin`，RVRT 格式沿用铁路 RVTP，30,584 节点 / 36,744 边，含等级系数与跨线边）。
+- **B 公路搜索**：`suggestPlaces` 四类索引（地名 / 公路编号 / 景点 / 服务区），降级链 高德 → Nominatim → 点地图选点；
+  前端「公路编号键盘」（G/S/X/Y/C + 数字 + 省芯片，对标车次前缀键盘）。
+- **C 任意 OD → 沿程景点**：双引擎规划（高德 v5 GCJ-02→WGS84 + 本地干线 A* 兜底 + direct 降级）；
+  `filterSpotsAlongRoad` 沿程匹配器（0.05° 网格索引，缓冲分档 roadside 0.3 / detour5 3 / detour20 12 / distant 35 km，
+  detourKm = distKm×2−0.3）；C3 实时态（v1 雷达车速带规则原样复用，嵌入沿程页）。
+- **D 排行榜**：统一榜单模型（政策 12 线 / 中国国家地理最美公路 / 其他聚合 / 分省榜，
+  条目 = roadKeys 引用 + 精选，点入复用主功能沿程页）。
+- **E 路书降级保留**：`/drive/roadbook/:routeId`，入口收窄到次级导航抽屉；青甘环线打样数据保留并复制到 `data/roads/routes/`。
+
+**页面与路由**（PRD §2.1）：`/drive`（地图 + OD + 键盘，榜单第二屏）、`/drive/trip`（沿程页）、
+`/drive/road/:code`、`/drive/atlas`（复用全国地图 + 公路图层开关）、`/drive/rankings[/:boardId]`、
+`/drive/roadbook/:routeId`；旧 `/drive/:id` 与 `/drive/:id/nav` 重定向兼容；`DriveNav.vue` 独立页移除（改造为 `DriveLivePanel` 组件）。
+
+**API**（PRD §5.5）：`/api/drive/suggest` `/road/:key` `/route` `/along` `/network/stats` `/network/overview` `/board[/:id]`；
+v0.3.0 的 `/routes` `/routes/:id` `/stats` 保留。新增服务：`roadNetwork` `roadIndex` `roadsideSpots` `roadRouting` `roadTopology` `driveBoards`。
+
+**数据**：`data/roads/roadside-spots.json` 1,035 条起步集（铁路侧 624 景点迁移 + Tier C 手工种子 89 + OSM 观景点 355）；
+`places-geo.json` 216 个地名锚点（运行时 geocode 回写）；`facilities.json` 服务区种子；
+`scripts/`：`lib/overpass.mjs`（共享抓取库）、`build-road-index` `fetch-road-geometry` `build-road-topology`
+`build-roadside-spots` `verify-road-network` `validate-road-keys`。
+
+**视觉**：`ROAD_COLORS` 单一色板驱动编号徽标 / 地图线色 / 沿程标记三处（PRD §11.2）；三档响应式 390/768/1440。
+
+**诚实边界**（写进 UI 与数据）：OSM 众包估算、非导航依据；国道/高速名录为高置信子集非全量 301/278；
+省道 unverified；多数已抓几何为部分段（verify-road-network 报告偏差）；景点库目标 3 万当前 1,035。
+
+**验证**：`pnpm --filter @railvista/shared test`（174 用例全绿，新增 alongRoute/spotGrid 21 例）；
+`pnpm build` 全仓通过；`/api/drive/*` 端到端 curl 见交付报告。
 
 ---
 

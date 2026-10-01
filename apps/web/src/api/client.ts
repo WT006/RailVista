@@ -241,4 +241,94 @@ export const api = {
       updated: string;
     }>('/drive/stats');
   },
+  // ── 万里路书 · 全国公路旅游网（v0.4.0，PRD §5.5） ──────────────────────────
+  /** 公路搜索：地名 / 编号 / 景点 / 服务区四类索引 + geocode 兜底 */
+  suggestDrivePlaces(q: string, kind?: string, limit = 20) {
+    const qs = new URLSearchParams({ q, limit: String(limit) });
+    if (kind) qs.set('kind', kind);
+    return request<{ q: string; kind: string | null; hits: import('@railvista/shared').PlaceHit[] }>(
+      `/drive/suggest?${qs}`,
+    );
+  },
+  /** 单条公路详情（L1 几何 + 统计） */
+  getDriveRoad(key: string) {
+    return request<{
+      entry: import('@railvista/shared').RoadIndexEntry;
+      geometry: { key: string; points: [number, number][]; nodes: import('@railvista/shared').RoadGeometryNode[]; simplified: boolean } | null;
+      totalKm?: number;
+      spotCount?: number;
+      note?: string;
+    }>(`/drive/road/${encodeURIComponent(key)}`);
+  },
+  /** 双引擎 OD 规划 */
+  planDriveRoute(params: { from: string; to: string; via?: string[]; engine?: 'auto' | 'local' }) {
+    const qs = new URLSearchParams({ from: params.from, to: params.to });
+    if (params.via?.length) qs.set('via', params.via.join(';'));
+    if (params.engine) qs.set('engine', params.engine);
+    return request<{ route: import('@railvista/shared').RoadRoute }>(`/drive/route?${qs}`);
+  },
+  /** 沿程：折线 + 景点 + 章节（C1 点对点 / C2 整条公路 / 路书条目） */
+  getDriveAlong(params: {
+    from?: string;
+    to?: string;
+    road?: string;
+    route?: string;
+    cat?: string[];
+    min?: number;
+    max?: number;
+    engine?: 'auto' | 'local';
+  }) {
+    const qs = new URLSearchParams();
+    if (params.from) qs.set('from', params.from);
+    if (params.to) qs.set('to', params.to);
+    if (params.road) qs.set('road', params.road);
+    if (params.route) qs.set('route', params.route);
+    if (params.cat?.length) qs.set('cat', params.cat.join(','));
+    if (params.min != null) qs.set('min', String(params.min));
+    if (params.max != null) qs.set('max', String(params.max));
+    if (params.engine) qs.set('engine', params.engine);
+    return request<{
+      route: import('@railvista/shared').RoadRoute;
+      spots: import('@railvista/shared').AlongSpot[];
+      chapters: import('@railvista/shared').RoadChapter[];
+      highlights?: import('@railvista/shared').DriveHighlight[];
+      legacyChapters?: unknown;
+      spotLibrary?: { count: number; updated: string; note?: string };
+    }>(`/drive/along?${qs}`);
+  },
+  /** 路网覆盖统计（含诚实说明） */
+  getDriveNetworkStats() {
+    return request<
+      import('@railvista/shared').RoadNetworkStats & {
+        topology: { loaded: boolean; nodeCount: number; edgeCount: number; roadKeyCount: number };
+      }
+    >('/drive/network/stats');
+  },
+  /** 地图公路图层（抽稀折线） */
+  getDriveNetworkOverview() {
+    return request<{
+      roads: Array<{
+        key: string;
+        ref: string;
+        name?: string;
+        class: import('@railvista/shared').RoadClass;
+        polyline: [number, number][];
+        lengthKm: number;
+      }>;
+      updated: string;
+    }>('/drive/network/overview');
+  },
+  /** 榜单列表 */
+  getDriveBoards() {
+    return request<{ boards: import('@railvista/shared').RankingBoardSummary[]; updated: string }>(
+      '/drive/board',
+    );
+  },
+  /** 单个榜单（含 alsoIn 交叉索引 + 几何可用性） */
+  getDriveBoard(boardId: string) {
+    return request<{
+      board: import('@railvista/shared').RankingBoard;
+      geomAvailable: boolean[];
+    }>(`/drive/board/${encodeURIComponent(boardId)}`);
+  },
 };

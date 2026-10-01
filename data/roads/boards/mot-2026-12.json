@@ -1,0 +1,152 @@
+{
+  "id": "mot-2026-12",
+  "title": "国家精品自驾旅游公路",
+  "subtitle": "「1+N」体系主骨架：三环、四横、五纵，约 6 万公里，以普通国道为主体（交公路发〔2026〕100 号《精品自驾旅游公路实施方案》）",
+  "source": {
+    "org": "交通运输部",
+    "doc": "《精品自驾旅游公路实施方案》（交公路发〔2026〕100 号）",
+    "publishedAt": "2026-08"
+  },
+  "level": "national",
+  "itemCount": 12,
+  "items": [
+    {
+      "rank": 1,
+      "routeId": "",
+      "name": "沿边沿海环线",
+      "roadKeys": ["G331", "G219", "G228"],
+      "province": ["辽宁", "吉林", "黑龙江", "内蒙古", "新疆", "西藏", "云南", "广西"],
+      "lengthKm": 25000,
+      "highlight": "国境线上的大环线，从极地到热带",
+      "tags": ["三环", "国境线", "极地到热带"]
+    },
+    {
+      "rank": 2,
+      "routeId": "",
+      "name": "首都都市圈环线",
+      "roadKeys": ["G112"],
+      "province": ["北京", "河北", "天津"],
+      "lengthKm": 1085,
+      "highlight": "草原、长城、皇家园林串起的环京线",
+      "tags": ["三环", "草原", "长城"]
+    },
+    {
+      "rank": 3,
+      "routeId": "qinghai-gansu-ring",
+      "name": "青甘环线",
+      "roadKeys": ["G315", "G214"],
+      "province": ["青海", "甘肃"],
+      "lengthKm": 2800,
+      "highlight": "大漠、盐湖、石窟、祁连山——经典西北大环线",
+      "tags": ["三环", "盐湖", "石窟", "祁连山"]
+    },
+    {
+      "rank": 4,
+      "routeId": "",
+      "name": "长城文化线",
+      "roadKeys": [],
+      "fromPlace": "秦皇岛",
+      "toPlace": "嘉峪关",
+      "province": ["河北", "山西", "内蒙古", "陕西", "宁夏", "甘肃"],
+      "lengthKm": 3500,
+      "highlight": "从山海关到嘉峪关，长城全程",
+      "tags": ["四横", "长城"]
+    },
+    {
+      "rank": 5,
+      "routeId": "",
+      "name": "黄河文化线",
+      "roadKeys": [],
+      "fromPlace": "东营",
+      "toPlace": "玛多",
+      "province": ["山东", "河南", "山西", "陕西", "内蒙古", "宁夏", "甘肃", "青海"],
+      "lengthKm": 4500,
+      "highlight": "从入海口到三江源，母亲河全程",
+      "tags": ["四横", "黄河"]
+    },
+    {
+      "rank": 6,
+      "routeId": "",
+      "name": "长江文化线",
+      "roadKeys": [],
+      "fromPlace": "上海",
+      "toPlace": "攀枝花",
+      "province": ["上海", "江苏", "安徽", "江西", "湖北", "湖南", "重庆", "四川", "云南"],
+      "lengthKm": 4000,
+      "highlight": "从崇明岛到金沙江，长江全程",
+      "tags": ["四横", "长江"]
+    },
+    {
+      "rank": 7,
+      "routeId": "",
+      "name": "西部雪域天路",
+      "roadKeys": ["G318", "G317"],
+      "fromPlace": "成都",
+      "toPlace": "拉萨",
+      "province": ["四川", "西藏"],
+      "lengthKm": 4300,
+      "highlight": "G318/G317，川藏南北线 + 滇藏联络",
+      "tags": ["四横", "川藏", "滇藏"]
+    },
+    {
+      "rank": 8,
+      "routeId": "",
+      "name": "大运河文化线",
+      "roadKeys": [],
+      "fromPlace": "北京",
+      "toPlace": "杭州",
+      "province": ["北京", "天津", "河北", "山东", "江苏", "浙江"],
+      "lengthKm": 1800,
+      "highlight": "京杭大运河全程",
+      "tags": ["五纵", "运河"]
+    },
+    {
+      "rank": 9,
+      "routeId": "",
+      "name": "华东世界遗产线",
+      "roadKeys": [],
+      "fromPlace": "泰安",
+      "toPlace": "武夷山",
+      "province": ["山东", "江苏", "安徽", "江西", "福建"],
+      "lengthKm": 1500,
+      "highlight": "泰山 - 黄山 - 武夷山，世遗串联",
+      "tags": ["五纵", "世界遗产"]
+    },
+    {
+      "rank": 10,
+      "routeId": "",
+      "name": "中部锦绣山岳线",
+      "roadKeys": [],
+      "fromPlace": "张家界",
+      "toPlace": "武当山",
+      "province": ["湖南", "湖北"],
+      "lengthKm": 900,
+      "highlight": "张家界 - 神农架 - 武当山",
+      "tags": ["五纵", "山岳"]
+    },
+    {
+      "rank": 11,
+      "routeId": "",
+      "name": "长征文化线",
+      "roadKeys": [],
+      "fromPlace": "赣州",
+      "toPlace": "延安",
+      "province": ["江西", "湖南", "贵州", "四川", "甘肃", "陕西"],
+      "lengthKm": 4000,
+      "highlight": "红色线路，从瑞金到延安",
+      "tags": ["五纵", "红色"]
+    },
+    {
+      "rank": 12,
+      "routeId": "",
+      "name": "古道秘境线",
+      "roadKeys": ["G312"],
+      "fromPlace": "西安",
+      "toPlace": "喀什",
+      "province": ["陕西", "甘肃", "新疆"],
+      "lengthKm": 3000,
+      "highlight": "茶马古道、蜀道、丝绸之路",
+      "tags": ["五纵", "丝路", "茶马古道"]
+    }
+  ]
+}

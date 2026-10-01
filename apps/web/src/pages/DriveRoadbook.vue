@@ -41,7 +41,8 @@ onMounted(async () => {
 });
 
 function startNav() {
-  router.push({ name: 'drive-nav', params: { routeId } });
+  // v0.4.0：伴随导航不再是独立页，改为沿程页实时态（PRD §8）
+  void router.push(`/drive/trip?route=${encodeURIComponent(routeId)}&mode=live`);
 }
 </script>
 

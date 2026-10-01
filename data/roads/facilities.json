@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "updated": "2026-10-01",
+  "note": "服务区/互通/收费站种子（坐标为 WGS-84 近似值，unverified）。全量来源应为 Overpass highway=services / motorway_junction + 各省高速集团名录（PRD §4.1，待抓取）。",
+  "facilities": [
+    { "id": "f-ychengdhu-sa", "name": "阳澄湖服务区", "lng": 120.78, "lat": 31.44, "kind": "service-area", "road": "G2" },
+    { "id": "f-taihu-sa", "name": "太湖服务区", "lng": 120.62, "lat": 31.24, "kind": "service-area", "road": "G50" },
+    { "id": "f-tengzhou-sa", "name": "滕州服务区", "lng": 117.17, "lat": 35.06, "kind": "service-area", "road": "G3" },
+    { "id": "f-guilin-sa", "name": "桂林服务区", "lng": 110.51, "lat": 25.36, "kind": "service-area", "road": "G72" },
+    { "id": "f-yumen-sa", "name": "玉门服务区", "lng": 97.85, "lat": 40.27, "kind": "service-area", "road": "G30" },
+    { "id": "f-chaka-sa", "name": "茶卡服务区", "lng": 99.08, "lat": 36.79, "kind": "service-area", "road": "G6" },
+    { "id": "f-dulan-sa", "name": "都兰服务区", "lng": 98.10, "lat": 36.30, "kind": "service-area", "road": "G6" },
+    { "id": "f-golmud-sa", "name": "格尔木服务区", "lng": 94.92, "lat": 36.41, "kind": "service-area", "road": "G6" },
+    { "id": "f-nagqu-sa", "name": "那曲服务区", "lng": 92.05, "lat": 31.48, "kind": "service-area", "road": "G6" },
+    { "id": "f-duku-tianchi-sa", "name": "独库公路天山神秘大峡谷停车区", "lng": 83.55, "lat": 42.05, "kind": "service-area", "road": "G217" },
+    { "id": "f-luhuang-toll", "name": "泸沽湖收费站", "lng": 100.86, "lat": 27.76, "kind": "tollgate", "road": "S307" },
+    { "id": "f-chaershan-jct", "name": "茶尔山互通", "lng": 102.17, "lat": 27.82, "kind": "junction", "road": "G5" }
+  ]
+}

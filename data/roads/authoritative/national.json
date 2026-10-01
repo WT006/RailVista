@@ -1,0 +1,607 @@
+{
+ "version": 1,
+ "updated": "2026-10-01",
+ "note": "高置信种子名录（经典 1981 骨架 + 2013 规划已知新增）；全量 301/278 需《国家公路网规划》附表核对",
+ "roads": [
+  {
+   "ref": "G101",
+   "name": "京沈线",
+   "fromPlace": "北京",
+   "toPlace": "沈阳",
+   "provinces": "北京,河北,辽宁",
+   "officialLengthKm": 909
+  },
+  {
+   "ref": "G102",
+   "name": "京哈线",
+   "fromPlace": "北京",
+   "toPlace": "抚远",
+   "provinces": "北京,河北,天津,辽宁,吉林,黑龙江",
+   "officialLengthKm": 1337
+  },
+  {
+   "ref": "G103",
+   "name": "京塘线",
+   "fromPlace": "北京",
+   "toPlace": "天津滨海新区",
+   "provinces": "北京,天津",
+   "officialLengthKm": 143
+  },
+  {
+   "ref": "G104",
+   "name": "京福线",
+   "fromPlace": "北京",
+   "toPlace": "福州",
+   "provinces": "北京,河北,天津,山东,江苏,安徽,浙江,福建",
+   "officialLengthKm": 2420
+  },
+  {
+   "ref": "G105",
+   "name": "京珠线",
+   "fromPlace": "北京",
+   "toPlace": "澳门",
+   "provinces": "北京,河北,山东,河南,安徽,湖北,江西,广东,澳门",
+   "officialLengthKm": 2285
+  },
+  {
+   "ref": "G106",
+   "name": "京广线",
+   "fromPlace": "北京",
+   "toPlace": "广州",
+   "provinces": "北京,河北,山东,河南,湖北,湖南,广东",
+   "officialLengthKm": 2292
+  },
+  {
+   "ref": "G107",
+   "name": "京深线",
+   "fromPlace": "北京",
+   "toPlace": "深圳",
+   "provinces": "北京,河北,河南,湖北,湖南,广东",
+   "officialLengthKm": 2490
+  },
+  {
+   "ref": "G108",
+   "name": "京昆线",
+   "fromPlace": "北京",
+   "toPlace": "昆明",
+   "provinces": "北京,河北,山西,陕西,四川,云南",
+   "officialLengthKm": 3228
+  },
+  {
+   "ref": "G109",
+   "name": "京拉线",
+   "fromPlace": "北京",
+   "toPlace": "拉萨",
+   "provinces": "北京,河北,山西,内蒙古,宁夏,甘肃,青海,西藏",
+   "officialLengthKm": 3901
+  },
+  {
+   "ref": "G110",
+   "name": "京银线",
+   "fromPlace": "北京",
+   "toPlace": "青铜峡",
+   "provinces": "北京,河北,内蒙古,宁夏",
+   "officialLengthKm": 1156
+  },
+  {
+   "ref": "G111",
+   "name": "京加线",
+   "fromPlace": "北京",
+   "toPlace": "漠河",
+   "provinces": "北京,河北,内蒙古,黑龙江",
+   "officialLengthKm": 1996
+  },
+  {
+   "ref": "G112",
+   "name": "",
+   "fromPlace": "天津",
+   "toPlace": "宣化",
+   "provinces": "天津,河北",
+   "officialLengthKm": 1085
+  },
+  {
+   "ref": "G201",
+   "name": "鹤大线",
+   "fromPlace": "鹤岗",
+   "toPlace": "大连",
+   "provinces": "黑龙江,吉林,辽宁",
+   "officialLengthKm": 1964
+  },
+  {
+   "ref": "G202",
+   "name": "黑大线",
+   "fromPlace": "黑河",
+   "toPlace": "旅顺",
+   "provinces": "黑龙江,吉林,辽宁",
+   "officialLengthKm": 1818
+  },
+  {
+   "ref": "G203",
+   "name": "明沈线",
+   "fromPlace": "明水",
+   "toPlace": "沈阳",
+   "provinces": "黑龙江,吉林,辽宁,内蒙古",
+   "officialLengthKm": 700
+  },
+  {
+   "ref": "G204",
+   "name": "烟上线",
+   "fromPlace": "烟台",
+   "toPlace": "上海",
+   "provinces": "山东,江苏,上海",
+   "officialLengthKm": 966
+  },
+  {
+   "ref": "G205",
+   "name": "山深线",
+   "fromPlace": "山海关",
+   "toPlace": "深圳",
+   "provinces": "河北,天津,山东,江苏,安徽,浙江,福建,广东",
+   "officialLengthKm": 2984
+  },
+  {
+   "ref": "G206",
+   "name": "烟汕线",
+   "fromPlace": "烟台",
+   "toPlace": "汕头",
+   "provinces": "山东,江苏,安徽,江西,广东",
+   "officialLengthKm": 2324
+  },
+  {
+   "ref": "G207",
+   "name": "锡海线",
+   "fromPlace": "锡林浩特",
+   "toPlace": "徐闻",
+   "provinces": "内蒙古,河北,山西,河南,湖北,湖南,广西,广东",
+   "officialLengthKm": 3738
+  },
+  {
+   "ref": "G208",
+   "name": "",
+   "fromPlace": "二连浩特",
+   "toPlace": "淅川",
+   "provinces": "内蒙古,山西,河南",
+   "officialLengthKm": 990
+  },
+  {
+   "ref": "G209",
+   "name": "呼北线",
+   "fromPlace": "呼和浩特",
+   "toPlace": "北海",
+   "provinces": "内蒙古,山西,河南,湖北,湖南,广西",
+   "officialLengthKm": 3312
+  },
+  {
+   "ref": "G210",
+   "name": "包南线",
+   "fromPlace": "包头",
+   "toPlace": "南宁",
+   "provinces": "内蒙古,陕西,四川,重庆,贵州,广西",
+   "officialLengthKm": 3047
+  },
+  {
+   "ref": "G211",
+   "name": "",
+   "fromPlace": "银川",
+   "toPlace": "重庆",
+   "provinces": "宁夏,甘肃,陕西,重庆",
+   "officialLengthKm": 1000
+  },
+  {
+   "ref": "G212",
+   "name": "兰渝线",
+   "fromPlace": "兰州",
+   "toPlace": "龙邦",
+   "provinces": "甘肃,四川,重庆,贵州,广西",
+   "officialLengthKm": 1302
+  },
+  {
+   "ref": "G213",
+   "name": "兰磨线",
+   "fromPlace": "兰州",
+   "toPlace": "磨憨",
+   "provinces": "甘肃,四川,云南",
+   "officialLengthKm": 2800
+  },
+  {
+   "ref": "G214",
+   "name": "西景线",
+   "fromPlace": "西宁",
+   "toPlace": "勐腊",
+   "provinces": "青海,西藏,云南",
+   "officialLengthKm": 3256
+  },
+  {
+   "ref": "G215",
+   "name": "柳格线",
+   "fromPlace": "马鬃山",
+   "toPlace": "格尔木",
+   "provinces": "甘肃,青海",
+   "officialLengthKm": 660
+  },
+  {
+   "ref": "G216",
+   "name": "",
+   "fromPlace": "阿勒泰",
+   "toPlace": "库尔勒",
+   "provinces": "新疆",
+   "officialLengthKm": 970
+  },
+  {
+   "ref": "G217",
+   "name": "阿库线",
+   "fromPlace": "阿勒泰",
+   "toPlace": "库车",
+   "provinces": "新疆",
+   "officialLengthKm": 1079
+  },
+  {
+   "ref": "G218",
+   "name": "伊若线",
+   "fromPlace": "伊宁",
+   "toPlace": "若羌",
+   "provinces": "新疆",
+   "officialLengthKm": 1067
+  },
+  {
+   "ref": "G219",
+   "name": "新藏线",
+   "fromPlace": "喀纳斯",
+   "toPlace": "东兴",
+   "provinces": "新疆,西藏,云南,广西",
+   "officialLengthKm": 10065
+  },
+  {
+   "ref": "G220",
+   "name": "",
+   "fromPlace": "东营",
+   "toPlace": "深圳",
+   "provinces": "山东,河南,安徽,湖北,江西,广东",
+   "officialLengthKm": 2600
+  },
+  {
+   "ref": "G221",
+   "name": "哈同线",
+   "fromPlace": "哈尔滨",
+   "toPlace": "同江",
+   "provinces": "黑龙江",
+   "officialLengthKm": 558
+  },
+  {
+   "ref": "G222",
+   "name": "哈伊线",
+   "fromPlace": "哈尔滨",
+   "toPlace": "伊春",
+   "provinces": "黑龙江",
+   "officialLengthKm": 333
+  },
+  {
+   "ref": "G223",
+   "name": "海榆东线",
+   "fromPlace": "海口",
+   "toPlace": "三亚",
+   "provinces": "海南",
+   "officialLengthKm": 323
+  },
+  {
+   "ref": "G224",
+   "name": "海榆中线",
+   "fromPlace": "海口",
+   "toPlace": "三亚",
+   "provinces": "海南",
+   "officialLengthKm": 309
+  },
+  {
+   "ref": "G225",
+   "name": "海榆西线",
+   "fromPlace": "海口",
+   "toPlace": "三亚",
+   "provinces": "海南",
+   "officialLengthKm": 429
+  },
+  {
+   "ref": "G227",
+   "name": "宁张线",
+   "fromPlace": "西宁",
+   "toPlace": "张掖",
+   "provinces": "青海,甘肃",
+   "officialLengthKm": 341
+  },
+  {
+   "ref": "G228",
+   "name": "",
+   "fromPlace": "丹东",
+   "toPlace": "东兴",
+   "provinces": "辽宁,河北,天津,山东,江苏,上海,浙江,福建,广东,广西",
+   "officialLengthKm": 6800
+  },
+  {
+   "ref": "G240",
+   "name": "",
+   "fromPlace": "保定",
+   "toPlace": "台山",
+   "provinces": "河北,山东,河南,湖北,湖南,广东",
+   "officialLengthKm": 2200
+  },
+  {
+   "ref": "G331",
+   "name": "丹阿线",
+   "fromPlace": "丹东",
+   "toPlace": "阿勒泰",
+   "provinces": "辽宁,吉林,黑龙江,内蒙古,新疆",
+   "officialLengthKm": 9000
+  },
+  {
+   "ref": "G332",
+   "name": "",
+   "fromPlace": "虎林",
+   "toPlace": "额尔古纳",
+   "provinces": "黑龙江,内蒙古",
+   "officialLengthKm": 1000
+  },
+  {
+   "ref": "G301",
+   "name": "绥满线",
+   "fromPlace": "绥芬河",
+   "toPlace": "满洲里",
+   "provinces": "黑龙江,内蒙古",
+   "officialLengthKm": 1580
+  },
+  {
+   "ref": "G302",
+   "name": "珲乌线",
+   "fromPlace": "珲春",
+   "toPlace": "乌兰浩特",
+   "provinces": "吉林,内蒙古",
+   "officialLengthKm": 1000
+  },
+  {
+   "ref": "G303",
+   "name": "集锡线",
+   "fromPlace": "集安",
+   "toPlace": "锡林浩特",
+   "provinces": "吉林,辽宁,内蒙古",
+   "officialLengthKm": 1000
+  },
+  {
+   "ref": "G304",
+   "name": "丹霍线",
+   "fromPlace": "丹东",
+   "toPlace": "霍林郭勒",
+   "provinces": "辽宁,内蒙古",
+   "officialLengthKm": 850
+  },
+  {
+   "ref": "G305",
+   "name": "",
+   "fromPlace": "庄河",
+   "toPlace": "林西",
+   "provinces": "辽宁,内蒙古",
+   "officialLengthKm": 700
+  },
+  {
+   "ref": "G306",
+   "name": "",
+   "fromPlace": "绥中",
+   "toPlace": "克什克腾旗",
+   "provinces": "辽宁,内蒙古",
+   "officialLengthKm": 500
+  },
+  {
+   "ref": "G307",
+   "name": "歧银线",
+   "fromPlace": "黄骅",
+   "toPlace": "银川",
+   "provinces": "河北,山西,陕西,宁夏",
+   "officialLengthKm": 1350
+  },
+  {
+   "ref": "G308",
+   "name": "青石线",
+   "fromPlace": "青岛",
+   "toPlace": "石家庄",
+   "provinces": "山东,河北",
+   "officialLengthKm": 700
+  },
+  {
+   "ref": "G309",
+   "name": "荣兰线",
+   "fromPlace": "荣成",
+   "toPlace": "兰州",
+   "provinces": "山东,河北,山西,陕西,甘肃,宁夏",
+   "officialLengthKm": 2200
+  },
+  {
+   "ref": "G310",
+   "name": "连天线",
+   "fromPlace": "连云港",
+   "toPlace": "共和",
+   "provinces": "江苏,山东,河南,陕西,甘肃,青海",
+   "officialLengthKm": 1600
+  },
+  {
+   "ref": "G311",
+   "name": "徐西线",
+   "fromPlace": "徐州",
+   "toPlace": "西峡",
+   "provinces": "江苏,安徽,河南",
+   "officialLengthKm": 700
+  },
+  {
+   "ref": "G312",
+   "name": "沪霍线",
+   "fromPlace": "上海",
+   "toPlace": "霍尔果斯",
+   "provinces": "上海,江苏,安徽,河南,湖北,陕西,甘肃,宁夏,新疆",
+   "officialLengthKm": 4967
+  },
+  {
+   "ref": "G314",
+   "name": "乌红线",
+   "fromPlace": "乌鲁木齐",
+   "toPlace": "红其拉甫",
+   "provinces": "新疆",
+   "officialLengthKm": 1948
+  },
+  {
+   "ref": "G315",
+   "name": "西莎线",
+   "fromPlace": "西宁",
+   "toPlace": "喀什",
+   "provinces": "青海,新疆",
+   "officialLengthKm": 3063
+  },
+  {
+   "ref": "G316",
+   "name": "福兰线",
+   "fromPlace": "福州",
+   "toPlace": "同仁",
+   "provinces": "福建,江西,湖北,陕西,甘肃,青海",
+   "officialLengthKm": 2915
+  },
+  {
+   "ref": "G317",
+   "name": "成那线",
+   "fromPlace": "成都",
+   "toPlace": "噶尔",
+   "provinces": "四川,西藏",
+   "officialLengthKm": 2043
+  },
+  {
+   "ref": "G318",
+   "name": "沪聂线",
+   "fromPlace": "上海",
+   "toPlace": "聂拉木",
+   "provinces": "上海,江苏,浙江,安徽,湖北,重庆,四川,西藏",
+   "officialLengthKm": 5476
+  },
+  {
+   "ref": "G319",
+   "name": "厦成线",
+   "fromPlace": "厦门",
+   "toPlace": "成都",
+   "provinces": "福建,江西,湖南,重庆,四川",
+   "officialLengthKm": 2631
+  },
+  {
+   "ref": "G320",
+   "name": "沪瑞线",
+   "fromPlace": "上海",
+   "toPlace": "瑞丽",
+   "provinces": "上海,浙江,江西,湖南,贵州,云南",
+   "officialLengthKm": 3695
+  },
+  {
+   "ref": "G321",
+   "name": "广成线",
+   "fromPlace": "广州",
+   "toPlace": "成都",
+   "provinces": "广东,广西,贵州,四川",
+   "officialLengthKm": 2220
+  },
+  {
+   "ref": "G322",
+   "name": "",
+   "fromPlace": "瑞安",
+   "toPlace": "友谊关",
+   "provinces": "浙江,江西,湖南,广西",
+   "officialLengthKm": 2300
+  },
+  {
+   "ref": "G323",
+   "name": "瑞临线",
+   "fromPlace": "瑞金",
+   "toPlace": "清水河",
+   "provinces": "江西,广东,广西,云南",
+   "officialLengthKm": 2919
+  },
+  {
+   "ref": "G324",
+   "name": "福昆线",
+   "fromPlace": "福州",
+   "toPlace": "昆明",
+   "provinces": "福建,广东,广西,贵州,云南",
+   "officialLengthKm": 2800
+  },
+  {
+   "ref": "G325",
+   "name": "广南线",
+   "fromPlace": "广州",
+   "toPlace": "南宁",
+   "provinces": "广东,广西",
+   "officialLengthKm": 900
+  },
+  {
+   "ref": "G326",
+   "name": "秀河线",
+   "fromPlace": "秀山",
+   "toPlace": "河口",
+   "provinces": "重庆,贵州,云南",
+   "officialLengthKm": 1000
+  },
+  {
+   "ref": "G327",
+   "name": "",
+   "fromPlace": "菏泽",
+   "toPlace": "连云港",
+   "provinces": "山东,江苏",
+   "officialLengthKm": 500
+  },
+  {
+   "ref": "G328",
+   "name": "宁启线",
+   "fromPlace": "南京",
+   "toPlace": "启东",
+   "provinces": "江苏",
+   "officialLengthKm": 350
+  },
+  {
+   "ref": "G329",
+   "name": "杭沈线",
+   "fromPlace": "杭州",
+   "toPlace": "朱家尖",
+   "provinces": "浙江",
+   "officialLengthKm": 250
+  },
+  {
+   "ref": "G330",
+   "name": "温寿线",
+   "fromPlace": "温州",
+   "toPlace": "寿昌",
+   "provinces": "浙江",
+   "officialLengthKm": 330
+  },
+  {
+   "ref": "G345",
+   "name": "",
+   "fromPlace": "启东",
+   "toPlace": "那曲",
+   "provinces": "江苏,安徽,河南,湖北,陕西,甘肃,四川,青海,西藏",
+   "officialLengthKm": 3800
+  },
+  {
+   "ref": "G346",
+   "name": "",
+   "fromPlace": "上海",
+   "toPlace": "安康",
+   "provinces": "上海,江苏,安徽,湖北,陕西",
+   "officialLengthKm": 2000
+  },
+  {
+   "ref": "G347",
+   "name": "",
+   "fromPlace": "南京",
+   "toPlace": "德令哈",
+   "provinces": "江苏,安徽,河南,湖北,陕西,甘肃,青海",
+   "officialLengthKm": 2500
+  },
+  {
+   "ref": "G348",
+   "name": "",
+   "fromPlace": "武汉",
+   "toPlace": "大理",
+   "provinces": "湖北,重庆,四川,云南",
+   "officialLengthKm": 2500
+  }
+ ]
+}

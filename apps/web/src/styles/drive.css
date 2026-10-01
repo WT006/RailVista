@@ -476,3 +476,1034 @@
   color: var(--text-2);
   font-size: var(--fs-meta);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * 全国公路旅游网 v0.4.0（PRD-万里路书-全国公路旅游网-20261001）
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/* —— 次级导航（主/从分界，非顶栏） —— */
+.drive-subnav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 var(--space-4);
+  flex-wrap: wrap;
+}
+
+.drive-subnav__main,
+.drive-subnav__sub {
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.drive-subnav__main {
+  border: none;
+  background: var(--fill-subtle);
+  color: var(--text-2);
+  text-decoration: none;
+}
+
+.drive-subnav__main.is-active {
+  background: var(--accent);
+  color: var(--surface-0);
+}
+
+.drive-subnav__sub {
+  border: 1px solid var(--line-default);
+  background: transparent;
+  color: var(--text-2);
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.drive-subnav__sub.is-active {
+  border-color: var(--line-accent);
+  color: var(--accent-hover);
+}
+
+.drive-subnav__caret {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+.drive-subnav__wrap {
+  position: relative;
+}
+
+.drive-subnav__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  min-width: 220px;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-2);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--elev-3);
+  display: grid;
+  gap: 2px;
+}
+
+.drive-subnav__menu-title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+.drive-subnav__menu-item {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--text-1);
+  font-size: var(--fs-cap);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.drive-subnav__menu-item:hover {
+  background: var(--fill-accent);
+}
+
+.drive-subnav__menu-item.is-empty {
+  color: var(--text-3);
+}
+
+.drive-subnav__menu-meta {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* —— 首屏主结构：地图 + 面板 —— */
+.drive-home-main {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+.drive-netmap {
+  position: relative;
+  min-height: 420px;
+  padding: var(--space-2);
+  overflow: hidden;
+  display: flex;
+}
+
+.drive-netmap__svg {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.drive-netmap__outline :deep(path),
+.drive-netmap__outline path {
+  fill: var(--fill-subtle);
+  fill-opacity: 0.5;
+  stroke: var(--line-default);
+  stroke-opacity: 0.6;
+  stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.drive-netmap__road {
+  fill: none;
+  stroke-width: 2;
+  stroke-opacity: 0.85;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  cursor: pointer;
+}
+
+.drive-netmap__road:hover {
+  stroke-opacity: 1;
+  stroke-width: 3.2;
+}
+
+.drive-netmap__note,
+.drive-netmap__hint {
+  position: absolute;
+  left: var(--space-3);
+  margin: 0;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+.drive-netmap__note {
+  top: var(--space-2);
+}
+
+.drive-netmap__hint {
+  bottom: var(--space-2);
+}
+
+.drive-home-panel {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+/* —— OD 搜索 —— */
+.drive-od {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drive-od__row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-2);
+  align-items: end;
+}
+
+.drive-od__swap {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-default);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-h3);
+  cursor: pointer;
+}
+
+.drive-od__swap:hover {
+  border-color: var(--line-accent);
+  color: var(--accent-hover);
+}
+
+.drive-od__error {
+  margin: 0;
+  font-size: var(--fs-cap);
+  color: var(--danger);
+}
+
+.drive-od__hint {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  align-self: center;
+}
+
+.drive-suggest__kind {
+  margin-right: var(--space-1);
+  padding: 1px var(--space-1);
+  border-radius: var(--radius-xs);
+  background: var(--fill-subtle);
+  color: var(--text-3);
+  font-size: var(--fs-micro);
+}
+
+.drive-suggest__sub {
+  float: right;
+  color: var(--text-3);
+  font-size: var(--fs-micro);
+  white-space: nowrap;
+}
+
+/* —— 公路编号键盘（对标车次前缀键盘的 DOM 与间距变量） —— */
+.road-kbd {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.road-kbd__label {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+.road-kbd__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+}
+
+.road-kbd__input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-default);
+  background: var(--surface-sunken);
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  letter-spacing: 0.04em;
+}
+
+.road-kbd__input:focus {
+  outline: none;
+  border-color: var(--line-accent);
+}
+
+.road-kbd__provinces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.road-kbd__chip {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-default);
+  background: transparent;
+  color: var(--text-2);
+  font-size: var(--fs-micro);
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.road-kbd__chip.is-on {
+  border-color: var(--line-accent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.road-kbd__prefixes {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-1);
+}
+
+.road-kbd__prefix {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  padding: var(--space-2) var(--space-1);
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--prefix-color, var(--accent)) 42%, transparent);
+  background: color-mix(in srgb, var(--prefix-color, var(--accent)) 10%, transparent);
+  color: var(--text-1);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.road-kbd__prefix[aria-pressed='true'] {
+  border-color: var(--prefix-color, var(--accent));
+  background: color-mix(in srgb, var(--prefix-color, var(--accent)) 26%, transparent);
+  box-shadow: 0 0 0 1px var(--prefix-color, var(--accent)) inset;
+}
+
+.road-kbd__letter {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  color: var(--prefix-color, var(--accent));
+  line-height: 1.1;
+}
+
+.road-kbd__name strong {
+  display: block;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.road-kbd__name em {
+  font-style: normal;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.road-kbd__digits {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: var(--space-1);
+}
+
+.road-kbd__digit {
+  padding: var(--space-2) 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-2);
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: var(--fs-meta);
+  cursor: pointer;
+}
+
+.road-kbd__digit:hover {
+  border-color: var(--line-accent);
+  color: var(--accent-hover);
+}
+
+.road-kbd__candidates {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.road-kbd__candidate {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-1);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.road-kbd__candidate:hover {
+  background: var(--fill-accent);
+}
+
+.road-kbd__badge {
+  flex-shrink: 0;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-xs);
+  border: 1px solid color-mix(in srgb, var(--prefix-color, var(--accent)) 52%, transparent);
+  color: var(--prefix-color, var(--accent));
+  font-family: var(--font-display);
+  font-size: var(--fs-cap);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.road-kbd__candidate-sub {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-3);
+  font-size: var(--fs-micro);
+}
+
+.road-kbd__none {
+  margin: 0;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+/* —— 覆盖诚实说明 —— */
+.drive-coverage-note {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-5);
+  font-size: var(--fs-micro);
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+.drive-stat__target {
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+}
+
+/* —— 榜单（从属：入口卡 + 聚合页 + 单榜页） —— */
+.drive-boards {
+  margin-top: var(--space-6);
+}
+
+.drive-boards__title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fs-h3);
+  font-weight: 700;
+}
+
+.drive-boards__title span {
+  font-weight: 400;
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+}
+
+.drive-boards__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-3);
+}
+
+.drive-boards__more {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-size: var(--fs-cap);
+  color: var(--accent-hover);
+  text-decoration: none;
+}
+
+.drive-board-card {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  color: inherit;
+  text-decoration: none;
+}
+
+.drive-board-card:hover {
+  border-color: var(--line-accent);
+}
+
+.drive-board-card__level {
+  justify-self: start;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.drive-board-card__level.is-national { background: var(--accent-soft); color: var(--accent-hover); }
+.drive-board-card__level.is-provincial { background: var(--success-soft); color: var(--success); }
+.drive-board-card__level.is-media { background: var(--warning-soft); color: var(--warning); }
+
+.drive-board-card__title {
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  color: var(--text-1);
+}
+
+.drive-board-card__sub {
+  font-size: var(--fs-cap);
+  color: var(--text-2);
+}
+
+.drive-board-card__meta {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-board-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.drive-board-source {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+}
+
+.drive-board-items {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.drive-board-item {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drive-board-item__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.drive-board-item__rank {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  color: var(--accent-hover);
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+}
+
+.drive-board-item__name {
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-board-item__km {
+  margin-left: auto;
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.drive-board-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--fs-cap);
+  color: var(--text-2);
+}
+
+.drive-board-item__highlight {
+  color: var(--accent-hover);
+}
+
+.drive-board-item__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.drive-board-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.drive-board-item__hint {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+/* —— 沿程页（DriveTrip）：左路线卡 / 中地图 / 右景点流 —— */
+.drive-trip-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.drive-trip-tabs {
+  display: flex;
+  gap: var(--space-1);
+  padding: 3px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+}
+
+.drive-trip-tab {
+  padding: 5px var(--space-3);
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-2);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.drive-trip-tab.is-active {
+  background: var(--accent);
+  color: var(--surface-0);
+}
+
+.drive-trip-engine {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+.drive-trip-grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 4fr) minmax(0, 8fr) minmax(280px, 5fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.drive-road-grid {
+  grid-template-columns: minmax(0, 8fr) minmax(240px, 4fr);
+}
+
+.drive-trip-side {
+  display: grid;
+  gap: var(--space-3);
+  position: sticky;
+  top: calc(var(--appbar-h) + var(--space-3));
+}
+
+.drive-route-card.is-flat {
+  cursor: default;
+}
+
+.drive-route-card.is-flat::before {
+  background: var(--accent);
+}
+
+.drive-trip-roadkeys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.drive-trip-roadkey {
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-xs);
+  border: 1px solid color-mix(in srgb, var(--prefix-color, var(--accent)) 52%, transparent);
+  color: var(--prefix-color, var(--accent));
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.drive-block-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.drive-block-title span {
+  font-weight: 400;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+/* 章节条：按里程占比分段的横条 */
+.drive-chapters {
+  padding: var(--space-3);
+}
+
+.drive-chapterbar {
+  display: flex;
+  gap: 2px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.drive-chapterbar__seg {
+  min-width: 6px;
+  background: color-mix(in srgb, var(--accent) 34%, var(--line-default));
+  cursor: default;
+  position: relative;
+}
+
+.drive-chapterbar__seg:hover {
+  background: var(--accent);
+}
+
+.drive-chapterbar__label {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-size: 8px;
+  line-height: 14px;
+  text-align: center;
+  color: var(--surface-0);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.drive-chapterlist {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+  max-height: 280px;
+  overflow-y: auto;
+  font-size: var(--fs-cap);
+  color: var(--text-2);
+}
+
+.drive-chapterlist li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-chapterlist__range {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 沿程地图（离线 SVG） */
+.drive-trip-map {
+  position: relative;
+  min-height: 380px;
+  padding: var(--space-2);
+  display: flex;
+}
+
+.drive-trip-map__svg {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.drive-trip-map__svg .drive-netmap__outline path {
+  fill: var(--fill-subtle);
+  fill-opacity: 0.35;
+  stroke: var(--line-default);
+  stroke-opacity: 0.4;
+}
+
+.drive-trip-map__route {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.6;
+  stroke-opacity: 0.95;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.drive-trip-map__dot {
+  cursor: pointer;
+  stroke: var(--surface-0);
+  stroke-width: 0.8;
+}
+
+.drive-trip-map__dot.is-expanded {
+  r: 4;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+
+.drive-trip-map__hint {
+  position: absolute;
+  bottom: var(--space-2);
+  left: var(--space-3);
+  margin: 0;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+/* 沿程景点流 */
+.drive-trip-flow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.drive-flow-head {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drive-flow-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.drive-flow-list {
+  display: grid;
+  gap: var(--space-2);
+  max-height: 72vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
+}
+
+.drive-spot {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 6px);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+  cursor: pointer;
+  position: relative;
+}
+
+.drive-spot::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--spot-color, var(--accent));
+}
+
+.drive-spot:hover,
+.drive-spot.is-expanded {
+  border-color: var(--line-accent);
+}
+
+.drive-spot__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.drive-spot__km {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-spot__name {
+  font-size: var(--fs-meta);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-spot__tier {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 1px var(--space-1);
+  border-radius: var(--radius-xs);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.drive-spot__tier.is-A { background: var(--warning-soft); color: var(--warning); }
+.drive-spot__tier.is-B { background: var(--accent-soft); color: var(--accent-hover); }
+.drive-spot__tier.is-C { background: var(--success-soft); color: var(--success); }
+
+.drive-spot__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-spot__honor {
+  color: var(--warning);
+}
+
+.drive-spot__detour {
+  font-size: var(--fs-micro);
+  color: var(--accent-hover);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-spot__detour.is-distant {
+  color: var(--text-3);
+}
+
+.drive-spot__intro {
+  margin: 0;
+  font-size: var(--fs-cap);
+  line-height: var(--lh-snug);
+  color: var(--text-2);
+}
+
+.drive-spot__vis {
+  margin: 0;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+/* 单条公路页 */
+.drive-road-spots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.drive-road-spots li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--fs-cap);
+  color: var(--text-1);
+  white-space: nowrap;
+}
+
+.drive-road-spot__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 实时态面板 */
+.drive-live {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* 诚实标注脚注 */
+.drive-footnote {
+  margin: var(--space-6) 0 0;
+  font-size: var(--fs-micro);
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+/* —— 三档响应式（PRD §11.3：390 / 768 / 1440） —— */
+@media (max-width: 1200px) {
+  .drive-trip-grid {
+    grid-template-columns: minmax(240px, 4fr) minmax(0, 7fr);
+  }
+
+  .drive-trip-flow {
+    grid-column: 1 / -1;
+  }
+
+  .drive-trip-side {
+    position: static;
+  }
+}
+
+@media (max-width: 840px) {
+  .drive-home-main {
+    grid-template-columns: 1fr;
+  }
+
+  .drive-netmap {
+    min-height: 46vh;
+  }
+
+  .drive-road-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .drive-trip-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .drive-flow-list {
+    max-height: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .drive-od__row {
+    grid-template-columns: 1fr;
+  }
+
+  .drive-od__swap {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+
+  .road-kbd__digits {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .road-kbd__prefixes {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .drive-trip-tab {
+    padding: 5px var(--space-2);
+  }
+}

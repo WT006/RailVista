@@ -320,8 +320,15 @@ export interface PresetPackage {
 //       可选高程，向后兼容（现有代码读取前两位不受影响）。
 // ═══════════════════════════════════════════════════════════════════════════
 
-/** 公路行政等级：G 国道 / S 省道 / X 县道 / Y 乡道 / C 村道 / E 高速 */
-export type RoadClass = 'G' | 'S' | 'X' | 'Y' | 'C' | 'E';
+/**
+ * 公路行政等级（v2 语义，PRD-万里路书-全国公路旅游网 §9）：
+ * expressway 国家高速 / national 普通国道 / provincial 省道 / county 县道 / township 乡道 / village 村道。
+ * v1 的字母编号前缀语义保留为 RoadRefPrefix（编号主键规范见 §3.2）。
+ */
+export type RoadClass = 'expressway' | 'national' | 'provincial' | 'county' | 'township' | 'village';
+
+/** 编号前缀字母：G 国道（含 G+4 位国家高速）/ S 省道 / X 县道 / Y 乡道 / C 村道 */
+export type RoadRefPrefix = 'G' | 'S' | 'X' | 'Y' | 'C';
 
 /** 公路点：经纬度 + 可选高程（m） */
 export type RoadPoint = [number, number, number?];
@@ -552,4 +559,231 @@ export interface RadarResult {
   direction: 'forward' | 'backward' | 'unknown';
   band: SpeedBand;
   offRouteM: number;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 万里路书 · 全国公路旅游网（v0.4.0 新增，PRD-万里路书-全国公路旅游网-20261001）
+// 说明：本区块为 v2 主功能类型（L0 索引 / L1 几何 / 沿程匹配 / 搜索 / 榜单）。
+//       保留上方 v1 的 Drive* 路书类型不删（路书页继续使用）；新类型统一用 Road
+//       前缀命名，避免与 v1 的 Drive* 混淆。
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** L0 索引条目（data/roads/index/*.json，供搜索 / 列表 / 地图 LOD / 编号键盘候选） */
+export interface RoadIndexEntry {
+  /** 主键：国道/高速全国唯一 "G318"；省道及以下省内唯一 "青海:S101" */
+  key: string;
+  /** 编号：'G318'（高速为 G+4 位，如 'G5611'） */
+  ref: string;
+  /** 中文线名：'沪聂线' */
+  name?: string;
+  class: RoadClass;
+  provinces: string[];
+  fromPlace: string;
+  toPlace: string;
+  /** 里程（km，估算值，OSM 众包还原） */
+  lengthKm: number;
+  /** bbox [minLng, minLat, maxLng, maxLat] */
+  bbox: [number, number, number, number];
+  spotCount: number;
+  /** 是否已有 L1 几何（data/roads/geom/{key}.json） */
+  hasGeom: boolean;
+  source: 'authoritative' | 'osm_only';
+  status: 'ok' | 'partial' | 'broken' | 'unverified';
+}
+
+/** L1 几何节点（城市 / 交叉 / 服务 / 垭口 / 端点） */
+export interface RoadGeometryNode {
+  name: string;
+  atKm: number;
+  type: 'city' | 'junction' | 'service' | 'pass' | 'endpoint';
+}
+
+/** L1 几何（data/roads/geom/{key}.json，按 key 懒加载） */
+export interface RoadGeometry {
+  key: string;
+  points: RoadPoint[];
+  /** 逐点累计里程（km），与 points 等长 */
+  cumKm: number[];
+  nodes: RoadGeometryNode[];
+  simplified: boolean;
+}
+
+/** 公路侧景点沿程可见性（与铁路 SpotVisibility 的语义差异见 PRD §5.3） */
+export type RoadVisibility = 'roadside' | 'detour5' | 'detour20' | 'distant';
+
+/** 公路侧景点（data/roads/roadside-spots.json，目标 3 万条） */
+export interface RoadsideSpot {
+  id: string;
+  name: string;
+  lng: number;
+  lat: number;
+  tier: 'A' | 'B' | 'C';
+  /** 六维分类：'nature.mountain' / 'engineering.spiral-road' / 'service.charging' ... */
+  category: string;
+  score: number;
+  /** 沿程可见性（决定缓冲半径），默认 detour20 */
+  visibility?: RoadVisibility;
+  intro?: string;
+  tags?: string[];
+  province?: string;
+  /** 官方资质：['5A','世界遗产','中国传统村落'] */
+  honors?: string[];
+  bestView?: SpotBestView;
+  stayMin?: number;
+  /** 是否可停车（Tier C 小确幸关键属性） */
+  canPark?: boolean;
+  source: string;
+  verified?: boolean;
+}
+
+/** 合成路线章节（沿程分段标题） */
+export interface RoadChapter {
+  title: string;
+  fromKm: number;
+  toKm: number;
+}
+
+/** 合成路线（OD 规划结果 / 榜单条目指向的路线） */
+export interface RoadRoute {
+  id: string;
+  name: string;
+  roadKeys: string[];
+  provinces: string[];
+  lengthKm: number;
+  durationMin?: number;
+  coords: RoadPoint[];
+  chapters?: RoadChapter[];
+  boardIds?: string[];
+  /** 规划引擎：amap（在线）/ local / local-spliced（端点外接）/ direct（两点直连） */
+  engine?: string;
+  /** 引擎说明（诚实标注，UI 直接展示） */
+  engineNote?: string;
+}
+
+/** 搜索命中类别（PRD §4 四类索引） */
+export type PlaceKind = 'place' | 'road' | 'spot' | 'facility';
+
+/** 搜索命中（/api/drive/suggest） */
+export interface PlaceHit {
+  kind: PlaceKind;
+  /** place: 行政码 / road: key / spot: spot.id / facility: osm id */
+  id: string;
+  /** 'G318' 或 '稻城亚丁' */
+  name: string;
+  /** '沪聂线·上海→聂拉木' 或 '四川·甘孜' */
+  sub: string;
+  lng: number;
+  lat: number;
+  score: number;
+}
+
+/** 沿程匹配选项（filterSpotsAlongRoad） */
+export interface AlongRouteOptions {
+  /** 沿路缓冲半径上限（km），默认 35（distant）；各可见性分档见 ROAD_BUFFER_KM */
+  bufferKm?: number;
+  /** 是否做左右侧判定，默认 true */
+  autoSide?: boolean;
+  /** 只返回某几类（category 前缀匹配，如 ['nature', 'engineering.spiral-road']） */
+  categories?: string[];
+  /** 最少「值得一看」分值，过滤路人 POI；C1/C2 默认 35，C3 实时默认 45 */
+  minScore?: number;
+  maxCount?: number;
+}
+
+/** 沿程景点（filterSpotsAlongRoad 输出，按 progressKm 升序） */
+export interface AlongSpot {
+  id: string;
+  name: string;
+  lng: number;
+  lat: number;
+  /** 在路线上的投影里程（km，从起点算） */
+  progressKm: number;
+  /** 到路线的垂直距离（km） */
+  distKm: number;
+  /** 左右侧：相对路线正方向 */
+  side: 'left' | 'right' | 'unknown';
+  sideConfidence: 'high' | 'mid' | 'low';
+  category: string;
+  score: number;
+  /** 偏离主路多远需要绕行（km），0 = 就在路边；= distKm×2−0.3 向下取整到 0.5 */
+  detourKm: number;
+  /** 建议停留（分钟） */
+  stayMin?: number;
+  intro?: string;
+  tier: 'A' | 'B' | 'C';
+  visibility?: RoadVisibility;
+  honors?: string[];
+  bestView?: SpotBestView;
+  canPark?: boolean;
+  province?: string;
+}
+
+/** 榜单条目：指向路网里的实际路线（引用 + 精选，非独立数据） */
+export interface RankingItem {
+  rank: number;
+  /** → data/roads/routes/{routeId}.json（可选，无文件时用内联元数据） */
+  routeId: string;
+  /** 'G315 西宁—喀什' 或 '独库公路' */
+  name: string;
+  alias?: string[];
+  /** 该条目由哪些公路编号串成（可多条） */
+  roadKeys: string[];
+  province: string[];
+  lengthKm?: number;
+  /** OD 兜底：无 roadKeys 几何时按起终点规划（如 长城文化：山海关→嘉峪关） */
+  fromPlace?: string;
+  toPlace?: string;
+  highlight?: string;
+  tags?: string[];
+  /** 归属榜单的交叉索引：这条路同时出现在哪些榜 */
+  alsoIn?: string[];
+}
+
+/** 统一榜单模型（一个 schema 装下所有榜单，加新榜单 = 加一个 JSON，零代码） */
+export interface RankingBoard {
+  id: string;
+  title: string;
+  subtitle?: string;
+  source: {
+    org: string;
+    doc?: string;
+    url?: string;
+    publishedAt?: string;
+  };
+  level: 'national' | 'provincial' | 'media';
+  cover?: string;
+  itemCount: number;
+  items: RankingItem[];
+}
+
+/** 榜单摘要（列表页用，不含 items） */
+export interface RankingBoardSummary {
+  id: string;
+  title: string;
+  subtitle?: string;
+  level: RankingBoard['level'];
+  org: string;
+  publishedAt?: string;
+  itemCount: number;
+}
+
+/** /api/drive/network/stats 响应 */
+export interface RoadNetworkStats {
+  national: number;
+  expressway: number;
+  provincial: number;
+  county: number;
+  township: number;
+  village: number;
+  totalKm: number;
+  hasGeom: number;
+  hasGeomRatio: number;
+  spotCount: number;
+  /** 覆盖诚实说明（PRD §3.1：不能装作什么都有） */
+  coverage: {
+    targetNational: number;
+    targetExpressway: number;
+    notes: string[];
+  };
+  updated: string;
 }

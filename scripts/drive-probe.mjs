@@ -76,15 +76,17 @@ const report = await evaluate(`(() => {
     const lh = parseFloat(getComputedStyle(el).lineHeight || '20');
     return { ok: h <= lh * 1.5 + 1, h };
   };
-  const names = [...document.querySelectorAll('.drive-route-card__name, .drive-chapter__title, .drive-radar-card__name, .drive-highlight__name')]
+  const names = [...document.querySelectorAll('.drive-route-card__name, .drive-chapter__title, .drive-radar-card__name, .drive-highlight__name, .drive-spot__name, .drive-board-card__title, .drive-board-item__name')]
     .map((el) => ({ text: el.textContent.trim().slice(0, 12), ...singleLine(el) }));
-  const cards = document.querySelectorAll('.drive-route-card, .drive-chapter, .drive-highlight, .drive-radar-card').length;
+  const cards = document.querySelectorAll('.drive-route-card, .drive-chapter, .drive-highlight, .drive-radar-card, .drive-spot, .drive-board-card, .drive-board-item').length;
   return {
     url: location.href,
     viewport: [innerWidth, innerHeight],
     overflowX,
     scrollW: doc.scrollWidth, clientW: doc.clientWidth,
     cardCount: cards,
+    roadKbd: document.querySelectorAll('.road-kbd__prefix, .road-kbd__digit').length,
+    netmapRoads: document.querySelectorAll('.drive-netmap__road').length,
     navLinks: [...document.querySelectorAll('.appbar__nav a')].map((a) => ({ text: a.textContent.trim(), href: a.getAttribute('href') })),
     names: names.slice(0, 8),
     folded: names.filter((n) => !n.ok).map((n) => n.text),

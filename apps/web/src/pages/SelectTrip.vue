@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { Stop, TrainSummary } from '@railvista/shared';
 import { api } from '../api/client';
@@ -18,6 +18,7 @@ import {
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import RailProgressLoader from '../components/RailProgressLoader.vue';
 import RankingsSection from '../components/rankings/RankingsSection.vue';
+import AtlasEntryCard from '../components/AtlasEntryCard.vue';
 import AppTopBar from '../components/AppTopBar.vue';
 import ChinaBackdropMap from '../components/ChinaBackdropMap.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
@@ -42,6 +43,7 @@ const toActive = ref(-1);
 const trains = ref<TrainSummary[]>([]);
 const loading = ref(false);
 const loadingPhase = ref<'search' | 'stops' | 'enter' | 'demo' | 'resume' | null>(null);
+const loaderRef = ref<{ abort: () => void; whenSettled: () => Promise<void> } | null>(null);
 const error = ref('');
 const resumeHint = ref('');
 const selected = ref<TrainSummary | null>(null);
@@ -53,8 +55,58 @@ const recent = ref<TripIndexEntry[]>([]);
 const currentEntry = ref<TripIndexEntry | null>(null);
 /** 「最近访问」折叠态：默认收起，点击标题展开 */
 const recentOpen = ref(false);
+/** 查询面板朝向：od = 按站查询（正面），code = 车次号查询（背面） */
+const searchFace = ref<'od' | 'code'>('od');
 /** 按车次号直达的输入 */
 const codeQuery = ref('');
+
+const queryFlipCard = ref<HTMLElement | null>(null);
+const queryFlipFront = ref<HTMLElement | null>(null);
+const queryFlipBack = ref<HTMLElement | null>(null);
+/** 首帧量高完成前保持正面文档流，避免 absolute 叠放把容器压成 0 */
+const queryFlipMeasured = ref(false);
+let queryFlipRo: ResizeObserver | null = null;
+
+/** 把容器高度钉到当前可见面板，供 CSS height 过渡使用 */
+function syncQueryFlipHeight() {
+  const card = queryFlipCard.value;
+  const face = searchFace.value === 'od' ? queryFlipFront.value : queryFlipBack.value;
+  if (!card || !face) return;
+  const next = `${face.offsetHeight}px`;
+  if (!queryFlipMeasured.value) {
+    card.style.transition = 'none';
+    card.style.setProperty('--query-flip-h', next);
+    void card.offsetHeight;
+    card.style.transition = '';
+    queryFlipMeasured.value = true;
+    return;
+  }
+  card.style.setProperty('--query-flip-h', next);
+}
+
+/** 切换查询面板；离开按站面时收起站名建议 */
+function flipSearchFace() {
+  searchFace.value = searchFace.value === 'od' ? 'code' : 'od';
+  fromOpen.value = false;
+  toOpen.value = false;
+}
+
+watch(searchFace, async () => {
+  await nextTick();
+  syncQueryFlipHeight();
+});
+
+onMounted(() => {
+  syncQueryFlipHeight();
+  queryFlipRo = new ResizeObserver(() => syncQueryFlipHeight());
+  if (queryFlipFront.value) queryFlipRo.observe(queryFlipFront.value);
+  if (queryFlipBack.value) queryFlipRo.observe(queryFlipBack.value);
+});
+
+onBeforeUnmount(() => {
+  queryFlipRo?.disconnect();
+  queryFlipRo = null;
+});
 
 /** 车次类型前缀 → 专属颜色（前缀键盘 + 车次列表共用同一色板，保证"对得上"）。
  * 每类一个可区分色，落在深色玻璃底上均 ≥ 3:1 对比；纯数字普速用中性灰。 */
@@ -124,20 +176,29 @@ function beginLoading(phase: 'search' | 'stops' | 'enter' | 'demo' | 'resume') {
   loading.value = true;
 }
 
-function endLoading() {
+/**
+ * complete：冲到 100% 再收起（默认）
+ * abort：立刻收起（失败 / 取消 / 过期请求）
+ */
+async function endLoading(mode: 'complete' | 'abort' = 'complete') {
+  if (!loading.value) return;
+  if (mode === 'abort') loaderRef.value?.abort();
+  const settled = loaderRef.value?.whenSettled() ?? Promise.resolve();
   loading.value = false;
   loadingPhase.value = null;
+  await settled;
 }
 
 function onRetry() {
   const fn = retryFn.value;
-  endLoading();
-  if (fn) fn();
+  void endLoading('abort').then(() => {
+    if (fn) fn();
+  });
 }
 
 function onCancel() {
   requestSeq += 1;
-  endLoading();
+  void endLoading('abort');
 }
 
 function defaultDate() {
@@ -164,9 +225,11 @@ async function openCachedTrip(key: string) {
       resumeHint.value = '无法恢复该行程，请重新查询。';
       await deleteSnapshot(key);
       refreshRecentUi();
+      await endLoading('abort');
       return;
     }
     hydrateFromSnapshot(snap);
+    await endLoading('complete');
     await router.replace({
       path: '/trip',
       query: {
@@ -181,8 +244,7 @@ async function openCachedTrip(key: string) {
     error.value = e instanceof Error ? e.message : '恢复失败';
     clearAutoResume();
     refreshRecentUi();
-  } finally {
-    endLoading();
+    await endLoading('abort');
   }
 }
 
@@ -214,37 +276,36 @@ onMounted(async () => {
   } catch {
     /* */
   }
-  beginLoading('resume');
   try {
     await pruneRecentTrips();
     refreshRecentUi();
     const stayOnSelect = consumeStayOnSelect();
     const resumeKey = getAutoResumeTripKey();
-    if (!stayOnSelect && resumeKey) {
-      const snap = await getSnapshot(resumeKey);
-      if (snap) {
-        hydrateFromSnapshot(snap);
-        await router.replace({
-          path: '/trip',
-          query: {
-            trainCode: snap.segment.trainCode,
-            date: snap.segment.date,
-            from: snap.segment.fromName,
-            to: snap.segment.toName,
-          },
-        });
-        return;
-      }
-      clearAutoResume();
-      resumeHint.value = '无法恢复上次行程';
-      refreshRecentUi();
+    // 仅在真正要自动跳回行程时才播加载动画；从全国地图等返回主页不应闪「已到达」
+    if (stayOnSelect || !resumeKey) return;
+
+    beginLoading('resume');
+    const snap = await getSnapshot(resumeKey);
+    if (snap) {
+      hydrateFromSnapshot(snap);
+      await endLoading('complete');
+      await router.replace({
+        path: '/trip',
+        query: {
+          trainCode: snap.segment.trainCode,
+          date: snap.segment.date,
+          from: snap.segment.fromName,
+          to: snap.segment.toName,
+        },
+      });
+      return;
     }
-    // 线路详情页「Z8991 演示」：?demo=z8991 → 走既有 /api/presets/z8991 演示链路
-    if (route.query.demo === 'z8991') {
-      await loadDemo();
-    }
-  } finally {
-    endLoading();
+    clearAutoResume();
+    resumeHint.value = '无法恢复上次行程';
+    refreshRecentUi();
+    await endLoading('abort');
+  } catch {
+    if (loading.value) await endLoading('abort');
   }
 });
 
@@ -339,14 +400,20 @@ async function search() {
   selected.value = null;
   try {
     const res = await api.searchTrains(from.value, to.value, date.value);
-    if (isStale(seq)) return;
+    if (isStale(seq)) {
+      await endLoading('abort');
+      return;
+    }
     trains.value = res.trains;
     if (!trains.value.length) error.value = '这个区间暂时没有查到直达车次。';
+    await endLoading('complete');
   } catch (e) {
-    if (isStale(seq)) return;
+    if (isStale(seq)) {
+      await endLoading('abort');
+      return;
+    }
     error.value = e instanceof Error ? e.message : '查询失败';
-  } finally {
-    if (!isStale(seq)) endLoading();
+    await endLoading('abort');
   }
 }
 
@@ -378,10 +445,14 @@ async function searchByCode() {
   selected.value = null;
   try {
     const res = await api.searchTrainByCode(code, date.value);
-    if (isStale(seq)) return;
+    if (isStale(seq)) {
+      await endLoading('abort');
+      return;
+    }
     const list = res.stops;
     if (!list.length) {
       error.value = '未查到该车次，请核对车次号与日期。';
+      await endLoading('abort');
       return;
     }
     stops.value = list;
@@ -413,11 +484,14 @@ async function searchByCode() {
       muteSuggest = false;
     }, 0);
     step.value = 'od';
+    await endLoading('complete');
   } catch (e) {
-    if (isStale(seq)) return;
+    if (isStale(seq)) {
+      await endLoading('abort');
+      return;
+    }
     error.value = e instanceof Error ? e.message : '车次查询失败';
-  } finally {
-    if (!isStale(seq)) endLoading();
+    await endLoading('abort');
   }
 }
 
@@ -435,7 +509,10 @@ async function pickTrain(t: TrainSummary) {
       to: t.to.telecode,
       date: t.date,
     });
-    if (isStale(seq)) return;
+    if (isStale(seq)) {
+      await endLoading('abort');
+      return;
+    }
     stops.value = res.stops;
     boardFrom.value = from.value;
     boardTo.value = to.value;
@@ -451,11 +528,14 @@ async function pickTrain(t: TrainSummary) {
       else boardTo.value = names[names.length - 1];
     }
     step.value = 'od';
+    await endLoading('complete');
   } catch (e) {
-    if (isStale(seq)) return;
+    if (isStale(seq)) {
+      await endLoading('abort');
+      return;
+    }
     error.value = e instanceof Error ? e.message : '经停加载失败';
-  } finally {
-    if (!isStale(seq)) endLoading();
+    await endLoading('abort');
   }
 }
 
@@ -489,6 +569,7 @@ async function enterTrip() {
     const knownCoords = odStops.filter((s) => s.lng != null && s.lat != null).length;
     if (knownCoords < 2 && odStops.length < 2) {
       error.value = '车站坐标获取失败，无法绘制地图。请稍后重试。';
+      await endLoading('abort');
       return;
     }
 
@@ -538,6 +619,7 @@ async function enterTrip() {
     const coordStops = odStops.filter((s) => s.lng != null && s.lat != null);
     if (coordStops.length < 2) {
       error.value = '车站坐标获取失败，无法绘制地图。请稍后重试。';
+      await endLoading('abort');
       return;
     }
 
@@ -555,6 +637,7 @@ async function enterTrip() {
       railHint,
       canUpgradePrecise,
     });
+    await endLoading('complete');
     router.push({
       path: '/trip',
       query: {
@@ -566,81 +649,7 @@ async function enterTrip() {
     });
   } catch (e) {
     error.value = e instanceof Error ? e.message : '进入行程失败';
-  } finally {
-    endLoading();
-  }
-}
-
-async function loadDemo() {
-  beginLoading('demo');
-  error.value = '';
-  try {
-    const preset = await api.getPreset('z8991');
-    const demoStops: Stop[] = preset.stations.map((s, i) => ({
-      seq: i + 1,
-      name: s.name,
-      type: s.type,
-      at: s.at,
-      arrive: s.arrive,
-      depart: s.depart,
-      arriveTime: s.arrive || (s.type === 'arrive' ? s.at : null) || null,
-      departTime: s.depart || (s.type === 'depart' ? s.at : null) || null,
-      lng: s.lng,
-      lat: s.lat,
-      intro: s.intro,
-      telecode: s.telecode,
-    }));
-    let spots: import('@railvista/shared').ScenicSpot[] = [];
-    let preciseRailway = (preset.railway as [number, number][] | undefined) || null;
-    try {
-      const geo = await api.getRailGeometry({
-        trainCode: preset.meta.train,
-        mode: 'preset',
-        stops: demoStops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat })),
-      });
-      if (geo.coords?.length >= 2) preciseRailway = geo.coords;
-      if (geo.scenicSpots?.length) spots = geo.scenicSpots;
-    } catch {
-      /* fallback below */
-    }
-    if (!spots.length && preset.scenicSpots?.length) {
-      spots = preset.scenicSpots.map((s) => ({
-        id: String(s.id),
-        name: s.name,
-        lng: s.lng,
-        lat: s.lat,
-        intro: s.intro,
-        nightOnly: s.nightOnly,
-        side: s.side,
-        visibility: 'window' as const,
-        source: 'preset' as const,
-      }));
-    }
-    trip.setTrip({
-      trainCode: preset.meta.train,
-      trainNo: preset.meta.trainNo || '5500000Z8991',
-      date: preset.meta.date || '2026-08-11',
-      fromName: preset.meta.from,
-      toName: preset.meta.to,
-      stops: demoStops,
-      spots,
-      preciseRailway,
-      isDemo: true,
-    });
-    router.push({
-      path: '/trip',
-      query: {
-        trainCode: 'Z8991',
-        date: preset.meta.date || '2026-08-11',
-        from: preset.meta.from,
-        to: preset.meta.to,
-        demo: '1',
-      },
-    });
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : '演示加载失败';
-  } finally {
-    endLoading();
+    await endLoading('abort');
   }
 }
 
@@ -735,7 +744,7 @@ function goBack() {
 </script>
 
 <template>
-  <div class="select-page rv-page">
+  <div class="select-page rv-page" :class="{ 'is-solo-main': !showHomeLists }">
     <!-- 背景层：极淡的中国地图 + 全国铁路景点热力光点。
          轮廓与点位均为构建期生成的离线静态资源（内联进包），运行时零网络请求，
          不依赖任何在线地图服务；整层 pointer-events:none，不影响前景交互。 -->
@@ -754,13 +763,13 @@ function goBack() {
 
       <header class="select-hero">
         <h1>车上风景与行程定位</h1>
-        <p class="sub">选择出发站、到达站与日期，进入行程地图</p>
+        <p class="sub">按站查询或按车次号直达，进入行程地图</p>
       </header>
 
       <p v-if="resumeHint" class="error">{{ resumeHint }}</p>
 
       <!-- 12 列栅格：sm 竖屏单列纵向堆叠；≥600px 起主栏 7 列 + 侧栏 5 列 -->
-      <div class="rv-grid">
+      <div class="rv-grid" :class="{ 'is-solo-main': !showHomeLists }">
         <!-- 主栏：查询与当前行程相关的一切 -->
         <div class="rv-col rv-col--main">
           <section v-if="currentEntry && showHomeLists" class="current-trip rv-card" data-spotlight>
@@ -789,130 +798,184 @@ function goBack() {
             </div>
           </section>
 
-          <form
-            class="select-form select-form--panel rv-card"
-            :class="{ 'has-suggest-open': fromOpen || toOpen }"
-            data-spotlight
-            @submit.prevent="search"
+          <!-- 查询面板：按站 / 车次号同级；高度过渡 + 交叉淡入 + 微位移 -->
+          <div
+            class="query-flip"
+            :class="{
+              'is-flipped': searchFace === 'code',
+              'has-suggest-open': fromOpen || toOpen,
+            }"
           >
-            <div class="rv-head select-form__head">
-              <h2 class="rv-head__title">开始查询</h2>
-              <p class="rv-head__sub">填写 OD 与乘车日，查找直达车次</p>
+            <div
+              ref="queryFlipCard"
+              class="query-flip__card"
+              :class="{ 'is-measured': queryFlipMeasured }"
+            >
+              <!-- 正面：出发站 / 到达站 -->
+              <form
+                ref="queryFlipFront"
+                class="query-flip__face query-flip__face--front select-form select-form--panel rv-card"
+                data-spotlight
+                :aria-hidden="searchFace === 'code'"
+                :inert="searchFace === 'code'"
+                @submit.prevent="search"
+              >
+                  <div class="rv-head select-form__head query-flip__head">
+                    <div class="query-flip__head-text">
+                      <h2 class="rv-head__title">按站查询</h2>
+                      <p class="rv-head__sub">填写 OD 与乘车日，查找直达车次</p>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn ghost btn-sm query-flip__toggle"
+                      :disabled="loading"
+                      aria-label="切换到车次查询"
+                      @click="flipSearchFace"
+                    >
+                      按车次号
+                      <span class="query-flip__toggle-icon" aria-hidden="true">↻</span>
+                    </button>
+                  </div>
+
+                  <label class="station-field">
+                    <span>出发站</span>
+                    <div class="station-field__control">
+                      <input
+                        v-model="from"
+                        autocomplete="off"
+                        placeholder="例如 西宁"
+                        @focus="fromOpen = fromSuggest.length > 0"
+                        @blur="fromOpen = false"
+                        @keydown="onSuggestKey('from', $event)"
+                      />
+                      <ul v-show="fromOpen && fromSuggest.length" class="station-suggest" role="listbox">
+                        <li
+                          v-for="(s, i) in fromSuggest"
+                          :key="s.telecode"
+                          role="option"
+                          :aria-selected="i === fromActive"
+                          :class="{ 'is-active': i === fromActive }"
+                          @mousedown.prevent="pickStation('from', s.name)"
+                        >
+                          {{ s.name }}
+                        </li>
+                      </ul>
+                    </div>
+                  </label>
+
+                  <label class="station-field">
+                    <span>到达站</span>
+                    <div class="station-field__control">
+                      <input
+                        v-model="to"
+                        autocomplete="off"
+                        placeholder="例如 拉萨"
+                        @focus="toOpen = toSuggest.length > 0"
+                        @blur="toOpen = false"
+                        @keydown="onSuggestKey('to', $event)"
+                      />
+                      <ul v-show="toOpen && toSuggest.length" class="station-suggest" role="listbox">
+                        <li
+                          v-for="(s, i) in toSuggest"
+                          :key="s.telecode"
+                          role="option"
+                          :aria-selected="i === toActive"
+                          :class="{ 'is-active': i === toActive }"
+                          @mousedown.prevent="pickStation('to', s.name)"
+                        >
+                          {{ s.name }}
+                        </li>
+                      </ul>
+                    </div>
+                  </label>
+
+                  <label class="date-field">
+                    <span>乘车日期</span>
+                    <DarkDateTimeField v-model="date" mode="date" placeholder="选择乘车日期" />
+                  </label>
+
+                  <div class="actions">
+                    <button type="submit" class="btn primary" :disabled="loading">查询直达车次</button>
+                  </div>
+                </form>
+
+              <!-- 背面：按车次号查询 -->
+              <form
+                ref="queryFlipBack"
+                class="query-flip__face query-flip__face--back select-form select-form--panel rv-card"
+                data-spotlight
+                :aria-hidden="searchFace === 'od'"
+                :inert="searchFace === 'od'"
+                @submit.prevent="searchByCode"
+              >
+                  <div class="rv-head select-form__head query-flip__head">
+                    <div class="query-flip__head-text">
+                      <h2 class="rv-head__title">车次查询</h2>
+                      <p class="rv-head__sub">输入车次号与乘车日，直达时刻表</p>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn ghost btn-sm query-flip__toggle"
+                      :disabled="loading"
+                      aria-label="切换到按站查询"
+                      @click="flipSearchFace"
+                    >
+                      按站查询
+                      <span class="query-flip__toggle-icon" aria-hidden="true">↻</span>
+                    </button>
+                  </div>
+
+                  <label class="date-field">
+                    <span>乘车日期</span>
+                    <DarkDateTimeField v-model="date" mode="date" placeholder="选择乘车日期" />
+                  </label>
+
+                  <div class="code-search">
+                    <label class="code-search__field">
+                      <span>车次号</span>
+                      <div class="code-search__row">
+                        <input
+                          v-model="codeQuery"
+                          class="code-search__input"
+                          autocomplete="off"
+                          placeholder="输入车次号，例如 Z8991"
+                        />
+                      </div>
+                    </label>
+
+                    <div class="code-prefix" role="group" aria-label="车次类型前缀">
+                      <button
+                        v-for="p in codePrefixes"
+                        :key="p.key || 'num'"
+                        type="button"
+                        class="code-prefix__key"
+                        :class="`code-prefix__key--${p.kind}`"
+                        :style="{ '--prefix-color': p.color }"
+                        :aria-pressed="activePrefixKey !== null && activePrefixKey === p.key"
+                        :title="p.key ? `${p.key} 字头 · ${p.zh}（${p.en}）` : `纯数字车次 · ${p.zh}（${p.en}），无字母开头`"
+                        @click="applyPrefix(p)"
+                      >
+                        <span class="code-prefix__letter">{{ p.key || '#' }}</span>
+                        <span class="code-prefix__name">
+                          <strong>{{ p.zh }}</strong>
+                          <em>{{ p.en }}</em>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="actions">
+                    <button type="submit" class="btn primary" :disabled="loading">查时刻</button>
+                  </div>
+              </form>
             </div>
-
-            <label class="station-field">
-              <span>出发站</span>
-              <div class="station-field__control">
-                <input
-                  v-model="from"
-                  autocomplete="off"
-                  placeholder="例如 西宁"
-                  @focus="fromOpen = fromSuggest.length > 0"
-                  @blur="fromOpen = false"
-                  @keydown="onSuggestKey('from', $event)"
-                />
-                <ul v-show="fromOpen && fromSuggest.length" class="station-suggest" role="listbox">
-                  <li
-                    v-for="(s, i) in fromSuggest"
-                    :key="s.telecode"
-                    role="option"
-                    :aria-selected="i === fromActive"
-                    :class="{ 'is-active': i === fromActive }"
-                    @mousedown.prevent="pickStation('from', s.name)"
-                  >
-                    {{ s.name }}
-                  </li>
-                </ul>
-              </div>
-            </label>
-
-            <label class="station-field">
-              <span>到达站</span>
-              <div class="station-field__control">
-                <input
-                  v-model="to"
-                  autocomplete="off"
-                  placeholder="例如 拉萨"
-                  @focus="toOpen = toSuggest.length > 0"
-                  @blur="toOpen = false"
-                  @keydown="onSuggestKey('to', $event)"
-                />
-                <ul v-show="toOpen && toSuggest.length" class="station-suggest" role="listbox">
-                  <li
-                    v-for="(s, i) in toSuggest"
-                    :key="s.telecode"
-                    role="option"
-                    :aria-selected="i === toActive"
-                    :class="{ 'is-active': i === toActive }"
-                    @mousedown.prevent="pickStation('to', s.name)"
-                  >
-                    {{ s.name }}
-                  </li>
-                </ul>
-              </div>
-            </label>
-
-            <label class="date-field">
-              <span>乘车日期</span>
-              <DarkDateTimeField v-model="date" mode="date" placeholder="选择乘车日期" />
-            </label>
-
-            <div class="actions">
-              <button type="submit" class="btn primary" :disabled="loading">查询直达车次</button>
-              <button type="button" class="btn ghost" :disabled="loading" @click="loadDemo">
-                演示：Z8991 青藏线
-              </button>
-            </div>
-
-            <!-- 按车次号直达：已知车次时跳过 OD 查询，直接进时刻表选区间 -->
-            <div class="code-search">
-              <span class="code-search__label">或按车次号直达</span>
-              <div class="code-search__row">
-                <input
-                  v-model="codeQuery"
-                  class="code-search__input"
-                  autocomplete="off"
-                  placeholder="输入车次号，例如 Z8991"
-                  @keydown.enter.prevent="searchByCode"
-                />
-                <button
-                  type="button"
-                  class="btn ghost btn-sm"
-                  :disabled="loading"
-                  @click="searchByCode"
-                >
-                  查时刻
-                </button>
-              </div>
-
-              <!-- 车次号前缀键盘：点击即填入/替换首字母，附带中文名与英文名 -->
-              <div class="code-prefix" role="group" aria-label="车次类型前缀">
-                <button
-                  v-for="p in codePrefixes"
-                  :key="p.key || 'num'"
-                  type="button"
-                  class="code-prefix__key"
-                  :class="`code-prefix__key--${p.kind}`"
-                  :style="{ '--prefix-color': p.color }"
-                  :aria-pressed="activePrefixKey !== null && activePrefixKey === p.key"
-                  :title="p.key ? `${p.key} 字头 · ${p.zh}（${p.en}）` : `纯数字车次 · ${p.zh}（${p.en}），无字母开头`"
-                  @click="applyPrefix(p)"
-                >
-                  <span class="code-prefix__letter">{{ p.key || '#' }}</span>
-                  <span class="code-prefix__name">
-                    <strong>{{ p.zh }}</strong>
-                    <em>{{ p.en }}</em>
-                  </span>
-                </button>
-              </div>
-            </div>
-          </form>
+          </div>
 
           <p v-if="error && !showEmptyState" class="error">{{ error }}</p>
 
           <section v-if="showEmptyState" class="empty-state rv-card">
             <p class="empty-state__title">这个区间暂时没有查到直达车次</p>
-            <p class="empty-state__desc">可以换一天看看，或者先体验青藏线 demo。</p>
+            <p class="empty-state__desc">可以换一天看看。</p>
             <div class="empty-state__actions">
               <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(-1)">
                 前一天
@@ -920,7 +983,6 @@ function goBack() {
               <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(1)">
                 后一天
               </button>
-              <button type="button" class="btn primary btn-sm" @click="loadDemo">试试演示线路</button>
             </div>
           </section>
 
@@ -975,6 +1037,9 @@ function goBack() {
               </div>
             </div>
           </section>
+
+          <!-- 全国铁路景点地图：紧跟查询区，首屏可见 -->
+          <AtlasEntryCard v-if="showHomeLists" />
 
           <section
             v-if="trains.length && step === 'search'"
@@ -1032,6 +1097,15 @@ function goBack() {
               </label>
             </div>
 
+            <div class="od-panel__actions">
+              <button type="button" class="btn primary" :disabled="loading" @click="enterTrip">
+                进入行程地图
+              </button>
+              <button type="button" class="btn ghost" :disabled="loading" @click="step = 'search'">
+                返回列表
+              </button>
+            </div>
+
             <ol class="tl" v-auto-animate>
               <li
                 v-for="s in timeline"
@@ -1054,21 +1128,13 @@ function goBack() {
                 <span v-if="s.dayOffset > 0" class="tl__day">+{{ s.dayOffset }}天</span>
               </li>
             </ol>
-
-            <div class="od-panel__actions">
-              <button type="button" class="btn primary" :disabled="loading" @click="enterTrip">
-                进入行程地图
-              </button>
-              <button type="button" class="btn ghost" :disabled="loading" @click="step = 'search'">
-                返回列表
-              </button>
-            </div>
           </section>
         </div>
 
-        <!-- 侧栏：中国最美铁路排行榜（首页态才展示） -->
-        <div class="rv-col rv-col--side">
-          <RankingsSection v-if="showHomeLists" />
+        <!-- 侧栏：中国最美铁路排行榜（首页态；竖屏单列时落在下一屏） -->
+        <div v-if="showHomeLists" class="rv-col rv-col--side select-rankings-below-fold">
+          <div class="select-rankings-spacer" aria-hidden="true" />
+          <RankingsSection />
         </div>
       </div>
 
@@ -1076,6 +1142,7 @@ function goBack() {
     </div>
 
     <RailProgressLoader
+      ref="loaderRef"
       :active="loading"
       :phase="loadingPhase"
       @retry="onRetry"
@@ -1092,6 +1159,42 @@ function goBack() {
  */
 .select-page .rv-grid {
   margin-top: var(--space-1);
+}
+
+/* 无侧栏（查车次 / 选区间）：主栏居中，避免只占 7/12 列贴左 */
+@media (min-width: 600px) {
+  .select-page.is-solo-main .select-top,
+  .select-page.is-solo-main .select-hero {
+    max-width: min(720px, 100%);
+    margin-inline: auto;
+  }
+
+  .select-page .rv-grid.is-solo-main .rv-col--main {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: min(720px, 100%);
+    justify-self: center;
+  }
+}
+
+/* 竖屏单列：首屏留给查询 + 景点地图，榜单从下一屏起 */
+@media (max-width: 599px) {
+  .select-rankings-below-fold {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    min-height: calc(100svh - var(--appbar-h) - var(--space-4));
+    scroll-margin-top: calc(var(--appbar-h) + var(--space-3));
+  }
+
+  .select-rankings-spacer {
+    min-height: 0;
+  }
+}
+
+@media (min-width: 600px) {
+  .select-rankings-spacer {
+    display: none;
+  }
 }
 
 .select-page .footnote {

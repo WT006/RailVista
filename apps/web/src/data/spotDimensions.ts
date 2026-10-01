@@ -47,12 +47,39 @@ export function isKnownDimension(key: string | undefined | null): boolean {
   return SPOT_DIMENSIONS.some((d) => d.key === key);
 }
 
+/**
+ * v2 `category` → 六维兜底。
+ * 当前 scenic-spots 仅约十余条有 dimensions，其余只靠 category；
+ * 侧栏维度筛选若只认 dimensions，会点了像没反应（筛成空集）。
+ */
+const CATEGORY_TO_DIMENSION: Record<string, SpotDimensionKey> = {
+  lake: 'geo',
+  mountain: 'geo',
+  gorge: 'geo',
+  desert: 'geo',
+  grassland: 'nature',
+  engineering: 'construct',
+  architecture: 'architecture',
+};
+
+/** 解析景点有效维度：优先 dimensions，缺省时用 category 映射 */
+export function resolveSpotDimensions(input: {
+  dimensions?: string[] | null;
+  category?: string | null;
+}): string[] {
+  const dims = (input.dimensions || []).filter((d): d is string => isKnownDimension(d));
+  if (dims.length) return dims;
+  const mapped = input.category ? CATEGORY_TO_DIMENSION[input.category] : undefined;
+  return mapped ? [mapped] : [];
+}
+
 /** 点位主色：取第一个已知维度，无维度用中性灰 */
-export function dimensionColor(dimensions?: string[] | null): string {
-  const list = Array.isArray(dimensions) ? dimensions : [];
-  for (const d of list) {
-    if (isKnownDimension(d)) return dimensionMeta(d).color;
-  }
+export function dimensionColor(
+  dimensions?: string[] | null,
+  category?: string | null,
+): string {
+  const list = resolveSpotDimensions({ dimensions, category });
+  if (list.length) return dimensionMeta(list[0]).color;
   return UNCLASSIFIED_DIMENSION.color;
 }
 

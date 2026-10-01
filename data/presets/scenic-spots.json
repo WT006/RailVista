@@ -1176,13 +1176,13 @@
     {
       "id": "huangshan-west-portal",
       "name": "黄山（西大门方向）",
-      "lng": 120.224953,
-      "lat": 36.052313,
+      "lng": 118.0865,
+      "lat": 30.1412,
       "intro": "黄山西大门方向，黟县—黄山北一带徽派山水门户。",
       "visibility": "distant",
       "source": "curated",
       "category": "mountain",
-      "maxDistKm": 37.9
+      "maxDistKm": 18
     },
     {
       "id": "yixian-ancient-villages",

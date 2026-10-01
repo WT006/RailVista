@@ -1,10 +1,12 @@
 <script setup lang="ts">
 /**
  * 统一加载动效：复兴号 CR450AF 沿轨道行进。
- * 查询车次 / 加载经停站 / 进入地图 等场景共用，仅文案与阶段锚点不同。
+ * 查询车次 / 加载经停站 / 进入地图 等场景共用，仅文案与阶段不同。
  *
- * 进度推进采用「阶段锚点 + 指数逼近」：未收到真实阶段事件时按剩余距离 8% 逼近下一锚点，
- * 上限 92%，避免"假进度到 100% 后卡住"。
+ * 进度策略（行业常见「感知进度」）：
+ * 1. 无真实进度时：快→慢指数逼近软顶 97–99%，绝不先到 100%
+ * 2. 加载成功：active 关闭后冲到 100%，短暂停留再收起（避免「走不满就打开」）
+ * 3. 取消 / 失败：abort() 后立刻收起，不演 100%
  */
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
@@ -14,25 +16,21 @@ const props = withDefaults(
   defineProps<{
     active: boolean;
     phase?: LoaderPhase;
-    /** 后端回传真实进度时优先使用（0–100） */
+    /** 后端回传真实进度时优先使用（0–100）；仍会钳在软顶之下，直到完成 */
     progress?: number | null;
   }>(),
   { phase: null, progress: null },
 );
 
-const emit = defineEmits<{ retry: []; cancel: [] }>();
+const emit = defineEmits<{ retry: []; cancel: []; settled: [] }>();
 
 const SLOW_AFTER_MS = 8000;
 const HOLD_AFTER_MS = 15000;
-const CAP = 92;
-
-const ANCHORS: Record<string, number[]> = {
-  search: [15, 55, 85],
-  stops: [10, 45, 80],
-  enter: [25, 60, 88],
-  demo: [25, 65, 88],
-  resume: [35, 75],
-};
+/** 假进度软顶：成功前停在这里，不冻结在「假 100%」 */
+const SOFT_CAP = 98;
+const TICK_MS = 180;
+/** 略长于 fill/train 的 --dur-slow(300ms)，确保用户能看见 100% */
+const FINISH_HOLD_MS = 380;
 
 const COPY: Record<string, { title: string; detail: string }> = {
   search: { title: '正在查询直达车次', detail: '向 12306 请求车次列表 · 通常 1–3 秒' },
@@ -44,42 +42,134 @@ const COPY: Record<string, { title: string; detail: string }> = {
 
 const progress = ref(0);
 const elapsedMs = ref(0);
-const anchorIdx = ref(0);
+const shown = ref(false);
+const finishing = ref(false);
 let timer: number | undefined;
+let finishTimer: number | undefined;
 let startedAt = 0;
+/** 下一轮 active→false 时跳过 100% 收尾 */
+let abortNext = false;
+let settledWaiters: Array<() => void> = [];
+
+function notifySettled() {
+  const waiters = settledWaiters;
+  settledWaiters = [];
+  for (const w of waiters) w();
+  emit('settled');
+}
+
+function clearTick() {
+  if (timer != null) {
+    window.clearInterval(timer);
+    timer = undefined;
+  }
+}
+
+function clearFinish() {
+  if (finishTimer != null) {
+    window.clearTimeout(finishTimer);
+    finishTimer = undefined;
+  }
+}
 
 function reset() {
   progress.value = 0;
   elapsedMs.value = 0;
-  anchorIdx.value = 0;
   startedAt = Date.now();
+  finishing.value = false;
 }
 
+/**
+ * 快→慢逼近软顶（类似 NProgress / YouTube）：
+ * 前期大步，接近 97–99% 后细步爬行，保持一直在动。
+ */
 function tick() {
   elapsedMs.value = Date.now() - startedAt;
+  if (finishing.value) return;
+
   if (props.progress != null) {
-    progress.value = Math.max(progress.value, Math.min(100, props.progress));
+    progress.value = Math.max(progress.value, Math.min(SOFT_CAP, props.progress));
     return;
   }
-  const anchors = ANCHORS[props.phase ?? ''] ?? [30, 70];
-  const target = anchorIdx.value < anchors.length ? (anchors[anchorIdx.value] as number) : CAP;
-  const next = progress.value + (target - progress.value) * 0.08;
-  progress.value = Math.min(CAP, next);
-  if (progress.value >= target - 0.6 && anchorIdx.value < anchors.length) anchorIdx.value += 1;
+
+  const p = progress.value;
+  const remaining = SOFT_CAP - p;
+  // 分段速率：前段快冲，后段减速，避免卡死在某一格
+  let rate: number;
+  if (p < 40) rate = 0.42;
+  else if (p < 70) rate = 0.22;
+  else if (p < 90) rate = 0.12;
+  else rate = 0.06;
+
+  const step = Math.max(remaining * rate, p >= 95 ? 0.12 : 0.35);
+  progress.value = Math.min(SOFT_CAP, p + step);
 }
+
+function hideNow() {
+  clearTick();
+  clearFinish();
+  shown.value = false;
+  finishing.value = false;
+  progress.value = 0;
+  notifySettled();
+}
+
+function finishAndHide() {
+  clearTick();
+  clearFinish();
+  finishing.value = true;
+  progress.value = 100;
+  finishTimer = window.setTimeout(() => {
+    finishTimer = undefined;
+    shown.value = false;
+    finishing.value = false;
+    notifySettled();
+  }, FINISH_HOLD_MS);
+}
+
+/** 失败 / 取消：下次关闭时立刻收起 */
+function abort() {
+  abortNext = true;
+  clearFinish();
+  if (!props.active) hideNow();
+}
+
+/** 供父级 await：等到遮罩真正收起（含 100% 短停） */
+function whenSettled(): Promise<void> {
+  if (!shown.value && !props.active) return Promise.resolve();
+  return new Promise((resolve) => {
+    settledWaiters.push(resolve);
+  });
+}
+
+defineExpose({ abort, whenSettled });
 
 watch(
   () => props.active,
   (on) => {
     if (on) {
+      clearFinish();
+      abortNext = false;
       reset();
-      if (timer) window.clearInterval(timer);
-      timer = window.setInterval(tick, 300);
+      shown.value = true;
+      clearTick();
+      timer = window.setInterval(tick, TICK_MS);
       tick();
-    } else if (timer) {
-      window.clearInterval(timer);
-      timer = undefined;
+      return;
     }
+
+    // active → false
+    clearTick();
+    if (!shown.value) {
+      if (settledWaiters.length) notifySettled();
+      return;
+    }
+    if (abortNext) {
+      abortNext = false;
+      hideNow();
+      return;
+    }
+    finishAndHide();
   },
   { immediate: true },
 );
@@ -87,17 +177,20 @@ watch(
 watch(
   () => props.progress,
   (v) => {
-    if (v != null) progress.value = Math.min(100, v);
+    if (v == null || finishing.value) return;
+    progress.value = Math.max(progress.value, Math.min(SOFT_CAP, v));
   },
 );
 
 onBeforeUnmount(() => {
-  if (timer) window.clearInterval(timer);
+  clearTick();
+  clearFinish();
+  notifySettled();
 });
 
 const isSlow = computed(() => elapsedMs.value > SLOW_AFTER_MS && elapsedMs.value <= HOLD_AFTER_MS);
-const isHold = computed(() => elapsedMs.value > HOLD_AFTER_MS);
-const done = computed(() => progress.value >= 100);
+const isHold = computed(() => elapsedMs.value > HOLD_AFTER_MS && !finishing.value);
+const done = computed(() => progress.value >= 100 || finishing.value);
 
 const copy = computed(() => {
   const base = COPY[props.phase ?? ''] ?? { title: '加载中', detail: '请稍候…' };
@@ -111,14 +204,23 @@ const copy = computed(() => {
   return base;
 });
 
-const elapsedSec = computed(() => Math.floor(elapsedMs.value / 1000));
 const milestones = [0, 33, 66, 100];
 const pct = computed(() => Math.round(progress.value));
+
+function onRetryClick() {
+  abort();
+  emit('retry');
+}
+
+function onCancelClick() {
+  abort();
+  emit('cancel');
+}
 </script>
 
 <template>
   <div
-    v-if="active"
+    v-if="shown"
     class="rv-loader"
     role="status"
     aria-live="polite"
@@ -204,12 +306,11 @@ const pct = computed(() => Math.round(progress.value));
       <p class="rv-loader__detail">{{ copy.detail }}</p>
 
       <div v-if="isHold" class="rv-loader__actions">
-        <button type="button" class="rv-loader__btn" @click="emit('retry')">重新发车</button>
-        <button type="button" class="rv-loader__btn rv-loader__btn--ghost" @click="emit('cancel')">
+        <button type="button" class="rv-loader__btn" @click="onRetryClick">重新发车</button>
+        <button type="button" class="rv-loader__btn rv-loader__btn--ghost" @click="onCancelClick">
           结束等待
         </button>
       </div>
-      <p v-else-if="isSlow" class="rv-loader__hint">已等待 {{ elapsedSec }} 秒</p>
     </div>
   </div>
 </template>
@@ -399,12 +500,6 @@ const pct = computed(() => Math.round(progress.value));
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.5;
-  color: var(--text-muted);
-}
-
-.rv-loader__hint {
-  margin: 10px 0 0;
-  font-size: 12px;
   color: var(--text-muted);
 }
 

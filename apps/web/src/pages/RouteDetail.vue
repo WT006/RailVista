@@ -8,7 +8,7 @@
  * 页面只做「展示」：
  *  - 小地图的 from/to 切片是**最近顶点投影 + 索引区间**的粗略切片，仅用于看图，
  *    不回写、不影响任何行程 / 几何数据链路；
- *  - 「进入实时地图」只把 from/to 通过 query 带回首页预填输入框。
+ *  - 「进入实时地图」进入全屏线路地图（/route/:id/map），不再回首页选车。
  */
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -291,22 +291,19 @@ async function load() {
   }
 }
 
+/** 返回主页（选程页），不依赖浏览器历史——从榜单/全国地图/线路图进入时路径不一 */
 function goBack() {
-  if (window.history.length > 1) router.back();
-  else void router.push('/');
+  void router.push('/');
 }
 
-/** 「进入实时地图」：回首页并预填 OD（SelectTrip 读取 query，仅赋值不触发查询） */
+/** 「进入实时地图」：直达全屏线路地图，跳过选车页 */
 function goLiveMap() {
+  const id = corridorId.value;
+  if (!id) return;
   const q: Record<string, string> = {};
   if (displayFrom.value) q.from = displayFrom.value;
   if (displayTo.value) q.to = displayTo.value;
-  void router.push({ path: '/', query: q });
-}
-
-/** 青藏线专属：走既有 Z8991 演示链路（首页 loadDemo → /api/presets/z8991） */
-function goZ8991Demo() {
-  void router.push({ path: '/', query: { demo: 'z8991' } });
+  void router.push({ path: `/route/${id}/map`, query: q });
 }
 
 function goAtlas() {
@@ -357,7 +354,7 @@ watch(corridorId, async () => {
       <section v-else-if="notFound" class="route-empty">
         <h2>没有找到这条线路</h2>
         <p>corridorId「{{ corridorId }}」暂未收录，或链接已失效。</p>
-        <button type="button" class="route-btn route-btn--primary" @click="goBack">返回榜单</button>
+        <button type="button" class="route-btn route-btn--primary" @click="goBack">返回主页</button>
       </section>
 
       <template v-else>
@@ -391,14 +388,6 @@ watch(corridorId, async () => {
         <div class="route-actions">
           <button type="button" class="route-btn route-btn--primary" @click="goLiveMap">
             进入实时地图
-          </button>
-          <button
-            v-if="corridorId === 'qingzang'"
-            type="button"
-            class="route-btn route-btn--ghost"
-            @click="goZ8991Demo"
-          >
-            Z8991 演示
           </button>
         </div>
 

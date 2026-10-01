@@ -32,7 +32,7 @@ describe('matchCorridor', () => {
   it('stitches Kunming→Shangri-La via kunli+lixiang network', () => {
     const stops = [
       { name: '昆明', lng: 102.720287, lat: 25.0186616 },
-      { name: '大理', lng: 100.297, lat: 25.591 },
+      { name: '大理', lng: 100.2503917, lat: 25.5925944 },
       { name: '丽江', lng: 100.2512118, lat: 26.8143271 },
       { name: '小中甸', lng: 99.81346, lat: 27.56238 },
       { name: '香格里拉', lng: 99.6885399, lat: 27.8133154 },
@@ -42,6 +42,100 @@ describe('matchCorridor', () => {
     assert.ok(net);
     assert.deepEqual(net!.corridorIds, ['kunli', 'lixiang']);
     assert.ok(net!.coords.length >= 2);
+  });
+
+  it('stitches Z175 南京→杭州 via jinghuxian+hukunxian through 上海松江', () => {
+    const stops = [
+      { name: '南京', lng: 118.787, lat: 32.088 },
+      { name: '镇江', lng: 119.43, lat: 32.18 },
+      { name: '常州', lng: 119.97, lat: 31.79 },
+      { name: '无锡', lng: 120.3, lat: 31.59 },
+      { name: '苏州', lng: 120.61, lat: 31.32 },
+      { name: '上海松江', lng: 121.2262833, lat: 30.9846806 },
+      { name: '嘉兴', lng: 120.758, lat: 30.767 },
+      { name: '海宁', lng: 120.486, lat: 30.48 },
+      { name: '杭州', lng: 120.1786, lat: 30.246 },
+    ];
+    assert.equal(matchCorridor(stops, { trainCode: 'Z175' }), null);
+    const net = matchCorridorNetwork(stops, { trainCode: 'Z175' });
+    assert.ok(net, 'Z175 should stitch conventional network');
+    assert.ok(net!.corridorIds.includes('jinghuxian'), `got ${net!.corridorIds.join('+')}`);
+    assert.ok(net!.corridorIds.includes('hukunxian'), `got ${net!.corridorIds.join('+')}`);
+    assert.ok(!net!.corridorIds.includes('ninghang'), 'Z must not use 宁杭高铁');
+    const { path, lengthKm } = buildRailwayMetrics(net!.coords);
+    const sj = projectToRailway(path, lengthKm, 121.2262833, 30.9846806);
+    assert.ok(sj.distKm < 3, `上海松江 should be on path, got ${sj.distKm.toFixed(2)}km`);
+  });
+
+  it('stitches G942 广州南→青岛 via jingguang+xulan+rilan+jinghu+jiaojikezhuan', () => {
+    const stops = [
+      { name: '广州南', lng: 113.2640375, lat: 22.9914143 },
+      { name: '韶关', lng: 113.5089582, lat: 24.753512 },
+      { name: '郴州西', lng: 112.963555, lat: 25.725446 },
+      { name: '衡阳东', lng: 112.705344, lat: 26.901773 },
+      { name: '长沙南', lng: 113.0598811, lat: 28.1500782 },
+      { name: '咸宁北', lng: 114.356702, lat: 29.945504 },
+      { name: '武汉', lng: 114.419, lat: 30.6096 },
+      { name: '驻马店西', lng: 113.967472, lat: 33.07347 },
+      { name: '漯河西', lng: 113.961043, lat: 33.647079 },
+      { name: '郑州东', lng: 113.777, lat: 34.76 },
+      { name: '兰考南', lng: 114.825855, lat: 34.76866 },
+      { name: '庄寨', lng: 115.1860909, lat: 35.0337718 },
+      { name: '菏泽东', lng: 115.487693, lat: 35.139546 },
+      { name: '嘉祥北', lng: 116.180626, lat: 35.455329 },
+      { name: '济宁北', lng: 116.6082682, lat: 35.5245755 },
+      { name: '曲阜东', lng: 117.064341, lat: 35.5565465 },
+      { name: '泰安', lng: 117.0286667, lat: 36.1717083 },
+      { name: '济南', lng: 116.9851524, lat: 36.6708478 },
+      { name: '淄博', lng: 118.0503244, lat: 36.7868463 },
+      { name: '潍坊', lng: 119.0915313, lat: 36.6961413 },
+      { name: '胶州北', lng: 119.992475, lat: 36.424152 },
+      { name: '青岛', lng: 120.3076944, lat: 36.065375 },
+    ];
+    const net = matchCorridorNetwork(stops, { trainCode: 'G942' });
+    assert.ok(net, 'G942 should stitch HSR network');
+    assert.deepEqual(net!.corridorIds, [
+      'jingguang',
+      'xulan',
+      'rilan',
+      'jinghu',
+      'jiaojikezhuan',
+    ]);
+    assert.ok(!net!.corridorIds.includes('jiqing'), 'must not use 济青北站走廊绕开淄博/潍坊');
+    const { path, lengthKm } = buildRailwayMetrics(net!.coords);
+    for (const s of [
+      { name: '泰安', lng: 117.0286667, lat: 36.1717083 },
+      { name: '淄博', lng: 118.0503244, lat: 36.7868463 },
+      { name: '潍坊', lng: 119.0915313, lat: 36.6961413 },
+      { name: '曲阜东', lng: 117.064341, lat: 35.5565465 },
+      { name: '青岛', lng: 120.3076944, lat: 36.065375 },
+    ]) {
+      const hit = projectToRailway(path, lengthKm, s.lng, s.lat);
+      assert.ok(hit.distKm < 3, `${s.name} should be on path, got ${hit.distKm.toFixed(2)}km`);
+    }
+  });
+
+  it('matches 杭黄 杭州东→黄山北 via hanghuang through 杭州南 (not city diagonal)', () => {
+    const stops = [
+      { name: '杭州东', lng: 120.21233, lat: 30.289012 },
+      { name: '杭州南', lng: 120.2900497, lat: 30.1746889 },
+      { name: '富阳', lng: 119.988243, lat: 30.002652 },
+      { name: '桐庐', lng: 119.728051, lat: 29.791829 },
+      { name: '建德', lng: 119.4216222, lat: 29.575675 },
+      { name: '千岛湖', lng: 119.188135, lat: 29.737479 },
+      { name: '黄山北', lng: 118.22474, lat: 29.783277 },
+    ];
+    const hit = matchCorridor(stops, { trainCode: 'G1501' });
+    assert.ok(hit);
+    assert.equal(hit!.corridor.id, 'hanghuang');
+    const sliced = sliceCorridorForStops(hit!.corridor, stops);
+    assert.ok(sliced && sliced.length >= 2);
+    const { path, lengthKm } = buildRailwayMetrics(sliced!);
+    const nan = projectToRailway(path, lengthKm, 120.2900497, 30.1746889);
+    assert.ok(nan.distKm < 2, `杭州南 should be on path, got ${nan.distKm.toFixed(2)}km`);
+    // 旧 bug：杭州东→富阳直线穿城（过 120.16,30.16）；正线经杭州南应远离该点
+    const cityDiag = projectToRailway(path, lengthKm, 120.16, 30.16);
+    assert.ok(cityDiag.distKm > 8, `must not use city diagonal, dist=${cityDiag.distKm.toFixed(2)}km`);
   });
 
   it('allows K trains on lixiang conventional corridor (not HSR)', () => {

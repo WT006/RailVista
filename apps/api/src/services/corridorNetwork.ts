@@ -74,6 +74,8 @@ type CorridorGraph = {
 
 const MAX_HOPS = 8;
 const START_NEAR_KM = 40;
+/** 中间经停贴线：勿用 START_NEAR_KM=40，否则上海松江会误算进京沪（~34km）引发错误桥接 */
+const MID_TOUCH_KM = 12;
 /** 经停桥接最大跨距（合肥南→蚌埠南约 125km）；过大则易乱跳 */
 const BRIDGE_MAX_KM = 280;
 /** B3 几何枢纽：bbox 粗筛的膨胀角（约 5km） */
@@ -132,16 +134,20 @@ function nearCorridor(c: CorridorPreset, stop: CorridorStop, maxKm: number): boo
 
 /** 站是否可作为该走廊的入口/出口（名命中或贴线） */
 function stopTouchesCorridor(c: CorridorPreset, stop: CorridorStop): boolean {
+  return stopOnCorridor(c, stop, START_NEAR_KM);
+}
+
+/** 中间经停覆盖 / 桥接判定：更严贴线，避免跨线误吸 */
+function stopTouchesCorridorMid(c: CorridorPreset, stop: CorridorStop): boolean {
+  return stopOnCorridor(c, stop, MID_TOUCH_KM);
+}
+
+function stopOnCorridor(c: CorridorPreset, stop: CorridorStop, maxKm: number): boolean {
   const hints = hintKeys(c);
   if (onHintsExact(stop.name, hints)) return true;
-  const n = normalize(stop.name);
-  const stem = n.replace(/[东西南北]$/u, '');
-  for (const h of hints) {
-    if (h === n) return true;
-    const hs = h.replace(/[东西南北]$/u, '');
-    if (stem.length >= 2 && hs === stem && h !== n) return false;
-  }
-  return nearCorridor(c, stop, START_NEAR_KM);
+  // 方位冲突（杭州 vs 杭州南）不再硬拒：否则京沪+沪昆等普速拼线会被掐死。
+  // 单走廊匹配仍有独立方位门禁；此处以贴线可达性为准（与 touchesCorridorGeo 对齐）。
+  return nearCorridor(c, stop, maxKm);
 }
 
 /** B2 用：忽略方位冲突的纯几何贴线判断（OD 已被单走廊拒收，这里只关心可达性） */
@@ -425,11 +431,11 @@ type ExpandLink = {
   geoPtTo?: [number, number];
 };
 
-/** 走廊覆盖的经停下标（名命中或贴线） */
+/** 走廊覆盖的经停下标（名命中或严贴线） */
 function stopIndicesOnCorridor(c: CorridorPreset, stops: CorridorStop[]): number[] {
   const out: number[] = [];
   for (let i = 0; i < stops.length; i++) {
-    if (stopTouchesCorridor(c, stops[i])) out.push(i);
+    if (stopTouchesCorridorMid(c, stops[i])) out.push(i);
   }
   return out;
 }
@@ -451,8 +457,8 @@ function hubServesLaterStops(
   let nextHits = 0;
   let curHits = 0;
   for (const s of later) {
-    if (stopTouchesCorridor(nextC, s)) nextHits += 1;
-    if (stopTouchesCorridor(curC, s)) curHits += 1;
+    if (stopTouchesCorridorMid(nextC, s)) nextHits += 1;
+    if (stopTouchesCorridorMid(curC, s)) curHits += 1;
   }
   return nextHits > 0 && nextHits >= curHits;
 }
@@ -486,7 +492,7 @@ function stopBridgeLinks(
     const toStop = stops[j];
     for (const c of byId.values()) {
       if (usedIds.includes(c.id) || seen.has(c.id)) continue;
-      if (!stopTouchesCorridor(c, toStop)) continue;
+      if (!stopTouchesCorridorMid(c, toStop)) continue;
       const toPt =
         toStop.lng != null && toStop.lat != null
           ? { lng: Number(toStop.lng), lat: Number(toStop.lat) }
@@ -498,7 +504,7 @@ function stopBridgeLinks(
       let skipsOrphan = false;
       for (let k = lastIdx + 1; k < j; k++) {
         const mid = stops[k];
-        if (stopTouchesCorridor(curC, mid) || stopTouchesCorridor(c, mid)) continue;
+        if (stopTouchesCorridorMid(curC, mid) || stopTouchesCorridorMid(c, mid)) continue;
         skipsOrphan = true;
         break;
       }
@@ -534,7 +540,7 @@ function noveltyPenaltyKm(
   let fresh = 0;
   for (let i = 0; i < stops.length; i++) {
     if (covered.has(i)) continue;
-    if (stopTouchesCorridor(nextC, stops[i])) fresh += 1;
+    if (stopTouchesCorridorMid(nextC, stops[i])) fresh += 1;
   }
   // 只加罚不加负分：负代价会破坏 bestCost 剪枝（绕路先到某走廊会压过直达起点）
   if (fresh > 0) return 0;
@@ -673,6 +679,14 @@ function findCorridorPath(
         transferPenalty = 25 + link.transferKm;
       } else if (hubPreferred) {
         transferPenalty = 0;
+      } else if (hubKey) {
+        // 走廊端点共享枢纽（京沪↔沪昆「上海」）即使不在经停里，也远优于站间大桥接
+        const tipHubs = new Set(
+          [hintKeys(curC)[0], hintKeys(curC).at(-1), hintKeys(nextC)[0], hintKeys(nextC).at(-1)].filter(
+            Boolean,
+          ) as string[],
+        );
+        transferPenalty = tipHubs.has(hubKey) ? 10 : 280;
       } else {
         transferPenalty = 280;
       }

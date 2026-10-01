@@ -16,6 +16,14 @@ import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
 import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
+import { usePointerSpotlight } from '../composables/usePointerSpotlight';
+import { useRoadDraw } from '../composables/useRoadDraw';
+import { useScrollReveal } from '../composables/useScrollReveal';
+
+usePointerSpotlight();
+const routePathRef = ref<SVGPathElement | null>(null);
+useRoadDraw(routePathRef);
+useScrollReveal('.drive-scroll-reveal');
 import DriveLivePanel from '../components/DriveLivePanel.vue';
 import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
@@ -276,8 +284,14 @@ function switchMode(mode: 'plan' | 'live') {
     <main class="rv-shell">
       <DriveSubNav />
 
-      <div v-if="loading" class="drive-empty">正在规划路线与加载沿程景点…</div>
-      <div v-else-if="error || !roadRoute" class="drive-empty">
+      <div v-if="loading" class="drive-skeleton">
+        <div class="drive-skeleton__line drive-skeleton__line--wide" />
+        <div class="drive-skeleton__line drive-skeleton__line--mid" />
+        <div class="drive-skeleton__line drive-skeleton__line--wide" />
+        <div class="drive-skeleton__line drive-skeleton__line--narrow" />
+        <div class="drive-skeleton__line drive-skeleton__line--wide" />
+      </div>
+      <div v-else-if="error || !roadRoute" class="drive-empty drive-empty--error">
         {{ error || '未找到路线' }}
         <div class="drive-actions" style="justify-content: center">
           <router-link class="btn ghost btn-sm" to="/drive">回首页重新规划</router-link>
@@ -334,6 +348,7 @@ function switchMode(mode: 'plan' | 'live') {
                   class="drive-chapterbar__seg"
                   :style="{ flex: Math.max(1, ch.toKm - ch.fromKm) }"
                   :title="`${ch.title}（${Math.round(ch.fromKm)}—${Math.round(ch.toKm)} km）`"
+                  :data-title="`${ch.title}（${Math.round(ch.fromKm)}—${Math.round(ch.toKm)} km）`"
                 >
                   <span class="drive-chapterbar__label">{{ ch.title }}</span>
                 </div>
@@ -347,20 +362,22 @@ function switchMode(mode: 'plan' | 'live') {
             </section>
 
             <!-- 实时态面板（C3） -->
-            <DriveLivePanel
-              v-if="liveMode && routeLike"
-              :route="routeLike"
-              :highlights="radarHighlights"
-              v-model:progress="progress"
-              v-model:speed-kmh="speedKmh"
-            />
+            <Transition name="drive-trip-panel">
+              <DriveLivePanel
+                v-if="liveMode && routeLike"
+                :route="routeLike"
+                :highlights="radarHighlights"
+                v-model:progress="progress"
+                v-model:speed-kmh="speedKmh"
+              />
+            </Transition>
           </aside>
 
           <!-- 中：地图 -->
           <section class="drive-trip-map rv-card" data-spotlight>
             <svg :viewBox="viewBoxAttr" class="drive-trip-map__svg" role="img" aria-label="路线示意图">
               <g class="drive-netmap__outline" v-html="outlinePaths" />
-              <path class="drive-trip-map__route" :d="routePath" />
+              <path ref="routePathRef" class="drive-trip-map__route" :d="routePath" />
               <circle
                 v-for="s in filteredSpots"
                 :key="s.id"
@@ -408,7 +425,7 @@ function switchMode(mode: 'plan' | 'live') {
               <article
                 v-for="s in filteredSpots"
                 :key="s.id"
-                class="drive-spot"
+                class="drive-spot drive-scroll-reveal"
                 :class="{ 'is-expanded': expandedSpotId === s.id }"
                 :style="{ '--spot-color': tierColor(s.tier) }"
                 @click="toggleSpot(s)"
@@ -428,8 +445,12 @@ function switchMode(mode: 'plan' | 'live') {
                   {{ detourText(s) }}
                   <template v-if="s.stayMin"> · 建议停留 {{ s.stayMin }} 分钟</template>
                 </div>
-                <p v-if="expandedSpotId === s.id && s.intro" class="drive-spot__intro">{{ s.intro }}</p>
-                <p v-if="expandedSpotId === s.id" class="drive-spot__vis">{{ VIS_LABEL[s.visibility ?? 'detour20'] }} · {{ VIS_LABEL[s.visibility ?? 'detour20'] === '就在路边' ? '可即停即看' : '缓冲 ' + (s.visibility === 'distant' ? '35' : s.visibility === 'detour20' ? '12' : '3') + ' km' }}</p>
+                <Transition name="drive-spot-expand">
+                  <div v-if="expandedSpotId === s.id" class="drive-spot__expand">
+                    <p v-if="s.intro" class="drive-spot__intro">{{ s.intro }}</p>
+                    <p class="drive-spot__vis">{{ VIS_LABEL[s.visibility ?? 'detour20'] }} · {{ VIS_LABEL[s.visibility ?? 'detour20'] === '就在路边' ? '可即停即看' : '缓冲 ' + (s.visibility === 'distant' ? '35' : s.visibility === 'detour20' ? '12' : '3') + ' km' }}</p>
+                  </div>
+                </Transition>
               </article>
               <p v-if="!filteredSpots.length" class="drive-empty">
                 该路段暂无匹配景点（试试放开筛选，或降低 minScore）

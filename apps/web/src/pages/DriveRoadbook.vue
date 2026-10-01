@@ -3,8 +3,12 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
 import AppTopBar from '../components/AppTopBar.vue';
+import DriveSubNav from '../components/DriveSubNav.vue';
+import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 import { highlightColor, highlightLabel } from '../data/highlightColors';
 import type { DriveHighlight, DriveRoute } from '@railvista/shared';
+
+usePointerSpotlight();
 
 const route = useRoute();
 const router = useRouter();
@@ -51,8 +55,9 @@ function startNav() {
     <AppTopBar />
 
     <main class="rv-shell">
+      <DriveSubNav />
       <div v-if="loading" class="drive-empty">正在翻开路书…</div>
-      <div v-else-if="error || !data" class="drive-empty">{{ error || '未找到该线路' }}</div>
+      <div v-else-if="error || !data" class="drive-empty drive-empty--error">{{ error || '未找到该线路' }}</div>
 
       <template v-else>
         <header class="drive-hero">

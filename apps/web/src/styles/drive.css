@@ -584,14 +584,14 @@
 /* —— 首屏主结构：地图 + 面板 —— */
 .drive-home-main {
   display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-columns: 1fr;
   gap: var(--space-3);
   align-items: stretch;
 }
 
 .drive-netmap {
   position: relative;
-  min-height: 420px;
+  min-height: 46vh;
   padding: var(--space-2);
   overflow: hidden;
   display: flex;
@@ -658,7 +658,7 @@
 
 .drive-od__row {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr;
   gap: var(--space-2);
   align-items: end;
 }
@@ -672,6 +672,8 @@
   color: var(--text-2);
   font-size: var(--fs-h3);
   cursor: pointer;
+  justify-self: center;
+  transform: rotate(90deg);
 }
 
 .drive-od__swap:hover {
@@ -767,7 +769,7 @@
 
 .road-kbd__prefixes {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-1);
 }
 
@@ -815,7 +817,7 @@
 
 .road-kbd__digits {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: var(--space-1);
 }
 
@@ -911,7 +913,7 @@
 
 .drive-boards__title {
   margin: 0 0 var(--space-3);
-  font-size: var(--fs-h3);
+  font-size: var(--fs-h2);
   font-weight: 700;
 }
 
@@ -1085,7 +1087,7 @@
 }
 
 .drive-trip-tab {
-  padding: 5px var(--space-3);
+  padding: 5px var(--space-2);
   border: none;
   border-radius: var(--radius-full);
   background: transparent;
@@ -1110,20 +1112,19 @@
 
 .drive-trip-grid {
   display: grid;
-  grid-template-columns: minmax(240px, 4fr) minmax(0, 8fr) minmax(280px, 5fr);
+  grid-template-columns: 1fr;
   gap: var(--space-3);
   align-items: start;
 }
 
 .drive-road-grid {
-  grid-template-columns: minmax(0, 8fr) minmax(240px, 4fr);
+  grid-template-columns: 1fr;
 }
 
 .drive-trip-side {
   display: grid;
   gap: var(--space-3);
-  position: sticky;
-  top: calc(var(--appbar-h) + var(--space-3));
+  position: static;
 }
 
 .drive-route-card.is-flat {
@@ -1153,7 +1154,7 @@
 
 .drive-block-title {
   margin: 0 0 var(--space-2);
-  font-size: var(--fs-meta);
+  font-size: var(--fs-h2);
   font-weight: 700;
   color: var(--text-1);
 }
@@ -1182,6 +1183,7 @@
   background: color-mix(in srgb, var(--accent) 34%, var(--line-default));
   cursor: default;
   position: relative;
+  transition: background var(--dur-fast) var(--ease-standard);
 }
 
 .drive-chapterbar__seg:hover {
@@ -1286,7 +1288,7 @@
   left: var(--space-3);
   margin: 0;
   font-size: var(--fs-micro);
-  color: #d97706;
+  color: var(--warning);
   font-weight: 600;
 }
 
@@ -1296,6 +1298,7 @@
   flex-direction: column;
   gap: var(--space-2);
   min-width: 0;
+  grid-column: 1 / -1;
 }
 
 .drive-flow-head {
@@ -1312,7 +1315,7 @@
 .drive-flow-list {
   display: grid;
   gap: var(--space-2);
-  max-height: 72vh;
+  max-height: none;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 2px;
@@ -1458,62 +1461,388 @@
   color: var(--text-3);
 }
 
-/* —— 三档响应式（PRD §11.3：390 / 768 / 1440） —— */
-@media (max-width: 1200px) {
+/* —— 三档响应式（PRD §11.3：390 / 768 / 1440）—— */
+/* 旧: max-width 降序，新: min-width 升序（mobile-first，与 tokens.css 方向一致） */
+@media (min-width: 600px) {
+  .drive-od__row {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .drive-od__swap {
+    justify-self: auto;
+    transform: none;
+  }
+
+  .road-kbd__digits {
+    grid-template-columns: repeat(10, 1fr);
+  }
+
+  .road-kbd__prefixes {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .drive-trip-tab {
+    padding: 5px var(--space-3);
+  }
+}
+
+@media (min-width: 840px) {
+  .drive-home-main {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+
+  .drive-netmap {
+    min-height: 420px;
+  }
+
+  .drive-road-grid {
+    grid-template-columns: minmax(0, 8fr) minmax(240px, 4fr);
+  }
+
   .drive-trip-grid {
     grid-template-columns: minmax(240px, 4fr) minmax(0, 7fr);
   }
 
+  .drive-flow-list {
+    max-height: 72vh;
+  }
+}
+
+@media (min-width: 1200px) {
+  .drive-trip-grid {
+    grid-template-columns: minmax(240px, 4fr) minmax(0, 8fr) minmax(280px, 5fr);
+  }
+
   .drive-trip-flow {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 
   .drive-trip-side {
-    position: static;
+    position: sticky;
+    top: calc(var(--appbar-h) + var(--space-3));
+  }
+}
+/* ══════════ P3 卡片三件套：悬停光影/微缩放/渐显反馈/入场动画 ══════════ */
+
+/* 径向光晕（::after，所有自定义卡片类，复用 base.css .rv-card::after 模式） */
+.drive-route-card::after,
+.drive-stat::after,
+.drive-board-card::after,
+.drive-chapter::after,
+.drive-highlight::after,
+.drive-spot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(
+      var(--glow-radius) circle at var(--mx, 50%) var(--my, 0%),
+      rgba(255, 255, 255, var(--glow-alpha)),
+      transparent 62%
+    ),
+    radial-gradient(
+      calc(var(--glow-radius) * 0.7) circle at var(--mx, 50%) var(--my, 0%),
+      rgba(77, 159, 255, calc(var(--glow-alpha) * 0.9)),
+      transparent 65%
+    );
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+/* 顶部高光带（::before，仅无现有 ::before 的 .drive-stat/.drive-board-card） */
+.drive-stat::before,
+.drive-board-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.34) 50%,
+    transparent 100%
+  );
+  background-size: 42% 100%;
+  background-repeat: no-repeat;
+  background-position: var(--mx-line, 50%) 0;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+/* 悬停三件套交互态 */
+@media (hover: hover) and (pointer: fine) {
+  .drive-route-card:hover,
+  .drive-stat:hover,
+  .drive-board-card:hover,
+  .drive-chapter:hover,
+  .drive-highlight:hover,
+  .drive-spot:hover {
+    transform: translateY(-2px) scale(1.006);
+    border-color: var(--line-accent);
+    box-shadow: var(--elev-3), var(--glow-accent);
+  }
+
+  .drive-route-card:hover::after,
+  .drive-stat:hover::after,
+  .drive-board-card:hover::after,
+  .drive-chapter:hover::after,
+  .drive-highlight:hover::after,
+  .drive-spot:hover::after,
+  .drive-stat:hover::before,
+  .drive-board-card:hover::before {
+    opacity: 1;
   }
 }
 
-@media (max-width: 840px) {
-  .drive-home-main {
-    grid-template-columns: 1fr;
-  }
-
-  .drive-netmap {
-    min-height: 46vh;
-  }
-
-  .drive-road-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .drive-trip-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .drive-flow-list {
-    max-height: none;
-  }
+/* transition + 入场动画 */
+.drive-route-card,
+.drive-stat,
+.drive-board-card,
+.drive-chapter,
+.drive-highlight,
+.drive-spot {
+  transition: transform var(--dur-base) var(--ease-spring),
+              border-color var(--dur-base),
+              box-shadow var(--dur-base);
+  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) both;
 }
 
-@media (max-width: 600px) {
-  .drive-od__row {
-    grid-template-columns: 1fr;
-  }
+/* 错峰延迟 */
+.drive-route-card:nth-child(1),
+.drive-stat:nth-child(1),
+.drive-board-card:nth-child(1) { animation-delay: 20ms; }
+.drive-route-card:nth-child(2),
+.drive-stat:nth-child(2),
+.drive-board-card:nth-child(2) { animation-delay: 70ms; }
+.drive-route-card:nth-child(3),
+.drive-stat:nth-child(3),
+.drive-board-card:nth-child(3) { animation-delay: 120ms; }
+.drive-route-card:nth-child(4),
+.drive-stat:nth-child(4),
+.drive-board-card:nth-child(4) { animation-delay: 170ms; }
 
-  .drive-od__swap {
-    justify-self: center;
-    transform: rotate(90deg);
-  }
+/* .drive-spot 玻璃材质 */
+.drive-spot {
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+}
 
-  .road-kbd__digits {
-    grid-template-columns: repeat(5, 1fr);
+/* 无障碍降级 */
+@media (prefers-reduced-motion: reduce) {
+  .drive-route-card,
+  .drive-stat,
+  .drive-board-card,
+  .drive-chapter,
+  .drive-highlight,
+  .drive-spot {
+    animation: none;
+    transition: none;
   }
+}
+/* ══════════ P4 按钮四态：按压态/聚焦环/过渡 ══════════ */
 
-  .road-kbd__prefixes {
-    grid-template-columns: repeat(3, 1fr);
+/* 自定义按钮按压态 */
+.drive-trip-tab:active:not(:disabled),
+.road-kbd__chip:active:not(:disabled),
+.road-kbd__prefix:active:not(:disabled),
+.road-kbd__digit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* 自定义按钮聚焦环 */
+.drive-trip-tab:focus-visible,
+.road-kbd__chip:focus-visible,
+.road-kbd__prefix:focus-visible,
+.road-kbd__digit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-border);
+}
+
+/* 自定义按钮 transition */
+.drive-trip-tab,
+.road-kbd__chip,
+.road-kbd__prefix,
+.road-kbd__digit {
+  transition: transform var(--dur-micro) var(--ease-standard),
+              border-color var(--dur-micro),
+              background-color var(--dur-fast) var(--ease-standard);
+}
+
+/* .btn 聚焦环（模块层补充，不改 base.css） */
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-border);
+}
+
+/* 输入框聚焦环 */
+.road-kbd__input:focus {
+  box-shadow: 0 0 0 2px var(--accent-border);
+}
+
+/* 次级导航悬停过渡 */
+.drive-subnav__main,
+.drive-subnav__sub {
+  transition: background-color var(--dur-fast) var(--ease-standard),
+              color var(--dur-fast) var(--ease-standard),
+              border-color var(--dur-fast) var(--ease-standard);
+}
+
+/* 车速带颜色过渡 */
+.drive-speed__band {
+  transition: background-color var(--dur-fast) var(--ease-standard),
+              color var(--dur-fast) var(--ease-standard);
+}
+/* ══════════ P5 路线绘制与滚动揭示 ══════════ */
+
+@keyframes drive-scroll-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.drive-scroll-reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--dur-base) var(--ease-standard),
+              transform var(--dur-base) var(--ease-standard);
+}
+
+.drive-scroll-reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* SVG 路线绘制（useRoadDraw composable 设置 stroke-dasharray/offset） */
+.drive-trip-map__route,
+.drive-netmap__road {
+  transition: stroke-dashoffset var(--dur-slower) var(--ease-emphasized);
+}
+
+/* 无障碍降级 */
+@media (prefers-reduced-motion: reduce) {
+  .drive-scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
+  .drive-trip-map__route,
+  .drive-netmap__road {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+}
+/* ══════════ P6 Transition 过渡 ══════════ */
 
-  .drive-trip-tab {
-    padding: 5px var(--space-2);
+/* 三入口面板切换 */
+.drive-trip-panel-enter-active,
+.drive-trip-panel-leave-active {
+  transition: opacity var(--dur-flip) var(--ease-emphasized),
+              transform var(--dur-flip) var(--ease-emphasized);
+}
+.drive-trip-panel-enter-from { opacity: 0; transform: translateY(8px); }
+.drive-trip-panel-leave-to { opacity: 0; transform: translateY(-8px); }
+
+/* 景点卡片展开 */
+.drive-spot-expand-enter-active,
+.drive-spot-expand-leave-active {
+  transition: opacity var(--dur-base) var(--ease-standard),
+              max-height var(--dur-base) var(--ease-standard);
+  overflow: hidden;
+  max-height: 200px;
+}
+.drive-spot-expand-enter-from,
+.drive-spot-expand-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+
+/* 路书菜单展开 */
+.drive-subnav-menu-enter-active,
+.drive-subnav-menu-leave-active {
+  transition: opacity var(--dur-base) var(--ease-spring),
+              transform var(--dur-base) var(--ease-spring);
+}
+.drive-subnav-menu-enter-from,
+.drive-subnav-menu-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+/* ══════════ P7 骨架屏 + 错误态 + 章节条 tooltip ══════════ */
+
+/* 章节条悬停 tooltip（§5.2.7） */
+.drive-chapterbar__seg::after {
+  content: attr(data-title);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+  color: var(--text-1);
+  font-size: var(--fs-micro);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-standard);
+  z-index: 10;
+}
+
+.drive-chapterbar__seg:hover::after {
+  opacity: 1;
+}
+
+/* 骨架屏加载态（§5.3.6） */
+@keyframes drive-skeleton-pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.drive-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.drive-skeleton__line {
+  height: var(--space-3);
+  border-radius: var(--radius-xs);
+  background: linear-gradient(
+    90deg,
+    var(--surface-sunken) 0%,
+    color-mix(in srgb, var(--surface-sunken) 60%, var(--text-3) 40%) 50%,
+    var(--surface-sunken) 100%
+  );
+  background-size: 200% 100%;
+  animation: drive-skeleton-pulse var(--dur-slow) var(--ease-standard) infinite;
+}
+
+.drive-skeleton__line--wide { width: 100%; }
+.drive-skeleton__line--mid { width: 60%; }
+.drive-skeleton__line--narrow { width: 35%; }
+
+/* 错误态视觉区分（§5.3.5） */
+.drive-empty--error {
+  border: 1px solid var(--danger);
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+
+/* 无障碍降级：骨架屏脉冲 */
+@media (prefers-reduced-motion: reduce) {
+  .drive-skeleton__line {
+    animation: none;
+  }
+  .drive-chapterbar__seg::after {
+    transition: none;
   }
 }

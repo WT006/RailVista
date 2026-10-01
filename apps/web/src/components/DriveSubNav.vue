@@ -68,21 +68,23 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
       <button type="button" class="drive-subnav__sub" :class="{ 'is-active': route.path.startsWith('/drive/roadbook') }" @click="toggleBook">
         路书 <span class="drive-subnav__caret">▾</span>
       </button>
-      <div v-if="bookOpen" class="drive-subnav__menu" role="menu">
-        <p class="drive-subnav__menu-title">精品线路书（v1 打样）</p>
-        <router-link
-          v-for="b in books"
-          :key="b.id"
-          class="drive-subnav__menu-item"
-          role="menuitem"
-          :to="`/drive/roadbook/${b.id}`"
-          @click="bookOpen = false"
-        >
-          {{ b.name }}
-          <span class="drive-subnav__menu-meta">{{ b.totalKm }} km</span>
-        </router-link>
-        <p v-if="!books.length" class="drive-subnav__menu-item is-empty">暂无成书线路</p>
-      </div>
+      <Transition name="drive-subnav-menu">
+        <div v-if="bookOpen" class="drive-subnav__menu" role="menu">
+          <p class="drive-subnav__menu-title">精品线路书（v1 打样）</p>
+          <router-link
+            v-for="b in books"
+            :key="b.id"
+            class="drive-subnav__menu-item"
+            role="menuitem"
+            :to="`/drive/roadbook/${b.id}`"
+            @click="bookOpen = false"
+          >
+            {{ b.name }}
+            <span class="drive-subnav__menu-meta">{{ b.totalKm }} km</span>
+          </router-link>
+          <p v-if="!books.length" class="drive-subnav__menu-item is-empty">暂无成书线路</p>
+        </div>
+      </Transition>
     </div>
   </nav>
 </template>

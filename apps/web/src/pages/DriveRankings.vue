@@ -9,6 +9,9 @@ import { onMounted, ref } from 'vue';
 import { api } from '../api/client';
 import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
+import { usePointerSpotlight } from '../composables/usePointerSpotlight';
+
+usePointerSpotlight();
 import type { RankingBoardSummary } from '@railvista/shared';
 
 const loading = ref(true);
@@ -51,7 +54,7 @@ onMounted(async () => {
       </header>
 
       <div v-if="loading" class="drive-empty">正在加载榜单…</div>
-      <div v-else-if="error" class="drive-empty">{{ error }}</div>
+      <div v-else-if="error" class="drive-empty drive-empty--error">{{ error }}</div>
 
       <template v-else>
         <section class="drive-board-list">

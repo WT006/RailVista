@@ -10,14 +10,27 @@ import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
 import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
+import { usePointerSpotlight } from '../composables/usePointerSpotlight';
+import { useRoadDraw } from '../composables/useRoadDraw';
+
+usePointerSpotlight();
 import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
-import { roadColor, roadClassLabel, classOfRef } from '../data/roadColors';
+import { ROAD_COLORS, roadColor, roadClassLabel, classOfRef } from '../data/roadColors';
 import type { AlongSpot, RoadIndexEntry, RoadRoute } from '@railvista/shared';
 
 const route = useRoute();
 const router = useRouter();
 const code = String(route.params.code ?? '');
+
+function tierColor(tier: string): string {
+  if (tier === 'A') return ROAD_COLORS.expressway;
+  if (tier === 'C') return ROAD_COLORS.provincial;
+  return ROAD_COLORS.national;
+}
+
+const routePathRef = ref<SVGPathElement | null>(null);
+useRoadDraw(routePathRef);
 
 const VIEW_W = CHINA_OUTLINE_VIEWBOX.width;
 const VIEW_H = CHINA_OUTLINE_VIEWBOX.height;
@@ -124,8 +137,14 @@ function goTripLive() {
     <main class="rv-shell">
       <DriveSubNav />
 
-      <div v-if="loading" class="drive-empty">正在翻开的公路档案…</div>
-      <div v-else-if="error || !entry" class="drive-empty">{{ error || '公路不在册' }}</div>
+      <div v-if="loading" class="drive-skeleton">
+        <div class="drive-skeleton__line drive-skeleton__line--wide" />
+        <div class="drive-skeleton__line drive-skeleton__line--mid" />
+        <div class="drive-skeleton__line drive-skeleton__line--wide" />
+        <div class="drive-skeleton__line drive-skeleton__line--narrow" />
+        <div class="drive-skeleton__line drive-skeleton__line--mid" />
+      </div>
+      <div v-else-if="error || !entry" class="drive-empty drive-empty--error">{{ error || '公路不在册' }}</div>
 
       <template v-else>
         <header class="drive-hero">
@@ -152,7 +171,7 @@ function goTripLive() {
           <section class="drive-trip-map rv-card" data-spotlight>
             <svg :viewBox="viewBoxAttr" class="drive-trip-map__svg" role="img" aria-label="路线示意图">
               <g class="drive-netmap__outline" v-html="outlinePaths" />
-              <path class="drive-trip-map__route" :d="routePath" :stroke="roadColor(entry.class)" />
+              <path ref="routePathRef" class="drive-trip-map__route" :d="routePath" :stroke="roadColor(entry.class)" />
               <path
                 v-for="(d, i) in segmentPaths"
                 :key="'seg-' + i"
@@ -169,7 +188,7 @@ function goTripLive() {
                 :cx="lngLatToViewBox(s.lng, s.lat)[0]"
                 :cy="lngLatToViewBox(s.lng, s.lat)[1]"
                 r="2.4"
-                :fill="s.tier === 'A' ? '#ffb84d' : s.tier === 'C' ? '#7ee0c0' : '#4d9fff'"
+                :fill="tierColor(s.tier)"
               >
                 <title>{{ s.name }} · K{{ Math.round(s.progressKm) }}</title>
               </circle>

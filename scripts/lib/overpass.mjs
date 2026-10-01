@@ -24,6 +24,7 @@ export const OVERPASS_USER_AGENT = 'RailVista/0.4.0 (drive-net-builder)';
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PROVINCE_BBOXES, mergeProvincialWays } from './province-bbox.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const ROADS_CACHE_DIR = join(__dirname, '../../data/cache/roads');
@@ -91,8 +92,13 @@ export function elementsToWays(elements, fallbackRef) {
     }));
 }
 
-/** 按 ref 抓 way（带缓存）：way 查询优先，覆盖不足时回退 route relation */
-export async function fetchWaysForRef(ref, bbox, { timeoutSec = 90, useCache = true } = {}) {
+/**
+ * 按 ref 抓 way（带缓存）。
+ * 长线（officialKm > 1000km）route relation 优先：成员覆盖比散 way 全，bbox 过滤后串接。
+ * 短线（≤1000km 或未传 officialKm）way 查询优先，覆盖不足时回退 route relation（向后兼容）。
+ * 共线 relation（ref 形如 G318;G317）按成员 way 的 ref 正则过滤。
+ */
+export async function fetchWaysForRef(ref, bbox, { timeoutSec = 90, useCache = true, officialKm = 0 } = {}) {
   if (useCache) {
     const cached = readWaysCache(ref);
     if (cached && cached.length > 0) {
@@ -101,28 +107,59 @@ export async function fetchWaysForRef(ref, bbox, { timeoutSec = 90, useCache = t
     }
   }
   const [s, w, n, e] = bbox;
-  let ways = [];
-  // 正则匹配含多编号共线的 way（ref="G318;G214" 这类分段很常见，精确匹配会断链）
   const esc = ref.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const q = `[out:json][timeout:${timeoutSec}];way["highway"]["ref"~"(^|;)${esc}(;|$)"](${s},${w},${n},${e});out geom;`;
-  ways = elementsToWays(await overpassQuery(q, timeoutSec), ref);
+  const inBbox = (pt) => pt[1] >= s && pt[1] <= n && pt[0] >= w && pt[0] <= e;
+
+  // route relation 查询（`>;out geom` 展开全国整条，须按 bbox 过滤 member way 后重新串接）
+  const queryRelation = async () => {
+    const rq = `[out:json][timeout:${timeoutSec}];rel["route"="road"]["ref"="${ref}"](${s},${w},${n},${e});out body;>;out geom;`;
+    const relElements = await overpassQuery(rq, timeoutSec);
+    const rels = relElements.filter((el) => el.type === 'relation');
+    if (rels.length === 0) return null;
+    const relWays = elementsToWays(relElements, ref).filter((way) => way.geom.some(inBbox));
+    const seen = new Set();
+    return relWays.filter((way) => (seen.has(way.id) ? false : (seen.add(way.id), true)));
+  };
+
+  // way 查询（正则匹配含多编号共线的 way，ref="G318;G214" 这类分段很常见，精确匹配会断链）
+  const queryWays = async () => {
+    const q = `[out:json][timeout:${timeoutSec}];way["highway"]["ref"~"(^|;)${esc}(;|$)"](${s},${w},${n},${e});out geom;`;
+    return elementsToWays(await overpassQuery(q, timeoutSec), ref);
+  };
+
+  // 长线（officialKm > 1000km）relation 优先：成员覆盖比散 way 全，减少 orphan 段
+  if (officialKm > 1000) {
+    try {
+      const relWays = await queryRelation();
+      if (relWays && relWays.length >= 3) {
+        if (useCache) writeWaysCache(ref, relWays);
+        return { ways: relWays, source: 'relation' };
+      }
+    } catch {
+      /* relation 失败回退 way 查询 */
+    }
+    const ways = await queryWays();
+    if (ways.length >= 3) {
+      if (useCache) writeWaysCache(ref, ways);
+      return { ways, source: 'ways' };
+    }
+    return { ways, source: 'ways' };
+  }
+
+  // 短线（≤1000km 或未传 officialKm）保持 way 优先，不足 3 回退 relation
+  const ways = await queryWays();
   if (ways.length >= 3) {
     if (useCache) writeWaysCache(ref, ways);
     return { ways, source: 'ways' };
   }
-  // 回退：route relation（成员 way 覆盖更完整，但 `>;out geom` 展开全国整条，须按 bbox 过滤）
-  const rq = `[out:json][timeout:${timeoutSec}];rel["route"="road"]["ref"="${ref}"](${s},${w},${n},${e});out body;>;out geom;`;
-  const relElements = await overpassQuery(rq, timeoutSec);
-  const rels = relElements.filter((el) => el.type === 'relation');
-  if (rels.length > 0) {
-    const inBbox = (pt) => pt[1] >= s && pt[1] <= n && pt[0] >= w && pt[0] <= e;
-    const relWays = elementsToWays(relElements, ref).filter((way) => way.geom.some(inBbox));
-    const seen = new Set();
-    const deduped = relWays.filter((way) => (seen.has(way.id) ? false : (seen.add(way.id), true)));
-    if (deduped.length > 0) {
-      if (useCache) writeWaysCache(ref, deduped);
-      return { ways: deduped, source: 'relation' };
+  try {
+    const relWays = await queryRelation();
+    if (relWays && relWays.length > 0) {
+      if (useCache) writeWaysCache(ref, relWays);
+      return { ways: relWays, source: 'relation' };
     }
+  } catch {
+    /* relation 失败保留 way 结果 */
   }
   return { ways, source: 'ways' };
 }
@@ -276,4 +313,100 @@ export function chainWays(ways, toleranceM = 800, maxKm = 0) {
   }
 
   return { chain, gaps: pool.length, remaining: pool };
+}
+/**
+ * 计算段间断点标注：主链末点↔segments 首点、segments 之间的未贯通处。
+ * atKm 为断点在全线中的里程位置（主链总里程 + 已遍历 segments 里程累计）。
+ * gapKm > 200 时 status='suspect'（可疑大断点，可能串错），否则 'normal'。
+ * segments 按里程降序排列（chainAll 已排序），段间断点如实标注不插值伪造连续。
+ */
+export function computeGapAnnotations(main, segments) {
+  if (!segments || segments.length === 0) return [];
+  const annotations = [];
+  const mainCum = main.length > 0 ? computeCumKm(main) : [0];
+  let cumKm = mainCum[mainCum.length - 1] ?? 0;
+  let prevEnd = main.length > 0 ? main[main.length - 1] : null;
+  let fromSeg = 0;
+  for (let i = 0; i < segments.length; i += 1) {
+    const seg = segments[i];
+    if (!seg || seg.length < 2) continue;
+    const segStart = seg[0];
+    if (prevEnd) {
+      const gapKm = haversineKm(prevEnd, segStart);
+      const status = gapKm > 200 ? 'suspect' : 'normal';
+      annotations.push({
+        atKm: Math.round(cumKm * 100) / 100,
+        gapKm: Math.round(gapKm * 100) / 100,
+        fromSeg,
+        toSeg: i + 1,
+        status,
+      });
+    }
+    let segKm = 0;
+    for (let j = 1; j < seg.length; j += 1) segKm += haversineKm(seg[j - 1], seg[j]);
+    cumKm += segKm;
+    prevEnd = seg[seg.length - 1];
+    fromSeg = i + 1;
+  }
+  return annotations;
+}
+
+/**
+ * 断链点局部补取：around 查询找几何上确实连通的 way（不限 ref，宁缺毋滥）。
+ * 城市区域（>50 ways）返回空数组并标注 urban_skip，避免误串城市道路。
+ */
+export async function fetchConnectingWaysAround(pt, radiusM = 2000, { timeoutSec = 30 } = {}) {
+  const [lng, lat] = pt;
+  const q = `[out:json][timeout:${timeoutSec}];way["highway"](around:${lat},${lng},${radiusM});out geom;`;
+  const elements = await overpassQuery(q, timeoutSec);
+  const ways = elementsToWays(elements, '');
+  if (ways.length > 50) {
+    console.log(`    （around ${radiusM}m 返回 ${ways.length} ways，城市区域跳过）`);
+    return { ways: [], status: 'urban_skip' };
+  }
+  return { ways, status: ways.length > 0 ? 'normal' : 'no_connect' };
+}
+/**
+ * 按省分片抓取：遍历 34 省 bbox，每片独立缓存（key 含省码），合并去重，断点续抓。
+ * 单条全国查询易超时/限流；分片命中率高且可断点续抓（已完成的省分片缓存命中即跳过）。
+ * 单省超时记入 provincesFailed，不中断整体。
+ */
+export async function fetchWaysByProvincialTiling(ref, officialKm = 0, { timeoutSec = 90 } = {}) {
+  const waysByProvince = [];
+  const provincesHit = [];
+  const provincesFailed = [];
+  for (const prov of PROVINCE_BBOXES) {
+    const cacheFile = join(ROADS_CACHE_DIR, `ways-${String(ref).replace(/[^\w]/g, '')}-${prov.code}.json`);
+    let cached = null;
+    try {
+      if (existsSync(cacheFile)) cached = JSON.parse(readFileSync(cacheFile, 'utf8'));
+    } catch {
+      /* ignore broken cache */
+    }
+    if (cached && cached.length > 0) {
+      console.log(`    ${prov.name}（缓存命中 ${cached.length} ways）`);
+      waysByProvince.push(cached);
+      provincesHit.push(prov.code);
+      continue;
+    }
+    try {
+      const result = await fetchWaysForRef(ref, prov.bbox, { timeoutSec, useCache: false, officialKm });
+      if (result.ways.length > 0) {
+        try {
+          mkdirSync(ROADS_CACHE_DIR, { recursive: true });
+          writeFileSync(cacheFile, JSON.stringify(result.ways), 'utf8');
+        } catch {
+          /* cache write best-effort */
+        }
+        waysByProvince.push(result.ways);
+        provincesHit.push(prov.code);
+        console.log(`    ${prov.name}（${result.ways.length} ways，${result.source}）`);
+      }
+    } catch (e) {
+      provincesFailed.push({ code: prov.code, name: prov.name, error: e.message });
+      console.log(`    ${prov.name} 失败：${e.message}`);
+    }
+  }
+  const ways = mergeProvincialWays(waysByProvince);
+  return { ways, source: 'provincial-tiling', provincesHit, provincesFailed };
 }

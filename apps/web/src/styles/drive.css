@@ -1280,6 +1280,16 @@
   color: var(--text-3);
 }
 
+.drive-trip-map__gap-note {
+  position: absolute;
+  bottom: calc(var(--space-2) + 18px);
+  left: var(--space-3);
+  margin: 0;
+  font-size: var(--fs-micro);
+  color: #d97706;
+  font-weight: 600;
+}
+
 /* 沿程景点流 */
 .drive-trip-flow {
   display: flex;

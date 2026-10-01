@@ -20,6 +20,8 @@ import { fileURLToPath } from 'node:url';
 import {
   chainWays,
   computeCumKm,
+  computeGapAnnotations,
+  fetchWaysByProvincialTiling,
   fetchWaysForRef,
   haversineKm,
   simplifyDP,
@@ -72,11 +74,13 @@ const FLAGSHIP_REFS = [
 
 function parseArgs() {
   const args = process.argv.slice(2);
-  const out = { refs: [], key: null, bbox: CN_BBOX };
+  const out = { refs: [], key: null, bbox: CN_BBOX, provincialTiling: false, batch: false };
   for (let i = 0; i < args.length; i += 1) {
     if (args[i] === '--ref') out.refs.push(args[i + 1] ?? '');
     else if (args[i] === '--key') out.key = args[i + 1] ?? null;
     else if (args[i] === '--bbox') out.bbox = (args[i + 1] ?? '').split(',').map(Number);
+    else if (args[i] === '--provincial-tiling') out.provincialTiling = true;
+    else if (args[i] === '--batch') out.batch = true;
   }
   return out;
 }
@@ -86,21 +90,21 @@ function parseArgs() {
  * 端点相近的链拼到主链（不动点迭代：拼接延长主链后，原先够不着的段可能够着了）。
  * officialKm > 0 时全程受「官方里程 × 1.6」封顶（防多编号共线误匹配越串越远）。
  */
-function chainAll(ways, officialKm = 0) {
+function chainAll(ways, officialKm = 0, toleranceM = 800) {
   const maxKm = officialKm > 0 ? officialKm * 1.6 : 0;
   let pool = ways.slice();
   const chains = [];
   while (pool.length > 0 && chains.length < 400) {
-    const { chain, remaining } = chainWays(pool, 800, maxKm);
+    const { chain, remaining } = chainWays(pool, toleranceM, maxKm);
     if (!chain || chain.length < 2 || remaining.length === pool.length) break;
     chains.push(chain);
     pool = remaining;
   }
+  if (chains.length === 0) return { main: [], segments: [], gapAnnotations: [], orphans: 0 };
   // 按长度排序，主链最长；其余尝试端点并接（≤5km 且不超上限），不动点直到无可拼接
   chains.sort((a, b) => totalKm(b) - totalKm(a));
   let main = chains.shift() ?? [];
   let rest = chains;
-  let orphans = 0;
   for (;;) {
     let attached = false;
     const next = [];
@@ -124,8 +128,11 @@ function chainAll(ways, officialKm = 0) {
     rest = next;
     if (!attached || !rest.length) break;
   }
-  orphans = rest.length;
-  return { chain: main, orphans };
+  // orphan 链不再丢弃（结构性修复）：按里程降序存入 segments，
+  // 即使 ref 标注不全也能把已知的每一段都画出来，G318 立刻从部分段涨到接近全量
+  const segments = rest.sort((a, b) => totalKm(b) - totalKm(a));
+  const gapAnnotations = computeGapAnnotations(main, segments);
+  return { main, segments, gapAnnotations, orphans: segments.length };
 }
 
 function totalKm(coords) {
@@ -155,34 +162,90 @@ function tryAttachHead(main, piece) {
   return true;
 }
 
-async function fetchOne({ key, ref, bbox, fromPlace, toPlace, officialKm = 0 }) {
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * 限流分批调度：按 batchSize 分批，批内逐条执行，批间 sleep。
+ * 单条失败 sleep(60s) 重试最多 2 次，全端点失败的条目跳过继续。
+ */
+async function runBatched(jobs, batchSize, sleepMs) {
+  const results = [];
+  const failed = [];
+  for (let i = 0; i < jobs.length; i += batchSize) {
+    const batch = jobs.slice(i, i + batchSize);
+    if (i > 0) {
+      console.log(`  批间 sleep ${sleepMs / 1000}s…`);
+      await sleep(sleepMs);
+    }
+    for (const job of batch) {
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        try {
+          const r = await fetchOne(job);
+          if (r) results.push(r);
+          break;
+        } catch (e) {
+          console.log(`  ✗ ${job.key} 失败（尝试 ${attempt + 1}/3）：${e.message}`);
+          if (attempt < 2) {
+            console.log(`  sleep 60s 后重试…`);
+            await sleep(60000);
+          } else {
+            failed.push({ key: job.key, error: e.message });
+          }
+        }
+      }
+    }
+  }
+  return { results, failed };
+}
+
+async function fetchOne({ key, ref, bbox, fromPlace, toPlace, officialKm = 0, provincialTiling = false }) {
   console.log(`▶ ${key}（${fromPlace} → ${toPlace}）${officialKm ? ` 官方里程参考 ${officialKm}km` : ''}`);
   const t0 = Date.now();
-  const { ways, source } = await fetchWaysForRef(ref, bbox, { timeoutSec: 300 });
+  let ways, source;
+  if (provincialTiling) {
+    const result = await fetchWaysByProvincialTiling(ref, officialKm, { timeoutSec: 300 });
+    ways = result.ways;
+    source = result.source;
+  } else {
+    const result = await fetchWaysForRef(ref, bbox, { timeoutSec: 300, officialKm });
+    ways = result.ways;
+    source = result.source;
+  }
   if (ways.length < 3) {
     console.log(`  ✗ 仅 ${ways.length} ways，跳过`);
     return null;
   }
   console.log(`  抓到 ${ways.length} ways（${source}），串接中…`);
-  const { chain, orphans } = chainAll(ways, officialKm);
-  if (chain.length < 10) {
-    console.log(`  ✗ 成链仅 ${chain.length} 点，跳过`);
+  const { main, segments, gapAnnotations, orphans } = chainAll(ways, officialKm);
+  if (main.length < 10) {
+    console.log(`  ✗ 成链仅 ${main.length} 点，跳过`);
     return null;
   }
-  const simplified = simplifyDP(chain, 30); // PRD Step 2：ε=30m
+  const simplified = simplifyDP(main, 30); // PRD Step 2：ε=30m
+  const simplifiedSegments = segments.map((seg) => simplifyDP(seg, 30));
   const cumKm = computeCumKm(simplified);
   const totalKm = Math.round(cumKm[cumKm.length - 1] * 10) / 10;
   const nodes = [
     { name: fromPlace, atKm: 0, type: 'endpoint' },
     { name: toPlace, atKm: totalKm, type: 'endpoint' },
   ];
-  const geom = { key, points: simplified, cumKm: cumKm.map((k) => Math.round(k * 100) / 100), nodes, simplified: true };
+  const geom = {
+    key,
+    points: simplified,
+    cumKm: cumKm.map((k) => Math.round(k * 100) / 100),
+    nodes,
+    simplified: true,
+    segments: simplifiedSegments,
+    gapAnnotations,
+  };
   mkdirSync(GEOM_DIR, { recursive: true });
   writeFileSync(join(GEOM_DIR, `${key.replace(/[^\w:]/g, '_')}.json`), JSON.stringify(geom), 'utf8');
   console.log(
-    `  ✓ ${totalKm} km · ${simplified.length} 点 · 孤立段 ${orphans} · ${((Date.now() - t0) / 1000).toFixed(0)}s → data/roads/geom/${key}.json`,
+    `  ✓ ${totalKm} km · 主链+${segments.length}段 · orphan ${orphans} · ${((Date.now() - t0) / 1000).toFixed(0)}s → data/roads/geom/${key}.json`,
   );
-  return { key, totalKm, points: simplified.length, orphans };
+  return { key, totalKm, points: simplified.length, orphans, segmentCount: segments.length };
 }
 
 // ── 主流程 ───────────────────────────────────────────────────────────────────
@@ -205,7 +268,33 @@ for (const f of ['national.json', 'expressway.json']) {
 }
 
 const jobs = [];
-if (args.key) {
+if (args.batch) {
+  // --batch：对在册但未抓取的国道/高速按优先级分批抓取
+  const allRefs = [];
+  for (const f of ['national.json', 'expressway.json']) {
+    const p = join(__dirname, '../data/roads/index', f);
+    if (!existsSync(p)) continue;
+    for (const r of JSON.parse(readFileSync(p, 'utf8')).roads ?? []) {
+      const geomFile = join(GEOM_DIR, `${r.key.replace(/[^\w:]/g, '_')}.json`);
+      if (!existsSync(geomFile)) allRefs.push(r.key);
+    }
+  }
+  // 优先级排序：长线（officialKm > 1000km）优先 → 其余按编号
+  allRefs.sort((a, b) => (officialKmByRef.get(b) ?? 0) - (officialKmByRef.get(a) ?? 0));
+  console.log(`--batch：${allRefs.length} 条未抓取，分批抓取（每批 15 条，批间 30s）`);
+  for (const ref of allRefs) {
+    const entry = indexByRef.get(ref);
+    jobs.push({
+      key: ref,
+      ref,
+      bbox: CN_BBOX,
+      fromPlace: entry?.fromPlace ?? ref,
+      toPlace: entry?.toPlace ?? ref,
+      officialKm: officialKmByRef.get(ref) ?? 0,
+      provincialTiling: args.provincialTiling,
+    });
+  }
+} else if (args.key) {
   const entry = indexByRef.get(args.key);
   jobs.push({
     key: args.key,
@@ -214,6 +303,7 @@ if (args.key) {
     fromPlace: entry?.fromPlace ?? args.key,
     toPlace: entry?.toPlace ?? args.key,
     officialKm: officialKmByRef.get(args.key) ?? 0,
+    provincialTiling: args.provincialTiling,
   });
 } else {
   const refs = args.refs.length ? args.refs : FLAGSHIP_REFS;
@@ -226,20 +316,29 @@ if (args.key) {
       fromPlace: entry?.fromPlace ?? ref,
       toPlace: entry?.toPlace ?? ref,
       officialKm: officialKmByRef.get(ref) ?? 0,
+      provincialTiling: args.provincialTiling,
     });
   }
 }
 
-const results = [];
-for (const job of jobs) {
-  try {
-    const r = await fetchOne(job);
-    if (r) results.push(r);
-  } catch (e) {
-    console.log(`  ✗ ${job.key} 失败：${e.message}`);
+let results, failed;
+if (args.batch) {
+  ({ results, failed } = await runBatched(jobs, 15, 30000));
+} else {
+  results = [];
+  for (const job of jobs) {
+    try {
+      const r = await fetchOne(job);
+      if (r) results.push(r);
+    } catch (e) {
+      console.log(`  ✗ ${job.key} 失败：${e.message}`);
+    }
   }
 }
 
 console.log('\n== 抓取汇总 ==');
 for (const r of results) console.log(`${r.key}: ${r.totalKm}km / ${r.points}点 / 孤立段${r.orphans}`);
+if (failed && failed.length) {
+  console.log(`失败 ${failed.length} 条：${failed.map((f) => f.key).join(', ')}`);
+}
 console.log(`成功 ${results.length}/${jobs.length}。后续：node scripts/build-road-index.mjs --merge 挂回 L0。`);

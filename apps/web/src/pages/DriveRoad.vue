@@ -44,6 +44,30 @@ const routePath = computed(() => {
   return d;
 });
 
+/** 多段几何（orphan 链）SVG 路径：虚线渲染未贯通段 */
+const segmentPaths = computed(() => {
+  const segs = roadRoute.value?.segments;
+  if (!segs?.length) return [];
+  return segs
+    .map((seg) => {
+      if (seg.length < 2) return '';
+      let d = '';
+      seg.forEach(([lng, lat], i) => {
+        const [x, y] = lngLatToViewBox(lng, lat);
+        d += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+      });
+      return d;
+    })
+    .filter(Boolean);
+});
+
+/** 段间断点标注 */
+const gapAnnotations = computed(() => roadRoute.value?.gapAnnotations ?? []);
+const hasGaps = computed(() => gapAnnotations.value.length > 0);
+const gapKmTotal = computed(() =>
+  Math.round(gapAnnotations.value.reduce((s, g) => s + g.gapKm, 0)),
+);
+
 const viewBoxAttr = computed(() => {
   const coords = roadRoute.value?.coords;
   if (!coords?.length) return `0 0 ${VIEW_W} ${VIEW_H}`;
@@ -129,6 +153,15 @@ function goTripLive() {
             <svg :viewBox="viewBoxAttr" class="drive-trip-map__svg" role="img" aria-label="路线示意图">
               <g class="drive-netmap__outline" v-html="outlinePaths" />
               <path class="drive-trip-map__route" :d="routePath" :stroke="roadColor(entry.class)" />
+              <path
+                v-for="(d, i) in segmentPaths"
+                :key="'seg-' + i"
+                class="drive-trip-map__segment"
+                :d="d"
+                :stroke="roadColor(entry.class)"
+                stroke-dasharray="4 3"
+                opacity="0.45"
+              />
               <circle
                 v-for="s in spots.slice(0, 160)"
                 :key="s.id"
@@ -142,6 +175,9 @@ function goTripLive() {
               </circle>
             </svg>
             <p class="drive-trip-map__hint">全线走向示意（OSM 众包还原，非官方线位）</p>
+            <p v-if="hasGaps" class="drive-trip-map__gap-note">
+              ⚠ {{ gapAnnotations.length }} 处未贯通（合计约 {{ gapKmTotal }} km），虚线段为示意连接
+            </p>
           </section>
 
           <aside class="drive-trip-side">

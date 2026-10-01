@@ -1,6 +1,7 @@
 :root {
   --top-overlay: 72px;
   --bottom-overlay: 168px;
+  --bottom-panel-clearance: 168px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
@@ -32,11 +33,14 @@ body {
 /* ── 地图类页面：全屏不滚的壳，按页路由锁定根滚动容器 ──────────────────────
    - .trip-page  行程地图（Leaflet/高德全屏）
    - .atlas-page 全国铁路景点地图（position:fixed; inset:0）
+   - .corridor-map-page 线路详情「进入实时地图」全屏走廊图
    文档流页面（.select-page / .route-page）不在此列，保持正常滚动。 */
 html:has(.trip-page),
 html:has(.atlas-page),
+html:has(.corridor-map-page),
 body:has(.trip-page),
-body:has(.atlas-page) {
+body:has(.atlas-page),
+body:has(.corridor-map-page) {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
@@ -44,7 +48,8 @@ body:has(.atlas-page) {
 
 /* #app 的高度锁同样只在页面级地图生效：.trip-page{height:100%} 需要父级有确定高度 */
 html:has(.trip-page) #app,
-html:has(.atlas-page) #app {
+html:has(.atlas-page) #app,
+html:has(.corridor-map-page) #app {
   height: 100%;
 }
 
@@ -945,13 +950,16 @@ html:has(.atlas-page) #app {
   right: calc(10px + var(--safe-right));
   bottom: calc(var(--bottom-overlay) + 10px);
   z-index: 101;
-  min-width: 44px;
-  height: 44px;
-  padding: 0 12px;
+  box-sizing: border-box;
+  width: 88px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--success);
   border-radius: 999px;
   background: var(--panel-bg);
-  
   color: var(--success);
   font-size: 13px;
   font-weight: 700;
@@ -963,15 +971,18 @@ html:has(.atlas-page) #app {
 .satellite-btn {
   position: fixed;
   right: calc(10px + var(--safe-right));
-  bottom: calc(var(--bottom-overlay) + 62px);
+  bottom: calc(var(--bottom-overlay) + 58px);
   z-index: 101;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0 12px;
+  box-sizing: border-box;
+  width: 88px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border-default);
   border-radius: 999px;
   background: var(--panel-bg);
-  
   color: var(--text-primary);
   font-size: 13px;
   font-weight: 600;
@@ -989,18 +1000,22 @@ html:has(.atlas-page) #app {
 .legend-toggle {
   position: fixed;
   right: calc(10px + var(--safe-right));
-  bottom: calc(var(--bottom-overlay) + 114px);
+  bottom: calc(var(--bottom-overlay) + 106px);
   z-index: 101;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0 14px;
+  box-sizing: border-box;
+  width: 88px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border-default);
   border-radius: 999px;
   background: var(--panel-bg);
-  
   color: var(--text-primary);
   font-size: 13px;
   font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
 }
@@ -1008,15 +1023,16 @@ html:has(.atlas-page) #app {
 .legend {
   position: fixed;
   right: calc(10px + var(--safe-right));
-  bottom: calc(var(--bottom-overlay) + 166px);
+  bottom: calc(var(--bottom-overlay) + 154px);
   z-index: 101;
   display: none;
+  min-width: 88px;
   background: var(--panel-bg);
   border: 1px solid var(--border-default);
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   font-size: 12px;
-  line-height: 1.9;
+  line-height: 1.4;
   color: var(--text-secondary);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
 }
@@ -1026,27 +1042,28 @@ html:has(.atlas-page) #app {
 }
 
 .legend i {
-  display: inline-block;
+  display: block;
   flex-shrink: 0;
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  margin-right: 0;
-  vertical-align: middle;
+  margin: 0;
+  justify-self: center;
 }
 
 .legend-item--toggle {
-  display: flex;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
   align-items: center;
-  gap: 8px;
+  column-gap: 8px;
   width: 100%;
   margin: 0;
-  padding: 4px 6px;
+  padding: 5px 4px;
   border: none;
   background: transparent;
   color: inherit;
   font: inherit;
-  line-height: 1.4;
+  line-height: 1.35;
   text-align: left;
   cursor: pointer;
   border-radius: 6px;
@@ -1272,6 +1289,7 @@ html:has(.atlas-page) #app {
   :root {
     --top-overlay: 88px;
     --bottom-overlay: 156px;
+    --bottom-panel-clearance: 156px;
   }
 
   .top-bar {
@@ -1299,7 +1317,7 @@ html:has(.atlas-page) #app {
     display: none;
   }
 
-  /* 桌面图例常显：定位/卫星放在图例上方，避免遮挡 */
+  /* 桌面图例常显：定位/卫星放在图例上方（TripMap 图例较高，留足空隙） */
   .legend {
     display: block;
     bottom: calc(var(--bottom-overlay) + 12px);
@@ -1310,7 +1328,7 @@ html:has(.atlas-page) #app {
   }
 
   .satellite-btn {
-    bottom: calc(var(--bottom-overlay) + 242px);
+    bottom: calc(var(--bottom-overlay) + 238px);
   }
 
   .bottom-panel .meta {

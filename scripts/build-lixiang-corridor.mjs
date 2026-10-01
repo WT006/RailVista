@@ -1,5 +1,11 @@
 /**
  * 构建丽香 + 昆丽（滇藏南段）走廊，共享枢纽「丽江」，供 C118 路网拼接。
+ *
+ * 注意：锚点 densify 仅为历史兜底。正式几何请用：
+ *   node scripts/build-corridor-from-osm-relation.mjs 3431754 lixiang --from … --to …
+ *   node scripts/rebuild-kunli-corridor.mjs
+ * 过门禁：node scripts/verify-corridor-geometry.mjs --strict --id kunli|lixiang
+ *
  * node scripts/build-lixiang-corridor.mjs
  */
 import { writeFileSync, mkdirSync } from 'node:fs';

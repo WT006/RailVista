@@ -299,9 +299,25 @@ async function ensureTripLoaded() {
 
 function updateOverlayMetrics() {
   const top = document.querySelector('.top-bar')?.getBoundingClientRect().height || 72;
-  const bottom = document.querySelector('.bottom-panel')?.getBoundingClientRect().height || 118;
+  const vh = window.innerHeight;
+  const panel = document.querySelector('.bottom-panel')?.getBoundingClientRect();
+  const approach = document.querySelector('.approach-card')?.getBoundingClientRect();
+
+  // 仅底栏占位（给临近景点卡叠放用，避免把自身高度算进 --bottom-overlay 造成抬升环）
+  let panelClearance = 118;
+  if (panel && panel.height > 0) {
+    panelClearance = Math.ceil(vh - panel.top);
+  }
+
+  // 地图/图例/定位按钮：清到底栏与景点卡的最高顶边
+  let bottomClearance = panelClearance;
+  if (approach && approach.height > 0) {
+    bottomClearance = Math.max(bottomClearance, Math.ceil(vh - approach.top));
+  }
+
   document.documentElement.style.setProperty('--top-overlay', `${Math.ceil(top) + 16}px`);
-  document.documentElement.style.setProperty('--bottom-overlay', `${Math.ceil(bottom) + 12}px`);
+  document.documentElement.style.setProperty('--bottom-panel-clearance', `${panelClearance}px`);
+  document.documentElement.style.setProperty('--bottom-overlay', `${bottomClearance + 12}px`);
   map?.resize();
 }
 
@@ -366,7 +382,7 @@ function tick() {
     simulatedProgress: readSimulatedProgress(),
     forceSchedule,
     stationKm: mileage.stationKm,
-    railwaySource: 'station',
+    railwaySource: trip.railwaySource === 'precise' ? 'precise' : 'station',
   });
   progress.value = result.progress;
   mode.value = result.mode;
@@ -984,6 +1000,11 @@ function onVisibilityPersist() {
   }
 }
 
+function onWindowResize() {
+  compact.value = window.matchMedia('(max-width: 640px)').matches;
+  updateOverlayMetrics();
+}
+
 onMounted(async () => {
   try {
     await ensureTripLoaded();
@@ -992,6 +1013,7 @@ onMounted(async () => {
     await initMap();
     window.addEventListener('pagehide', onPageHidePersist);
     document.addEventListener('visibilitychange', onVisibilityPersist);
+    window.addEventListener('resize', onWindowResize, { passive: true });
   } catch (e) {
     error.value = e instanceof Error ? e.message : '地图初始化失败';
   }
@@ -1038,9 +1060,15 @@ watch(
   },
 );
 
+watch(approachingSpot, async () => {
+  await nextTick();
+  updateOverlayMetrics();
+});
+
 onUnmounted(() => {
   window.removeEventListener('pagehide', onPageHidePersist);
   document.removeEventListener('visibilitychange', onVisibilityPersist);
+  window.removeEventListener('resize', onWindowResize);
   void persistActiveTrip({ bumpOpenedAt: false, setResume: false });
   trip.stopPrecisePoll();
   map?.destroy?.();

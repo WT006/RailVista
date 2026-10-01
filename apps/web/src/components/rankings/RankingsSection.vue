@@ -6,19 +6,15 @@
  *
  * 交互要点（见主页改版指令 §2）：
  * - 胶囊 Tab 切换，200ms 淡入 / 位移动画；
- * - 前三名大卡（金/银/铜渐变描边），第 4 名起紧凑列表行；
+ * - 前三名领奖台（①居中通栏，②左③右；金/银/铜低饱和金属色），第 4 名起紧凑列表行；
  * - corridorId === null 条目弱化：无「查看线路」箭头，点击只展开亮点与说明；
- * - 点击有 corridorId 的条目 → /route/:corridorId，并在 localStorage 累计「我的关注」；
- * - 底部来源脚注外链 target="_blank"；模块下方是全国铁路景点地图入口。
+ * - 点击有 corridorId 的条目 → /route/:corridorId；
+ * - 末尾一句来源说明。
  */
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   RANKINGS,
-  RANKING_SOURCE_LINKS,
-  bumpFocus,
-  focusKeyOf,
-  readFocusCounts,
   type RankItem,
 } from '../../data/beautifulRailings';
 
@@ -26,10 +22,11 @@ const router = useRouter();
 
 const activeId = ref(RANKINGS[0]!.id);
 const expandedKey = ref<string | null>(null);
-const focus = ref<Record<string, number>>(readFocusCounts());
 
 const active = computed(() => RANKINGS.find((r) => r.id === activeId.value) || RANKINGS[0]!);
-const top3 = computed(() => active.value.items.filter((i) => i.rank <= 3));
+const top3 = computed(() =>
+  active.value.items.filter((i) => i.rank <= 3).sort((a, b) => a.rank - b.rank),
+);
 const rest = computed(() => active.value.items.filter((i) => i.rank > 3));
 
 function medal(rank: number): 'gold' | 'silver' | 'bronze' {
@@ -44,12 +41,7 @@ function isExpanded(item: RankItem): boolean {
   return expandedKey.value === itemKey(item);
 }
 
-function focusCountOf(item: RankItem): number {
-  return focus.value[focusKeyOf(active.value.id, item.name)] || 0;
-}
-
 function onItemClick(item: RankItem) {
-  focus.value = bumpFocus(active.value.id, item.name);
   if (!item.corridorId) {
     // 无线路地图：只展开亮点与说明，不跳转
     expandedKey.value = isExpanded(item) ? null : itemKey(item);
@@ -59,33 +51,6 @@ function onItemClick(item: RankItem) {
   if (item.from) q.from = item.from;
   if (item.to) q.to = item.to;
   void router.push({ path: `/route/${item.corridorId}`, query: q });
-}
-
-function goAtlas() {
-  void router.push('/atlas');
-}
-
-/** 「我的关注」：本机点击计数降序，最多 5 条 */
-const focusTop = computed(() => {
-  const entries = RANKINGS.flatMap((r) =>
-    r.items.map((item) => ({
-      ranking: r,
-      item,
-      count: focus.value[focusKeyOf(r.id, item.name)] || 0,
-    })),
-  )
-    .filter((x) => x.count > 0)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
-  return entries;
-});
-
-function onFocusClick(rankingId: string, item: RankItem) {
-  if (!item.corridorId) return;
-  void router.push({
-    path: `/route/${item.corridorId}`,
-    query: { from: item.from, to: item.to },
-  });
 }
 </script>
 
@@ -117,7 +82,6 @@ function onFocusClick(rankingId: string, item: RankItem) {
     <Transition name="rank-swap" mode="out-in">
       <div :key="active.id" class="rankings__body">
         <p class="rankings__source">
-          <span class="rankings__source-nature">{{ active.source.nature }}</span>
           {{ active.source.name }} · {{ active.source.year }}
         </p>
 
@@ -138,11 +102,6 @@ function onFocusClick(rankingId: string, item: RankItem) {
             <h3 class="rank-card__name">{{ item.name }}</h3>
             <span class="rank-od">{{ item.from }} → {{ item.to }}</span>
             <p class="rank-card__tagline">{{ item.tagline }}</p>
-            <p class="rank-card__meta">
-              <span v-if="item.lengthKm">{{ item.lengthKm }} km</span>
-              <span v-if="item.openedYear">{{ item.openedYear }} 年通车</span>
-              <span v-if="focusCountOf(item)" class="rank-card__focus">看过 {{ focusCountOf(item) }} 次</span>
-            </p>
             <span v-if="item.corridorId" class="rank-card__go">查看线路 ›</span>
             <span v-else class="rank-card__none">暂无线路地图</span>
             <p v-if="!item.corridorId && isExpanded(item)" class="rank-card__note">
@@ -176,51 +135,15 @@ function onFocusClick(rankingId: string, item: RankItem) {
                 {{ item.note || '该线路暂无轨道数据，未收录进线路地图' }}
               </span>
             </span>
-            <span class="rank-row__src">{{ active.source.nature }}</span>
             <span v-if="item.corridorId" class="rank-row__go" aria-hidden="true">›</span>
           </li>
         </ul>
       </div>
     </Transition>
 
-    <div v-if="focusTop.length" class="rankings__focus">
-      <p class="rankings__focus-title">我的关注<span class="rankings__focus-hint">（本机点击统计，非全网热度）</span></p>
-      <ol class="rankings__focus-list">
-        <li v-for="(f, i) in focusTop" :key="`${f.ranking.id}-${f.item.name}`">
-          <button
-            type="button"
-            class="rankings__focus-btn"
-            :disabled="!f.item.corridorId"
-            @click="onFocusClick(f.ranking.id, f.item)"
-          >
-            <span class="rankings__focus-no">{{ i + 1 }}</span>
-            <span class="rankings__focus-name">{{ f.item.name }}</span>
-            <span class="rankings__focus-count">{{ f.count }} 次</span>
-            <span class="rankings__focus-src">{{ f.ranking.title }}</span>
-          </button>
-        </li>
-      </ol>
-    </div>
-
-    <button type="button" class="atlas-entry" @click="goAtlas">
-      <span class="atlas-entry__main">
-        <span class="atlas-entry__title">全国铁路景点地图</span>
-        <span class="atlas-entry__desc">一眼看遍中国铁路沿线的风景</span>
-      </span>
-      <span class="atlas-entry__go" aria-hidden="true">进入 ›</span>
-    </button>
-
-    <footer class="rankings__sources">
-      <p class="rankings__sources-title">榜单来源（排名口径与年份以来源为准，不代表官方统一评选）</p>
-      <ul>
-        <li v-for="s in RANKING_SOURCE_LINKS" :key="s.url">
-          <a :href="s.url" target="_blank" rel="noopener noreferrer">{{ s.label }}</a>
-        </li>
-      </ul>
-      <p class="rankings__sources-note">
-        线路排名为线路级展示，不精确到车次；「我的关注」仅记录本机点击，不伪造搜索量。
-      </p>
-    </footer>
+    <p class="rankings__sources-note">
+      排名口径与年份以来源为准，不代表官方统一评选。
+    </p>
   </section>
 </template>
 
@@ -340,27 +263,22 @@ function onFocusClick(rankingId: string, item: RankItem) {
   color: var(--text-3);
 }
 
-.rankings__source-nature {
-  display: inline-block;
-  margin-right: var(--space-1);
-  padding: 1px var(--space-2);
-  border-radius: var(--radius-full);
-  background: var(--accent-soft);
-  color: var(--accent-hover);
-  font-size: var(--fs-micro);
-}
-
-/* ── 前三名大卡 ── */
+/* ── 前三名领奖台：① 通栏居中置顶；②③ 左右并排略矮 ── */
 .rankings__podium {
   display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    'gold gold'
+    'silver bronze';
   gap: var(--space-2);
+  align-items: end;
 }
 
 .rank-card {
   position: relative;
   display: grid;
   gap: var(--space-1);
-  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  padding: var(--space-3);
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-hairline);
   background: var(--surface-sunken);
@@ -368,7 +286,8 @@ function onFocusClick(rankingId: string, item: RankItem) {
   transition:
     transform var(--dur-fast) var(--ease-spring),
     border-color var(--dur-fast) var(--ease-standard),
-    background-color var(--dur-fast) var(--ease-standard);
+    background-color var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-fast) var(--ease-standard);
 }
 
 .rank-card::before {
@@ -381,16 +300,50 @@ function onFocusClick(rankingId: string, item: RankItem) {
   border-radius: var(--radius-full);
 }
 
+/* 金 / 银 / 铜：低饱和金属色，贴合深色玻璃；三卡同尺寸，仅色相区分 */
+.rank-card--gold {
+  grid-area: gold;
+  justify-self: center;
+  /* 与下方单列同宽，居中摆在第一排 */
+  width: calc((100% - var(--space-2)) / 2);
+  padding: var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 2px);
+  border-color: rgba(224, 177, 85, 0.32);
+  background:
+    linear-gradient(155deg, rgba(224, 177, 85, 0.16), transparent 58%),
+    var(--surface-sunken);
+  box-shadow: 0 10px 24px -16px rgba(224, 177, 85, 0.35);
+}
+
 .rank-card--gold::before {
-  background: linear-gradient(180deg, #f0c976, #c9a24d);
+  background: linear-gradient(180deg, #f0d78a, #c9a24d 55%, #a8842f);
+}
+
+.rank-card--silver {
+  grid-area: silver;
+  padding: var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 2px);
+  border-color: rgba(165, 176, 192, 0.28);
+  background:
+    linear-gradient(155deg, rgba(165, 176, 192, 0.12), transparent 58%),
+    var(--surface-sunken);
+  box-shadow: 0 10px 24px -16px rgba(140, 152, 168, 0.3);
 }
 
 .rank-card--silver::before {
-  background: linear-gradient(180deg, #cdd5e0, #8d97a6);
+  background: linear-gradient(180deg, #e4e9f0, #9aa5b4 55%, #6f7a8a);
+}
+
+.rank-card--bronze {
+  grid-area: bronze;
+  padding: var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 2px);
+  border-color: rgba(196, 132, 88, 0.3);
+  background:
+    linear-gradient(155deg, rgba(196, 132, 88, 0.13), transparent 58%),
+    var(--surface-sunken);
+  box-shadow: 0 10px 24px -16px rgba(168, 108, 64, 0.32);
 }
 
 .rank-card--bronze::before {
-  background: linear-gradient(180deg, #d79a6a, #a9703f);
+  background: linear-gradient(180deg, #e0a878, #b8794a 55%, #8f5a32);
 }
 
 .rank-card.is-muted {
@@ -406,29 +359,31 @@ function onFocusClick(rankingId: string, item: RankItem) {
   display: grid;
   place-items: center;
   border-radius: var(--radius-sm);
-  color: var(--text-on-accent);
+  color: #0b0e14;
   font-size: var(--fs-cap);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .rank-card--gold .rank-card__badge {
-  background: linear-gradient(135deg, #f0c976, #c9a24d);
+  background: linear-gradient(145deg, #f3dfa0, #d4a84a 48%, #b8923a);
 }
 
 .rank-card--silver .rank-card__badge {
-  background: linear-gradient(135deg, #e2e7ee, #9aa4b2);
+  background: linear-gradient(145deg, #f0f3f7, #b0b9c6 48%, #8a95a4);
 }
 
 .rank-card--bronze .rank-card__badge {
-  background: linear-gradient(135deg, #d79a6a, #a9703f);
+  background: linear-gradient(145deg, #ebc09a, #c48452 48%, #9a6238);
 }
 
 .rank-card__name {
   margin: 0;
   padding-right: 30px;
-  font-size: var(--fs-h3);
+  font-size: var(--fs-meta);
   font-weight: 700;
+  line-height: var(--lh-tight);
   color: var(--text-1);
 }
 
@@ -442,29 +397,35 @@ function onFocusClick(rankingId: string, item: RankItem) {
   font-size: var(--fs-micro);
 }
 
+.rank-card--gold .rank-od {
+  border-color: rgba(224, 177, 85, 0.28);
+  background: rgba(224, 177, 85, 0.1);
+  color: #e8d2a0;
+}
+
+.rank-card--silver .rank-od {
+  border-color: rgba(165, 176, 192, 0.28);
+  background: rgba(165, 176, 192, 0.1);
+}
+
+.rank-card--bronze .rank-od {
+  border-color: rgba(196, 132, 88, 0.28);
+  background: rgba(196, 132, 88, 0.1);
+}
+
 .rank-card__tagline {
   margin: 0;
-  font-size: var(--fs-cap);
-  line-height: var(--lh-normal);
-  color: var(--text-2);
-}
-
-.rank-card__meta {
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
   font-size: var(--fs-micro);
+  line-height: var(--lh-snug);
   color: var(--text-3);
-  font-variant-numeric: tabular-nums;
-}
-
-.rank-card__focus {
-  color: var(--accent-hover);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .rank-card__go {
-  font-size: var(--fs-cap);
+  font-size: var(--fs-micro);
   font-weight: 600;
   color: var(--accent);
 }
@@ -486,6 +447,27 @@ function onFocusClick(rankingId: string, item: RankItem) {
     transform: translateY(-2px);
     border-color: var(--line-strong);
     background: var(--surface-2);
+  }
+
+  .rank-card--gold:hover {
+    border-color: rgba(224, 177, 85, 0.48);
+    background:
+      linear-gradient(155deg, rgba(224, 177, 85, 0.2), transparent 58%),
+      var(--surface-2);
+  }
+
+  .rank-card--silver:hover {
+    border-color: rgba(165, 176, 192, 0.42);
+    background:
+      linear-gradient(155deg, rgba(165, 176, 192, 0.16), transparent 58%),
+      var(--surface-2);
+  }
+
+  .rank-card--bronze:hover {
+    border-color: rgba(196, 132, 88, 0.45);
+    background:
+      linear-gradient(155deg, rgba(196, 132, 88, 0.17), transparent 58%),
+      var(--surface-2);
   }
 }
 
@@ -584,16 +566,6 @@ function onFocusClick(rankingId: string, item: RankItem) {
   color: var(--text-2);
 }
 
-.rank-row__src {
-  flex-shrink: 0;
-  align-self: center;
-  padding: 1px var(--space-2);
-  border-radius: var(--radius-full);
-  background: var(--fill-subtle);
-  color: var(--text-3);
-  font-size: var(--fs-micro);
-}
-
 .rank-row__go {
   flex-shrink: 0;
   align-self: center;
@@ -602,259 +574,25 @@ function onFocusClick(rankingId: string, item: RankItem) {
   line-height: 1;
 }
 
-/* ── 我的关注 ── */
-.rankings__focus {
-  padding: var(--space-3);
-  border-radius: var(--radius-sm);
-  border: 1px dashed var(--line-accent);
-  background: var(--accent-soft);
-}
-
-.rankings__focus-title {
-  margin: 0 0 var(--space-2);
-  font-size: var(--fs-cap);
-  font-weight: 700;
-  color: var(--accent-hover);
-}
-
-.rankings__focus-hint {
-  margin-left: var(--space-1);
-  font-size: var(--fs-micro);
-  font-weight: 400;
-  color: var(--text-3);
-}
-
-.rankings__focus-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--space-1);
-}
-
-.rankings__focus-btn {
-  position: relative;
-  width: 100%;
-  min-height: 32px;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-1) var(--space-2);
-  border: none;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--text-2);
-  font-family: inherit;
-  font-size: var(--fs-cap);
-  text-align: left;
-  cursor: pointer;
-  transition: background-color var(--dur-fast) var(--ease-standard);
-}
-
-/* 触控热区补齐到 44px */
-.rankings__focus-btn::after {
-  content: '';
-  position: absolute;
-  inset: calc((44px - 100%) / -2) 0;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .rankings__focus-btn:hover:not(:disabled) {
-    background: var(--fill-accent);
-  }
-}
-
-.rankings__focus-btn:disabled {
-  cursor: default;
-  opacity: 0.6;
-}
-
-.rankings__focus-no {
-  width: 16px;
-  text-align: center;
-  color: var(--text-3);
-  font-variant-numeric: tabular-nums;
-}
-
-.rankings__focus-name {
-  font-weight: 600;
-  color: var(--text-1);
-}
-
-.rankings__focus-count {
-  color: var(--accent-hover);
-  font-variant-numeric: tabular-nums;
-}
-
-.rankings__focus-src {
-  margin-left: auto;
-  font-size: var(--fs-micro);
-  color: var(--text-3);
-}
-
-/* ── 全国铁路景点地图入口 ──
- * 侧栏的"次级主行动点"：用宇宙蓝渐变玻璃 + 同心圆轨迹装饰，
- * 与榜单条目拉开层级；悬停时光晕点亮 + 箭头位移。 */
-.atlas-entry {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--line-accent);
-  background: linear-gradient(
-    135deg,
-    rgba(77, 159, 255, 0.22),
-    rgba(77, 159, 255, 0.07) 52%,
-    rgba(157, 140, 240, 0.14)
-  );
-  color: var(--accent-hover);
-  font-family: inherit;
-  cursor: pointer;
-  transition:
-    transform var(--dur-fast) var(--ease-spring),
-    border-color var(--dur-fast) var(--ease-standard),
-    box-shadow var(--dur-base) var(--ease-standard);
-}
-
-/* 装饰：右上角同心圆"航线"纹理（纯 CSS，随容器裁剪） */
-.atlas-entry::before {
-  content: '';
-  position: absolute;
-  right: -26px;
-  top: -30px;
-  width: 104px;
-  height: 104px;
-  border-radius: var(--radius-full);
-  border: 1px solid rgba(77, 159, 255, 0.28);
-  box-shadow:
-    0 0 0 18px rgba(77, 159, 255, 0.07),
-    0 0 0 36px rgba(77, 159, 255, 0.04);
-  pointer-events: none;
-}
-
-/* 指针光晕（与其他二/三级条目同规格，坐标由 usePointerSpotlight 写入） */
-.atlas-entry::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(
-    calc(var(--glow-radius) * 0.55) circle at var(--mx, 50%) var(--my, 0%),
-    rgba(255, 255, 255, var(--glow-alpha-tile)),
-    transparent 65%
-  );
-  transition: opacity var(--dur-base) var(--ease-standard);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .atlas-entry:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent);
-    box-shadow: 0 12px 32px -12px rgba(77, 159, 255, 0.35);
-  }
-
-  .atlas-entry:hover::after {
-    opacity: 1;
-  }
-
-  .atlas-entry:hover .atlas-entry__go {
-    transform: translateX(3px);
-  }
-}
-
-.atlas-entry__main {
-  display: grid;
-  gap: var(--space-1);
-  text-align: left;
-}
-
-.atlas-entry__title {
-  font-size: var(--fs-h3);
-  font-weight: 700;
-  color: var(--text-1);
-}
-
-.atlas-entry__desc {
-  font-size: var(--fs-cap);
-  color: var(--text-2);
-}
-
-.atlas-entry__go {
-  flex-shrink: 0;
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--line-accent);
-  background: rgba(77, 159, 255, 0.16);
-  font-size: var(--fs-cap);
-  font-weight: 600;
-  color: var(--accent-hover);
-  transition: transform var(--dur-fast) var(--ease-spring);
-}
-
 /* ── 来源脚注 ── */
-.rankings__sources {
-  display: grid;
-  gap: var(--space-1);
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--line-hairline);
-}
-
-.rankings__sources-title {
-  margin: 0;
-  font-size: var(--fs-micro);
-  color: var(--text-3);
-}
-
-.rankings__sources ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--space-1);
-}
-
-.rankings__sources a {
-  font-size: var(--fs-micro);
-  line-height: var(--lh-normal);
-  color: var(--accent-hover);
-  text-decoration: none;
-}
-
-.rankings__sources a:hover {
-  text-decoration: underline;
-}
-
 .rankings__sources-note {
-  margin: var(--space-1) 0 0;
+  margin: 0;
+  padding-top: var(--space-1);
   font-size: var(--fs-micro);
   line-height: var(--lh-normal);
   color: var(--text-3);
 }
 
-/* ── 窄屏：列表行允许换行，来源标签下移 ── */
+/* ── 窄屏 ── */
 @media (max-width: 480px) {
   .rank-row {
     flex-wrap: wrap;
-  }
-
-  .rank-row__src {
-    order: 3;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .rank-card,
   .rank-row,
-  .atlas-entry,
-  .atlas-entry__go,
   .rankings__tab {
     transition: none;
   }

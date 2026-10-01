@@ -444,7 +444,12 @@ html {
   overflow: auto;
   overscroll-behavior: contain;
   border-radius: var(--radius-md);
-  background: var(--surface-1);
+  /* 弹出层压在卡内字段上：提高不透明度 + 玻璃模糊，避免「乘车日期」等透字重叠。
+   * 父级 .rv-card 已有 backdrop-filter 时，嵌套 blur 在部分引擎会弱化，
+   * 故底色需比 --surface-1 更实，blur 作为增强而非唯一屏障。 */
+  background: color-mix(in srgb, var(--surface-0) 88%, transparent);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   border: 1px solid var(--line-default);
   box-shadow: var(--elev-4);
 }
@@ -587,6 +592,131 @@ html {
 .select-form--panel {
   gap: var(--space-4);
   animation: rv-card-in var(--dur-enter) var(--ease-emphasized) 60ms both;
+}
+
+/* ── 查询面板切换（按站 ↔ 车次号）──
+ * 容器高度由 JS 写入 --query-flip-h 并平滑过渡；
+ * 两面绝对叠放，交叉淡入 + 上下微位移。 */
+.query-flip {
+  position: relative;
+  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) 60ms both;
+}
+
+.query-flip__card {
+  position: relative;
+  height: var(--query-flip-h, auto);
+  transition: height var(--dur-flip) var(--ease-emphasized);
+}
+
+.query-flip__face {
+  width: 100%;
+  /* 入场动画改由 .query-flip 承担，避免正反面各播一次 */
+  animation: none;
+  transition:
+    opacity var(--dur-flip) var(--ease-emphasized),
+    transform var(--dur-flip) var(--ease-emphasized);
+}
+
+/* 量高前：正面占文档流撑开容器；背面藏起 */
+.query-flip__card:not(.is-measured) .query-flip__face--front {
+  position: relative;
+}
+
+.query-flip__card:not(.is-measured) .query-flip__face--back {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  visibility: hidden;
+}
+
+.query-flip__card.is-measured .query-flip__face--front,
+.query-flip__card.is-measured .query-flip__face--back {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+/* 正面可见 */
+.query-flip__card.is-measured .query-flip__face--front {
+  opacity: 1;
+  transform: translateY(0);
+  z-index: 1;
+}
+
+/* 切到车次面：正面上移淡出 */
+.query-flip.is-flipped .query-flip__face--front {
+  opacity: 0;
+  transform: translateY(-8px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 背面默认：下移隐藏 */
+.query-flip__face--back {
+  opacity: 0;
+  transform: translateY(8px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 切到车次面：背面就位淡入 */
+.query-flip.is-flipped .query-flip__face--back {
+  opacity: 1;
+  transform: translateY(0);
+  z-index: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* 悬停抬升会覆盖微位移 transform：隐藏面保持离场位移，可见面保留卡片抬升 */
+@media (hover: hover) and (pointer: fine) {
+  .query-flip.is-flipped .query-flip__face--front.rv-card:hover {
+    transform: translateY(-8px);
+  }
+
+  .query-flip:not(.is-flipped) .query-flip__face--back.rv-card:hover {
+    transform: translateY(8px);
+  }
+
+  .query-flip:not(.is-flipped) .query-flip__face--front.rv-card:hover {
+    transform: translateY(-2px) scale(1.006);
+  }
+
+  .query-flip.is-flipped .query-flip__face--back.rv-card:hover {
+    transform: translateY(-2px) scale(1.006);
+  }
+}
+
+.query-flip__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.query-flip__head-text {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.query-flip__toggle {
+  flex: none;
+  gap: var(--space-1);
+}
+
+.query-flip__toggle-icon {
+  display: inline-block;
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+/* 弹层防遮挡：日期 / 站名建议伸出卡外时抬整块翻转容器 */
+.query-flip:has(.dtf--open),
+.query-flip.has-suggest-open {
+  z-index: 30;
 }
 
 /* ── 弹层防遮挡 ──
@@ -831,19 +961,16 @@ html {
   border-color: var(--danger);
 }
 
-/* —— 按车次号直达（查询表单内的次级入口）——
- * 视觉上弱化为主查询的"另一种方式"：细分隔线 + 小号标签 + 单行输入。
- * 复用同一个日期字段的乘车日。 */
+/* —— 按车次号查询（翻转卡片背面）——
+ * 与按站查询同级，不再用顶部分隔线弱化。 */
 .code-search {
   display: grid;
-  gap: var(--space-2);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--line-hairline);
+  gap: var(--space-3);
 }
 
-.code-search__label {
-  font-size: var(--fs-cap);
-  color: var(--text-3);
+.code-search__field {
+  display: grid;
+  gap: var(--space-2);
 }
 
 .code-search__row {
@@ -950,13 +1077,6 @@ html {
     transform: translateY(-1px);
     border-color: var(--line-strong);
     background: var(--surface-3);
-  }
-}
-
-/* 横屏两列表单：车次直达跨整行 */
-@media (orientation: landscape) and (max-height: 560px) {
-  .select-form > .code-search {
-    grid-column: 1 / -1;
   }
 }
 
@@ -1233,7 +1353,7 @@ html {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  margin-top: var(--space-3);
+  margin: var(--space-2) 0 var(--space-1);
 }
 
 @media (max-width: 560px) {
@@ -1289,7 +1409,8 @@ html {
 
   .select-form > .rv-head,
   .select-form > .date-field,
-  .select-form > .actions {
+  .select-form > .actions,
+  .select-form > .code-search {
     grid-column: 1 / -1;
   }
 
@@ -1479,7 +1600,7 @@ html {
     left: auto;
     right: var(--space-4);
     bottom: var(--space-4);
-    width: min(380px, calc(100vw - 2 * var(--space-4)));
+    width: min(380px, calc(50vw - 2.5 * var(--space-4)));
     border-radius: var(--radius-md);
     border: 1px solid var(--line-default);
     box-shadow: var(--elev-3);

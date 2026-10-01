@@ -137,6 +137,7 @@
   --dur-slow: 300ms; /* 页面转场 */
   --dur-slower: 520ms; /* 大块内容进出场 */
   --dur-enter: 400ms; /* 首屏入场 */
+  --dur-flip: 600ms; /* 查询面板切换：高度 + 交叉淡入 */
 
   --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
   --ease-emphasized: cubic-bezier(0.4, 0, 0.2, 1);

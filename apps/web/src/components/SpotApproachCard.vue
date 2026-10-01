@@ -116,11 +116,16 @@ const countdownText = computed(() => {
 
 <style scoped>
 .approach-card {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 128px);
-  z-index: 40;
+  /* fixed：与 .bottom-panel 同一坐标系，避免 absolute 相对 .trip-page 时宽屏叠压错位 */
+  position: fixed;
+  left: calc(12px + var(--safe-left, 0px));
+  right: calc(12px + var(--safe-right, 0px));
+  /* 叠在底栏上方；高度仅取底栏占位，避免与 --bottom-overlay 互相抬升 */
+  bottom: calc(var(--bottom-panel-clearance, var(--bottom-overlay, 168px)) + 8px);
+  z-index: 99;
+  max-width: 100%;
+  max-height: min(42vh, 260px);
+  overflow: auto;
   padding: 10px 12px 11px;
   border-radius: 14px;
   background: linear-gradient(165deg, rgba(30, 41, 59, 0.96), var(--bg-base));
@@ -130,6 +135,17 @@ const countdownText = computed(() => {
   font-size: 12.5px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+/* 宽屏：左下浮卡，与右下 .bottom-panel 成对，不再拉满全宽压住右侧 */
+@media (min-width: 960px) {
+  .approach-card {
+    left: var(--space-4);
+    right: auto;
+    bottom: var(--space-4);
+    width: min(380px, calc(50vw - 2.5 * var(--space-4)));
+    max-height: min(48vh, 320px);
+  }
 }
 
 .approach-card--compact {

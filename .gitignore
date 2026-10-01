@@ -43,3 +43,6 @@ coverage
 .idea.bak-route/
 skills-lock.json
 .workbuddy/
+
+# Office lock files
+~$*

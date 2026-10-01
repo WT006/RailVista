@@ -1,0 +1,102 @@
+{
+ "version": 1,
+ "updated": "2026-10-01",
+ "roads": [
+  {
+   "province": "青海",
+   "ref": "S101",
+   "name": "",
+   "fromPlace": "西宁",
+   "toPlace": "久治",
+   "officialLengthKm": 400
+  },
+  {
+   "province": "青海",
+   "ref": "S102",
+   "name": "",
+   "fromPlace": "西宁",
+   "toPlace": "平安",
+   "officialLengthKm": 40
+  },
+  {
+   "province": "青海",
+   "ref": "S202",
+   "name": "",
+   "fromPlace": "恰卜恰",
+   "toPlace": "贵德",
+   "officialLengthKm": 100
+  },
+  {
+   "province": "四川",
+   "ref": "S211",
+   "name": "",
+   "fromPlace": "丹巴",
+   "toPlace": "小金",
+   "officialLengthKm": 60
+  },
+  {
+   "province": "四川",
+   "ref": "S217",
+   "name": "",
+   "fromPlace": "甘孜",
+   "toPlace": "白玉",
+   "officialLengthKm": 300
+  },
+  {
+   "province": "四川",
+   "ref": "S303",
+   "name": "",
+   "fromPlace": "映秀",
+   "toPlace": "卧龙",
+   "officialLengthKm": 45
+  },
+  {
+   "province": "云南",
+   "ref": "S308",
+   "name": "",
+   "fromPlace": "丽江",
+   "toPlace": "香格里拉",
+   "officialLengthKm": 180
+  },
+  {
+   "province": "新疆",
+   "ref": "S101",
+   "name": "",
+   "fromPlace": "乌鲁木齐",
+   "toPlace": "巴仑台",
+   "officialLengthKm": 300
+  },
+  {
+   "province": "西藏",
+   "ref": "S301",
+   "name": "",
+   "fromPlace": "拉萨",
+   "toPlace": "羊八井",
+   "officialLengthKm": 80
+  },
+  {
+   "province": "甘肃",
+   "ref": "S301",
+   "name": "",
+   "fromPlace": "兰州",
+   "toPlace": "刘家峡",
+   "officialLengthKm": 80
+  },
+  {
+   "province": "湖南",
+   "ref": "S228",
+   "name": "",
+   "fromPlace": "张家界",
+   "toPlace": "武陵源",
+   "officialLengthKm": 40
+  },
+  {
+   "province": "河北",
+   "ref": "S272",
+   "name": "",
+   "fromPlace": "张北",
+   "toPlace": "沽源",
+   "officialLengthKm": 90
+  }
+ ]
+}

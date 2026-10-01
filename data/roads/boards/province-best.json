@@ -1,0 +1,73 @@
+{
+  "id": "province-best",
+  "title": "分省精品自驾线",
+  "subtitle": "各省交通运输厅 / 文旅厅「最美自驾路」上榜线路（扩展位，持续录入）",
+  "source": {
+    "org": "各省交通运输厅 / 文旅厅",
+    "publishedAt": "历年"
+  },
+  "level": "provincial",
+  "itemCount": 5,
+  "items": [
+    {
+      "rank": 1,
+      "routeId": "",
+      "name": "河北 · 草原天路",
+      "roadKeys": [],
+      "fromPlace": "张家口",
+      "toPlace": "张北",
+      "province": ["河北"],
+      "lengthKm": 132,
+      "highlight": "坝上草原的起伏天路",
+      "tags": ["草原", "坝上"]
+    },
+    {
+      "rank": 2,
+      "routeId": "",
+      "name": "新疆 · 伊昭公路",
+      "roadKeys": [],
+      "fromPlace": "伊宁",
+      "toPlace": "昭苏",
+      "province": ["新疆"],
+      "lengthKm": 180,
+      "highlight": "翻越乌孙山的险峻短线，一日四季",
+      "tags": ["天山", "险峻"]
+    },
+    {
+      "rank": 3,
+      "routeId": "",
+      "name": "云南 · 独龙江公路",
+      "roadKeys": [],
+      "fromPlace": "丽江",
+      "toPlace": "香格里拉",
+      "province": ["云南"],
+      "lengthKm": 180,
+      "highlight": "老国道上的雪山峡谷段（独龙江公路全段待录）",
+      "tags": ["峡谷", "雪山"]
+    },
+    {
+      "rank": 4,
+      "routeId": "",
+      "name": "青海 · 环青海湖公路",
+      "roadKeys": [],
+      "fromPlace": "西宁",
+      "toPlace": "共和",
+      "province": ["青海"],
+      "lengthKm": 360,
+      "highlight": "高原圣湖环线，油菜花与候鸟",
+      "tags": ["湖泊", "高原"]
+    },
+    {
+      "rank": 5,
+      "routeId": "",
+      "name": "四川 · 熊猫大道",
+      "roadKeys": [],
+      "fromPlace": "成都",
+      "toPlace": "四姑娘山",
+      "province": ["四川"],
+      "lengthKm": 230,
+      "highlight": "映秀卧龙到四姑娘山，熊猫家园走廊",
+      "tags": ["大熊猫", "邛崃山"]
+    }
+  ]
+}

@@ -9,6 +9,7 @@
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import BrandLogo from './BrandLogo.vue';
+import AppNavLinks from './AppNavLinks.vue';
 
 /** 滚动增强：滚过一小段距离后加深顶栏渐变，保证内容从栏下穿过时的可读性 */
 const scrolled = ref(false);
@@ -27,7 +28,11 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
     <div class="rv-shell appbar__inner">
       <div class="appbar__left">
         <!-- 品牌组合图已自带中英文字标，无需再叠副标题 -->
-        <BrandLogo :height="42" />
+        <BrandLogo :height="34" />
+        <nav class="appbar__nav" aria-label="主导航">
+          <!-- 默认全站导航（行程 / 自驾 / 全国地图），页面可用具名 slot 覆盖 -->
+          <slot name="nav"><AppNavLinks /></slot>
+        </nav>
       </div>
 
       <div class="appbar__right">
@@ -77,7 +82,27 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 .appbar__left {
   display: flex;
   align-items: center;
+  gap: var(--space-4);
   min-width: 0;
+}
+
+/* 主导航链接组（默认内容 AppNavLinks.vue，页面可用具名 slot 覆盖） */
+.appbar__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+/* 移动端：缩小品牌与导航的间距，导航仍保持可见（提供自驾入口） */
+@media (max-width: 599px) {
+  .appbar__left {
+    gap: var(--space-2);
+  }
+
+  .appbar__nav {
+    gap: 0;
+  }
 }
 
 .appbar__right {

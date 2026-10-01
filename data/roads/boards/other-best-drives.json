@@ -1,0 +1,85 @@
+{
+  "id": "other-best-drives",
+  "title": "其他最美自驾路线",
+  "subtitle": "多来源聚合（文旅部乡村旅游 251 条 / 冰雪旅游 12 条 / 各省最美自驾路 / 媒体榜单；本榜为样例集，全量待录入）",
+  "source": {
+    "org": "文旅部 · 各地文旅厅 · 媒体",
+    "publishedAt": "2024-2025"
+  },
+  "level": "media",
+  "itemCount": 6,
+  "items": [
+    {
+      "rank": 1,
+      "routeId": "",
+      "name": "海南环岛旅游公路",
+      "roadKeys": [],
+      "fromPlace": "海口",
+      "toPlace": "三亚",
+      "province": ["海南"],
+      "lengthKm": 988,
+      "highlight": "椰林海岸线上的环岛旅游公路",
+      "tags": ["滨海", "环岛"]
+    },
+    {
+      "rank": 2,
+      "routeId": "",
+      "name": "呼伦贝尔草原环线",
+      "roadKeys": [],
+      "fromPlace": "海拉尔",
+      "toPlace": "满洲里",
+      "province": ["内蒙古"],
+      "lengthKm": 600,
+      "highlight": "世界四大草原之一，边境卡线",
+      "tags": ["草原", "边境"]
+    },
+    {
+      "rank": 3,
+      "routeId": "",
+      "name": "甘南陇南秘境线",
+      "roadKeys": [],
+      "fromPlace": "兰州",
+      "toPlace": "郎木寺",
+      "province": ["甘肃"],
+      "lengthKm": 450,
+      "highlight": "拉卜楞寺、扎尕那、若尔盖草原",
+      "tags": ["藏地", "草原"]
+    },
+    {
+      "rank": 4,
+      "routeId": "",
+      "name": "黔东南民族风情线",
+      "roadKeys": [],
+      "fromPlace": "贵阳",
+      "toPlace": "荔波",
+      "province": ["贵州"],
+      "lengthKm": 400,
+      "highlight": "西江千户苗寨、肇兴侗寨、小七孔",
+      "tags": ["苗寨", "侗寨"]
+    },
+    {
+      "rank": 5,
+      "routeId": "",
+      "name": "太行天路",
+      "roadKeys": [],
+      "fromPlace": "长治",
+      "toPlace": "晋城",
+      "province": ["山西"],
+      "lengthKm": 300,
+      "highlight": "南太行绝壁峡谷与挂壁村落",
+      "tags": ["峡谷", "挂壁"]
+    },
+    {
+      "rank": 6,
+      "routeId": "",
+      "name": "中越沿边公路",
+      "roadKeys": ["G219"],
+      "fromPlace": "东兴",
+      "toPlace": "凭祥",
+      "province": ["广西"],
+      "lengthKm": 725,
+      "highlight": "G219 最南段，跨国瀑布与边关风情",
+      "tags": ["边境", "瀑布"]
+    }
+  ]
+}

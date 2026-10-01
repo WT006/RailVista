@@ -1,0 +1,133 @@
+{
+  "id": "cng-beautiful-roads",
+  "title": "中国最美公路",
+  "subtitle": "《中国国家地理》主题栏目历年评选（有名称有口碑，无权威坐标；段落范围为人工映射，媒体榜单不冒充官方）",
+  "source": {
+    "org": "中国国家地理",
+    "publishedAt": "历年"
+  },
+  "level": "media",
+  "itemCount": 10,
+  "items": [
+    {
+      "rank": 1,
+      "routeId": "",
+      "name": "独库公路",
+      "roadKeys": ["G217"],
+      "fromPlace": "独山子",
+      "toPlace": "库车",
+      "province": ["新疆"],
+      "lengthKm": 561,
+      "highlight": "一天历四季，纵贯天山",
+      "tags": ["天山", "英雄之路"]
+    },
+    {
+      "rank": 2,
+      "routeId": "",
+      "name": "318 川藏线",
+      "roadKeys": ["G318"],
+      "fromPlace": "成都",
+      "toPlace": "拉萨",
+      "province": ["四川", "西藏"],
+      "lengthKm": 2100,
+      "highlight": "此生必驾，中国人的景观大道",
+      "tags": ["横断山", "此生必驾"]
+    },
+    {
+      "rank": 3,
+      "routeId": "",
+      "name": "塔里木沙漠公路",
+      "roadKeys": [],
+      "fromPlace": "轮台",
+      "toPlace": "民丰",
+      "province": ["新疆"],
+      "lengthKm": 522,
+      "highlight": "纵穿死亡之海塔克拉玛干",
+      "tags": ["沙漠"]
+    },
+    {
+      "rank": 4,
+      "routeId": "",
+      "name": "矮寨盘山公路",
+      "roadKeys": [],
+      "fromPlace": "吉首",
+      "toPlace": "花垣",
+      "province": ["湖南"],
+      "lengthKm": 60,
+      "highlight": "湘川公路奇观，十三道锐角急弯",
+      "tags": ["盘山", "工程奇观"]
+    },
+    {
+      "rank": 5,
+      "routeId": "",
+      "name": "天山公路",
+      "roadKeys": ["G218"],
+      "fromPlace": "伊宁",
+      "toPlace": "库尔勒",
+      "province": ["新疆"],
+      "lengthKm": 470,
+      "highlight": "伊犁河谷到巴音布鲁克草原",
+      "tags": ["草原", "河谷"]
+    },
+    {
+      "rank": 6,
+      "routeId": "",
+      "name": "挂壁公路（郭亮）",
+      "roadKeys": [],
+      "fromPlace": "新乡",
+      "toPlace": "辉县",
+      "province": ["河南"],
+      "lengthKm": 60,
+      "highlight": "太行绝壁上凿出的公路",
+      "tags": ["挂壁", "太行"]
+    },
+    {
+      "rank": 7,
+      "routeId": "",
+      "name": "滇藏线",
+      "roadKeys": ["G214", "G318"],
+      "fromPlace": "昆明",
+      "toPlace": "拉萨",
+      "province": ["云南", "西藏"],
+      "lengthKm": 2300,
+      "highlight": "三江并流区的进藏通道",
+      "tags": ["三江并流"]
+    },
+    {
+      "rank": 8,
+      "routeId": "",
+      "name": "青藏公路",
+      "roadKeys": ["G109"],
+      "fromPlace": "西宁",
+      "toPlace": "拉萨",
+      "province": ["青海", "西藏"],
+      "lengthKm": 1937,
+      "highlight": "世界屋脊上的苏伊士运河",
+      "tags": ["高原", "昆仑山"]
+    },
+    {
+      "rank": 9,
+      "routeId": "",
+      "name": "滨海公路（辽宁）",
+      "roadKeys": [],
+      "fromPlace": "丹东",
+      "toPlace": "葫芦岛",
+      "province": ["辽宁"],
+      "lengthKm": 1443,
+      "highlight": "中国最长的滨海公路",
+      "tags": ["滨海"]
+    },
+    {
+      "rank": 10,
+      "routeId": "",
+      "name": "草原天路",
+      "roadKeys": [],
+      "fromPlace": "张家口",
+      "toPlace": "张北",
+      "province": ["河北"],
+      "lengthKm": 132,
+      "highlight": "中国的 66 号公路",
+      "tags": ["草原", "风电"]
+    }
+  ]
+}

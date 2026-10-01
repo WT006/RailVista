@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "updated": "2026-09-30",
+  "routes": [
+    {
+      "id": "qinghai-gansu-ring",
+      "name": "青甘环线 · G315 柴达木段",
+      "tier": "national",
+      "group": "ring",
+      "provinces": [
+        "青海"
+      ],
+      "summary": "青甘环线最苍茫的一段：G315 沿柴达木盆地西行，穿过西台吉乃尔湖、水上雅丹与无人戈壁，公路笔直消失在雅丹尽头的地平线。本版以水上雅丹段为真实 OSM 数据打样（约 100 公里连续无缺口）。",
+      "totalKm": 151.6,
+      "driveDays": 8,
+      "difficulty": 3,
+      "bestSeason": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "tags": [
+        "大漠",
+        "盐湖",
+        "雅丹"
+      ],
+      "status": "calibrated",
+      "highlightCount": 3,
+      "chapterCount": 3,
+      "file": "qinghai-gansu-ring.json"
+    }
+  ]
+}

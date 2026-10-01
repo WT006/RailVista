@@ -1,0 +1,3722 @@
+{
+  "version": 3,
+  "updated": "2026-10-01",
+  "staging": true,
+  "note": "2026-10-01 扩充批次：东北/江浙沪/福建/两广海南/赣湘桂 欠覆盖走廊新增候选；v3 六维；lines/side 由走廊几何实算；坐标为初值待终核，未过审不进主库。",
+  "count": 49,
+  "spots": [
+    {
+      "id": "niuheliang-hongshan",
+      "name": "牛河梁红山文化遗址",
+      "province": "辽宁",
+      "lng": 119.3,
+      "lat": 41.12,
+      "intro": "距今五千余年的红山文化祭坛、女神庙与积石冢群，京沈高铁专设牛河梁站，过凌源段右侧丘陵可见遗址保护区地貌，为中华五千年文明曙光之地。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "history",
+        "culture"
+      ],
+      "category": "other",
+      "subtype": "ruins_site",
+      "tags": [
+        "红山文化",
+        "世界遗产预备名录",
+        "考古遗址"
+      ],
+      "lines": [
+        {
+          "corridorId": "jingha",
+          "alongKmFrom": 306.5,
+          "distKm": 2.5,
+          "nearStations": [
+            "牛河梁",
+            "喀左"
+          ]
+        },
+        {
+          "corridorId": "jingshen",
+          "alongKmFrom": 306.5,
+          "distKm": 2.5,
+          "nearStations": [
+            "牛河梁",
+            "喀左"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "春秋光线柔和，丘陵轮廓清晰"
+      },
+      "honors": [
+        "NCH"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（牛河梁遗址）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "news",
+          "level": "B",
+          "ref": "京沈高铁穿越\"中华五千年文明曙光\"报道",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "jinzhou-bijiashan",
+      "name": "锦州笔架山（天桥）",
+      "province": "辽宁",
+      "lng": 121.1,
+      "lat": 40.83,
+      "intro": "渤海湾中随潮汐隐现的天然卵石通道\"天桥\"相连的海岛，秦沈客专过锦州南段，列车左侧向海方向可见笔架山岛影。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "other",
+      "subtype": "coast_island",
+      "tags": [
+        "海岛",
+        "潮汐天桥",
+        "渤海湾"
+      ],
+      "lines": [
+        {
+          "corridorId": "haqin",
+          "alongKmFrom": 770.8,
+          "distKm": 10.5,
+          "nearStations": [
+            "锦州南",
+            "葫芦岛北"
+          ]
+        },
+        {
+          "corridorId": "qinshen",
+          "alongKmFrom": 171,
+          "distKm": 10.5,
+          "nearStations": [
+            "锦州南",
+            "葫芦岛北"
+          ]
+        },
+        {
+          "corridorId": "jinghaxian",
+          "alongKmFrom": 441,
+          "distKm": 13.8,
+          "nearStations": [
+            "锦州南",
+            "葫芦岛北"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          5,
+          6,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "退潮时天桥显露，需昼间通过"
+      },
+      "honors": [
+        "NSCENIC"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家级风景名胜区（笔架山）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10872357",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "panjin-red-beach",
+      "name": "盘锦辽河口红海滩",
+      "province": "辽宁",
+      "lng": 121.85,
+      "lat": 40.92,
+      "intro": "碱蓬草染红的滨海湿地与芦苇荡，盘营高铁过盘锦段，列车右侧向辽河口方向秋季可见连绵红滩，距轨较远为远眺。",
+      "visibility": "distant",
+      "maxDistKm": 35,
+      "viewScale": "far",
+      "viewMinutes": 4,
+      "dimensions": [
+        "nature",
+        "geo"
+      ],
+      "category": "other",
+      "subtype": "wetland",
+      "tags": [
+        "红海滩",
+        "国际重要湿地",
+        "碱蓬草",
+        "季节性"
+      ],
+      "lines": [
+        {
+          "corridorId": "panying",
+          "alongKmFrom": 37,
+          "distKm": 33,
+          "nearStations": [
+            "盘锦北",
+            "盘锦"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "front",
+        "note": "9—10月碱蓬草最红；夏季为绿色"
+      },
+      "honors": [
+        "NNR",
+        "RAMSAR"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "辽宁辽河口国家级自然保护区",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q15978511",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "benxi-water-cave",
+      "name": "本溪水洞",
+      "province": "辽宁",
+      "lng": 124.1,
+      "lat": 41.3,
+      "intro": "太子河上游的大型充水溶洞，沈丹线过本溪段，列车右侧山谷可见洞口与太子河曲流，洞内暗河可乘船游览。",
+      "visibility": "window",
+      "maxDistKm": 6,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "nature",
+        "geo"
+      ],
+      "category": "other",
+      "subtype": "karst_danxia",
+      "tags": [
+        "溶洞",
+        "国家地质公园",
+        "太子河"
+      ],
+      "lines": [
+        {
+          "corridorId": "shendan",
+          "alongKmFrom": 101.1,
+          "distKm": 2,
+          "nearStations": [
+            "本溪",
+            "下马塘"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          5,
+          6,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "洞口近轨，昼间通过可见"
+      },
+      "honors": [
+        "NGEO",
+        "AAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "本溪水洞国家地质公园",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10884806",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "dandong-yalu-bridge",
+      "name": "鸭绿江断桥（丹东）",
+      "province": "辽宁",
+      "lng": 124.39,
+      "lat": 40.12,
+      "intro": "抗美援朝中被炸断的百年铁路桥残跨矗立鸭绿江中，沈丹线终抵丹东，列车沿江进站两侧可见断桥与中朝界江。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "near",
+      "viewMinutes": 2,
+      "dimensions": [
+        "history",
+        "geo"
+      ],
+      "category": "engineering",
+      "subtype": "railway_heritage",
+      "tags": [
+        "鸭绿江",
+        "抗美援朝",
+        "铁路遗产",
+        "界江"
+      ],
+      "lines": [
+        {
+          "corridorId": "shendan",
+          "alongKmFrom": 278.1,
+          "distKm": 1.4,
+          "nearStations": [
+            "丹东"
+          ]
+        }
+      ],
+      "side": "both",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [],
+        "timeOfDay": "any",
+        "light": "any",
+        "note": "全年可见，夜间有景观照明"
+      },
+      "honors": [
+        "NCH"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（鸭绿江断桥）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10926395",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "fengcheng-fenghuangshan",
+      "name": "凤城凤凰山",
+      "province": "辽宁",
+      "lng": 124.1,
+      "lat": 40.42,
+      "intro": "辽东险峻花岗岩名山，沈丹线过凤城段，列车右侧可见凤凰山群峰与崖壁栈道，9—10月秋色尤佳。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "tags": [
+        "花岗岩峰林",
+        "秋色"
+      ],
+      "lines": [
+        {
+          "corridorId": "shendan",
+          "alongKmFrom": 238.7,
+          "distKm": 4.9,
+          "nearStations": [
+            "凤城东",
+            "凤凰城"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          5,
+          6,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "9—10月红叶期最佳"
+      },
+      "honors": [
+        "AAAA",
+        "NSCENIC"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家级风景名胜区（凤凰山）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10927737",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "jingpo-lake",
+      "name": "镜泊湖",
+      "province": "黑龙江",
+      "lng": 128.9,
+      "lat": 43.95,
+      "intro": "牡丹江上游的火山熔岩堰塞湖，牡图线过宁安段，列车向东南可见镜泊湖湖面与吊水楼瀑布方向的山峦，为远眺景观。",
+      "visibility": "distant",
+      "maxDistKm": 30,
+      "viewScale": "far",
+      "viewMinutes": 4,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "lake",
+      "subtype": "lake",
+      "tags": [
+        "火山堰塞湖",
+        "国家级自然保护区",
+        "吊水楼瀑布"
+      ],
+      "lines": [
+        {
+          "corridorId": "mutu",
+          "alongKmFrom": 82.7,
+          "distKm": 27.3,
+          "nearStations": [
+            "镜泊湖",
+            "宁安"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "夏季水量充沛，冬季可看冰瀑"
+      },
+      "honors": [
+        "NNR",
+        "NSCENIC"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "镜泊湖国家级自然保护区",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10885450",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "dunhua-liuding-shan",
+      "name": "敦化六顶山（正觉寺金鼎大佛）",
+      "province": "吉林",
+      "lng": 128.2,
+      "lat": 43.35,
+      "intro": "长珲、敦白线过敦化段，列车左侧可见六顶山正觉寺与山顶金鼎大佛；敦化为唐代渤海国故地，山麓有渤海古墓群。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "culture",
+        "architecture"
+      ],
+      "category": "other",
+      "subtype": "temple_religion",
+      "tags": [
+        "正觉寺",
+        "金鼎大佛",
+        "渤海国"
+      ],
+      "lines": [
+        {
+          "corridorId": "dunbai",
+          "alongKmFrom": 0,
+          "distKm": 3.3,
+          "nearStations": [
+            "敦化"
+          ]
+        },
+        {
+          "corridorId": "shenjia",
+          "alongKmFrom": 0,
+          "distKm": 3.3,
+          "nearStations": [
+            "敦化"
+          ]
+        },
+        {
+          "corridorId": "changhui",
+          "alongKmFrom": 263.3,
+          "distKm": 4.5,
+          "nearStations": [
+            "敦化"
+          ]
+        }
+      ],
+      "side": "both",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          5,
+          6,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "山麓六顶山古墓群为全国重点文保"
+      },
+      "honors": [
+        "NCH"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（六顶山古墓群）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10898326",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "songhua-lake-jilin",
+      "name": "松花湖（吉林市）",
+      "province": "吉林",
+      "lng": 126.55,
+      "lat": 43.7,
+      "intro": "松花江上丰满水电站形成的大型人工湖，沈吉线过吉林段，列车右侧可见松花江水面与湖畔丘陵，冬季雾凇闻名。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "lake",
+      "subtype": "lake",
+      "tags": [
+        "人工湖",
+        "丰满水电站",
+        "雾凇"
+      ],
+      "lines": [
+        {
+          "corridorId": "shenji",
+          "alongKmFrom": 402.3,
+          "distKm": 4.2,
+          "nearStations": [
+            "吉林",
+            "丰满"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          1,
+          2,
+          6,
+          7,
+          8,
+          9
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "1—2月吉林雾凇最佳"
+      },
+      "honors": [
+        "NSCENIC"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家级风景名胜区（松花湖）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10915281",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "jiaohe-redleaf-valley",
+      "name": "蛟河红叶谷",
+      "province": "吉林",
+      "lng": 127.4,
+      "lat": 43.85,
+      "intro": "长图线过拉法、蛟河段，列车两侧为长白山余脉阔叶林，9月末至10月上旬层林尽染，是东北著名红叶观赏带。",
+      "visibility": "window",
+      "maxDistKm": 10,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "nature",
+        "geo"
+      ],
+      "category": "grassland",
+      "subtype": "seasonal_foliage",
+      "tags": [
+        "红叶",
+        "季相",
+        "长白山余脉"
+      ],
+      "lines": [
+        {
+          "corridorId": "changtu",
+          "alongKmFrom": 205.9,
+          "distKm": 6.2,
+          "nearStations": [
+            "拉法",
+            "蛟河"
+          ]
+        },
+        {
+          "corridorId": "labin",
+          "alongKmFrom": 242.6,
+          "distKm": 6.5,
+          "nearStations": [
+            "拉法",
+            "蛟河"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "front",
+        "note": "9月底—10月上旬红叶期，仅约两周"
+      },
+      "honors": [
+        "NFOREST"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "红叶谷国家森林公园",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "ugc",
+          "level": "C",
+          "ref": "长图线秋季红叶车窗记录",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "jian-goguryeo-capital",
+      "name": "集安高句丽王城王陵",
+      "province": "吉林",
+      "lng": 126.19,
+      "lat": 41.13,
+      "intro": "世界文化遗产高句丽王城、王陵及贵族墓葬所在地，梅集线终抵集安，列车沿鸭绿江进站两侧可见将军坟等积石墓与山城。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "dimensions": [
+        "history",
+        "culture"
+      ],
+      "category": "other",
+      "subtype": "ruins_site",
+      "tags": [
+        "高句丽",
+        "世界文化遗产",
+        "积石墓",
+        "鸭绿江"
+      ],
+      "lines": [
+        {
+          "corridorId": "meiji",
+          "alongKmFrom": 208.3,
+          "distKm": 0.1,
+          "nearStations": [
+            "集安"
+          ]
+        }
+      ],
+      "side": "both",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          5,
+          6,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "集安为终点站，停留可细看"
+      },
+      "honors": [
+        "WCH",
+        "NCH",
+        "AAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "世界遗产名录（高句丽王城、王陵及贵族墓葬）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q42105",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "yalu-river-jian",
+      "name": "鸭绿江（集安段）",
+      "province": "吉林",
+      "lng": 126.185,
+      "lat": 41.122,
+      "intro": "中朝界江鸭绿江在集安段河谷开阔，梅集线沿江而行，列车两侧皆可俯瞰江面与对岸朝鲜山峦，秋季两岸层林尽染。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "near",
+      "viewMinutes": 5,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "gorge",
+      "subtype": "river",
+      "tags": [
+        "界江",
+        "河谷",
+        "中朝边境"
+      ],
+      "lines": [
+        {
+          "corridorId": "meiji",
+          "alongKmFrom": 208.5,
+          "distKm": 0.9,
+          "nearStations": [
+            "集安"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          5,
+          6,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "沿江段较长，可持续观赏"
+      },
+      "honors": [],
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q9352",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "relation 鸭绿江",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "xianghai-wetland",
+      "name": "向海湿地（通榆）",
+      "province": "吉林",
+      "lng": 123.1,
+      "lat": 44.6,
+      "intro": "松嫩平原西部的大型湖泊湿地、鹤类栖息地，平齐线过通榆段，列车左侧可见向海湿地水面与芦苇草甸。",
+      "visibility": "window",
+      "maxDistKm": 10,
+      "viewScale": "far",
+      "viewMinutes": 4,
+      "dimensions": [
+        "nature",
+        "geo"
+      ],
+      "category": "lake",
+      "subtype": "wetland",
+      "tags": [
+        "国际重要湿地",
+        "丹顶鹤",
+        "湿地"
+      ],
+      "lines": [
+        {
+          "corridorId": "pingqi",
+          "alongKmFrom": 225.9,
+          "distKm": 4,
+          "nearStations": [
+            "通榆",
+            "太平川"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          5,
+          6,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "春秋候鸟迁徙季最佳"
+      },
+      "honors": [
+        "NNR",
+        "RAMSAR"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "吉林向海国家级自然保护区",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10885733",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "zhalong-crane-wetland",
+      "name": "扎龙湿地（丹顶鹤故乡）",
+      "province": "黑龙江",
+      "lng": 124.1,
+      "lat": 47.2,
+      "intro": "世界最大芦苇湿地、丹顶鹤繁殖地，哈齐高铁过齐齐哈尔东南段，列车右侧可见扎龙湿地水塘与鹤群。",
+      "visibility": "window",
+      "maxDistKm": 10,
+      "viewScale": "far",
+      "viewMinutes": 4,
+      "dimensions": [
+        "nature",
+        "geo"
+      ],
+      "category": "other",
+      "subtype": "wildlife",
+      "tags": [
+        "丹顶鹤",
+        "国际重要湿地",
+        "芦苇湿地"
+      ],
+      "lines": [
+        {
+          "corridorId": "haqi",
+          "alongKmFrom": 255,
+          "distKm": 1.9,
+          "nearStations": [
+            "齐齐哈尔南",
+            "杜尔伯特"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          5,
+          6,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "繁殖季可见丹顶鹤放飞"
+      },
+      "honors": [
+        "NNR",
+        "RAMSAR"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "黑龙江扎龙国家级自然保护区",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q9060273",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "chagan-lake",
+      "name": "查干湖",
+      "province": "吉林",
+      "lng": 124.3,
+      "lat": 45.25,
+      "intro": "松嫩平原中部的大型淡水湖，冬捕闻名，通让线过前郭段，列车右侧可远眺查干湖湖面与湖畔草原，距轨较远。",
+      "visibility": "distant",
+      "maxDistKm": 25,
+      "viewScale": "far",
+      "viewMinutes": 4,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "lake",
+      "subtype": "lake",
+      "tags": [
+        "冬捕",
+        "国家级自然保护区",
+        "淡水湖"
+      ],
+      "lines": [
+        {
+          "corridorId": "tongrang",
+          "alongKmFrom": 245.8,
+          "distKm": 19.8,
+          "nearStations": [
+            "前郭",
+            "长山屯"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          6,
+          7,
+          8,
+          12,
+          1
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "12月—1月冬捕季最有价值"
+      },
+      "honors": [
+        "NNR",
+        "NWETLAND"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "吉林查干湖国家级自然保护区",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10949257",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "sanjiang-plain-jiamusi",
+      "name": "三江平原（佳木斯西）",
+      "province": "黑龙江",
+      "lng": 130.4,
+      "lat": 46.8,
+      "intro": "黑龙江、松花江、乌苏里江冲积的肥沃平原，牡佳高铁抵佳木斯西段，列车两侧为连片稻田与湿地，秋收时节金色无际。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "mid",
+      "viewMinutes": 5,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "grassland",
+      "subtype": "plain_basin",
+      "tags": [
+        "三江平原",
+        "商品粮基地",
+        "稻田"
+      ],
+      "lines": [
+        {
+          "corridorId": "mujia",
+          "alongKmFrom": 367.8,
+          "distKm": 0.6,
+          "nearStations": [
+            "佳木斯西",
+            "桦南"
+          ]
+        },
+        {
+          "corridorId": "suijia",
+          "alongKmFrom": 360.8,
+          "distKm": 2.7,
+          "nearStations": [
+            "佳木斯西",
+            "桦南"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          6,
+          7,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "9月稻熟金黄"
+      },
+      "honors": [],
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q1139382",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "authority",
+          "level": "B",
+          "ref": "三江平原商品粮基地",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "tumen-river",
+      "name": "图们江（图们段）",
+      "province": "吉林",
+      "lng": 129.85,
+      "lat": 42.96,
+      "intro": "中朝界江图们江在图们市段临江而过，长珲城际、牡图线抵图们站，列车可见江面与对岸朝鲜南阳市及中朝友谊桥。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "history"
+      ],
+      "category": "gorge",
+      "subtype": "river",
+      "tags": [
+        "界江",
+        "中朝边境",
+        "图们"
+      ],
+      "lines": [
+        {
+          "corridorId": "mutu",
+          "alongKmFrom": 267.6,
+          "distKm": 1.4,
+          "nearStations": [
+            "图们",
+            "图们北"
+          ]
+        },
+        {
+          "corridorId": "changtu",
+          "alongKmFrom": 530,
+          "distKm": 1.4,
+          "nearStations": [
+            "图们",
+            "图们北"
+          ]
+        }
+      ],
+      "side": "both",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [],
+        "timeOfDay": "any",
+        "light": "any",
+        "note": "图们站可近距离观江"
+      },
+      "honors": [],
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q33200",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "relation 图们江",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "suifenhe-port-valley",
+      "name": "绥芬河谷地（口岸）",
+      "province": "黑龙江",
+      "lng": 131.15,
+      "lat": 44.4,
+      "intro": "中东铁路东段出入境口岸，牡绥铁路终抵绥芬河，列车沿绥芬河谷两侧可见山城、百年站房与中俄边境风貌。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "history"
+      ],
+      "category": "gorge",
+      "subtype": "river",
+      "tags": [
+        "中东铁路",
+        "口岸",
+        "铁路遗产"
+      ],
+      "lines": [
+        {
+          "corridorId": "musui",
+          "alongKmFrom": 138.6,
+          "distKm": 0.4,
+          "nearStations": [
+            "绥芬河"
+          ]
+        },
+        {
+          "corridorId": "binsui",
+          "alongKmFrom": 450.8,
+          "distKm": 1.5,
+          "nearStations": [
+            "绥芬河"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          5,
+          6,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "绥芬河站为百年中东铁路老站"
+      },
+      "honors": [
+        "NCH"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（中东铁路建筑群）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q1142430",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "harbin-songhua-railbridge",
+      "name": "哈尔滨松花江滨洲铁路桥",
+      "province": "黑龙江",
+      "lng": 126.62,
+      "lat": 45.78,
+      "intro": "1901年建成的中东铁路松花江百年钢桥，滨洲线出哈尔滨即跨江，列车从桥上通过两侧可览江面与老桥钢桁架。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "near",
+      "viewMinutes": 2,
+      "dimensions": [
+        "construct",
+        "history"
+      ],
+      "category": "engineering",
+      "subtype": "bridge",
+      "tags": [
+        "中东铁路",
+        "百年老桥",
+        "松花江"
+      ],
+      "lines": [
+        {
+          "corridorId": "haqi",
+          "alongKmFrom": 1.6,
+          "distKm": 0.1,
+          "nearStations": [
+            "哈尔滨",
+            "哈尔滨西"
+          ]
+        },
+        {
+          "corridorId": "binzhou",
+          "alongKmFrom": 2.8,
+          "distKm": 0.1,
+          "nearStations": [
+            "哈尔滨",
+            "哈尔滨西"
+          ]
+        },
+        {
+          "corridorId": "hajia",
+          "alongKmFrom": 1.6,
+          "distKm": 2,
+          "nearStations": [
+            "哈尔滨",
+            "哈尔滨西"
+          ]
+        }
+      ],
+      "side": "both",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [],
+        "timeOfDay": "any",
+        "light": "any",
+        "note": "冬季江面冰封另有景致"
+      },
+      "honors": [
+        "NCH",
+        "MAJOR_PROJ"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（中东铁路滨州线松花江桥）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q9441238",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "jianglang-shan-danxia",
+      "name": "江郎山（中国丹霞）",
+      "province": "浙江",
+      "lng": 118.55,
+      "lat": 28.55,
+      "intro": "世界自然遗产\"中国丹霞\"组成部分，三爿巨石拔地而起，沪昆高铁过江山段，列车左侧可见江郎山标志性三峰。",
+      "visibility": "distant",
+      "maxDistKm": 25,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "mountain",
+      "subtype": "karst_danxia",
+      "tags": [
+        "中国丹霞",
+        "世界自然遗产",
+        "三爿石"
+      ],
+      "lines": [
+        {
+          "corridorId": "hukun",
+          "alongKmFrom": 448.6,
+          "distKm": 17.8,
+          "nearStations": [
+            "江山"
+          ]
+        },
+        {
+          "corridorId": "hukunxian",
+          "alongKmFrom": 414.5,
+          "distKm": 24.5,
+          "nearStations": [
+            "江山"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10,
+          11
+        ],
+        "timeOfDay": "day",
+        "light": "front",
+        "note": "晴天顺光三峰最清晰"
+      },
+      "honors": [
+        "WNH",
+        "NSCENIC"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "世界遗产名录（中国丹霞）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10889830",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "yangzhou-shouxihu",
+      "name": "扬州瘦西湖",
+      "province": "江苏",
+      "lng": 119.42,
+      "lat": 32.41,
+      "intro": "京杭运河畔的经典园林湖景，宁启铁路过扬州段，列车右侧可见瘦西湖水面、五亭桥方向与扬州城园林绿廊。",
+      "visibility": "window",
+      "maxDistKm": 6,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "culture",
+        "geo"
+      ],
+      "category": "other",
+      "subtype": "old_town",
+      "tags": [
+        "园林",
+        "运河世界遗产",
+        "五亭桥"
+      ],
+      "lines": [
+        {
+          "corridorId": "ningqi",
+          "alongKmFrom": 84.2,
+          "distKm": 1.2,
+          "nearStations": [
+            "扬州"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          3,
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "烟花三月最佳"
+      },
+      "honors": [
+        "NSCENIC",
+        "AAAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家级风景名胜区（瘦西湖）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10948319",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "taizhou-qinhu-wetland",
+      "name": "泰州溱湖湿地",
+      "province": "江苏",
+      "lng": 120.13,
+      "lat": 32.62,
+      "intro": "里下河地区的大型湖泊湿地，宁启铁路过泰州段，列车北侧可见溱湖水网、芦苇与麋鹿保护区风貌，为远眺景观。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "dimensions": [
+        "nature",
+        "geo"
+      ],
+      "category": "lake",
+      "subtype": "wetland",
+      "tags": [
+        "国家湿地公园",
+        "里下河",
+        "麋鹿"
+      ],
+      "lines": [
+        {
+          "corridorId": "ningqi",
+          "alongKmFrom": 154.6,
+          "distKm": 8.3,
+          "nearStations": [
+            "姜堰",
+            "泰州"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "清明会船节民俗闻名"
+      },
+      "honors": [
+        "NWETLAND",
+        "AAAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家湿地公园名录（溱湖）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10927596",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "changshu-shajiabang",
+      "name": "常熟沙家浜",
+      "province": "江苏",
+      "lng": 120.75,
+      "lat": 31.68,
+      "intro": "阳澄湖畔芦苇荡、新四军抗日根据地，沪宁沿江高铁过常熟段，列车左侧可见沙家浜水乡芦苇与湖荡。",
+      "visibility": "window",
+      "maxDistKm": 6,
+      "viewScale": "mid",
+      "viewMinutes": 2,
+      "dimensions": [
+        "culture",
+        "history"
+      ],
+      "category": "other",
+      "subtype": "revolutionary",
+      "tags": [
+        "红色旅游",
+        "芦苇荡",
+        "水乡"
+      ],
+      "lines": [
+        {
+          "corridorId": "huningyanjiang",
+          "alongKmFrom": 53.6,
+          "distKm": 2.8,
+          "nearStations": [
+            "常熟",
+            "张家港"
+          ]
+        },
+        {
+          "corridorId": "hutong",
+          "alongKmFrom": 100.4,
+          "distKm": 5.2,
+          "nearStations": [
+            "常熟",
+            "张家港"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10,
+          11
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "秋季芦花飞雪"
+      },
+      "honors": [
+        "AAAAA",
+        "PATRIOT"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国爱国主义教育示范基地（沙家浜）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10928309",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "nantong-langshan",
+      "name": "南通狼山（长江）",
+      "province": "江苏",
+      "lng": 120.87,
+      "lat": 32,
+      "intro": "长江北岸五山之首，宁启铁路过南通段，列车右侧可见狼山塔影与长江江面，是江海交汇的地标。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "culture"
+      ],
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "tags": [
+        "长江",
+        "江海交汇",
+        "佛教名山"
+      ],
+      "lines": [
+        {
+          "corridorId": "ningqi",
+          "alongKmFrom": 259.5,
+          "distKm": 4.4,
+          "nearStations": [
+            "南通",
+            "南通西"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "临江可见宽阔江面"
+      },
+      "honors": [
+        "NSCENIC"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家级风景名胜区（狼山）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10940386",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "lianyungang-huaguoshan",
+      "name": "连云港花果山",
+      "province": "江苏",
+      "lng": 119.2,
+      "lat": 34.6,
+      "intro": "云台山主峰、《西游记》文化原型地，徐连高铁抵连云港段，列车左侧可见花果山（玉女峰）山脊轮廓。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "culture"
+      ],
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "tags": [
+        "云台山",
+        "西游记",
+        "名山"
+      ],
+      "lines": [
+        {
+          "corridorId": "qinglian",
+          "alongKmFrom": 98.6,
+          "distKm": 3.1,
+          "nearStations": [
+            "连云港东",
+            "连云港"
+          ]
+        },
+        {
+          "corridorId": "qingyan",
+          "alongKmFrom": 267.6,
+          "distKm": 3.7,
+          "nearStations": [
+            "连云港东",
+            "连云港"
+          ]
+        },
+        {
+          "corridorId": "xulian",
+          "alongKmFrom": 183.2,
+          "distKm": 4.1,
+          "nearStations": [
+            "连云港东",
+            "连云港"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "front",
+        "note": "晴日远眺山形最佳"
+      },
+      "honors": [
+        "NSCENIC",
+        "AAAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家级风景名胜区（云台山）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10888495",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "pizhou-ginkgo",
+      "name": "邳州银杏（时光隧道）",
+      "province": "江苏",
+      "lng": 117.95,
+      "lat": 34.3,
+      "intro": "全国最大银杏人工林带，徐连高铁过邳州东段，深秋列车两侧可见金黄银杏林与田园，是苏北著名秋色窗口。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 2,
+      "dimensions": [
+        "nature",
+        "culture"
+      ],
+      "category": "grassland",
+      "subtype": "seasonal_foliage",
+      "tags": [
+        "银杏",
+        "季相",
+        "秋色"
+      ],
+      "lines": [
+        {
+          "corridorId": "xulian",
+          "alongKmFrom": 63.2,
+          "distKm": 2,
+          "nearStations": [
+            "邳州东",
+            "新沂南"
+          ]
+        },
+        {
+          "corridorId": "longhai",
+          "alongKmFrom": 76,
+          "distKm": 2,
+          "nearStations": [
+            "邳州东",
+            "新沂南"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          10,
+          11
+        ],
+        "timeOfDay": "day",
+        "light": "front",
+        "note": "10月底—11月中金黄期"
+      },
+      "honors": [],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "邳州国家银杏种质资源库/银杏博览园",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "ugc",
+          "level": "C",
+          "ref": "邳州银杏时光隧道摄影",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "ningbo-dongqian-lake",
+      "name": "宁波东钱湖",
+      "province": "浙江",
+      "lng": 121.6,
+      "lat": 29.78,
+      "intro": "浙东最大天然淡水湖，甬台温铁路过宁波段，列车左侧可见东钱湖湖面与环湖丘陵，湖光山色近城郊。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "culture"
+      ],
+      "category": "lake",
+      "subtype": "lake",
+      "tags": [
+        "淡水湖",
+        "湖光山色"
+      ],
+      "lines": [
+        {
+          "corridorId": "yongtaiwen",
+          "alongKmFrom": 9.1,
+          "distKm": 5.5,
+          "nearStations": [
+            "宁波",
+            "鄞州"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "春秋最宜"
+      },
+      "honors": [
+        "NSCENIC"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家级风景名胜区（东钱湖）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10898825",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "shaoxing-jianhu-lanting",
+      "name": "绍兴鉴湖·兰亭",
+      "province": "浙江",
+      "lng": 120.58,
+      "lat": 30.02,
+      "intro": "书法圣地兰亭与鉴湖水系所在，杭甬高铁过绍兴北段，列车可见鉴湖水网与稽山阴的江南水乡田园。",
+      "visibility": "window",
+      "maxDistKm": 10,
+      "viewScale": "mid",
+      "viewMinutes": 2,
+      "dimensions": [
+        "culture",
+        "history"
+      ],
+      "category": "other",
+      "subtype": "old_town",
+      "tags": [
+        "兰亭",
+        "书法",
+        "水乡"
+      ],
+      "lines": [
+        {
+          "corridorId": "hangyong",
+          "alongKmFrom": 48.1,
+          "distKm": 8.2,
+          "nearStations": [
+            "绍兴北",
+            "绍兴东"
+          ]
+        },
+        {
+          "corridorId": "hangtai",
+          "alongKmFrom": 49.4,
+          "distKm": 8.2,
+          "nearStations": [
+            "绍兴北",
+            "绍兴东"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          3,
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "春水满城时最佳"
+      },
+      "honors": [
+        "NSCENIC"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（兰亭）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10919064",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "lanxi-zhuge-bagua",
+      "name": "兰溪诸葛八卦村",
+      "province": "浙江",
+      "lng": 119.45,
+      "lat": 29.13,
+      "intro": "诸葛亮后裔聚居的八卦布局古村，沪昆高铁过金华、龙游段，列车右侧可见丘陵环抱的古村建筑群与田野。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 2,
+      "dimensions": [
+        "culture",
+        "architecture"
+      ],
+      "category": "other",
+      "subtype": "ethnic_village",
+      "tags": [
+        "古村落",
+        "八卦布局",
+        "诸葛后裔"
+      ],
+      "lines": [
+        {
+          "corridorId": "hukun",
+          "alongKmFrom": 343.6,
+          "distKm": 3.5,
+          "nearStations": [
+            "金华",
+            "龙游"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "明清古建筑群保存完整"
+      },
+      "honors": [
+        "NCH",
+        "AAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（诸葛八卦村古建筑群）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10889395",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "yanzhou-ancient-meicheng",
+      "name": "严州古城（建德梅城）",
+      "province": "浙江",
+      "lng": 119.28,
+      "lat": 29.46,
+      "intro": "古严州府治、新安江—兰江—富春江三江汇流处的千年州城，杭衢高铁过建德段从古城旁通过，列车两侧可见城墙、澄清门与三江口水网。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "culture",
+        "history"
+      ],
+      "category": "other",
+      "subtype": "old_town",
+      "tags": [
+        "严州古城",
+        "三江汇流",
+        "州府"
+      ],
+      "lines": [
+        {
+          "corridorId": "hangqu",
+          "alongKmFrom": 24.4,
+          "distKm": 0.7,
+          "nearStations": [
+            "建德",
+            "建德东"
+          ]
+        },
+        {
+          "corridorId": "hukunxian",
+          "alongKmFrom": 294.1,
+          "distKm": 1.2,
+          "nearStations": [
+            "建德",
+            "建德东"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          3,
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "三江口晨雾时最佳"
+      },
+      "honors": [
+        "AAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "建德梅城严州古城（省级历史文化名城）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10900137",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "jinhua-wuzhou-ancient-city",
+      "name": "金华婺州古城（八咏楼·侍王府）",
+      "province": "浙江",
+      "lng": 119.65,
+      "lat": 29.08,
+      "intro": "唐宋婺州州治所在的古子城，金建高铁出金华段，列车可见婺州古城墙、八咏楼与万佛塔方向的历史街区天际线。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 2,
+      "dimensions": [
+        "culture",
+        "history"
+      ],
+      "category": "other",
+      "subtype": "old_town",
+      "tags": [
+        "婺州古城",
+        "八咏楼",
+        "太平天国侍王府"
+      ],
+      "lines": [
+        {
+          "corridorId": "hukun",
+          "alongKmFrom": 325.1,
+          "distKm": 4.1,
+          "nearStations": [
+            "金华",
+            "金华南"
+          ]
+        },
+        {
+          "corridorId": "jinjian",
+          "alongKmFrom": 1.1,
+          "distKm": 4.2,
+          "nearStations": [
+            "金华",
+            "金华南"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          3,
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "侍王府为全国重点文保"
+      },
+      "honors": [
+        "NCH",
+        "AAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（太平天国侍王府）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10889397",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "taining-danxia",
+      "name": "泰宁丹霞（世界自然遗产）",
+      "province": "福建",
+      "lng": 117.05,
+      "lat": 26.85,
+      "intro": "世界自然遗产\"中国丹霞\"组成、世界地质公园，青年期丹霞峰林与九曲溪谷，向莆铁路设泰宁站，列车右侧可见丹霞赤壁群。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 4,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "mountain",
+      "subtype": "karst_danxia",
+      "tags": [
+        "中国丹霞",
+        "世界自然遗产",
+        "世界地质公园"
+      ],
+      "lines": [
+        {
+          "corridorId": "xiangpu",
+          "alongKmFrom": 245.6,
+          "distKm": 8.2,
+          "nearStations": [
+            "泰宁",
+            "建宁北"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10,
+          11
+        ],
+        "timeOfDay": "day",
+        "light": "front",
+        "note": "丹霞赤壁在斜光下最红"
+      },
+      "honors": [
+        "WNH",
+        "NGEO",
+        "NSCENIC",
+        "AAAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "世界遗产名录（中国丹霞）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10935137",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "gutian-conference-site",
+      "name": "古田会议会址",
+      "province": "福建",
+      "lng": 116.77,
+      "lat": 25.2,
+      "intro": "1929年古田会议召开地，赣龙铁路专设古田会址站，列车出站即见会址旧址群与背后山峦，为著名红色圣地。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "near",
+      "viewMinutes": 2,
+      "dimensions": [
+        "history",
+        "culture"
+      ],
+      "category": "other",
+      "subtype": "revolutionary",
+      "tags": [
+        "古田会议",
+        "红色圣地",
+        "全国重点文保"
+      ],
+      "lines": [
+        {
+          "corridorId": "ganlong",
+          "alongKmFrom": 219.5,
+          "distKm": 0,
+          "nearStations": [
+            "古田会址"
+          ]
+        }
+      ],
+      "side": "both",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "车站即以会址命名"
+      },
+      "honors": [
+        "NCH",
+        "PATRIOT",
+        "AAAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（古田会议会址）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10882001",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "taimu-shan",
+      "name": "福鼎太姥山",
+      "province": "福建",
+      "lng": 120.2,
+      "lat": 27.1,
+      "intro": "花岗岩峰林海上名山，温福铁路过福鼎段，列车向海侧可见太姥山群峰耸峙与闽东山海相接的地貌，为远眺景观。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 4,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "tags": [
+        "花岗岩峰林",
+        "海上仙都",
+        "国家地质公园"
+      ],
+      "lines": [
+        {
+          "corridorId": "wenfu",
+          "alongKmFrom": 127.1,
+          "distKm": 12.3,
+          "nearStations": [
+            "太姥山",
+            "福鼎"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10,
+          11
+        ],
+        "timeOfDay": "day",
+        "light": "front",
+        "note": "晴日峰林最清晰"
+      },
+      "honors": [
+        "NSCENIC",
+        "NGEO",
+        "AAAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家级风景名胜区（太姥山）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10932593",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "xiapu-tidal-flat",
+      "name": "霞浦滩涂",
+      "province": "福建",
+      "lng": 120,
+      "lat": 26.88,
+      "intro": "中国最美滩涂，温福铁路过霞浦段，列车向海侧可见滩涂紫菜架、渔排与光影交织的海岸曲线，晨昏逆光最佳。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "dimensions": [
+        "nature",
+        "culture"
+      ],
+      "category": "other",
+      "subtype": "sky_light",
+      "tags": [
+        "滩涂",
+        "摄影",
+        "紫菜",
+        "光影"
+      ],
+      "lines": [
+        {
+          "corridorId": "wenfu",
+          "alongKmFrom": 158.2,
+          "distKm": 15.9,
+          "nearStations": [
+            "霞浦"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "dawn",
+        "light": "back",
+        "note": "日出日落逆光滩涂线条最美"
+      },
+      "honors": [],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "霞浦县文旅（中国最美滩涂）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "ugc",
+          "level": "C",
+          "ref": "霞浦滩涂摄影机位",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "quanzhou-luoyang-bridge",
+      "name": "泉州洛阳桥",
+      "province": "福建",
+      "lng": 118.68,
+      "lat": 24.95,
+      "intro": "北宋跨海梁式石桥、世界遗产\"宋元中国世界海洋商贸中心\"遗产点，福厦高铁过泉州段，列车可见洛阳江上长桥与红树林。",
+      "visibility": "window",
+      "maxDistKm": 15,
+      "viewScale": "mid",
+      "viewMinutes": 2,
+      "dimensions": [
+        "construct",
+        "history"
+      ],
+      "category": "engineering",
+      "subtype": "bridge",
+      "tags": [
+        "世界文化遗产",
+        "宋代石桥",
+        "洛阳江"
+      ],
+      "lines": [
+        {
+          "corridorId": "fuxia",
+          "alongKmFrom": 143.1,
+          "distKm": 9.2,
+          "nearStations": [
+            "泉州",
+            "惠安"
+          ]
+        },
+        {
+          "corridorId": "zhangquan",
+          "alongKmFrom": 129.6,
+          "distKm": 11,
+          "nearStations": [
+            "泉州",
+            "惠安"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "退潮时桥墩筏形基础可见"
+      },
+      "honors": [
+        "WCH",
+        "NCH"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "世界遗产名录（宋元中国的世界海洋商贸中心）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10886018",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "yongan-taoyuandong",
+      "name": "永安桃源洞",
+      "province": "福建",
+      "lng": 117.35,
+      "lat": 25.95,
+      "intro": "丹霞地貌一线天峡谷与鳞隐石林，鹰厦、南龙线过永安段，列车右侧可见沙溪河谷与两岸丹霞崖壁。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "gorge",
+      "subtype": "gorge",
+      "tags": [
+        "丹霞",
+        "一线天",
+        "石林"
+      ],
+      "lines": [
+        {
+          "corridorId": "yingxia",
+          "alongKmFrom": 334.5,
+          "distKm": 3.2,
+          "nearStations": [
+            "永安",
+            "沙县"
+          ]
+        },
+        {
+          "corridorId": "nanlong",
+          "alongKmFrom": 128.8,
+          "distKm": 7.1,
+          "nearStations": [
+            "永安",
+            "沙县"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10,
+          11
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "沙溪沿河谷可见"
+      },
+      "honors": [
+        "NSCENIC",
+        "AAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家级风景名胜区（桃源洞—鳞隐石林）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10924327",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "minjiang-laizhou",
+      "name": "闽江（来舟—南平段）",
+      "province": "福建",
+      "lng": 118.3,
+      "lat": 26.53,
+      "intro": "福建母亲河闽江上游，来福线自来舟沿沙溪口入库区，列车两侧可见闽江宽阔水面与两岸丘陵，是闽北水运要道。",
+      "visibility": "window",
+      "maxDistKm": 6,
+      "viewScale": "mid",
+      "viewMinutes": 4,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "gorge",
+      "subtype": "river",
+      "tags": [
+        "闽江",
+        "河谷",
+        "闽北"
+      ],
+      "lines": [
+        {
+          "corridorId": "laifu",
+          "alongKmFrom": 17.5,
+          "distKm": 4,
+          "nearStations": [
+            "来舟",
+            "南平"
+          ]
+        },
+        {
+          "corridorId": "hefu",
+          "alongKmFrom": 709.2,
+          "distKm": 4.8,
+          "nearStations": [
+            "来舟",
+            "南平"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "江面开阔，昼间可见"
+      },
+      "honors": [],
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q9352",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "relation 闽江",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "shantou-inner-bay",
+      "name": "汕头内海湾",
+      "province": "广东",
+      "lng": 116.68,
+      "lat": 23.35,
+      "intro": "梅汕高铁终抵汕头，列车沿内海湾进站，两侧可见海湾、跨海大桥与骑楼老城方向的海滨城市天际线。",
+      "visibility": "window",
+      "maxDistKm": 10,
+      "viewScale": "mid",
+      "viewMinutes": 2,
+      "dimensions": [
+        "geo",
+        "culture"
+      ],
+      "category": "other",
+      "subtype": "coast_island",
+      "tags": [
+        "内海湾",
+        "海滨城市",
+        "骑楼"
+      ],
+      "lines": [
+        {
+          "corridorId": "guangmeishan",
+          "alongKmFrom": 498.5,
+          "distKm": 7.7,
+          "nearStations": [
+            "汕头"
+          ]
+        },
+        {
+          "corridorId": "meishan",
+          "alongKmFrom": 145.2,
+          "distKm": 7.7,
+          "nearStations": [
+            "汕头"
+          ]
+        }
+      ],
+      "side": "both",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "进站段海湾视野开阔"
+      },
+      "honors": [],
+      "sources": [
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "汕头内海湾 coastline",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q577656",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "qinzhou-sanniang-bay",
+      "name": "钦州三娘湾",
+      "province": "广西",
+      "lng": 108.62,
+      "lat": 21.88,
+      "intro": "北部湾中华白海豚栖息海湾，广西沿海铁路过钦州东段，列车向海侧可见三娘湾滩涂、渔排与北部湾海岸线。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "dimensions": [
+        "nature",
+        "geo"
+      ],
+      "category": "other",
+      "subtype": "coast_island",
+      "tags": [
+        "中华白海豚",
+        "北部湾",
+        "海湾"
+      ],
+      "lines": [
+        {
+          "corridorId": "guangxiyanhai",
+          "alongKmFrom": 112.4,
+          "distKm": 10.9,
+          "nearStations": [
+            "钦州东"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "晴日可见白海豚"
+      },
+      "honors": [],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "三娘湾中华白海豚保护区",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10914318",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "wuzhou-xijiang-arcade",
+      "name": "梧州西江·骑楼城",
+      "province": "广西",
+      "lng": 111.3,
+      "lat": 23.45,
+      "intro": "西江与桂江交汇的百年商埠，南广铁路过梧州南段，列车可见宽阔西江江面与沿岸骑楼老城风貌。",
+      "visibility": "window",
+      "maxDistKm": 12,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "culture",
+        "geo"
+      ],
+      "category": "gorge",
+      "subtype": "river",
+      "tags": [
+        "西江",
+        "骑楼城",
+        "岭南商埠"
+      ],
+      "lines": [
+        {
+          "corridorId": "nanguang",
+          "alongKmFrom": 322.2,
+          "distKm": 8.7,
+          "nearStations": [
+            "梧州南"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "江面开阔，昼间可见"
+      },
+      "honors": [],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "梧州骑楼城—龙母庙历史文化",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "西江 way",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "zhanjiang-port",
+      "name": "湛江港（铁水联运枢纽）",
+      "province": "广东",
+      "lng": 110.4,
+      "lat": 21.18,
+      "intro": "黎湛铁路终抵湛江港，是西南出海铁水联运枢纽，列车进站段两侧可见港区龙门吊、集装箱堆场与湛江湾海面。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "near",
+      "viewMinutes": 2,
+      "dimensions": [
+        "construct",
+        "geo"
+      ],
+      "category": "engineering",
+      "subtype": "port_hub",
+      "tags": [
+        "港口",
+        "铁水联运",
+        "大国建造",
+        "湛江湾"
+      ],
+      "lines": [
+        {
+          "corridorId": "lizhan",
+          "alongKmFrom": 322.5,
+          "distKm": 1.3,
+          "nearStations": [
+            "湛江",
+            "湛江西"
+          ]
+        }
+      ],
+      "side": "both",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [],
+        "timeOfDay": "any",
+        "light": "any",
+        "note": "港区作业昼夜可见"
+      },
+      "honors": [
+        "MAJOR_PROJ"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "湛江港（集团）西南出海枢纽港",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "湛江港 way",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "yinggehai-saltfield",
+      "name": "莺歌海盐场",
+      "province": "海南",
+      "lng": 108.95,
+      "lat": 18.5,
+      "intro": "中国三大盐场之一，海南西环高铁过莺歌海段，列车向海侧可见连片盐田、蒸发池与盐山，几何色块蔚为壮观。",
+      "visibility": "window",
+      "maxDistKm": 10,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "construct",
+        "geo"
+      ],
+      "category": "other",
+      "subtype": "water_conservancy",
+      "tags": [
+        "盐场",
+        "盐田",
+        "大国建造"
+      ],
+      "lines": [
+        {
+          "corridorId": "hainanxi",
+          "alongKmFrom": 278.6,
+          "distKm": 1.8,
+          "nearStations": [
+            "莺歌海",
+            "黄流"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          3,
+          4,
+          5,
+          11,
+          12
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "旱季晒盐期盐田最亮"
+      },
+      "honors": [
+        "MAJOR_PROJ"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "莺歌海盐场（海南盐业）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10897090",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "changjiang-qizi-bay",
+      "name": "昌江棋子湾",
+      "province": "海南",
+      "lng": 108.85,
+      "lat": 19.35,
+      "intro": "海南西部原生态海湾，海南西环高铁过昌江段，列车向海侧可见棋子湾碧蓝海水、礁石与防风林海岸线。",
+      "visibility": "window",
+      "maxDistKm": 10,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "category": "other",
+      "subtype": "coast_island",
+      "tags": [
+        "海湾",
+        "原生态",
+        "西线海岸"
+      ],
+      "lines": [
+        {
+          "corridorId": "hainanxi",
+          "alongKmFrom": 163.4,
+          "distKm": 2.5,
+          "nearStations": [
+            "棋子湾"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          11,
+          12,
+          1,
+          2,
+          3,
+          4
+        ],
+        "timeOfDay": "day",
+        "light": "front",
+        "note": "旱季海水最清"
+      },
+      "honors": [],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "棋子湾旅游区（昌江文旅）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "棋子湾 coastline",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "xingan-lingqu-canal",
+      "name": "兴安灵渠",
+      "province": "广西",
+      "lng": 110.67,
+      "lat": 25.61,
+      "intro": "秦代开凿的世界灌溉工程遗产，沟通湘江与漓江，湘桂扩能过兴安段，列车左侧可见灵渠古渠、铧嘴与兴安古城方向。",
+      "visibility": "window",
+      "maxDistKm": 10,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "construct",
+        "history"
+      ],
+      "category": "engineering",
+      "subtype": "water_conservancy",
+      "tags": [
+        "世界灌溉工程遗产",
+        "秦代运河",
+        "湘江漓江"
+      ],
+      "lines": [
+        {
+          "corridorId": "xiangguikuoneng",
+          "alongKmFrom": 279.9,
+          "distKm": 7.1,
+          "nearStations": [
+            "兴安",
+            "全州"
+          ]
+        },
+        {
+          "corridorId": "hengliu",
+          "alongKmFrom": 267.9,
+          "distKm": 7.2,
+          "nearStations": [
+            "兴安",
+            "全州"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "古渠与陡门近轨可见"
+      },
+      "honors": [
+        "WORLDIRRIG",
+        "NCH"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "世界灌溉工程遗产名录（灵渠）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10873221",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "changde-taohuayuan",
+      "name": "常德桃花源",
+      "province": "湖南",
+      "lng": 111.35,
+      "lat": 28.9,
+      "intro": "《桃花源记》原型地，沅江畔的桃花源古镇与山水，黔张常铁路过桃源段，列车右侧可见沅江水乡与桃花山方向。",
+      "visibility": "on_track",
+      "maxDistKm": 3,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "culture",
+        "nature"
+      ],
+      "category": "other",
+      "subtype": "old_town",
+      "tags": [
+        "桃花源记",
+        "沅江",
+        "古镇"
+      ],
+      "lines": [
+        {
+          "corridorId": "qianzhangchang",
+          "alongKmFrom": 292.9,
+          "distKm": 0.8,
+          "nearStations": [
+            "桃源",
+            "常德"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          3,
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "3—4月桃花期最佳"
+      },
+      "honors": [
+        "NSCENIC",
+        "AAAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "国家级风景名胜区（桃花源）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10922227",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "changde-liuye-lake",
+      "name": "常德柳叶湖",
+      "province": "湖南",
+      "lng": 111.75,
+      "lat": 29.05,
+      "intro": "沅水下游的大型城郊湖泊，常益长高铁过常德段，列车左侧可见柳叶湖开阔水面与环湖绿廊，是洞庭西畔的城市名片。",
+      "visibility": "window",
+      "maxDistKm": 6,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "geo",
+        "culture"
+      ],
+      "category": "lake",
+      "subtype": "lake",
+      "tags": [
+        "城市湖泊",
+        "沅水",
+        "环湖绿廊"
+      ],
+      "lines": [
+        {
+          "corridorId": "changyichang",
+          "alongKmFrom": 3.9,
+          "distKm": 2.6,
+          "nearStations": [
+            "常德"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "春秋湖光最宜"
+      },
+      "honors": [
+        "NWATER",
+        "AAAA"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "A",
+          "ref": "柳叶湖国家级水利风景区/旅游度假区",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10915283",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "yongzhou-liuzi-temple",
+      "name": "永州柳子庙·愚溪",
+      "province": "湖南",
+      "lng": 111.6,
+      "lat": 26.45,
+      "intro": "柳宗元贬谪永州时的柳子庙与愚溪所在，衡柳铁路过永州段，列车左侧可见潇湘二水汇流与零陵古城方向。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 2,
+      "dimensions": [
+        "history",
+        "culture"
+      ],
+      "category": "other",
+      "subtype": "historic_building",
+      "tags": [
+        "柳宗元",
+        "潇湘",
+        "零陵古城"
+      ],
+      "lines": [
+        {
+          "corridorId": "xiangguikuoneng",
+          "alongKmFrom": 134.1,
+          "distKm": 3.5,
+          "nearStations": [
+            "永州"
+          ]
+        },
+        {
+          "corridorId": "hengliu",
+          "alongKmFrom": 129.9,
+          "distKm": 3.9,
+          "nearStations": [
+            "永州"
+          ]
+        }
+      ],
+      "side": "left",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [
+          4,
+          5,
+          9,
+          10
+        ],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "潇湘汇流处昼间可见"
+      },
+      "honors": [
+        "NCH"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（柳子庙）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10905502",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    },
+    {
+      "id": "ganzhou-city-wall",
+      "name": "赣州古城墙·八境台",
+      "province": "江西",
+      "lng": 114.94,
+      "lat": 25.86,
+      "intro": "宋代砖城墙与章贡二水汇合处的八境台，京九线过赣州段，列车右侧可见赣州古城墙、八境台与三江汇流。",
+      "visibility": "window",
+      "maxDistKm": 8,
+      "viewScale": "mid",
+      "viewMinutes": 3,
+      "dimensions": [
+        "history",
+        "architecture"
+      ],
+      "category": "other",
+      "subtype": "historic_building",
+      "tags": [
+        "宋代城墙",
+        "八境台",
+        "章贡汇流"
+      ],
+      "lines": [
+        {
+          "corridorId": "jingjiu",
+          "alongKmFrom": 1891.5,
+          "distKm": 4.6,
+          "nearStations": [
+            "赣州",
+            "赣州西"
+          ]
+        },
+        {
+          "corridorId": "changgan",
+          "alongKmFrom": 355.1,
+          "distKm": 6.1,
+          "nearStations": [
+            "赣州",
+            "赣州西"
+          ]
+        }
+      ],
+      "side": "right",
+      "sideRefDirection": "line_forward",
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "宋代城墙保存完好"
+      },
+      "honors": [
+        "NCH"
+      ],
+      "sources": [
+        {
+          "type": "authority",
+          "level": "S",
+          "ref": "全国重点文物保护单位（赣州城墙）",
+          "checkedAt": "2026-10-01"
+        },
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "Q10890144",
+          "checkedAt": "2026-10-01"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-01",
+        "checkedBy": "ai+2026-10-batch",
+        "method": "corridor-geometry-projection（里程/离轨/左右侧实算）+ 知识库坐标初值，待 GCJ02→WGS84 终核"
+      },
+      "source": "ai_generated",
+      "reviewRound": "2026-10-v3-northeast-eastchina-south"
+    }
+  ]
+}

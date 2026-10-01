@@ -1,0 +1,81 @@
+[
+  {
+    "name": "西台吉乃尔湖 · 双色湖",
+    "lng": 93.4,
+    "lat": 37.85,
+    "category": "water",
+    "worthSlowDown": true,
+    "canPark": true,
+    "intro": "G315 从湖中穿过，两侧湖水一蓝一绿，被称作「双色湖」。",
+    "howToPlay": "停车后走到湖岸，晴天正午颜色最艳，无人机视角更佳。",
+    "id": "qinghai-gansu-ring-h-西台吉乃尔湖---双色湖",
+    "routeId": "qinghai-gansu-ring",
+    "alongKm": 56.4,
+    "side": "right",
+    "stopMinutes": 20,
+    "walkMinutes": 5,
+    "dimensions": [
+      "geo",
+      "nature"
+    ],
+    "verification": {
+      "status": "verified",
+      "checkedAt": "2026-09-30",
+      "method": "osm"
+    },
+    "source": "curated"
+  },
+  {
+    "name": "乌素特水上雅丹",
+    "lng": 93.7,
+    "lat": 37.65,
+    "category": "landform",
+    "worthSlowDown": true,
+    "canPark": true,
+    "intro": "全球罕见的水上雅丹——雅丹土丘从碧蓝湖水中升起。",
+    "howToPlay": "日落前 1 小时最美，站在高地远眺，风大注意保暖。",
+    "id": "qinghai-gansu-ring-h-乌素特水上雅丹",
+    "routeId": "qinghai-gansu-ring",
+    "alongKm": 97.7,
+    "side": "right",
+    "stopMinutes": 20,
+    "walkMinutes": 5,
+    "dimensions": [
+      "geo",
+      "nature"
+    ],
+    "verification": {
+      "status": "verified",
+      "checkedAt": "2026-09-30",
+      "method": "osm"
+    },
+    "source": "curated"
+  },
+  {
+    "name": "G315 无人雅丹观景点",
+    "lng": 94.05,
+    "lat": 37.42,
+    "category": "landform",
+    "worthSlowDown": true,
+    "canPark": true,
+    "intro": "右侧一片无人雅丹，停车走 2 分钟能拍到公路消失在地平线。",
+    "howToPlay": "停车后沿车辙走 2 分钟，站上土梁回拍，G315 笔直消失在雅丹尽头。长焦压缩感最好。",
+    "safetyNote": "无手机信号，勿单车深入；风大易迷路。",
+    "id": "qinghai-gansu-ring-h-g315-无人雅丹观景点",
+    "routeId": "qinghai-gansu-ring",
+    "alongKm": 140.8,
+    "side": "right",
+    "stopMinutes": 20,
+    "walkMinutes": 5,
+    "dimensions": [
+      "geo",
+      "nature"
+    ],
+    "verification": {
+      "status": "verified",
+      "checkedAt": "2026-09-30",
+      "method": "osm"
+    },
+    "source": "curated"
+  }
+]

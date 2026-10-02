@@ -80,6 +80,12 @@ export type AtlasSpot = {
   matchKind: 'line' | 'geo' | null;
   /** 数据来源：rail=铁路景点库，road=公路景点库（前端合并筛选/着色时用） */
   origin?: 'rail' | 'road';
+  /** 省份（铁路侧仅 192/624 有值，公路侧已全量补齐） */
+  province?: string;
+  /** 观赏评分（0–100）：公路侧有，铁路侧数据源无此字段 */
+  score?: number;
+  /** 质量分级 A/B/C */
+  tier?: string;
 };
 
 /** 线路详情页用：景点在该走廊上的里程位置 */
@@ -394,6 +400,12 @@ function buildOverview(): AtlasOverview {
       intro: s.intro,
       category: s.category,
       dimensions: Array.isArray(s.dimensions) ? s.dimensions : undefined,
+      // v0.6.3：透出省份供前端省份筛选（铁路侧 192/624 有值，如实透传，不补假数据）
+      province:
+        typeof (s as unknown as Record<string, unknown>).province === 'string' &&
+        String((s as unknown as Record<string, unknown>).province)
+          ? String((s as unknown as Record<string, unknown>).province)
+          : undefined,
       lines: s.lines,
       corridorIds: merged,
       matchKind: lineIds.length ? 'line' : geoIds.length ? 'geo' : null,
@@ -509,6 +521,11 @@ function buildRoadLayer(): RoadLayerCache['data'] {
         lat: round4(lat),
         intro: typeof s.intro === 'string' ? s.intro.slice(0, 60) : undefined,
         category: typeof s.category === 'string' ? s.category : undefined,
+        // v0.6.3：透出省份/评分/分级，前端据此做省份筛选与景点排名，
+        // 不必再发一次请求。铁路侧数据源无 score，前端排名会自动退化为按关联线路数。
+        province: typeof s.province === 'string' && s.province ? s.province : undefined,
+        score: Number.isFinite(Number(s.score)) ? Number(s.score) : undefined,
+        tier: typeof s.tier === 'string' ? s.tier : undefined,
         corridorIds: keys,
         matchKind: keys.length ? 'geo' : null,
         origin: 'road',
@@ -549,10 +566,44 @@ function getOverview(): AtlasOverview {
 atlasRoute.get('/overview', (c) => {
   try {
     const data = getOverview();
-    return c.json({ ok: true, data });
+    /*
+     * v0.6.3：此处**不再**返回 roadCorridors / roadSpots。
+     * 公路侧一旦并入，响应体从 ~200KB 涨到 4.4MB（624 铁路 + 1.2 万公路景点），
+     * 浏览器要解析 4.4MB JSON 再把 1.2 万个点交给 AMap 聚类，主线程长时间阻塞，
+     * 表现为「可选要素一直不加载、页面卡住」（实测冷加载路径）。
+     * 公路侧改由 /atlas/road 按需提供：meta 里仍带 roadSpotCount 等轻量计数，
+     * 侧栏能显示「铁路 624 · 公路 12087」，但明细等用户真要看公路时才拉。
+     */
+    const { roadCorridors: _rc, roadSpots: _rs, ...railOnly } = data;
+    return c.json({ ok: true, data: railOnly });
   } catch (e) {
     return c.json(
       { ok: false, error: { code: 'ATLAS_FAIL', message: e instanceof Error ? e.message : '聚合失败' } },
+      500,
+    );
+  }
+});
+
+/** v0.6.3：公路侧明细（编号公路折线 + 公路原生景点），前端按需拉取 */
+atlasRoute.get('/road', (c) => {
+  try {
+    const { roadCorridors, roadSpots, meta } = getOverview();
+    return c.json({
+      ok: true,
+      data: {
+        roadCorridors,
+        roadSpots,
+        meta: {
+          roadCorridorCount: meta.roadCorridorCount,
+          roadSpotCount: meta.roadSpotCount,
+          roadMigratedExcluded: meta.roadMigratedExcluded,
+          generatedAt: meta.generatedAt,
+        },
+      },
+    });
+  } catch (e) {
+    return c.json(
+      { ok: false, error: { code: 'ATLAS_ROAD_FAIL', message: e instanceof Error ? e.message : '公路图层聚合失败' } },
       500,
     );
   }

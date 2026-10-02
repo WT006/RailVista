@@ -149,15 +149,90 @@ const viewBoxAttr = computed(() => {
   return `${(minX - padX).toFixed(1)} ${(minY - padY).toFixed(1)} ${(maxX - minX + padX * 2).toFixed(1)} ${(maxY - minY + padY * 2).toFixed(1)}`;
 });
 
-/** 里程分段：按几何 nodes（端点/城市）切段 */
+/**
+ * 里程分段：**按沿线景点实际分布聚合**，而不是几何等分。
+ * 旧实现用 120km 固定窗口切,title 写成「第 N 段 · X—Y km」——
+ * 范围和标题重复、无地名、无信息量、且不可点，等于纯占位。
+ * 现在：以 120km 为窗口聚合出「有景点」的段（空段不显示），每段带景点数与
+ * 评分峰值，点击可筛选该段景点并在地图上高亮（activeSegment）。
+ */
+const SEGMENT_WINDOW_KM = 120;
+
 const segments = computed(() => {
-  const r = roadRoute.value;
-  if (!r?.chapters?.length) return [];
-  return r.chapters;
+  const total = roadRoute.value?.lengthKm ?? 0;
+  if (!total) return [];
+  const buckets: Array<{ fromKm: number; toKm: number; spots: typeof spots.value }> = [];
+  for (let from = 0; from < total; from += SEGMENT_WINDOW_KM) {
+    const to = Math.min(from + SEGMENT_WINDOW_KM, total);
+    const inRange = spots.value.filter(
+      (s) => s.progressKm >= from && (s.progressKm < to || to >= total),
+    );
+    if (inRange.length) buckets.push({ fromKm: Math.round(from), toKm: Math.round(to), spots: inRange });
+    if (to >= total) break;
+  }
+  // 段数上限保护：极端稀疏线路会切出上百段，只留景点最多的 24 段
+  return buckets.length > 24 ? buckets.slice(0, 24) : buckets;
 });
 
-/** 沿线景点 Top（按分数） */
+/** 当前选中的分段（null = 全部） */
+const activeSegment = ref<number | null>(null);
+
+const maxSegmentSpots = computed(() =>
+  segments.value.reduce((m, s) => Math.max(m, s.spots.length), 1),
+);
+
+/** 选中分段后，景点列表只显示该段；再点一次取消 */
+const visibleSpots = computed(() => {
+  if (activeSegment.value === null) return topSpots.value;
+  const seg = segments.value[activeSegment.value];
+  if (!seg) return topSpots.value;
+  return [...seg.spots].sort((a, b) => b.score - a.score);
+});
+
+/** 沿线景点 Top（按评分） */
 const topSpots = computed(() => [...spots.value].sort((a, b) => b.score - a.score).slice(0, 12));
+
+/** 分类中文名（公路侧 category 是英文层级，取末段做中文兜底） */
+const SPOT_CATEGORY_CN: Record<string, string> = {
+  'viewpoint.landmark': '地标',
+  'viewpoint.observation-deck': '观景台',
+  'viewpoint.scenic-byway': '风景公路',
+  'nature.mountain': '山岳',
+  'nature.canyon': '峡谷',
+  'nature.lake': '湖泊',
+  'nature.river': '河流',
+  'nature.forest': '森林',
+  'nature.grassland': '草原',
+  'nature.desert': '沙漠',
+  'nature.glacier': '冰川',
+  'culture.heritage': '遗产',
+  'culture.ancient-town': '古镇',
+  'culture.ruin': '遗址',
+  'culture.temple': '古建',
+  'engineering.bridge': '桥梁',
+  'engineering.tunnel': '隧道',
+  'engineering.pass': '垭口',
+  'experience.hot-spring': '温泉',
+};
+
+function spotCategoryCn(cat?: string): string {
+  if (!cat) return '';
+  return SPOT_CATEGORY_CN[cat] ?? cat.split('.').pop() ?? '';
+}
+
+function selectSegment(i: number) {
+  activeSegment.value = activeSegment.value === i ? null : i;
+}
+
+/** 景点条目点击：地图平移并放大到该点（列表可点开的关键交互） */
+function focusSpotOnMap(s: { lng: number; lat: number; name: string }) {
+  focusTarget.value = { lng: s.lng, lat: s.lat, name: s.name, key: Date.now() };
+  if (mapWrap.value) {
+    mapWrap.value.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+const focusTarget = ref<{ lng: number; lat: number; name: string; key: number } | null>(null);
+const mapWrap = ref<HTMLElement | null>(null);
 
 onMounted(load);
 
@@ -339,7 +414,7 @@ function goTripLive() {
         </div>
 
         <div v-if="roadRoute" class="drive-trip-grid drive-road-grid">
-          <section class="drive-trip-map rv-card" data-spotlight>
+          <section ref="mapWrap" class="drive-trip-map rv-card" data-spotlight>
             <svg :viewBox="viewBoxAttr" class="drive-trip-map__svg" role="img" aria-label="路线示意图">
               <g class="drive-netmap__outline" v-html="outlinePaths" />
               <path ref="routePathRef" class="drive-trip-map__route" :d="routePath" :stroke="roadColor(entryView.class)" />
@@ -363,6 +438,17 @@ function goTripLive() {
               >
                 <title>{{ s.name }} · K{{ Math.round(s.progressKm) }}</title>
               </circle>
+              <!-- 选中景点的高亮定位环（点击右侧景点条目后出现） -->
+              <g
+                v-if="focusTarget"
+                :key="focusTarget.key"
+                class="drive-trip-map__focus"
+                :transform="`translate(${lngLatToViewBox(focusTarget.lng, focusTarget.lat)[0]} ${lngLatToViewBox(focusTarget.lng, focusTarget.lat)[1]})`"
+              >
+                <circle class="drive-trip-map__focus-pulse" r="14" />
+                <circle class="drive-trip-map__focus-ring" r="7" />
+                <circle class="drive-trip-map__focus-core" r="3" />
+              </g>
             </svg>
             <p class="drive-trip-map__hint">
               全线走向（OSM 众包还原，{{ precisionText }}）
@@ -376,15 +462,42 @@ function goTripLive() {
             <section v-if="segments.length" class="rv-card drive-chapters">
               <h2 class="drive-block-title">分段</h2>
               <ul class="drive-chapterlist">
-                <li v-for="(ch, i) in segments" :key="i">
-                  <span class="drive-chapterlist__range">{{ Math.round(ch.fromKm) }}—{{ Math.round(ch.toKm) }} km</span>
-                  {{ ch.title }}
+                <li v-for="(seg, i) in segments" :key="i">
+                  <button
+                    type="button"
+                    class="drive-seg"
+                    :class="{ 'is-on': activeSegment === i }"
+                    :aria-pressed="activeSegment === i"
+                    @click="selectSegment(i)"
+                  >
+                    <span class="drive-seg__no">{{ i + 1 }}</span>
+                    <span class="drive-seg__body">
+                      <span class="drive-seg__range">{{ seg.fromKm }}—{{ seg.toKm }} km</span>
+                      <!-- 进度条表达该段景点密度（鸿蒙展示类：数据可视化用进度表达） -->
+                      <span class="drive-seg__bar">
+                        <span
+                          class="drive-seg__fill"
+                          :style="{ transform: `scaleX(${seg.spots.length / maxSegmentSpots})` }"
+                        ></span>
+                      </span>
+                    </span>
+                    <span class="drive-seg__num">{{ seg.spots.length }}</span>
+                  </button>
                 </li>
               </ul>
+              <p class="drive-seg__hint">
+                按 {{ SEGMENT_WINDOW_KM }} km 聚合，只列有景点的段；点击可只看该段
+              </p>
             </section>
 
             <section class="rv-card">
-              <h2 class="drive-block-title">沿线景点 Top{{ topSpots.length }}</h2>
+              <h2 class="drive-block-title">
+                <template v-if="activeSegment === null">沿线景点 Top{{ topSpots.length }}</template>
+                <template v-else>
+                  第 {{ activeSegment + 1 }} 段 · {{ segments[activeSegment]?.fromKm }}—{{ segments[activeSegment]?.toKm }} km
+                  的 {{ visibleSpots.length }} 处景点
+                </template>
+              </h2>
 
               <!-- B3：景点加载失败时的独立错误态 + 重试（不牵连整页） -->
               <div v-if="alongError" class="drive-road-degraded">
@@ -395,11 +508,18 @@ function goTripLive() {
               </div>
 
               <template v-else>
-                <ul v-if="topSpots.length" class="drive-road-spots">
-                  <li v-for="s in topSpots" :key="s.id">
-                    <span class="drive-spot__km">K{{ Math.round(s.progressKm) }}</span>
-                    <span class="drive-road-spot__name">{{ s.name }}</span>
-                    <span class="drive-spot__tier" :class="'is-' + s.tier">{{ s.tier }}</span>
+                <ul v-if="visibleSpots.length" class="drive-road-spots">
+                  <li v-for="s in visibleSpots" :key="s.id">
+                    <button type="button" class="drive-road-spot" @click="focusSpotOnMap(s)">
+                      <span class="drive-spot__km">K{{ Math.round(s.progressKm) }}</span>
+                      <span class="drive-road-spot__main">
+                        <span class="drive-road-spot__name">{{ s.name }}</span>
+                        <span v-if="spotCategoryCn(s.category)" class="drive-road-spot__cat">
+                          {{ spotCategoryCn(s.category) }}
+                        </span>
+                      </span>
+                      <span class="drive-spot__tier" :class="'is-' + s.tier">{{ s.tier }}</span>
+                    </button>
                   </li>
                 </ul>
                 <p v-else class="drive-road-degraded">

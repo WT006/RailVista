@@ -88,6 +88,12 @@ export type AtlasSpotLite = {
   matchKind: 'line' | 'geo' | null;
   /** 数据来源：rail=铁路景点库，road=公路景点库 */
   origin?: 'rail' | 'road';
+  /** 省份（铁路侧仅 192/624 有值，公路侧已全量补齐） */
+  province?: string;
+  /** 观赏评分（0–100）：公路侧有，铁路侧数据源无此字段 */
+  score?: number;
+  /** 质量分级 A/B/C */
+  tier?: string;
 };
 
 /** 公路线路（编号公路，仅含已挂几何的） */
@@ -238,6 +244,23 @@ export const api = {
   /** 全国铁路景点地图：全部走廊（抽稀折线）+ 全量景点，只读聚合，60s 服务端缓存 */
   getAtlasOverview() {
     return request<AtlasOverviewData>('/atlas/overview');
+  },
+  /**
+   * v0.6.3：公路侧明细（编号公路折线 + 公路原生景点）。
+   * 与 overview 分开按需拉取 —— 并入后响应体 4.4MB，浏览器解析 + AMap 聚类
+   * 1.2 万个点会长时间阻塞主线程，侧栏一直停在"正在加载"。
+   */
+  getAtlasRoad() {
+    return request<{
+      roadCorridors: AtlasRoadCorridorLite[];
+      roadSpots: AtlasSpotLite[];
+      meta: {
+        roadCorridorCount: number;
+        roadSpotCount: number;
+        roadMigratedExcluded: number;
+        generatedAt: string;
+      };
+    }>('/atlas/road');
   },
   /** 线路详情页：单条走廊完整折线 + 沿线景点（含里程） */
   getAtlasCorridor(id: string) {

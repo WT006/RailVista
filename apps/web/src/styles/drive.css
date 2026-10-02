@@ -2182,3 +2182,172 @@
     animation: none;
   }
 }
+/* ══════════ 详情页侧栏重设计（鸿蒙展示类：列表可点 + 进度条表达密度） ══════════ */
+
+/* 分段条目：序号 + 里程范围 + 景点密度进度条 + 数量 */
+.drive-seg {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-2);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+
+.drive-seg:hover {
+  background: var(--fill-subtle);
+}
+
+.drive-seg.is-on {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+  color: var(--text-1);
+}
+
+.drive-seg__no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 6px;
+  background: var(--fill-subtle);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.drive-seg.is-on .drive-seg__no {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--text-1);
+}
+
+.drive-seg__body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.drive-seg__range {
+  font-size: var(--fs-cap);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-seg__bar {
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--fill-subtle);
+  overflow: hidden;
+}
+
+.drive-seg__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transform-origin: left center;
+  transition: transform var(--dur-base) var(--ease-standard);
+}
+
+.drive-seg__num {
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.drive-seg.is-on .drive-seg__num {
+  color: var(--accent);
+}
+
+.drive-seg__hint {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-micro);
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+/* 沿线景点行：里程徽标 + 名称/分类 + 分级 */
+.drive-road-spot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 6px var(--space-1);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.drive-road-spot:hover {
+  background: var(--fill-subtle);
+}
+
+.drive-road-spot__main {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.drive-road-spot__name {
+  font-size: var(--fs-cap);
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-road-spot__cat {
+  flex: none;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--fill-subtle);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  color: var(--text-3);
+}
+
+/* 地图上的选中定位环 */
+.drive-trip-map__focus-pulse {
+  fill: color-mix(in srgb, var(--accent) 22%, transparent);
+  transform-origin: center;
+  animation: drive-focus-pulse 1.8s var(--ease-standard) infinite;
+}
+
+.drive-trip-map__focus-ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+
+.drive-trip-map__focus-core {
+  fill: #fff;
+}
+
+@keyframes drive-focus-pulse {
+  0% { transform: scale(0.55); opacity: 0.9; }
+  70% { transform: scale(1.5); opacity: 0; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drive-trip-map__focus-pulse { animation: none; }
+}

@@ -19,7 +19,6 @@ import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import RailProgressLoader from '../components/RailProgressLoader.vue';
 import RankingsSection from '../components/rankings/RankingsSection.vue';
 import AtlasEntryCard from '../components/AtlasEntryCard.vue';
-import AppTopBar from '../components/AppTopBar.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 import { useTripStore } from '../stores/tripStore';
 
@@ -748,8 +747,6 @@ function goBack() {
          轮廓与点位均为构建期生成的离线静态资源（内联进包），运行时零网络请求，
          不依赖任何在线地图服务；整层 pointer-events:none，不影响前景交互。 -->
 
-    <!-- 顶部导航栏：品牌标识 + 版本徽标。sticky 吸顶，与正文共用同一 .rv-shell 栅格。 -->
-    <AppTopBar />
 
     <div class="rv-shell">
       <div v-if="showBackBtn" class="select-top">

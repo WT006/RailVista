@@ -824,6 +824,19 @@ async function load() {
   }
 }
 
+/** P4 防御加固：错误态不再是一行死文本，提供重试按钮，避免"页面闪一下就回不去" */
+async function reloadAll() {
+  mapError.value = '';
+  loadError.value = '';
+  await load();
+  if (!map) await initMap();
+  else {
+    renderNetwork();
+    renderSpots();
+    if (roadLayerOn.value) renderRoadLayer();
+  }
+}
+
 onMounted(async () => {
   await load();
   await initMap();
@@ -1149,8 +1162,10 @@ watch(heatOn, () => renderHeat());
     </aside>
 
     <p v-if="loading" class="atlas-status">正在加载全国铁路与景点数据…</p>
-    <p v-else-if="loadError" class="atlas-status atlas-status--err">{{ loadError }}</p>
-    <p v-else-if="mapError" class="atlas-status atlas-status--err">{{ mapError }}</p>
+    <div v-else-if="loadError || mapError" class="atlas-status atlas-status--err">
+      <p class="atlas-status__text">{{ loadError || mapError }}</p>
+      <button type="button" class="btn ghost btn-sm" @click="reloadAll">重新加载</button>
+    </div>
     <p v-else-if="!heatSupported" class="atlas-status atlas-status--warn">
       热力图插件不可用，已自动隐藏开关
     </p>
@@ -1594,6 +1609,15 @@ watch(heatOn, () => renderHeat());
 .atlas-status--err {
   border-color: var(--danger);
   color: var(--danger);
+  /* P4：错误态容器需要容纳文本 + 重试按钮 */
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.atlas-status__text {
+  margin: 0;
 }
 
 .atlas-status--warn {

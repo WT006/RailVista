@@ -2,7 +2,6 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
-import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 import { highlightColor, highlightLabel } from '../data/highlightColors';
@@ -52,7 +51,6 @@ function startNav() {
 
 <template>
   <div class="drive-page">
-    <AppTopBar />
 
     <main class="rv-shell">
       <DriveSubNav />

@@ -62,7 +62,10 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   z-index: 60;
   height: var(--appbar-h);
   /* 与主页面融为一体：去掉底部硬描边，背景几乎透明，仅保留极淡的玻璃模糊，
-   * 让顶栏像"悬浮在页面之上"而非一块独立的条。滚过内容后才微微加深，给出层级暗示。 */
+   * 让顶栏像"悬浮在页面之上"而非一块独立的条。滚过内容后才微微加深，给出层级暗示。
+   * P5：背景随滚动状态的加深/变浅走平滑过渡（沉浸光感规范：从透明到模糊平滑过渡），
+   * 而不是瞬间替换 —— 此前无 transition，is-scrolled 翻转时会出现突兀的模糊闪变。 */
+  transition: background var(--dur-slow) var(--ease-standard);
   border-bottom: none;
   background: linear-gradient(
     to bottom,

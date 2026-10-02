@@ -15,7 +15,6 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '../api/client';
-import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 
@@ -332,7 +331,6 @@ const levelLabel: Record<string, string> = {
 
 <template>
   <div class="drive-page">
-    <AppTopBar />
 
     <main class="rv-shell">
       <DriveSubNav />

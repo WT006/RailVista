@@ -8,6 +8,16 @@
   isolation: isolate;
   min-height: 100dvh;
   padding-bottom: var(--space-8);
+  /*
+   * P1：自驾页背景是构建期渲染的全国路网位图（亮线密集）+ 景点星点，
+   * 比铁路页"淡轮廓 + 稀疏星点"的背景亮得多。两页卡片本身用的是同一个
+   * .rv-card（实测 computed style 完全一致：rgba(19,24,32,0.62) + blur(26px)），
+   * 但同样的透明度在更亮的背景上透出更多内容，观感上"卡片过透、文字发飘"。
+   * 这里只在自驾作用域内把两级玻璃表面调实一档，让自驾卡片与铁路页的
+   * 实际观感对齐（沉浸光感材质层厚度按背景复杂度自适应，属规范内做法）。
+   */
+  --surface-1: rgba(19, 24, 32, 0.78); /* 全局 0.62 → 自驾 0.78 */
+  --surface-2: rgba(26, 33, 43, 0.7); /* 全局 0.55 → 自驾 0.70 */
   /* 与 .rv-page 同一纪律：末层底色透出 App 级背景层（见 base.css .rv-page 注释） */
   background:
     radial-gradient(ellipse 70% 42% at 10% -8%, var(--accent-soft), transparent 58%),
@@ -589,11 +599,15 @@
 }
 
 /* —— 首屏主结构：地图 + 面板 —— */
+/* P3：与下方「普通国道 / 国家高速 / 已挂几何」统计区之间原本没有间距，
+ * 图例与上方组件紧贴。main.rv-shell 不是 gap 布局，区块间靠自身 margin 撑开，
+ * 这里补上与 .drive-stats 的 margin-bottom(--space-5) 同级的呼吸间距。 */
 .drive-home-main {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-3);
   align-items: stretch;
+  margin-bottom: var(--space-5);
 }
 
 .drive-home-panel {
@@ -1975,5 +1989,196 @@
   }
   .drive-chapterbar__seg::after {
     transition: none;
+  }
+}
+
+/* ═══════════ P6 公路详情页重构（鸿蒙布局/排版/动效规范） ═══════════ */
+
+/* ── 详情页 hero：编号徽章 + 标题层级 ── */
+.drive-road-hero {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  animation: drive-road-rise var(--dur-enter) var(--ease-emphasized) both;
+}
+
+.drive-road-hero__id {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* 编号徽章：等级色描边 + 微弱外发光，是整页的锚点 */
+.drive-road-hero__ref {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.4em;
+  padding: 10px 14px;
+  border: 1.5px solid color-mix(in srgb, var(--prefix-color, var(--accent)) 62%, transparent);
+  border: 1.5px solid var(--prefix-color, var(--accent));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--prefix-color, var(--accent)) 12%, transparent);
+  background: var(--surface-1);
+  color: var(--prefix-color, var(--accent));
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 22px color-mix(in srgb, var(--prefix-color, var(--accent)) 26%, transparent);
+  box-shadow: none;
+  text-shadow: 0 0 14px color-mix(in srgb, var(--prefix-color, var(--accent)) 55%, transparent);
+}
+
+.drive-road-hero__names {
+  min-width: 0;
+}
+
+.drive-road-hero__class {
+  margin: 0 0 2px;
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+.drive-road-hero__title {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-1);
+  /* 中文长标题在窄屏允许折行，但保持词内不碎 */
+  overflow-wrap: anywhere;
+}
+
+/* ── 事实卡栅格（meta 不再是裸 span 串） ── */
+.drive-road-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.drive-road-fact {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line-hairline);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  min-width: 0;
+}
+
+.drive-road-fact dt {
+  margin: 0 0 2px;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+.drive-road-fact dd {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-road-fact dd small {
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.drive-road-fact__sub {
+  display: block;
+  margin-top: 1px;
+  font-style: normal;
+  font-size: var(--fs-micro);
+  font-weight: 400;
+  color: var(--text-3);
+  white-space: normal;
+}
+
+.drive-road-fact__provs {
+  white-space: normal;
+  line-height: 1.5;
+}
+
+/* 事实卡逐个入场（鸿蒙动效规范：克制、错落） */
+.drive-road-fact {
+  animation: drive-road-rise var(--dur-enter) var(--ease-emphasized) both;
+}
+.drive-road-fact:nth-child(1) { animation-delay: 30ms; }
+.drive-road-fact:nth-child(2) { animation-delay: 70ms; }
+.drive-road-fact:nth-child(3) { animation-delay: 110ms; }
+.drive-road-fact:nth-child(4) { animation-delay: 150ms; }
+.drive-road-fact:nth-child(5) { animation-delay: 190ms; }
+
+/* ── 提示条 note 组件：左色条 + 玻璃底，替代散落的 drive-empty rv-card ── */
+.drive-road-note {
+  display: grid;
+  gap: 4px;
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  border-left: 3px solid var(--accent);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  animation: drive-road-rise var(--dur-enter) var(--ease-emphasized) both;
+}
+
+.drive-road-note strong {
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.drive-road-note p {
+  margin: 0;
+  font-size: var(--fs-cap);
+  line-height: 1.7;
+  color: var(--text-2);
+}
+
+.drive-road-note[data-grade='warn'] {
+  border-left-color: var(--warning);
+}
+.drive-road-note[data-grade='danger'] {
+  border-left-color: var(--danger);
+}
+.drive-road-note[data-grade='info'] {
+  border-left-color: var(--accent);
+}
+
+.drive-road-note a {
+  color: var(--accent);
+}
+
+/* ── 入场动效（克制：仅位移+淡入，无缩放弹跳） ── */
+@keyframes drive-road-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drive-road-hero,
+  .drive-road-fact,
+  .drive-road-note {
+    animation: none;
   }
 }

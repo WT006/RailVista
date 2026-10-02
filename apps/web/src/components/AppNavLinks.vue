@@ -11,6 +11,7 @@ const links = [
   { to: '/', label: '行程', match: (p: string) => p === '/' || p === '/trip' || p.startsWith('/route/') },
   { to: '/drive', label: '自驾', match: (p: string) => p.startsWith('/drive') },
   { to: '/atlas', label: '全国地图', match: (p: string) => p.startsWith('/atlas') },
+  { to: '/ticket', label: '纪念票', match: (p: string) => p.startsWith('/ticket') },
 ];
 </script>
 

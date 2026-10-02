@@ -134,12 +134,15 @@ function paintPoints(
   ctx: CanvasRenderingContext2D,
   points: readonly (readonly number[])[],
   scale: number,
+  /** 仅保留参数位（旧版区分冷暖两色，v0.6.2 起统一主题色，见鸿蒙沉浸光感规范） */
   warm: boolean,
   boost: (x: number, y: number, w: number) => number,
   glowScale: number,
 ): void {
-  const inner = warm ? '255, 236, 205' : '199, 224, 255';
-  const outer = warm ? '255, 184, 77' : '77, 159, 255';
+  // 沉浸光感用色（鸿蒙规范）：环境光应为轻盈通透的中性-主题色，
+  // 随深浅色自适应，不应整体染成单一色相（此前公路侧被改成琥珀黄，已回归）。
+  const inner = '224, 240, 255';
+  const outer = '77, 159, 255';
   ctx.globalCompositeOperation = 'lighter';
   for (const p of points) {
     const [x, y, w] = [p[0]!, p[1]!, p[2] ?? 0.6];
@@ -171,8 +174,8 @@ function paintHotSpots(
   warm: boolean,
   hot: number[],
 ): void {
-  const inner = warm ? '255, 244, 224' : '226, 240, 255';
-  const outer = warm ? '255, 184, 77' : '77, 159, 255';
+  const inner = '229, 242, 255';
+  const outer = '77, 159, 255';
   ctx.globalCompositeOperation = 'lighter';
   for (const i of hot) {
     const pt = points[i];
@@ -493,14 +496,15 @@ onBeforeUnmount(() => {
   opacity: calc(var(--backdrop-map-opacity) * 0.95);
 }
 
-/* 指针径向高光：只改 CSS 变量，由合成层完成，不触发布局与重绘 */
+/* 指针径向高光：只改 CSS 变量，由合成层完成，不触发布局与重绘。
+ * 用色对齐沉浸光感规范：中性亮芯 + 主题蓝外晕，深浅色下均轻盈通透。 */
 .app-backdrop__glow {
   position: absolute;
   inset: 0;
   opacity: 0;
   background: radial-gradient(
     460px circle at var(--bx, 50%) var(--by, 50%),
-    rgba(255, 184, 77, 0.14),
+    rgba(229, 242, 255, 0.13),
     rgba(77, 159, 255, 0.06) 42%,
     transparent 68%
   );

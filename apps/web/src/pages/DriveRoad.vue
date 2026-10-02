@@ -8,7 +8,6 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
-import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 import { useRoadDraw } from '../composables/useRoadDraw';
@@ -237,7 +236,6 @@ function goTripLive() {
 
 <template>
   <div class="drive-page">
-    <AppTopBar />
 
     <main class="rv-shell">
       <DriveSubNav />
@@ -252,54 +250,93 @@ function goTripLive() {
       <div v-else-if="error" class="drive-empty drive-empty--error">{{ error }}</div>
 
       <template v-else>
-        <header class="drive-hero">
-          <p class="drive-stat__label">
-            <span class="drive-trip-roadkey" :style="{ '--prefix-color': roadColor(entryView.class) }">{{ entryView.ref }}</span>
-            {{ roadClassLabel(entryView.class) }}
-            <template v-if="entryView.name"> · {{ entryView.name }}</template>
-          </p>
-          <!-- B2-1：端点未经验证时不展示「上海 —聂拉木」这种会被误读的标题 -->
-          <h1 v-if="!endpointsUnverified">{{ entryView.ref }}　{{ entryView.fromPlace }} — {{ entryView.toPlace }}</h1>
-          <h1 v-else>{{ entryView.ref }}　全线走向（端点待核）</h1>
-          <div class="drive-route-card__meta" style="margin-top: 12px">
-            <span v-if="nominalKm > 0">
-              已收录 {{ connectedKm }} km / 官方 {{ nominalKm }} km（{{ coveragePct }}%）
-            </span>
-            <span v-else-if="roadRoute">{{ roadRoute.lengthKm }} km（OSM 估算）</span>
-            <span v-else>官方里程约 {{ entryView.lengthKm }} km</span>
-            <!-- v0.6.0 精度分级：A=偏差≤10% · B=≤25% · C=官方里程未知或偏差更大 -->
-            <span v-if="precision" class="drive-road-precision" :data-grade="precision">{{ precisionText }}</span>
-            <span v-if="componentCount > 1">{{ componentCount }} 段（{{ componentCount - 1 }} 处未贯通）</span>
-            <span v-if="entryView.provinces.length">途经 {{ entryView.provinces.join(' · ') }}</span>
-            <span>{{ spots.length }} 处沿线景点</span>
+        <!-- P6：公路详情页 header 重构（鸿蒙布局/排版规范）——
+             编号徽章与名称左对齐成行，元信息改为「事实卡」栅格（dt/dd），
+             不再是一串裸 span 挤在一行。 -->
+        <header class="drive-road-hero">
+          <div class="drive-road-hero__id">
+            <span
+              class="drive-road-hero__ref"
+              :style="{ '--prefix-color': roadColor(entryView.class) }"
+              aria-hidden="true"
+            >{{ entryView.ref }}</span>
+            <div class="drive-road-hero__names">
+              <p class="drive-road-hero__class">
+                {{ roadClassLabel(entryView.class) }}<template v-if="entryView.name"> · {{ entryView.name }}</template>
+              </p>
+              <!-- B2-1：端点未经验证时不展示「上海 —聂拉木」这种会被误读的标题 -->
+              <h1 class="drive-road-hero__title">
+                <template v-if="!endpointsUnverified">{{ entryView.fromPlace }} — {{ entryView.toPlace }}</template>
+                <template v-else>全线走向（端点待核）</template>
+              </h1>
+            </div>
           </div>
+
+          <dl class="drive-road-facts">
+            <div class="drive-road-fact">
+              <dt>收录里程</dt>
+              <dd v-if="nominalKm > 0">
+                {{ connectedKm }}<small> km</small>
+                <em class="drive-road-fact__sub">/ 官方 {{ nominalKm }} km · {{ coveragePct }}%</em>
+              </dd>
+              <dd v-else-if="roadRoute">{{ roadRoute.lengthKm }}<small> km</small><em class="drive-road-fact__sub">OSM 估算</em></dd>
+              <dd v-else>约 {{ entryView.lengthKm }}<small> km</small><em class="drive-road-fact__sub">官方里程</em></dd>
+            </div>
+            <div v-if="precision" class="drive-road-fact">
+              <dt>几何精度</dt>
+              <dd>
+                <span class="drive-road-precision" :data-grade="precision">{{ precisionText }}</span>
+              </dd>
+            </div>
+            <div v-if="componentCount > 1" class="drive-road-fact">
+              <dt>连通情况</dt>
+              <dd>{{ componentCount }}<small> 段</small><em class="drive-road-fact__sub">{{ componentCount - 1 }} 处未贯通</em></dd>
+            </div>
+            <div v-if="entryView.provinces.length" class="drive-road-fact">
+              <dt>途经</dt>
+              <dd class="drive-road-fact__provs">{{ entryView.provinces.join(' · ') }}</dd>
+            </div>
+            <div class="drive-road-fact">
+              <dt>沿线景点</dt>
+              <dd>{{ spots.length }}<small> 处</small></dd>
+            </div>
+          </dl>
         </header>
 
-        <!-- B2-1：端点标注不可信 / 里程覆盖不足的诚实提示 -->
-        <p v-if="endpointsUnverified" class="drive-empty rv-card drive-road-degraded" style="padding: 16px">
-          端点地名与已收录几何相距较远（远超 50km），因此本页不展示「起点 — 终点」的里程标注：
-          已落库的折线只是该编号被 OSM 记录到的部分路段，顺序与真实走向未必一致。
-          官方逐桩走向表尚未发布，此处不作导航依据。
-        </p>
-        <p v-else-if="componentCount > 1" class="drive-empty rv-card drive-road-degraded" style="padding: 16px">
-          该编号在 OSM 中未贯通：共 {{ componentCount }} 段，合计 {{ connectedKm }} km（另有
-          {{ stitchedGaps }} 处 &le;1.5km 的城区断档已按几何接续）。
-          虚线段为其余连通分量，不代表实际连接关系。
-        </p>
+        <!-- B2-1：端点标注不可信 / 里程覆盖不足的诚实提示（统一 note 组件样式） -->
+        <div v-if="endpointsUnverified" class="drive-road-note" data-grade="warn">
+          <strong>端点待核</strong>
+          <p>
+            端点地名与已收录几何相距较远（远超 50km），因此本页不展示「起点 — 终点」的里程标注：
+            已落库的折线只是该编号被 OSM 记录到的部分路段，顺序与真实走向未必一致。
+            官方逐桩走向表尚未发布，此处不作导航依据。
+          </p>
+        </div>
+        <div v-else-if="componentCount > 1" class="drive-road-note" data-grade="warn">
+          <strong>未完全贯通</strong>
+          <p>
+            该编号在 OSM 中未贯通：共 {{ componentCount }} 段，合计 {{ connectedKm }} km（另有
+            {{ stitchedGaps }} 处 &le;1.5km 的城区断档已按几何接续）。
+            虚线段为其余连通分量，不代表实际连接关系。
+          </p>
+        </div>
 
-        <!-- 几何待补的诚实提示 -->
-        <p v-if="geometryNote" class="drive-empty rv-card" style="padding: 16px">
-          {{ geometryNote }}
-        </p>
-        <p v-if="indexError" class="drive-empty rv-card drive-road-degraded" style="padding: 16px">
-          公路索引加载失败：{{ indexError }}
-        </p>
+        <!-- 几何待补 / 索引失败的诚实提示 -->
+        <div v-if="geometryNote" class="drive-road-note" data-grade="info">
+          <p>{{ geometryNote }}</p>
+        </div>
+        <div v-if="indexError" class="drive-road-note" data-grade="danger">
+          <strong>公路索引加载失败</strong>
+          <p>{{ indexError }}</p>
+        </div>
 
         <!-- B3：几何/景点缺失时的占位说明，而不是整页红字 -->
-        <p v-if="!roadRoute && !alongError" class="drive-empty rv-card" style="padding: 16px">
-          该公路的几何尚未收录，暂无法展示走向与沿途景点。可先到
-          <router-link to="/drive">首页按起点/终点规划</router-link>。
-        </p>
+        <div v-if="!roadRoute && !alongError" class="drive-road-note" data-grade="info">
+          <p>
+            该公路的几何尚未收录，暂无法展示走向与沿途景点。可先到
+            <router-link to="/drive">首页按起点/终点规划</router-link>。
+          </p>
+        </div>
 
         <div v-if="roadRoute" class="drive-trip-grid drive-road-grid">
           <section class="drive-trip-map rv-card" data-spotlight>

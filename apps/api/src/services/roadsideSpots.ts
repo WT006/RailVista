@@ -4,12 +4,17 @@
  * 数据：data/roads/roadside-spots.json（构建脚本预生成，运行时不抓网络）。
  * 加载后即建 0.05° 网格索引（spotGrid），沿程匹配只投影路线 bbox 覆盖格内
  * 的候选（PRD §5.2 性能要求：参与量压到 300~800 个，单次 <30ms）。
+ *
+ * 加载时同时按 CHINA_LAND_BBOX（P2-3 境外 POI 过滤）剔除境外 POI：
+ *   - 防御 OSM 批量抓取时 province 误标（曾实测把 lng≈135 的伯力博物馆错放为"黑龙江"）
+ *   - 防御网格候选越界命中（如途径东北三江口的路线，35km buffer 会扩到外东北）
+ *   - 元信息 roadsideSpotsMeta() 暴露 droppedOob，便于前端在「数据声明」卡片告知用户
  */
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AlongRouteOptions, AlongSpot, RoadChapter, RoadGeometryNode, RoadsideSpot } from '@railvista/shared';
-import { buildSpotGrid, spotsAlongRoute, type SpotGrid } from '@railvista/shared';
+import { buildSpotGrid, partitionByChinaLand, spotsAlongRoute, type SpotGrid } from '@railvista/shared';
 import { computeCumKm } from '@railvista/shared';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -26,6 +31,8 @@ interface SpotsState {
   mtime: number;
   file: RoadsideSpotsFile;
   grid: SpotGrid;
+  /** 加载时按 CHINA_LAND_BBOX 剔除的境外 / 非法坐标 POI 数 */
+  droppedOob: number;
 }
 
 let state: SpotsState | null = null;
@@ -36,22 +43,42 @@ function loadSpots(): SpotsState | null {
   if (state && state.mtime === mtime) return state;
   try {
     const file = JSON.parse(readFileSync(SPOTS_PATH, 'utf8')) as RoadsideSpotsFile;
-    const spots = Array.isArray(file.spots) ? file.spots : [];
-    state = { mtime, file: { ...file, spots }, grid: buildSpotGrid(spots) };
+    const raw = Array.isArray(file.spots) ? file.spots : [];
+    const { kept, dropped } = partitionByChinaLand(raw);
+    state = {
+      mtime,
+      file: { ...file, spots: kept },
+      grid: buildSpotGrid(kept),
+      droppedOob: dropped.length,
+    };
     return state;
   } catch {
     return null;
   }
 }
 
+/** 加载后的境内 POI 列表（不含境外与非法坐标）。 */
 export function getRoadsideSpots(): RoadsideSpot[] {
   return loadSpots()?.file.spots ?? [];
 }
 
-export function roadsideSpotsMeta(): { count: number; updated: string; note?: string } {
+/**
+ * POI 库元信息：用于前端「数据声明」卡片。
+ * droppedOob 是本次进程启动时被 CHINA_LAND_BBOX 剔除的境外 POI 数；
+ * OSM 批量抓取里实测常有几条到十几条，province 字段会被错放为邻国边境省。
+ */
+export function roadsideSpotsMeta(): {
+  count: number;
+  totalLoaded: number;
+  droppedOob: number;
+  updated: string;
+  note?: string;
+} {
   const s = loadSpots();
   return {
     count: s?.file.spots.length ?? 0,
+    totalLoaded: (s?.file.spots.length ?? 0) + (s?.droppedOob ?? 0),
+    droppedOob: s?.droppedOob ?? 0,
     updated: s?.file.updated ?? '',
     note: s?.file.note,
   };

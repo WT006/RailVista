@@ -16,10 +16,63 @@ export const SPOT_GRID_CELL_DEG = 0.05;
 /** 行数上限（lat -90..90 → 3600 行），列偏移乘子 */
 const COL_STRIDE = 8192;
 
+/**
+ * 中国陆地经纬度外包框（度数，WGS-84）。
+ *
+ * 取值说明（PRD §6.2 P2-3 境外 POI 过滤）：
+ *   lng ∈ [73.5, 134.77]，lat ∈ [17.5, 53.56]
+ *   - 73.5°：新疆西部最西端（塔什库尔干）
+ *   - 134.77°：黑龙江—乌苏里江主航道最东端（抚远/黑瞎子岛方向）；
+ *     故意大于 135° 是为了把真正落在黑龙江省内的抚远市（lng≈134.3）保住，
+ *     而把 lng≥135 的"伯力—哈巴罗夫斯克"（俄罗斯远东，错放为"黑龙江"）剔除。
+ *   - 17.5°：南海南沙最南（曾母暗沙方向）
+ *   - 53.56°：黑龙江漠河北极村
+ *
+ * 注意：bbox 是**矩形近似**而非多边形精确边界。南海九段线内、藏南等争议区
+ * 会暂时保留（这些区域的 POI 通常本来就不会被抓入公路侧景点库）。
+ * 一旦引入简化版中国陆地多边形（参考 scripts/lib/china-bbox.mjs 占位），
+ * 应替换为多边形点-在-内测试 —— 这是已规划的演进方向。
+ */
+export const CHINA_LAND_BBOX = Object.freeze({
+  minLng: 73.5,
+  minLat: 17.5,
+  maxLng: 134.77,
+  maxLat: 53.56,
+});
+
+/** 经纬度是否落在 CHINA_LAND_BBOX 范围内（含边界） */
+export function isWithinChinaLand(lng: number, lat: number): boolean {
+  return (
+    Number.isFinite(lng) &&
+    Number.isFinite(lat) &&
+    lng >= CHINA_LAND_BBOX.minLng &&
+    lng <= CHINA_LAND_BBOX.maxLng &&
+    lat >= CHINA_LAND_BBOX.minLat &&
+    lat <= CHINA_LAND_BBOX.maxLat
+  );
+}
+
+/**
+ * 剔除落在国境外的 POI；NaN 坐标一并丢弃。
+ * 返回 { kept, dropped }，dropped 是被过滤掉的下标列表（便于上层审计 / 写报告）。
+ */
+export function partitionByChinaLand(spots: RoadsideSpot[]): {
+  kept: RoadsideSpot[];
+  dropped: RoadsideSpot[];
+} {
+  const kept: RoadsideSpot[] = [];
+  const dropped: RoadsideSpot[] = [];
+  for (const s of spots) {
+    if (isWithinChinaLand(s.lng, s.lat)) kept.push(s);
+    else dropped.push(s);
+  }
+  return { kept, dropped };
+}
+
 export interface SpotGrid {
-  /** 建网格时的景点总数 */
+  /** 原始 spots 数组长度（含境外与非法坐标），便于上层做覆盖率审计 */
   size: number;
-  /** cellKey → 景点下标列表 */
+  /** cellKey → 原始 spots 数组下标列表（已剔除境外与非法坐标） */
   cells: Map<number, number[]>;
 }
 
@@ -29,12 +82,16 @@ function cellKeyOf(lng: number, lat: number): number {
   return col * COL_STRIDE + row;
 }
 
-/** 建网格：O(M)。坐标非法的景点跳过（不参与任何查询）。 */
+/**
+ * 建网格：O(M)。境外 POI（不在 CHINA_LAND_BBOX 内）直接跳过：
+ * 防止它们被 grid 索引收录后，再随 bbox 外扩命中任何途径外东北/南亚的路线。
+ * 坐标非法的景点同样跳过（不参与任何查询）。
+ */
 export function buildSpotGrid(spots: RoadsideSpot[]): SpotGrid {
   const cells = new Map<number, number[]>();
   for (let i = 0; i < spots.length; i += 1) {
     const s = spots[i]!;
-    if (!Number.isFinite(s.lng) || !Number.isFinite(s.lat)) continue;
+    if (!isWithinChinaLand(s.lng, s.lat)) continue;
     const key = cellKeyOf(s.lng, s.lat);
     const list = cells.get(key);
     if (list) list.push(i);

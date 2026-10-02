@@ -18,12 +18,10 @@ import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  chainWays,
+  chainAll,
   computeCumKm,
-  computeGapAnnotations,
   fetchWaysByProvincialTiling,
   fetchWaysForRef,
-  haversineKm,
   simplifyDP,
 } from './lib/overpass.mjs';
 
@@ -83,83 +81,6 @@ function parseArgs() {
     else if (args[i] === '--batch') out.batch = true;
   }
   return out;
-}
-
-/**
- * 多链贪心串接：chainWays 断链后，从剩余池继续开新链，再按 5km 容差把
- * 端点相近的链拼到主链（不动点迭代：拼接延长主链后，原先够不着的段可能够着了）。
- * officialKm > 0 时全程受「官方里程 × 1.6」封顶（防多编号共线误匹配越串越远）。
- */
-function chainAll(ways, officialKm = 0, toleranceM = 800) {
-  const maxKm = officialKm > 0 ? officialKm * 1.6 : 0;
-  let pool = ways.slice();
-  const chains = [];
-  while (pool.length > 0 && chains.length < 400) {
-    const { chain, remaining } = chainWays(pool, toleranceM, maxKm);
-    if (!chain || chain.length < 2 || remaining.length === pool.length) break;
-    chains.push(chain);
-    pool = remaining;
-  }
-  if (chains.length === 0) return { main: [], segments: [], gapAnnotations: [], orphans: 0 };
-  // 按长度排序，主链最长；其余尝试端点并接（≤5km 且不超上限），不动点直到无可拼接
-  chains.sort((a, b) => totalKm(b) - totalKm(a));
-  let main = chains.shift() ?? [];
-  let rest = chains;
-  for (;;) {
-    let attached = false;
-    const next = [];
-    for (const c of rest) {
-      if (maxKm > 0 && totalKm(main) + totalKm(c) > maxKm) {
-        next.push(c); // 超上限的段不拼（诚实留给 orphan，verify 会标记偏差）
-        continue;
-      }
-      if (tryAttach(main, c)) {
-        attached = true;
-      } else if (tryAttach(main, c.slice().reverse())) {
-        attached = true;
-      } else if (tryAttachHead(main, c)) {
-        attached = true;
-      } else if (tryAttachHead(main, c.slice().reverse())) {
-        attached = true;
-      } else {
-        next.push(c);
-      }
-    }
-    rest = next;
-    if (!attached || !rest.length) break;
-  }
-  // orphan 链不再丢弃（结构性修复）：按里程降序存入 segments，
-  // 即使 ref 标注不全也能把已知的每一段都画出来，G318 立刻从部分段涨到接近全量
-  const segments = rest.sort((a, b) => totalKm(b) - totalKm(a));
-  const gapAnnotations = computeGapAnnotations(main, segments);
-  return { main, segments, gapAnnotations, orphans: segments.length };
-}
-
-function totalKm(coords) {
-  let acc = 0;
-  for (let i = 1; i < coords.length; i += 1) acc += haversineKm(coords[i - 1], coords[i]);
-  return acc;
-}
-
-function tryAttach(main, piece) {
-  if (!main.length || piece.length < 2) return false;
-  const tail = main[main.length - 1];
-  const head = piece[0];
-  const d = haversineKm(tail, head);
-  if (d > 5) return false;
-  // 保留拼接点：splice 段长 = 端点距（≤5km）。丢弃端点会让跳点放大到
-  // 「端点距 + 相邻段长」，质检（跳点 >5km 标 broken）会误伤
-  main.push(...piece);
-  return true;
-}
-
-/** 头部拼接：piece 末点贴 main 首点（西部线段只能从头上接回来） */
-function tryAttachHead(main, piece) {
-  if (!main.length || piece.length < 2) return false;
-  const d = haversineKm(piece[piece.length - 1], main[0]);
-  if (d > 5) return false;
-  main.unshift(...piece);
-  return true;
 }
 
 function sleep(ms) {

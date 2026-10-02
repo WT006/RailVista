@@ -241,7 +241,11 @@ export function planRoadRoute(key: string): (RoadRoute & {
   if (!entry || !geom) return null;
   const coords = geom.points.map((p) => [p[0], p[1]] as [number, number]);
   const cum = computeCumKm(coords);
-  const lengthKm = Math.round(cum[cum.length - 1]! * 10) / 10;
+  // v0.6.0：里程用去重后里程（双向分隔道路只计一条），与官方里程可比；
+  // 主链长度仅代表最长连通分量，长线会显著小于全线里程。
+  const lengthKm = Number.isFinite((geom as { totalKm?: number }).totalKm)
+    ? Math.round(((geom as { totalKm?: number }).totalKm as number) * 10) / 10
+    : Math.round(cum[cum.length - 1]! * 10) / 10;
   const hasSegments = geom.segments.length > 0;
   return {
     id: `road-${key}`,

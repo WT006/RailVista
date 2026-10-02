@@ -33,7 +33,8 @@ import { buildChapters, matchSpotsAlong, roadsideSpotsMeta } from '../services/r
 import { PlaceNotFoundError, planDriveRoute, planRoadRoute } from '../services/roadRouting.js';
 import { boardsAlsoIn, getBoard, itemHasGeometry, listBoards } from '../services/driveBoards.js';
 import { loadRoadTopology, roadTopologyInfo } from '../services/roadTopology.js';
-import type { PlaceKind, RankingBoard, RankingItem, RoadRoute } from '@railvista/shared';
+import { computeCumKm } from '@railvista/shared';
+import type { AlongSpot, PlaceKind, RankingBoard, RankingItem, RoadRoute } from '@railvista/shared';
 
 export const driveRoute = new Hono();
 
@@ -81,10 +82,16 @@ driveRoute.get('/road/:key', (c) => {
   // 传输抽稀：默认 ≤600 点；?full=1 返回原始几何（含逐点 cumKm）
   const full = c.req.query('full') === '1';
   const points = full ? geom.points : decimatePoints(geom.points, 600);
+  // 分量数量可能上百（G318 实测 114 段），每段抽稀到 200 点即可满足画线；
+  // full=1 时回全量（供导出/调试）。
   const segments = full
     ? geom.segments
-    : geom.segments.map((seg) => decimatePoints(seg, 600));
-  const totalKm = geom.cumKm[geom.cumKm.length - 1] ?? entry.lengthKm;
+    : geom.segments.map((seg) => decimatePoints(seg, 200));
+  // v0.6.0：用去重后里程（totalKm），主链长度不等于全线里程
+  const totalKm =
+    Number.isFinite((geom as { totalKm?: number }).totalKm)
+      ? ((geom as { totalKm?: number }).totalKm as number)
+      : (geom.cumKm[geom.cumKm.length - 1] ?? entry.lengthKm);
   // B2-1：如实带出「已贯通里程 vs 官方里程」与端点可信度。
   // 注意：entry.lengthKm 对有几何的公路已被 mergeGeometry 覆盖为几何长度，
   // 必须用权威名录的 officialLengthKm，否则覆盖率恒为 100%。
@@ -102,6 +109,11 @@ driveRoute.get('/road/:key', (c) => {
       gapAnnotations: geom.gapAnnotations,
       segmentCount: geom.segmentCount,
       gapCount: geom.gapCount,
+      // v0.6.0：精度分级 / 连通分量数 / 缝合断档数（供页面如实标注）
+      precision: (geom as { precision?: string }).precision ?? null,
+      componentCount: (geom as { componentCount?: number }).componentCount ?? geom.segmentCount,
+      stitchedGaps: (geom as { stitchedGaps?: number }).stitchedGaps ?? 0,
+      officialKm: (geom as { officialKm?: number | null }).officialKm ?? null,
       endpointsUnverified: geom.endpointsUnverified ?? false,
       lengthDeviation: geom.lengthDeviation ?? null,
       connectedKm,
@@ -202,13 +214,44 @@ driveRoute.get('/along', async (c) => {
   // G318 4673 点实测 124ms；抽到 600 点后匹配量降一个数量级。
   // 抽稀对沿程匹配的影响可接受：600 点仍能保持道路走向的空间连续性。
   const matchCoords = decimatePoints(route.coords as [number, number, number?][], 600);
-
-  const spots = matchSpotsAlong(matchCoords, {
+  const alongOpts = {
     categories: cat.length ? cat : undefined,
     minScore: Number.isFinite(min) ? min : undefined,
     maxCount: Number.isFinite(max) && max > 0 ? Math.min(max, 500) : 200,
     bufferKm: Number.isFinite(buffer) && buffer > 0 ? buffer : undefined,
-  });
+  };
+
+  // v0.6.0：整条公路在 OSM 中常由多个连通分量组成（城区 ref 断档）。
+  // 沿程景点必须覆盖**全部分量**，否则「G318 沿线景点」只找得到最长那一段。
+  // 做法：逐分量匹配 + 里程偏移累加；跨分量重复命中的点位按"离路更近"去重。
+  let spots: AlongSpot[];
+  const extraChains = (route.segments ?? []).filter((c) => Array.isArray(c) && c.length >= 2);
+  if (route.engine === 'road-geometry' && extraChains.length) {
+    const chains: [number, number, number?][][] = [matchCoords, ...extraChains.map((c) => c as [number, number, number?][])];
+    const merged: AlongSpot[] = [];
+    const bestById = new Map<string, number>();
+    let offsetKm = 0;
+    for (const chain of chains) {
+      const part = matchSpotsAlong(decimatePoints(chain, 400), alongOpts);
+      for (const sp of part) {
+        const shifted = { ...sp, progressKm: Math.round((sp.progressKm + offsetKm) * 10) / 10 };
+        const prev = bestById.get(sp.id);
+        if (prev === undefined) {
+          bestById.set(sp.id, merged.length);
+          merged.push(shifted);
+        } else if (shifted.distKm < merged[prev]!.distKm) {
+          merged[prev] = shifted;
+        }
+      }
+      const cum = computeCumKm(chain as [number, number][]);
+      offsetKm += cum[cum.length - 1] ?? 0;
+    }
+    merged.sort((a, b) => a.progressKm - b.progressKm);
+    const cap = alongOpts.maxCount ?? 200;
+    spots = merged.slice(0, cap);
+  } else {
+    spots = matchSpotsAlong(matchCoords, alongOpts);
+  }
 
   return c.json({
     ok: true,
@@ -237,7 +280,13 @@ driveRoute.get('/network/stats', (c) => {
 });
 
 driveRoute.get('/network/overview', (c) => {
-  return c.json({ ok: true, data: roadNetworkOverview() });
+  // v0.6.0：默认只回干线（高速+国道）；?classes= 放宽等级，?limit= 控制条数，?points= 控制抽稀点数
+  const raw = (c.req.query('classes') ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  const allowed = ['expressway', 'national', 'provincial', 'county', 'township', 'village'] as const;
+  const classes = raw.filter((s): s is (typeof allowed)[number] => (allowed as readonly string[]).includes(s));
+  const limit = Number(c.req.query('limit')) || undefined;
+  const points = Number(c.req.query('points')) || undefined;
+  return c.json({ ok: true, data: roadNetworkOverview({ classes, limit, maxPoints: points }) });
 });
 
 // ── 榜单（PRD §7） ──────────────────────────────────────────────────────────

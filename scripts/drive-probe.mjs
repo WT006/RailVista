@@ -87,11 +87,14 @@ const report = await evaluate(`(() => {
     cardCount: cards,
     roadKbd: document.querySelectorAll('.road-kbd__prefix, .road-kbd__digit').length,
     backdrop: {
-      canvas: document.querySelectorAll('.drive-backdrop__canvas').length,
-      ready: document.querySelectorAll('.drive-backdrop.is-net-ready').length,
+      // v0.6.1 起背景层提升到 App 级（AppBackdrop），不再是页面内的 .drive-backdrop
+      layer: document.querySelectorAll('.app-backdrop__layer').length,
+      ready: document.querySelectorAll('.app-backdrop.is-net-ready').length,
+      mode: document.querySelector('.app-backdrop')?.className.match(/is-(rail|road)/)?.[1] ?? null,
       legend: document.querySelectorAll('.drive-legend li').length,
       hotRoads: document.querySelectorAll('.drive-hotroads__chip').length,
     },
+    version: document.querySelector('.appbar__version')?.textContent?.trim() ?? null,
     navLinks: [...document.querySelectorAll('.appbar__nav a')].map((a) => ({ text: a.textContent.trim(), href: a.getAttribute('href') })),
     names: names.slice(0, 8),
     folded: names.filter((n) => !n.ok).map((n) => n.text),

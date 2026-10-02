@@ -19,6 +19,7 @@ import {
   api,
   type AtlasCorridorLite,
   type AtlasOverviewData,
+  type AtlasRoadCorridorLite,
   type AtlasSpotLite,
 } from '../api/client';
 import { RANKINGS } from '../data/beautifulRailings';
@@ -55,6 +56,17 @@ const stats = ref<AtlasOverviewData['meta'] | null>(null);
 
 const corridors = ref<AtlasCorridorLite[]>([]);
 const spots = ref<AtlasSpotLite[]>([]);
+/** 双源融合：公路线路与公路景点（公路景点已排除从铁路迁移来的条目） */
+const roadCorridors = ref<AtlasRoadCorridorLite[]>([]);
+const roadSpots = ref<AtlasSpotLite[]>([]);
+/**
+ * 景点来源筛选：all=铁路+公路都显示，rail/road=只看一侧。
+ * /drive/atlas 进来默认 'road'（此前该页标题硬编码「铁路景点地图」、
+ * Top10 与排行榜全是铁路数据，公路侧等于空壳 —— 需求方指出的严重问题）。
+ */
+const spotOrigin = ref<'all' | 'rail' | 'road'>(props.drive ? 'road' : 'all');
+/** 公路榜单（快捷入口用） */
+const roadBoards = ref<Array<{ id: string; title: string; level: string; itemCount: number }>>([]);
 
 let map: any = null;
 let AMapRef: any = null;
@@ -68,20 +80,11 @@ let plainMarkers: any[] = [];
 /** corridorId → 折线，供点击/搜索后 fitView */
 const lineByCorridor = new Map<string, any>();
 
-// ── 公路图层（/drive/atlas）：与铁路图层共存，独立开关 ────────────────────────
+// ── 公路图层：与铁路图层共存，独立开关 ────────────────────────────────────────
+// v0.5.5：数据直接取 /atlas/overview 的 roadCorridors，不再单独请求
+// /drive/network/overview —— 同一份折线在同页出现两次是纯浪费。
 const roadLayerOn = ref(false);
-const roadLines = ref<Array<{ key: string; ref: string; name?: string; class: string; polyline: [number, number][]; lengthKm: number }>>([]);
 let roadPolylines: any[] = [];
-
-async function loadRoadLayer() {
-  if (roadLines.value.length) return;
-  try {
-    const data = await api.getDriveNetworkOverview();
-    roadLines.value = data.roads;
-  } catch {
-    /* 公路图层加载失败不影响铁路图 */
-  }
-}
 
 function renderRoadLayer() {
   if (!map || !AMapRef) return;
@@ -94,8 +97,8 @@ function renderRoadLayer() {
   }
   roadPolylines = [];
   if (!roadLayerOn.value) return;
-  for (const r of roadLines.value) {
-    if (r.polyline.length < 2) continue;
+  for (const r of roadCorridors.value) {
+    if (!r.polyline || r.polyline.length < 2) continue;
     const line = new AMapRef.Polyline({
       path: r.polyline,
       strokeColor: roadColor(r.class),
@@ -116,25 +119,36 @@ function renderRoadLayer() {
 
 async function toggleRoadLayer() {
   roadLayerOn.value = !roadLayerOn.value;
-  if (roadLayerOn.value) await loadRoadLayer();
   renderRoadLayer();
 }
 
 const corridorName = computed(() => {
   const map = new Map<string, string>();
   for (const c of corridors.value) map.set(c.id, c.name);
+  // 公路线路的 corridorIds 存的是 road key，名册里一并登记，弹窗才能显示线路名
+  for (const r of roadCorridors.value) map.set(r.key, r.name ? `${r.ref} ${r.name}` : r.ref);
   return map;
+});
+
+/** 按来源筛选后的景点全集（铁路 + 公路） */
+const spotsByOrigin = computed(() => {
+  const o = spotOrigin.value;
+  if (o === 'rail') return spots.value;
+  if (o === 'road') return roadSpots.value;
+  return spots.value.concat(roadSpots.value);
 });
 
 const selectedCorridor = computed(
   () => corridors.value.find((c) => c.id === selectedCorridorId.value) || null,
 );
 
-/** 六维筛选：未选 = 全部；选中后 = 命中任一维度（含「其它」= 无有效维度的景点） */
+/** 六维筛选：未选 = 全部；选中后 = 命中任一维度（含「其它」= 无有效维度的景点）。
+ *  先按来源（铁路/公路）筛，再按维度筛 —— 来源筛选是双源融合后新增的一层。 */
 const filteredSpots = computed(() => {
-  if (!activeDims.value.length) return spots.value;
+  const base = spotsByOrigin.value;
+  if (!activeDims.value.length) return base;
   const set = new Set(activeDims.value);
-  return spots.value.filter((s) => {
+  return base.filter((s) => {
     const dims = resolveSpotDimensions(s);
     if (!dims.length) return set.has('other');
     return dims.some((d) => set.has(d));
@@ -143,7 +157,14 @@ const filteredSpots = computed(() => {
 
 const dimOptions = [...SPOT_DIMENSIONS, UNCLASSIFIED_DIMENSION];
 
-/** 沿线景点最多的线路 Top10（按客户端统计的 spotCount） */
+/** 景点来源筛选选项：冷蓝=铁路（与铁路侧星点同色），琥珀=公路（与公路侧星点同色） */
+const ORIGIN_OPTIONS = [
+  { key: 'all' as const, label: '全部', color: '#9aa7b8' },
+  { key: 'rail' as const, label: '铁路', color: '#4d9fff' },
+  { key: 'road' as const, label: '公路', color: '#ffb84d' },
+];
+
+/** 铁路：沿线景点最多的线路 Top10（按客户端统计的 spotCount） */
 const topCorridors = computed(() =>
   corridors.value
     .filter((c) => c.spotCount > 0)
@@ -152,7 +173,18 @@ const topCorridors = computed(() =>
     .slice(0, 10),
 );
 
-const maxSpotCount = computed(() => topCorridors.value[0]?.spotCount || 1);
+/** 公路：沿线景点最多的编号公路 Top10（此前 /drive/atlas 完全没有这一块，是空壳） */
+const topRoadCorridors = computed(() =>
+  roadCorridors.value
+    .filter((r) => r.spotCount > 0)
+    .slice()
+    .sort((a, b) => b.spotCount - a.spotCount || b.lengthKm - a.lengthKm)
+    .slice(0, 10),
+);
+
+const maxSpotCount = computed(
+  () => Math.max(topCorridors.value[0]?.spotCount || 1, topRoadCorridors.value[0]?.spotCount || 1),
+);
 
 /** 排行榜快捷清单：去重后的上榜线路 */
 const rankingShortcuts = computed(() => {
@@ -667,6 +699,42 @@ function goRouteDetail() {
   void router.push(`/route/${selectedCorridorId.value}`);
 }
 
+/** 聚焦一条编号公路：加粗高亮 + fitView（与铁路走廊同一套交互） */
+function focusRoad(key: string) {
+  const target = roadCorridors.value.find((r) => r.key === key);
+  if (!target || !map || !AMapRef) return;
+  selectedCorridorId.value = key;
+  if (highlightLine) {
+    try {
+      map.remove(highlightLine);
+    } catch {
+      /* ignore */
+    }
+  }
+  highlightLine = new AMapRef.Polyline({
+    path: target.polyline,
+    strokeColor: roadColor(target.class),
+    strokeWeight: 5,
+    strokeOpacity: 0.95,
+    lineJoin: 'round',
+    lineCap: 'round',
+    zIndex: 50,
+    clickable: false,
+    bubble: true,
+  });
+  map.add(highlightLine);
+  try {
+    map.setFitView([highlightLine], false, getMapChromeInsets());
+  } catch {
+    map.setZoomAndCenter(7, target.polyline[0]!);
+  }
+}
+
+/** 公路榜单击详情 */
+function goRoadBoard(boardId: string) {
+  void router.push(`/drive/rankings/${encodeURIComponent(boardId)}`);
+}
+
 async function loadPlugins() {
   if (!map || !AMapRef) return;
   await new Promise<void>((resolve) => {
@@ -733,12 +801,26 @@ async function load() {
   try {
     const data = await api.getAtlasOverview();
     corridors.value = data.corridors || [];
-    spots.value = data.spots || [];
+    spots.value = (data.spots || []).map((s) => ({ ...s, origin: 'rail' as const }));
+    roadCorridors.value = data.roadCorridors || [];
+    roadSpots.value = (data.roadSpots || []).map((s) => ({ ...s, origin: 'road' as const }));
     stats.value = data.meta || null;
   } catch (e) {
     loadError.value = e instanceof Error ? e.message : '地图数据加载失败';
   } finally {
     loading.value = false;
+  }
+  // 公路榜单（快捷入口）：失败不影响地图主体
+  try {
+    const b = await api.getDriveBoards();
+    roadBoards.value = (b.boards || []).map((x) => ({
+      id: x.id,
+      title: x.title,
+      level: x.level,
+      itemCount: x.itemCount,
+    }));
+  } catch {
+    roadBoards.value = [];
   }
 }
 
@@ -748,7 +830,6 @@ onMounted(async () => {
   // /drive/atlas 模式：默认打开公路图层（铁路图层共存，可再手动切换）
   if (props.drive && map) {
     roadLayerOn.value = true;
-    await loadRoadLayer();
     renderRoadLayer();
   }
 });
@@ -864,13 +945,18 @@ watch(heatOn, () => renderHeat());
               收起
             </button>
           </div>
-          <div class="atlas-dock__title">
-            <div class="atlas-dock__identity">
-              <span class="train-badge">全国</span>
-              <h1 class="atlas-dock__name">铁路景点地图</h1>
+            <div class="atlas-dock__title">
+              <div class="atlas-dock__identity">
+                <span class="train-badge">全国</span>
+                <!-- 此前标题硬编码「铁路景点地图」，/drive/atlas 也显示这个，属空壳遗留 -->
+                <h1 class="atlas-dock__name">
+                  {{ spotOrigin === 'road' ? '公路景点地图' : spotOrigin === 'rail' ? '铁路景点地图' : '铁路 + 公路景点地图' }}
+                </h1>
+              </div>
+              <p class="atlas-dock__sub">
+                铁路线与编号公路共存，铁路景点与公路景点可分别或同时查看
+              </p>
             </div>
-            <p class="atlas-dock__sub">浏览全国铁路线与沿线风景，点击线路可查看详情</p>
-          </div>
         </header>
 
         <div class="atlas-dock__body">
@@ -897,6 +983,32 @@ watch(heatOn, () => renderHeat());
         </section>
 
         <section class="atlas-block">
+          <h2 class="atlas-block__title">景点来源</h2>
+          <div class="atlas-dims">
+            <button
+              v-for="o in ORIGIN_OPTIONS"
+              :key="o.key"
+              type="button"
+              class="atlas-dim"
+              :class="{ 'is-on': spotOrigin === o.key }"
+              :style="{ '--dot': o.color }"
+              :aria-pressed="spotOrigin === o.key"
+              @click.stop="spotOrigin = o.key"
+            >
+              <span class="atlas-dim__dot" aria-hidden="true"></span>{{ o.label }}
+            </button>
+          </div>
+          <div class="atlas-dim-actions">
+            <span class="atlas-count">
+              铁路 {{ spots.length }} · 公路 {{ roadSpots.length }}
+              <template v-if="stats?.roadMigratedExcluded">
+                （公路库已排除 {{ stats.roadMigratedExcluded }} 条铁路迁移条）
+              </template>
+            </span>
+          </div>
+        </section>
+
+        <section class="atlas-block">
           <h2 class="atlas-block__title">景点维度<span class="atlas-block__hint">（可多选）</span></h2>
           <div class="atlas-dims">
             <button
@@ -913,7 +1025,7 @@ watch(heatOn, () => renderHeat());
             </button>
           </div>
           <div class="atlas-dim-actions">
-            <span class="atlas-count">{{ filteredSpots.length }} / {{ spots.length }} 处</span>
+            <span class="atlas-count">{{ filteredSpots.length }} / {{ spotsByOrigin.length }} 处</span>
             <button v-if="activeDims.length" type="button" class="atlas-link" @click="clearDims">
               清空筛选
             </button>
@@ -921,7 +1033,9 @@ watch(heatOn, () => renderHeat());
         </section>
 
         <section class="atlas-block">
-          <h2 class="atlas-block__title">沿线景点最多的线路 Top10</h2>
+          <h2 class="atlas-block__title">
+            铁路线 · 沿线景点最多 Top10
+          </h2>
           <ul class="atlas-top-list">
             <li v-for="(c, i) in topCorridors" :key="c.id">
               <button
@@ -946,7 +1060,54 @@ watch(heatOn, () => renderHeat());
         </section>
 
         <section class="atlas-block">
-          <h2 class="atlas-block__title">排行榜线路快捷入口</h2>
+          <h2 class="atlas-block__title">
+            编号公路 · 沿线景点最多 Top10
+          </h2>
+          <ul class="atlas-top-list">
+            <li v-for="(r, i) in topRoadCorridors" :key="r.key">
+              <button
+                type="button"
+                class="atlas-top-row"
+                :class="{ 'is-active': r.key === selectedCorridorId }"
+                @click="focusRoad(r.key)"
+              >
+                <span class="atlas-top-row__no">{{ i + 1 }}</span>
+                <span class="atlas-top-row__name">
+                  <b class="atlas-top-row__ref" :style="{ color: roadColor(r.class) }">{{ r.ref }}</b>
+                  {{ r.name ?? '' }}
+                </span>
+                <span class="atlas-top-row__bar">
+                  <span
+                    class="atlas-top-row__fill"
+                    :style="{
+                      transform: `scaleX(${r.spotCount / maxSpotCount})`,
+                      background: roadColor(r.class),
+                    }"
+                  ></span>
+                </span>
+                <span class="atlas-top-row__num">{{ r.spotCount }}</span>
+              </button>
+            </li>
+          </ul>
+          <p v-if="!topRoadCorridors.length" class="atlas-none">
+            暂无公路统计（需先补齐公路几何）
+          </p>
+        </section>
+
+        <section v-if="roadBoards.length" class="atlas-block">
+          <h2 class="atlas-block__title">公路榜单</h2>
+          <ul class="atlas-rank-list">
+            <li v-for="b in roadBoards" :key="b.id">
+              <button type="button" class="atlas-rank-row" @click="goRoadBoard(b.id)">
+                <span class="atlas-rank-row__name">{{ b.title }}</span>
+                <span class="atlas-rank-row__src">{{ b.itemCount }} 条</span>
+              </button>
+            </li>
+          </ul>
+        </section>
+
+        <section class="atlas-block">
+          <h2 class="atlas-block__title">铁路排行榜线路快捷入口</h2>
           <ul class="atlas-rank-list">
             <li v-for="r in rankingShortcuts" :key="r.corridorId">
               <button

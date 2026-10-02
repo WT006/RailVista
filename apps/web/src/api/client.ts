@@ -86,12 +86,37 @@ export type AtlasSpotLite = {
   dimensions?: string[];
   corridorIds: string[];
   matchKind: 'line' | 'geo' | null;
+  /** 数据来源：rail=铁路景点库，road=公路景点库 */
+  origin?: 'rail' | 'road';
+};
+
+/** 公路线路（编号公路，仅含已挂几何的） */
+export type AtlasRoadCorridorLite = {
+  key: string;
+  ref: string;
+  name?: string;
+  class: string;
+  polyline: [number, number][];
+  lengthKm: number;
+  spotCount: number;
+  spotIds: string[];
 };
 
 export type AtlasOverviewData = {
   corridors: AtlasCorridorLite[];
   spots: AtlasSpotLite[];
-  meta: { corridorCount: number; spotCount: number; generatedAt: string; buildMs: number };
+  /** 双源融合：公路线路与公路景点（公路景点已排除从铁路迁移来的条目） */
+  roadCorridors: AtlasRoadCorridorLite[];
+  roadSpots: AtlasSpotLite[];
+  meta: {
+    corridorCount: number;
+    spotCount: number;
+    roadCorridorCount: number;
+    roadSpotCount: number;
+    roadMigratedExcluded: number;
+    generatedAt: string;
+    buildMs: number;
+  };
 };
 
 /** 线路详情页景点：带沿线里程 */

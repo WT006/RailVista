@@ -123,7 +123,20 @@ const geomCache = new Map<string, RoadGeometry>();
  */
 let geomMtimeSeen = 0;
 
+/**
+ * mtime 指纹的采样节流（ms）。
+ * 原实现每次 getRoadGeometry() 都遍历 data/roads/geom 全部文件做 statSync：
+ * 全国地图一次聚合要取 200+ 条路 × 448 个文件 ≈ 9 万次同步 stat，实测首次构建 42s。
+ * 几何是构建期产物、变化以分钟计，5s 内复用上一次采样值完全够用，
+ * 且不会漏掉"抓取脚本刚跑完"这种情况（只是最多晚 5s 生效）。
+ */
+const GEOM_MTIME_TTL_MS = 5000;
+let geomMtimeValue = 0;
+let geomMtimeAt = 0;
+
 function currentGeomMtime(): number {
+  const now = Date.now();
+  if (geomMtimeAt && now - geomMtimeAt < GEOM_MTIME_TTL_MS) return geomMtimeValue;
   let m = 0;
   try {
     for (const f of existsSync(join(ROADS_DIR, 'geom')) ? readdirSync(join(ROADS_DIR, 'geom')) : []) {
@@ -134,6 +147,8 @@ function currentGeomMtime(): number {
   } catch {
     /* 目录不可读时保持既有缓存 */
   }
+  geomMtimeValue = m;
+  geomMtimeAt = now;
   return m;
 }
 
@@ -151,7 +166,10 @@ export function getRoadGeometry(key: string): RoadGeometry | null {
     geomCache.set(key, hit);
     return hit;
   }
-  const path = join(ROADS_DIR, 'geom', `${key.replace(/[^\w:]/g, '_')}.json`);
+  // 文件名规则必须与 scripts/lib/road-ref.mjs 的 keyToFileName 一致：
+  // 只替换 ':' 与文件系统非法字符，中文省名原样保留（改成 \w 会把中文变成 _，
+  // 而 ':' 在 Windows 上会被当成 NTFS 数据流，导致省道几何写丢）。
+  const path = join(ROADS_DIR, 'geom', `${key.replace(/[:/\\*?"<>|]/g, '_')}.json`);
   if (!existsSync(path)) return null;
   try {
     const g = JSON.parse(readFileSync(path, 'utf8')) as RoadGeometry;
@@ -204,47 +222,64 @@ export function decimatePoints<T extends [number, number, number?]>(points: T[],
  * 同步 IO 期间阻塞整个事件循环，是「忽好忽坏」（限流 429 / 请求超时）的主要成因之一。
  * 索引 `updated` 天然是缓存键：数据变了索引必然变，缓存自动失效。
  */
+/** v0.6.0：地图图层默认只回干线（高速+国道）；等级可选、条数有上限，避免把 1.5 万条几何推给浏览器 */
+export const OVERVIEW_DEFAULT_CLASSES: RoadIndexEntry['class'][] = ['expressway', 'national'];
+
 let overviewCache: { updated: string; payload: ReturnType<typeof buildNetworkOverview> } | null = null;
 
 /** 地图公路图层：有几何的路线抽稀折线（≤160 点/条） */
-export function roadNetworkOverview(): {
-  roads: Array<{ key: string; ref: string; name?: string; class: RoadIndexEntry['class']; polyline: [number, number][]; lengthKm: number; segments?: [number, number][][]; gapCount?: number }>;
+export function roadNetworkOverview(opts: { classes?: RoadIndexEntry['class'][]; limit?: number; maxPoints?: number } = {}): {
+  roads: Array<{ key: string; ref: string; name?: string; class: RoadIndexEntry['class']; polyline: [number, number][]; lengthKm: number; segments?: [number, number][][]; gapCount?: number; precision?: string; componentCount?: number }>;
+  totals: Record<string, number>;
   updated: string;
 } {
+  const classes = opts.classes?.length ? opts.classes : OVERVIEW_DEFAULT_CLASSES;
+  const limit = Math.max(1, Math.min(2000, opts.limit ?? 600));
+  const maxPoints = Math.max(20, Math.min(400, opts.maxPoints ?? 120));
+  const cacheKey = classes.join(',') + '|' + limit + '|' + maxPoints;
   const { updated } = loadRoadIndex();
-  if (overviewCache && overviewCache.updated === updated) return overviewCache.payload;
-  const payload = buildNetworkOverview();
-  overviewCache = { updated, payload };
+  if (overviewCache && overviewCache.updated === updated + '|' + cacheKey) return overviewCache.payload;
+  const payload = buildNetworkOverview(classes, limit, maxPoints);
+  overviewCache = { updated: updated + '|' + cacheKey, payload };
   return payload;
 }
 
-function buildNetworkOverview(): {
-  roads: Array<{ key: string; ref: string; name?: string; class: RoadIndexEntry['class']; polyline: [number, number][]; lengthKm: number; segments?: [number, number][][]; gapCount?: number }>;
+function buildNetworkOverview(
+  classes: RoadIndexEntry['class'][],
+  limit: number,
+  maxPoints: number,
+): {
+  roads: Array<{ key: string; ref: string; name?: string; class: RoadIndexEntry['class']; polyline: [number, number][]; lengthKm: number; segments?: [number, number][][]; gapCount?: number; precision?: string; componentCount?: number }>;
+  totals: Record<string, number>;
   updated: string;
 } {
   const { entries, updated } = loadRoadIndex();
+  const totals: Record<string, number> = {};
+  for (const e of entries) totals[e.class] = (totals[e.class] ?? 0) + 1;
+  const picked = entries
+    .filter((e) => e.hasGeom && classes.includes(e.class))
+    .sort((a, b) => b.lengthKm - a.lengthKm)
+    .slice(0, limit);
   const roads = [];
-  for (const e of entries) {
-    if (!e.hasGeom) continue;
+  for (const e of picked) {
     const g = getRoadGeometry(e.key);
     if (!g) continue;
-    const segments =
-      Array.isArray(g.segments) && g.segments.length > 0
-        ? g.segments.map((seg) => decimatePoints(seg, 160).map((p) => [p[0], p[1]] as [number, number]))
-        : undefined;
+    // 背景图层不需要其余连通分量：一条干线动辄上百个分量，全带上会让响应涨到 MB 级
+    // （实测 8.5MB → 只回主链后 0.9MB）。分量的完整走向由 /drive/road/:key 提供。
     const gapCount = Array.isArray(g.gapAnnotations) ? g.gapAnnotations.length : 0;
     roads.push({
       key: e.key,
       ref: e.ref,
       name: e.name,
       class: e.class,
-      polyline: decimatePoints(g.points, 160).map((p) => [p[0], p[1]] as [number, number]),
+      polyline: decimatePoints(g.points, maxPoints).map((p) => [p[0], p[1]] as [number, number]),
       lengthKm: e.lengthKm,
-      segments,
       gapCount: gapCount > 0 ? gapCount : undefined,
+      precision: e.precision,
+      componentCount: e.componentCount,
     });
   }
-  return { roads, updated };
+  return { roads, totals, updated };
 }
 
 /**
@@ -255,9 +290,11 @@ function buildNetworkOverview(): {
  */
 const COVERAGE_NOTES = [
   '路网数据来自 OpenStreetMap 众包，里程与走向为估算，不作为导航依据',
-  '几何可查率：国道约 11%（301 条中 33 条已收录）、高速暂未收录、省道暂未收录；县道/乡道/村道名录尚未建设，暂不可查',
-  '政策 12 条精品线官方尚未发布逐桩走向表，本产品中的走向为 OSM 编号还原的近似线位',
-  '公路几何为 OSM 众包局部还原，与官方走向可能不符；「已贯通里程」可能远小于名义里程',
+  'v0.6.0 起改为「省份 PBF 全量要素库 → 本地装配」：国道/高速/省道/县道/乡道/村道均按编号还原走向，' +
+    '不再按编号逐条抓取（OSM 中 89% 的路段没有 ref 标签，按编号抓必然漏段）',
+  '里程为「去重后里程」：双向分隔道路的平行对向车道只计一条，与官方里程可比',
+  '精度分级 A/B/C：A=与官方里程偏差≤10%，B=≤25%，C=偏差更大或官方里程未知（多为规划调整过编号的老路）',
+  '几何由 OSM 共享节点拓扑装配（连通分量 + 直行优先），未贯通处如实标注断点，不做插值拼接',
 ];
 
 /**
@@ -294,7 +331,26 @@ export function networkStats(spotCount: number): RoadNetworkStats {
   const count = (cls: RoadIndexEntry['class']) => entries.filter((r) => r.class === cls).length;
   const withGeom = entries.filter((r) => r.hasGeom);
   const totalKm = entries.reduce((s, r) => s + (r.hasGeom ? r.lengthKm : 0), 0);
+  const classes: RoadIndexEntry['class'][] = ['expressway', 'national', 'provincial', 'county', 'township', 'village'];
+  const coverageByClass = classes.map((cls) => {
+    const rows = entries.filter((r) => r.class === cls);
+    const geom = rows.filter((r) => r.hasGeom);
+    const byPrecision = { A: 0, B: 0, C: 0, X: 0 };
+    for (const r of geom) {
+      const p = (r as RoadIndexEntry & { precision?: string }).precision;
+      if (p === 'A' || p === 'B' || p === 'C' || p === 'X') byPrecision[p] += 1;
+    }
+    return {
+      class: cls,
+      total: rows.length,
+      withGeometry: geom.length,
+      coverage: rows.length ? Math.round((geom.length / rows.length) * 100) / 100 : 0,
+      lengthKm: Math.round(rows.reduce((s, r) => s + (r.hasGeom ? r.lengthKm : 0), 0)),
+      precision: byPrecision,
+    };
+  });
   return {
+    coverageByClass,
     national: count('national'),
     expressway: count('expressway'),
     provincial: count('provincial'),

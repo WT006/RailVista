@@ -15,7 +15,6 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '../api/client';
-import DriveBackdropMap from '../components/DriveBackdropMap.vue';
 import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
@@ -287,6 +286,27 @@ function setRoadAsConstraint(field: 'from' | 'to') {
 
 // ── 路网统计 + 榜单入口（第二屏） ────────────────────────────────────────────
 const stats = ref<Awaited<ReturnType<typeof api.getDriveNetworkStats>> | null>(null);
+
+/**
+ * v0.6.0 覆盖口径：按等级动态生成"已收录走向"说明。
+ * 数据来自省份 PBF 全量要素库装配，覆盖数是实测值，不再写死"85~95%"这类估计。
+ */
+const coverageLine = computed(() => {
+  const rows = stats.value?.coverageByClass;
+  if (!rows?.length) return '';
+  const label: Record<string, string> = {
+    expressway: '国家高速',
+    national: '普通国道',
+    provincial: '省道',
+    county: '县道',
+    township: '乡道',
+    village: '村道',
+  };
+  const parts = rows
+    .filter((r) => r.total > 0)
+    .map((r) => `${label[r.class] ?? r.class} ${r.withGeometry}/${r.total}`);
+  return parts.length ? `已收录走向：${parts.join('、')}。` : '';
+});
 const boards = ref<Awaited<ReturnType<typeof api.getDriveBoards>>['boards']>([]);
 
 onMounted(async () => {
@@ -312,7 +332,6 @@ const levelLabel: Record<string, string> = {
 
 <template>
   <div class="drive-page">
-    <DriveBackdropMap />
     <AppTopBar />
 
     <main class="rv-shell">
@@ -552,7 +571,7 @@ const levelLabel: Record<string, string> = {
         </div>
         <div class="drive-stat">
           <div class="drive-stat__value">{{ stats.hasGeom }}</div>
-          <div class="drive-stat__label">已挂几何（{{ Math.round(stats.hasGeomRatio * 100) }}%）</div>
+          <div class="drive-stat__label">已收录走向（{{ Math.round(stats.hasGeomRatio * 100) }}%）</div>
         </div>
         <div class="drive-stat">
           <div class="drive-stat__value">{{ stats.spotCount }}</div>
@@ -560,7 +579,8 @@ const levelLabel: Record<string, string> = {
         </div>
       </section>
       <p v-if="stats" class="drive-coverage-note">
-        {{ stats.coverage.notes[0] }}。高速/国道几何可查率 85~95%，省道 50~70%，县道 20~40%；
+        {{ stats.coverage.notes[0] }}。
+        <template v-if="coverageLine">{{ coverageLine }}</template>
         精品线走向为 OSM 编号还原的近似线位。
       </p>
 

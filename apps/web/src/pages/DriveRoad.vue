@@ -8,7 +8,6 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
-import DriveBackdropMap from '../components/DriveBackdropMap.vue';
 import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
@@ -115,12 +114,31 @@ const hasGaps = computed(() => gapAnnotations.value.length > 0);
 const gapKmTotal = computed(() =>
   Math.round(gapAnnotations.value.reduce((s, g) => s + g.gapKm, 0)),
 );
+const maxGapKm = computed(() =>
+  gapAnnotations.value.reduce((m, g) => Math.max(m, g.gapKm), 0).toFixed(1),
+);
+/** v0.6.0 精度分级与分量数（来自 geom 的 precision / componentCount / stitchedGaps） */
+const precision = ref<string | null>(null);
+const componentCount = ref(1);
+const stitchedGaps = ref(0);
+const PRECISION_TEXT: Record<string, string> = {
+  A: '走向已核对（与官方里程偏差 ≤10%）',
+  B: 'OSM 还原（偏差 ≤25%）',
+  C: 'OSM 还原（官方里程未知或偏差更大）',
+  X: '走向存疑（偏差 >50%，仅供参考）',
+};
+const precisionText = computed(() => (precision.value ? PRECISION_TEXT[precision.value] ?? 'OSM 还原' : 'OSM 还原'));
 
 const viewBoxAttr = computed(() => {
-  const coords = roadRoute.value?.coords;
-  if (!coords?.length) return `0 0 ${VIEW_W} ${VIEW_H}`;
+  const r = roadRoute.value;
+  // 视野必须覆盖「主链 + 全部连通分量」：G318 这类长线的主链与其余分量
+  // 可能分处东西两端，只按主链算视野会把大部分线段裁到画布外。
+  const all: [number, number][] = [];
+  for (const p of r?.coords ?? []) all.push([p[0], p[1]]);
+  for (const seg of r?.segments ?? []) for (const p of seg) all.push([p[0], p[1]]);
+  if (!all.length) return `0 0 ${VIEW_W} ${VIEW_H}`;
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  for (const [lng, lat] of coords) {
+  for (const [lng, lat] of all) {
     const [x, y] = lngLatToViewBox(lng, lat);
     if (x < minX) minX = x;
     if (x > maxX) maxX = x;
@@ -168,6 +186,16 @@ async function load() {
     connectedKm.value = roadRes.value.connectedKm ?? 0;
     nominalKm.value = roadRes.value.nominalKm ?? roadRes.value.entry.lengthKm ?? 0;
     coveragePct.value = roadRes.value.coveragePct ?? null;
+    // v0.6.0：精度分级 / 连通分量数 / 缝合断档数（无字段时保持旧行为）
+    const extra = roadRes.value as unknown as {
+      precision?: string | null;
+      segmentCount?: number;
+      componentCount?: number;
+      stitchedGaps?: number;
+    };
+    precision.value = extra.precision ?? null;
+    componentCount.value = extra.componentCount ?? extra.segmentCount ?? 1;
+    stitchedGaps.value = extra.stitchedGaps ?? 0;
   } else {
     indexError.value = roadRes.reason instanceof Error ? roadRes.reason.message : '公路索引加载失败';
   }
@@ -209,7 +237,6 @@ function goTripLive() {
 
 <template>
   <div class="drive-page">
-    <DriveBackdropMap />
     <AppTopBar />
 
     <main class="rv-shell">
@@ -235,14 +262,16 @@ function goTripLive() {
           <h1 v-if="!endpointsUnverified">{{ entryView.ref }}　{{ entryView.fromPlace }} — {{ entryView.toPlace }}</h1>
           <h1 v-else>{{ entryView.ref }}　全线走向（端点待核）</h1>
           <div class="drive-route-card__meta" style="margin-top: 12px">
-            <span v-if="coveragePct !== null">
-              已贯通 {{ connectedKm }} km / 官方 {{ nominalKm }} km（{{ coveragePct }}%）
+            <span v-if="nominalKm > 0">
+              已收录 {{ connectedKm }} km / 官方 {{ nominalKm }} km（{{ coveragePct }}%）
             </span>
             <span v-else-if="roadRoute">{{ roadRoute.lengthKm }} km（OSM 估算）</span>
-            <span v-else>官方里程约 {{ nominalKm || entryView.lengthKm }} km</span>
+            <span v-else>官方里程约 {{ entryView.lengthKm }} km</span>
+            <!-- v0.6.0 精度分级：A=偏差≤10% · B=≤25% · C=官方里程未知或偏差更大 -->
+            <span v-if="precision" class="drive-road-precision" :data-grade="precision">{{ precisionText }}</span>
+            <span v-if="componentCount > 1">{{ componentCount }} 段（{{ componentCount - 1 }} 处未贯通）</span>
             <span v-if="entryView.provinces.length">途经 {{ entryView.provinces.join(' · ') }}</span>
             <span>{{ spots.length }} 处沿线景点</span>
-            <span v-if="entryView.source === 'osm_only'">OSM 还原 · unverified</span>
           </div>
         </header>
 
@@ -252,9 +281,10 @@ function goTripLive() {
           已落库的折线只是该编号被 OSM 记录到的部分路段，顺序与真实走向未必一致。
           官方逐桩走向表尚未发布，此处不作导航依据。
         </p>
-        <p v-else-if="coveragePct !== null && coveragePct < 80" class="drive-empty rv-card drive-road-degraded" style="padding: 16px">
-          该编号已收录几何仅覆盖官方里程的 {{ coveragePct }}%，其余路段尚未贯通；
-          下方虚线为示意连接，不代表实际路线。
+        <p v-else-if="componentCount > 1" class="drive-empty rv-card drive-road-degraded" style="padding: 16px">
+          该编号在 OSM 中未贯通：共 {{ componentCount }} 段，合计 {{ connectedKm }} km（另有
+          {{ stitchedGaps }} 处 &le;1.5km 的城区断档已按几何接续）。
+          虚线段为其余连通分量，不代表实际连接关系。
         </p>
 
         <!-- 几何待补的诚实提示 -->
@@ -297,8 +327,11 @@ function goTripLive() {
                 <title>{{ s.name }} · K{{ Math.round(s.progressKm) }}</title>
               </circle>
             </svg>
-            <p class="drive-trip-map__hint">全线走向示意（OSM 众包还原，非官方线位）</p>            <p v-if="hasGaps" class="drive-trip-map__gap-note">
-              ⚠ {{ gapAnnotations.length }} 处未贯通（合计约 {{ gapKmTotal }} km），虚线段为示意连接
+            <p class="drive-trip-map__hint">
+              全线走向（OSM 众包还原，{{ precisionText }}）
+            </p>
+            <p v-if="hasGaps" class="drive-trip-map__gap-note">
+              ⚠ {{ gapAnnotations.length }} 处未贯通（最大断口约 {{ maxGapKm }} km），虚线段为其余连通分量
             </p>
           </section>
 

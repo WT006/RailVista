@@ -7,7 +7,6 @@
  */
 import { onMounted, ref } from 'vue';
 import { api } from '../api/client';
-import DriveBackdropMap from '../components/DriveBackdropMap.vue';
 import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
@@ -41,7 +40,6 @@ onMounted(async () => {
 
 <template>
   <div class="drive-page">
-    <DriveBackdropMap />
     <AppTopBar />
 
     <main class="rv-shell">

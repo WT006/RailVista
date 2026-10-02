@@ -8,10 +8,11 @@
   isolation: isolate;
   min-height: 100dvh;
   padding-bottom: var(--space-8);
+  /* 与 .rv-page 同一纪律：末层底色透出 App 级背景层（见 base.css .rv-page 注释） */
   background:
     radial-gradient(ellipse 70% 42% at 10% -8%, var(--accent-soft), transparent 58%),
     radial-gradient(ellipse 60% 38% at 92% 4%, var(--fill-accent), transparent 55%),
-    var(--surface-0);
+    transparent;
   color: var(--text-1);
 }
 

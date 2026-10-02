@@ -589,6 +589,13 @@ export interface RoadIndexEntry {
   hasGeom: boolean;
   source: 'authoritative' | 'osm_only';
   status: 'ok' | 'partial' | 'broken' | 'unverified';
+  /**
+   * v0.6.0 精度分级：A=官方里程偏差≤10% · B=≤25% · C=偏差更大或官方里程未知 · X=走向存疑。
+   * 判据与门禁见 docs/方案-全国公路网全等级覆盖与精准化落地-20261002.md §2.2
+   */
+  precision?: 'A' | 'B' | 'C' | 'X';
+  /** 连通分量数（>1 表示该编号在 OSM 中未贯通，断点数 = 分量数-1） */
+  componentCount?: number;
 }
 
 /** L1 几何节点（城市 / 交叉 / 服务 / 垭口 / 端点） */
@@ -637,6 +644,24 @@ export interface RoadGeometry {
   endpointDistanceKm?: { from: number; to: number };
   /** 已贯通里程相对官方里程的偏差百分比（正=超出，负=不足），仅在偏差 >50% 时写入 */
   lengthDeviation?: number;
+  /** 精度分级：A=与官方里程偏差不超 10% · B=不超 25% · C=偏差更大或官方里程未知 · X=走向存疑 */
+  precision?: 'A' | 'B' | 'C' | 'X';
+  /** 已收录里程（去重后，km）：双向分隔道路的平行对向车道只计一条，与官方里程可比 */
+  totalKm?: number;
+  /** 实际绘制的折线总长（km，含全部连通分量、未去重），用于排查 */
+  drawnKm?: number;
+  /** 连通分量数（大于 1 表示该编号在 OSM 中未贯通，断点数 = 分量数 - 1） */
+  componentCount?: number;
+  /** 城区 ref 断档按几何接续的次数（只影响绘制，不影响里程口径） */
+  stitchedGaps?: number;
+  /** 官方里程参考值（km），来自权威名录；未知时为 null */
+  officialKm?: number | null;
+  /** 来源标记：osm-pbf-elements 表示由省份 PBF 要素库装配 */
+  source?: string;
+  /** v0.6.0：该编号是否在 OSM 中真实出现过（官方规划在册但 OSM 无数据时为 false/undefined） */
+  inOsm?: boolean;
+  method?: string;
+  assembledAt?: string;
 }
 
 /** 公路侧景点沿程可见性（与铁路 SpotVisibility 的语义差异见 PRD §5.3） */
@@ -829,5 +854,17 @@ export interface RoadNetworkStats {
     targetExpressway: number;
     notes: string[];
   };
+  /**
+   * v0.6.0：按等级的覆盖与精度分布（数据来自省份 PBF 全量要素库装配）。
+   * precision：A=与官方里程偏差≤10% · B=≤25% · C=偏差更大或官方里程未知 · X=走向存疑
+   */
+  coverageByClass?: Array<{
+    class: RoadIndexEntry['class'];
+    total: number;
+    withGeometry: number;
+    coverage: number;
+    lengthKm: number;
+    precision: { A: number; B: number; C: number; X: number };
+  }>;
   updated: string;
 }

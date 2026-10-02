@@ -68,10 +68,15 @@ html {
   isolation: isolate;
   min-height: 100dvh;
   padding-bottom: var(--space-8);
+  /*
+   * 末层底色改为 transparent：背景层已从各页面内提升到 App 根（AppBackdrop），
+   * 页面若仍铺一层不透明 --surface-0 就会把背景整块盖住。
+   * 页面底色由 body（base.css 的 --surface-0）兜底，观感不变。
+   */
   background:
     radial-gradient(ellipse 70% 42% at 10% -8%, var(--accent-soft), transparent 58%),
     radial-gradient(ellipse 60% 38% at 92% 4%, var(--fill-accent), transparent 55%),
-    var(--surface-0);
+    transparent;
   color: var(--text-1);
 }
 

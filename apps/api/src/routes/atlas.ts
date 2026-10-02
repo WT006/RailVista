@@ -6,17 +6,28 @@
  *
  * - GET /api/atlas/overview   → 全部走廊（折线抽稀 ≤300 点）+ 全量景点 + 景点↔线路归属统计
  * - GET /api/atlas/corridor/:id → 单条走廊完整折线（线路详情页小地图用）
+ *
+ * 双源融合（v0.5.5）：一次请求同时返回铁路与公路两套数据，前端单页叠加显示。
+ *   铁路：corridors（248 走廊）+ spots（铁路景点，来自 data/presets/scenic-spots.json）
+ *   公路：roadCorridors（已挂几何的编号公路）+ roadSpots（公路侧景点，来自
+ *        data/roads/roadside-spots.json，**排除 source=migrated:* 的铁路迁移条**）
  */
 import { Hono } from 'hono';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadScenicSpots } from '../services/scenicSpots.js';
+import { roadNetworkOverview } from '../services/roadNetwork.js';
+import { getRoadsideSpots } from '../services/roadsideSpots.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const presetsDir = join(__dirname, '../../../../data/presets');
 const corridorsDir = join(presetsDir, 'corridors');
 const spotsPath = join(presetsDir, 'scenic-spots.json');
+// 公路侧（双源融合的另一半）：编号公路几何 + 公路景点库
+const roadsDir = join(__dirname, '../../../../data/roads');
+const GEOM_DIR = join(roadsDir, 'geom');
+const SPOTS_PATH = join(roadsDir, 'roadside-spots.json');
 
 export const atlasRoute = new Hono();
 
@@ -67,6 +78,8 @@ export type AtlasSpot = {
   corridorIds: string[];
   /** line = 数据明确标注；geo = 按沿线距离推算；null = 未归属 */
   matchKind: 'line' | 'geo' | null;
+  /** 数据来源：rail=铁路景点库，road=公路景点库（前端合并筛选/着色时用） */
+  origin?: 'rail' | 'road';
 };
 
 /** 线路详情页用：景点在该走廊上的里程位置 */
@@ -86,12 +99,33 @@ export type AtlasCorridorSpot = {
   distKm: number;
 };
 
+/** 公路线路（编号公路，仅含已挂几何的） */
+export type AtlasRoadCorridor = {
+  key: string;
+  ref: string;
+  name?: string;
+  class: string;
+  polyline: [number, number][];
+  lengthKm: number;
+  /** 沿线 20km 内的公路景点数 */
+  spotCount: number;
+  spotIds: string[];
+};
+
 export type AtlasOverview = {
   corridors: AtlasCorridor[];
   spots: AtlasSpot[];
+  /** 公路线路（双源融合的公路侧） */
+  roadCorridors: AtlasRoadCorridor[];
+  /** 公路侧景点（已排除从铁路迁移来的条目） */
+  roadSpots: AtlasSpot[];
   meta: {
     corridorCount: number;
     spotCount: number;
+    roadCorridorCount: number;
+    roadSpotCount: number;
+    /** 公路景点库中被排除的铁路迁移条数量（说明为什么 roadSpots < 库总量） */
+    roadMigratedExcluded: number;
     generatedAt: string;
     buildMs: number;
   };
@@ -252,6 +286,21 @@ function geoMatch(
 }
 
 let overviewCache: { at: number; data: AtlasOverview } | null = null;
+
+/**
+ * 公路侧单独缓存。
+ * 铁路侧的 overviewCache 只有 60s TTL，而公路侧构建要读几何 + 遍历上万景点
+ * （实测 42s），若跟着 60s 一起重建会周期性卡死请求链路。
+ * 公路数据变更极少（路网几何 + 景点库都是构建期产物），故按「文件指纹 + 10 分钟」
+ * 双条件缓存：数据没变就一直复用。
+ */
+const ROAD_TTL_MS = 600_000;
+type RoadLayerCache = {
+  stamp: string;
+  at: number;
+  data: { roadCorridors: AtlasRoadCorridor[]; roadSpots: AtlasSpot[]; excluded: number };
+};
+let roadCache: RoadLayerCache | null = null;
 let cacheStamp = '';
 
 function stamp(): string {
@@ -367,16 +416,122 @@ function buildOverview(): AtlasOverview {
     };
   });
 
+  // ── 公路侧（双源融合）：线路 + 公路原生景点 ────────────────────────────────
+  // 任一侧加载失败都不影响铁路侧（Promise 级别的降级在前端，这里用 try 兜住即可）
+  const road = getRoadLayer();
+  const roadCorridors = road.roadCorridors;
+  const roadSpots = road.roadSpots;
+  const roadMigratedExcluded = road.excluded;
+
+  // 铁路景点补来源标记，前端合并成一个列表时可区分
+  for (const s of spots) s.origin = 'rail';
+
   return {
     corridors: out,
     spots,
+    roadCorridors,
+    roadSpots,
     meta: {
       corridorCount: out.length,
       spotCount: spots.length,
+      roadCorridorCount: roadCorridors.length,
+      roadSpotCount: roadSpots.length,
+      roadMigratedExcluded,
       generatedAt: new Date().toISOString(),
       buildMs: Date.now() - t0,
     },
   };
+}
+
+/** 公路图层指纹：几何目录与景点库任一变化即失效 */
+function roadStamp(): string {
+  let out = '';
+  try {
+    if (existsSync(SPOTS_PATH)) out += String(statSync(SPOTS_PATH).mtimeMs);
+  } catch {
+    /* ignore */
+  }
+  try {
+    if (existsSync(GEOM_DIR)) {
+      for (const f of readdirSync(GEOM_DIR).slice(0, 400)) {
+        if (!f.endsWith('.json')) continue;
+        out += `${f}:${statSync(join(GEOM_DIR, f)).mtimeMs};`;
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  return out;
+}
+
+function getRoadLayer(): RoadLayerCache['data'] {
+  const now = Date.now();
+  const cur = roadStamp();
+  if (roadCache && roadCache.stamp === cur && now - roadCache.at < ROAD_TTL_MS) {
+    return roadCache.data;
+  }
+  const data = buildRoadLayer();
+  roadCache = { stamp: cur, at: now, data };
+  return data;
+}
+
+function buildRoadLayer(): RoadLayerCache['data'] {
+  const empty = { roadCorridors: [] as AtlasRoadCorridor[], roadSpots: [] as AtlasSpot[], excluded: 0 };
+  try {
+    // 取 250 条上限：索引里 hasGeom 标了 15107 条，但实际几何文件只有 448 个
+    // （既有数据不一致，本轮不修数据），按里程降序取前 250 条能覆盖到全部
+    // 真实有几何的干线（约 201 条），剩下的会因文件缺失被 buildNetworkOverview 跳过。
+    const { roads } = roadNetworkOverview({ limit: 250, maxPoints: 160 });
+    const all = getRoadsideSpots() as unknown as Array<Record<string, unknown>>;
+    // 公路网只显示公路原生景点；source=migrated:* 是早期从铁路侧迁来的，
+    // 它们的坐标贴铁路走廊，画在公路网上位置就是错的（需求方明确指出的严重问题）
+    const native = all.filter((s) => !String(s.source ?? '').startsWith('migrated'));
+    const excluded = all.length - native.length;
+
+    const roadGrid = buildGeoIndex(roads.map((r) => ({ id: r.key, polyline: r.polyline })));
+    const roadIdsByKey = new Map<string, string[]>();
+    const roadSpots: AtlasSpot[] = [];
+    for (const s of native) {
+      const lng = Number(s.lng);
+      const lat = Number(s.lat);
+      const id = String(s.id ?? s.name ?? '');
+      if (!Number.isFinite(lng) || !Number.isFinite(lat) || !id) continue;
+      const keys = [...geoMatch(roadGrid, lng, lat, 20).keys()];
+      for (const k of keys) {
+        const arr = roadIdsByKey.get(k);
+        if (arr) arr.push(id);
+        else roadIdsByKey.set(k, [id]);
+      }
+      roadSpots.push({
+        id,
+        name: String(s.name ?? id),
+        lng: round4(lng),
+        lat: round4(lat),
+        intro: typeof s.intro === 'string' ? s.intro.slice(0, 60) : undefined,
+        category: typeof s.category === 'string' ? s.category : undefined,
+        corridorIds: keys,
+        matchKind: keys.length ? 'geo' : null,
+        origin: 'road',
+      });
+    }
+    const roadCorridors: AtlasRoadCorridor[] = roads.map((r) => {
+      const ids = roadIdsByKey.get(r.key) ?? [];
+      return {
+        key: r.key,
+        ref: r.ref,
+        name: r.name,
+        class: r.class,
+        polyline: r.polyline,
+        lengthKm: r.lengthKm,
+        spotCount: ids.length,
+        spotIds: ids,
+      };
+    });
+    return { roadCorridors, roadSpots, excluded };
+  } catch {
+    // 公路侧不可用（无路网数据/服务未初始化）：铁路侧完整保留
+    return empty;
+  }
 }
 
 function getOverview(): AtlasOverview {

@@ -2,7 +2,6 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
-import DriveBackdropMap from '../components/DriveBackdropMap.vue';
 import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
@@ -53,7 +52,6 @@ function startNav() {
 
 <template>
   <div class="drive-page">
-    <DriveBackdropMap />
     <AppTopBar />
 
     <main class="rv-shell">

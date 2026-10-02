@@ -1,6 +1,6 @@
 {
   "name": "@railvista/shared",
-  "version": "0.5.4",
+  "version": "0.6.1",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",

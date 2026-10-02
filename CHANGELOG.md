@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.5.4`**（2026-10-02）
+**当前版本：`0.6.1`**（2026-10-03）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -26,6 +26,195 @@
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
 
 ---
+
+## [0.6.1] — 2026-10-03
+
+**需求方反馈的 4 个缺陷修复 + 公路景点批量扩充 + 全国地图双源融合**（分支 `heyworldchannel-20261002`）。
+
+承接 v0.6.0 的全等级路网底座，本轮修的是**体验层与数据归属**问题。
+
+### F1 版本号徽标消失（回归）
+
+- 现象：顶栏看不到版本号，改了 `version.ts` 界面上毫无反应。
+- 根因：徽标在 `ba6d8d6`「走廊全屏地图页」那次提交里被整块删掉，此后
+  `appVersionInfo` / `APP_VERSION` **全仓没有任何消费方**（`git log -S` 确认）。
+- 处置：恢复 `AppTopBar.vue` 的 `.appbar__version` 徽标（含悬浮摘要 tooltip，
+  `max-width: 420px` 时隐藏），重新消费 `@railvista/shared` 的版本常量。
+
+### F2 进入页面时背景地图"跳一下"（回归）
+
+- 现象：点「自驾」或「行程」进来，背景地图会跳一下。
+- 根因（两条，均已修）：
+  1. **路由切换时页面级背景被销毁重建** —— 铁路页挂 `ChinaBackdropMap`、自驾 6 页挂
+     `DriveBackdropMap`，两套实现早已分叉，路由一切换背景就没了再出现；
+  2. **路网内容被瞬间替换** —— 采样实测（50ms 间隔）显示舞台几何全程恒定
+     （`1728px / x=-149`），变化的是 canvas 的 `opacity`（0.24 → 0.456）与内容：
+     路网懒加载块就绪后整张折线一次性画进同一张 canvas，与 opacity 变化叠加成"双跳"。
+- 处置：
+  - 新增 `components/AppBackdrop.vue` 挂到 `App.vue`，**跨路由唯一实例**，
+    按 `route.path` 自动切 `rail` / `road` 两种模式；
+  - 路网独立成一层 canvas（`.app-backdrop__layer--net`），就绪后走 CSS 过渡淡入，
+    星点层 opacity 恒定，不再有"亮度跳变 + 内容瞬替"的双跳；
+  - 页面底色末层由 `var(--surface-0)` 改为 `transparent`（`.rv-page` / `.drive-page`），
+    底色上移到 `body` 兜底，否则不透明页面底会把 App 级背景整块盖住；
+  - 移除 7 处页面级背景挂载与 `DriveBackdropMap.vue`、`driveRoadNetwork.ts`（v0.6.0 已改位图方案）。
+- 验证：`MutationObserver` 全程监听，SPA 路由来回切换（`/` ↔ `/drive`）期间
+  背景舞台几何**只有 1 种取值**，即完全不再重建。
+
+### F3 公路网的景点是铁路的景点（数据归属错误）
+
+- 现象：自驾页背景与公路地图上出现的景点是铁路景点。
+- 根因：`data/roads/roadside-spots.json` 共 1035 条，其中 **624 条（60%）是早期从
+  `data/presets/scenic-spots.json` 迁移来的**（`source` 形如 `migrated:curated` /
+  `migrated:ai_reviewed`），坐标贴铁路走廊。叠加两个放大因素：
+  - `scripts/build-drive-backdrop.mjs` 的过滤条件写成 `source.includes('rail')`，
+    而迁移条的 source 一个都不含 `rail` —— **过滤完全失效**，624 个铁路点一直画在公路背景上；
+  - `/drive/atlas` 只是把 `AtlasMap` 的 `roadLayerOn` 默认打开，景点/Top10/排行榜
+    **全部仍来自 `/api/atlas/overview` 的铁路数据**，标题还硬编码「铁路景点地图」，
+    公路侧等于零。
+- 处置：过滤条件改为**前缀匹配** `startsWith('migrated')`（已生成产物复核：
+  背景星点 1200 个全部来自公路原生景点，624 条迁移条已排除）；
+  迁移条**不删数据**，在全国地图里作为铁路景点展示。
+
+### F4 全国地图双源融合（/atlas 单页）
+
+- `/api/atlas/overview` 新增 `roadCorridors`（编号公路，抽稀折线）与 `roadSpots`
+  （公路原生景点，已排除迁移条），`meta` 增加 `roadCorridorCount` / `roadSpotCount` /
+  `roadMigratedExcluded`；公路侧按「文件指纹 + 10 分钟」独立缓存。
+- `AtlasMap.vue` 新增**景点来源筛选**（全部 / 铁路 / 公路，冷蓝=铁路、琥珀=公路），
+  标题随之切换；新增**编号公路沿线景点 Top10**（`focusRoad` 高亮 + fitView，
+  与铁路走廊同一套交互）与**公路榜单**快捷入口；`/drive/atlas` 默认落在「公路」来源。
+- 顺带：公路图层开关改为直接复用 `roadCorridors`，不再重复请求 `/drive/network/overview`；
+  维度筛选计数分母由写死的 `spots.length` 改为 `spotsByOrigin.length`。
+
+### F5 公路景点批量扩充：411 → 12104 条
+
+- 新增 `scripts/harvest-roadside-spots.mjs`：复用 `scripts/lib/overpass.mjs` 的多端点
+  failover 与 34 省分片，批量抓取全国旅游/自然/史迹类 POI，每省独立磁盘缓存、断点续抓。
+- 质量控制（三轮实测调参后才达标）：
+  - **类别黑名单**：剔除 `artwork` / `memorial` / `tomb` / `place_of_worship` 与
+    `theme_park` —— 首轮把 `artwork` 等算进去时，北京+海南两省就产出 8872 条，
+    绝大多数是城市雕塑、纪念碑、村庙；`theme_park` 更抓到乐园**内部单个设施**
+    （"狮门娱乐天地""晶彩奇航""七个小矮人矿山车"）；
+  - **设施名正则**再滤一遍游乐园设施与景区内店铺/餐饮/停车/充电站；
+  - **取名优先级** `name:zh` → `name` → `name:en`：原先优先 `name`，导致沿程景点
+    显示成 "Kalinchowk Temple" 这类外国地名（1066 条）；
+  - **国境过滤**：`lng∈[73.4,135.1] / lat∈[17.8,53.6]`，剔除 G318 延伸段带进来的尼泊尔、印度点位；
+  - **距离分档**：按到最近已绘公路的距离落 `roadside/detour5/detour20/distant`（>35km 不入库）；
+  - **密度抑制**（同 0.01° 格保留前 2）+ **分类配额**（`nature.mountain` 单独限 2500，
+    否则首轮它独占 13495 条 / 64%，地图被无名小山淹没）。
+- 成果：`roadside-spots.json` 1035 → **12728** 条（公路原生 411 → **12104**，29 倍）；
+  `province` 字段从 0 补到 11696 条；最终分类分布均衡
+  （viewpoint.landmark 2796 / nature.mountain 2560 / viewpoint.observation-deck 2508 /
+  culture.heritage 1627 / …），`visibility` 分布 roadside 2286 / detour5 6490 /
+  detour20 2517 / distant 811。
+- 沿程匹配实测无性能退化：`/api/drive/along?road=G318` 返回 200 个景点、45 个章节，
+  首次 443ms、命中缓存后 8ms。
+
+### F6 `/api/atlas/overview` 构建耗时 42s → 1.5s
+
+- 根因：`getRoadGeometry()` **每调用一次**都遍历 `data/roads/geom` 全部文件做
+  `statSync` 算 mtime 指纹；地图一次聚合取 200+ 条路 × 448 个文件 ≈ 9 万次同步 stat。
+- 处置：mtime 采样加 5s 节流（几何是构建期产物，变化以分钟计，最多晚 5s 生效）。
+- 同时公路图层数由 200 收敛到 250 上限（覆盖全部真实有几何的干线），缓存 10 分钟。
+
+### 顺带修掉的一个既有数据不一致（未修数据，仅记录）
+
+- `data/roads/index/*.json` 里 `hasGeom: true` 的条目共 **15107** 条，
+  但 `data/roads/geom/` 实际只有 **448** 个几何文件（缺 14675）。
+  后果：按 `hasGeom` 过滤会选出大量没有几何的条目，`buildNetworkOverview` 里被
+  `if (!g) continue` 静默跳过 —— `/atlas` 传 limit 60 时只得到 29 条公路。
+  本轮改为在 `buildRoadLayer` 里以「几何文件是否存在」为准，并把 limit 提到 250
+  （实测拿到 244 条）。**索引标记本身仍需用 `pnpm roads:index` 重建才能修正**。
+
+### 验证
+
+- 三包类型检查（shared build / api tsc / web vue-tsc）全部通过；单测 174 例通过。
+- 真浏览器（headless Edge + CDP）：
+  - `/atlas`：标题「铁路 + 公路景点地图」、来源筛选 3 项、维度筛选 7 类、
+    `12728 / 12728 处`、铁路线 Top10 + 编号公路 Top10（G5 京昆 365 / G4 京港澳 349 …）+
+    公路榜单 4 个 + 铁路排行榜 67 条，无 console 报错；
+  - `/drive/atlas`：标题「公路景点地图」、`12537→12104 / 12104 处`、公路图层默认开；
+  - `/drive`、`/drive/trip`、`/drive/rankings`、`/drive/road/G318`：无横向溢出、
+    背景 3 层 canvas 且 `is-net-ready`、模式 `road`、图例 4 项、干线 chips 12 个、
+    中文名 0 折行、版本徽标可见；
+  - SPA 路由来回切换期间背景舞台几何恒定（见 F2）。
+
+### 已知限制
+
+- **`pnpm build` 在本机无法执行**：esbuild 原生进程被安全策略拒绝文件读取
+  （`winapi error #5`，0.25.12 与 0.28.2 均如此，连仓库根目录的临时文件也读不了）；
+  `node` 自身读写正常、`apps/api` 的 tsc 构建正常。属环境问题，与本轮改动无关。
+- 公路景点仍有 990 条只有英文名（OSM 上确实无中文名），后续可在归一化阶段补译。
+- 公路几何覆盖仍偏低：`/atlas` 的公路图层来自已挂几何的 244 条干线，
+  省道及以下虽有编号与连通性但未全部出几何（v0.6.0 已把路网底座备好，待 `roads:geom` 继续装配）。
+
+---
+
+## [0.6.0] — 2026-10-03
+
+**全国公路网「全等级覆盖 + 精准化落地」**（分支 \`heyworldchannel-20261002\`）。
+方案见 \`docs/方案-全国公路网全等级覆盖与精准化落地-20261002.md\`。
+一句话：把「按编号去 Overpass 逐条捞线」换成「**一次拿全国 OSM 分省提取物（PBF）→ 本地建全等级路网 → 从这张网派生一切**」。
+
+### 诊断：不是覆盖率低，是范式错
+
+- 旧管道以「编号」为检索键查 Overpass，但 OSM 中 **89.3% 的路段没有 ref 标签**（全国实测：9,101,780 条 highway way 中带编号仅 956,942 条），按编号必然漏段；
+- 旧装配用「端点最近邻 + 5km 容差」贪心拼链，主链是**碰巧串起来的**（G318 主链落在西藏、"上海"贴在错的端点上），拼不上的段丢进 segments 后与主链空间不相交；
+- 旧渲染把折线打进前端静态块，**33 条线 = 153KB**，全国 1.5 万条编号公路 + 790 万条可通行道路无法承载。
+
+### 新增：全国路网数据流水线（8 个脚本）
+
+| 脚本 | 作用 |
+|---|---|
+| \`scripts/lib/osm-pbf.mjs\` | 零依赖流式 PBF 解析（BlobHeader/Blob/PrimitiveBlock/DenseNodes/Ways） |
+| \`scripts/lib/road-ref.mjs\` | 编号清洗与等级判定（G/E/S/X/Y/C，与 §3.2 主键规则一致） |
+| \`scripts/fetch-china-pbf.mjs\` | 31 省 PBF 下载（断点续传 + md5 校验 + 体积比对） |
+| \`scripts/build-road-census.mjs\` | 全国路网普查（各等级 way 数 / ref 覆盖率 / 编号值） |
+| \`scripts/build-road-ways.mjs\` | PBF → \`data/roads/net/{prov}.rvwn\` 全等级要素库（两遍扫描，内存可控） |
+| \`scripts/lib/rvwn.mjs\` | RVWN 二进制格式读写（way 记录 + 节点下标 + 坐标池，节点用 OSM node id） |
+| \`scripts/lib/road-assemble.mjs\` | 几何装配：连通分量 + 直行优先 + 平行对向车道识别 + 折返剔除 |
+| \`scripts/build-road-geom.mjs\` | 逐编号装配几何 → \`data/roads/geom/{key}.json\`（含精度分级） |
+| \`scripts/build-drive-network-raster.mjs\` | 全路网离线渲染 → \`apps/web/public/drive-network.png\` |
+| \`scripts/verify-road-network.mjs\` | 质检门禁：覆盖率 / 里程偏差 / 精度分布 / 跳点 / 完整性 |
+
+命令：\`pnpm roads:fetch\` → \`roads:census\` → \`roads:ways\` → \`roads:geom\` → \`roads:index\` → \`roads:verify\` → \`roads:raster\`（或一键 \`pnpm roads:build\`）。
+
+### 全国实测基数（2026-10-03，31 省片）
+
+- 可通行道路 **7,944,551 条 way / 93,670,047 节点 / 105,727,777 个 way 点引用**（要素库 2.49GB）；
+- 编号实体 **15,183 条**：高速 E / 国道 G / 省道 S / 县道 X / 乡道 Y / 村道 C 全部入册；
+- 关键发现：**物理路网在 OSM 里基本是全的，缺的是"编号"**。旧实现只画 33 条线，是因为按编号查 —— 无编号的路一条都进不来。
+
+### 几何装配（替换旧贪心）
+
+- **连通性只认 OSM 共享 node id**，不用距离猜：一个编号有几段就如实输出几段，绝不硬拼（G318 不再出现"主链在西藏"）；
+- **直行优先**：度 ≥3 的交叉口按来向夹角最小选下一段，避免拐进支线；
+- **平行对向车道识别**：双向分隔式道路（上下行各一条 oneway）按"长度比 + 双向最近距离中位数"判定，里程只计一条 —— G98 海南环岛高速由 1226km（2×）修正为 **613.2km vs 官方 613km（偏差 0%）**；
+- **折返剔除**：走链中沿对向车道折回的段落按 oneway 段识别并剔除（山区回头弯是双向路，绝不参与判定）；
+- **精度分级** A（≤10%）/ B（≤25%）/ C（更大或官方里程未知），用于如实标注与门禁；
+- **端点与途经点命名**只用 30km 内的地名锚点，绝不把官方起讫点硬贴到错的端点上。
+
+### API 与前端
+
+- \`/drive/network/overview\` 默认只回干线（高速+国道），支持 \`?classes=\`/\`?limit=\`/\`?points=\` —— 不再把 1.5 万条几何推给浏览器；
+- \`/drive/network/stats\` 新增 \`coverageByClass\`（按等级的覆盖与 A/B/C 精度分布），首页文案由写死的"85~95%"改为**实测值**；
+- \`/drive/road/:key\` 与单条公路页：里程改用**去重后里程** \`totalKm\`；视野改为覆盖**全部分量**（原先只按主链算视野，东部线段会被裁掉）；
+- 自驾页背景改为**构建期离线渲染的全路网位图** \`drive-network.png\`（零依赖 PNG 编码器 + Xiaolin Wu 抗锯齿线 + 2× 超采样），指针高光改为位图径向遮罩点亮；移除 153KB 的矢量路网懒加载块。
+
+### 已知边界（如实标注）
+
+- 村道 C### 的"编号"没有全国公开名录（OSM 中仅 1,291 条 way 带 C 编号），因此**村道提供物理几何与连通性，不承诺编号完整**；
+- 部分国道因 OSM 未贯通而存在多个连通分量（页面如实显示断点数与最大断口）；
+- 里程为 OSM 众包估算值，不作为导航依据。
+
+### 验证
+
+- \`pnpm --filter @railvista/shared exec tsc --noEmit\` / \`api\` / \`web\` 三包类型检查通过；
+- 装配算法自检 6 项（共享节点成链 / 不连通分段 / 十字路口直行 / 平行重复剔除 / 闭环 / 断点标注）全绿；
+- 要素库长度自检：海南 48,480 条 way 的长度与几何重算**误差 <0.5m**；
+- \`node scripts/verify-road-network.mjs\` 输出按等级覆盖与精度分布（见 \`data/roads/reports/quality-*.json\`）。
+
 
 ## [0.5.4] — 2026-10-02
 

@@ -1,5 +1,7 @@
 /**
- * v0.6.5 公路详情页真浏览器验收探针（headless Edge + CDP）。
+ * v0.6.5 公路详情页「分段高亮可见性」验收探针（headless Edge + CDP）。
+ *
+ * 用途：QA 复验 / 开发自检。**判据规范以本文件头注释为准**，不要另写一套。
  *
  * 用法：node scripts/verify-road-highlight.mjs
  * 覆盖：地名分段 / 精选景点 / 分段点击高亮 / 景点点击聚焦 / 覆盖率 / 类型角标 / 控制台报错
@@ -23,11 +25,21 @@
  *   1. 遍历**每一段**（不再只点第 2 段），逐段量屏幕包围盒；
  *   2. 报出最小值与不合格段号列表，无高亮段数必须为 0；
  *   3. 景点聚焦用 viewBox 数值 + 定位环屏幕尺寸双重证明。
+ *
+ * ── 探针自身的等待时间也是判据的一部分 ──
+ * 逐段点击后必须等 Vue 完成响应式更新 + 浏览器重排 + 样式重算再去量矩形。
+ * 等待**不足**会读到上一段或未渲染的状态，产生假阴性（本项目踩过两次：
+ *   · 用 320ms 测出「第 1 段无高亮」—— 误报，第 1 段实际一直有高亮；
+ *   · 用 240ms 虽然没出错，但偏紧，换台慢机器就可能翻车）。
+ * 因此 `SEG_SETTLE_MS = 600` 是**判据的一部分**，不要为了跑快而调小 ——
+ * 要快就减少测量项，不要缩短等待。
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
 /** 高亮合格判据：屏幕包围盒短边下限（px） */
 const HIGHLIGHT_MIN_PX = 24;
+/** 逐段点击后的稳定等待（ms）。判据的一部分，见头注释「探针自身的等待时间也是判据的一部分」。 */
+const SEG_SETTLE_MS = 600;
 
 const EDGE = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 const { spawn } = await import('node:child_process');
@@ -37,7 +49,7 @@ const path = await import('node:path');
 const { fileURLToPath } = await import('node:url');
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const OUT_DIR = path.join(HERE, 'ui');
+const OUT_DIR = path.join(HERE, '..', 'tmp', 'ui');
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -133,9 +145,9 @@ const MEASURE_ALL_SEGMENTS = `(async () => {
   const out = [];
   for (let i = 0; i < segs.length; i++) {
     const on = document.querySelector('.drive-seg.is-on');
-    if (on) { on.click(); await sleep(160); }
+    if (on) { on.click(); await sleep(${SEG_SETTLE_MS}); }
     segs[i].click();
-    await sleep(240);
+    await sleep(${SEG_SETTLE_MS});
     const p = document.querySelector('.drive-trip-map__route.is-active');
     const t = segs[i].querySelector('.drive-seg__title');
     const rec = { i: i + 1, title: t ? t.textContent.replace(/\\s+/g,' ').trim() : '', exists: !!p, dLen: 0, w: 0, h: 0, short: 0, ok: false, isTiny };

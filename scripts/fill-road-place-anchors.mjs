@@ -684,6 +684,8 @@ async function main() {
     }
 
     if (!anchors) {
+      // ⚠️ 刻意**不**读 geom.cumKm —— 落盘的那个同名字段是历史遗留的「米」量纲且不可信
+      // （实测 G318 末值 1627363.5 / drawnKm 6331.5）。一律按 points 现算公里值。
       const cum = computeCumKm(geom.points);
       anchors =
         PROVIDER === 'nominatim'

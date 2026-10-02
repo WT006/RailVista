@@ -240,6 +240,8 @@ export function planRoadRoute(key: string): (RoadRoute & {
   const geom = getRoadGeometryFull(key);
   if (!entry || !geom) return null;
   const coords = geom.points.map((p) => [p[0], p[1]] as [number, number]);
+  // ⚠️ 刻意**不**用 geom.cumKm —— 那个落盘字段是历史遗留的「米」量纲且不可信
+  // （实测 G318 末值 1627363.5，而 drawnKm=6331.5）。这里现算公里值并随坐标下发。
   const cum = computeCumKm(coords);
   // v0.6.0：里程用去重后里程（双向分隔道路只计一条），与官方里程可比；
   // 主链长度仅代表最长连通分量，长线会显著小于全线里程。

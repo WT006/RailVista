@@ -584,8 +584,6 @@ const activeSegmentPath = computed(() => {
 /**
  * v0.6.5（P0-2）：选中分段时把 viewBox **收拢到该段**，且保证高亮在屏幕上真的看得见。
  *
- * ── 判据（不可放宽）：高亮折线的**屏幕包围盒短边 ≥ 24px** ──
- *
  * ── 为什么不能简单「按内容 bbox 留边」──
  * SVG 默认 `preserveAspectRatio="xMidYMid meet"`：viewBox 会**等比缩放并居中**。
  * 若 viewBox 直接取内容 bbox + 边距，则缩放比 = min(cw/vbW, ch/vbH)，
@@ -628,6 +626,18 @@ const HIGHLIGHT_TARGET_PX = HIGHLIGHT_MIN_PX * 1.3;
 const SCALE_MAX = 400;
 /** 景点并入 bbox 后允许的最大放大倍数（相对纯段 bbox） */
 const SPOT_BBOX_MAX = 2.2;
+/**
+ * v0.6.5（P1-4）：段 bbox / 全链 bbox 的**面积比**阈值。
+ *
+ * 当某段的 bbox 已经几乎等于整条链的 bbox 时，收拢 viewBox 没有任何信息增益 ——
+ * 视野本来就等于全线，再收拢只是把同一段路放大到「只剩一条线」，高亮反而更细。
+ * 实测极短线路（实绘 < 1km）上 **85.5% 的段**属于这种（比值 p25 即为 1.000），
+ * 例如 G256 全局 viewBox 40 单位、点击后被收拢到 1.7 单位，高亮只剩 2×4px，
+ * 用户反馈「点了反而更看不清」。
+ *
+ * 超过该阈值时直接沿用全局视野（`focusViewBox = null`），不收拢。
+ */
+const SEGMENT_FOCUS_MIN_GAIN = 0.8;
 
 function focusSegmentView(index: number): void {
   const seg = segments.value[index];
@@ -691,6 +701,33 @@ function focusSegmentView(index: number): void {
   // 用 HIGHLIGHT_TARGET_PX（32px）而非及格线 24px：贴着及格线交付会被视口尺寸波动打穿
   const sMin = HIGHLIGHT_TARGET_PX / Math.min(segW, segH);
   const s = Math.max(1, Math.min(Math.max(sFit, sMin), SCALE_MAX));
+
+  // ── P1-4：没有放大增益就不收拢 ──
+  // ① 段 bbox 已经几乎等于**主链** bbox → 收拢只是把同一条路放大，视野更窄、高亮更细；
+  // ② 目标缩放比 < 1（算出来是「缩小」）→ 收拢反而丢信息。
+  // 两种情况都退回全局视野，让用户至少还能看清整条线的位置关系。
+  //
+  // ⚠️ 比较基准必须是**主链未加内边距的 bbox**，不能直接用 `globalViewBox`：
+  // 后者的 padX/padY 有 20 单位的下限（`bboxOfViewPts`），
+  // 对极短线路会放大成 40×40，而段 bbox 只有 0.004 单位 —— 拿单位不对等的两个框比，
+  // 会把「段=全链」误判成「段只占万分之一」，于是照样收拢（这正是 G256 点了反而更看不清的原因）。
+  let chainMinX = Infinity;
+  let chainMinY = Infinity;
+  let chainMaxX = -Infinity;
+  let chainMaxY = -Infinity;
+  for (const [px, py] of pts) {
+    if (px < chainMinX) chainMinX = px;
+    if (px > chainMaxX) chainMaxX = px;
+    if (py < chainMinY) chainMinY = py;
+    if (py > chainMaxY) chainMaxY = py;
+  }
+  const chainW = Math.max(chainMaxX - chainMinX, 1e-9);
+  const chainH = Math.max(chainMaxY - chainMinY, 1e-9);
+  const bboxGain = Math.sqrt((segW * segH) / (chainW * chainH));
+  if (bboxGain >= SEGMENT_FOCUS_MIN_GAIN || s <= 1) {
+    focusViewBox.value = null; // 不收拢，沿用全局
+    return;
+  }
 
   // 4) viewBox 宽高比与容器一致 → 无 letterbox，短边即 content短边 × s
   const vbW = cw / s;

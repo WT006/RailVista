@@ -664,7 +664,15 @@ export interface GapAnnotation {
 export interface RoadGeometry {
   key: string;
   points: RoadPoint[];
-  /** 逐点累计里程（km），与 points 等长 */
+  /**
+   * 逐点累计里程。
+   *
+   * ⚠️ **单位不可信 —— 历史遗留的「米」量纲**（实测 G318 末值 1627363.5，
+   * 而同文件 drawnKm=6331.5；G217 末值 1023313.3 / drawnKm=2343.5）。
+   * 与 `RoadRoute.cumKm`（**公里**，API 现算）同名不同量纲，**不要混用**。
+   * 需要可用的公里制累计里程时，请用 `RoadRoute.cumKm`，
+   * 或按 `points` 自行 haversine 重算（见 scripts/fill-road-place-anchors.mjs）。
+   */
   cumKm: number[];
   nodes: RoadGeometryNode[];
   simplified: boolean;
@@ -761,7 +769,13 @@ export interface RoadRoute {
   durationMin?: number;
   coords: RoadPoint[];
   /**
-   * v0.6.5：与 `coords` **等长同源**的累计里程（km）。
+   * v0.6.5：与 `coords` **等长同源**的累计里程。
+   *
+   * ⚠️ **单位是公里（km），不是米。** 注意与落盘文件的同名字段区分：
+   * `data/roads/geom/*.json` 里的 `geom.cumKm`（RoadGeometry.cumKm）
+   * 是历史遗留的**米**量纲且不可信（实测 G318 末值 1627363，而该路 drawnKm=6331.5），
+   * **不可直接使用**。本字段是 API 在全分辨率链上重算后下发的公里值，
+   * 两处同名不同量纲，正是第一轮 P0-1「末段无高亮」的温床，引用前务必确认来源。
    *
    * 必须由服务端在**抽稀之前**按全分辨率链算出，再随坐标一起下发；
    * 抽稀时按被选中点的下标同步切片。理由：抽稀会切掉弯道、缩短折线

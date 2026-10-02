@@ -5407,6 +5407,38 @@ spots.push(
   }
 }
 
+// —— 2026-10-02 全国正式景区/地标补充：仅按同名或 500m 内地理重合去重 ——
+// 城市内相距数公里的不同景点（如博物馆、历史街区、塔楼）是独立 POI，不能用旧批次的 8km 半径合并。
+{
+  const supPath = join(__dirname, '../data/presets/scenic-spots-supplement-20261002.json');
+  if (existsSync(supPath)) {
+    const sup = JSON.parse(readFileSync(supPath, 'utf8'));
+    const list = Array.isArray(sup.spots) ? sup.spots : [];
+    const norm = (n) => String(n || '').replace(/（[^）]*）/g, '').replace(/[·・\s]/g, '');
+    const existIds = new Set(spots.map((s) => s.id));
+    const existNames = new Set(spots.map((s) => norm(s.name)));
+    let addedN = 0;
+    let skipN = 0;
+    for (const o of list) {
+      if (existIds.has(o.id) || existNames.has(norm(o.name))) { skipN += 1; continue; }
+      let prox = false;
+      for (const s of spots) {
+        const dx = (s.lng - o.lng) * 111.32 * Math.cos((o.lat * Math.PI) / 180);
+        const dy = (s.lat - o.lat) * 110.574;
+        if (Math.hypot(dx, dy) < 0.5) { prox = true; break; }
+      }
+      if (prox) { skipN += 1; continue; }
+      spots.push(spot(o));
+      existIds.add(o.id);
+      existNames.add(norm(o.name));
+      addedN += 1;
+    }
+    console.log(`supplement 2026-10-02: +${addedN} new, ${skipN} skipped (dup id/name/<0.5km)`);
+  } else {
+    console.warn('skip supplement 2026-10-02: file missing');
+  }
+}
+
 enrichV3Spots(spots);
 
 // —— 省区字段 harmonize：tags[0] 为省区名且缺 province 者回填 province（与 2026-10-01 批次一致，满足"标注所在省区"）——
@@ -5421,8 +5453,8 @@ enrichV3Spots(spots);
 
 const doc = {
   version: 3,
-  updated: '2026-10-01',
-  note: 'v3 纯扩展：六维分类/线路归属/左右侧/时段/可核验来源；v2 老数据语义不变（docs/scenic-schema-v3.md）。patches 见 scenic-spot-calibration-patches.json；2026-10-01 并入全国扩充批次（含 province 字段）',
+  updated: '2026-10-03',
+  note: 'v3 纯扩展：六维分类/线路归属/左右侧/时段/可核验来源；v2 老数据语义不变（docs/scenic-schema-v3.md）。patches 见 scenic-spot-calibration-patches.json；2026-10-01 与 2026-10-03 并入全国扩充批次（含 province 字段）',
   spots,
 };
 

@@ -99,6 +99,8 @@ async function loadRoad(): Promise<void> {
       };
     }
     renderSpots();
+    // 公路点进来后热力图要跟着重算，否则仍按铁路的 624 点渲染
+    if (heatOn.value) renderHeat();
     if (roadLayerOn.value) renderRoadLayer();
   } catch (e) {
     roadError.value = e instanceof Error ? e.message : '公路图层加载失败';
@@ -116,6 +118,8 @@ let highlightLine: any = null;
 let focusMarker: any = null;
 let baseLines: any[] = [];
 let plainMarkers: any[] = [];
+/** 公路侧普通 Marker 列表（renderRoadSpots 维护） */
+let roadPlainMarkers: any[] = [];
 /** corridorId → 折线，供点击/搜索后 fitView */
 const lineByCorridor = new Map<string, any>();
 
@@ -226,8 +230,15 @@ function toggleProvince(name: string) {
 /**
  * 景点统计（侧栏顶部）：当前筛选范围内的来源分布与分级分布。
  * 用 Progress 条呈现（鸿蒙展示类规范：数据可视化用进度/占比表达，不用纯数字堆砌）。
+ *
+ * 公路明细按需加载期间不显示数字 —— 直接算会得到 0，表现为"切来源后统计先掉 0
+ * 再跳到一万多"，正是需求方说的"切换时跳一下"。此时显示加载态。
  */
 const spotStats = computed(() => {
+  const roadPending = roadLoading.value && spotOrigin.value !== 'rail';
+  if (roadPending) {
+    return { total: spotsByOrigin.value.length, rail: spotsByOrigin.value.length, road: 0, byTier: {}, pending: true };
+  }
   const list = filteredSpots.value;
   const rail = list.filter((s) => s.origin === 'rail').length;
   const road = list.length - rail;
@@ -236,7 +247,7 @@ const spotStats = computed(() => {
     const t = s.tier ?? '—';
     byTier[t] = (byTier[t] ?? 0) + 1;
   }
-  return { total: list.length, rail, road, byTier };
+  return { total: list.length, rail, road, byTier, pending: false };
 });
 
 /**
@@ -478,12 +489,29 @@ function clearCluster() {
 
 function renderSpots() {
   if (!map || !AMapRef) return;
+  /*
+   * v0.6.4 按来源分流渲染，消除"切换来源时地图跳一下"：
+   *   · 铁路点（≤ ~1k）走 MarkerCluster，保留聚合圆圈与维度着色；
+   *   · 公路点（1.2 万）走独立图层 + 4000 个绘制上限，
+   *     全部塞进 MarkerCluster 会长时间阻塞主线程，表现为切到公路时地图卡住再跳一下。
+   * 两侧各自独立重建/销毁，切换来源时另一侧保持不动。
+   */
   const list = filteredSpots.value;
+  const railList = list.filter((s) => s.origin !== 'road');
+  const roadList = list.filter((s) => s.origin === 'road');
+
+  renderRailSpots(railList);
+  renderRoadSpots(roadList);
+}
+
+function renderRailSpots(list: AtlasSpotLite[]) {
+  if (!map || !AMapRef) return;
   const data = list.map((s) => ({ lnglat: [s.lng, s.lat], spot: s }));
 
   if (typeof AMapRef.MarkerCluster === 'function') {
     // 着色逻辑变更后必须重建，避免沿用旧的全蓝 renderClusterMarker
     clearCluster();
+    if (!data.length) return;
     cluster = new AMapRef.MarkerCluster(map, data, {
       gridSize: 70,
       maxZoom: 12,
@@ -513,7 +541,7 @@ function renderSpots() {
     return;
   }
 
-  // 降级：聚合插件不可用时直接画普通 Marker（点位上限 600，避免过载）
+  // 降级：聚合插件不可用时直接画普通 Marker
   clearCluster();
   for (const item of data.slice(0, 600)) {
     const spot = item.spot;
@@ -527,6 +555,94 @@ function renderSpots() {
     map.add(m);
     plainMarkers.push(m);
   }
+}
+
+/**
+/**
+/**
+ * 公路侧点渲染：**省级聚合标记**（不是逐点画）。
+ *
+ * 走过的两条弯路，都留在这里别再踩：
+ *  1. AMap.MassMarks（Canvas 批量绘制）—— 实测在当前环境下**一个点都不画**，
+ *     MassMarks 是图片标记 API，内联 SVG data URI + anchor 都不生效。
+ *  2. 普通 Marker 逐点画 —— 实测 4000 个 Marker 产生 **10.7 秒主线程长任务**
+ *     （约 2.7ms/Marker），页面直接卡死。1.2 万点这条路根本走不通。
+ *
+ * 现在的方案：按省份聚合成 30 来个标记（瞬时渲染），
+ * 密度交给热力图层承载（AMap.HeatMap 走 canvas，1.2 万点无压力，
+ * 权重口径见 renderHeat）。这与参考 UI 的聚合圆圈是同一种表达。
+ * 点击省标记 = 切换该省的筛选，侧栏统计与榜单随之收敛。
+ */
+function renderRoadSpots(list: AtlasSpotLite[]) {
+  if (!map || !AMapRef) return;
+  // 切到公路来源但明细还在加载时保持上一次渲染，避免"点先消失再冒出来"
+  if (!list.length && roadLoading.value) return;
+  clearRoadSpots();
+  if (!list.length) return;
+
+  // 按省份聚合
+  const groups = new Map<string, AtlasSpotLite[]>();
+  for (const s of list) {
+    const key = s.province ?? '';
+    const arr = groups.get(key);
+    if (arr) arr.push(s);
+    else groups.set(key, [s]);
+  }
+
+  for (const [prov, items] of groups) {
+    let lng = 0;
+    let lat = 0;
+    let scoreSum = 0;
+    for (const s of items) {
+      lng += s.lng;
+      lat += s.lat;
+      scoreSum += s.score ?? 60;
+    }
+    const count = items.length;
+    const size = count < 50 ? 28 : count < 300 ? 34 : 42;
+    const label = prov || '未标注省份';
+    const marker = new AMapRef.Marker({
+      position: [lng / count, lat / count],
+      content:
+        '<div class="atlas-prov-cluster" data-prov="' + escHtml(prov) + '" style="width:' + size + 'px;height:' + size + 'px">' +
+        '<span class="atlas-prov-cluster__name">' + escHtml(label) + '</span>' +
+        '<em class="atlas-prov-cluster__num">' + count + '</em>' +
+        '</div>',
+      offset: new AMapRef.Pixel(-size / 2, -size / 2),
+      zIndex: 95,
+      cursor: 'pointer',
+      title: label + ' · ' + count + ' 处景点（点击只看该省）',
+    });
+    map.add(marker);
+    roadPlainMarkers.push(marker);
+  }
+}
+
+/**
+ * 省聚合标记的点击：走**地图容器上的事件委托**而不是 Marker.on('click')。
+ * AMap 2.0 的 Marker 事件在部分环境下不稳定触发（合成点击测不到），
+ * 委托到容器上用 data-prov 判定最可靠，行为与用户直觉一致。
+ */
+function onMapClickDelegated(event: MouseEvent) {
+  const el = (event.target as HTMLElement)?.closest?.('[data-prov]') as HTMLElement | null;
+  const prov = el?.dataset?.prov;
+  if (!prov) return;
+  if (activeProvinces.value.includes(prov)) {
+    activeProvinces.value = activeProvinces.value.filter((p) => p !== prov);
+  } else {
+    activeProvinces.value = [prov];
+  }
+}
+
+function clearRoadSpots() {
+  for (const m of roadPlainMarkers) {
+    try {
+      map?.remove(m);
+    } catch {
+      /* ignore */
+    }
+  }
+  roadPlainMarkers = [];
 }
 
 function resolveHeatMapCtor(): (new (...args: any[]) => any) | null {
@@ -555,10 +671,24 @@ function renderHeat() {
     return;
   }
 
-  // HeatMap 走 canvas，颜色必须是实色；CSS 变量无效会导致整层不渲染
+  /*
+   * HeatMap 走 canvas，颜色必须是实色；CSS 变量无效会导致整层不渲染。
+   *
+   * 权重口径（v0.6.4 修正）：原先每点 count 固定 1、max 按总数动态
+   * （`points.length / 80`）。切到公路来源后点数从 624 涨到 1.2 万，
+   * max 随之变成 ~151，单点相对强度降到 1/151 —— 热力层几乎不可见，
+   * 表现为「热力图开关打开但看不到东西」。
+   * 改为：max 固定 12（有评分用评分、无评分用 1），密度差异由点数与评分共同表达，
+   * 两侧来源的观感一致，且高评分景点自然更热。
+   */
   const points = filteredSpots.value
     .filter((s) => Number.isFinite(s.lng) && Number.isFinite(s.lat))
-    .map((s) => ({ lng: s.lng, lat: s.lat, count: 1 }));
+    .map((s) => ({
+      lng: s.lng,
+      lat: s.lat,
+      // 评分 0–100 → 1–12；无评分（铁路侧数据源无 score）按 6 计
+      count: Number.isFinite(s.score) ? Math.max(1, Math.min(12, s.score! / 8)) : 6,
+    }));
   if (!points.length) return;
 
   try {
@@ -576,7 +706,8 @@ function renderHeat() {
       zIndex: 120,
     });
     heat.setDataSet({
-      max: Math.max(3, Math.ceil(points.length / 80)),
+      // 固定上限：与来源无关，铁路/公路两侧观感一致
+      max: 12,
       data: points,
     });
     heat.show?.();
@@ -913,6 +1044,8 @@ async function initMap() {
       closeSpotInfo();
       return;
     }
+    // 省聚合标记：点击只看该省（事件委托，见 onMapClickDelegated 注释）
+    onMapClickDelegated(event);
   });
   // 点空白处收起高亮蓝线（路网已不可点，避免密线区误触）
   map.on('click', () => {
@@ -990,6 +1123,7 @@ onUnmounted(() => {
   }
   clearFocusMarker();
   clearCluster();
+  clearRoadSpots();
   for (const l of baseLines) {
     try {
       map?.remove(l);
@@ -1164,12 +1298,20 @@ watch(spotOrigin, (v) => {
                 </template>
               </template>
             </span>
+            <button v-if="activeDims.length || activeProvinces.length" type="button" class="atlas-link" @click="clearFilters">
+              清空筛选
+            </button>
           </div>
+          <!-- 公路侧为省级聚合标记，密度请配合热力图查看 -->
+          <p class="atlas-block__note">
+            地图上公路景点按省份聚合显示（数字为该省景点数，点击只看该省）；
+            开启「热力图」可查看全国密度分布。
+          </p>
 
           <!-- 景点统计：当前筛选范围的来源与分级占比（鸿蒙展示类：数据可视化用进度条表达） -->
           <div class="atlas-stats" role="group" aria-label="景点统计">
             <div class="atlas-stat">
-              <span class="atlas-stat__num">{{ spotStats.total }}</span>
+              <span class="atlas-stat__num">{{ spotStats.pending ? '…' : spotStats.total }}</span>
               <span class="atlas-stat__label">当前筛选景点</span>
             </div>
             <div class="atlas-stat">
@@ -1177,7 +1319,7 @@ watch(spotOrigin, (v) => {
               <span class="atlas-stat__label">铁路景点</span>
             </div>
             <div class="atlas-stat">
-              <span class="atlas-stat__num">{{ spotStats.road }}</span>
+              <span class="atlas-stat__num">{{ spotStats.pending ? '…' : spotStats.road }}</span>
               <span class="atlas-stat__label">公路景点</span>
             </div>
           </div>
@@ -2179,5 +2321,249 @@ watch(spotOrigin, (v) => {
   font-size: 11px;
   color: var(--text-secondary);
   line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   v0.6.4 布局修复
+   下面这组样式在 ba6d8d6「走廊全屏地图页」那次提交里连同旧侧栏结构
+   一起被删除，但模板仍在引用它们，后果是：
+     · .atlas-side 退化成无样式的裸块流 —— 侧栏横跨整个屏幕压住地图；
+     · 顶部条与「公路图层 / 热力图 / 收起侧栏」按钮失去玻璃质感、挤在左上角。
+   按 c00bc19 原样恢复，并补齐同批引入的 .atlas-dock* 内部结构样式
+   （那批只改了模板结构、没写样式）。
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── 顶部条 ── */
+.atlas-top {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-raised);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.atlas-top__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.atlas-top__eyebrow {
+  margin: 0;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.atlas-top__title h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── 图层 / 热力图 / 收起侧栏 开关 ── */
+.atlas-toggle {
+  flex: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
+}
+
+.atlas-toggle.is-on {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 52%, transparent);
+  color: var(--text-primary);
+}
+
+.atlas-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── 侧栏：地图之上的窄栏（≤720vp 落到底部） ── */
+.atlas-side {
+  position: absolute;
+  top: 66px;
+  left: 12px;
+  bottom: 12px;
+  z-index: 4;
+  width: 302px;
+  padding: 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-raised);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  transition: width var(--dur-base) var(--ease-out), padding var(--dur-base) var(--ease-out);
+}
+
+.atlas-side.is-collapsed {
+  width: 34px;
+  padding: 6px;
+  overflow: hidden;
+}
+
+.atlas-side__open,
+.atlas-dock__open {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: var(--border-hairline);
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ── 侧栏内部结构（ba6d8d6 引入的 dock 结构） ── */
+.atlas-dock__head {
+  display: grid;
+  gap: 8px;
+}
+
+.atlas-dock__nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.atlas-dock__title {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.atlas-dock__identity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.atlas-dock__name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.atlas-dock__sub {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.atlas-dock__body {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+/* 线路聚焦时地图上的定位点 */
+.route-dot {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--dot, var(--accent));
+  color: var(--bg-base);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* 公路景点：琥珀色小点（与铁路侧的六维着色区分） */
+.atlas-dot--road {
+  --dot: #ffb84d;
+  width: 7px;
+  height: 7px;
+  box-shadow: 0 0 6px rgba(255, 184, 77, 0.55);
+}
+
+/*
+ * 公路侧省级聚合标记。
+ * 1.2 万个点逐个画 Marker 实测产生 10.7 秒主线程长任务（≈2.7ms/个），
+ * 页面直接卡死；改为按省聚合（30 来个标记）后瞬时完成，
+ * 密度分布交给热力图层（AMap.HeatMap 走 canvas，1.2 万点无压力）。
+ */
+.atlas-prov-cluster {
+  display: grid;
+  place-content: center;
+  gap: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 184, 77, 0.75);
+  background: radial-gradient(circle at 35% 30%, rgba(255, 208, 138, 0.95), rgba(255, 160, 40, 0.85));
+  color: #1a1206;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 0 14px rgba(255, 168, 60, 0.45);
+  cursor: pointer;
+  /* 数字为主、省名为辅：省名太长会挤爆小圆，截断即可 */
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.atlas-prov-cluster__name {
+  font-size: 8px;
+  line-height: 1.1;
+  opacity: 0.85;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.atlas-prov-cluster__num {
+  font-size: 12px;
+  line-height: 1.1;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 响应式：窄屏侧栏改为底部抽屉 ── */
+@media (max-width: 720px) {
+  .atlas-side {
+    top: auto;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: 46vh;
+  }
+
+  .atlas-top {
+    right: 12px;
+  }
 }
 </style>

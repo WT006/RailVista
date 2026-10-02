@@ -293,7 +293,7 @@ const levelLabel: Record<string, string> = {
                   <input
                     v-model="from"
                     autocomplete="off"
-                    placeholder="地名 / 公路编号，例如 上海 或 G318"
+                    placeholder="例如 上海 或 G318"
                     @input="refreshSuggest('from')"
                     @focus="fromOpen = fromSuggest.length > 0"
                     @blur="fromOpen = false"

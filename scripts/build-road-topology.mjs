@@ -82,16 +82,24 @@ for (const f of files) {
   const flag = cls === 'expressway' ? 1 : cls === 'national' ? 2 : 4;
 
   // 采样建链：逐点，但跳过过密点（≥200m 才成边，控制边数）
-  let prev = nodeIdOf(g.points[0][0], g.points[0][1]);
-  let prevPt = g.points[0];
-  for (let i = 1; i < g.points.length; i += 1) {
-    const p = g.points[i];
-    const d = haversineKm([prevPt[0], prevPt[1]], [p[0], p[1]]);
-    if (d < 0.2 && i !== g.points.length - 1) continue;
-    const id = nodeIdOf(p[0], p[1]);
-    addEdge(prev, id, d * coef, flag, line);
-    prev = id;
-    prevPt = p;
+  const buildEdges = (pts) => {
+    if (!Array.isArray(pts) || pts.length < 2) return;
+    let prev = nodeIdOf(pts[0][0], pts[0][1]);
+    let prevPt = pts[0];
+    for (let i = 1; i < pts.length; i += 1) {
+      const p = pts[i];
+      const d = haversineKm([prevPt[0], prevPt[1]], [p[0], p[1]]);
+      if (d < 0.2 && i !== pts.length - 1) continue;
+      const id = nodeIdOf(p[0], p[1]);
+      addEdge(prev, id, d * coef, flag, line);
+      prev = id;
+      prevPt = p;
+    }
+  };
+  buildEdges(g.points);
+  // segments 段建边入拓扑（多段几何的 orphan 段也参与拓扑，提升主分量连通性）
+  if (Array.isArray(g.segments)) {
+    for (const seg of g.segments) buildEdges(seg);
   }
   roadsUsed += 1;
 }

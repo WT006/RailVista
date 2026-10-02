@@ -22,7 +22,8 @@ import {
 import {
   decimatePoints,
   getRoadEntry,
-  getRoadGeometry,
+
+  getRoadGeometryFull,
   isValidRoadKey,
   networkStats,
   roadNetworkOverview,
@@ -65,7 +66,7 @@ driveRoute.get('/road/:key', (c) => {
   if (!entry) {
     return c.json({ ok: false, error: { code: 'NOT_FOUND', message: `公路不在册：${key}` } }, 404);
   }
-  const geom = getRoadGeometry(key);
+  const geom = getRoadGeometryFull(key);
   if (!geom) {
     // 诚实返回：索引在册但几何待补（PRD §3.1 不能装作什么都有）
     return c.json({
@@ -80,6 +81,9 @@ driveRoute.get('/road/:key', (c) => {
   // 传输抽稀：默认 ≤600 点；?full=1 返回原始几何（含逐点 cumKm）
   const full = c.req.query('full') === '1';
   const points = full ? geom.points : decimatePoints(geom.points, 600);
+  const segments = full
+    ? geom.segments
+    : geom.segments.map((seg) => decimatePoints(seg, 600));
   const totalKm = geom.cumKm[geom.cumKm.length - 1] ?? entry.lengthKm;
   return c.json({
     ok: true,
@@ -88,6 +92,10 @@ driveRoute.get('/road/:key', (c) => {
       geometry: { key: geom.key, points, nodes: geom.nodes, simplified: geom.simplified },
       totalKm: Math.round(totalKm * 10) / 10,
       spotCount: entry.spotCount,
+      segments,
+      gapAnnotations: geom.gapAnnotations,
+      segmentCount: geom.segmentCount,
+      gapCount: geom.gapCount,
     },
   });
 });
@@ -133,7 +141,9 @@ driveRoute.get('/along', async (c) => {
       return c.json({ ok: false, error: { code: 'NOT_FOUND', message: `公路不在册或几何待补：${roadKey}` } }, 404);
     }
     route.engine = 'road-geometry';
-    route.engineNote = '整条公路 L1 几何（OSM 众包还原，里程为估算）';
+    route.engineNote = route.segments?.length
+      ? `整条公路 L1 几何（OSM 众包还原，部分段，${route.gapAnnotations?.length ?? 0} 处未贯通，里程为估算）`
+      : '整条公路 L1 几何（OSM 众包还原，里程为估算）';
   } else if (routeId) {
     // 榜单 / 路书条目（v1 DriveRoute 打样数据）
     const legacy = getDriveRoute(routeId);

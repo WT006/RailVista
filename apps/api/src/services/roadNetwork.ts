@@ -9,7 +9,7 @@
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { RoadGeometry, RoadIndexEntry, RoadNetworkStats } from '@railvista/shared';
+import type { RoadGeometry, RoadIndexEntry, RoadNetworkStats, RoadPoint, GapAnnotation } from '@railvista/shared';
 import { computeCumKm } from '@railvista/shared';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -105,6 +105,23 @@ export function getRoadGeometry(key: string): RoadGeometry | null {
   }
 }
 
+/**
+ * L1 几何完整读取（含 segments + gapAnnotations + 统计）。
+ * segments 缺失时按单段处理（segments: []、segmentCount: 1、gapCount: 0），向后兼容。
+ */
+export function getRoadGeometryFull(key: string): (RoadGeometry & {
+  segments: RoadPoint[][];
+  gapAnnotations: GapAnnotation[];
+  segmentCount: number;
+  gapCount: number;
+}) | null {
+  const g = getRoadGeometry(key);
+  if (!g) return null;
+  const segments = Array.isArray(g.segments) ? g.segments : [];
+  const gapAnnotations = Array.isArray(g.gapAnnotations) ? g.gapAnnotations : [];
+  return { ...g, segments, gapAnnotations, segmentCount: 1 + segments.length, gapCount: gapAnnotations.length };
+}
+
 /** 折线抽稀：均匀取样至 ≤ maxPoints（地图渲染用，不改原始几何） */
 export function decimatePoints<T extends [number, number, number?]>(points: T[], maxPoints: number): T[] {
   if (points.length <= maxPoints) return points;
@@ -118,7 +135,7 @@ export function decimatePoints<T extends [number, number, number?]>(points: T[],
 
 /** 地图公路图层：有几何的路线抽稀折线（≤160 点/条） */
 export function roadNetworkOverview(): {
-  roads: Array<{ key: string; ref: string; name?: string; class: RoadIndexEntry['class']; polyline: [number, number][]; lengthKm: number }>;
+  roads: Array<{ key: string; ref: string; name?: string; class: RoadIndexEntry['class']; polyline: [number, number][]; lengthKm: number; segments?: [number, number][][]; gapCount?: number }>;
   updated: string;
 } {
   const { entries, updated } = loadRoadIndex();
@@ -127,6 +144,11 @@ export function roadNetworkOverview(): {
     if (!e.hasGeom) continue;
     const g = getRoadGeometry(e.key);
     if (!g) continue;
+    const segments =
+      Array.isArray(g.segments) && g.segments.length > 0
+        ? g.segments.map((seg) => decimatePoints(seg, 160).map((p) => [p[0], p[1]] as [number, number]))
+        : undefined;
+    const gapCount = Array.isArray(g.gapAnnotations) ? g.gapAnnotations.length : 0;
     roads.push({
       key: e.key,
       ref: e.ref,
@@ -134,6 +156,8 @@ export function roadNetworkOverview(): {
       class: e.class,
       polyline: decimatePoints(g.points, 160).map((p) => [p[0], p[1]] as [number, number]),
       lengthKm: e.lengthKm,
+      segments,
+      gapCount: gapCount > 0 ? gapCount : undefined,
     });
   }
   return { roads, updated };

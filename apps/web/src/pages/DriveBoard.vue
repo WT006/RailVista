@@ -11,6 +11,9 @@ import { useRoute } from 'vue-router';
 import { api } from '../api/client';
 import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
+import { usePointerSpotlight } from '../composables/usePointerSpotlight';
+
+usePointerSpotlight();
 import type { RankingBoard, RankingItem } from '@railvista/shared';
 
 const route = useRoute();
@@ -63,8 +66,13 @@ onMounted(async () => {
     <main class="rv-shell">
       <DriveSubNav />
 
-      <div v-if="loading" class="drive-empty">正在翻榜单…</div>
-      <div v-else-if="error || !board" class="drive-empty">{{ error || '榜单不存在' }}</div>
+      <div v-if="loading" class="drive-skeleton">
+        <div class="drive-skeleton__line drive-skeleton__line--wide" />
+        <div class="drive-skeleton__line drive-skeleton__line--mid" />
+        <div class="drive-skeleton__line drive-skeleton__line--narrow" />
+        <div class="drive-skeleton__line drive-skeleton__line--wide" />
+      </div>
+      <div v-else-if="error || !board" class="drive-empty drive-empty--error">{{ error || '榜单不存在' }}</div>
 
       <template v-else>
         <header class="drive-hero">

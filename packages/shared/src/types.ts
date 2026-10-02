@@ -598,6 +598,22 @@ export interface RoadGeometryNode {
   type: 'city' | 'junction' | 'service' | 'pass' | 'endpoint';
 }
 
+/** 段间断点状态：normal 正常小断点 / suspect 可疑大断点(>200km) / no_connect 无连通way / urban_skip 城市区域跳过 */
+export type GapStatus = 'normal' | 'suspect' | 'no_connect' | 'urban_skip';
+
+/** 段间断点标注（主链与 segments 之间、segments 之间的未贯通处） */
+export interface GapAnnotation {
+  /** 断点在全线中的里程位置（km） */
+  atKm: number;
+  /** 未贯通 Haversine 距离（km），>200 时 status='suspect' */
+  gapKm: number;
+  /** 断点起始段索引：0=主链，1+=segments 索引 */
+  fromSeg: number;
+  /** 断点终止段索引 */
+  toSeg: number;
+  status: GapStatus;
+}
+
 /** L1 几何（data/roads/geom/{key}.json，按 key 懒加载） */
 export interface RoadGeometry {
   key: string;
@@ -606,6 +622,10 @@ export interface RoadGeometry {
   cumKm: number[];
   nodes: RoadGeometryNode[];
   simplified: boolean;
+  /** 多段几何数组（orphan 链按里程降序，每段 ≥2 点）；缺失或空数组表示单段几何，向后兼容旧文件 */
+  segments?: RoadPoint[][];
+  /** 段间断点标注数组（主链末点↔segments 首点、segments 间） */
+  gapAnnotations?: GapAnnotation[];
 }
 
 /** 公路侧景点沿程可见性（与铁路 SpotVisibility 的语义差异见 PRD §5.3） */
@@ -658,6 +678,10 @@ export interface RoadRoute {
   engine?: string;
   /** 引擎说明（诚实标注，UI 直接展示） */
   engineNote?: string;
+  /** 多段几何（orphan 链，主链外未贯通段，前端可渲染为虚线） */
+  segments?: RoadPoint[][];
+  /** 段间断点标注（主链与 segments 之间未贯通处） */
+  gapAnnotations?: GapAnnotation[];
 }
 
 /** 搜索命中类别（PRD §4 四类索引） */

@@ -4,11 +4,12 @@
  *   - 每条国道长度与官方里程偏差 >±25% → 告警（partial / broken 标记）
  *   - 连通分量检测：干线应落在 1 个主分量（含跨省接续）
  *   - 几何跳点 >5km 的段 → 标 broken
+ *   - 段间断点检测：主链↔segments、segments 间距离 >200km 标 suspect_gap
  *
  * 用法：node scripts/verify-road-network.mjs
- * 产物：data/roads/coverage-gap.csv（缺几何/超差的在册编号）
+ * 产物：data/roads/coverage-gap.csv（8 列：key,ref,officialKm,measuredKm,deviation,status,segmentCount,gapCount）
  */
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { haversineKm } from './lib/overpass.mjs';
@@ -54,11 +55,18 @@ function angleDiff(a, b) {
   return (d * 180) / Math.PI;
 }
 
+/** 计算折线总里程（km） */
+function totalKm(coords) {
+  let acc = 0;
+  for (let i = 1; i < coords.length; i += 1) acc += haversineKm(coords[i - 1], coords[i]);
+  return acc;
+}
+
 for (const e of entries) {
   const geomPath = join(GEOM_DIR, `${e.key.replace(/[^\w:]/g, '_')}.json`);
   if (!existsSync(geomPath) || e.hasGeom === false) {
     missing += 1;
-    gaps.push([e.key, 'no-geometry', '', e.lengthKm].join(','));
+    gaps.push([e.key, e.ref, e.lengthKm, '', '', 'no-geometry', 0, 0].join(','));
     continue;
   }
   let g;
@@ -66,15 +74,27 @@ for (const e of entries) {
     g = JSON.parse(readFileSync(geomPath, 'utf8'));
   } catch {
     broken += 1;
-    gaps.push([e.key, 'broken-json', '', e.lengthKm].join(','));
+    gaps.push([e.key, e.ref, e.lengthKm, '', '', 'broken-json', 0, 0].join(','));
     continue;
   }
   const points = g.points ?? [];
   if (points.length < 2) {
     broken += 1;
-    gaps.push([e.key, 'too-few-points', points.length, e.lengthKm].join(','));
+    gaps.push([e.key, e.ref, e.lengthKm, '', '', 'too-few-points', 0, 0].join(','));
     continue;
   }
+
+  // 段间断点检测：主链↔segments、segments 间（gapAnnotations 已在抓取时计算）
+  const segments = Array.isArray(g.segments) ? g.segments : [];
+  const gapAnnotations = Array.isArray(g.gapAnnotations) ? g.gapAnnotations : [];
+  const segmentCount = 1 + segments.length;
+  const gapCount = gapAnnotations.length;
+  const suspectGaps = gapAnnotations.filter((a) => a.status === 'suspect').length;
+
+  // 实测里程 = 主链 + segments 总和（多段几何的完整覆盖）
+  const mainKm = g.cumKm?.length === points.length ? g.cumKm[g.cumKm.length - 1] : totalKm(points);
+  const segKm = segments.reduce((s, seg) => s + totalKm(seg), 0);
+  const measuredKm = mainKm + segKm;
 
   // 跳点检测（>5km 的段）：
   // 注意 DP 简化后的笔直长段（青藏线柴达木段可连续数十公里直线）不是跳点，
@@ -94,25 +114,31 @@ for (const e of entries) {
   }
 
   // 与官方里程偏差（官方里程参考值来自 authoritative/，为 0 时跳过比对）
-  const geomKm = g.cumKm?.length === points.length ? g.cumKm[g.cumKm.length - 1] : null;
   const refKm = officialKm.get(e.key) ?? 0;
-  if (geomKm == null || !refKm) {
+  if (!refKm) {
     partial += 1;
-    gaps.push([e.key, 'no-official-km', geomKm?.toFixed?.(1) ?? '', refKm].join(','));
+    gaps.push([e.key, e.ref, '', measuredKm.toFixed(1), '', 'no-official-km', segmentCount, gapCount].join(','));
     continue;
   }
-  const dev = Math.abs(geomKm - refKm) / refKm;
+  const dev = Math.abs(measuredKm - refKm) / refKm;
+  const devPct = Math.round(dev * 100);
+
   if (jumps > 0 || dev > DEVIATION_LIMIT * 3) {
     broken += 1;
-    console.warn(`✗ ${e.key}: 偏差 ${(dev * 100).toFixed(0)}%（${geomKm.toFixed(0)} vs 官方 ${refKm} km）· 跳点 ${jumps} → broken`);
-    gaps.push([e.key, 'broken', geomKm.toFixed(1), refKm].join(','));
+    console.warn(`✗ ${e.key}: 偏差 ${devPct}%（${measuredKm.toFixed(0)} vs 官方 ${refKm} km）· 跳点 ${jumps} · 段 ${segmentCount} · 断点 ${gapCount} → broken`);
+    gaps.push([e.key, e.ref, refKm, measuredKm.toFixed(1), devPct, 'broken', segmentCount, gapCount].join(','));
+  } else if (suspectGaps > 0) {
+    partial += 1;
+    console.warn(`⚠ ${e.key}: 偏差 ${devPct}%（${measuredKm.toFixed(0)} vs 官方 ${refKm} km）· 可疑断点 ${suspectGaps} → suspect_gap`);
+    gaps.push([e.key, e.ref, refKm, measuredKm.toFixed(1), devPct, 'suspect_gap', segmentCount, gapCount].join(','));
   } else if (dev > DEVIATION_LIMIT) {
     partial += 1;
-    console.warn(`⚠ ${e.key}: 偏差 ${(dev * 100).toFixed(0)}%（${geomKm.toFixed(0)} vs 官方 ${refKm} km）→ partial`);
-    gaps.push([e.key, 'partial', geomKm.toFixed(1), refKm].join(','));
+    console.warn(`⚠ ${e.key}: 偏差 ${devPct}%（${measuredKm.toFixed(0)} vs 官方 ${refKm} km）· 段 ${segmentCount} · 断点 ${gapCount} → partial`);
+    gaps.push([e.key, e.ref, refKm, measuredKm.toFixed(1), devPct, 'partial', segmentCount, gapCount].join(','));
   } else {
     ok += 1;
-    console.log(`✓ ${e.key}: ${geomKm.toFixed(0)} km（偏差 ${(dev * 100).toFixed(0)}%）`);
+    console.log(`✓ ${e.key}: ${measuredKm.toFixed(0)} km（偏差 ${devPct}%）· 段 ${segmentCount} · 断点 ${gapCount}`);
+    gaps.push([e.key, e.ref, refKm, measuredKm.toFixed(1), devPct, 'ok', segmentCount, gapCount].join(','));
   }
 }
 
@@ -122,6 +148,6 @@ if (existsSync(TOPO_META)) {
   console.log(`\n拓扑：${meta.nodeCount} 节点 / ${meta.edgeCount} 边，主分量 ${meta.mainCompNodes} 节点（应覆盖绝大多数干线）`);
 }
 
-writeFileSync(GAP_CSV, ['key,issue,geomKm,officialKm'].join('\n') + '\n' + gaps.join('\n') + '\n', 'utf8');
+writeFileSync(GAP_CSV, ['key,ref,officialKm,measuredKm,deviation,status,segmentCount,gapCount'].join('\n') + '\n' + gaps.join('\n') + '\n', 'utf8');
 console.log(`\n汇总：ok ${ok} · partial ${partial} · broken ${broken} · 缺几何 ${missing} / 在册 ${entries.length}`);
 console.log(`缺口清单 → data/roads/coverage-gap.csv`);

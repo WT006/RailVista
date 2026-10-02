@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.4.2`**（2026-10-01）
+**当前版本：`0.5.1`**（2026-10-02）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,105 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.5.1] — 2026-10-02
+
+**自驾模块 UI 优化**（分支 `heyworldchannel-20261001`，P1-P7 七阶段，对应 `.codeartsdoer/specs/drive_ui_optimize/`）。
+
+### P1 基础清理：硬编码色值清零 + 字号对齐
+
+- `drive.css`：`#d97706` → `var(--warning)`（gap-note）；`.drive-block-title` 字号 `--fs-meta` → `--fs-h2`；`.drive-boards__title` 字号 `--fs-h3` → `--fs-h2`。
+- `DriveRoad.vue`：引入 `ROAD_COLORS` + 新增 `tierColor()` 函数，替换内联 hex 三元。
+
+### P2 composable 挂载：指针光晕全量覆盖
+
+- 6 个自驾页面（DriveHome/DriveRoad/DriveTrip/DriveBoard/DriveRankings/DriveRoadbook）均挂载 `usePointerSpotlight()`。
+- `DriveRoadbook.vue` 补齐 `DriveSubNav` import + 模板 `<DriveSubNav />`。
+
+### P3 卡片三件套：悬停光影/微缩放/渐显反馈/入场动画
+
+- `drive.css` 追加约 100 行：自定义卡片类（`.drive-route-card`/`.drive-stat`/`.drive-board-card`/`.drive-chapter`/`.drive-highlight`/`.drive-spot`）的 `::after` 径向光晕 + `::before` 高光带 + `:hover` 三件套 + `transition` + `rv-card-in` 入场动画 + `:nth-child` 错峰延迟 + `.drive-spot` 玻璃材质 + `prefers-reduced-motion` 降级。
+
+### P4 按钮四态：按压/聚焦/悬停/默认
+
+- `drive.css` 追加约 40 行：自定义按钮类（`.drive-trip-tab`/`.road-kbd__chip`/`.road-kbd__prefix`/`.road-kbd__digit`）的 `:active:not(:disabled)` 按压态 + `:focus-visible` 聚焦环 + `transition`。
+
+### P5 路线绘制与滚动揭示
+
+- 新建 `useScrollReveal.ts`（IntersectionObserver 滚动揭示）+ `useRoadDraw.ts`（SVG `stroke-dasharray`/`stroke-dashoffset` 绘制动画）。
+- `DriveRoad.vue`/`DriveTrip.vue`：挂载 composable + `routePathRef` + 模板 `<path ref="routePathRef">` + `.drive-spot` 追加 `drive-scroll-reveal` 类。
+
+### P6 Transition 过渡
+
+- `drive.css` 追加 Transition 过渡类：`.drive-trip-panel-*`（三入口切换 600ms）+ `.drive-spot-expand-*`（景点展开 250ms）+ `.drive-subnav-menu-*`（路书菜单 250ms 弹性）。
+- `DriveTrip.vue`：`<Transition name="drive-trip-panel">` 包裹 DriveLivePanel + `<Transition name="drive-spot-expand">` 包裹景点展开内容。
+- `DriveSubNav.vue`：`<Transition name="drive-subnav-menu">` 包裹路书菜单。
+
+### P7 骨架屏 + 错误态 + 章节条 tooltip + 响应式断点重写
+
+- `drive.css`：`@keyframes drive-skeleton-pulse` + `.drive-skeleton`/`.drive-skeleton__line` 类 + `.drive-empty--error` 错误态修饰类 + `.drive-chapterbar__seg::after` tooltip + `prefers-reduced-motion` 降级。
+- 响应式断点重写：`max-width` 降序 → `min-width` 升序（600px/840px/1200px），mobile-first 与 `tokens.css` 方向一致。
+- `DriveRoad.vue`/`DriveTrip.vue`/`DriveBoard.vue`：加载态用骨架屏替代文本。
+- 5 个自驾页面错误态追加 `.drive-empty--error` 修饰类。
+- `DriveTrip.vue`：章节条段追加 `data-title` 属性绑定。
+
+### 验证
+
+- 类型检查（shared + api + web）全部通过。
+- 174 单测全绿，构建通过。
+- `tokens.css`/`base.css`/`api/client.ts` 未修改（只读引用约束）。
+- `drive.css` 无硬编码 hex 色值，3 处 `prefers-reduced-motion` 降级规则。
+
+---
+
+## [0.5.0] — 2026-10-02
+
+**公路路网多段几何 + 段间断点标注**（分支 `heyworldchannel-20261001`，P0 公路路网建设）。
+
+### 1. 多段几何存储（RoadGeometry.segments + gapAnnotations）
+
+- `packages/shared/src/types.ts`：`RoadGeometry` 新增可选字段 `segments?: RoadPoint[][]`（orphan 链）+ `gapAnnotations?: GapAnnotation[]`（断点标注）；新增 `GapStatus` 类型 + `GapAnnotation` 接口（atKm/gapKm/fromSeg/toSeg/status）。
+- `RoadRoute` 同步扩展 `segments?` + `gapAnnotations?`，向后兼容（旧数据无字段时按单段处理）。
+
+### 2. 几何抓取改造（chainAll 保留 orphan 链 + 段间断点标注）
+
+- `scripts/lib/overpass.mjs`：新增 `computeGapAnnotations`（主链末点 ↔ segment 首点 Haversine，>200km 标 suspect）+ `fetchConnectingWaysAround`；`fetchWaysForRef` 新增 `officialKm` 参数，长线(>1000km) relation 优先。
+- `scripts/fetch-road-geometry.mjs`：`chainAll` 返回 `{main, segments, gapAnnotations, orphans}`（**修复：之前 orphan 链被丢弃**）；`fetchOne` 写入 segments 到几何文件；新增 `sleep`/`runBatched` 限流分批 + `--provincial-tiling`/`--batch` 参数。
+- 33 条已抓线重跑成功（零网络成本，缓存命中），segments 全部填充。G318 实测 6202km（主链+71段，偏差 13% vs 之前 1954km 偏差 64%）。
+
+### 3. 省级分片抓取（province-bbox）
+
+- `scripts/lib/province-bbox.mjs`（**新建**）：34 省 bbox + `mergeProvincialWays` 去重。
+- `scripts/lib/overpass.mjs`：新增 `fetchWaysByProvincialTiling` 分片抓取（长线按省分片，合并去重）。
+
+### 4. 拓扑重建（segments 段建边）
+
+- `scripts/build-road-topology.mjs`：抽 `buildEdges` 函数，对 `g.points` + `g.segments` 都建边。
+- 拓扑重建效果：节点 40,448→182,007（4.5x），边 44,710→206,609（4.6x），主分量 17,919→31,300（1.75x）。
+
+### 5. 质检报告（8 列 CSV + 段间断点检测）
+
+- `scripts/verify-road-network.mjs`：**重写**，8 列 CSV（key,ref,officialKm,measuredKm,deviation,status,segmentCount,gapCount）+ 段间断点检测 + suspect_gap 状态。
+
+### 6. 服务层 + API + 前端全链路
+
+- `apps/api/src/services/roadNetwork.ts`：新增 `getRoadGeometryFull`（含 segments + gapAnnotations + 统计）；`roadNetworkOverview` 扩展返回 segments + gapCount。
+- `apps/api/src/services/roadRouting.ts`：`planRoadRoute` 改造，用 `getRoadGeometryFull`，返回 segments/gapAnnotations/engineNote（含「部分段，N 处未贯通」）。
+- `apps/api/src/routes/drive.ts`：`/road/:key` 响应加 segments/gapAnnotations/segmentCount/gapCount；`/along` engineNote 含段间断点提示。
+- `apps/web/src/pages/DriveRoad.vue`：SVG 渲染 segments 虚线（opacity 0.45）+ 「⚠ N 处未贯通（合计约 X km）」标注 UI。
+- `apps/web/src/styles/drive.css`：新增 `.drive-trip-map__gap-note` 样式。
+
+### 验证
+
+- 174 单测全绿；apps/api + apps/web 类型检查通过。
+- G318 端到端：主链 1953.5km + 71 段 orphan，gapAnnotations 71 条（54 suspect >200km，17 normal），maxGap 3313.5km。
+
+### 已知限制
+
+- 546 条公路几何待抓取（依赖 Overpass 网络可达性，P6 批量抓取任务）。
+- 段间断点距离为 Haversine 直线距离，非实际道路距离。
 
 ---
 

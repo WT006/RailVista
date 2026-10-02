@@ -11,8 +11,8 @@
  * 本地拓扑不可用时最后降级 direct（两点直连，engine 标注 direct，前端明示）。
  */
 import { computeCumKm, gcj02ToWgs84 } from '@railvista/shared';
-import type { RoadRoute } from '@railvista/shared';
-import { getRoadEntry, getRoadGeometry } from './roadNetwork.js';
+import type { GapAnnotation, RoadPoint, RoadRoute } from '@railvista/shared';
+import { getRoadEntry, getRoadGeometry, getRoadGeometryFull } from './roadNetwork.js';
 import { geocodeFallback, resolvePlace } from './roadIndex.js';
 import { buildChapters } from './roadsideSpots.js';
 import {
@@ -228,14 +228,18 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
   };
 }
 
-/** C2「整条公路」入口：L1 几何直接就是折线（PRD §5.4） */
-export function planRoadRoute(key: string): RoadRoute | null {
+/** C2「整条公路」入口：L1 几何直接就是折线（PRD §5.4），含多段 segments + 断点标注 */
+export function planRoadRoute(key: string): (RoadRoute & {
+  segments?: RoadPoint[][];
+  gapAnnotations?: GapAnnotation[];
+}) | null {
   const entry = getRoadEntry(key);
-  const geom = getRoadGeometry(key);
+  const geom = getRoadGeometryFull(key);
   if (!entry || !geom) return null;
   const coords = geom.points.map((p) => [p[0], p[1]] as [number, number]);
   const cum = computeCumKm(coords);
   const lengthKm = Math.round(cum[cum.length - 1]! * 10) / 10;
+  const hasSegments = geom.segments.length > 0;
   return {
     id: `road-${key}`,
     name: `${entry.ref} ${entry.name ?? ''}`.trim(),
@@ -244,6 +248,12 @@ export function planRoadRoute(key: string): RoadRoute | null {
     lengthKm,
     coords,
     chapters: buildChapters(coords, lengthKm, geom.nodes),
+    engine: 'local',
+    engineNote: hasSegments
+      ? `本地干线几何（部分段，${geom.gapCount} 处未贯通）`
+      : routeEngineNote('local'),
+    segments: hasSegments ? geom.segments : undefined,
+    gapAnnotations: hasSegments ? geom.gapAnnotations : undefined,
   };
 }
 

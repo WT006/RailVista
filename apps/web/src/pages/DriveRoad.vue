@@ -10,14 +10,27 @@ import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
 import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
+import { usePointerSpotlight } from '../composables/usePointerSpotlight';
+import { useRoadDraw } from '../composables/useRoadDraw';
+
+usePointerSpotlight();
 import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
-import { roadColor, roadClassLabel, classOfRef } from '../data/roadColors';
+import { ROAD_COLORS, roadColor, roadClassLabel, classOfRef } from '../data/roadColors';
 import type { AlongSpot, RoadIndexEntry, RoadRoute } from '@railvista/shared';
 
 const route = useRoute();
 const router = useRouter();
 const code = String(route.params.code ?? '');
+
+function tierColor(tier: string): string {
+  if (tier === 'A') return ROAD_COLORS.expressway;
+  if (tier === 'C') return ROAD_COLORS.provincial;
+  return ROAD_COLORS.national;
+}
+
+const routePathRef = ref<SVGPathElement | null>(null);
+useRoadDraw(routePathRef);
 
 const VIEW_W = CHINA_OUTLINE_VIEWBOX.width;
 const VIEW_H = CHINA_OUTLINE_VIEWBOX.height;
@@ -43,6 +56,30 @@ const routePath = computed(() => {
   });
   return d;
 });
+
+/** 多段几何（orphan 链）SVG 路径：虚线渲染未贯通段 */
+const segmentPaths = computed(() => {
+  const segs = roadRoute.value?.segments;
+  if (!segs?.length) return [];
+  return segs
+    .map((seg) => {
+      if (seg.length < 2) return '';
+      let d = '';
+      seg.forEach(([lng, lat], i) => {
+        const [x, y] = lngLatToViewBox(lng, lat);
+        d += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+      });
+      return d;
+    })
+    .filter(Boolean);
+});
+
+/** 段间断点标注 */
+const gapAnnotations = computed(() => roadRoute.value?.gapAnnotations ?? []);
+const hasGaps = computed(() => gapAnnotations.value.length > 0);
+const gapKmTotal = computed(() =>
+  Math.round(gapAnnotations.value.reduce((s, g) => s + g.gapKm, 0)),
+);
 
 const viewBoxAttr = computed(() => {
   const coords = roadRoute.value?.coords;
@@ -100,8 +137,14 @@ function goTripLive() {
     <main class="rv-shell">
       <DriveSubNav />
 
-      <div v-if="loading" class="drive-empty">正在翻开的公路档案…</div>
-      <div v-else-if="error || !entry" class="drive-empty">{{ error || '公路不在册' }}</div>
+      <div v-if="loading" class="drive-skeleton">
+        <div class="drive-skeleton__line drive-skeleton__line--wide" />
+        <div class="drive-skeleton__line drive-skeleton__line--mid" />
+        <div class="drive-skeleton__line drive-skeleton__line--wide" />
+        <div class="drive-skeleton__line drive-skeleton__line--narrow" />
+        <div class="drive-skeleton__line drive-skeleton__line--mid" />
+      </div>
+      <div v-else-if="error || !entry" class="drive-empty drive-empty--error">{{ error || '公路不在册' }}</div>
 
       <template v-else>
         <header class="drive-hero">
@@ -128,7 +171,16 @@ function goTripLive() {
           <section class="drive-trip-map rv-card" data-spotlight>
             <svg :viewBox="viewBoxAttr" class="drive-trip-map__svg" role="img" aria-label="路线示意图">
               <g class="drive-netmap__outline" v-html="outlinePaths" />
-              <path class="drive-trip-map__route" :d="routePath" :stroke="roadColor(entry.class)" />
+              <path ref="routePathRef" class="drive-trip-map__route" :d="routePath" :stroke="roadColor(entry.class)" />
+              <path
+                v-for="(d, i) in segmentPaths"
+                :key="'seg-' + i"
+                class="drive-trip-map__segment"
+                :d="d"
+                :stroke="roadColor(entry.class)"
+                stroke-dasharray="4 3"
+                opacity="0.45"
+              />
               <circle
                 v-for="s in spots.slice(0, 160)"
                 :key="s.id"
@@ -136,12 +188,15 @@ function goTripLive() {
                 :cx="lngLatToViewBox(s.lng, s.lat)[0]"
                 :cy="lngLatToViewBox(s.lng, s.lat)[1]"
                 r="2.4"
-                :fill="s.tier === 'A' ? '#ffb84d' : s.tier === 'C' ? '#7ee0c0' : '#4d9fff'"
+                :fill="tierColor(s.tier)"
               >
                 <title>{{ s.name }} · K{{ Math.round(s.progressKm) }}</title>
               </circle>
             </svg>
             <p class="drive-trip-map__hint">全线走向示意（OSM 众包还原，非官方线位）</p>
+            <p v-if="hasGaps" class="drive-trip-map__gap-note">
+              ⚠ {{ gapAnnotations.length }} 处未贯通（合计约 {{ gapKmTotal }} km），虚线段为示意连接
+            </p>
           </section>
 
           <aside class="drive-trip-side">

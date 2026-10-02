@@ -254,9 +254,14 @@ export function planRoadRoute(key: string): (RoadRoute & {
     provinces: entry.provinces,
     lengthKm,
     coords,
-    // B2-1：端点未经验证时不用 nodes 切章，否则章节标题会写出
-    // 「0—1954 km 上海 — 聂拉木」这种把西藏几何标成上海的假分段。
-    chapters: buildChapters(coords, lengthKm, geom.endpointsUnverified ? undefined : geom.nodes),
+    // v0.6.5：nodes 现在也承载「沿几何反查出来的中途地名」（见
+    // scripts/fill-road-place-anchors.mjs），与「起讫点声明」是两回事。
+    // B2-1 当初因 nodes[0].name="上海" 而几何首点其实在西藏，把 nodes 整体禁用；
+    // 现在端点不可信只影响 UI 的「起点 — 终点」标题（DriveRoad 仍按 B2-1 降级为
+    // 「全线走向（端点待核）」），中途地名段照常展示 —— 实测 G217/G318 两条主干
+    // 都带 endpointsUnverified，禁用 nodes 会让它们的分段永久退化成 120km 数字区间。
+    // 量纲不可信的老数据由 buildChapters 内部的 sanitizePlaceNodes 兜住。
+    chapters: buildChapters(coords, lengthKm, geom.nodes),
     engine: 'local',
     engineNote: hasSegments
       ? `本地干线几何（部分段，${geom.gapCount} 处未贯通）`

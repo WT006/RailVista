@@ -15,7 +15,6 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AlongRouteOptions, AlongSpot, RoadChapter, RoadGeometryNode, RoadsideSpot } from '@railvista/shared';
 import { buildSpotGrid, partitionByChinaLand, spotsAlongRoute, type SpotGrid } from '@railvista/shared';
-import { computeCumKm } from '@railvista/shared';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPOTS_PATH = join(__dirname, '../../../../data/roads/roadside-spots.json');
@@ -95,26 +94,50 @@ export function matchSpotsAlong(
 }
 
 /**
- * 沿程章节：按里程窗口（默认 120km）切段；几何自带 nodes（城市/垭口）时
- * 优先用 node 位置做段界（C2 整条公路入口）。
+ * 沿程章节：优先按几何自带的**地名锚点**（nodes）切段，缺地名时退回 120km 里程等分。
+ *
+ * v0.6.5 两个关键修正（都源于实测数据缺陷，不改会写出荒谬分段）：
+ *
+ * 1. **量纲守卫**：历史 geom 的 `nodes[].atKm` 有两套量纲并存 ——
+ *    `scripts/fill-road-place-anchors.mjs` 新写入的是 **km**，而 2026-09 之前
+ *    落盘的老文件是 **米**（实测 G318 nodes 末值 1385010，而该路 drawnKm=6331.5）。
+ *    直接拿来求 fromKm/toKm 会写出「0—1385010 km」。这里按 `totalKm` 做上限校验：
+ *    锚点必须落在 [0, totalKm*1.35] 内（1.35 容差覆盖「官方里程 vs 主链长度」差异），
+ *    否则整体丢弃 nodes、退回里程等分。
+ *
+ * 2. **端点守卫**：B2-1 曾因 `endpointsUnverified`（端点地名与几何首末点相距 >50km）
+ *    把 nodes 整体禁用。实测干线里 208 条命中该标记，而它们的 nodes 是
+ *    `fill-road-place-anchors.mjs` 沿**几何本身**反查出来的中途地名，与「起讫点声明」
+ *    无关 —— 因此端点不可信不再牵连中途地名。真正的端点声明由 UI 侧
+ *    「端点待核」提示单独降级处理。
+ *
+ * @param coords 主链坐标
+ * @param totalKm 名义里程（km）
+ * @param nodes 几何自带的地名锚点（可能为空、或量纲不可信）
  */
 export function buildChapters(
   coords: [number, number, number?][],
   totalKm: number,
   nodes?: RoadGeometryNode[],
 ): RoadChapter[] {
-  if (nodes && nodes.length >= 2) {
+  const usable = sanitizePlaceNodes(nodes, totalKm);
+  if (usable.length >= 2) {
     const chapters: RoadChapter[] = [];
-    for (let i = 1; i < nodes.length; i += 1) {
-      const a = nodes[i - 1]!;
-      const b = nodes[i]!;
+    for (let i = 1; i < usable.length; i += 1) {
+      const a = usable[i - 1]!;
+      const b = usable[i]!;
       if (b.atKm - a.atKm < 5) continue;
-      chapters.push({ title: `${a.name} — ${b.name}`, fromKm: a.atKm, toKm: b.atKm });
+      chapters.push({
+        title: `${a.name} — ${b.name}`,
+        fromKm: a.atKm,
+        toKm: b.atKm,
+        fromSource: a.source,
+        toSource: b.source,
+      });
     }
     if (chapters.length) return chapters;
   }
   const windowKm = 120;
-  const cum = computeCumKm(coords);
   const chapters: RoadChapter[] = [];
   for (let from = 0; from < totalKm; from += windowKm) {
     const to = Math.min(from + windowKm, totalKm);
@@ -122,4 +145,47 @@ export function buildChapters(
     if (to >= totalKm) break;
   }
   return chapters;
+}
+
+/** 锚点里程上限的容差系数：锚点是沿主链反查的，主链长度可能略短于名义里程 */
+const NODE_KM_TOLERANCE = 1.35;
+/** 相邻锚点的最小里程间隔（km），过近的锚点切出的段没有意义 */
+const NODE_MIN_GAP_KM = 5;
+
+/**
+ * 过滤不可信的地名锚点：非有限值、超出里程量程、里程非单调、同名重复。
+ * 返回按 atKm 升序、同名去重后的可用锚点（保留 source 字段供 UI 分级展示）。
+ * @param nodes 原始锚点
+ * @param totalKm 名义里程（km），用于量程校验；<=0 时跳过量程校验
+ */
+export function sanitizePlaceNodes(
+  nodes: RoadGeometryNode[] | undefined,
+  totalKm: number,
+): RoadGeometryNode[] {
+  if (!Array.isArray(nodes) || !nodes.length) return [];
+  const limitKm = totalKm > 0 ? totalKm * NODE_KM_TOLERANCE : Infinity;
+  const seen = new Set<string>();
+  const out: RoadGeometryNode[] = [];
+  for (const n of nodes) {
+    const name = (n?.name ?? '').trim();
+    const atKm = n?.atKm;
+    // 名地为空 / 里程非有限 / 负里程 / 超出量程（米量纲老数据会在这里被拦下）
+    if (!name || !Number.isFinite(atKm) || atKm < 0 || atKm > limitKm) continue;
+    if (seen.has(name)) continue;
+    seen.add(name);
+    // 历史节点无 source 字段（一律由站名兜底生成），保守标注为 'station'
+    out.push({ name, atKm, type: n.type, source: n.source ?? 'station' });
+  }
+  out.sort((a, b) => a.atKm - b.atKm);
+  // 去掉间距过近的锚点（保留每段里里程更靠后的那个，避免出现 3km 的碎段）
+  const pruned: RoadGeometryNode[] = [];
+  for (const n of out) {
+    const last = pruned[pruned.length - 1];
+    if (last && n.atKm - last.atKm < NODE_MIN_GAP_KM) {
+      pruned[pruned.length - 1] = n;
+      continue;
+    }
+    pruned.push(n);
+  }
+  return pruned;
 }

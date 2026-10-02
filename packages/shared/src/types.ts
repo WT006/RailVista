@@ -598,11 +598,24 @@ export interface RoadIndexEntry {
   componentCount?: number;
 }
 
+/**
+ * v0.6.5：地名锚点的来源分级。
+ *
+ * 「站名兜底」不等于「地名」——铁路站名只是 towns 的一个子集，且站场可能离公路
+ * 沿线数公里。UI 需据此弱化非权威来源，避免把推定地名当成已核实地名展示。
+ *  - amap   ：高德逆地理编码（乡镇/区县级，权威且贴近沿线）
+ *  - place  ：本地地名库（行政地名 + 乡镇级 POI，人工/规则整理）
+ *  - station：铁路站名兜底（最弱，精度最低）
+ */
+export type RoadAnchorSource = 'amap' | 'place' | 'station';
+
 /** L1 几何节点（城市 / 交叉 / 服务 / 垭口 / 端点） */
 export interface RoadGeometryNode {
   name: string;
   atKm: number;
   type: 'city' | 'junction' | 'service' | 'pass' | 'endpoint';
+  /** v0.6.5：地名来源分级；缺省视为 'station'（历史数据均为站名兜底） */
+  source?: RoadAnchorSource;
 }
 
 /** 段间断点状态：normal 正常小断点 / suspect 可疑大断点(>200km) / no_connect 无连通way / urban_skip 城市区域跳过 */
@@ -697,6 +710,13 @@ export interface RoadChapter {
   title: string;
   fromKm: number;
   toKm: number;
+  /**
+   * v0.6.5：段内两端锚点的地名来源（供 UI 弱化非权威来源的段名）。
+   * 缺省视为 'station'（历史章节由站名兜底生成）。
+   * 若两端来源不同，取**较弱**的一侧（station < place < amap），保守标注。
+   */
+  fromSource?: RoadAnchorSource;
+  toSource?: RoadAnchorSource;
 }
 
 /** 合成路线（OD 规划结果 / 榜单条目指向的路线） */

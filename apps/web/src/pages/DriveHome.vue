@@ -81,19 +81,38 @@ const fromOpen = ref(false);
 const toOpen = ref(false);
 const odError = ref('');
 const odBusy = ref(false);
-let suggestSeq = 0;
+/**
+ * A7：原为单个共享计数器 suggestSeq，导致在「起点」输入后立刻在「终点」输入时，
+ * 起点的响应到达后 seq !== suggestSeq 被当作迟到响应丢弃 → 起点下拉永远不弹。
+ * 改为每字段独立序号（铁路 SelectTrip.vue 也是 fromActive/toActive 分离设计）。
+ */
+const suggestSeq = { from: 0, to: 0 };
+/** A7：250ms 防抖，避免每次按键都发请求（铁路侧同值） */
+let suggestTimer: ReturnType<typeof setTimeout> | null = null;
+
+function scheduleSuggest(field: 'from' | 'to') {
+  if (suggestTimer) clearTimeout(suggestTimer);
+  suggestTimer = setTimeout(() => void refreshSuggest(field), 250);
+}
 
 async function refreshSuggest(field: 'from' | 'to') {
   const q = (field === 'from' ? from : to).value.trim();
-  const seq = ++suggestSeq;
+  const seq = ++suggestSeq[field];
   if (!q) {
-    if (field === 'from') fromSuggest.value = [];
-    else toSuggest.value = [];
+    if (field === 'from') {
+      fromSuggest.value = [];
+      fromOpen.value = false;
+    } else {
+      toSuggest.value = [];
+      toOpen.value = false;
+    }
     return;
   }
   try {
-    const data = await api.suggestDrivePlaces(q, undefined, 8);
-    if (seq !== suggestSeq) return; // 迟到响应丢弃
+    // A5：OD 框只接受「地点」，公路编号一律不在此联想 ——
+    // 公路编号有独立的「按公路编号直达」区。两个入口混在一个输入框里是自驾最大的 IA 歧义。
+    const data = await api.suggestDrivePlaces(q, 'place', 8);
+    if (seq !== suggestSeq[field]) return; // 本字段的迟到响应丢弃
     if (field === 'from') {
       fromSuggest.value = data.hits;
       fromOpen.value = data.hits.length > 0;
@@ -106,12 +125,22 @@ async function refreshSuggest(field: 'from' | 'to') {
   }
 }
 
+/**
+ * A5：原实现只写 hit.name，丢弃 kind/id/lng/lat —— 公路编号与地名被压成同一个字符串，
+ * 「我要走 G318 全程」与「我要从 G318 某点出发」在提交时无法区分。
+ * 现在保留结构化对象，提交时按 kind 分流；输入框仍显示 name 以保证可读性。
+ */
+const fromHit = ref<PlaceHit | null>(null);
+const toHit = ref<PlaceHit | null>(null);
+
 function pickHit(field: 'from' | 'to', hit: PlaceHit) {
   if (field === 'from') {
     from.value = hit.name;
+    fromHit.value = hit;
     fromOpen.value = false;
   } else {
     to.value = hit.name;
+    toHit.value = hit;
     toOpen.value = false;
   }
 }
@@ -120,11 +149,22 @@ function swapOd() {
   const f = from.value;
   from.value = to.value;
   to.value = f;
+  // A5：结构化端点也要一起交换，否则 kind 会与文本错位
+  const fh = fromHit.value;
+  fromHit.value = toHit.value;
+  toHit.value = fh;
 }
 
 function goTrip() {
   if (!from.value.trim() || !to.value.trim()) {
-    odError.value = '请先填写起点和终点（支持地名 / 公路编号 / 景点）';
+    odError.value = '请先填写起点和终点（城市 / 区县级地名）';
+    return;
+  }
+  // A5：任一端选中的是「公路」而非「地点」时，语义是走这条公路的全程，
+  // 与点对点规划不同 —— 直接跳单条公路页，不再混在同一个 OD 请求里。
+  const roadHit = fromHit.value?.kind === 'road' ? fromHit.value : toHit.value?.kind === 'road' ? toHit.value : null;
+  if (roadHit) {
+    void router.push(`/drive/road/${encodeURIComponent(roadHit.id)}`);
     return;
   }
   odError.value = '';
@@ -135,6 +175,8 @@ function goTrip() {
 const codeQuery = ref('');
 const selectedProvince = ref('');
 const roadCandidates = ref<PlaceHit[]>([]);
+/** A2：用户当前点选的公路候选（null = 未点选，「设为起点/终点」回退到首条） */
+const selectedRoadHit = ref<PlaceHit | null>(null);
 const roadBusy = ref(false);
 
 const PREFIXES = [
@@ -169,6 +211,7 @@ async function refreshRoadCandidates() {
   const q = codeQuery.value.trim();
   if (!q) {
     roadCandidates.value = [];
+    selectedRoadHit.value = null;
     return;
   }
   roadBusy.value = true;
@@ -185,8 +228,14 @@ async function refreshRoadCandidates() {
       return na - nb || a.name.localeCompare(b.name);
     });
     roadCandidates.value = hits;
+    // A2：候选集变化后，若原选中项已不在新集合内则清空，
+    // 避免「设为起点/终点」写进一个用户看不到的旧条目。
+    if (selectedRoadHit.value && !hits.some((h) => h.id === selectedRoadHit.value?.id)) {
+      selectedRoadHit.value = null;
+    }
   } catch {
     roadCandidates.value = [];
+    selectedRoadHit.value = null;
   } finally {
     roadBusy.value = false;
   }
@@ -213,11 +262,23 @@ function openRoadHit(hit: PlaceHit) {
   }
 }
 
+/** A2：点选候选时记录选中项，「设为起点/终点」用它而不是列表第一项。 */
+function selectRoadHit(hit: PlaceHit) {
+  selectedRoadHit.value = selectedRoadHit.value?.id === hit.id ? null : hit;
+}
+
 function setRoadAsConstraint(field: 'from' | 'to') {
-  const hit = roadCandidates.value[0];
+  // A2：原先恒取 roadCandidates[0]，导致「设为起点」永远设成编号最小的那条。
+  // 现在优先用用户点选的条目；未点选时回退到首条（与旧行为一致，不更差）。
+  const hit = selectedRoadHit.value ?? roadCandidates.value[0];
   if (!hit) return;
-  if (field === 'from') from.value = hit.name;
-  else to.value = hit.name;
+  if (field === 'from') {
+    from.value = hit.name;
+    fromHit.value = hit;
+  } else {
+    to.value = hit.name;
+    toHit.value = hit;
+  }
 }
 
 // ── 路网统计 + 榜单入口（第二屏） ────────────────────────────────────────────
@@ -285,7 +346,12 @@ const levelLabel: Record<string, string> = {
 
         <div class="drive-home-panel">
           <!-- OD 搜索 -->
-          <form class="drive-od rv-card" data-spotlight @submit.prevent="goTrip">
+          <form
+            class="drive-od rv-card"
+            data-spotlight
+            :class="{ 'has-suggest-open': fromOpen || toOpen }"
+            @submit.prevent="goTrip"
+          >
             <div class="drive-od__row">
               <label class="station-field">
                 <span>起点</span>
@@ -293,8 +359,8 @@ const levelLabel: Record<string, string> = {
                   <input
                     v-model="from"
                     autocomplete="off"
-                    placeholder="例如 上海 或 G318"
-                    @input="refreshSuggest('from')"
+                    placeholder="城市 / 区县，如 上海"
+                    @input="scheduleSuggest('from')"
                     @focus="fromOpen = fromSuggest.length > 0"
                     @blur="fromOpen = false"
                   />
@@ -321,7 +387,7 @@ const levelLabel: Record<string, string> = {
                     v-model="to"
                     autocomplete="off"
                     placeholder="例如 拉萨"
-                    @input="refreshSuggest('to')"
+                    @input="scheduleSuggest('to')"
                     @focus="toOpen = toSuggest.length > 0"
                     @blur="toOpen = false"
                   />
@@ -343,8 +409,10 @@ const levelLabel: Record<string, string> = {
             </div>
             <p v-if="odError" class="drive-od__error">{{ odError }}</p>
             <div class="drive-actions">
-              <button type="submit" class="btn primary" :disabled="odBusy">出发</button>
-              <span class="drive-od__hint">在线高德规划 + 本地干线 A* 兜底，离线也能出沿程景点</span>
+              <button type="submit" class="btn primary" :disabled="odBusy">
+                {{ odBusy ? '规划中…' : '出发' }}
+              </button>
+              <span class="drive-od__hint">按起终点规划一条自定义路线（在线高德规划，本地干线 A* 兜底）</span>
             </div>
           </form>
 
@@ -357,7 +425,7 @@ const levelLabel: Record<string, string> = {
                 class="road-kbd__input"
                 autocomplete="off"
                 placeholder="输入编号，例如 G318"
-                @keydown.enter.prevent="roadCandidates[0] && openRoadHit(roadCandidates[0])"
+                @keydown.enter.prevent="(selectedRoadHit ?? roadCandidates[0]) && openRoadHit((selectedRoadHit ?? roadCandidates[0])!)"
               />
               <button type="button" class="btn ghost btn-sm" @click="backspace">⌫</button>
             </div>
@@ -398,9 +466,17 @@ const levelLabel: Record<string, string> = {
 
             <ul v-if="roadCandidates.length" class="road-kbd__candidates">
               <li v-for="hit in roadCandidates.slice(0, 8)" :key="hit.id">
-                <button type="button" class="road-kbd__candidate" @click="openRoadHit(hit)">
+                <button
+                  type="button"
+                  class="road-kbd__candidate"
+                  :class="{ 'is-picked': selectedRoadHit?.id === hit.id }"
+                  :aria-pressed="selectedRoadHit?.id === hit.id"
+                  @click="selectRoadHit(hit)"
+                  @dblclick="openRoadHit(hit)"
+                >
                   <span class="road-kbd__badge" :style="{ '--prefix-color': roadColor(classOfRef(hit.name)) }">{{ hit.name }}</span>
                   <span class="road-kbd__candidate-sub">{{ hit.sub }}</span>
+                  <span class="road-kbd__candidate-go">查看详情</span>
                 </button>
               </li>
             </ul>
@@ -408,8 +484,35 @@ const levelLabel: Record<string, string> = {
               没有匹配的编号（省道需先选省）
             </p>
             <div v-if="roadCandidates.length" class="drive-actions">
-              <button type="button" class="btn ghost btn-sm" @click="setRoadAsConstraint('from')">设为起点</button>
-              <button type="button" class="btn ghost btn-sm" @click="setRoadAsConstraint('to')">设为终点</button>
+              <p class="road-kbd__hint">
+                {{ selectedRoadHit ? `已选 ${selectedRoadHit.name}` : '先点选一条公路，再设为起点/终点' }}
+              </p>
+              <button
+                type="button"
+                class="btn ghost btn-sm"
+                :disabled="!selectedRoadHit"
+                :title="selectedRoadHit ? '' : '请先在上方列表点选一条公路'"
+                @click="setRoadAsConstraint('from')"
+              >
+                设为起点
+              </button>
+              <button
+                type="button"
+                class="btn ghost btn-sm"
+                :disabled="!selectedRoadHit"
+                :title="selectedRoadHit ? '' : '请先在上方列表点选一条公路'"
+                @click="setRoadAsConstraint('to')"
+              >
+                设为终点
+              </button>
+              <button
+                type="button"
+                class="btn ghost btn-sm"
+                :disabled="!selectedRoadHit"
+                @click="selectedRoadHit && openRoadHit(selectedRoadHit)"
+              >
+                查看该公路
+              </button>
             </div>
           </div>
         </div>

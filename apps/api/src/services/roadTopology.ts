@@ -108,7 +108,15 @@ export function loadRoadTopology(): boolean {
     off += twoE;
     const edgeLine = new Uint16Array(buf.buffer, buf.byteOffset + off, twoE);
     off += twoE * 2;
-    const reserved = buf.readInt32LE(20);
+    // 文件头：magic(0..4) version(4) nodeCount(8) edgeCount(12) reserved(16) pad(20)
+    // 注意（A3）：reserved 写在 offset 16（见 scripts/build-road-topology.mjs:198），
+    // 原实现误读 offset 20（恒为 0），导致 nodeFlag 永不加载 → snap 选中小分量孤立节点
+    // → 实测 1406 组 OD 中 A* 成功率仅 1%、99% 降级为两点直线 direct。
+    let reserved = buf.readInt32LE(16);
+    if (reserved !== 1) {
+      // 兼容更早的错误写入位置（曾把标记写到 20）
+      if (buf.readInt32LE(20) === 1) reserved = 1;
+    }
     let nodeFlag: Uint8Array | null = null;
     if (reserved === 1 && buf.byteLength >= off + nodeCount) {
       nodeFlag = new Uint8Array(buf.buffer, buf.byteOffset + off, nodeCount);

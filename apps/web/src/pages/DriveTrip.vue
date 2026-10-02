@@ -11,7 +11,7 @@
  * 布局：左路线卡 / 中地图 + 章节条 / 右沿程景点流（progressKm 升序）。
  * 地图为离线 SVG（中国轮廓 + 动态取景框），零密钥依赖，与首页公路网同源。
  */
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
 import AppTopBar from '../components/AppTopBar.vue';
@@ -23,7 +23,9 @@ import { useScrollReveal } from '../composables/useScrollReveal';
 usePointerSpotlight();
 const routePathRef = ref<SVGPathElement | null>(null);
 useRoadDraw(routePathRef);
-useScrollReveal('.drive-scroll-reveal');
+// A1：内容在异步 load 完成后才渲染，需在 finally 里主动 rescan 一次，
+//确保骨架屏切换后新出现的 .drive-spot 被纳入观察。
+const { rescan: rescanReveal } = useScrollReveal('.drive-scroll-reveal');
 import DriveLivePanel from '../components/DriveLivePanel.vue';
 import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
@@ -93,6 +95,8 @@ async function load() {
     error.value = e instanceof Error ? e.message : '加载失败';
   } finally {
     loading.value = false;
+    // A1：DOM 已从骨架屏切换为内容，主动重扫一次揭示动画
+    void nextTick(rescanReveal);
   }
 }
 

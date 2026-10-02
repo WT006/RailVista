@@ -258,6 +258,15 @@ export const api = {
       totalKm?: number;
       spotCount?: number;
       note?: string;
+      /** B2-1：端点地名与几何首/末点距离过远，nodes 不可作为里程标注 */
+      endpointsUnverified?: boolean;
+      lengthDeviation?: number | null;
+      /** 已贯通里程（OSM 实际落库长度） */
+      connectedKm?: number;
+      /** 名义里程（权威名录） */
+      nominalKm?: number;
+      /** 已贯通 / 名义（百分比）；名义为 0 时为 null */
+      coveragePct?: number | null;
     }>(`/drive/road/${encodeURIComponent(key)}`);
   },
   /** 双引擎 OD 规划 */

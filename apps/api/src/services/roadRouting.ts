@@ -36,7 +36,10 @@ export interface PlanRouteInput {
 export class PlaceNotFoundError extends Error {
   code = 'PLACE_NOT_FOUND';
   constructor(public field: 'from' | 'to', name: string) {
-    super(`未找到「${name}」，请换个说法或直接点地图选点`);
+    // A4：原文案提示「直接点地图选点」，但自驾页从未实现地图点选
+    // （DriveHome 的 SVG 上没有任何获取坐标的 handler），属于错误引导。
+    // 改为提示真实可用的替代路径。
+    super(`未找到「${name}」，请改用城市/区县名，或先在「按公路编号」中选定公路`);
   }
 }
 
@@ -247,7 +250,9 @@ export function planRoadRoute(key: string): (RoadRoute & {
     provinces: entry.provinces,
     lengthKm,
     coords,
-    chapters: buildChapters(coords, lengthKm, geom.nodes),
+    // B2-1：端点未经验证时不用 nodes 切章，否则章节标题会写出
+    // 「0—1954 km 上海 — 聂拉木」这种把西藏几何标成上海的假分段。
+    chapters: buildChapters(coords, lengthKm, geom.endpointsUnverified ? undefined : geom.nodes),
     engine: 'local',
     engineNote: hasSegments
       ? `本地干线几何（部分段，${geom.gapCount} 处未贯通）`
@@ -262,5 +267,8 @@ export function routeEngineNote(engine: string): string {
   if (engine === 'amap') return '高德驾车规划（GCJ-02 已转 WGS-84）';
   if (engine === 'local') return '本地干线拓扑 A*';
   if (engine === 'local-spliced') return '本地干线 A*（端点外接段拼接）';
-  return '两点直连（干线未覆盖，仅供示意）';
+  // A3 实测：本地路网连通分量 1237 个、主分量 bbox 仅 lng[84.8,109.1]/lat[25.3,40.3]（青藏东部），
+  // 华东/华南/华北均不在主分量内，跨省 OD 无法规划。这里如实说明覆盖边界，
+  // 避免用户把两点直线误认为真实路线规划结果。
+  return '两点直连示意：本地路网仅覆盖青藏部分干线，跨省规划暂不可用（不代表真实路线）';
 }

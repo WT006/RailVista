@@ -22,10 +22,10 @@ import {
 import {
   decimatePoints,
   getRoadEntry,
-
   getRoadGeometryFull,
   isValidRoadKey,
   networkStats,
+  officialLengthKm,
   roadNetworkOverview,
 } from '../services/roadNetwork.js';
 import { geocodeFallback, suggestPlaces } from '../services/roadIndex.js';
@@ -85,17 +85,28 @@ driveRoute.get('/road/:key', (c) => {
     ? geom.segments
     : geom.segments.map((seg) => decimatePoints(seg, 600));
   const totalKm = geom.cumKm[geom.cumKm.length - 1] ?? entry.lengthKm;
+  // B2-1：如实带出「已贯通里程 vs 官方里程」与端点可信度。
+  // 注意：entry.lengthKm 对有几何的公路已被 mergeGeometry 覆盖为几何长度，
+  // 必须用权威名录的 officialLengthKm，否则覆盖率恒为 100%。
+  const connectedKm = Math.round(totalKm * 10) / 10;
+  const nominalKm = officialLengthKm(key) || entry.lengthKm;
+  const coveragePct = nominalKm > 0 ? Math.round((connectedKm / nominalKm) * 100) : null;
   return c.json({
     ok: true,
     data: {
       entry,
       geometry: { key: geom.key, points, nodes: geom.nodes, simplified: geom.simplified },
-      totalKm: Math.round(totalKm * 10) / 10,
+      totalKm: connectedKm,
       spotCount: entry.spotCount,
       segments,
       gapAnnotations: geom.gapAnnotations,
       segmentCount: geom.segmentCount,
       gapCount: geom.gapCount,
+      endpointsUnverified: geom.endpointsUnverified ?? false,
+      lengthDeviation: geom.lengthDeviation ?? null,
+      connectedKm,
+      nominalKm,
+      coveragePct,
     },
   });
 });
@@ -141,9 +152,18 @@ driveRoute.get('/along', async (c) => {
       return c.json({ ok: false, error: { code: 'NOT_FOUND', message: `公路不在册或几何待补：${roadKey}` } }, 404);
     }
     route.engine = 'road-geometry';
-    route.engineNote = route.segments?.length
-      ? `整条公路 L1 几何（OSM 众包还原，部分段，${route.gapAnnotations?.length ?? 0} 处未贯通，里程为估算）`
-      : '整条公路 L1 几何（OSM 众包还原，里程为估算）';
+    // B2-1：不要笼统宣称「整条公路」。实测主链常只是 OSM 抓取时碰巧串起来的一条链，
+    // 与该公路真实走向无关；这里如实展示已贯通里程占官方里程的比例。
+    const entry = getRoadEntry(roadKey);
+    const nominalKm = roadKey ? officialLengthKm(roadKey) || entry?.lengthKm || 0 : 0;
+    const connectedKm = Math.round(route.lengthKm * 10) / 10;
+    const pct = nominalKm > 0 ? Math.round((connectedKm / nominalKm) * 100) : null;
+    const segNote = route.segments?.length ? `，另有 ${route.segments.length} 段未贯通` : '';
+    route.engineNote =
+      `OSM 众包还原：已贯通 ${connectedKm} km` +
+      (pct !== null ? ` / 官方里程 ${nominalKm} km（${pct}%）` : '') +
+      segNote +
+      '，非官方线位，不作为导航依据';
   } else if (routeId) {
     // 榜单 / 路书条目（v1 DriveRoute 打样数据）
     const legacy = getDriveRoute(routeId);
@@ -178,7 +198,12 @@ driveRoute.get('/along', async (c) => {
     return badRequest(c, '缺少参数：from+to（点对点）/ road=编号（整条公路）/ route=路线ID（路书）');
   }
 
-  const spots = matchSpotsAlong(route.coords, {
+  // B3-2：先抽稀再匹配。原先在未抽稀的全量折线上跑匹配（抽稀在响应组装时），
+  // G318 4673 点实测 124ms；抽到 600 点后匹配量降一个数量级。
+  // 抽稀对沿程匹配的影响可接受：600 点仍能保持道路走向的空间连续性。
+  const matchCoords = decimatePoints(route.coords as [number, number, number?][], 600);
+
+  const spots = matchSpotsAlong(matchCoords, {
     categories: cat.length ? cat : undefined,
     minScore: Number.isFinite(min) ? min : undefined,
     maxCount: Number.isFinite(max) && max > 0 ? Math.min(max, 500) : 200,
@@ -190,10 +215,10 @@ driveRoute.get('/along', async (c) => {
     data: {
       route: {
         ...route,
-        coords: decimatePoints(route.coords as [number, number, number?][], 600),
+        coords: matchCoords,
       },
       spots,
-      chapters: route.chapters ?? buildChapters(route.coords as [number, number, number?][], route.lengthKm),
+      chapters: route.chapters ?? buildChapters(matchCoords, route.lengthKm),
       highlights: legacyHighlights,
       legacyChapters,
       spotLibrary: roadsideSpotsMeta(),

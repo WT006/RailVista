@@ -626,6 +626,17 @@ export interface RoadGeometry {
   segments?: RoadPoint[][];
   /** 段间断点标注数组（主链末点↔segments 首点、segments 间） */
   gapAnnotations?: GapAnnotation[];
+  /**
+   * B2-1：端点标注是否不可信。
+   * 实测 33 条已落盘几何全部为假标注（G318 声明 nodes[0].name="上海"，
+   * 但 points[0] 实际在西藏，相距 2400km）。为 true 时 nodes 不含端点项，
+   * UI 不得展示「上海 0km」这类未经验证的端点里程。
+   */
+  endpointsUnverified?: boolean;
+  /** 端点地名坐标与几何首/末点的距离（km），供排查 */
+  endpointDistanceKm?: { from: number; to: number };
+  /** 已贯通里程相对官方里程的偏差百分比（正=超出，负=不足），仅在偏差 >50% 时写入 */
+  lengthDeviation?: number;
 }
 
 /** 公路侧景点沿程可见性（与铁路 SpotVisibility 的语义差异见 PRD §5.3） */
@@ -803,6 +814,15 @@ export interface RoadNetworkStats {
   hasGeom: number;
   hasGeomRatio: number;
   spotCount: number;
+  /**
+   * B2-1：几何质检结论（来自 data/roads/coverage-gap.csv）。
+   * noGeometry = 索引有但几何未抓；broken = 已抓但走向与官方里程偏差过大，不应对外发布。
+   */
+  quality?: {
+    noGeometry: number;
+    broken: number;
+    suspectGap: number;
+  };
   /** 覆盖诚实说明（PRD §3.1：不能装作什么都有） */
   coverage: {
     targetNational: number;

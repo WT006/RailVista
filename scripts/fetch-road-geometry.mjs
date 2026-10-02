@@ -27,6 +27,77 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const GEOM_DIR = join(__dirname, '../data/roads/geom');
+const PLACES_GEO = join(__dirname, '../data/roads/places-geo.json');
+
+/** 端点标注可信距离阈值（km）：端点地名坐标与几何首/末点超过此距离即认为标注不可信 */
+const ENDPOINT_TRUST_KM = 50;
+
+/** 两点大圆距离（km），haversine */
+function haversineKm(lng1, lat1, lng2, lat2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(a)));
+}
+
+/**
+ * B2-1：端点地名 → 坐标查找（只用本地已落盘数据，不发网络请求）。
+ * 命中不了返回 null，此时不做校验、也不声称已验证。
+ */
+function lookupPlaceCoords(name) {
+  if (!name) return null;
+  try {
+    if (!existsSync(PLACES_GEO)) return null;
+    const raw = JSON.parse(readFileSync(PLACES_GEO, 'utf8'));
+    const list = Array.isArray(raw) ? raw : (raw.places ?? Object.values(raw));
+    const hit = list.find((p) => (p.name || p.title) === name && p.lng != null && p.lat != null);
+    return hit ? { lng: hit.lng, lat: hit.lat } : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * B2-1：校验几何首/末点是否真的落在声明的起终点附近。
+ * 实测 33 条路全部为「假标注」—— 例如 G318 声明 nodes[0].name="上海"，
+ * 但 points[0] 实际在西藏（相距 2400km）。原实现无条件写入端点名，
+ * 导致 UI 展示「上海 0km」而地图画的是西藏，用户完全被误导。
+ * 现在校验失败就不写端点标注，改写 endpointsUnverified 标记。
+ */
+function verifyEndpoints(points, fromPlace, toPlace) {
+  if (!points.length) return { nodes: [], endpointsUnverified: true, endpointDistanceKm: null };
+  const first = points[0];
+  const last = points[points.length - 1];
+  const fromC = lookupPlaceCoords(fromPlace);
+  const toC = lookupPlaceCoords(toPlace);
+  // 部分可判定：只命中一端时也能证明该端不可信（另一端保持原标注但不声称已验证）
+  const dFrom = fromC ? haversineKm(fromC.lng, fromC.lat, first[0], first[1]) : null;
+  const dTo = toC ? haversineKm(toC.lng, toC.lat, last[0], last[1]) : null;
+  const okFrom = dFrom !== null && dFrom <= ENDPOINT_TRUST_KM;
+  const okTo = dTo !== null && dTo <= ENDPOINT_TRUST_KM;
+  const unverifiable = dFrom === null || dTo === null || !okFrom || !okTo;
+
+  const nodes = [];
+  if (okFrom) nodes.push({ name: fromPlace, atKm: 0, type: 'endpoint' });
+  if (okTo) nodes.push({ name: toPlace, atKm: 0, type: 'endpoint' });
+
+  if (unverifiable) {
+    const detail = [
+      dFrom === null ? `${fromPlace} 无本地坐标` : `${fromPlace} 距起点 ${Math.round(dFrom)}km`,
+      dTo === null ? `${toPlace} 无本地坐标` : `${toPlace} 距终点 ${Math.round(dTo)}km`,
+    ].join('，');
+    console.log(`  ⚠ 端点标注不可信：${detail}（阈值 ${ENDPOINT_TRUST_KM}km）→ 标记 endpointsUnverified`);
+  }
+  return {
+    nodes,
+    endpointsUnverified: unverifiable,
+    endpointDistanceKm:
+      dFrom === null || dTo === null ? null : { from: Math.round(dFrom), to: Math.round(dTo) },
+  };
+}
 
 // 中国大陆 bbox（不含海外争议区，覆盖国道全线）
 const CN_BBOX = [18, 73, 54, 135];
@@ -148,10 +219,15 @@ async function fetchOne({ key, ref, bbox, fromPlace, toPlace, officialKm = 0, pr
   const simplifiedSegments = segments.map((seg) => simplifyDP(seg, 30));
   const cumKm = computeCumKm(simplified);
   const totalKm = Math.round(cumKm[cumKm.length - 1] * 10) / 10;
-  const nodes = [
-    { name: fromPlace, atKm: 0, type: 'endpoint' },
-    { name: toPlace, atKm: totalKm, type: 'endpoint' },
-  ];
+
+  // B2-1：端点标注必须校验，否则会出现「声明上海→聂拉木、实际画在西藏」
+  const { nodes, endpointsUnverified, endpointDistanceKm } = verifyEndpoints(simplified, fromPlace, toPlace);
+  // 校验通过时把地名里程对齐到 0 / totalKm
+  if (nodes.length === 2) {
+    nodes[0].atKm = 0;
+    nodes[1].atKm = totalKm;
+  }
+
   const geom = {
     key,
     points: simplified,
@@ -161,12 +237,21 @@ async function fetchOne({ key, ref, bbox, fromPlace, toPlace, officialKm = 0, pr
     segments: simplifiedSegments,
     gapAnnotations,
   };
+  // 诚实化标记：端点不可信 / 已贯通里程远小于名义里程
+  if (endpointsUnverified) {
+    geom.endpointsUnverified = true;
+    geom.endpointDistanceKm = endpointDistanceKm;
+  }
+  const officialKmNote = officialKm > 0 ? ` / 官方里程 ${officialKm}km（${Math.round((totalKm / officialKm) * 100)}%）` : '';
+  if (officialKm > 0 && Math.abs(totalKm - officialKm) / officialKm > 0.5) {
+    geom.lengthDeviation = Math.round(((totalKm - officialKm) / officialKm) * 1000) / 10;
+  }
   mkdirSync(GEOM_DIR, { recursive: true });
   writeFileSync(join(GEOM_DIR, `${key.replace(/[^\w:]/g, '_')}.json`), JSON.stringify(geom), 'utf8');
   console.log(
-    `  ✓ ${totalKm} km · 主链+${segments.length}段 · orphan ${orphans} · ${((Date.now() - t0) / 1000).toFixed(0)}s → data/roads/geom/${key}.json`,
+    `  ✓ 已贯通 ${totalKm} km${officialKmNote} · 主链+${segments.length}段 · orphan ${orphans} · ${((Date.now() - t0) / 1000).toFixed(0)}s → data/roads/geom/${key}.json`,
   );
-  return { key, totalKm, points: simplified.length, orphans, segmentCount: segments.length };
+  return { key, totalKm, officialKm, points: simplified.length, orphans, segmentCount: segments.length, endpointsUnverified };
 }
 
 // ── 主流程 ───────────────────────────────────────────────────────────────────

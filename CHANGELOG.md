@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.5.2`**（2026-10-02）
+**当前版本：`0.5.3`**（2026-10-02）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -26,6 +26,73 @@
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
 
 ---
+
+## [0.5.3] — 2026-10-02
+
+**自驾板块 Sprint 1 止损：修P0 缺陷 + 数据诚实化**（分支 `heyworldchannel-20261002`）。
+
+诊断报告见 `docs/自驾板块-问题诊断与优化方案-20261002.md`。本轮只做「已经写了但没生效」和「会整页崩」的止损，不做视觉重做。
+
+### A1 沿程景点永久不可见（P0，已浏览器实测验证）
+
+- 动机：`useScrollReveal` 在 `onMounted` 里 `querySelectorAll`，但此时模板走 loading 骨架屏分支、`.drive-spot` 尚未渲染 → 抓到空集合后提前 return → IntersectionObserver 从未注册 → 而 `drive.css` 的初始态是 `opacity: 0`，导致**自驾最核心的卖点功能完全不可见且无任何报错**。`useRoadDraw` 同源同病（路线描边动画也从不播放）。
+- 涉及文件：`apps/web/src/composables/useScrollReveal.ts`（改为「MutationObserver 监听子树 + 惰性建立 IntersectionObserver」，并返回 `rescan()`；无IntersectionObserver 时直接全部显示）；`apps/web/src/composables/useRoadDraw.ts`（`onMounted` 一次性取值 → `watch(pathRef, { flush: 'post' })`）；`apps/web/src/pages/DriveTrip.vue`（`load()` 的 `finally` 里 `nextTick(rescanReveal)`）；`apps/web/src/styles/drive.css`（新增 CSS animation 兜底，1.2s 内无条件推到终态 opacity:1 —— 即使 JS 失效内容也一定可见）。
+- 行为变化：G318 沿程页 42 张景点卡实测 `minOpacity: 1`、不可见 0 张（修复前全部`opacity: 0`）；路线描边动画恢复播放。
+- 验证：headless Edge 注入脚本实测 42/42 可见；单测 174 通过。
+
+### A2 「设为起点/终点」永远取候选第 1 项（P0）
+
+- 动机：`setRoadAsConstraint` 恒取 `roadCandidates[0]`，忽略用户点选的那一项；候选按编号升序，导致「设为起点」永远设成编号最小的公路，公路编号筛选实际不可用。
+- 涉及文件：`apps/web/src/pages/DriveHome.vue`（新增 `selectedRoadHit`、候选项改为单选并加 `is-picked` 态、未点选时按钮禁用并显示提示、候选集变化时清空失效选中项、回车改为用选中项）。
+- 行为变化：实测输入 G3 出现 8 条候选 → 点选第 4 项 G303 → 「设为起点」后起点框为 **G303**（修复前为 G3）。
+-样式：`drive.css` 新增 `.road-kbd__candidate.is-picked` / `.is-picked` 光标提示 / `.road-kbd__hint`。
+
+### A3 拓扑二进制 reserved 字段读取偏移（P0，附实测结论修正）
+
+- 动机：写端`build-road-topology.mjs:198` 写 offset 16，读端 `roadTopology.ts:111` 读 offset 20 → `nodeFlag` 永不加载 → snap 选中小分量孤立节点。
+- 涉及文件：`apps/api/src/services/roadTopology.ts`（改读 offset 16，并保留 offset 20 兼容分支）；`scripts/build-road-topology.mjs`（注释锁定偏移约定）。
+- **实测结论修正（重要）**：修复后 `nodeFlag` 正常加载（31,300 节点，与 meta 的 `mainCompNodes` 完全一致），但 **OD 成功率并未提升**（1406 组前后均为 0.8%）。真正瓶颈是图碎裂：连通分量 1,237 个、最大分量仅占全图 17.2%、**主分量 bbox 仅 lng[84.8,109.1]/lat[25.3,40.3]（青藏东部）**，华东/华南/华北均不在主分量内。诊断报告初版预测「1% → 30~50%」有误，已在报告中更正。
+- 连带：`routeEngineNote('direct')` 改为如实说明「本地路网仅覆盖青藏部分干线，跨省规划暂不可用（不代表真实路线）」。
+
+### B3 单条公路页 / 榜单「看沿程景点」整页失败（P0）
+
+- 动机：三个原因叠加 —— ① `Promise.all` 原子失败（558/591 条路 `hasGeom:false` 时 `getDriveAlong` 返 404 → 整页红字，而非「景点为空」）；② 限流 120次/分无 drive 桶；③ `/drive/network/overview` 每次请求同步 `JSON.parse` 约 5.72MB 阻塞事件循环；④ 高德失败静默无日志。
+- 涉及文件：`apps/web/src/pages/DriveRoad.vue`（`Promise.allSettled` 独立降级 + 景点区独立重试按钮 + `entryView` 合成条目防模板解引用 null）；`apps/web/src/pages/DriveBoard.vue`（`alongHref` 校验 `from !== to`，相同则禁用跳转显示「暂无 OD 数据」——原先22/33 个条目会退化成同省 `from===to` 的空路线）；`apps/api/src/services/roadNetwork.ts`（overview 按 `updated` 进程级缓存、几何 LRU 24→64、**新增几何 mtime 指纹失效**，此前重跑抓取脚本后API 仍返回旧对象）。
+- 行为变化：几何失败仍展示索引信息 + 占位说明；景点失败只影响景点区并可单独重试。
+
+### B3-2 沿程匹配性能
+
+- `apps/api/src/routes/drive.ts`：先抽稀到 600 点再匹配（原先在未抽稀的全量折线上跑）。G318 实测 4673 点 614ms → 600 点 80ms（**7.7×**），景点数不变（42 → 42）。
+- `COVERAGE_NOTES` 修正：原文声称「县道 20~40%，乡道村道 <10%（仅名称）」，实测县/乡/村道索引为 **0 条**，已改为如实披露。
+- `networkStats()` 新增 `quality` 字段，读 `coverage-gap.csv` 得出 `noGeometry 558 / broken 23 / suspectGap 10`（此前前端拿不到「这条几何是坏的」信号）。
+
+### B2-1 公路几何诚实化（G318 问题的直接修复）
+
+- 动机：G318 声明「上海 → 聂拉木 5476km」，实际落盘主链是西藏林芝→四川甘孜 1954km，`nodes[0].name="上海"` 相距 **6709km**。全部 33 条中 **26 条端点不可信**。根因是抓取脚本无条件写入端点名、且 `points`与 `segments` 互不相交、顺序未按空间重排。
+- 涉及文件：`scripts/fetch-road-geometry.mjs`（新增 `verifyEndpoints()`，端点地名与几何首/末点距离 >50km 则不写标注并标记 `endpointsUnverified`；里程偏差 >50% 写入 `lengthDeviation`）；`apps/api/src/services/roadNetwork.ts`（新增 `officialLengthKm()` —— **`build-road-index.mjs:241` 会用几何长度覆盖索引 `lengthKm`，直接用它算覆盖率会得到假性 100%**）；`apps/api/src/routes/drive.ts`（`/road/:key` 带出 `connectedKm`/`nominalKm`/`coveragePct`/`endpointsUnverified`；`/along` 的 C2 模式 engineNote 改为如实展示已贯通占比）；`apps/web/src/pages/DriveRoad.vue`（端点不可信时标题改为「全线走向（端点待核）」、分段不再用假端点命名、展示覆盖率）；`packages/shared/src/types.ts`（`RoadGeometry` 新增三个可选字段，向后兼容）。
+- 数据回填：33 个几何文件补写 `endpointsUnverified`/`lengthDeviation`（改前已备份至 Temp）。
+- 行为变化：G318 页面标题从「G318上海 — 聂拉木」变为「G318　全线走向（端点待核）」，并显示「已贯通 1953.5 km / 官方 5476 km（36%）」。实测覆盖率：G312 10%、G104 13%、G331 15%、G318 36%、G109 41%、G317 95%、G227 161%。
+
+### A4/A5/A7 输入与信息架构
+
+- OD 联想 `suggestSeq` 由**单计数器**改为**每字段独立**（原逻辑下在起点输入后立刻在终点输入，起点响应会被当迟到响应丢弃 → 起点下拉永不弹出）；新增 250ms 防抖。
+- `pickHit` 保留结构化 `{kind,id,name,lng,lat}`（原只存 name，公路编号与地名被压成同一字符串）；提交时按 `kind` 分流：任一端为公路 → 跳单条公路页而非点对点。
+- OD 联想限定 `kind='place'`，公路编号不再混入；占位符「例如 上海 或 G318」→「城市 / 区县，如 上海」。
+- 后端错误文案去掉不存在的「直接点地图选点」，改为提示可用路径。
+- `geocodeFallback` 由串行 12s 改为 `Promise.any` 并行（超时 6s→3.5s）+ 24h 结果缓存。
+
+### V1/V3 兼容性与层级
+
+- `base.css`：`.station-suggest` 的 `color-mix()` 背景加不透明回退双声明（旧WebView 不支持时整条声明失效 → 下拉完全透明 → 文字重叠）。
+- `drive.css`：8 处 `backdrop-filter` 补 `-webkit-` 前缀（iOS Safari/部分 WebView玻璃完全失效）。
+- 新增 `.drive-od.has-suggest-open`（联想展开时把 OD 卡片提到兄弟卡片之上）—— `.rv-card` 自带 `isolation:isolate`，子元素 z-index 只在卡内有效，压不过兄弟卡片。
+
+### 验证与已知限制
+
+- 单测 174 通过 / 0 失败；`vue-tsc` 与 `tsc` 三包零错误。
+- headless Edge 实测：A1 景点 42/42 可见、A2 编号点选正确、`/drive` 与 `/drive/road/G318` 移动端 390px 无横向溢出。
+- **未解决**：OD 跨省规划仍不可用（A3 的图碎裂属N4 阶段数据建设，需按几何交叉点缝合 33 条路）；公路几何 `points`/`segments` 顺序错乱需重跑抓取；景点库 1035 条（目标 3万）；县/乡/村道名录仍为 0 条。
+- 回滚：本次改动集中在上述文件，`data/roads/geom/*.json` 可从 Temp 备份还原。
 
 ## [0.5.2] — 2026-10-02
 

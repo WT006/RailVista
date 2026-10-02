@@ -6,8 +6,7 @@
  * 搜索框视觉权重 > 榜单入口，榜单放在第二屏。
  *
  * 结构：
- *   1. 全幅公路网 SVG 底图（离线中国轮廓 + /drive/network/overview 抽稀折线，
- *      ROAD_COLORS 按等级着色，点击路线进 /drive/road/:key）
+ *   1. 全国公路网背景层 DriveBackdropMap（与铁路行程页同规格：地图只做背景）
  *   2. 起终点 OD 搜索（suggest 四类索引 + geocode 兜底）+ ⇄ 交换
  *   3. 公路编号键盘（对标车次号前缀键盘：G/S/X/Y/C + 数字；S 需先选省）
  *   4. 路网统计 + 覆盖诚实说明（PRD §3.1）
@@ -16,57 +15,62 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '../api/client';
+import DriveBackdropMap from '../components/DriveBackdropMap.vue';
 import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 
 usePointerSpotlight();
-import outlineRaw from '../assets/china-outline.svg?raw';
-import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
 import { ROAD_COLORS, roadColor, roadClassLabel, classOfRef } from '../data/roadColors';
 import type { PlaceHit, RoadClass } from '@railvista/shared';
 
 const router = useRouter();
 
-// ── 公路网底图 ───────────────────────────────────────────────────────────────
-const VIEW_W = CHINA_OUTLINE_VIEWBOX.width;
-const VIEW_H = CHINA_OUTLINE_VIEWBOX.height;
-const outlinePaths = (() => {
-  const m = /<g[^>]*>([\s\S]*?)<\/g>/.exec(outlineRaw);
-  return m ? m[1].trim() : '';
-})();
-
-interface RoadLine {
+/**
+ * ── 全国公路网 ──────────────────────────────────────────────────────────────
+ * 路网几何由 `DriveBackdropMap` 作为**整页背景**渲染（与铁路行程页同一规格：
+ * 地图只做背景，前景是内容）。这里只取索引，用于「干线直达」快捷入口与等级图例。
+ * 此前前景另有一张 46vh 的路网 SVG 卡，与背景重复且深色填充轮廓在背景上成斑块，已移除。
+ */
+interface RoadBrief {
   key: string;
   ref: string;
   name?: string;
   class: RoadClass;
   lengthKm: number;
-  d: string;
 }
 
-const roadLines = ref<RoadLine[]>([]);
+const roadList = ref<RoadBrief[]>([]);
 const netError = ref('');
-
-function polylineToPath(pts: [number, number][]): string {
-  let d = '';
-  for (let i = 0; i < pts.length; i += 1) {
-    const [x, y] = lngLatToViewBox(pts[i]![0], pts[i]![1]);
-    d += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
-  }
-  return d;
-}
 
 async function loadNetwork() {
   try {
     const data = await api.getDriveNetworkOverview();
-    roadLines.value = data.roads
+    roadList.value = data.roads
       .filter((r) => r.polyline.length >= 2)
-      .map((r) => ({ ...r, d: polylineToPath(r.polyline) }));
+      .map((r) => ({
+        key: r.key,
+        ref: r.ref,
+        name: r.name,
+        class: r.class,
+        lengthKm: r.lengthKm,
+      }));
   } catch (e) {
     netError.value = e instanceof Error ? e.message : '路网图层加载失败';
   }
 }
+
+/** 干线直达：按里程取前若干条作快捷入口（背景图上画的就是这些已挂几何的公路） */
+const hotRoads = computed(() =>
+  [...roadList.value].sort((a, b) => b.lengthKm - a.lengthKm).slice(0, 12),
+);
+
+/** 等级图例：与背景路网、编号徽标共用 ROAD_COLORS 单一色板，不硬编码颜色 */
+const LEGEND = (['national', 'expressway', 'provincial', 'county'] as RoadClass[]).map((cls) => ({
+  cls,
+  label: roadClassLabel(cls),
+  color: roadColor(cls),
+}));
 
 function openRoad(key: string) {
   void router.push(`/drive/road/${encodeURIComponent(key)}`);
@@ -308,6 +312,7 @@ const levelLabel: Record<string, string> = {
 
 <template>
   <div class="drive-page">
+    <DriveBackdropMap />
     <AppTopBar />
 
     <main class="rv-shell">
@@ -323,27 +328,6 @@ const levelLabel: Record<string, string> = {
 
       <!-- 首屏主体：地图 + OD 搜索 + 编号键盘（搜索框视觉权重 > 榜单，验收项） -->
       <section class="drive-home-main">
-        <div class="drive-netmap rv-card" data-spotlight>
-          <svg :viewBox="`0 0 ${VIEW_W} ${VIEW_H}`" class="drive-netmap__svg" role="img" aria-label="全国公路网示意图">
-            <g class="drive-netmap__outline" v-html="outlinePaths" />
-            <path
-              v-for="r in roadLines"
-              :key="r.key"
-              class="drive-netmap__road"
-              :class="`drive-netmap__road--${r.class}`"
-              :d="r.d"
-              :stroke="roadColor(r.class)"
-            >
-              <title>{{ r.ref }} {{ r.name ?? '' }} · 约 {{ Math.round(r.lengthKm) }} km（估算）</title>
-            </path>
-          </svg>
-          <p v-if="netError" class="drive-netmap__note">{{ netError }}</p>
-          <p v-else-if="!roadLines.length" class="drive-netmap__note">
-            路网几何加载中…（无几何时仅显示索引统计）
-          </p>
-          <p class="drive-netmap__hint">点击路线进入单条公路详情</p>
-        </div>
-
         <div class="drive-home-panel">
           <!-- OD 搜索 -->
           <form
@@ -516,6 +500,44 @@ const levelLabel: Record<string, string> = {
             </div>
           </div>
         </div>
+
+        <!-- 路网速览：图例 + 干线直达（背景图即全国公路网，此处不再重复画一张地图） -->
+        <aside class="drive-netpanel rv-card" data-spotlight>
+          <h2 class="drive-netpanel__title">全国公路网</h2>
+          <p class="drive-netpanel__sub">页面背景即为已挂几何的公路干线，颜色按等级区分</p>
+
+          <ul class="drive-legend">
+            <li v-for="l in LEGEND" :key="l.cls">
+              <i class="drive-legend__dot" :style="{ background: l.color }" aria-hidden="true"></i>
+              <span>{{ l.label }}</span>
+            </li>
+          </ul>
+
+          <div class="drive-hotroads">
+            <span class="drive-hotroads__label">干线直达 · 按已绘里程排序</span>
+            <div v-if="hotRoads.length" class="drive-hotroads__chips">
+              <button
+                v-for="r in hotRoads"
+                :key="r.key"
+                type="button"
+                class="drive-hotroads__chip"
+                :style="{ '--prefix-color': roadColor(r.class) }"
+                :title="`${r.ref} ${r.name ?? ''} · 已绘几何 ${Math.round(r.lengthKm)} km（估算，非官方里程）`"
+                @click="openRoad(r.key)"
+              >
+                <b>{{ r.ref }}</b>
+                <em>{{ Math.round(r.lengthKm) }} km</em>
+              </button>
+            </div>
+            <p v-if="netError" class="drive-netpanel__note">{{ netError }}</p>
+            <p v-else-if="!hotRoads.length" class="drive-netpanel__note">
+              路网几何加载中…（暂无可直达的干线）
+            </p>
+            <p v-else class="drive-netpanel__note">
+              里程为已绘制几何长度（估算），非官方里程；全国公路网背景层不阻塞页面加载。
+            </p>
+          </div>
+        </aside>
       </section>
 
       <!-- 路网统计 + 诚实边界 -->

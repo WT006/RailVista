@@ -595,65 +595,118 @@
   align-items: stretch;
 }
 
-.drive-netmap {
-  position: relative;
-  min-height: 46vh;
-  padding: var(--space-2);
-  overflow: hidden;
-  display: flex;
-}
-
-.drive-netmap__svg {
-  width: 100%;
-  flex: 1;
-  min-height: 0;
-}
-
-.drive-netmap__outline :deep(path),
-.drive-netmap__outline path {
-  fill: var(--fill-subtle);
-  fill-opacity: 0.5;
-  stroke: var(--line-default);
-  stroke-opacity: 0.6;
-  stroke-width: 0.7;
-  vector-effect: non-scaling-stroke;
-}
-
-.drive-netmap__road {
-  fill: none;
-  stroke-width: 2;
-  stroke-opacity: 0.85;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  cursor: pointer;
-}
-
-.drive-netmap__road:hover {
-  stroke-opacity: 1;
-  stroke-width: 3.2;
-}
-
-.drive-netmap__note,
-.drive-netmap__hint {
-  position: absolute;
-  left: var(--space-3);
-  margin: 0;
-  font-size: var(--fs-micro);
-  color: var(--text-3);
-}
-
-.drive-netmap__note {
-  top: var(--space-2);
-}
-
-.drive-netmap__hint {
-  bottom: var(--space-2);
-}
-
 .drive-home-panel {
   display: grid;
   gap: var(--space-3);
   align-content: start;
+}
+
+/* —— 路网速览（背景地图的图例与快捷入口，不重复画一张地图） —— */
+.drive-netpanel {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  padding: var(--space-3);
+}
+
+.drive-netpanel__title {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.drive-netpanel__sub,
+.drive-netpanel__note {
+  margin: 0;
+  font-size: var(--fs-micro);
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+.drive-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.drive-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-cap);
+  color: var(--text-2);
+}
+
+.drive-legend__dot {
+  width: 10px;
+  height: 3px;
+  border-radius: 999px;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.drive-hotroads {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drive-hotroads__label,
+.drive-hotroads__label + * {
+  font-size: var(--fs-micro);
+}
+
+.drive-hotroads__label {
+  color: var(--text-3);
+  letter-spacing: 0.08em;
+}
+
+.drive-hotroads__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.drive-hotroads__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--prefix-color) 42%, transparent);
+  border: 1px solid var(--line-default);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--prefix-color) 12%, transparent);
+  background: var(--fill-subtle);
+  color: var(--text-1);
+  font: inherit;
+  font-size: var(--fs-cap);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background var(--dur-fast) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard);
+}
+
+.drive-hotroads__chip b {
+  color: var(--prefix-color);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-hotroads__chip em {
+  font-style: normal;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-hotroads__chip:hover {
+  border-color: var(--prefix-color);
+  background: color-mix(in srgb, var(--prefix-color) 20%, transparent);
+  background: var(--fill-accent);
+  transform: translateY(-1px);
 }
 
 /* —— OD 搜索 —— */
@@ -1553,12 +1606,14 @@
 }
 
 @media (min-width: 840px) {
+  /* 搜索面板必须比路网速览更宽（验收项：搜索框视觉权重 > 任何非搜索元素） */
   .drive-home-main {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-columns: minmax(0, 8fr) minmax(0, 5fr);
   }
 
-  .drive-netmap {
-    min-height: 420px;
+  .drive-netpanel {
+    position: sticky;
+    top: calc(var(--appbar-h) + var(--space-3));
   }
 
   .drive-road-grid {

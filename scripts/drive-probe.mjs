@@ -86,7 +86,12 @@ const report = await evaluate(`(() => {
     scrollW: doc.scrollWidth, clientW: doc.clientWidth,
     cardCount: cards,
     roadKbd: document.querySelectorAll('.road-kbd__prefix, .road-kbd__digit').length,
-    netmapRoads: document.querySelectorAll('.drive-netmap__road').length,
+    backdrop: {
+      canvas: document.querySelectorAll('.drive-backdrop__canvas').length,
+      ready: document.querySelectorAll('.drive-backdrop.is-net-ready').length,
+      legend: document.querySelectorAll('.drive-legend li').length,
+      hotRoads: document.querySelectorAll('.drive-hotroads__chip').length,
+    },
     navLinks: [...document.querySelectorAll('.appbar__nav a')].map((a) => ({ text: a.textContent.trim(), href: a.getAttribute('href') })),
     names: names.slice(0, 8),
     folded: names.filter((n) => !n.ok).map((n) => n.text),

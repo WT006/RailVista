@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.5.3`**（2026-10-02）
+**当前版本：`0.5.4`**（2026-10-02）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,83 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.5.4] — 2026-10-02
+
+**自驾页背景重做：全国公路网光带背景 + 首屏改为搜索主导**（分支 `heyworldchannel-20261002`）。
+
+对应诊断报告 §三「视觉与交互」的第 1、3 项（背景统一为公路网风格 / 沉浸光感全局化）。
+用户诉求原文：「把自驾页的背景设计成非常好看的那种感觉……设计成这个全国公路网这种就比较好。
+要参考那个行程页的，就是铁路的景点那种地图的这个规格设计。」
+
+### B1 新增 `<DriveBackdropMap>`：全国公路网光带背景（6 个自驾页统一接入）
+
+- 动机：v0.4.0 起自驾 6 个页面**没有背景层**，而铁路行程页（`SelectTrip.vue`）自始就有
+  `<ChinaBackdropMap>`。用户明确要求按铁路行程页的地图规格设计，且要体现"全国公路网"。
+- 规格对齐（逐项与 `ChinaBackdropMap.vue` 一致，便于后续合并同一套背景抽象）：
+  - 投影与 viewBox：复用 `CHINA_OUTLINE_VIEWBOX`（1000×971）与 `china-outline.svg`（`?raw` 内联，
+    运行时零网络请求、无密钥依赖）；
+  - 铺满策略：`position: fixed; inset: 0` + `width: 120vmax` + `aspect-ratio: 1000/971`
+    + `translate(-50%,-50%)`，竖屏 `150vw`、横屏矮屏 `150vh` 三档；
+  - 边缘 `mask-image` 径向渐隐、整体不透明度走 `--backdrop-map-opacity`（0.48）、
+    整层 `pointer-events: none`、触屏与 `prefers-reduced-motion` 下只渲染静态底图。
+- 公路版专属观感（与铁路版的差异点）：
+  - 路网按「外发光宽带（5.5× 线宽、低透明）+ 高亮细芯（0.85× 线宽）」**两遍描线**，
+    叠加处用 `globalCompositeOperation = 'lighter'` 自然变亮 → 形成"路网光带"而不是一团亮斑；
+  - 线色取 `ROAD_COLORS` 单一色板（与编号徽标、沿程标记同源，不硬编码）；
+  - 景点星点改**琥珀色**（`rgb(255,184,77)`）与铁路版冷蓝星点区分；
+  - 指针不仅点亮光圈内景点，还会让**穿过光圈的公路段**加亮（包围盒粗筛 + 60 单位空间分桶），
+    形成"探照灯扫过路网"的效果。
+- 体积纪律（沿用"懒加载禁止进主 bundle"约束）：
+  - `scripts/build-drive-backdrop.mjs`（新增）构建期产出两个文件：
+    `apps/web/src/data/driveBackdrop.ts`（主模块，含 viewBox 常量、解包函数、1035 个星点）
+    与 `apps/web/src/data/driveRoadNetwork.ts`（33 条公路折线，`ROAD_NETWORK_CHUNK` 动态 import）；
+  - 折线做**弧长重采样**（`SAMPLE_UNITS = 4`，单路上限 420 点）并压成扁平整数数组；
+  - 实测：主模块 24.9 KB（gzip 7.9 KB），懒加载块 153.6 KB（gzip 46 KB），首屏不阻塞，
+    路网到达后 canvas 才淡入（`is-net-ready`），视觉上是"路网逐渐点亮"。
+  - **关键正确性细节**：折线取 `points ∪ segments` 的并集 —— G318 真实的上海段（121°E）
+    只存在于 `segments` 里，若只取主链（91–103°E）会直接丢掉华东整段。
+- 接入：6 个自驾页（`DriveHome` / `DriveTrip` / `DriveRoad` / `DriveRankings` / `DriveBoard` /
+  `DriveRoadbook`）在 `.drive-page` 首子节点挂 `<DriveBackdropMap />`。
+
+### B1-b 移除首屏重复的前景路网卡（`DriveHome`）
+
+- 现象：`DriveHome` 首屏左侧原有一张 46vh 的 `.drive-netmap` SVG 卡，画的正是同一份
+  `/drive/network/overview` 折线，并带 `fill: var(--fill-subtle)` 的深色中国轮廓填充。
+  背景层上线后两者重复，且深色填充轮廓在背景上渲染成一块与地图无关的"斑块"。
+- 处置：删除该卡，改为 `aside.drive-netpanel「全国公路网」`——**等级图例（4 条，取 `ROAD_COLORS`）
+  + 干线直达 chips（按已绘里程取前 12 条，点击进 `/drive/road/:key`）**，
+  既保留"点路线进单条公路"的入口，又不与背景抢注意力。
+- 首屏栅格：≥840px 由 `7fr 5fr`（地图在左）改为 `8fr 5fr`（**搜索在左且更宽**），
+  落实验收项「DriveHome 首屏搜索框权重必须 > 榜单入口」；移动端顺序不变（搜索仍在最上）。
+- 措辞诚实化：chips 的里程明确标注为「已绘几何长度（估算），非官方里程」——
+  因为 `build-road-index.mjs:241` 会用几何长度覆盖索引里的 `lengthKm`，
+  按这个数字排序并不等于"公路实际长度排序"（例：G318 已绘 1954 km / 官方 5476 km，覆盖率 36%）。
+
+### 验证
+
+- `vue-tsc --noEmit`（web）+ `tsc --noEmit`（api）+ shared 构建：全部通过。
+- 单测 174 例全通过（含 drive 雷达/采样 2 文件）。
+- 真实浏览器（headless Edge + CDP）实测 `scripts/drive-probe.mjs`：
+  - `/drive` 1440×900 与 390×844：无横向溢出（scrollW == clientW）、
+    背景 canvas 1 个且 `is-net-ready`、图例 4 项、干线 chips 12 个、中文名 0 折行；
+  - `/drive/trip`、`/drive/rankings`、`/drive/road/G318` 1440×900：同样无溢出、背景就绪。
+- 轮廓层等价性验证：单独渲染 `.drive-backdrop__outline` 与铁路页 `.backdrop` 的轮廓层，
+  两者逐像素同形（同一份 `china-outline.svg`，291 环、bbox 0,0–1000,971 铺满 viewBox），
+  即背景观感差异只来自新增的路网层，未改动铁路侧任何行为。
+
+### 已知限制 / 下一步
+
+- **`pnpm build` 在本机环境无法执行**：esbuild 原生进程（`@esbuild/win32-x64` 0.25.12 与 0.28.2
+  两个版本均试过）在本机被安全策略拦住文件读取，报 `winapi error #5 (ACCESS_DENIED)`，
+  连对仓库根目录的临时文件亦如此；`node` 自身读写正常，`apps/api` 的 `tsc` 构建正常。
+  属环境问题、与本轮改动无关（本轮只动模板 / 样式 / 前端脚本，且 `vue-tsc` 已通过）。
+  提交前如需产物验证，请在放行 esbuild 文件的终端重跑 `pnpm build`。
+- 沉浸光感仍是"零散组件"级别（仅首屏 hero + 卡片）；全局化留给 Sprint 2。
+- `.drive-page` 与 `.rv-page` 的背景声明目前**逐字重复**（两份完全相同的 radial-gradient + surface-0），
+  待 Sprint 2B 背景层统一时合并。
 
 ---
 

@@ -437,6 +437,8 @@ const globalViewBox = computed<ViewBox>(() => {
 
 /** 聚焦时使用的视野（未聚焦 = 全局） */
 const focusViewBox = ref<ViewBox | null>(null);
+/** 已到缩放比上限、且到上限后仍达不到 HIGHLIGHT_TARGET_PX（UI 需如实说明，不假装成功） */
+const focusCapped = ref(false);
 
 const viewBoxAttr = computed(() => {
   const vb = focusViewBox.value ?? globalViewBox.value;
@@ -478,6 +480,7 @@ function focusSpotOnMap(s: AlongSpot): void {
 function clearFocus(): void {
   focusTarget.value = null;
   focusViewBox.value = null;
+  focusCapped.value = false;
 }
 
 /**
@@ -572,11 +575,12 @@ const activeSegmentPath = computed(() => {
   let d = '';
   for (let k = 0; k < idxs.length; k += 1) {
     const [x, y] = pts[idxs[k]!]!;
-    // 精度必须给足：分段聚焦时缩放比可达 50+ px/单位，
-    // `toFixed(1)` 的 0.1 单位量化误差就达 5px 以上 ——
-    // 实测 G318 第 6 段（390 断点）段高仅 0.467 单位，量化后画出来只有 21.3px，
-    // 达不到「短边 ≥ 24px」判据。这里用 3 位小数。
-    d += `${k === 0 ? 'M' : 'L'}${x.toFixed(3)} ${y.toFixed(3)}`;
+    // 精度必须给足：量化误差 = 10^-decimals × 缩放比。
+    // toFixed(1) 在 50 倍就达 5px（G318 第 6 段实测只有 21.3px）；
+    // toFixed(3) 在 1000 倍达 0.5px，仍是隐形天花板；
+    // 第五轮把 SCALE_MAX 提到 8000（见其注释的两条依据），故用 5 位小数，
+    // 8000 倍下量化误差 0.40px < 1px。
+    d += `${k === 0 ? 'M' : 'L'}${x.toFixed(5)} ${y.toFixed(5)}`;
   }
   return d;
 });
@@ -617,27 +621,28 @@ const HIGHLIGHT_MIN_PX = 24;
  */
 const HIGHLIGHT_TARGET_PX = HIGHLIGHT_MIN_PX * 1.3;
 /**
- * 缩放比上限（px/viewBox 单位）。
- * 高德/本地地名锚点之间的段可能又长又扁（内容高仅 0.6 单位），
- * 要让短边达到 24px 需要缩放比 ~40，因此上限必须放得开。
- * 放大后线宽不会失控：高亮线已用 `vector-effect: non-scaling-stroke`，
- * 线宽以屏幕像素计，不随缩放比膨胀。
+ * v0.6.5 第五轮修正 · 缩放比上限（px / viewBox 单位）。
+ *
+ * ⚠️ 第五轮初版把极短线路改成「段 bbox ≈ 全链 bbox 就不收拢」，QA 复验发现**更糟**：
+ * G256 / G1502 / G8311 的高亮从 2×4px / 17×10px / 31×13px 掉到 **0×0px / 1×0px / 1×1px**
+ * —— 因为这几条路 `coords` 只有 2 个点，在 40 单位的全局视野下必然亚像素。
+ * 「点了没反应」正是需求方第一轮投诉的原话，所以**不能靠不收拢来回避**。
+ * 现改为「尽量收拢到可见 + 上限兜底」，本常量是那个上限。
+ *
+ * ── 上限取 8000 的依据（两条独立约束在此交汇）──
+ * 1) **d 字符串量化**：`activeSegmentPath` 的坐标写到 `toFixed(5)`，量化误差
+ *    ≤ 0.00005 viewBox 单位；在 8000 倍下 = 0.40px < 1px，线不会变锯齿。
+ *    （上一版 `toFixed(3)` 在 1000 倍就逼近 0.5px，是更早的隐形天花板。）
+ * 2) **数据量子**：1 viewBox 单位 ≈ 6.85km（赤道水平）。8000 倍下约 **0.86 m/px**，
+ *    而 5 位小数坐标的存储量子是 **1.11m ≈ 1.3px** —— 再放大就是放大
+ *    OSM 坐标的量化噪声，而不是真实道路形状。
+ *
+ * **超过 8000 倍会失真**：画面只剩 1~2 个数据点的连线，线形由坐标取整决定，
+ * 不再反映实际走向。
  */
-const SCALE_MAX = 400;
+const SCALE_MAX = 8000;
 /** 景点并入 bbox 后允许的最大放大倍数（相对纯段 bbox） */
 const SPOT_BBOX_MAX = 2.2;
-/**
- * v0.6.5（P1-4）：段 bbox / 全链 bbox 的**面积比**阈值。
- *
- * 当某段的 bbox 已经几乎等于整条链的 bbox 时，收拢 viewBox 没有任何信息增益 ——
- * 视野本来就等于全线，再收拢只是把同一段路放大到「只剩一条线」，高亮反而更细。
- * 实测极短线路（实绘 < 1km）上 **85.5% 的段**属于这种（比值 p25 即为 1.000），
- * 例如 G256 全局 viewBox 40 单位、点击后被收拢到 1.7 单位，高亮只剩 2×4px，
- * 用户反馈「点了反而更看不清」。
- *
- * 超过该阈值时直接沿用全局视野（`focusViewBox = null`），不收拢。
- */
-const SEGMENT_FOCUS_MIN_GAIN = 0.8;
 
 function focusSegmentView(index: number): void {
   const seg = segments.value[index];
@@ -700,34 +705,18 @@ function focusSegmentView(index: number): void {
   // segW=0.592 单位但 contentW=1.303，据此算出的 s 只让线宽到 19.8px（< 24px）。
   // 用 HIGHLIGHT_TARGET_PX（32px）而非及格线 24px：贴着及格线交付会被视口尺寸波动打穿
   const sMin = HIGHLIGHT_TARGET_PX / Math.min(segW, segH);
-  const s = Math.max(1, Math.min(Math.max(sFit, sMin), SCALE_MAX));
+  const sWanted = Math.max(sFit, sMin);
+  const s = Math.max(1, Math.min(sWanted, SCALE_MAX));
 
-  // ── P1-4：没有放大增益就不收拢 ──
-  // ① 段 bbox 已经几乎等于**主链** bbox → 收拢只是把同一条路放大，视野更窄、高亮更细；
-  // ② 目标缩放比 < 1（算出来是「缩小」）→ 收拢反而丢信息。
-  // 两种情况都退回全局视野，让用户至少还能看清整条线的位置关系。
-  //
-  // ⚠️ 比较基准必须是**主链未加内边距的 bbox**，不能直接用 `globalViewBox`：
-  // 后者的 padX/padY 有 20 单位的下限（`bboxOfViewPts`），
-  // 对极短线路会放大成 40×40，而段 bbox 只有 0.004 单位 —— 拿单位不对等的两个框比，
-  // 会把「段=全链」误判成「段只占万分之一」，于是照样收拢（这正是 G256 点了反而更看不清的原因）。
-  let chainMinX = Infinity;
-  let chainMinY = Infinity;
-  let chainMaxX = -Infinity;
-  let chainMaxY = -Infinity;
-  for (const [px, py] of pts) {
-    if (px < chainMinX) chainMinX = px;
-    if (px > chainMaxX) chainMaxX = px;
-    if (py < chainMinY) chainMinY = py;
-    if (py > chainMaxY) chainMaxY = py;
-  }
-  const chainW = Math.max(chainMaxX - chainMinX, 1e-9);
-  const chainH = Math.max(chainMaxY - chainMinY, 1e-9);
-  const bboxGain = Math.sqrt((segW * segH) / (chainW * chainH));
-  if (bboxGain >= SEGMENT_FOCUS_MIN_GAIN || s <= 1) {
-    focusViewBox.value = null; // 不收拢，沿用全局
+  // 目标缩放比 < 1（算出来是「缩小」）→ 收拢反而丢信息，直接不收拢。
+  if (sWanted <= 1) {
+    focusViewBox.value = null;
+    focusCapped.value = false;
     return;
   }
+
+  // 是否「已到上限、且到上限后仍达不到 32px」——用于 UI 如实说明，不假装成功。
+  focusCapped.value = sWanted > SCALE_MAX && Math.min(segW, segH) * s < HIGHLIGHT_TARGET_PX;
 
   // 4) viewBox 宽高比与容器一致 → 无 letterbox，短边即 content短边 × s
   const vbW = cw / s;
@@ -755,11 +744,21 @@ const isTinyRoute = computed<boolean>(() => chainMaxKm.value > 0 && chainMaxKm.v
 const tinyRouteKmText = computed<string>(() => `${chainMaxKm.value.toFixed(1)} km`);
 
 /**
- * 分段提示条文案：极短线路不显示「已聚焦第 N 段」（那会暗示存在多段可选），
- * 改说「全线仅 X km，已整体显示」。
+ * 分段提示条文案。
+ *
+ * 极短线路有两种结局，都必须如实说：
+ * · 放大到上限后**够 32px** → 正常说「已聚焦第 N 段」（真的聚焦了）；
+ * · 放大到上限**仍不够** → 说「已放到最大」，**不假装成功**。
+ * 早期版本一律说「已整体显示」，但那时其实已改成不收拢 —— 现在收拢回来了，
+ * 文案必须跟着实际行为走。
  */
 const focusScopeText = computed<string>(() => {
-  if (isTinyRoute.value) return `全线仅 ${tinyRouteKmText.value}，已整体显示`;
+  if (focusCapped.value) {
+    return `全线仅 ${tinyRouteKmText.value}，已放到最大（再放大只剩数据噪声）`;
+  }
+  if (isTinyRoute.value) {
+    return `全线仅 ${tinyRouteKmText.value}，已放大显示`;
+  }
   return `已聚焦第 ${(activeSegment.value ?? 0) + 1} 段 · ${segments.value[activeSegment.value ?? 0]?.title ?? ''}`;
 });
 
@@ -1119,7 +1118,7 @@ function fmtKm(v: number): string {
                   </button>
                 </li>
               </ul>
-              <p class="drive-seg__hint">{{ segmentSourceNote }}；<template v-if="isTinyRoute">全线过短，点击将整体显示</template><template v-else>点击可只看该段并高亮</template></p>
+              <p class="drive-seg__hint">{{ segmentSourceNote }}；<template v-if="isTinyRoute">线路过短，点击会尽量放大显示</template><template v-else>点击可只看该段并高亮</template></p>
               <!-- P1-3：分段覆盖率披露。段名只来自主链已绘制部分，尾部里程可能没有地名段 -->
               <p v-if="segmentCoverage" class="drive-seg__cover">
                 分段覆盖 0—{{ fmtKm(segmentCoverage.lastKm) }} km，占已收录里程

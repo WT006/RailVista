@@ -217,6 +217,43 @@ export function decimatePoints<T extends [number, number, number?]>(points: T[],
 }
 
 /**
+ * v0.6.5：抽稀并**同时返回被选中点的下标**。
+ *
+ * 背景（P0-1 根因）：/along 响应把主链从 3669 点抽稀到 600 点后返回给前端，
+ * 前端为了给「分段」定位折线，只能在这条**降采样后的短链**上重算 haversine 累计里程。
+ * 但抽稀本身会「切掉弯道」——点数越少折线越直，累计里程必然缩水
+ * （实测 G318 抽稀后重算 1509.5km，而全分辨率是 1627.4km，缩水 117.8km / 7.2%）。
+ * 于是末段（1518.6~1568.8km）完全落在重算链之外，遍历不到任何点 → `d=""` → 无高亮。
+ * 全量扫描约 2619 条路存在这种「无高亮段」。
+ *
+ * 为什么不用「等弧长抽稀」：实测它更差（G318 缩水 126.9km / 7.8%）。
+ * 抽稀减少点数必然切弯道，重新分布采样点并不能保住总长 —— 这是抽稀的固有代价。
+ *
+ * 正解：**不要让前端重算里程**。里程是全分辨率链的固有属性，应当在抽稀**之前**
+ * 算好、随坐标一起下发（见 `planRoadRoute` 返回的 `cumKm`），
+ * 抽稀时按下标同步切片即可保持一一对应。
+ *
+ * @returns 抽稀后的点 + 每个点在原数组中的下标
+ */
+export function decimatePointsWithIndex<T extends [number, number, number?]>(
+  points: T[],
+  maxPoints: number,
+): { points: T[]; indices: number[] } {
+  if (points.length <= maxPoints) {
+    return { points, indices: points.map((_, i) => i) };
+  }
+  const step = (points.length - 1) / (maxPoints - 1);
+  const out: T[] = [];
+  const indices: number[] = [];
+  for (let i = 0; i < maxPoints; i += 1) {
+    const idx = Math.round(i * step);
+    indices.push(idx);
+    out.push(points[idx]!);
+  }
+  return { points: out, indices };
+}
+
+/**
  * B3-2：overview 结果按索引 mtime 缓存。
  * 原实现每次请求都要遍历 33 条几何、readFileSync + JSON.parse 合计约 5.72MB，
  * 同步 IO 期间阻塞整个事件循环，是「忽好忽坏」（限流 429 / 请求超时）的主要成因之一。

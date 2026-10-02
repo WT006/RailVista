@@ -14,7 +14,7 @@ import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AlongRouteOptions, AlongSpot, RoadChapter, RoadGeometryNode, RoadsideSpot } from '@railvista/shared';
-import { buildSpotGrid, partitionByChinaLand, spotsAlongRoute, type SpotGrid } from '@railvista/shared';
+import { buildSpotGrid, computeCumKm, partitionByChinaLand, spotsAlongRoute, type SpotGrid } from '@railvista/shared';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SPOTS_PATH = join(__dirname, '../../../../data/roads/roadside-spots.json');
@@ -133,16 +133,40 @@ export function buildChapters(
         toKm: b.atKm,
         fromSource: a.source,
         toSource: b.source,
+        fromType: a.type,
+        toType: b.type,
       });
     }
     if (chapters.length) return chapters;
   }
+  // ── 退化：等里程窗口 ──
+  //
+  // v0.6.5（P0-1）：里程窗口必须**夹到主链实绘长度**。
+  // `totalKm` 是全线名义里程（去重后、含未贯通的其它连通分量），而 coords 只是
+  // 主链 —— 两者差距很大（G111 totalKm=2848.6 但主链仅 847.6km；G345 4094.7 vs 341.6）。
+  // 原实现按 totalKm 切 120km 窗口，会切出大量**主链上根本没有点**的段：
+  // 实测 G111 24 段里 16 段、G345 35 段里 32 段点不中 → 地图上「点了没反应」。
+  // 夹到主链长度后，每一段都必然对应真实折线。
+  const chainKm = coords.length >= 2 ? (computeCumKm(coords)[coords.length - 1] ?? 0) : 0;
+  const windowTotal = chainKm > 0 ? Math.min(totalKm, chainKm) : totalKm;
+  if (!(windowTotal > 0)) return [];
   const windowKm = 120;
+  // v0.6.5：保留 1 位小数而非取整。极短编号（主链仅 0.1~0.5km，如 G1502 / 上海_Y101）
+  // 取整会把段落塌成 `0—0`，于是 `min(0, 0.4) > max(0, 0)` 不成立 → 整段被判无高亮。
+  // 实测这类文件全库有 218 个，是「无高亮段」清零后的最后一批。
+  const round1 = (v: number): number => Math.round(v * 10) / 10;
   const chapters: RoadChapter[] = [];
-  for (let from = 0; from < totalKm; from += windowKm) {
-    const to = Math.min(from + windowKm, totalKm);
-    chapters.push({ title: `第 ${chapters.length + 1} 段 · ${Math.round(from)}—${Math.round(to)} km`, fromKm: Math.round(from), toKm: Math.round(to) });
-    if (to >= totalKm) break;
+  for (let from = 0; from < windowTotal; from += windowKm) {
+    const to = Math.min(from + windowKm, windowTotal);
+    const fromKm = round1(from);
+    const toKm = round1(to);
+    // 零长度段一律不生成：极短编号（主链 0.04~120.04km，如 广西_S307 / 广西_S318）
+    // 四舍五入后会塌成 `120—120` / `0—0`，而前端按「区间与折线求交」判定高亮，
+    // 零长度段必然求交为空 → 被计入「无高亮段」。宁可不分段，也不产出坏段。
+    if (toKm > fromKm) {
+      chapters.push({ title: `第 ${chapters.length + 1} 段 · ${fromKm}—${toKm} km`, fromKm, toKm });
+    }
+    if (to >= windowTotal) break;
   }
   return chapters;
 }

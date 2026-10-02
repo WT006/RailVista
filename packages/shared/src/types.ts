@@ -609,11 +609,37 @@ export interface RoadIndexEntry {
  */
 export type RoadAnchorSource = 'amap' | 'place' | 'station';
 
+/**
+ * v0.6.5（P1-2）：锚点所指的**地理实体类型**。
+ *
+ * 旧值只有 'city'，而 `fill-road-place-anchors.mjs` 除站名/省份外一律写 'city'，
+ * 导致「林则猕猴园」（动物园）、「天瀑」（瀑布）、「甲玛王宫」（宫殿）
+ * 全被标成城市聚落，UI 无法区分、用户会误以为是城镇。
+ *
+ * - settlement 聚落：城镇 / 村庄 / 行政驻地（最常见的段名）
+ * - pass       山口 / 垭口 / 关隘（公路分段的天然节点，如「米拉山口」）
+ * - landmark   景区 / 古建 / 地标等**非聚落**实体（如「甲玛王宫」「鲁朗林海」）
+ * - junction   省级行政区（历史值，保持兼容）
+ * - station    铁路站名兜底
+ * - city / service / pass / endpoint 为历史值，仅老数据可能出现
+ */
+export type RoadAnchorType =
+  | 'settlement'
+  | 'pass'
+  | 'landmark'
+  | 'junction'
+  | 'station'
+  // 历史值（老 geom 文件可能出现）
+  | 'city'
+  | 'service'
+  | 'endpoint';
+
 /** L1 几何节点（城市 / 交叉 / 服务 / 垭口 / 端点） */
 export interface RoadGeometryNode {
   name: string;
   atKm: number;
-  type: 'city' | 'junction' | 'service' | 'pass' | 'endpoint';
+  /** v0.6.5：缺失时按 'city'（历史语义）处理，UI 归为聚落 */
+  type: RoadAnchorType;
   /** v0.6.5：地名来源分级；缺省视为 'station'（历史数据均为站名兜底） */
   source?: RoadAnchorSource;
 }
@@ -717,6 +743,12 @@ export interface RoadChapter {
    */
   fromSource?: RoadAnchorSource;
   toSource?: RoadAnchorSource;
+  /**
+   * v0.6.5（P1-2）：段两端锚点的地理实体类型，供 UI 区分
+   * 「聚落（城镇）」与「山口 / 景区地标」—— 后者不该被当成地名读。
+   */
+  fromType?: RoadAnchorType;
+  toType?: RoadAnchorType;
 }
 
 /** 合成路线（OD 规划结果 / 榜单条目指向的路线） */
@@ -728,6 +760,15 @@ export interface RoadRoute {
   lengthKm: number;
   durationMin?: number;
   coords: RoadPoint[];
+  /**
+   * v0.6.5：与 `coords` **等长同源**的累计里程（km）。
+   *
+   * 必须由服务端在**抽稀之前**按全分辨率链算出，再随坐标一起下发；
+   * 抽稀时按被选中点的下标同步切片。理由：抽稀会切掉弯道、缩短折线
+   * （实测 G318 3669→600 点后重算里程缩水 117.8km / 7.2%），
+   * 前端若在降采样链上重算里程，末段会落在重算链之外导致分段无高亮。
+   */
+  cumKm?: number[];
   chapters?: RoadChapter[];
   boardIds?: string[];
   /** 规划引擎：amap（在线）/ local / local-spliced（端点外接）/ direct（两点直连） */

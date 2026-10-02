@@ -9,7 +9,7 @@ export const APP_VERSION = '0.6.5';
 
 /** 版本对应的发布/变更摘要，便于 UI 展示（与 CHANGELOG.md 首条一致） */
 export const APP_VERSION_SUMMARY =
-  '公路详情页改版：分段按地名切分（G318 拉萨—林芝 401km 拆成 6 段）、地名来源分级标注、精选景点剔除未译名条目、地图与信息栏重排';
+  '公路详情页返工：分段高亮真正可见（逐段实测短边 ≥24px）、无高亮段全量归零、地名类型区分聚落/山口/地标、分段覆盖率如实披露';
 
 export const APP_VERSION_DATE = '2026-10-03';
 

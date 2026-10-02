@@ -22,7 +22,7 @@ usePointerSpotlight();
 import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
 import { ROAD_COLORS, roadColor, roadClassLabel, classOfRef } from '../data/roadColors';
-import type { AlongSpot, RoadAnchorSource, RoadIndexEntry, RoadRoute } from '@railvista/shared';
+import type { AlongSpot, RoadAnchorSource, RoadAnchorType, RoadIndexEntry, RoadRoute } from '@railvista/shared';
 
 const route = useRoute();
 const router = useRouter();
@@ -105,7 +105,7 @@ const mainChainView = computed<[number, number][]>(() =>
 const routePath = computed(() => {
   const pts = mainChainView.value;
   if (pts.length < 2) return '';
-  return pts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`).join('');
+  return pts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(2)} ${y.toFixed(2)}`).join('');
 });
 
 /** 多段几何（orphan 链）SVG 路径：虚线渲染未贯通段 */
@@ -157,10 +157,21 @@ interface RoadSegment {
    * 段名带「站名推测」标记以免被当成已核实地名。
    */
   weakestSource: RoadAnchorSource | null;
+  /**
+   * v0.6.5（P1-2）：段内**较弱**的一侧锚点实体类型。
+   * 聚落（城镇）之外还有山口 / 景区地标 —— 「甲玛王宫 — 米拉山口」这类段名
+   * 若不标注，用户会误以为两端都是城镇。UI 加弱化角标说明。
+   */
+  weakestType: RoadAnchorType | null;
 }
 
 /** 来源强弱：数字大者更权威 */
 const SOURCE_STRENGTH: Record<RoadAnchorSource, number> = { station: 1, place: 2, amap: 3 };
+
+/** 实体类型强弱：数字大者越「像地名」 */
+const TYPE_STRENGTH: Record<string, number> = {
+  settlement: 4, city: 4, junction: 3, pass: 2, station: 1, landmark: 1, service: 1, endpoint: 0,
+};
 
 /** 取两端中较弱的一侧（保守标注） */
 function weakerSource(a?: RoadAnchorSource, b?: RoadAnchorSource): RoadAnchorSource | null {
@@ -168,6 +179,29 @@ function weakerSource(a?: RoadAnchorSource, b?: RoadAnchorSource): RoadAnchorSou
   if (!a) return b!;
   if (!b) return a;
   return SOURCE_STRENGTH[a] <= SOURCE_STRENGTH[b] ? a : b;
+}
+
+/** 同上，按实体类型取较弱一侧 */
+function weakerType(a?: RoadAnchorType, b?: RoadAnchorType): RoadAnchorType | null {
+  if (!a && !b) return null;
+  if (!a) return b!;
+  if (!b) return a;
+  return (TYPE_STRENGTH[a] ?? 0) <= (TYPE_STRENGTH[b] ?? 0) ? a : b;
+}
+
+/** 实体类型 → UI 角标文案（null = 聚落，无需标注） */
+const ANCHOR_TYPE_LABEL: Partial<Record<RoadAnchorType, string>> = {
+  pass: '山口',
+  landmark: '地标',
+  station: '站名',
+  junction: '省级',
+  service: '服务点',
+  endpoint: '端点',
+};
+
+function anchorTypeLabel(t: RoadAnchorType | null): string {
+  if (!t) return '';
+  return ANCHOR_TYPE_LABEL[t] ?? '';
 }
 
 const totalLengthKm = computed(() => roadRoute.value?.lengthKm ?? 0);
@@ -183,6 +217,7 @@ const segments = computed<RoadSegment[]>(() => {
       toKm: c.toKm,
       byPlace: !PLACE_SEGMENT_RE.test(c.title),
       weakestSource: weakerSource(c.fromSource, c.toSource),
+      weakestType: weakerType(c.fromType, c.toType),
     }));
   }
   if (!total) return [];
@@ -190,7 +225,7 @@ const segments = computed<RoadSegment[]>(() => {
   const windowKm = 120;
   for (let from = 0; from < total; from += windowKm) {
     const to = Math.min(from + windowKm, total);
-    out.push({ title: `第 ${out.length + 1} 段 · ${Math.round(from)}—${Math.round(to)} km`, fromKm: from, toKm: to, byPlace: false, weakestSource: null });
+    out.push({ title: `第 ${out.length + 1} 段 · ${Math.round(from)}—${Math.round(to)} km`, fromKm: from, toKm: to, byPlace: false, weakestSource: null, weakestType: null });
     if (to >= total) break;
   }
   return out;
@@ -201,16 +236,47 @@ const stationBasedSegmentCount = computed(
   () => segments.value.filter((s) => s.weakestSource === 'station').length,
 );
 
+/**
+ * v0.6.5（P1-3）：分段覆盖率披露。
+ *
+ * 段名来自「沿主链反查的地名锚点」，只能覆盖主链已绘制的部分；
+ * 而页面「收录里程」是全线名义里程（去重后，含未贯通的其它连通分量）。
+ * 两者差距很大：G318 分段覆盖 0—1568.8km，但标称收录 5346.6km —— 只占 29.3%。
+ * 不披露会让用户以为分段就是全线的完整体现。
+ */
+const segmentCoverage = computed(() => {
+  if (!segments.value.length) return null;
+  const lastKm = Math.max(...segments.value.map((s) => s.toKm));
+  const drawnKm = chainMaxKm.value;
+  // 分母用「主链实绘里程」，它才是分段能覆盖的上界
+  const denom = totalLengthKm.value > 0 ? totalLengthKm.value : drawnKm;
+  if (!(denom > 0)) return null;
+  return {
+    fromKm: 0,
+    lastKm: Math.min(lastKm, drawnKm || lastKm),
+    drawnKm,
+    totalKm: denom,
+    pct: Math.min(100, Math.round((Math.min(lastKm, drawnKm || lastKm) / denom) * 100)),
+    /** 尾部未覆盖里程（名义里程 - 分段覆盖），>0 说明还有里程没切出地名段 */
+    tailKm: Math.max(0, denom - Math.min(lastKm, drawnKm || lastKm)),
+  };
+});
+
 /** 分段是否全部为里程等分（决定要不要显示降级说明） */
 const segmentsByPlace = computed(() => segments.value.some((s) => s.byPlace));
 const segmentSourceNote = computed(() => {
   if (!segments.value.length) return '';
   if (!segmentsByPlace.value) return '暂无中途地名，仅按里程等分（该编号尚未收录地名锚点）';
   const base = '按沿线地名切段';
+  const notes: string[] = [];
   if (stationBasedSegmentCount.value > 0) {
-    return `${base}（其中 ${stationBasedSegmentCount.value} 段含站名推测，精度较低）`;
+    notes.push(`${stationBasedSegmentCount.value} 段含站名推测，精度较低`);
   }
-  return base;
+  // P0-1 降级提示：cumKm 缺失时前端在抽稀链上重算里程，末段可能定位不到
+  if (!cumKmAuthoritative.value) {
+    notes.push('分段定位里程为前端估算，末段高亮可能偏移');
+  }
+  return notes.length ? `${base}（${notes.join('；')}）` : base;
 });
 
 /** 每段的景点数（用于密度条与列表筛选） */
@@ -227,10 +293,20 @@ const maxSegmentSpots = computed(() => segmentSpots.value.reduce((m, arr) => Mat
 /** 当前选中的分段下标（null = 全部） */
 const activeSegment = ref<number | null>(null);
 
+/**
+ * v0.6.5（P1-1）：切段时必须**同时**清掉景点定位与景点视野。
+ *
+ * 原实现只清 `focusTarget`，漏清 `focusViewBox` —— 于是「点景点 → 再点分段」后
+ * viewBox 会卡在景点视角不回去，用户以为分段高亮失效。
+ * 统一走 `clearFocus()`（它两个都清），随后再由 `activeSegmentPath` / 段视图接管。
+ */
 function selectSegment(i: number): void {
-  activeSegment.value = activeSegment.value === i ? null : i;
-  // 切段时清掉景点定位，避免上一段的定位环留在新视角里造成误读
-  if (activeSegment.value !== null) focusTarget.value = null;
+  const next = activeSegment.value === i ? null : i;
+  activeSegment.value = next;
+  // 切段时清掉景点定位与景点视野，避免上一段的视角/标记留在新视角里造成误读
+  clearFocus();
+  // 选中分段 → 视野收拢到该段（见 focusSegmentView）；取消 → 回到全局（clearFocus 已复位）
+  if (next !== null) focusSegmentView(next);
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -324,6 +400,9 @@ interface FocusTarget {
 }
 const focusTarget = ref<FocusTarget | null>(null);
 const mapWrap = ref<HTMLElement | null>(null);
+/** P0-2：量 SVG 容器实际像素尺寸 —— viewBox 换算成屏幕像素必须有容器宽高，
+ *  否则无法保证「高亮短边 ≥ 24px」这条判据。 */
+const mapSvgRef = ref<SVGSVGElement | null>(null);
 
 /** 全局视野：覆盖主链 + 全部连通分量（G318 这类长线的分量可能分处东西两端） */
 interface ViewBox {
@@ -401,9 +480,29 @@ function clearFocus(): void {
   focusViewBox.value = null;
 }
 
-/** 主链各点对应的里程（km）：与 API progressKm 同量纲（主链投影里程） */
+/**
+ * v0.6.5（P0-1）：主链各点对应的里程（km）。
+ *
+ * **必须使用 API 下发的 `route.cumKm`，不能在前端重算。**
+ * /along 会把主链从 3669 点抽稀到 600 点，抽稀必然切掉弯道、缩短折线
+ * （实测 G318 抽稀后重算 1509.5km，全分辨率是 1627.4km，缩水 117.8km / 7.2%）。
+ * 若在降采样链上重算，末段（1518.6~1568.8km）完全落在重算链之外，
+ * `activeSegmentPath` 遍历不到任何点 → `d=""` → 地图上「点了没反应」。
+ * 服务端已在全分辨率链上算好 cumKm 并随抽稀同步切片下发（见 planRoadRoute）。
+ *
+ * 缺失时（老接口/其它来源）退回 haversine 兜底，并置 `cumKmAuthoritative=false`，
+ * 由 UI 降级提示告知用户「分段定位精度可能偏低」。
+ */
+const cumKmAuthoritative = computed<boolean>(() => {
+  const route = roadRoute.value;
+  if (!route) return false;
+  const cum = route.cumKm;
+  return Array.isArray(cum) && cum.length === route.coords.length && cum.length > 1;
+});
+
 const chainCumKm = computed<number[]>(() => {
   const coords = roadRoute.value?.coords ?? [];
+  if (cumKmAuthoritative.value) return roadRoute.value!.cumKm!;
   const out: number[] = new Array(coords.length).fill(0);
   for (let i = 1; i < coords.length; i += 1) {
     const a = coords[i - 1]!;
@@ -411,6 +510,12 @@ const chainCumKm = computed<number[]>(() => {
     out[i] = out[i - 1]! + haversineKm(a[0], a[1], b[0], b[1]);
   }
   return out;
+});
+
+/** 主链实际绘制到的里程（km），用于覆盖率披露与分段裁剪的上界 */
+const chainMaxKm = computed<number>(() => {
+  const cum = chainCumKm.value;
+  return cum.length ? cum[cum.length - 1]! : 0;
 });
 
 function haversineKm(lng1: number, lat1: number, lng2: number, lat2: number): number {
@@ -426,29 +531,204 @@ function haversineKm(lng1: number, lat1: number, lng2: number, lat2: number): nu
 /**
  * R3：选中分段的折线子路径（按里程区间裁剪主链）。
  * 高亮段用独立 path 绘制（加粗 + 不透明），未选中时主链整体变淡。
+ *
+ * v0.6.5（P0-1）：末段处理改为「**夹到主链末端**」而不是只认 `toKm`。
+ * 末段的 toKm 常大于主链实际里程（锚点取自全分辨率链，而 coords 已抽稀），
+ * 原判断 `i === pts.length - 1 && km <= seg.toKm` 在 km > toKm 时不成立，
+ * 末段最后一个点被丢掉；更严重的是整段可能一个点都匹配不上 → d=""。
+ * 现在先算区间与主链的交集，交集为空才返回空串。
  */
-const activeSegmentPath = computed(() => {
-  if (activeSegment.value === null) return '';
+/**
+ * 选中段落在主链上的**点下标集合**。
+ *
+ * v0.6.5（P0-2）：高亮折线与视野 bbox **必须用同一份下标**。
+ * 之前 bbox 用 `km >= lo && km <= hi`、折线用 `km >= lo && km < hi`，
+ * 两者不一致 → bbox 把右端点算进去、折线没画 → bbox 高估 →
+ * 反解出的缩放比偏小 → 实测 G318 第 6 段（390 断点）短边只有 20.6px（< 24px 判据）。
+ */
+function activeSegmentIndices(): number[] {
+  if (activeSegment.value === null) return [];
   const seg = segments.value[activeSegment.value];
-  if (!seg) return '';
-  const pts = mainChainView.value;
+  if (!seg) return [];
   const cum = chainCumKm.value;
-  if (pts.length < 2 || cum.length !== pts.length) return '';
-  let d = '';
-  let started = false;
-  for (let i = 0; i < pts.length; i += 1) {
+  const n = cum.length;
+  if (n < 2) return [];
+  const lo = Math.max(0, seg.fromKm);
+  const hi = Math.min(seg.toKm, cum[n - 1]!);
+  if (!(hi > lo)) return [];
+  const out: number[] = [];
+  for (let i = 0; i < n; i += 1) {
     const km = cum[i]!;
-    // 末段闭合：toKm 恰等于主链长度时把最后一个点也带上
-    const inRange = km >= seg.fromKm && (km < seg.toKm || (i === pts.length - 1 && km <= seg.toKm));
-    if (!inRange) {
-      started = false;
-      continue;
-    }
-    const [x, y] = pts[i]!;
-    d += `${started ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`;
-    started = true;
+    // 末点用 <= 闭合（保留区间右端点）
+    if (km >= lo && (km < hi || (i === n - 1 && km <= hi))) out.push(i);
+  }
+  return out;
+}
+
+const activeSegmentPath = computed(() => {
+  const idxs = activeSegmentIndices();
+  if (idxs.length < 2) return '';
+  const pts = mainChainView.value;
+  let d = '';
+  for (let k = 0; k < idxs.length; k += 1) {
+    const [x, y] = pts[idxs[k]!]!;
+    // 精度必须给足：分段聚焦时缩放比可达 50+ px/单位，
+    // `toFixed(1)` 的 0.1 单位量化误差就达 5px 以上 ——
+    // 实测 G318 第 6 段（390 断点）段高仅 0.467 单位，量化后画出来只有 21.3px，
+    // 达不到「短边 ≥ 24px」判据。这里用 3 位小数。
+    d += `${k === 0 ? 'M' : 'L'}${x.toFixed(3)} ${y.toFixed(3)}`;
   }
   return d;
+});
+
+/**
+ * v0.6.5（P0-2）：选中分段时把 viewBox **收拢到该段**，且保证高亮在屏幕上真的看得见。
+ *
+ * ── 判据（不可放宽）：高亮折线的**屏幕包围盒短边 ≥ 24px** ──
+ *
+ * ── 为什么不能简单「按内容 bbox 留边」──
+ * SVG 默认 `preserveAspectRatio="xMidYMid meet"`：viewBox 会**等比缩放并居中**。
+ * 若 viewBox 直接取内容 bbox + 边距，则缩放比 = min(cw/vbW, ch/vbH)，
+ * 对「又长又扁」的段（沿东西向近乎直线）来说，短边被压到几 px ——
+ * 实测 G318 第 6 段（贡觉林湖—仁布）就是这样：内容 bbox 约 256×0.6 单位，
+ * 套进 704×520 容器后短边只剩 **14.4px**，等于没高亮。
+ *
+ * ── 正确做法：反解缩放比 s（px / viewBox 单位）──
+ *   1. s_fit  = min(cw / 内容宽, ch / 内容高) / (1 + 边距)   —— 保证内容装得下
+ *   2. s_min  = 24 / min(内容宽, 内容高)                    —— 保证短边 ≥ 24px
+ *   3. s      = max(s_fit, s_min)，并夹在 [1, S_MAX] 内防过度放大
+ *   4. viewBox = 容器尺寸 / s，**宽高比与容器完全一致**（杜绝 letterbox 缩放）
+ * 这样内容既装得下，短边又一定 ≥24px。
+ *
+ * ── 景点如何纳入 ──
+ * 视区需容纳「该段高亮 + 两端锚点 + 该段景点」。但远处景点（沿路可达 35km）
+ * 若全量并入会把 bbox 撑大、把该段压成细线。折中：景点并入 bbox，
+ * 但总尺寸最多放大到纯段 bbox 的 SPOT_BBOX_MAX 倍（超出部分景点允许出视区）。
+ */
+const SEGMENT_FOCUS_PAD_RATIO = 0.12;
+/** 高亮短边下限（px）—— 与 tmp/road-v065-probe.mjs 的 HIGHLIGHT_MIN_PX 保持一致 */
+const HIGHLIGHT_MIN_PX = 24;
+/**
+ * 实际取用的目标短边 = 判据 × 本系数。
+ *
+ * 判据 24px 是**及格线**，不是目标值。实测发现贴着及格线交付很脆弱：
+ * G318 第 1 段（扎马日岗—邦仁）算出来是 **24.8px**，只比及格线高 0.8px ——
+ * 视口高度变化、滚动条出现/消失都会让它掉到 24px 以下（QA 用
+ * `tmp/seg-audit.mjs` 复测时该段就判为不合格），且 24.8px 本身视觉上也偏细。
+ * 因此把目标抬到 32px（24 × 1.3），留出足够余量。
+ */
+const HIGHLIGHT_TARGET_PX = HIGHLIGHT_MIN_PX * 1.3;
+/**
+ * 缩放比上限（px/viewBox 单位）。
+ * 高德/本地地名锚点之间的段可能又长又扁（内容高仅 0.6 单位），
+ * 要让短边达到 24px 需要缩放比 ~40，因此上限必须放得开。
+ * 放大后线宽不会失控：高亮线已用 `vector-effect: non-scaling-stroke`，
+ * 线宽以屏幕像素计，不随缩放比膨胀。
+ */
+const SCALE_MAX = 400;
+/** 景点并入 bbox 后允许的最大放大倍数（相对纯段 bbox） */
+const SPOT_BBOX_MAX = 2.2;
+
+function focusSegmentView(index: number): void {
+  const seg = segments.value[index];
+  if (!seg) return;
+  const pts = mainChainView.value;
+  if (pts.length < 2) return;
+
+  // 与高亮折线完全同一份下标（P0-2：两者必须一致，否则 bbox 高估、缩放比偏小）
+  const idxs = activeSegmentIndices();
+  if (idxs.length < 2) return;
+
+  // 1) 纯段 bbox
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const i of idxs) {
+    const [x, y] = pts[i]!;
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+  }
+  if (!Number.isFinite(minX)) return;
+  const segW = Math.max(maxX - minX, 0.001);
+  const segH = Math.max(maxY - minY, 0.001);
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+
+  // 2) 该段景点并入（限幅），保证「点的段 + 段的景点」尽量同框
+  const cum = chainCumKm.value;
+  const lo = Math.max(0, seg.fromKm);
+  const hi = Math.min(seg.toKm, cum[cum.length - 1]!);
+  const maxW = segW * SPOT_BBOX_MAX;
+  const maxH = segH * SPOT_BBOX_MAX;
+  // minX/minY/maxX/maxY 已是纯段 bbox，就地扩成「含景点」bbox
+  for (const s of spots.value) {
+    if (s.progressKm < lo || s.progressKm > hi) continue;
+    const [x, y] = lngLatToViewBox(s.lng, s.lat);
+    // 以段中心为基准限幅，避免远处景点把视区无限撑大
+    minX = Math.min(minX, Math.max(x, cx - maxW / 2));
+    maxX = Math.max(maxX, Math.min(x, cx + maxW / 2));
+    minY = Math.min(minY, Math.max(y, cy - maxH / 2));
+    maxY = Math.max(maxY, Math.min(y, cy + maxH / 2));
+  }
+
+  const contentW = Math.max(maxX - minX, 0.001);
+  const contentH = Math.max(maxY - minY, 0.001);
+
+  // 3) 反解缩放比
+  const el = mapSvgRef.value;
+  const cw = el?.clientWidth || 704;
+  const ch = el?.clientHeight || 520;
+  const padFactor = 1 + SEGMENT_FOCUS_PAD_RATIO * 2;
+  // sFit：让「含景点」的内容整体装得下
+  const sFit = Math.min(cw / (contentW * padFactor), ch / (contentH * padFactor));
+  // sMin：**用高亮折线自身的短边**（segW/segH），而不是含景点后的 contentW/H。
+  // 判据约束的是屏幕上能不能看见那条高亮线；景点可能把 content 撑大 2.2 倍，
+  // 若拿 content 的短边去算 sMin，会低估所需缩放比 —— 实测 G318 第 1 段
+  // segW=0.592 单位但 contentW=1.303，据此算出的 s 只让线宽到 19.8px（< 24px）。
+  // 用 HIGHLIGHT_TARGET_PX（32px）而非及格线 24px：贴着及格线交付会被视口尺寸波动打穿
+  const sMin = HIGHLIGHT_TARGET_PX / Math.min(segW, segH);
+  const s = Math.max(1, Math.min(Math.max(sFit, sMin), SCALE_MAX));
+
+  // 4) viewBox 宽高比与容器一致 → 无 letterbox，短边即 content短边 × s
+  const vbW = cw / s;
+  const vbH = ch / s;
+  focusViewBox.value = { x: cx - vbW / 2, y: cy - vbH / 2, w: vbW, h: vbH };
+}
+
+/**
+ * 极短线路阈值（km）。
+ *
+ * 主理人裁决：总长 < 1km 的编号（G1502 0.400km / G256 0.063km / G8311 0.477km）
+ * **不硬凑 24px 高亮** —— 把 63 米的路放大到 24px 需要 ~32000× 缩放比，地图会失真到无意义，
+ * 这类路线本就该是「一个点」而不是「一条线」。但**不能因此让用户以为点击失败**，
+ * 所以单独识别并给可见的替代反馈：
+ *   · 分段行直接标出总里程（如「全线 0.4 km」）
+ *   · 提示条改写成「全线仅 X km，已整体显示」而不是「已聚焦第 N 段」
+ * 探针里这类也从「无高亮」里分出，独立统计为「极短线」，两者不是同一缺陷。
+ */
+const TINY_ROUTE_KM = 1;
+
+/** 当前线路是否属于「极短线路」（主链实绘 < 1km） */
+const isTinyRoute = computed<boolean>(() => chainMaxKm.value > 0 && chainMaxKm.value < TINY_ROUTE_KM);
+
+/** 极短线路的里程文案（用于分段行与提示条） */
+const tinyRouteKmText = computed<string>(() => `${chainMaxKm.value.toFixed(1)} km`);
+
+/**
+ * 分段提示条文案：极短线路不显示「已聚焦第 N 段」（那会暗示存在多段可选），
+ * 改说「全线仅 X km，已整体显示」。
+ */
+const focusScopeText = computed<string>(() => {
+  if (isTinyRoute.value) return `全线仅 ${tinyRouteKmText.value}，已整体显示`;
+  return `已聚焦第 ${(activeSegment.value ?? 0) + 1} 段 · ${segments.value[activeSegment.value ?? 0]?.title ?? ''}`;
+});
+
+const segmentRangeNote = computed<string>(() => {
+  if (isTinyRoute.value) return `全线 ${tinyRouteKmText.value}`;
+  return '';
 });
 
 /** 地图点位是否落在选中分段的里程区间内（决定点位是否变暗） */
@@ -672,7 +952,7 @@ function fmtKm(v: number): string {
         <div v-if="roadRoute" class="drive-road-layout">
           <!-- 左：地图（R4 主视觉，桌面端 ≥420px 高） -->
           <section ref="mapWrap" class="drive-trip-map rv-card" data-spotlight>
-            <svg :viewBox="viewBoxAttr" class="drive-trip-map__svg" role="img" aria-label="路线示意图">
+            <svg ref="mapSvgRef" :viewBox="viewBoxAttr" class="drive-trip-map__svg" role="img" aria-label="路线示意图">
               <g class="drive-netmap__outline" v-html="outlinePaths" />
               <!-- 未选中分段时主链整体绘制；选中时变淡，由高亮 path 承担视觉 -->
               <path
@@ -739,7 +1019,7 @@ function fmtKm(v: number): string {
                 全线走向（OSM 众包还原，{{ precisionText }}）
               </p>
               <p v-if="activeSegment !== null" class="drive-trip-map__scope">
-                已聚焦第 {{ activeSegment + 1 }} 段 · {{ segments[activeSegment]?.title }}
+                {{ focusScopeText }}
                 <button type="button" class="drive-trip-map__back" @click="selectSegment(activeSegment)">返回全线</button>
               </p>
               <p v-else-if="focusTarget" class="drive-trip-map__scope">
@@ -778,9 +1058,18 @@ function fmtKm(v: number): string {
                           data-src="station"
                           title="此段端点地名由铁路站名推得：站名只是城镇的子集，且站场常离公路数公里，精度低于行政地名与逆地理编码"
                         >站名推测</span>
+                        <!-- P1-2：非聚落类锚点（山口/地标）标注，避免被误读为城镇 -->
+                        <span
+                          v-else-if="anchorTypeLabel(seg.weakestType)"
+                          class="drive-anchor-src"
+                          :data-src="seg.weakestType"
+                          :title="`此段端点为${anchorTypeLabel(seg.weakestType)}类实体（山口/景区地标等），不是城镇`"
+                        >{{ anchorTypeLabel(seg.weakestType) }}</span>
                       </span>
                       <span class="drive-seg__range">
-                        {{ fmtKm(seg.fromKm) }}—{{ fmtKm(seg.toKm) }} km · {{ segmentSpots[i]?.length ?? 0 }} 处景点
+                        <template v-if="isTinyRoute">{{ segmentRangeNote }}</template>
+                        <template v-else>{{ fmtKm(seg.fromKm) }}—{{ fmtKm(seg.toKm) }} km</template>
+                        · {{ segmentSpots[i]?.length ?? 0 }} 处景点
                       </span>
                       <span class="drive-seg__bar">
                         <span
@@ -793,7 +1082,15 @@ function fmtKm(v: number): string {
                   </button>
                 </li>
               </ul>
-              <p class="drive-seg__hint">{{ segmentSourceNote }}；点击可只看该段并高亮</p>
+              <p class="drive-seg__hint">{{ segmentSourceNote }}；<template v-if="isTinyRoute">全线过短，点击将整体显示</template><template v-else>点击可只看该段并高亮</template></p>
+              <!-- P1-3：分段覆盖率披露。段名只来自主链已绘制部分，尾部里程可能没有地名段 -->
+              <p v-if="segmentCoverage" class="drive-seg__cover">
+                分段覆盖 0—{{ fmtKm(segmentCoverage.lastKm) }} km，占已收录里程
+                <strong>{{ segmentCoverage.pct }}%</strong>
+                <template v-if="segmentCoverage.tailKm > 1">
+                  ；其余约 {{ fmtKm(segmentCoverage.tailKm) }} km（{{ entryView.provinces.join('、') || '后续省域' }}）尚未切出地名段
+                </template>
+              </p>
             </section>
 
             <!-- R2：精选景点 -->

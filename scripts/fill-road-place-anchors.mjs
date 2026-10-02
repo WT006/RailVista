@@ -431,7 +431,7 @@ function collectKeys() {
  * @typedef {Object} Anchor
  * @property {string} name
  * @property {number} atKm    沿主链的里程（km）
- * @property {'city'|'junction'|'service'|'pass'|'endpoint'} type
+ * @property {'settlement'|'pass'|'landmark'|'junction'|'station'|'city'|'service'|'endpoint'} type
  * @property {AnchorSource} source  地名来源分级
  * @property {number} lng
  * @property {number} lat
@@ -439,11 +439,25 @@ function collectKeys() {
  * @property {number} offsetKm  锚点到折线的距离（km），排查吸附质量
  */
 
-/** @param {GazetteerEntry} e @returns {Anchor['type']} */
+/**
+ * v0.6.5（P1-2）：锚点 type 改用 `classifyPlace()` 的语义分类。
+ *
+ * 旧实现除 station/province 外一律 `return 'city'`，导致
+ * 「林则猕猴园」（动物园）、「天瀑」（瀑布）、「甲玛王宫」（宫殿）、
+ * 「通麦长青温池」（温泉）全被标成城市聚落 —— UI 上无法区分，
+ * 用户会以为这些都是城镇。
+ *
+ * 现在 type 表达「这个锚点是什么地理实体」：
+ *   settlement 聚落（城镇/村庄/行政驻地）
+ *   pass       山口/垭口/关隘
+ *   landmark   景区/古建/地标（非聚落）
+ *   junction   省级行政区（保持历史值，避免破坏既有 type 语义）
+ *   station    铁路站名兜底
+ */
 function anchorType(e) {
-  if (e.source === 'station') return 'service';
-  if (e.level === 'province') return 'junction';
-  return 'city';
+  if (e.source === 'station') return 'station';
+  if (e.level === 'admin:province') return 'junction';
+  return e.kind;
 }
 
 /**
@@ -557,7 +571,7 @@ async function pickAmapFirstAnchors(points, cum, gaz, maxKm) {
         picked = {
           name: nm,
           atKm: Math.round(cum[i] * 10) / 10,
-          type: 'city',
+          type: 'settlement',
           source: 'amap',
           lng: points[i][0],
           lat: points[i][1],
@@ -770,7 +784,7 @@ async function pickNominatimAnchors(points, cum) {
         out.push({
           name,
           atKm: Math.round(cum[i] * 10) / 10,
-          type: 'city',
+          type: 'settlement',
           source: 'place',
           lng: points[i][0],
           lat: points[i][1],

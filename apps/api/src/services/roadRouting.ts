@@ -254,6 +254,11 @@ export function planRoadRoute(key: string): (RoadRoute & {
     provinces: entry.provinces,
     lengthKm,
     coords,
+    // v0.6.5（P0-1）：全分辨率主链的累计里程，与上面 coords 一一对应。
+    // /along 会把 coords 抽稀到 ≤600 点并同步切片本数组 —— 前端据此把
+    // 「章节 atKm」映射回折线点。若让前端自己在抽稀链上重算，里程会缩水
+    // （G318 实测 117.8km / 7.2%），末段将落在重算链外导致无高亮。
+    cumKm: cum,
     // v0.6.5：nodes 现在也承载「沿几何反查出来的中途地名」（见
     // scripts/fill-road-place-anchors.mjs），与「起讫点声明」是两回事。
     // B2-1 当初因 nodes[0].name="上海" 而几何首点其实在西藏，把 nodes 整体禁用；

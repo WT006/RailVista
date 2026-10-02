@@ -2428,9 +2428,16 @@
   stroke-width: 2;
 }
 
+/* v0.6.5（P0-2）：non-scaling-stroke 让线宽以**屏幕像素**计，不随 viewBox 缩放。
+   没有它时，为「保证短边 ≥24px」而放大缩放比会把线宽一起放大成巨条
+   （stroke-width 是用户单位，缩放比 40 时 5 单位 → 200px）。
+   解耦之后缩放比可以放开，长而扁的段也能达到 24px 判据。 */
 .drive-trip-map__route.is-active {
-  stroke-width: 5;
+  stroke-width: 4px;
   stroke-opacity: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+  stroke-linecap: round;
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 55%, transparent));
   transition: stroke-width var(--dur-base) var(--ease-standard),
     stroke-opacity var(--dur-base) var(--ease-standard);
@@ -2817,4 +2824,38 @@
 .drive-road-spot.is-latin .drive-spot__km,
 .drive-road-spot.is-latin .drive-spot__tier {
   opacity: 0.6;
+}
+
+/* ══════════ v0.6.5 第三轮（返工）：P0 高亮可见性 / P1 类型语义 / 覆盖率披露 ══════════ */
+
+/* P1-2：非聚落类锚点角标（山口 / 地标 / 站名）。
+   与「站名推测」共用 .drive-anchor-src 基座，仅换色与语义。 */
+.drive-anchor-src[data-src='pass'] {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.drive-anchor-src[data-src='landmark'] {
+  border-color: var(--line-default);
+  background: var(--fill-subtle);
+  color: var(--text-3);
+}
+
+/* P1-3：分段覆盖率披露行 */
+.drive-seg__cover {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-sunken);
+  font-size: var(--fs-micro);
+  line-height: 1.7;
+  color: var(--text-3);
+}
+
+.drive-seg__cover strong {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
 }

@@ -21,6 +21,7 @@ import {
 } from '../services/driveRoutes.js';
 import {
   decimatePoints,
+  decimatePointsWithIndex,
   getRoadEntry,
   getRoadGeometryFull,
   isValidRoadKey,
@@ -213,7 +214,17 @@ driveRoute.get('/along', async (c) => {
   // B3-2：先抽稀再匹配。原先在未抽稀的全量折线上跑匹配（抽稀在响应组装时），
   // G318 4673 点实测 124ms；抽到 600 点后匹配量降一个数量级。
   // 抽稀对沿程匹配的影响可接受：600 点仍能保持道路走向的空间连续性。
-  const matchCoords = decimatePoints(route.coords as [number, number, number?][], 600);
+  //
+  // v0.6.5（P0-1）：抽稀的同时按**同一下标**切片 route.cumKm。
+  // 抽稀会切掉弯道、缩短折线（G318 3669→600 点后重算里程缩水 117.8km / 7.2%），
+  // 若前端在降采样链上重算里程，末段（1518.6~1568.8km）会落在重算链之外 →
+  // 分段折线遍历不到任何点 → d="" → 地图上「点了没反应」。
+  // 因此里程必须由服务端在全分辨率链上算好后随坐标下发。
+  const decimated = decimatePointsWithIndex(route.coords as [number, number, number?][], 600);
+  const matchCoords = decimated.points;
+  const matchCumKm = route.cumKm
+    ? decimated.indices.map((i) => route.cumKm![i]!)
+    : undefined;
   const alongOpts = {
     categories: cat.length ? cat : undefined,
     minScore: Number.isFinite(min) ? min : undefined,
@@ -259,6 +270,8 @@ driveRoute.get('/along', async (c) => {
       route: {
         ...route,
         coords: matchCoords,
+        // 与 coords 同源同长度；缺失时省略，前端会退回 haversine 兜底并降级提示
+        ...(matchCumKm ? { cumKm: matchCumKm } : {}),
       },
       spots,
       chapters: route.chapters ?? buildChapters(matchCoords, route.lengthKm),

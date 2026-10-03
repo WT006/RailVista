@@ -8,7 +8,7 @@ import type { TicketKind } from '@railvista/shared';
 
 import logoCa from '../assets/ticket/ca.jpg';
 import logoCz from '../assets/ticket/cz.jpg';
-import logoMu from '../assets/ticket/mu.jpg';
+import logoMu from '../assets/ticket/mu.png';
 import logoHu from '../assets/ticket/hu.jpg';
 import logoMf from '../assets/ticket/mf.jpg';
 import logo3u from '../assets/ticket/3u.png';
@@ -140,6 +140,22 @@ export interface AirlineMeta {
   alliance: string | null;
 }
 
+/**
+ * 无官方 VI 时的文字标占位（SVG data URI，内联零网络请求）。
+ * 纪律：占位必须**看起来就是占位**（虚线底+ 二字码），
+ * 不允许伪装成官方 logo —— 宁可朴素，不可造假。
+ */
+function textMark(prefix: string, bg = '#1d2b45', fg = '#e8eef8'): string {
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">` +
+    `<rect x="3" y="3" width="94" height="94" rx="14" fill="${bg}" ` +
+    `stroke="${fg}" stroke-opacity=".45" stroke-width="2" stroke-dasharray="7 5"/>` +
+    `<text x="50" y="63" font-family="Helvetica,Arial,sans-serif" font-size="38" ` +
+    `font-weight="700" fill="${fg}" fill-opacity=".9" text-anchor="middle">${prefix}</text>` +
+    `</svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
 export const AIRLINES: Record<string, AirlineMeta> = {
   cz: { code: 'cz', name: '中国南方航空', en: 'CHINA SOUTHERN', prefix: 'CZ', logo: logoCz, alliance: null },
   ca: { code: 'ca', name: '中国国际航空', en: 'AIR CHINA', prefix: 'CA', logo: logoCa, alliance: 'staralliance' },
@@ -151,6 +167,26 @@ export const AIRLINES: Record<string, AirlineMeta> = {
   sc: { code: 'sc', name: '山东航空', en: 'SHANDONG AIRLINES', prefix: 'SC', logo: logoSc, alliance: 'staralliance' },
   '9c': { code: '9c', name: '春秋航空', en: 'SPRING AIRLINES', prefix: '9C', logo: logo9c, alliance: null },
   ho: { code: 'ho', name: '吉祥航空', en: 'JUNEYAO AIR', prefix: 'HO', logo: logoHo, alliance: null },
+
+  // ── 补充航司（2026-10-03）──
+  // logo 为虚线文字标占位，待补官方 VI。联盟归属按公开资料：
+  // 三大集团成员均已核对；地方/低成本航司多数无联盟。
+  gs: { code: 'gs', name: '天津航空', en: 'TIANJIN AIRLINES', prefix: 'GS', logo: textMark('GS'), alliance: null },
+  jd: { code: 'jd', name: '首都航空', en: 'BEIJING CAPITAL AIRLINES', prefix: 'JD', logo: textMark('JD'), alliance: null },
+  kn: { code: 'kn', name: '中国联合航空', en: 'CHINA UNITED AIRLINES', prefix: 'KN', logo: textMark('KN'), alliance: null },
+  g5: { code: 'g5', name: '华夏航空', en: 'CHINA EXPRESS AIRLINES', prefix: 'G5', logo: textMark('G5'), alliance: null },
+  eu: { code: 'eu', name: '成都航空', en: 'CHENGDU AIRLINES', prefix: 'EU', logo: textMark('EU'), alliance: null },
+  wz: { code: 'wz', name: '西部航空', en: 'WESTERN AIRLINES', prefix: 'WZ', logo: textMark('WZ'), alliance: null },
+  ns: { code: 'ns', name: '河北航空', en: 'HEBEI AIRLINES', prefix: 'NS', logo: textMark('NS'), alliance: null },
+  fu: { code: 'fu', name: '福州航空', en: 'FUZHOU AIRLINES', prefix: 'FU', logo: textMark('FU'), alliance: null },
+  uq: { code: 'uq', name: '乌鲁木齐航空', en: 'URUMQI AIRLINES', prefix: 'UQ', logo: textMark('UQ'), alliance: null },
+  aq: { code: 'aq', name: '九元航空', en: '9 AIRLINES', prefix: 'AQ', logo: textMark('AQ'), alliance: null },
+  gj: { code: 'gj', name: '长龙航空', en: 'LOONG AIR', prefix: 'GJ', logo: textMark('GJ'), alliance: null },
+  qw: { code: 'qw', name: '青岛航空', en: 'QINGDAO AIRLINES', prefix: 'QW', logo: textMark('QW'), alliance: null },
+  gt: { code: 'gt', name: '桂林航空', en: 'GUILIN AIRLINES', prefix: 'GT', logo: textMark('GT'), alliance: null },
+  a6: { code: 'a6', name: '湖南航空', en: 'HUNAN AIRLINES', prefix: 'A6', logo: textMark('A6'), alliance: null },
+  gx: { code: 'gx', name: '北部湾航空', en: 'BEGUI BAY AIRLINES', prefix: 'GX', logo: textMark('GX'), alliance: null },
+  ry: { code: 'ry', name: '江西航空', en: 'JIANGXI AIRLINES', prefix: 'RY', logo: textMark('RY'), alliance: null },
 };
 
 export const ALLIANCES: Record<string, { name: string; logo: string }> = {

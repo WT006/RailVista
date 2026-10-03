@@ -250,8 +250,8 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
         </div>
       </div>
 
-      <!-- 数据宫格 -->
-      <div v-if="config.stats.length" class="tk__stats" :class="{ 'tk__stats--3': config.kind === 'flight' }">
+      <!-- 数据宫格（原型 .stats 固定 2 列；曾对飞行票用3 列把字压到 10px 以下，已去） -->
+      <div v-if="config.stats.length" class="tk__stats">
         <div v-for="(s, i) in config.stats" :key="i" class="tk__stat">
           <span class="tk__stat-lb">{{ s.label }}</span>
           <span class="tk__stat-vl">{{ s.value }}<small v-if="s.unit"> {{ s.unit }}</small></span>
@@ -300,9 +300,14 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
    颜色一律取自 --tk-* 变量（由 src/data/ticket.ts 主题注入）。 */
 .tk {
   --tk-acc: var(--accent);
+  box-sizing: border-box;
   position: relative;
   width: 100%;
-  max-width: 420px;
+  /* 基准来自原型 万里路书-纪念票模板原型.html .ticket：宽 400 / min-height 640。
+     缺了 min-height 时，感言的 margin-top:auto 失效，内容全部堆在顶部、底部留白，
+     实测宽高比掉到 0.78（应为 0.625）——票面被压扁。*/
+  max-width: 400px;
+  min-height: 640px;
   margin-inline: auto;
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -311,6 +316,10 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
   box-shadow: var(--elev-3), 0 0 0 1px color-mix(in srgb, var(--tk-acc) 20%, transparent);
   transition: transform var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard);
 }
+/* 内层不加 border-box 时，padding 会被加在 .tk 的宽度之外 —— 实测 324px 宽的票面
+   内层实际占 347px，右侧内容（BOARDING PAS / CZ3467 / LXA）被切掉。
+   全局 base.css 未设 box-sizing，这里只在票面内局部修正，不动全局。 */
+.tk__inner { box-sizing: border-box; }
 .tk:hover {
   transform: translateY(-4px);
   box-shadow: var(--elev-4), 0 0 0 1px color-mix(in srgb, var(--tk-acc) 38%, transparent);
@@ -351,7 +360,11 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
 
 .tk__inner {
   position: relative; z-index: 2;
-  padding: var(--space-4) var(--space-3) var(--space-3);
+  /* 原型 .t-inner：padding 30px 26px 24px + min-height 640px。
+     flex:1 让内层撑满 .tk 的 min-height，感言的 margin-top:auto 才会生效。*/
+  padding: 30px 26px 24px;
+  min-height: 640px;
+  flex: 1;
   display: flex; flex-direction: column; gap: var(--space-1);
 }
 .tk--flight .tk__inner { padding-right: 108px; }
@@ -394,10 +407,14 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
 .tk__seal-text em { font-style: normal; margin-left: 6px; color: var(--tk-acc); }
 
 .tk__alrow { display: flex; align-items: center; gap: 9px; }
+/* 航司 logo 原图自带白底（为白底场景设计）。实测：直接去白底后国航红凤凰、
+   厦航深蓝在深色票面上几乎不可见 —— 故按原型 .al-logo 保留白底，
+   但缩小并柔化，降低"贴了个白方块"的突兀感。*/
 .tk__allogo {
-  height: 34px; min-width: 44px; background: #fff; border-radius: 7px;
-  padding: 4px 7px; object-fit: contain;
-  box-shadow: var(--elev-1), 0 0 0 1px rgba(255, 255, 255, .15);
+  height: 30px; min-width: 40px; background: rgba(255, 255, 255, .92);
+  border-radius: 6px;
+  padding: 3px 6px; object-fit: contain;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .18), 0 0 0 1px rgba(255, 255, 255, .1);
 }
 .tk__alname { display: flex; flex-direction: column; min-width: 0; }
 .tk__alname strong { font-size: 14px; letter-spacing: 1px; color: var(--tk-tx); }
@@ -471,7 +488,6 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
   background: var(--tk-line); border: 1px solid var(--tk-line);
   border-radius: var(--radius-sm); overflow: hidden;
 }
-.tk__stats--3 { grid-template-columns: repeat(3, 1fr); }
 .tk__stat { background: var(--tk-chip); padding: 9px 12px; min-width: 0; }
 .tk__stat-lb { display: block; font-size: 9px; letter-spacing: 1.5px; color: var(--tk-tx3); }
 .tk__stat-vl { display: block; font-size: 15px; font-weight: 700; color: var(--tk-tx); margin-top: 3px; }
@@ -529,7 +545,14 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
 }
 
 @media (max-width: 480px) {
-  .tk--flight .tk__inner { padding-right: var(--space-3); }
+  /* 窄屏：按原型 @media(max-width:460px) 取消 min-height ——
+     否则 324px 宽的票面仍锁 640px 高，宽高比被拉到 0.51，票面变成长条。*/
+  .tk,
+  .tk__inner { min-height: 0; }
+  .tk__inner { padding: 22px 18px 18px; }
+  .tk--flight .tk__inner { padding-right: 18px; }
   .tk__stub { display: none; }
+  .tk__station-cn { font-size: 21px; }
+  .tk__iata strong { font-size: 28px; }
 }
 </style>

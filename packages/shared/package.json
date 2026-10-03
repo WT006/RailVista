@@ -1,6 +1,6 @@
 {
   "name": "@railvista/shared",
-  "version": "0.7.0",
+  "version": "0.6.5",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",
@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
-    "test": "tsx --test src/index.test.ts src/spotSide.test.ts src/schedule/mileage.test.ts src/schedule/kinematics.test.ts src/schedule/scheduleCurve.test.ts src/schedule/trainProfile.test.ts src/schedule/fusion.test.ts src/schedule/delayField.test.ts src/schedule/spotEta.test.ts src/schedule/regression.test.ts src/geo/coordTransform.test.ts src/drive/radar.test.ts src/drive/trackSampler.test.ts src/drive/alongRoute.test.ts src/drive/spotGrid.test.ts src/ticket/index.test.ts",
+    "test": "tsx --test src/index.test.ts src/spotSide.test.ts src/schedule/mileage.test.ts src/schedule/kinematics.test.ts src/schedule/scheduleCurve.test.ts src/schedule/trainProfile.test.ts src/schedule/fusion.test.ts src/schedule/delayField.test.ts src/schedule/spotEta.test.ts src/schedule/regression.test.ts src/geo/coordTransform.test.ts src/drive/radar.test.ts src/drive/trackSampler.test.ts src/drive/alongRoute.test.ts src/drive/spotGrid.test.ts",
     "prepare": "tsc -p tsconfig.json"
   },
   "devDependencies": {

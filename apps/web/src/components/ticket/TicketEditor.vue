@@ -4,18 +4,14 @@
  * 直接读写 ticketStore.config（草稿自动落盘），保存动作入 saved 列表。
  */
 import { computed } from 'vue';
-import {
-  type TicketAirlineConfig,
-  type TicketRouteConfig,
-  type TicketSealEmblem,
-  type TicketStatItem,
-  type TicketTagItem,
+import type {
+  TicketRouteConfig,
+  TicketSealEmblem,
+  TicketStatItem,
+  TicketTagItem,
 } from '@railvista/shared';
 import { useTicketStore } from '../../stores/ticketStore';
 import { AIRLINES, ALLIANCES, themesForKind } from '../../data/ticket';
-
-/** 航司兜底值：字段必须齐全（alliance 必填），否则展开后类型不匹配 */
-const EMPTY_AIRLINE: TicketAirlineConfig = { code: '', name: '', en: '', flightNo: '', alliance: null };
 
 const store = useTicketStore();
 const config = computed(() => store.config);
@@ -235,13 +231,13 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
           <option v-for="a in Object.values(AIRLINES)" :key="a.code" :value="a.code">{{ a.name }} {{ a.prefix }}</option>
         </select>
       </label>
-      <label class="ed__row"><span>航班号</span><input class="ed__input" :value="config.airline?.flightNo ?? ''" @input="store.patch({ airline: { ...(config.airline ?? EMPTY_AIRLINE), flightNo: ($event.target as HTMLInputElement).value } })" /></label>
+      <label class="ed__row"><span>航班号</span><input class="ed__input" :value="config.airline?.flightNo ?? ''" @input="store.patch({ airline: { ...(config.airline ?? { code: '', name: '', en: '', flightNo: '' }), flightNo: ($event.target as HTMLInputElement).value } })" /></label>
       <label class="ed__row">
         <span>联盟</span>
         <select
           class="ed__select"
           :value="config.airline?.alliance ?? ''"
-          @change="store.patch({ airline: { ...(config.airline ?? EMPTY_AIRLINE), alliance: ($event.target as HTMLSelectElement).value || null } })"
+          @change="store.patch({ airline: { ...(config.airline ?? { code: '', name: '', en: '', flightNo: '' }), alliance: ($event.target as HTMLSelectElement).value || null } })"
         >
           <option value="">无</option>
           <option v-for="(a, id) in ALLIANCES" :key="id" :value="id">{{ a.name }}</option>

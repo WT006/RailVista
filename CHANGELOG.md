@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.6.5`**（2026-10-03）
+**当前版本：`0.7.0`**（2026-10-03）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,65 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.7.0] — 2026-10-03
+
+**新增「旅行纪念票」模块（`/ticket`）：铁路 / 自驾 / 飞行三类票面，全字段可配置，零框架依赖的共享逻辑层**。
+
+### 改动动机
+
+把一段真实旅程做成值得收藏的票面。票面所有展示项都必须可编辑（站名、票号、数据宫格、感言、印章…），
+因此「票面」不能是写死的模板，而是一份**配置对象**——组件只读配置渲染，不持有额外展示态。
+这样草稿落盘（localStorage）即可完整还原票面，且同一份配置在 Web 与鸿蒙端能渲染出完全一致的票。
+
+### 新增能力
+
+- **三票种**：`railway` / `drive` / `flight`，各自出厂默认文案 + 主题 + 徽记；
+- **票号生成**（`makeTicketSerial`）：`R-20261003-0007` 形制，**纯函数**——同输入必同输出，
+  草稿反复落盘票号不漂移；日期容忍分隔符、非法值回落全 0 而非抛错；
+- **铁路票车次联动**：`TrainPicker` 选 12306 车次 → 票面路线端点、日期行、4 项数据宫格自动填充；
+- **配置持久化**：草稿 300ms 防抖落`railvista:ticketDraft`，保存列表落 `railvista:ticketSaved`，
+  隐私模式 try/catch 静默兜底（沿用 `prefsStore` 做法）；
+- **航司 / 联盟**：11 家国内航司 + 三大联盟标志，`AIRLINES` 表内置正确联盟归属
+  （南航 2019 年已退出天合联盟，故为 `null`——这是易错点，已固化为数据而非注释）；
+- **票面编辑器**：主题、背景图（含本地文件 → dataURL）、基础文案、路线（含途经点链 / 路牌编号 /
+  海拔采样）、数据宫格、标签胶囊、感言、印章、二维码、品牌、航司，逐项可增删改。
+
+### 涉及文件
+
+- 新增 `packages/shared/src/ticket/index.ts`（类型 + 纯逻辑，**零框架依赖**，与 `drive/*` 同构）
+- 新增 `packages/shared/src/ticket/index.test.ts`（12 用例）
+- 新增 `apps/web/src/pages/TicketHome.vue`、`components/ticket/{TicketFace,TicketEditor,TrainPicker}.vue`、
+  `stores/ticketStore.ts`、`data/ticket.ts`、`assets/ticket/`（13 个联盟标志）
+- 修改 `packages/shared/src/index.ts`（导出 ticket 层）、`packages/shared/package.json`（测试脚本）
+- 修改 `apps/web/src/router/index.ts`（注册 `/ticket`）、`components/AppNavLinks.vue`（顶栏第 4 入口）
+
+### 已知问题与修复记录
+
+- **`TicketKind` / `TicketConfig` 曾缺失**：纪念票页面代码已写好并注册了路由，但共享层的类型与
+  `createTicketConfig` / `makeTicketSerial` 在此前剔除误提交时被一并丢弃，
+  导致 `router/index.ts` 引用了不存在的模块 —— **编译必然失败**。
+  本轮已补齐共享层。这是「工作区并行多条任务线时绝不能用 `git add -A`」的现实代价。
+- **`TicketEditor` 航司兜底对象缺 `alliance`**：模板内`config.airline ?? { code:'', … }`
+  的兜底字面量漏了必填字段 `alliance`，`vue-tsc` 报TS2322。
+  已提取为 `EMPTY_AIRLINE` 常量（纪律：类型检查抓到的兜底字面量必须补齐，不能靠断言糊过去）。
+
+### 验证方式
+
+- `packages/shared`：`tsc -p tsconfig.json` 通过；`tsx --test` **193 用例全过**（新增 12 例）；
+- `apps/web`：`vue-tsc --noEmit` **零错误**；
+- `apps/api`：`tsc --noEmit` 通过；
+- `ticket/index.test.ts` 覆盖票号前缀映射、纯函数性、日期容错、序号下限、
+  三票种默认值、徽记/主题随票种切换、对象独立性、JSON 往返。
+
+### 已知限制
+
+- 票面配置仅存本机浏览器（localStorage），**无云端同步**，换设备不可见；
+- 二维码为占位内容（默认填 `https://railvista.app/ticket`），未接真实行程 URL；
+- 背景图存dataURL，编辑器侧限制 1.5MB 以免撑爆 localStorage 配额；
+- 票面是**静态渲染**，尚未实现导出 PNG/SVG。
 
 ---
 

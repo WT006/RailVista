@@ -62,3 +62,12 @@ skills-lock.json
 # 迁移/采集过程的本地备份产物（可重建，不入库）
 data/roads/geom.bak/
 data/roads/*.pre-harvest.json
+
+# 迁移残骸：旧 node_modules 备份（迁移后重装依赖产生，已被新node_modules 取代）
+.node_modules.bak-migration/
+apps/*/.node_modules.bak/
+packages/*/.node_modules.bak/
+
+# 纪念票航司/联盟 logo 的**裁剪前原始素材**；
+# 代码只引用已裁剪压缩的 apps/web/src/assets/ticket/，源件仅本地留档
+ticket-assets/

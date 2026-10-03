@@ -10,6 +10,7 @@ import DriveRoad from '../pages/DriveRoad.vue';
 import DriveRankings from '../pages/DriveRankings.vue';
 import DriveBoard from '../pages/DriveBoard.vue';
 import DriveRoadbook from '../pages/DriveRoadbook.vue';
+import TicketHome from '../pages/TicketHome.vue';
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -19,6 +20,8 @@ export const router = createRouter({
     { path: '/route/:corridorId', name: 'route-detail', component: RouteDetail },
     { path: '/route/:corridorId/map', name: 'corridor-map', component: CorridorMap },
     { path: '/atlas', name: 'atlas', component: AtlasMap },
+    // ── 万里路书 · 旅行纪念票（顶部菜单第 4 入口） ──────────────────────────
+    { path: '/ticket', name: 'ticket', component: TicketHome },
     // ── 万里路书 · 全国公路旅游网（PRD §2.1 路由表） ─────────────────────────
     { path: '/drive', name: 'drive-home', component: DriveHome },
     { path: '/drive/trip', name: 'drive-trip', component: DriveTrip },

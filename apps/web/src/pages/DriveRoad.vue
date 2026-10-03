@@ -440,9 +440,34 @@ const focusViewBox = ref<ViewBox | null>(null);
 /** 已到缩放比上限、且到上限后仍达不到 HIGHLIGHT_TARGET_PX（UI 需如实说明，不假装成功） */
 const focusCapped = ref(false);
 
+/**
+ * viewBox 序列化精度 —— 必须随视区宽度自适应。
+ *
+ * v0.6.5 第七轮（P1-4′）：原先固定 `toFixed(1)`。但聚焦时视区宽度由缩放比决定，
+ * 极短线路走 SCALE_MAX=8000 后视区宽仅 **0.1 viewBox 单位** ——
+ * 此时 ±0.05 的舍入误差**等于视区的 50%**，视区边界被推到折线之外，线被裁掉。
+ * 实测 G3300（0.19km）@1440：折线 rect top=296.98 < svg rect top=319.59，**溢出 22.61px**；
+ * @390 更严重：视区被 `toFixed(1)` 压成 **0.0 单位**，折线宽高直接归零（rect 0×0，整条线消失）。
+ *
+ * 判据：**舍入误差占视区的比例要足够小**。取 1%：
+ *   需要的位数 ≈ ceil(-log10(视区宽 × 0.01))
+ * 落到整数档位（阈值由「长线路实测视区宽」反推，保证其字符串逐字符不变）：
+ *   · vb.w < 1   → 5 位：0.1 视区时误差 0.0005 = 0.5%  ✓（1 位时是 50%，✗）
+ *   · vb.w < 5   → 3 位：1~5 视区时误差 ≤0.0005 = ≤0.05% ✓（1 位时 5~2%，勉强）
+ *   · vb.w ≥ 5   → 1 位：长线路实测视区宽 5.1~13.0（G318/G217 全部段），
+ *                  1 位误差 0.05/5.1 = 1% ✓，且**字符串与改动前逐字符相同**（零回归）
+ *
+ * 阈值 5 是刻意选的：G318@1440 段6 的视区宽 8.7、G217@1440 段5 的 5.7 都 ≥5，
+ * 全部落回 1 位。若把阈值放到 20，长线路字符串会从 `196.1 553.3 13.0 9.5`
+ * 变成 `196.109 553.253 13.026 9.532` —— 数值等价，但**不是逐字符不变**，
+ * 会让「本轮只修超短路」这件事无法用字符串直接证明。故取 5。
+ */
+const VIEWBOX_PRECISION = (vbW: number): number => (vbW < 1 ? 5 : vbW < 5 ? 3 : 1);
+
 const viewBoxAttr = computed(() => {
   const vb = focusViewBox.value ?? globalViewBox.value;
-  return `${vb.x.toFixed(1)} ${vb.y.toFixed(1)} ${vb.w.toFixed(1)} ${vb.h.toFixed(1)}`;
+  const p = VIEWBOX_PRECISION(vb.w);
+  return `${vb.x.toFixed(p)} ${vb.y.toFixed(p)} ${vb.w.toFixed(p)} ${vb.h.toFixed(p)}`;
 });
 
 /**
@@ -705,8 +730,33 @@ function focusSegmentView(index: number): void {
   // segW=0.592 单位但 contentW=1.303，据此算出的 s 只让线宽到 19.8px（< 24px）。
   // 用 HIGHLIGHT_TARGET_PX（32px）而非及格线 24px：贴着及格线交付会被视口尺寸波动打穿
   const sMin = HIGHLIGHT_TARGET_PX / Math.min(segW, segH);
+  // 第八轮（P1-5）**长边硬约束**：光有 sMin 只保证「短边够粗、看得见」，
+  // 不保证「长边装得下」——又长又扁的段（如 G318 段6，segW:segH = 7.03:0.47 ≈ 15:1）
+  // 在窄视口下会横向溢出：实测 @390 段6 屏宽 469px > 容器 340px，**左右各溢出 64.7px**。
+  // 该缺陷 @1440 不暴露（长边上限 97.6 > sMin 68.54，不冲突），只有窄视口才现形。
+  //
+  // 约束：收拢后折线的**长边 + 描边**不得超过容器对应边，即
+  //       s ≤ min((cw - 描边) / segW, (ch - 描边) / segH)。
+  // ⚠️ 必须为 `stroke-width: 4px`（`vector-effect: non-scaling-stroke`，不随缩放膨胀）
+  //    **预留出描边宽度**：getBoundingClientRect() 量的是**含描边**的包围盒，
+  //    描边每侧各 2px。不预留时 G318 段6 @390 实测仍溢出 3.4px（340 vs 341）。
+  //
+  // 三者取**最严的**：sFit（含 padFactor，让「段+景点」整体装下）、
+  // sFitLong（长边+描边装得下）、sMin（短边够粗），再受 SCALE_MAX 封顶。
+  //
+  // ⚠️ 两条可见性约束在「又长又扁 + 窄视口」时**几何上不可兼得**：
+  // G318 段6 @390 要短边 ≥24px 需 s≥68.5（此时宽 469px，溢出 129px）；
+  // 要长边装得下需 s≈48.3（此时短边 22.7px）。二者互斥。
+  // 本实现按裁决「取更严的那个」，即**优先不溢出**：短边掉到 ~22.7px
+  // （略低于 HIGHLIGHT_MIN_PX=24，但仍远高于「看不见」的量级）。
+  // 溢出是实打实的裁切（线被切断），偏细只是观感下降，故以前者优先。
+  const HIGHLIGHT_STROKE_PX = 4; // 与 drive.css 的 .is-active stroke-width 保持一致
+  const sFitLong = Math.min(
+    Math.max(cw - HIGHLIGHT_STROKE_PX, 1) / segW,
+    Math.max(ch - HIGHLIGHT_STROKE_PX, 1) / segH,
+  );
   const sWanted = Math.max(sFit, sMin);
-  const s = Math.max(1, Math.min(sWanted, SCALE_MAX));
+  const s = Math.max(1, Math.min(sWanted, sFitLong, SCALE_MAX));
 
   // 目标缩放比 < 1（算出来是「缩小」）→ 收拢反而丢信息，直接不收拢。
   if (sWanted <= 1) {

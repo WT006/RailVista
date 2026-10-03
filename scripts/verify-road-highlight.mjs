@@ -128,10 +128,35 @@ async function withPage(vp, fn) {
  *   · 极短线   —— 该线路总长 < TINY_ROUTE_KM（主链实绘不足 1km）。
  *                按裁决**不硬凑 24px**（把 63 米的路放大到 24px 需 ~32000× 缩放比，
  *                地图失真到无意义）。这类独立统计，**与「无高亮」不是同一缺陷**，
- *                UI 侧已给替代反馈（分段行标里程 + 提示条「全线仅 X km，已整体显示」）。
+ *                UI 侧已给替代反馈（分段行标里程 + 提示条「全线仅 X km」）。
  *   · 不达标中的极短线单列，避免把「产品观感取舍」误报成「点击失效」。
+ *   · 溢出容器 —— **第七轮新增**（见下）。
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 【第四条断言：高亮 bbox 不得溢出 svg 容器】—— 由来：G3300 事件
+ *
+ * 前七轮的三条断言（无高亮 / 不达标 / 极短单列）都只检查「高亮自己有多大」，
+ * **没有检查「高亮是否被画在可视区里」**。于是漏掉了这类缺陷：
+ *   G3300（0.19km，超短路）点开后 SCALE_MAX=8000 把视区收到 0.1 viewBox 单位，
+ *   而 `viewBoxAttr` 当时用 `toFixed(1)` 输出 —— 0.1 单位的视区配上 ±0.05 的
+ *   舍入，**舍入误差等于视区的 50%**，视区上沿被推到折线顶边之外，
+ *   折线顶部被裁掉。实测：折线 rect top=296.98 < svg rect top=319.59，
+ *   **溢出 22.61px**，屏幕上表现为「线被切掉一截」。
+ *
+ * 这类缺陷在长线路上永远不会出现（几百单位的视区，0.1 舍入占比 <0.1%），
+ * 只在「放大路径」上暴露，因此前三条款判据对它完全失明 ——
+ * 当时是靠 QA 人工看截图发现的。**为了让将来所有走放大路径的线路都被自动覆盖，
+ * 这里补第四条断言：折线的 getBoundingClientRect() 必须完全落在
+ * `.drive-trip-map__svg` 的 rect 内（容差 CLIP_TOLERANCE_PX）。**
+ *
+ * 判据与前三条独立：即便高亮短边达标（如 G3300 的 133×174px），
+ * 只要溢出容器，一样判失败。
  */
 const TINY_ROUTE_KM = 1;
+
+/** 高亮 bbox 允许超出 svg 容器的容差（px）—— 覆盖 subpixel 抗锯齿与 transform 舍入 */
+const CLIP_TOLERANCE_PX = 1;
+
 
 const MEASURE_ALL_SEGMENTS = `(async () => {
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -139,8 +164,27 @@ const MEASURE_ALL_SEGMENTS = `(async () => {
   // 线路总长：取「收录里程」文案里的 km 值，解析不出则按 999 视为非极短
   const coverEl = document.querySelector('.drive-seg__cover');
   const m = coverEl && coverEl.textContent.match(/分段覆盖 0—([\\d.]+)\\s*km/);
-  const totalKm = m ? parseFloat(m[1]) : 999;
-  const isTiny = totalKm > 0 && totalKm < TINY;
+  let totalKm = m ? parseFloat(m[1]) : NaN;
+  // 第八轮（P2）**totalKm 取值修正**：原实现只认 .drive-seg__cover 的
+  // 「分段覆盖 0—X km」，而极短线路该文案是「0—0 km」（分段覆盖到 0km 处），
+  // 解析出 0 → isTiny 判定的 totalKm > 0 失败 → **极短线路被漏出「极短线」单列**，
+  // 输出「极短线段号: []」这个**假空**。假空比不输出更危险：它会让人以为
+  // 该分类没有实例，从而跳过对极短线的核查。
+  //
+  // 修正：优先从**分段行**的「全线 X km」取实测主链里程（极短线路时
+  // .drive-seg__range 显示 segmentRangeNote = 「全线 0.2 km」，与 UI 的
+  // tinyRouteKmText 同源即 chainMaxKm），解析不到再回退 cover 文案；
+  // 两者都拿不到时记为 NaN 而**不是 0**，让 isTiny 判定显式失败而非静默通过。
+  // （不能用 .drive-trip-map__scope：那是点击后才出现的提示条，测量循环开始时尚不存在。）
+  const segsRange0 = document.querySelector('.drive-seg__range');
+  const rangeM = segsRange0 && segsRange0.textContent.match(/全线\\s*([\\d.]+)\\s*km/);
+  if (rangeM) totalKm = parseFloat(rangeM[1]);
+  else if (coverEl) {
+    // 极短路：cover 的覆盖里程为 0，改用「占已收录里程 X%」反推不可靠，
+    // 直接把 0 视为「无法判定」，交给下面的 NaN 分支
+    if (!(totalKm > 0)) totalKm = NaN;
+  }
+  const isTiny = Number.isFinite(totalKm) && totalKm > 0 && totalKm < TINY;
   const segs = [...document.querySelectorAll('.drive-seg')];
   const out = [];
   for (let i = 0; i < segs.length; i++) {
@@ -150,14 +194,24 @@ const MEASURE_ALL_SEGMENTS = `(async () => {
     await sleep(${SEG_SETTLE_MS});
     const p = document.querySelector('.drive-trip-map__route.is-active');
     const t = segs[i].querySelector('.drive-seg__title');
-    const rec = { i: i + 1, title: t ? t.textContent.replace(/\\s+/g,' ').trim() : '', exists: !!p, dLen: 0, w: 0, h: 0, short: 0, ok: false, isTiny };
+    const rec = { i: i + 1, title: t ? t.textContent.replace(/\\s+/g,' ').trim() : '', exists: !!p, dLen: 0, w: 0, h: 0, short: 0, ok: false, isTiny, overflow: 0, clipped: false, vb: '' };
     if (p) {
       rec.dLen = (p.getAttribute('d') || '').length;
+      rec.vb = (document.querySelector('.drive-trip-map__svg')?.getAttribute('viewBox') ?? '');
       const b = p.getBoundingClientRect();
       rec.w = Math.round(b.width * 10) / 10;
       rec.h = Math.round(b.height * 10) / 10;
       rec.short = Math.round(Math.min(b.width, b.height) * 10) / 10;
       rec.ok = rec.short >= ${HIGHLIGHT_MIN_PX};
+      // 第四条断言：折线 bbox 必须完全落在 svg 容器 rect 内（容差 CLIP_TOLERANCE_PX）。
+      // 与「短边多大」无关 —— 一条 133×174px 的线若被裁掉一截，照样是缺陷。
+      const svg = document.querySelector('.drive-trip-map__svg');
+      if (svg) {
+        const s = svg.getBoundingClientRect();
+        const over = Math.max(s.left - b.left, s.top - b.top, b.right - s.right, b.bottom - s.bottom);
+        rec.overflow = Math.round(over * 100) / 100;
+        rec.clipped = over > ${CLIP_TOLERANCE_PX};
+      }
     }
     // d 为空 或 rect 短边为 0，一律算「无高亮」——不能只靠 exists 判存在性。
     if (rec.dLen === 0 || rec.short === 0) { rec.exists = false; rec.ok = false; rec.reason = rec.dLen === 0 ? 'd 为空' : 'rect 短边 0'; }
@@ -211,7 +265,8 @@ async function probeRoad(ctx, roadKey, label) {
   const shorts = segs.filter((s) => s.exists).map((s) => s.short);
   // 注意：不要写成 Math.min(...shorts, 0) —— 那个字面量 0 会被当成候选值，
   // 无论真实数据如何都会输出「最短 0px」，与「无高亮 0 段」自相矛盾（第三轮踩过）。
-  out.线路总长 = `${payload.totalKm} km${isTiny ? '（极短线路 <1km，按裁决不硬凑 24px）' : ''}`;
+  const kmLabel = Number.isFinite(payload.totalKm) ? `${payload.totalKm} km` : 'NaN（未能从页面判定，见下方说明）';
+  out.线路总长 = `${kmLabel}${isTiny ? '（极短线路 <1km，按裁决不硬凑 24px）' : ''}`;
   out.逐段高亮 = segs.length
     ? `共 ${segs.length} 段：无高亮 ${missing.length} 段，不达标 ${realUnder.length} 段` +
       (tinyUnder.length ? `，极短线不达标 ${tinyUnder.length} 段` : '') +
@@ -221,10 +276,17 @@ async function probeRoad(ctx, roadKey, label) {
     ...missing.map((s) => `${s.i}(${s.reason || '无高亮'})`),
     ...realUnder.map((s) => `${s.i}(${s.short}px)`),
   ]);
+  // 第四条断言：溢出容器的段（独立于像素判据 —— 短边达标也可能被裁）
+  const clipped = segs.filter((s) => s.exists && s.clipped);
+  out.溢出容器段 = clipped.length
+    ? `${clipped.length} 段 —— ${clipped.map((s) => `${s.i}(溢出${s.overflow}px)`).join(', ')}`
+    : '0 段 ✔';
+  out.最大溢出量 = segs.filter((s) => s.exists).reduce((m, s) => Math.max(m, s.overflow), 0) + 'px';
   out.极短线段号 = tinyUnder.length ? JSON.stringify(tinyUnder.map((s) => `${s.i}(${s.short}px)`)) : '[]';
   const wanted = roadKey === 'G318' ? [1, 6, 11, 22] : [1, 5, 11];
   out.点名段像素 = JSON.stringify(segs.filter((s) => wanted.includes(s.i)).map((s) => ({
     段: s.i, 名: s.title.slice(0, 20), 宽: s.w, 高: s.h, 短边: s.short, 合格: s.ok,
+    viewBox: s.vb ?? '', 溢出: s.overflow,
   })));
 
   // ── P1-1：点景点 → 点分段 → 再取消分段 → 必须回到全局 viewBox ──
@@ -283,7 +345,14 @@ async function probeRoad(ctx, roadKey, label) {
   return out;
 }
 
-const ROADS = ['G217', 'G318'];
+/**
+ * 受测线路。
+ *
+ * 第七轮起加入 **G3300**：第四条断言（高亮 bbox 不得溢出 svg 容器）就是为它而加，
+ * 若不纳入常规跑测，这条断言等于白写。G3300 是 0.19km 的超短路，
+ * 走 SCALE_MAX=8000 的放大路径 —— 这正是前三条断言的盲区。
+ */
+const ROADS = (process.env.QA_ROADS || 'G217,G318,G3300').split(',');
 
 console.log(`高亮判据：屏幕包围盒短边 ≥ ${HIGHLIGHT_MIN_PX}px（d 长度 / 类名 / DOM 数量均不作为证据）\n`);
 console.log('════ 断点 1440×900 ════');

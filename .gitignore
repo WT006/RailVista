@@ -58,3 +58,7 @@ skills-lock.json
 
 # Office lock files
 ~$*
+
+# 迁移/采集过程的本地备份产物（可重建，不入库）
+data/roads/geom.bak/
+data/roads/*.pre-harvest.json

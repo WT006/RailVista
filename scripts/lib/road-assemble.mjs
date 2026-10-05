@@ -729,6 +729,36 @@ export function stitchComponents(components, maxGapM = 500) {
 }
 
 /**
+ * 按官方起讫点方向给分量定向、排序，再做紧公差缝合。
+ * 解决「最长分量碰巧在西藏中段、上海段被丢进虚线」——主链应沿规划走向，
+ * 而不是单纯取最长碎段。
+ *
+ * 不跨大断口飞线：缝合上限仍由 maxGapM 约束（默认 8km，只吃城区 ref 断档）。
+ */
+export function orderAndStitchAlongAxis(polylines, fromPt, toPt, maxGapM = 8000) {
+  const ax = toPt[0] - fromPt[0];
+  const ay = toPt[1] - fromPt[1];
+  const proj = (p) => (p[0] - fromPt[0]) * ax + (p[1] - fromPt[1]) * ay;
+  const comps = [];
+  for (const pts of polylines) {
+    if (!Array.isArray(pts) || pts.length < 2) continue;
+    const a = pts[0];
+    const b = pts[pts.length - 1];
+    const oriented = proj(a) <= proj(b) ? pts.slice() : pts.slice().reverse();
+    const mid = oriented[(oriented.length >> 1)];
+    comps.push({ points: oriented, lengthM: polylineM(oriented), t: proj(mid) });
+  }
+  comps.sort((a, b) => a.t - b.t || b.lengthM - a.lengthM);
+  const stitched = stitchComponents(comps, maxGapM);
+  const tagged = stitched.components.map((c) => {
+    const mid = c.points[(c.points.length >> 1)];
+    return { ...c, t: proj(mid) };
+  });
+  tagged.sort((a, b) => a.t - b.t);
+  return { components: tagged, stitchedGaps: stitched.stitchedGaps };
+}
+
+/**
  * 段间断点标注：以"已收录集合"的任一端点到新分量的任一端点的最小距离为断口。
  * 诚实标注，不插值伪造连续。
  */

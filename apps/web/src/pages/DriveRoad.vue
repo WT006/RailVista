@@ -1054,8 +1054,6 @@ function fmtKm(v: number): string {
                 class="drive-trip-map__segment"
                 :d="d"
                 :stroke="roadColor(entryView.class)"
-                stroke-dasharray="4 3"
-                opacity="0.45"
               />
               <!-- R3：选中分段的高亮折线 -->
               <path

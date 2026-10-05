@@ -1371,6 +1371,15 @@
   stroke-linecap: round;
 }
 
+/* 未贯通分量与主链同色同宽，避免 G318 只剩西藏一段实线、其余全国碎段看不见 */
+.drive-trip-map__segment {
+  fill: none;
+  stroke-width: 2.2;
+  stroke-opacity: 0.82;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
 .drive-trip-map__dot {
   cursor: pointer;
   stroke: var(--surface-0);

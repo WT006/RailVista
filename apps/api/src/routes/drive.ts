@@ -47,7 +47,7 @@ function badRequest(c: any, message: string) {
 driveRoute.get('/suggest', async (c) => {
   const q = c.req.query('q') ?? '';
   const kindRaw = c.req.query('kind');
-  const limit = Math.min(50, Math.max(1, Number(c.req.query('limit')) || 20));
+  const limit = Math.min(80, Math.max(1, Number(c.req.query('limit')) || 20));
   const kind = ['place', 'road', 'spot', 'facility'].includes(kindRaw ?? '')
     ? (kindRaw as PlaceKind)
     : undefined;
@@ -76,7 +76,7 @@ driveRoute.get('/road/:key', (c) => {
       data: {
         entry,
         geometry: null,
-        note: `该编号几何待抓取（node scripts/fetch-road-geometry.mjs --ref ${entry.ref}）`,
+        note: `该编号几何待构建。请在有省份 PBF 的机器上运行 pnpm roads:build（生成 data/roads/geom/${entry.key}）。`,
       },
     });
   }

@@ -364,14 +364,16 @@
   },
   {
    "ref": "G215",
-   "name": "柳格线",
+   "name": "马宁线",
    "fromPlace": "马鬃山",
    "toPlace": "宁洱",
    "provinces": [
     "甘肃",
-    "青海"
+    "青海",
+    "四川",
+    "云南"
    ],
-   "officialLengthKm": 660
+   "officialLengthKm": 0
   },
   {
    "ref": "G216",
@@ -481,14 +483,16 @@
   },
   {
    "ref": "G227",
-   "name": "宁张线",
+   "name": "张孟线",
    "fromPlace": "张掖",
    "toPlace": "孟连",
    "provinces": [
+    "甘肃",
     "青海",
-    "甘肃"
+    "四川",
+    "云南"
    ],
-   "officialLengthKm": 341
+   "officialLengthKm": 0
   },
   {
    "ref": "G228",

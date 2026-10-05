@@ -159,6 +159,9 @@
      同时靠 backdrop-filter 保证正文对比度不受影响。 */
   --backdrop-map-opacity: 0.48;
   --backdrop-map-color: #b3cfff;
+  /* 自驾页公路网背景（AppBackdrop is-road）：低于铁路星点，避免密网过亮 */
+  --backdrop-road-net-opacity: 0.22;
+  --backdrop-road-heat-opacity: 0.26;
 }
 
 /* ── 断点：sm ≥600 / md ≥840 / lg ≥1200 ────────────────────────────────────

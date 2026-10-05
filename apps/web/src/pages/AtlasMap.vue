@@ -1220,14 +1220,8 @@ watch(spotOrigin, (v) => {
           <div class="atlas-dock__title">
             <div class="atlas-dock__identity">
               <span class="train-badge">全国</span>
-              <!-- 此前标题硬编码「铁路景点地图」，/drive/atlas 也显示这个，属空壳遗留 -->
-              <h1 class="atlas-dock__name">
-                {{ spotOrigin === 'road' ? '公路景点地图' : spotOrigin === 'rail' ? '铁路景点地图' : '铁路 + 公路景点地图' }}
-              </h1>
+              <h1 class="atlas-dock__name">全国景点地图</h1>
             </div>
-            <p class="atlas-dock__sub">
-              铁路线与编号公路共存，铁路景点与公路景点可分别或同时查看
-            </p>
           </div>
         </header>
 
@@ -1279,9 +1273,6 @@ watch(spotOrigin, (v) => {
               </template>
               <template v-else>
                 铁路 {{ spots.length }} · 公路 {{ roadLoaded ? roadSpots.length : (stats?.roadSpotCount ?? 0) }}
-                <template v-if="stats?.roadMigratedExcluded">
-                  （已排除 {{ stats.roadMigratedExcluded }} 条铁路迁移条）
-                </template>
               </template>
             </span>
             <button v-if="activeDims.length || activeProvinces.length" type="button" class="atlas-link" @click="clearFilters">
@@ -1290,7 +1281,7 @@ watch(spotOrigin, (v) => {
           </div>
           <!-- 公路侧为省级聚合标记，密度请配合热力图查看 -->
           <p class="atlas-block__note">
-            地图上公路景点按省份聚合显示（数字为该省景点数，点击只看该省）；
+            地图上公路景点按省份聚合显示（数字为该省景点数）；
             开启「热力图」可查看全国密度分布。
           </p>
 
@@ -1381,9 +1372,6 @@ watch(spotOrigin, (v) => {
               </button>
             </li>
           </ul>
-          <p class="atlas-block__note">
-            铁路景点库无评分字段，按「被几条铁路线路收录」排序，收录越多说明线路交集越广。
-          </p>
         </section>
 
         <section class="atlas-block">
@@ -1603,7 +1591,7 @@ watch(spotOrigin, (v) => {
 
 .atlas-dock__name {
   margin: 0;
-  font-size: var(--fs-h3);
+  font-size: var(--fs-h1);
   font-weight: 700;
   line-height: var(--lh-tight);
   color: var(--text-1);
@@ -2455,7 +2443,7 @@ watch(spotOrigin, (v) => {
 
 .atlas-dock__name {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--fs-h1);
   font-weight: 700;
   line-height: 1.3;
   color: var(--text-primary);

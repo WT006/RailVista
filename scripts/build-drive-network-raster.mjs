@@ -43,22 +43,22 @@ const CLASS_COLOR = {
   other: '#6b7280',
 };
 const CLASS_ALPHA = {
-  expressway: 1.0,
-  national: 0.95,
-  provincial: 0.62,
-  county: 0.5,
-  township: 0.34,
-  village: 0.28,
-  other: 0.26,
+  expressway: 0.88,
+  national: 0.78,
+  provincial: 0.48,
+  county: 0.32,
+  township: 0.16,
+  village: 0.1,
+  other: 0.12,
 };
 const CLASS_GLOW = {
-  expressway: 0.22,
-  national: 0.16,
-  provincial: 0.08,
-  county: 0.05,
-  township: 0.03,
-  village: 0.025,
-  other: 0.02,
+  expressway: 0.14,
+  national: 0.1,
+  provincial: 0.05,
+  county: 0.03,
+  township: 0.015,
+  village: 0.01,
+  other: 0.01,
 };
 
 const scale = RW / VIEW_W;
@@ -108,7 +108,7 @@ if (WITH_BASE) {
       }
       // 基础层（全部可通行道路）刻意压暗：东部路网极密，alpha 稍高就会糊成白块，
       // 反而看不出等级结构。编号公路层随后以等级色覆盖上去。
-      if (buf.length >= 2) raster.polyline(buf, bgColor, 0.085);
+      if (buf.length >= 2) raster.polyline(buf, bgColor, 0.045);
       ways += 1;
     }
     r.close();

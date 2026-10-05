@@ -8,16 +8,6 @@
   isolation: isolate;
   min-height: 100dvh;
   padding-bottom: var(--space-8);
-  /*
-   * P1：自驾页背景是构建期渲染的全国路网位图（亮线密集）+ 景点星点，
-   * 比铁路页"淡轮廓 + 稀疏星点"的背景亮得多。两页卡片本身用的是同一个
-   * .rv-card（实测 computed style 完全一致：rgba(19,24,32,0.62) + blur(26px)），
-   * 但同样的透明度在更亮的背景上透出更多内容，观感上"卡片过透、文字发飘"。
-   * 这里只在自驾作用域内把两级玻璃表面调实一档，让自驾卡片与铁路页的
-   * 实际观感对齐（沉浸光感材质层厚度按背景复杂度自适应，属规范内做法）。
-   */
-  --surface-1: rgba(19, 24, 32, 0.78); /* 全局 0.62 → 自驾 0.78 */
-  --surface-2: rgba(26, 33, 43, 0.7); /* 全局 0.55 → 自驾 0.70 */
   /* 与 .rv-page 同一纪律：末层底色透出 App 级背景层（见 base.css .rv-page 注释） */
   background:
     radial-gradient(ellipse 70% 42% at 10% -8%, var(--accent-soft), transparent 58%),
@@ -1181,10 +1171,31 @@
 .drive-trip-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: var(--space-3);
   margin-bottom: var(--space-3);
   flex-wrap: wrap;
+}
+
+.drive-trip-back {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+  color: var(--text-2);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color var(--dur-fast), color var(--dur-fast), background-color var(--dur-fast);
+}
+
+.drive-trip-back:hover {
+  border-color: var(--line-accent);
+  color: var(--text-1);
+  background: var(--accent-soft);
 }
 
 .drive-trip-tabs {
@@ -1275,7 +1286,417 @@
   color: var(--text-3);
 }
 
-/* 章节条：按里程占比分段的横条 */
+/* 沿程进度条（DriveTrip 左侧，默认折叠 + 可展开章节列表） */
+.drive-chprog {
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drive-chprog__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.drive-chprog__title {
+  font-size: var(--fs-cap);
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.drive-chprog__km {
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.drive-chprog__chevron {
+  flex: none;
+  width: 0.55em;
+  height: 0.55em;
+  border-right: 2px solid var(--text-3);
+  border-bottom: 2px solid var(--text-3);
+  transform: rotate(45deg);
+  transition: transform var(--dur-base) var(--ease-standard);
+}
+
+.drive-chprog__chevron.is-open {
+  transform: rotate(-135deg) translateY(2px);
+}
+
+.drive-chprog__body {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drive-chprog__ends {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  line-height: 1.3;
+}
+
+.drive-chprog__ends span {
+  min-width: 0;
+  max-width: 46%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-chprog__partial {
+  margin: 0;
+  font-size: var(--fs-micro);
+  line-height: 1.4;
+  color: var(--text-3);
+}
+
+.drive-chprog__track {
+  position: relative;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--line-default) 88%, transparent);
+  cursor: pointer;
+  outline: none;
+}
+
+.drive-chprog__track:focus-visible {
+  box-shadow: 0 0 0 2px var(--surface-0), 0 0 0 4px var(--accent);
+}
+
+.drive-chprog__segments {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.drive-chprog__segment {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: color-mix(in srgb, var(--accent) 16%, var(--line-default));
+  border-right: 1px solid color-mix(in srgb, var(--surface-0) 55%, transparent);
+}
+
+.drive-chprog__segment.is-done {
+  background: color-mix(in srgb, var(--accent) 28%, var(--line-default));
+}
+
+.drive-chprog__segment.is-current {
+  background: color-mix(in srgb, var(--accent) 42%, var(--line-default));
+}
+
+.drive-chprog__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent) 72%, transparent),
+    var(--accent)
+  );
+  pointer-events: none;
+  transition: width var(--dur-base) var(--ease-standard);
+}
+
+.drive-chprog__thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-0);
+  background: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent),
+    0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent);
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: left var(--dur-base) var(--ease-standard);
+}
+
+.drive-chprog__now {
+  display: grid;
+  gap: 4px;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  background: color-mix(in srgb, var(--surface-1) 82%, transparent);
+}
+
+.drive-chprog__now-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--accent-hover);
+}
+
+.drive-chprog__now-title {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-chprog__hint {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+.drive-chprog__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.drive-chprog__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--line-hairline);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-1) 70%, transparent);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--dur-fast), background-color var(--dur-fast), transform var(--dur-fast);
+}
+
+.drive-chprog__item.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.drive-chprog__item.is-done:not(.is-active) {
+  opacity: 0.72;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .drive-chprog__item:hover {
+    border-color: var(--line-accent);
+    transform: translateY(-1px);
+  }
+}
+
+.drive-chprog__item-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-default);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--surface-0) 80%, transparent);
+}
+
+.drive-chprog__item.is-active .drive-chprog__item-dot {
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft), 0 0 8px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.drive-chprog__item.is-done .drive-chprog__item-dot {
+  background: color-mix(in srgb, var(--accent) 55%, var(--line-default));
+}
+
+.drive-chprog__item-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.drive-chprog__item-title {
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-chprog__item-meta {
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.drive-chprog__item-here {
+  flex: none;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  color: var(--surface-0);
+}
+
+.drive-chprog__item-done {
+  flex: none;
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  color: var(--accent-hover);
+}
+
+.drive-chprog-expand-enter-active,
+.drive-chprog-expand-leave-active {
+  overflow: hidden;
+  transition: max-height var(--dur-base) var(--ease-emphasized),
+    opacity var(--dur-base) var(--ease-standard);
+}
+
+.drive-chprog-expand-enter-from,
+.drive-chprog-expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.drive-chprog-expand-enter-to,
+.drive-chprog-expand-leave-from {
+  max-height: 320px;
+  opacity: 1;
+}
+
+/* 即将到达（沿程页左侧，按当前进度前方景点） */
+.drive-upcoming {
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drive-upcoming__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.drive-upcoming__head .drive-block-title {
+  margin: 0;
+}
+
+.drive-upcoming__range {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-upcoming__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.drive-upcoming__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--line-hairline);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-1) 70%, transparent);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--dur-fast), background-color var(--dur-fast), transform var(--dur-fast);
+}
+
+.drive-upcoming__item.is-next {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.drive-upcoming__item.is-on {
+  border-color: var(--line-accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .drive-upcoming__item:hover {
+    border-color: var(--line-accent);
+    transform: translateY(-1px);
+  }
+}
+
+.drive-upcoming__ahead {
+  flex: none;
+  min-width: 3.6em;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-hover);
+  text-align: center;
+}
+
+.drive-upcoming__item.is-next .drive-upcoming__ahead {
+  background: var(--accent);
+  color: var(--surface-0);
+}
+
+.drive-upcoming__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.drive-upcoming__name {
+  font-size: var(--fs-cap);
+  font-weight: 700;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-upcoming__meta {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-upcoming__empty {
+  margin: 0;
+  padding: var(--space-2);
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+/* 章节条：按里程占比分段的横条（DriveRoad 等仍用 .drive-chapters） */
 .drive-chapters {
   padding: var(--space-3);
 }
@@ -1523,6 +1944,19 @@
   color: var(--text-3);
 }
 
+.drive-spot__expand {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.drive-spot__expand-inner {
+  min-height: 0;
+  overflow: hidden;
+  padding-top: var(--space-2);
+  display: grid;
+  gap: var(--space-1);
+}
+
 .drive-spot__intro {
   margin: 0;
   font-size: var(--fs-cap);
@@ -1588,6 +2022,35 @@
 .drive-live {
   display: grid;
   gap: var(--space-3);
+}
+
+.drive-live__gps {
+  margin: 0;
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-hairline);
+  background: var(--fill-subtle);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.drive-live__gps[data-status='live'] {
+  border-color: var(--line-accent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.drive-live__gps[data-status='offroute'],
+.drive-live__gps[data-status='denied'] {
+  border-color: color-mix(in srgb, var(--warning) 42%, transparent);
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.drive-live__gps[data-status='waiting'] {
+  color: var(--text-2);
 }
 
 /* 诚实标注脚注 */
@@ -1769,7 +2232,27 @@
 .drive-spot {
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+}
+
+/* 沿程景点流：取消全局 rv-card-in；筛选时整列轻量淡入，避免逐卡 TransitionGroup 卡顿 */
+.drive-flow-list .drive-spot {
+  animation: none;
+}
+
+@keyframes drive-flow-filter {
+  0% { opacity: 1; }
+  35% { opacity: 0.58; }
+  100% { opacity: 1; }
+}
+
+.drive-flow-list.is-filter-pulse {
+  animation: drive-flow-filter 240ms var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drive-flow-list.is-filter-pulse {
+    animation: none;
+  }
 }
 
 /* 无障碍降级 */
@@ -1895,18 +2378,27 @@
 .drive-trip-panel-enter-from { opacity: 0; transform: translateY(8px); }
 .drive-trip-panel-leave-to { opacity: 0; transform: translateY(-8px); }
 
-/* 景点卡片展开 */
+/* 景点卡片展开（grid 行高过渡，避免 max-height 固定值导致部分卡片无动画） */
 .drive-spot-expand-enter-active,
 .drive-spot-expand-leave-active {
-  transition: opacity var(--dur-base) var(--ease-standard),
-              max-height var(--dur-base) var(--ease-standard);
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--dur-base) var(--ease-emphasized),
+              opacity var(--dur-base) var(--ease-standard);
   overflow: hidden;
-  max-height: 200px;
 }
+
 .drive-spot-expand-enter-from,
 .drive-spot-expand-leave-to {
+  grid-template-rows: 0fr;
   opacity: 0;
-  max-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drive-spot-expand-enter-active,
+  .drive-spot-expand-leave-active {
+    transition: none;
+  }
 }
 
 /* 路书菜单展开 */

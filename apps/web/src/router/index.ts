@@ -36,11 +36,11 @@ export const router = createRouter({
     { path: '/drive/rankings', name: 'drive-rankings', component: DriveRankings },
     { path: '/drive/rankings/:boardId', name: 'drive-board', component: DriveBoard },
     { path: '/drive/roadbook/:routeId', name: 'drive-roadbook', component: DriveRoadbook },
-    // v0.3.0 旧路径兼容：/drive/:id → 路书页；/drive/:id/nav → 沿程页实时态
+    // v0.3.0 旧路径兼容：/drive/:id → 路书页；/drive/:id/nav → 沿程页
     { path: '/drive/:routeId', redirect: (to) => `/drive/roadbook/${to.params.routeId}` },
     {
       path: '/drive/:routeId/nav',
-      redirect: (to) => `/drive/trip?route=${to.params.routeId}&mode=live`,
+      redirect: (to) => `/drive/trip?route=${to.params.routeId}`,
     },
   ],
 });

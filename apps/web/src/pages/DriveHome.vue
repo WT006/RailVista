@@ -6,7 +6,7 @@
  * 搜索框视觉权重 > 榜单入口，榜单放在第二屏。
  *
  * 结构：
- *   1. 全国公路网背景层 DriveBackdropMap（与铁路行程页同规格：地图只做背景）
+ *   1. App 级背景与铁路选行程页一致（淡轮廓 + 冷蓝景点星点）
  *   2. 起终点 OD 搜索（suggest 四类索引 + geocode 兜底）+ ⇄ 交换
  *   3. 公路编号键盘（对标车次号前缀键盘：G/S/X/Y/C + 数字；S 需先选省）
  *   4. 路网统计 + 覆盖诚实说明（PRD §3.1）
@@ -24,12 +24,7 @@ import type { PlaceHit, RoadClass } from '@railvista/shared';
 
 const router = useRouter();
 
-/**
- * ── 全国公路网 ──────────────────────────────────────────────────────────────
- * 路网几何由 `DriveBackdropMap` 作为**整页背景**渲染（与铁路行程页同一规格：
- * 地图只做背景，前景是内容）。这里只取索引，用于「干线直达」快捷入口与等级图例。
- * 此前前景另有一张 46vh 的路网 SVG 卡，与背景重复且深色填充轮廓在背景上成斑块，已移除。
- */
+/** 路网索引：用于右侧「干线直达」快捷入口与等级图例（背景不再铺路网位图） */
 interface RoadBrief {
   key: string;
   ref: string;
@@ -521,7 +516,7 @@ const levelLabel: Record<string, string> = {
         <!-- 路网速览：图例 + 干线直达（背景图即全国公路网，此处不再重复画一张地图） -->
         <aside class="drive-netpanel rv-card" data-spotlight>
           <h2 class="drive-netpanel__title">全国公路网</h2>
-          <p class="drive-netpanel__sub">页面背景即为已挂几何的公路干线，颜色按等级区分</p>
+          <p class="drive-netpanel__sub">按等级区分已入库干线，可一键进入详情</p>
 
           <ul class="drive-legend">
             <li v-for="l in LEGEND" :key="l.cls">
@@ -551,7 +546,7 @@ const levelLabel: Record<string, string> = {
               路网几何加载中…（暂无可直达的干线）
             </p>
             <p v-else class="drive-netpanel__note">
-              里程为已绘制几何长度（估算），非官方里程；全国公路网背景层不阻塞页面加载。
+              里程为已绘制几何长度（估算），非官方里程。
             </p>
           </div>
         </aside>

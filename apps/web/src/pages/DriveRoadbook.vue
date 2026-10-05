@@ -44,8 +44,7 @@ onMounted(async () => {
 });
 
 function startNav() {
-  // v0.4.0：伴随导航不再是独立页，改为沿程页实时态（PRD §8）
-  void router.push(`/drive/trip?route=${encodeURIComponent(routeId)}&mode=live`);
+  void router.push(`/drive/trip?route=${encodeURIComponent(routeId)}`);
 }
 </script>
 
@@ -70,7 +69,7 @@ function startNav() {
             <span>最佳 {{ bestSeasonText }}</span>
           </div>
           <div class="drive-actions">
-            <button type="button" class="btn primary" @click="startNav">开始伴随导航</button>
+            <button type="button" class="btn primary" @click="startNav">看沿程景点</button>
           </div>
         </header>
 

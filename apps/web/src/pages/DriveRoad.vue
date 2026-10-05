@@ -927,10 +927,6 @@ async function retryAlong(): Promise<void> {
   }
 }
 
-function goTripLive(): void {
-  void router.push(`/drive/trip?road=${encodeURIComponent(code)}&mode=live`);
-}
-
 function fmtKm(v: number): string {
   return `${Math.round(v)}`;
 }
@@ -1269,7 +1265,6 @@ function fmtKm(v: number): string {
                   <router-link class="btn primary btn-sm" :to="`/drive/trip?road=${encodeURIComponent(code)}`">
                     看全部沿程景点 →
                   </router-link>
-                  <button type="button" class="btn ghost btn-sm" @click="goTripLive">实时态（我在哪）</button>
                 </div>
               </template>
             </section>

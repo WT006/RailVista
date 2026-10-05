@@ -2,43 +2,32 @@
 /**
  * 万里路书 · 沿程页（PRD §2.3 DriveTrip，本版最重要的页面）。
  *
- * 三种入口共用同一套沿程匹配器（PRD §5.4）：
+ * 入口共用同一套沿程匹配器（PRD §5.4）：
  *   C1 点对点   /drive/trip?from=上海&to=拉萨     规划引擎出折线
  *   C2 整条公路 /drive/trip?road=G318              L1 几何直接就是折线
- *   C3 我在哪   /drive/trip?...&mode=live          雷达车速带 + 前方推送
  *   路书条目    /drive/trip?route=qinghai-gansu-ring（v1 打样）
  *
- * 布局：左路线卡 / 中地图 + 章节条 / 右沿程景点流（progressKm 升序）。
- * 地图为离线 SVG（中国轮廓 + 动态取景框），零密钥依赖，与首页公路网同源。
+ * 布局：左路线卡 + 进度 + 即将到达 / 中地图 / 右沿程景点流。
+ * 有定位时静默投影到折线推进进度；无定位可点进度条预览。
+ * 地图为离线 SVG（中国轮廓 + 动态取景框），零密钥依赖。
  */
-import { computed, nextTick, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import { projectToRoute, type AlongSpot, type RoadChapter, type RoadRoute } from '@railvista/shared';
 import { api } from '../api/client';
 import DriveSubNav from '../components/DriveSubNav.vue';
+import { useGeolocation } from '../composables/useGeolocation';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 import { useRoadDraw } from '../composables/useRoadDraw';
-import { useScrollReveal } from '../composables/useScrollReveal';
+import outlineRaw from '../assets/china-outline.svg?raw';
+import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
+import { ROAD_COLORS } from '../data/roadColors';
 
 usePointerSpotlight();
 const routePathRef = ref<SVGPathElement | null>(null);
 useRoadDraw(routePathRef);
-// A1：内容在异步 load 完成后才渲染，需在 finally 里主动 rescan 一次，
-//确保骨架屏切换后新出现的 .drive-spot 被纳入观察。
-const { rescan: rescanReveal } = useScrollReveal('.drive-scroll-reveal');
-import DriveLivePanel from '../components/DriveLivePanel.vue';
-import outlineRaw from '../assets/china-outline.svg?raw';
-import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
-import { ROAD_COLORS, roadColor } from '../data/roadColors';
-import type {
-  AlongSpot,
-  DriveHighlight,
-  DriveRoute,
-  RoadChapter,
-  RoadRoute,
-} from '@railvista/shared';
 
 const route = useRoute();
-const router = useRouter();
 
 const VIEW_W = CHINA_OUTLINE_VIEWBOX.width;
 const VIEW_H = CHINA_OUTLINE_VIEWBOX.height;
@@ -47,6 +36,12 @@ const outlinePaths = (() => {
   return m ? m[1].trim() : '';
 })();
 
+/** 偏离路线超过此阈值（米）时不推进进度 */
+const OFF_ROUTE_MAX_M = 5000;
+/** 即将到达：前方多少公里内的景点 */
+const UPCOMING_LOOKAHEAD_KM = 80;
+const UPCOMING_LIMIT = 5;
+
 // ── 数据加载 ─────────────────────────────────────────────────────────────────
 const loading = ref(true);
 const error = ref('');
@@ -54,9 +49,7 @@ const roadRoute = ref<RoadRoute | null>(null);
 const spots = ref<AlongSpot[]>([]);
 const chapters = ref<RoadChapter[]>([]);
 const spotLibrary = ref<{ count: number; updated: string; note?: string } | null>(null);
-const liveMode = ref(false);
 const progress = ref(0);
-const speedKmh = ref(60);
 
 const entryMode = computed<'od' | 'road' | 'route'>(() => {
   if (route.query.road) return 'road';
@@ -85,17 +78,12 @@ async function load() {
     chapters.value = data.chapters ?? [];
     spotLibrary.value = data.spotLibrary ?? null;
 
-    liveMode.value = route.query.mode === 'live';
     const p = Number(route.query.progress);
-    const s = Number(route.query.speed);
     if (Number.isFinite(p)) progress.value = Math.max(0, Math.min(1, p));
-    if (Number.isFinite(s)) speedKmh.value = s;
   } catch (e) {
     error.value = e instanceof Error ? e.message : '加载失败';
   } finally {
     loading.value = false;
-    // A1：DOM 已从骨架屏切换为内容，主动重扫一次揭示动画
-    void nextTick(rescanReveal);
   }
 }
 
@@ -117,16 +105,24 @@ const focusBbox = computed<[number, number, number, number]>(() => {
   const coords = roadRoute.value?.coords;
   if (!coords || !coords.length) return [0, 0, VIEW_W, VIEW_H];
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  for (const [lng, lat] of coords) {
+  const absorb = (lng: number, lat: number) => {
     const [x, y] = lngLatToViewBox(lng, lat);
     if (x < minX) minX = x;
     if (x > maxX) maxX = x;
     if (y < minY) minY = y;
     if (y > maxY) maxY = y;
-  }
-  const padX = Math.max((maxX - minX) * 0.12, 30);
-  const padY = Math.max((maxY - minY) * 0.12, 30);
-  return [minX - padX, minY - padY, maxX + padX, maxY + padY];
+  };
+  for (const [lng, lat] of coords) absorb(lng, lat);
+  // 景点一并纳入取景，避免圆点贴边或被裁掉
+  for (const s of spots.value.slice(0, 80)) absorb(s.lng, s.lat);
+
+  const contentW = Math.max(maxX - minX, 4);
+  const contentH = Math.max(maxY - minY, 4);
+  const padX = Math.max(contentW * 0.14, 24);
+  const padY = Math.max(contentH * 0.14, 24);
+  // ⚠️ 必须返回 [x, y, width, height]。此前误把 maxX/maxY 当作 w/h，
+  // 视野被撑到「原点附近一整块中国」，路线只剩左上角一小撮。
+  return [minX - padX, minY - padY, contentW + padX * 2, contentH + padY * 2];
 });
 
 const viewBoxAttr = computed(() => {
@@ -155,6 +151,7 @@ const CATEGORY_FILTERS = [
 ];
 const activeCategories = ref<string[]>([]);
 const onlyDetour = ref(false);
+const filterPulse = ref(false);
 
 const filteredSpots = computed(() => {
   let list = spots.value;
@@ -167,10 +164,23 @@ const filteredSpots = computed(() => {
   return list;
 });
 
+function pulseFilterList() {
+  filterPulse.value = false;
+  void nextTick(() => {
+    filterPulse.value = true;
+  });
+}
+
 function toggleCategory(key: string) {
   const i = activeCategories.value.indexOf(key);
   if (i >= 0) activeCategories.value.splice(i, 1);
   else activeCategories.value.push(key);
+  pulseFilterList();
+}
+
+function toggleOnlyDetour() {
+  onlyDetour.value = !onlyDetour.value;
+  pulseFilterList();
 }
 
 // ── 展示辅助 ─────────────────────────────────────────────────────────────────
@@ -210,74 +220,131 @@ function categoryLabel(cat: string): string {
   return `${dimLabel[dim] ?? dim}${sub ? ' · ' + sub : ''}`;
 }
 
-// ── C3 实时态：把 AlongSpot 转成雷达可用的 DriveHighlight ────────────────────
-const routeLike = computed<DriveRoute | null>(() => {
-  const r = roadRoute.value;
-  if (!r) return null;
-  return {
-    id: r.id,
-    name: r.name,
-    tier: 'national',
-    provinces: r.provinces,
-    summary: '',
-    tags: [],
-    totalKm: r.lengthKm,
-    driveDays: 1,
-    bestSeason: [],
-    difficulty: 1,
-    roadRefs: r.roadKeys,
-    startName: '',
-    endName: '',
-    waypoints: [],
-    geometry: r.coords,
-    chapters: chapters.value.map((ch, i) => ({
-      id: `ch-${i}`,
-      index: i + 1,
-      title: ch.title,
-      fromKm: ch.fromKm,
-      toKm: ch.toKm,
-      summary: '',
-      roadRefs: [],
-      towns: [],
-      highlightIds: [],
-      spotIds: [],
-      tips: [],
-    })),
-    highlightIds: [],
-    spotIds: [],
-    alerts: [],
-    status: 'geometry_ready',
-    updatedAt: '',
+// ── 沿程进度跨度 ─────────────────────────────────────────────────────────────
+// lengthKm 常是「全线名义/去重后里程」（含未贯通分量），章节与主链 cumKm 只覆盖
+// 已贯通主链。进度条若用 lengthKm 当分母，分段会全部挤在左侧（G331 实测
+// 章节止于 ~1.5k km，而 lengthKm=9373）。
+const nominalKm = computed(() => roadRoute.value?.lengthKm ?? 0);
+const chapterSpanKm = computed(() => {
+  if (!chapters.value.length) return 0;
+  return Math.max(...chapters.value.map((c) => c.toKm));
+});
+const chainKm = computed(() => {
+  const cum = roadRoute.value?.cumKm;
+  if (cum?.length) return cum[cum.length - 1]!;
+  return 0;
+});
+/** 进度条可走跨度（主链 + 章节覆盖） */
+const spanKm = computed(() => {
+  const span = Math.max(chapterSpanKm.value, chainKm.value);
+  return span > 0 ? span : nominalKm.value;
+});
+const progressPartial = computed(
+  () => nominalKm.value > 0 && spanKm.value > 0 && spanKm.value / nominalKm.value < 0.92,
+);
+
+// ── 沿程进度 / 章节 / 即将到达 ───────────────────────────────────────────────
+const chaptersExpanded = ref(false);
+const gpsFollowing = ref(false);
+
+const progressKm = computed(() => progress.value * spanKm.value);
+const progressPct = computed(() => {
+  if (!spanKm.value) return 0;
+  return Math.min(100, (progressKm.value / spanKm.value) * 100);
+});
+
+const activeChapterIndex = computed(() => {
+  const km = progressKm.value;
+  const idx = chapters.value.findIndex((ch) => km >= ch.fromKm && km < ch.toKm);
+  if (idx >= 0) return idx;
+  if (chapters.value.length && km >= chapters.value[chapters.value.length - 1]!.toKm) {
+    return chapters.value.length - 1;
+  }
+  return 0;
+});
+
+const activeChapter = computed(() => chapters.value[activeChapterIndex.value] ?? null);
+
+const routeEndpoints = computed(() => {
+  if (!chapters.value.length) return { start: '', end: '' };
+  const split = (title: string) => {
+    const parts = title.split(/\s*[—–-]\s*/);
+    if (parts.length >= 2) return { from: parts[0].trim(), to: parts[parts.length - 1].trim() };
+    return { from: title.trim(), to: '' };
   };
+  const first = split(chapters.value[0].title);
+  const last = split(chapters.value[chapters.value.length - 1].title);
+  return { start: first.from, end: last.to || last.from };
 });
 
-const radarHighlights = computed<DriveHighlight[]>(() => {
-  // 车速带规则复用 v1 radar：worthSlowDown（值得减速看一眼）取高分景点，
-  // canPark 取可停或近路景点；advanceKm 沿用默认 5km
-  return spots.value.slice(0, 80).map((s) => ({
-    id: s.id,
-    routeId: roadRoute.value?.id ?? '',
-    name: s.name,
-    lng: s.lng,
-    lat: s.lat,
-    alongKm: s.progressKm,
-    side: s.side,
-    category: 'viewpoint' as const,
-    worthSlowDown: s.score >= 60,
-    canPark: s.canPark ?? s.distKm <= 1,
-    stopMinutes: s.stayMin,
-    intro: s.intro ?? '',
-    howToPlay: '',
-  }));
+const upcomingSpots = computed(() => {
+  const km = progressKm.value;
+  return spots.value
+    .filter((s) => s.progressKm > km - 0.2 && s.progressKm <= km + UPCOMING_LOOKAHEAD_KM)
+    .sort((a, b) => a.progressKm - b.progressKm || b.score - a.score)
+    .slice(0, UPCOMING_LIMIT);
 });
 
-function switchMode(mode: 'plan' | 'live') {
-  const query = { ...route.query };
-  if (mode === 'live') query.mode = 'live';
-  else delete query.mode;
-  void router.replace({ query });
-  liveMode.value = mode === 'live';
+function aheadText(s: AlongSpot): string {
+  const d = s.progressKm - progressKm.value;
+  if (d < 0.3) return '即将到达';
+  if (d < 1) return `${Math.round(d * 1000)} 米`;
+  return `${d.toFixed(1)} 公里`;
 }
+
+function chapterLeftPct(ch: RoadChapter): number {
+  if (!spanKm.value) return 0;
+  return Math.max(0, Math.min(100, (ch.fromKm / spanKm.value) * 100));
+}
+
+function chapterWidthPct(ch: RoadChapter): number {
+  if (!spanKm.value) return 0;
+  const w = ((ch.toKm - ch.fromKm) / spanKm.value) * 100;
+  return Math.max(0.8, Math.min(100 - chapterLeftPct(ch), w));
+}
+
+function spotsInChapter(ch: RoadChapter): number {
+  return spots.value.filter((s) => s.progressKm >= ch.fromKm && s.progressKm < ch.toKm).length;
+}
+
+function toggleChaptersExpanded() {
+  chaptersExpanded.value = !chaptersExpanded.value;
+}
+
+function jumpToChapter(index: number) {
+  const ch = chapters.value[index];
+  if (!ch || !spanKm.value) return;
+  gpsFollowing.value = false;
+  progress.value = Math.min(1, Math.max(0, (ch.fromKm + 0.001) / spanKm.value));
+}
+
+function jumpToProgress(event: MouseEvent) {
+  const track = event.currentTarget as HTMLElement;
+  const rect = track.getBoundingClientRect();
+  const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+  gpsFollowing.value = false;
+  progress.value = ratio;
+}
+
+function nudgeProgress(delta: number) {
+  gpsFollowing.value = false;
+  progress.value = Math.max(0, Math.min(1, progress.value + delta));
+}
+
+// 有定位时静默推进进度（无独立「我在哪」面板）
+const { gps } = useGeolocation();
+watch(gps, (sample) => {
+  if (!sample || !spanKm.value) return;
+  const coords = roadRoute.value?.coords;
+  if (!coords || coords.length < 2) return;
+  const proj = projectToRoute(coords, sample.lng, sample.lat);
+  if (proj.offRouteM > OFF_ROUTE_MAX_M) {
+    gpsFollowing.value = false;
+    return;
+  }
+  gpsFollowing.value = true;
+  progress.value = Math.max(0, Math.min(1, proj.alongKm / spanKm.value));
+});
 </script>
 
 <template>
@@ -301,25 +368,8 @@ function switchMode(mode: 'plan' | 'live') {
       </div>
 
       <template v-else>
-        <!-- 三入口切换 + 实时态 -->
         <div class="drive-trip-top">
-          <nav class="drive-trip-tabs" aria-label="入口切换">
-            <router-link class="drive-trip-tab" :class="{ 'is-active': entryMode === 'od' }" to="/drive">
-              点对点
-            </router-link>
-            <span class="drive-trip-tab" :class="{ 'is-active': entryMode === 'road' || entryMode === 'route' }">
-              整条公路
-            </span>
-            <button
-              type="button"
-              class="drive-trip-tab"
-              :class="{ 'is-active': liveMode }"
-              @click="switchMode(liveMode ? 'plan' : 'live')"
-            >
-              我在哪（实时）
-            </button>
-          </nav>
-          <span v-if="roadRoute.engineNote" class="drive-trip-engine">{{ roadRoute.engineNote }}</span>
+          <router-link class="drive-trip-back" to="/drive">← 返回选路线</router-link>
         </div>
 
         <div class="drive-trip-grid">
@@ -340,44 +390,125 @@ function switchMode(mode: 'plan' | 'live') {
               </div>
             </section>
 
-            <!-- 章节条 -->
-            <section v-if="chapters.length" class="rv-card drive-chapters">
-              <h2 class="drive-block-title">沿程章节</h2>
-              <div class="drive-chapterbar">
-                <div
-                  v-for="(ch, i) in chapters"
-                  :key="i"
-                  class="drive-chapterbar__seg"
-                  :style="{ flex: Math.max(1, ch.toKm - ch.fromKm) }"
-                  :title="`${ch.title}（${Math.round(ch.fromKm)}—${Math.round(ch.toKm)} km）`"
-                  :data-title="`${ch.title}（${Math.round(ch.fromKm)}—${Math.round(ch.toKm)} km）`"
-                >
-                  <span class="drive-chapterbar__label">{{ ch.title }}</span>
+            <!-- 沿程进度：默认进度条，点击展开全部章节 -->
+            <section v-if="chapters.length" class="rv-card drive-chprog">
+              <button
+                type="button"
+                class="drive-chprog__head"
+                :aria-expanded="chaptersExpanded"
+                @click="toggleChaptersExpanded"
+              >
+                <span class="drive-chprog__title">沿程进度</span>
+                <span class="drive-chprog__km">{{ Math.round(progressKm) }} / {{ Math.round(spanKm) }} km</span>
+                <span class="drive-chprog__chevron" :class="{ 'is-open': chaptersExpanded }" aria-hidden="true" />
+              </button>
+
+              <div class="drive-chprog__body">
+                <div class="drive-chprog__ends">
+                  <span>{{ routeEndpoints.start }}</span>
+                  <span>{{ routeEndpoints.end }}</span>
                 </div>
+
+                <div
+                  class="drive-chprog__track"
+                  role="slider"
+                  :aria-valuenow="Math.round(progressKm)"
+                  aria-valuemin="0"
+                  :aria-valuemax="Math.round(spanKm)"
+                  aria-label="沿程进度"
+                  tabindex="0"
+                  @click="jumpToProgress"
+                  @keydown.left.prevent="nudgeProgress(-0.01)"
+                  @keydown.right.prevent="nudgeProgress(0.01)"
+                >
+                  <div class="drive-chprog__segments" aria-hidden="true">
+                    <div
+                      v-for="(ch, i) in chapters"
+                      :key="'seg-' + i"
+                      class="drive-chprog__segment"
+                      :class="{ 'is-done': i < activeChapterIndex, 'is-current': i === activeChapterIndex }"
+                      :style="{ left: chapterLeftPct(ch) + '%', width: chapterWidthPct(ch) + '%' }"
+                    />
+                  </div>
+                  <div class="drive-chprog__fill" :style="{ width: progressPct + '%' }" />
+                  <div class="drive-chprog__thumb" :style="{ left: progressPct + '%' }" />
+                </div>
+
+                <p v-if="progressPartial" class="drive-chprog__partial">
+                  章节覆盖已贯通主链 {{ Math.round(spanKm) }} km · 全线名义 {{ Math.round(nominalKm) }} km
+                </p>
+
+                <div v-if="!chaptersExpanded && activeChapter" class="drive-chprog__now">
+                  <span class="drive-chprog__now-badge">第 {{ activeChapterIndex + 1 }}/{{ chapters.length }} 段</span>
+                  <span class="drive-chprog__now-title">{{ activeChapter.title }}</span>
+                  <span class="drive-chprog__hint">
+                    <template v-if="gpsFollowing">定位跟随中 · </template>点击标题展开全部章节
+                  </span>
+                </div>
+
+                <Transition name="drive-chprog-expand">
+                  <ul v-if="chaptersExpanded" class="drive-chprog__list">
+                    <li v-for="(ch, i) in chapters" :key="'ch-' + i">
+                      <button
+                        type="button"
+                        class="drive-chprog__item"
+                        :class="{ 'is-active': i === activeChapterIndex, 'is-done': i < activeChapterIndex }"
+                        @click="jumpToChapter(i)"
+                      >
+                        <span class="drive-chprog__item-dot" aria-hidden="true" />
+                        <span class="drive-chprog__item-body">
+                          <span class="drive-chprog__item-title">{{ ch.title }}</span>
+                          <span class="drive-chprog__item-meta">
+                            {{ Math.round(ch.fromKm) }}—{{ Math.round(ch.toKm) }} km · {{ spotsInChapter(ch) }} 处景点
+                          </span>
+                        </span>
+                        <span v-if="i === activeChapterIndex" class="drive-chprog__item-here">当前</span>
+                        <span v-else-if="i < activeChapterIndex" class="drive-chprog__item-done" aria-hidden="true">✓</span>
+                      </button>
+                    </li>
+                  </ul>
+                </Transition>
               </div>
-              <ul class="drive-chapterlist">
-                <li v-for="(ch, i) in chapters" :key="i">
-                  <span class="drive-chapterlist__range">{{ Math.round(ch.fromKm) }}—{{ Math.round(ch.toKm) }} km</span>
-                  {{ ch.title }}
-                </li>
-              </ul>
             </section>
 
-            <!-- 实时态面板（C3） -->
-            <Transition name="drive-trip-panel">
-              <DriveLivePanel
-                v-if="liveMode && routeLike"
-                :route="routeLike"
-                :highlights="radarHighlights"
-                v-model:progress="progress"
-                v-model:speed-kmh="speedKmh"
-              />
-            </Transition>
+            <!-- 即将到达（按当前进度前方景点） -->
+            <section class="rv-card drive-upcoming">
+              <div class="drive-upcoming__head">
+                <h2 class="drive-block-title">即将到达</h2>
+                <span class="drive-upcoming__range">前方 {{ UPCOMING_LOOKAHEAD_KM }} km</span>
+              </div>
+              <ul v-if="upcomingSpots.length" class="drive-upcoming__list">
+                <li v-for="(s, i) in upcomingSpots" :key="s.id">
+                  <button
+                    type="button"
+                    class="drive-upcoming__item"
+                    :class="{ 'is-next': i === 0, 'is-on': expandedSpotId === s.id }"
+                    @click="toggleSpot(s)"
+                  >
+                    <span class="drive-upcoming__ahead">{{ aheadText(s) }}</span>
+                    <span class="drive-upcoming__body">
+                      <span class="drive-upcoming__name">{{ s.name }}</span>
+                      <span class="drive-upcoming__meta">
+                        {{ kmText(s.progressKm) }} · {{ categoryLabel(s.category) }} · {{ detourText(s) }}
+                      </span>
+                    </span>
+                    <span class="drive-spot__tier" :class="'is-' + s.tier">{{ TIER_LABEL[s.tier] ?? s.tier }}</span>
+                  </button>
+                </li>
+              </ul>
+              <p v-else class="drive-upcoming__empty">前方暂无匹配景点，点进度条可预览沿途</p>
+            </section>
           </aside>
 
           <!-- 中：地图 -->
           <section class="drive-trip-map rv-card" data-spotlight>
-            <svg :viewBox="viewBoxAttr" class="drive-trip-map__svg" role="img" aria-label="路线示意图">
+            <svg
+              :viewBox="viewBoxAttr"
+              preserveAspectRatio="xMidYMid meet"
+              class="drive-trip-map__svg"
+              role="img"
+              aria-label="路线示意图"
+            >
               <g class="drive-netmap__outline" v-html="outlinePaths" />
               <path ref="routePathRef" class="drive-trip-map__route" :d="routePath" />
               <circle
@@ -416,18 +547,22 @@ function switchMode(mode: 'plan' | 'live') {
                   type="button"
                   class="road-kbd__chip"
                   :class="{ 'is-on': onlyDetour }"
-                  @click="onlyDetour = !onlyDetour"
+                  @click="toggleOnlyDetour"
                 >
                   只看值得绕行
                 </button>
               </div>
             </div>
 
-            <div class="drive-flow-list">
+            <div
+              class="drive-flow-list"
+              :class="{ 'is-filter-pulse': filterPulse }"
+              @animationend="filterPulse = false"
+            >
               <article
                 v-for="s in filteredSpots"
                 :key="s.id"
-                class="drive-spot drive-scroll-reveal"
+                class="drive-spot"
                 :class="{ 'is-expanded': expandedSpotId === s.id }"
                 :style="{ '--spot-color': tierColor(s.tier) }"
                 @click="toggleSpot(s)"
@@ -449,15 +584,17 @@ function switchMode(mode: 'plan' | 'live') {
                 </div>
                 <Transition name="drive-spot-expand">
                   <div v-if="expandedSpotId === s.id" class="drive-spot__expand">
-                    <p v-if="s.intro" class="drive-spot__intro">{{ s.intro }}</p>
-                    <p class="drive-spot__vis">{{ VIS_LABEL[s.visibility ?? 'detour20'] }} · {{ VIS_LABEL[s.visibility ?? 'detour20'] === '就在路边' ? '可即停即看' : '缓冲 ' + (s.visibility === 'distant' ? '35' : s.visibility === 'detour20' ? '12' : '3') + ' km' }}</p>
+                    <div class="drive-spot__expand-inner">
+                      <p v-if="s.intro" class="drive-spot__intro">{{ s.intro }}</p>
+                      <p class="drive-spot__vis">{{ VIS_LABEL[s.visibility ?? 'detour20'] }} · {{ VIS_LABEL[s.visibility ?? 'detour20'] === '就在路边' ? '可即停即看' : '缓冲 ' + (s.visibility === 'distant' ? '35' : s.visibility === 'detour20' ? '12' : '3') + ' km' }}</p>
+                    </div>
                   </div>
                 </Transition>
               </article>
-              <p v-if="!filteredSpots.length" class="drive-empty">
-                该路段暂无匹配景点（试试放开筛选，或降低 minScore）
-              </p>
             </div>
+            <p v-if="!filteredSpots.length" class="drive-empty">
+              该路段暂无匹配景点（试试放开筛选，或降低 minScore）
+            </p>
 
             <p v-if="spotLibrary" class="drive-footnote">
               景点库 {{ spotLibrary.count }} 条 · {{ spotLibrary.note ?? '持续扩充中' }} ·

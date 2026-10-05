@@ -86,12 +86,43 @@ export type AtlasSpotLite = {
   dimensions?: string[];
   corridorIds: string[];
   matchKind: 'line' | 'geo' | null;
+  /** 数据来源：rail=铁路景点库，road=公路景点库 */
+  origin?: 'rail' | 'road';
+  /** 省份（铁路侧仅 192/624 有值，公路侧已全量补齐） */
+  province?: string;
+  /** 观赏评分（0–100）：公路侧有，铁路侧数据源无此字段 */
+  score?: number;
+  /** 质量分级 A/B/C */
+  tier?: string;
+};
+
+/** 公路线路（编号公路，仅含已挂几何的） */
+export type AtlasRoadCorridorLite = {
+  key: string;
+  ref: string;
+  name?: string;
+  class: string;
+  polyline: [number, number][];
+  lengthKm: number;
+  spotCount: number;
+  spotIds: string[];
 };
 
 export type AtlasOverviewData = {
   corridors: AtlasCorridorLite[];
   spots: AtlasSpotLite[];
-  meta: { corridorCount: number; spotCount: number; generatedAt: string; buildMs: number };
+  /** 双源融合：公路线路与公路景点（公路景点已排除从铁路迁移来的条目） */
+  roadCorridors: AtlasRoadCorridorLite[];
+  roadSpots: AtlasSpotLite[];
+  meta: {
+    corridorCount: number;
+    spotCount: number;
+    roadCorridorCount: number;
+    roadSpotCount: number;
+    roadMigratedExcluded: number;
+    generatedAt: string;
+    buildMs: number;
+  };
 };
 
 /** 线路详情页景点：带沿线里程 */
@@ -214,6 +245,23 @@ export const api = {
   getAtlasOverview() {
     return request<AtlasOverviewData>('/atlas/overview');
   },
+  /**
+   * v0.6.3：公路侧明细（编号公路折线 + 公路原生景点）。
+   * 与 overview 分开按需拉取 —— 并入后响应体 4.4MB，浏览器解析 + AMap 聚类
+   * 1.2 万个点会长时间阻塞主线程，侧栏一直停在"正在加载"。
+   */
+  getAtlasRoad() {
+    return request<{
+      roadCorridors: AtlasRoadCorridorLite[];
+      roadSpots: AtlasSpotLite[];
+      meta: {
+        roadCorridorCount: number;
+        roadSpotCount: number;
+        roadMigratedExcluded: number;
+        generatedAt: string;
+      };
+    }>('/atlas/road');
+  },
   /** 线路详情页：单条走廊完整折线 + 沿线景点（含里程） */
   getAtlasCorridor(id: string) {
     return request<AtlasCorridorDetail>(`/atlas/corridor/${encodeURIComponent(id)}`);
@@ -258,6 +306,15 @@ export const api = {
       totalKm?: number;
       spotCount?: number;
       note?: string;
+      /** B2-1：端点地名与几何首/末点距离过远，nodes 不可作为里程标注 */
+      endpointsUnverified?: boolean;
+      lengthDeviation?: number | null;
+      /** 已贯通里程（OSM 实际落库长度） */
+      connectedKm?: number;
+      /** 名义里程（权威名录） */
+      nominalKm?: number;
+      /** 已贯通 / 名义（百分比）；名义为 0 时为 null */
+      coveragePct?: number | null;
     }>(`/drive/road/${encodeURIComponent(key)}`);
   },
   /** 双引擎 OD 规划 */

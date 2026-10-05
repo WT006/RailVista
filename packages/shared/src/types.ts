@@ -589,13 +589,59 @@ export interface RoadIndexEntry {
   hasGeom: boolean;
   source: 'authoritative' | 'osm_only';
   status: 'ok' | 'partial' | 'broken' | 'unverified';
+  /**
+   * v0.6.0 精度分级：A=官方里程偏差≤10% · B=≤25% · C=偏差更大或官方里程未知 · X=走向存疑。
+   * 判据与门禁见 docs/方案-全国公路网全等级覆盖与精准化落地-20261002.md §2.2
+   */
+  precision?: 'A' | 'B' | 'C' | 'X';
+  /** 连通分量数（>1 表示该编号在 OSM 中未贯通，断点数 = 分量数-1） */
+  componentCount?: number;
 }
+
+/**
+ * v0.6.5：地名锚点的来源分级。
+ *
+ * 「站名兜底」不等于「地名」——铁路站名只是 towns 的一个子集，且站场可能离公路
+ * 沿线数公里。UI 需据此弱化非权威来源，避免把推定地名当成已核实地名展示。
+ *  - amap   ：高德逆地理编码（乡镇/区县级，权威且贴近沿线）
+ *  - place  ：本地地名库（行政地名 + 乡镇级 POI，人工/规则整理）
+ *  - station：铁路站名兜底（最弱，精度最低）
+ */
+export type RoadAnchorSource = 'amap' | 'place' | 'station';
+
+/**
+ * v0.6.5（P1-2）：锚点所指的**地理实体类型**。
+ *
+ * 旧值只有 'city'，而 `fill-road-place-anchors.mjs` 除站名/省份外一律写 'city'，
+ * 导致「林则猕猴园」（动物园）、「天瀑」（瀑布）、「甲玛王宫」（宫殿）
+ * 全被标成城市聚落，UI 无法区分、用户会误以为是城镇。
+ *
+ * - settlement 聚落：城镇 / 村庄 / 行政驻地（最常见的段名）
+ * - pass       山口 / 垭口 / 关隘（公路分段的天然节点，如「米拉山口」）
+ * - landmark   景区 / 古建 / 地标等**非聚落**实体（如「甲玛王宫」「鲁朗林海」）
+ * - junction   省级行政区（历史值，保持兼容）
+ * - station    铁路站名兜底
+ * - city / service / pass / endpoint 为历史值，仅老数据可能出现
+ */
+export type RoadAnchorType =
+  | 'settlement'
+  | 'pass'
+  | 'landmark'
+  | 'junction'
+  | 'station'
+  // 历史值（老 geom 文件可能出现）
+  | 'city'
+  | 'service'
+  | 'endpoint';
 
 /** L1 几何节点（城市 / 交叉 / 服务 / 垭口 / 端点） */
 export interface RoadGeometryNode {
   name: string;
   atKm: number;
-  type: 'city' | 'junction' | 'service' | 'pass' | 'endpoint';
+  /** v0.6.5：缺失时按 'city'（历史语义）处理，UI 归为聚落 */
+  type: RoadAnchorType;
+  /** v0.6.5：地名来源分级；缺省视为 'station'（历史数据均为站名兜底） */
+  source?: RoadAnchorSource;
 }
 
 /** 段间断点状态：normal 正常小断点 / suspect 可疑大断点(>200km) / no_connect 无连通way / urban_skip 城市区域跳过 */
@@ -618,7 +664,15 @@ export interface GapAnnotation {
 export interface RoadGeometry {
   key: string;
   points: RoadPoint[];
-  /** 逐点累计里程（km），与 points 等长 */
+  /**
+   * 逐点累计里程。
+   *
+   * ⚠️ **单位不可信 —— 历史遗留的「米」量纲**（实测 G318 末值 1627363.5，
+   * 而同文件 drawnKm=6331.5；G217 末值 1023313.3 / drawnKm=2343.5）。
+   * 与 `RoadRoute.cumKm`（**公里**，API 现算）同名不同量纲，**不要混用**。
+   * 需要可用的公里制累计里程时，请用 `RoadRoute.cumKm`，
+   * 或按 `points` 自行 haversine 重算（见 scripts/fill-road-place-anchors.mjs）。
+   */
   cumKm: number[];
   nodes: RoadGeometryNode[];
   simplified: boolean;
@@ -626,6 +680,35 @@ export interface RoadGeometry {
   segments?: RoadPoint[][];
   /** 段间断点标注数组（主链末点↔segments 首点、segments 间） */
   gapAnnotations?: GapAnnotation[];
+  /**
+   * B2-1：端点标注是否不可信。
+   * 实测 33 条已落盘几何全部为假标注（G318 声明 nodes[0].name="上海"，
+   * 但 points[0] 实际在西藏，相距 2400km）。为 true 时 nodes 不含端点项，
+   * UI 不得展示「上海 0km」这类未经验证的端点里程。
+   */
+  endpointsUnverified?: boolean;
+  /** 端点地名坐标与几何首/末点的距离（km），供排查 */
+  endpointDistanceKm?: { from: number; to: number };
+  /** 已贯通里程相对官方里程的偏差百分比（正=超出，负=不足），仅在偏差 >50% 时写入 */
+  lengthDeviation?: number;
+  /** 精度分级：A=与官方里程偏差不超 10% · B=不超 25% · C=偏差更大或官方里程未知 · X=走向存疑 */
+  precision?: 'A' | 'B' | 'C' | 'X';
+  /** 已收录里程（去重后，km）：双向分隔道路的平行对向车道只计一条，与官方里程可比 */
+  totalKm?: number;
+  /** 实际绘制的折线总长（km，含全部连通分量、未去重），用于排查 */
+  drawnKm?: number;
+  /** 连通分量数（大于 1 表示该编号在 OSM 中未贯通，断点数 = 分量数 - 1） */
+  componentCount?: number;
+  /** 城区 ref 断档按几何接续的次数（只影响绘制，不影响里程口径） */
+  stitchedGaps?: number;
+  /** 官方里程参考值（km），来自权威名录；未知时为 null */
+  officialKm?: number | null;
+  /** 来源标记：osm-pbf-elements 表示由省份 PBF 要素库装配 */
+  source?: string;
+  /** v0.6.0：该编号是否在 OSM 中真实出现过（官方规划在册但 OSM 无数据时为 false/undefined） */
+  inOsm?: boolean;
+  method?: string;
+  assembledAt?: string;
 }
 
 /** 公路侧景点沿程可见性（与铁路 SpotVisibility 的语义差异见 PRD §5.3） */
@@ -661,6 +744,19 @@ export interface RoadChapter {
   title: string;
   fromKm: number;
   toKm: number;
+  /**
+   * v0.6.5：段内两端锚点的地名来源（供 UI 弱化非权威来源的段名）。
+   * 缺省视为 'station'（历史章节由站名兜底生成）。
+   * 若两端来源不同，取**较弱**的一侧（station < place < amap），保守标注。
+   */
+  fromSource?: RoadAnchorSource;
+  toSource?: RoadAnchorSource;
+  /**
+   * v0.6.5（P1-2）：段两端锚点的地理实体类型，供 UI 区分
+   * 「聚落（城镇）」与「山口 / 景区地标」—— 后者不该被当成地名读。
+   */
+  fromType?: RoadAnchorType;
+  toType?: RoadAnchorType;
 }
 
 /** 合成路线（OD 规划结果 / 榜单条目指向的路线） */
@@ -672,6 +768,21 @@ export interface RoadRoute {
   lengthKm: number;
   durationMin?: number;
   coords: RoadPoint[];
+  /**
+   * v0.6.5：与 `coords` **等长同源**的累计里程。
+   *
+   * ⚠️ **单位是公里（km），不是米。** 注意与落盘文件的同名字段区分：
+   * `data/roads/geom/*.json` 里的 `geom.cumKm`（RoadGeometry.cumKm）
+   * 是历史遗留的**米**量纲且不可信（实测 G318 末值 1627363，而该路 drawnKm=6331.5），
+   * **不可直接使用**。本字段是 API 在全分辨率链上重算后下发的公里值，
+   * 两处同名不同量纲，正是第一轮 P0-1「末段无高亮」的温床，引用前务必确认来源。
+   *
+   * 必须由服务端在**抽稀之前**按全分辨率链算出，再随坐标一起下发；
+   * 抽稀时按被选中点的下标同步切片。理由：抽稀会切掉弯道、缩短折线
+   * （实测 G318 3669→600 点后重算里程缩水 117.8km / 7.2%），
+   * 前端若在降采样链上重算里程，末段会落在重算链之外导致分段无高亮。
+   */
+  cumKm?: number[];
   chapters?: RoadChapter[];
   boardIds?: string[];
   /** 规划引擎：amap（在线）/ local / local-spliced（端点外接）/ direct（两点直连） */
@@ -803,11 +914,32 @@ export interface RoadNetworkStats {
   hasGeom: number;
   hasGeomRatio: number;
   spotCount: number;
+  /**
+   * B2-1：几何质检结论（来自 data/roads/coverage-gap.csv）。
+   * noGeometry = 索引有但几何未抓；broken = 已抓但走向与官方里程偏差过大，不应对外发布。
+   */
+  quality?: {
+    noGeometry: number;
+    broken: number;
+    suspectGap: number;
+  };
   /** 覆盖诚实说明（PRD §3.1：不能装作什么都有） */
   coverage: {
     targetNational: number;
     targetExpressway: number;
     notes: string[];
   };
+  /**
+   * v0.6.0：按等级的覆盖与精度分布（数据来自省份 PBF 全量要素库装配）。
+   * precision：A=与官方里程偏差≤10% · B=≤25% · C=偏差更大或官方里程未知 · X=走向存疑
+   */
+  coverageByClass?: Array<{
+    class: RoadIndexEntry['class'];
+    total: number;
+    withGeometry: number;
+    coverage: number;
+    lengthKm: number;
+    precision: { A: number; B: number; C: number; X: number };
+  }>;
   updated: string;
 }

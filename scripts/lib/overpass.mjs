@@ -314,6 +314,149 @@ export function chainWays(ways, toleranceM = 800, maxKm = 0) {
 
   return { chain, gaps: pool.length, remaining: pool };
 }
+
+function totalKm(coords) {
+  let acc = 0;
+  for (let i = 1; i < coords.length; i += 1) acc += haversineKm(coords[i - 1], coords[i]);
+  return acc;
+}
+
+function tryAttach(main, piece) {
+  if (!main.length || piece.length < 2) return false;
+  const tail = main[main.length - 1];
+  const head = piece[0];
+  const d = haversineKm(tail, head);
+  if (d > 5) return false;
+  // 保留拼接点：splice 段长 = 端点距（≤5km）。丢弃端点会让跳点放大到
+  // 「端点距 + 相邻段长」，质检（跳点 >5km 标 broken）会误伤
+  main.push(...piece);
+  return true;
+}
+
+/** 头部拼接：piece 末点贴 main 首点（西部线段只能从头上接回来） */
+function tryAttachHead(main, piece) {
+  if (!main.length || piece.length < 2) return false;
+  const d = haversineKm(piece[piece.length - 1], main[0]);
+  if (d > 5) return false;
+  main.unshift(...piece);
+  return true;
+}
+
+/**
+ * orphan 链几何去重：OSM 常把同一路段拆成多个 relation/way，
+ * chainWays 会生成几何重复的 orphan 链（例如同一段路因方向相反或仅覆盖中间部分，
+ * 导致首尾点并不接近）。本函数用采样点重叠度判定重复：
+ * 对每条链按 sampleIntervalKm 采样，检查有多少采样点落在另一条链的 thresholdKm 内；
+ * 重叠比例 >= minOverlap 即视为重复，优先保留较长链作为 canonical。
+ */
+function deduplicateChains(
+  chains,
+  { sampleIntervalKm = 2, thresholdKm = 2, minOverlap = 0.5 } = {},
+) {
+  if (!chains || chains.length <= 1) return chains;
+  const sorted = [...chains].sort((a, b) => totalKm(b) - totalKm(a));
+
+  // 为每条链预计算采样点，避免重复计算
+  const samplesList = sorted.map((chain) => {
+    if (chain.length < 2) return [];
+    const pts = [chain[0]];
+    let acc = 0;
+    for (let i = 1; i < chain.length; i += 1) {
+      acc += haversineKm(chain[i - 1], chain[i]);
+      if (acc >= sampleIntervalKm) {
+        pts.push(chain[i]);
+        acc = 0;
+      }
+    }
+    if (chain.length > 1) pts.push(chain[chain.length - 1]);
+    return pts;
+  });
+
+  const kept = [];
+  const keptSamples = [];
+  for (let i = 0; i < sorted.length; i += 1) {
+    const c = sorted[i];
+    if (c.length < 2) continue;
+    const samples = samplesList[i];
+    if (samples.length === 0) continue;
+
+    let duplicate = false;
+    for (const kSamples of keptSamples) {
+      let matched = 0;
+      for (const p of samples) {
+        let min = Infinity;
+        for (const q of kSamples) {
+          const d = haversineKm(p, q);
+          if (d < min) min = d;
+          if (min <= thresholdKm) break;
+        }
+        if (min <= thresholdKm) matched += 1;
+      }
+      if (matched / samples.length >= minOverlap) {
+        duplicate = true;
+        break;
+      }
+    }
+    if (!duplicate) {
+      kept.push(c);
+      keptSamples.push(samples);
+    }
+  }
+  return kept;
+}
+
+/**
+ * 多链贪心串接：chainWays 断链后，从剩余池继续开新链，再按 5km 容差把
+ * 端点相近的链拼到主链（不动点迭代：拼接延长主链后，原先够不着的段可能够着了）。
+ * officialKm > 0 时全程受「官方里程 × 1.6」封顶（防多编号共线误匹配越串越远）。
+ */
+export function chainAll(ways, officialKm = 0, toleranceM = 800) {
+  const maxKm = officialKm > 0 ? officialKm * 1.6 : 0;
+  let pool = ways.slice();
+  const chains = [];
+  while (pool.length > 0 && chains.length < 400) {
+    const { chain, remaining } = chainWays(pool, toleranceM, maxKm);
+    if (!chain || chain.length < 2 || remaining.length === pool.length) break;
+    chains.push(chain);
+    pool = remaining;
+  }
+  if (chains.length === 0) return { main: [], segments: [], gapAnnotations: [], orphans: 0 };
+  // 按长度排序，主链最长；其余尝试端点并接（≤5km 且不超上限），不动点直到无可拼接
+  chains.sort((a, b) => totalKm(b) - totalKm(a));
+  let main = chains.shift() ?? [];
+  let rest = chains;
+  for (;;) {
+    let attached = false;
+    const next = [];
+    for (const c of rest) {
+      if (maxKm > 0 && totalKm(main) + totalKm(c) > maxKm) {
+        next.push(c); // 超上限的段不拼（诚实留给 orphan，verify 会标记偏差）
+        continue;
+      }
+      if (tryAttach(main, c)) {
+        attached = true;
+      } else if (tryAttach(main, c.slice().reverse())) {
+        attached = true;
+      } else if (tryAttachHead(main, c)) {
+        attached = true;
+      } else if (tryAttachHead(main, c.slice().reverse())) {
+        attached = true;
+      } else {
+        next.push(c);
+      }
+    }
+    rest = next;
+    if (!attached || !rest.length) break;
+  }
+  // orphan 链不再丢弃（结构性修复）：按里程降序存入 segments，
+  // 即使 ref 标注不全也能把已知的每一段都画出来，G318 立刻从部分段涨到接近全量。
+  // 先对 orphan 链做几何去重，避免 OSM 多 relation/way 覆盖同一路段导致里程虚高。
+  rest = deduplicateChains(rest, { sampleIntervalKm: 2, thresholdKm: 2, minOverlap: 0.5 });
+  const segments = rest.sort((a, b) => totalKm(b) - totalKm(a));
+  const gapAnnotations = computeGapAnnotations(main, segments);
+  return { main, segments, gapAnnotations, orphans: segments.length };
+}
+
 /**
  * 计算段间断点标注：主链末点↔segments 首点、segments 之间的未贯通处。
  * atKm 为断点在全线中的里程位置（主链总里程 + 已遍历 segments 里程累计）。

@@ -21,13 +21,89 @@
 import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { openRvwn } from './lib/rvwn.mjs';
+import { canonicalRef } from './lib/road-ref.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const INDEX_DIR = join(ROOT, 'data/roads/index');
 const GEOM_DIR = join(ROOT, 'data/roads/geom');
 const AUTH_DIR = join(ROOT, 'data/roads/authoritative');
-const mergeGeom = process.argv.includes('--merge');
+const mergeGeom = process.argv.includes('--merge') || process.argv.includes('--from-net');
+const fromNet = process.argv.includes('--from-net');
+
+/** PBF 省片 slug → 中文省名 */
+const SLUG_TO_NAME = {
+  anhui: '安徽', beijing: '北京', chongqing: '重庆', fujian: '福建', gansu: '甘肃',
+  guangdong: '广东', guangxi: '广西', guizhou: '贵州', hainan: '海南', hebei: '河北',
+  heilongjiang: '黑龙江', henan: '河南', hubei: '湖北', hunan: '湖南', inner_mongolia: '内蒙古',
+  jiangsu: '江苏', jiangxi: '江西', jilin: '吉林', liaoning: '辽宁', macau: '澳门',
+  ningxia: '宁夏', qinghai: '青海', shaanxi: '陕西', shandong: '山东', shanghai: '上海',
+  shanxi: '山西', sichuan: '四川', tianjin: '天津', tibet: '西藏', xinjiang: '新疆',
+  yunnan: '云南', zhejiang: '浙江', hong_kong: '香港',
+};
+
+/** S/X/Y/C 前缀 → class */
+function classifyProvincial(ref) {
+  if (/^S\d{1,4}$/.test(ref)) return 'provincial';
+  if (/^X\d{1,4}$/.test(ref)) return 'county';
+  if (/^Y\d{1,4}$/.test(ref)) return 'township';
+  if (/^C\d{1,4}$/.test(ref)) return 'village';
+  return null;
+}
+
+/**
+ * 从 RVWN 要素库派生"事实名录"：省道/县道/乡道/村道的编号不是从某份文件抄来的，
+ * 而是从全省每一段真实道路的 ref 标签里聚合出来的 —— 这是"县乡村道一条都没有"的解法。
+ * 同时回收规划名录之外的 G/E 编号（OSM 有、官方表没有的），标 osm_only 不静默丢弃。
+ */
+function deriveFromNet() {
+  const NET_DIR = join(ROOT, 'data/roads/net');
+  if (!existsSync(NET_DIR)) return { provincial: [], extraNational: [], extraExpressway: [], provinces: 0 };
+  const shards = readdirSync(NET_DIR).filter((f) => f.endsWith('.rvwn')).sort();
+  const map = new Map();
+  const extraRoads = new Map();
+  // OSM 中真实出现过的编号集合：用于把"官方规划里存在、OSM 尚未出现"的条目
+  // 与"OSM 有却装配失败"的条目区分开（门禁只对后者追责）
+  const osmRefs = new Set();
+  for (const f of shards) {
+    const province = SLUG_TO_NAME[f.replace('.rvwn', '')] ?? f.replace('.rvwn', '');
+    const r = openRvwn(join(NET_DIR, f));
+    for (const w of r.iterateWays()) {
+      if (!w.ref) continue;
+      for (const rawRef of w.ref.split(';')) {
+        const ref = canonicalRef(rawRef);
+        osmRefs.add(ref);
+        const cls = classifyProvincial(ref);
+        if (!cls) {
+          const gc = classifyRef(ref);
+          if (gc) {
+            let e = extraRoads.get(ref);
+            if (!e) { e = { ref, class: gc, provinces: [], name: '', lengthKm: 0 }; extraRoads.set(ref, e); }
+            if (!e.provinces.includes(province)) e.provinces.push(province);
+            e.lengthKm += w.lenM / 1000;
+            if (w.name && w.name.length > e.name.length) e.name = w.name;
+          }
+          continue;
+        }
+        const key = province + ':' + ref;
+        let e = map.get(key);
+        if (!e) {
+          e = { key, ref, class: cls, provinces: [province], fromPlace: '', toPlace: '', lengthKm: 0, bbox: [0, 0, 0, 0], spotCount: 0, hasGeom: false, source: 'osm_only', status: 'unverified', wayCount: 0, name: '' };
+          map.set(key, e);
+        }
+        e.lengthKm += w.lenM / 1000;
+        e.wayCount += 1;
+        if (w.name && w.name.length > e.name.length) e.name = w.name;
+      }
+    }
+    r.close();
+  }
+  const rows = [...map.values()].map((e) => ({ ...e, lengthKm: Math.round(e.lengthKm * 10) / 10 }));
+  rows.sort((a, b) => (a.class === b.class ? a.key.localeCompare(b.key) : a.class.localeCompare(b.class)));
+  const extraRows = [...extraRoads.values()].map((e) => ({ ...e, lengthKm: Math.round(e.lengthKm * 10) / 10 }));
+  return { provincial: rows, extraRoads: extraRows, osmRefs, provinces: shards.length };
+}
 
 // ── §3.2 编号主键校验（进库前硬门槛） ────────────────────────────────────────
 // 1. G + 1~3 位数字 → national（普通国道）；例外：G + 1~2 位且 < 100（G1~G99）为高速主线
@@ -198,7 +274,9 @@ function fromPlan(plan, cls, metaMap) {
 const national = fromPlan(planNational, 'national', NATIONAL_META);
 const expressway = fromPlan(planExpressway, 'expressway', EXPRESSWAY_META);
 
-const provincial = PROVINCIAL_SEED.map(([province, ref, name, fromPlace, toPlace, lengthKm]) => ({
+const derived = fromNet ? deriveFromNet() : { provincial: [], extraRoads: [], provinces: 0 };
+
+const provincial = (derived.provincial.length ? derived.provincial : PROVINCIAL_SEED.map(([province, ref, name, fromPlace, toPlace, lengthKm]) => ({
   key: `${province}:${ref}`,
   ref,
   name: name || undefined,
@@ -212,7 +290,48 @@ const provincial = PROVINCIAL_SEED.map(([province, ref, name, fromPlace, toPlace
   hasGeom: false,
   source: 'osm_only',
   status: 'unverified',
-}));
+})));
+
+// 官方规划名录之外的 G/E 编号（OSM 有、规划表没有）：回收但不冒充权威
+if (fromNet && derived.extraRoads.length) {
+  const known = new Set([...national, ...expressway].map((r) => r.ref));
+  for (const e of derived.extraRoads) {
+    if (known.has(e.ref)) continue;
+    known.add(e.ref);
+    const row = {
+      key: e.ref,
+      ref: e.ref,
+      name: e.name || undefined,
+      class: e.class,
+      provinces: e.provinces,
+      fromPlace: '',
+      toPlace: '',
+      lengthKm: e.lengthKm,
+      bbox: [0, 0, 0, 0],
+      spotCount: 0,
+      hasGeom: false,
+      source: 'osm_only',
+      status: 'unverified',
+    };
+    if (e.class === 'expressway') expressway.push(row);
+    else national.push(row);
+  }
+  if (derived.extraRoads.length) {
+    console.log('  ↳ 规划名录之外回收 G/E ' + derived.extraRoads.length + ' 条（source=osm_only）');
+  }
+}
+
+// 标记"OSM 中真实出现过"的编号（门禁只对这类条目追责覆盖率）
+if (fromNet && derived.osmRefs) {
+  let inOsmCount = 0;
+  for (const row of [...national, ...expressway, ...provincial]) {
+    if (derived.osmRefs.has(row.ref)) {
+      row.inOsm = true;
+      inOsmCount += 1;
+    }
+  }
+  console.log('  ↳ 其中 OSM 中真实存在的编号 ' + inOsmCount + ' 条（其余为官方规划在册、OSM 暂无该编号的路段）');
+}
 
 validateEntries(national, 'national');
 validateEntries(expressway, 'expressway');
@@ -235,11 +354,28 @@ function mergeGeometry(rows) {
         if (lat < minLat) minLat = lat;
         if (lat > maxLat) maxLat = lat;
       }
-      entry.bbox = [minLng, minLat, maxLng, maxLat];
-      const cum = g.cumKm;
-      if (Array.isArray(cum) && cum.length === g.points.length) {
-        entry.lengthKm = Math.round(cum[cum.length - 1] * 10) / 10;
+      // bbox 取 points + segments 的并集（整条公路可能由多个连通分量组成）
+      for (const seg of [g.points, ...(Array.isArray(g.segments) ? g.segments : [])]) {
+        if (!Array.isArray(seg)) continue;
+        for (const p of seg) {
+          if (p[0] < minLng) minLng = p[0];
+          if (p[0] > maxLng) maxLng = p[0];
+          if (p[1] < minLat) minLat = p[1];
+          if (p[1] > maxLat) maxLat = p[1];
+        }
       }
+      entry.bbox = [minLng, minLat, maxLng, maxLat];
+      // v0.6.0：里程用"去重后里程"（双向分隔道路只计一条），与官方里程可比
+      if (Number.isFinite(g.totalKm)) {
+        entry.lengthKm = Math.round(g.totalKm * 10) / 10;
+      } else {
+        const cum = g.cumKm;
+        if (Array.isArray(cum) && cum.length === g.points.length) {
+          entry.lengthKm = Math.round(cum[cum.length - 1] * 10) / 10;
+        }
+      }
+      if (g.precision) entry.precision = g.precision;
+      if (Number.isFinite(g.componentCount)) entry.componentCount = g.componentCount;
       entry.hasGeom = true;
     } catch {
       /* skip broken geometry file */
@@ -282,9 +418,34 @@ writeAuth('expressway.json', expressway.map((r) => ({
 })));
 writeAuth('provincial.json', PROVINCIAL_SEED.map(([province, ref, name, fromPlace, toPlace, lengthKm]) => ({ province, ref, name, fromPlace, toPlace, officialLengthKm: lengthKm })));
 
+// v0.6.0：按等级的覆盖 / 精度分布，写入 index/_summary.json 供前端诚实展示
+const byClass = {};
+for (const [cls, rows] of [['expressway', expressway], ['national', national], ['provincial', provincial]]) {
+  const g = rows.filter((r) => r.hasGeom);
+  const prec = { A: 0, B: 0, C: 0, X: 0 };
+  for (const r of g) if (r.precision && prec[r.precision] !== undefined) prec[r.precision] += 1;
+  byClass[cls] = {
+    total: rows.length,
+    withGeometry: g.length,
+    coverage: rows.length ? Math.round((g.length / rows.length) * 1000) / 1000 : 0,
+    lengthKm: Math.round(rows.reduce((s, r) => s + (r.hasGeom ? r.lengthKm : 0), 0)),
+    precision: prec,
+  };
+}
+writeFileSync(
+  join(INDEX_DIR, '_summary.json'),
+  JSON.stringify({ version: 1, updated, source: fromNet ? 'osm-pbf-elements' : 'authoritative', byClass }, null, 1),
+  'utf8',
+);
+console.log('data/roads/index/_summary.json ← 按等级覆盖与精度分布');
+
 const geomCount = [...national, ...expressway, ...provincial].filter((r) => r.hasGeom).length;
 const metaNamed = national.filter((r) => r.name).length + expressway.filter((r) => r.name).length;
-console.log(`\n规模：国道 ${national.length}/301 · 高速 ${expressway.length}/278 · 省道 ${provincial.length}/3000+`);
+console.log('\n规模：国道 ' + national.length + '/301 · 高速 ' + expressway.length + '/278 · 省道及以下 ' + provincial.length + ' 条');
+for (const [cls, s] of Object.entries(byClass)) {
+  console.log('  ' + cls.padEnd(11) + ' ' + String(s.total).padStart(6) + ' 条 · 有几何 ' + String(s.withGeometry).padStart(6) +
+    '（' + (s.coverage * 100).toFixed(1) + '%）· ' + String(s.lengthKm).padStart(7) + ' km · 精度 A' + s.precision.A + ' B' + s.precision.B + ' C' + s.precision.C + ' X' + s.precision.X);
+}
 console.log(`元数据：线名/官方里程已补 ${metaNamed} 条（其余 lengthKm=0 待核对，verify 跳过比对）`);
 console.log(`已挂几何：${geomCount} 条${mergeGeom ? '' : '（未传 --merge，未扫描 geom/）'}`);
 console.log('诚实边界：名录来自 2022 规划官方方案表（全量）；里程与线名仅经典线有参考值。');

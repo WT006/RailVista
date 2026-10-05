@@ -9,7 +9,6 @@
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from '../api/client';
-import AppTopBar from '../components/AppTopBar.vue';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 
@@ -30,7 +29,13 @@ const LEVEL_LABEL: Record<string, string> = {
   media: '媒体榜',
 };
 
-function alongHref(item: RankingItem, hasGeom: boolean): string {
+/**
+ * B3：原兜底对「无 roadKeys / 无 routeId」的条目用 province 首尾兜底，
+ * 22/33 个条目 roadKeys 为空且无 fromPlace/toPlace，同省条目会得到 from === to，
+ * 规划出 lengthKm≈0 的空路线，点进去必然「加载失败」或空结果。
+ * 现在校验 from !== to，相同则返回 null，由模板显示「暂无 OD 数据」并禁用跳转。
+ */
+function alongHref(item: RankingItem, hasGeom: boolean): string | null {
   if (hasGeom && item.roadKeys.length) {
     return `/drive/trip?road=${encodeURIComponent(item.roadKeys[0]!)}`;
   }
@@ -39,6 +44,7 @@ function alongHref(item: RankingItem, hasGeom: boolean): string {
   }
   const from = item.fromPlace ?? item.province[0] ?? '';
   const to = item.toPlace ?? item.province[item.province.length - 1] ?? '';
+  if (!from || !to || from === to) return null;
   return `/drive/trip?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
 }
 
@@ -61,7 +67,6 @@ onMounted(async () => {
 
 <template>
   <div class="drive-page">
-    <AppTopBar />
 
     <main class="rv-shell">
       <DriveSubNav />
@@ -100,9 +105,21 @@ onMounted(async () => {
               <span v-for="t in item.tags" :key="t" class="drive-tag">{{ t }}</span>
             </div>
             <div class="drive-board-item__actions">
-              <router-link class="btn primary btn-sm" :to="alongHref(item, geomAvailable[i] ?? false)">
+              <router-link
+                v-if="alongHref(item, geomAvailable[i] ?? false)"
+                class="btn primary btn-sm"
+                :to="alongHref(item, geomAvailable[i] ?? false)!"
+              >
                 看沿程景点 →
               </router-link>
+              <!-- B3：无可用 OD（from===to 或全空）时禁用跳转并说明原因 -->
+              <span
+                v-else
+                class="btn ghost btn-sm is-disabled"
+                title="该条目尚未关联公路编号，也没有起终点数据，暂时无法查看沿程景点"
+              >
+                暂无 OD 数据
+              </span>
               <router-link
                 v-if="roadbookHref(item)"
                 class="btn ghost btn-sm"

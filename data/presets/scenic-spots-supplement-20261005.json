@@ -1,0 +1,3732 @@
+{
+  "version": 3,
+  "updated": "2026-10-05",
+  "note": "2026-10-scarce-prov 六省（皖鄂津宁青黔）铁路景点补全批次；由策展生成器读取后经 curated 合并器进入主库。",
+  "spots": [
+    {
+      "id": "anhui-chaohu-eastbay",
+      "name": "巢湖东岸湖湾",
+      "province": "安徽",
+      "lng": 117.71,
+      "lat": 31.68,
+      "intro": "合福高铁过巢湖东站至铜陵北区间，东南侧车窗可见巢湖东岸湖湾与波光水色，夏秋水位丰盈，晨昏光线最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "lake",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "安徽",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%B7%A2%E6%B9%96",
+          "quote": "用于核对「巢湖东岸湖湾」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%B7%A2%E6%B9%96%E4%B8%9C%E5%B2%B8%E6%B9%96%E6%B9%BE",
+          "quote": "按名称核对「巢湖东岸湖湾」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hefu",
+          "nearStations": [
+            "巢湖东",
+            "铜陵北"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anhui-anqing-yangtze",
+      "name": "安庆长江江段",
+      "province": "安徽",
+      "lng": 117.06,
+      "lat": 30.5,
+      "intro": "宁安城际过安庆站西侧江岸，长江主航道与振风塔江景即在车窗旁，四季江景不歇，晴日晨昏远眺最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "安徽",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%AE%89%E5%BA%86%E9%95%BF%E6%B1%9F%E5%A4%A7%E6%A1%A5",
+          "quote": "用于核对「安庆长江江段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%AE%89%E5%BA%86%E9%95%BF%E6%B1%9F%E6%B1%9F%E6%AE%B5",
+          "quote": "按名称核对「安庆长江江段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "ningan",
+          "nearStations": [
+            "安庆"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anhui-jingting-shan",
+      "name": "敬亭山",
+      "province": "安徽",
+      "lng": 118.75,
+      "lat": 31.03,
+      "intro": "敬亭山立于宣城站北郊，皖赣线出宣城站北行时山影即在线路左侧，江南诗山满目青翠，四季可望，晨光最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "安徽",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%95%AC%E4%BA%AD%E5%B1%B1",
+          "quote": "用于核对「敬亭山」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%95%AC%E4%BA%AD%E5%B1%B1",
+          "quote": "按名称核对「敬亭山」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "wangang",
+          "nearStations": [
+            "宣城"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anhui-taiping-lake",
+      "name": "太平湖",
+      "province": "安徽",
+      "lng": 118.16,
+      "lat": 30.29,
+      "intro": "合福高铁过黄山北站北侧区间，西侧车窗可见太平湖湖湾与群岛相嵌，秋冬湖水澄澈山色分明，晨昏光线最好。",
+      "visibility": "distant",
+      "maxDistKm": 36,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "lake",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "安徽",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%A4%AA%E5%B9%B3%E6%B9%96%20(%E5%AE%89%E5%BE%BD)",
+          "quote": "用于核对「太平湖」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%A4%AA%E5%B9%B3%E6%B9%96",
+          "quote": "按名称核对「太平湖」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hefu",
+          "nearStations": [
+            "黄山北"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anhui-huangshan-peaks",
+      "name": "黄山群峰",
+      "province": "安徽",
+      "lng": 118.17,
+      "lat": 30.13,
+      "intro": "合福高铁过黄山北站，西侧车窗远眺黄山群峰轮廓，天都莲花诸峰隐约可见，秋冬晴日远眺最好。",
+      "visibility": "distant",
+      "maxDistKm": 32,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "安徽",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E9%BB%84%E5%B1%B1",
+          "quote": "用于核对「黄山群峰」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E9%BB%84%E5%B1%B1%E7%BE%A4%E5%B3%B0",
+          "quote": "按名称核对「黄山群峰」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hefu",
+          "nearStations": [
+            "黄山北"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anhui-shuiyang-river",
+      "name": "水阳江宣城段",
+      "province": "安徽",
+      "lng": 118.79,
+      "lat": 30.95,
+      "intro": "皖赣线沿水阳江过宣城站至宁国区间，江湾与竹排即在车窗旁，两岸圩田相接，四季水色各异，夏秋丰水最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "安徽",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%B0%B4%E9%98%B3%E6%B1%9F",
+          "quote": "用于核对「水阳江宣城段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%B0%B4%E9%98%B3%E6%B1%9F%E5%AE%A3%E5%9F%8E%E6%AE%B5",
+          "quote": "按名称核对「水阳江宣城段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "wangang",
+          "nearStations": [
+            "宣城",
+            "巷口桥"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anhui-shengjin-lake",
+      "name": "升金湖湿地",
+      "province": "安徽",
+      "lng": 117.18,
+      "lat": 30.44,
+      "intro": "宁安城际过安庆至池州区间，长江北岸升金湖湿地可远眺湖面与滩涂，越冬候鸟万羽群集，冬季观鸟最好。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "lake",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "安徽",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%8D%87%E9%87%91%E6%B9%96",
+          "quote": "用于核对「升金湖湿地」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%8D%87%E9%87%91%E6%B9%96%E6%B9%BF%E5%9C%B0",
+          "quote": "按名称核对「升金湖湿地」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "ningan",
+          "nearStations": [
+            "安庆",
+            "池州"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anhui-bianyuzhou-bridge",
+      "name": "鳊鱼洲长江大桥",
+      "province": "安徽",
+      "lng": 116.28,
+      "lat": 30.06,
+      "intro": "安九高铁经鳊鱼洲长江大桥跨越长江，斜拉桥塔凌空，晴日自过江段远眺桥塔与江面，晨昏光线最好。",
+      "visibility": "distant",
+      "maxDistKm": 16,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "engineering",
+      "subtype": "bridge",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "安徽",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E9%B3%8A%E9%B1%BC%E6%B4%B2%E9%95%BF%E6%B1%9F%E5%A4%A7%E6%A1%A5",
+          "quote": "用于核对「鳊鱼洲长江大桥」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E9%B3%8A%E9%B1%BC%E6%B4%B2%E9%95%BF%E6%B1%9F%E5%A4%A7%E6%A1%A5",
+          "quote": "按名称核对「鳊鱼洲长江大桥」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "anjiu",
+          "nearStations": [
+            "安庆",
+            "太湖北"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anhui-dabie-piedmont",
+      "name": "大别山南麓丘陵",
+      "province": "安徽",
+      "lng": 115.6,
+      "lat": 31.1,
+      "intro": "宁蓉线过金寨至麻城北区间，南侧车窗可见大别山南麓丘陵连绵与茶园梯地，春夏山花烂漫云雾缠绕，春季最好。",
+      "visibility": "distant",
+      "maxDistKm": 30,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "安徽",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E5%88%AB%E5%B1%B1",
+          "quote": "用于核对「大别山南麓丘陵」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%A4%A7%E5%88%AB%E5%B1%B1%E5%8D%97%E9%BA%93%E4%B8%98%E9%99%B5",
+          "quote": "按名称核对「大别山南麓丘陵」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "ningrong",
+          "nearStations": [
+            "金寨",
+            "麻城北"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anhui-zhongmiao-guma",
+      "name": "中庙姥山岛",
+      "province": "安徽",
+      "lng": 117.62,
+      "lat": 31.62,
+      "intro": "合福高铁过巢湖东站，西北侧车窗可见中庙古寺与姥山岛浮于湖面，夏秋湖面开阔，晨昏光线最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "lake",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "安徽",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%BA%99",
+          "quote": "用于核对「中庙姥山岛」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E4%B8%AD%E5%BA%99%E5%A7%A5%E5%B1%B1%E5%B2%9B",
+          "quote": "按名称核对「中庙姥山岛」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hefu",
+          "nearStations": [
+            "巢湖东"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-tianxingzhou-bridge",
+      "name": "天兴洲长江大桥",
+      "province": "湖北",
+      "lng": 114.42,
+      "lat": 30.65,
+      "intro": "京广高铁经天兴洲长江大桥跨越长江，列车在桥上左右两侧均见江面与洲滩，四季江景，晨昏光线最好。",
+      "visibility": "on_track",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "engineering",
+      "subtype": "bridge",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%A4%A9%E5%85%B4%E6%B4%B2%E9%95%BF%E6%B1%9F%E5%A4%A7%E6%A1%A5",
+          "quote": "用于核对「天兴洲长江大桥」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%A4%A9%E5%85%B4%E6%B4%B2%E9%95%BF%E6%B1%9F%E5%A4%A7%E6%A1%A5",
+          "quote": "按名称核对「天兴洲长江大桥」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jingguang",
+          "nearStations": [
+            "武汉",
+            "滠口"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-xiling-gorge-mouth",
+      "name": "西陵峡口",
+      "province": "湖北",
+      "lng": 111.28,
+      "lat": 30.75,
+      "intro": "汉宜线过宜昌东站后西望，远眺西陵峡口峡壁与长江出峡江面，山势渐收水势渐阔，晴日晨昏远眺最好。",
+      "visibility": "distant",
+      "maxDistKm": 25,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "gorge",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E9%99%B5%E5%B3%A1",
+          "quote": "用于核对「西陵峡口」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E8%A5%BF%E9%99%B5%E5%B3%A1%E5%8F%A3",
+          "quote": "按名称核对「西陵峡口」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hanyi",
+          "nearStations": [
+            "宜昌东"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-geheyan-dam",
+      "name": "隔河岩水库大坝",
+      "province": "湖北",
+      "lng": 111.19,
+      "lat": 30.47,
+      "intro": "焦柳线过宜昌段，西南方远眺清江隔河岩水库大坝与库区水面，高坝锁江库湾深碧，四季水景，晴日最好。",
+      "visibility": "distant",
+      "maxDistKm": 40,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "engineering",
+      "subtype": "water_conservancy",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E9%9A%94%E6%B2%B3%E5%B2%A9%E6%B0%B4%E7%94%B5%E7%AB%99",
+          "quote": "用于核对「隔河岩水库大坝」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E9%9A%94%E6%B2%B3%E5%B2%A9%E6%B0%B4%E5%BA%93%E5%A4%A7%E5%9D%9D",
+          "quote": "按名称核对「隔河岩水库大坝」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jiaoliu",
+          "nearStations": [
+            "宜昌",
+            "长阳"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-xiangyang-hanjiang",
+      "name": "襄阳汉江岸线",
+      "province": "湖北",
+      "lng": 112.15,
+      "lat": 32.03,
+      "intro": "汉十高铁过襄阳段，汉江与古城墙江岸即在车窗旁，一江碧水穿城而过，四季江景不歇，晨昏光线最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%B1%89%E6%B1%9F%20(%E4%B8%AD%E5%9B%BD)",
+          "quote": "用于核对「襄阳汉江岸线」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E8%A5%84%E9%98%B3%E6%B1%89%E6%B1%9F%E5%B2%B8%E7%BA%BF",
+          "quote": "按名称核对「襄阳汉江岸线」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hanshi",
+          "nearStations": [
+            "襄阳东"
+          ]
+        },
+        {
+          "corridorId": "jiaoliu",
+          "nearStations": [
+            "襄阳"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-shennongxi",
+      "name": "神农溪",
+      "province": "湖北",
+      "lng": 110.36,
+      "lat": 31.06,
+      "intro": "宁蓉线过巴东站，北侧远眺神农溪溪谷与峡谷出口，溪水碧绿深切山体，夏秋水量丰盈，晴日远眺最好。",
+      "visibility": "distant",
+      "maxDistKm": 45,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E7%A5%9E%E5%86%9C%E6%BA%AA",
+          "quote": "用于核对「神农溪」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E7%A5%9E%E5%86%9C%E6%BA%AA",
+          "quote": "按名称核对「神农溪」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "ningrong",
+          "nearStations": [
+            "巴东"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-qingjiang-enshi",
+      "name": "清江恩施城区段",
+      "province": "湖北",
+      "lng": 109.48,
+      "lat": 30.3,
+      "intro": "宁蓉线过恩施站，清江自城中蜿蜒穿过，江湾与吊桥即在车窗旁，四季水色各异，晨昏光线最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%B8%85%E6%B1%9F",
+          "quote": "用于核对「清江恩施城区段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%B8%85%E6%B1%9F%E6%81%A9%E6%96%BD%E5%9F%8E%E5%8C%BA%E6%AE%B5",
+          "quote": "按名称核对「清江恩施城区段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "ningrong",
+          "nearStations": [
+            "恩施"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-yunyang-hanjiang",
+      "name": "郧阳汉江库湾",
+      "province": "湖北",
+      "lng": 110.8,
+      "lat": 32.85,
+      "intro": "汉十高铁过十堰东站北望，远眺郧阳汉江库湾与两岸青山，库面开阔水色湛蓝，夏秋水位丰盈，晴日最好。",
+      "visibility": "distant",
+      "maxDistKm": 18,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E9%83%A7%E9%98%B3%E5%8C%BA",
+          "quote": "用于核对「郧阳汉江库湾」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E9%83%A7%E9%98%B3%E6%B1%89%E6%B1%9F%E5%BA%93%E6%B9%BE",
+          "quote": "按名称核对「郧阳汉江库湾」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hanshi",
+          "nearStations": [
+            "十堰东"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-wudang-mountain",
+      "name": "武当山",
+      "province": "湖北",
+      "lng": 111,
+      "lat": 32.4,
+      "intro": "汉十高铁过武当山西站，南侧远眺武当山群峰与金顶轮廓，仙山楼阁隐于云雾，四季山色，秋冬晴日最好。",
+      "visibility": "distant",
+      "maxDistKm": 14,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%AD%A6%E5%BD%93%E5%B1%B1",
+          "quote": "用于核对「武当山」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%AD%A6%E5%BD%93%E5%B1%B1",
+          "quote": "按名称核对「武当山」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hanshi",
+          "nearStations": [
+            "武当山西"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-danjiangkou-dam",
+      "name": "丹江口水库大坝",
+      "province": "湖北",
+      "lng": 111.52,
+      "lat": 32.56,
+      "intro": "汉十高铁过丹江口南站，北侧远眺丹江口水库大坝与浩渺库面，南水北调水源地四季碧波万顷，晴日远眺最好。",
+      "visibility": "distant",
+      "maxDistKm": 16,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "engineering",
+      "subtype": "water_conservancy",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E4%B8%B9%E6%B1%9F%E5%8F%A3%E6%B0%B4%E5%BA%93",
+          "quote": "用于核对「丹江口水库大坝」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E4%B8%B9%E6%B1%9F%E5%8F%A3%E6%B0%B4%E5%BA%93%E5%A4%A7%E5%9D%9D",
+          "quote": "按名称核对「丹江口水库大坝」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hanshi",
+          "nearStations": [
+            "丹江口南"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-fanwan-lake",
+      "name": "返湾湖湿地",
+      "province": "湖北",
+      "lng": 112.85,
+      "lat": 30.45,
+      "intro": "汉宜线过潜江站西侧，返湾湖湿地湖面与芦苇荡即在车窗旁，候鸟群集生态良好，四季湖景，冬季观鸟最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "wetland",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E8%BF%94%E6%B9%BE%E6%B9%96",
+          "quote": "用于核对「返湾湖湿地」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E8%BF%94%E6%B9%BE%E6%B9%96%E6%B9%BF%E5%9C%B0",
+          "quote": "按名称核对「返湾湖湿地」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hanyi",
+          "nearStations": [
+            "潜江"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-chibi-yangtze",
+      "name": "赤壁长江江段",
+      "province": "湖北",
+      "lng": 113.87,
+      "lat": 29.78,
+      "intro": "京广高铁过赤壁北站，东侧车窗可见长江江面与三国赤壁古战场江岸，江流浩荡，四季江景，晨昏最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E8%B5%A4%E5%A3%81%E5%B8%82",
+          "quote": "用于核对「赤壁长江江段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E8%B5%A4%E5%A3%81%E9%95%BF%E6%B1%9F%E6%B1%9F%E6%AE%B5",
+          "quote": "按名称核对「赤壁长江江段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jingguang",
+          "nearStations": [
+            "赤壁北"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hubei-zhanghe-reservoir",
+      "name": "漳河水库",
+      "province": "湖北",
+      "lng": 112.15,
+      "lat": 30.98,
+      "intro": "焦柳线过荆门段，西侧远眺漳河水库湖面与岛屿星罗，库水清澈群山环抱，四季水景，晴日晨昏最好。",
+      "visibility": "distant",
+      "maxDistKm": 16,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "engineering",
+      "subtype": "water_conservancy",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "湖北",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%BC%B3%E6%B2%B3%E6%B0%B4%E5%BA%93",
+          "quote": "用于核对「漳河水库」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%BC%B3%E6%B2%B3%E6%B0%B4%E5%BA%93",
+          "quote": "按名称核对「漳河水库」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jiaoliu",
+          "nearStations": [
+            "荆门"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tianjin-haihe-downtown",
+      "name": "海河中心城区段",
+      "province": "天津",
+      "lng": 117.19,
+      "lat": 39.14,
+      "intro": "京津城际过天津站，海河两岸桥梁与世纪钟广场即在车窗旁，河面游船往来，四季河景不歇，夜色灯光最好。",
+      "visibility": "on_track",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "天津",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%B5%B7%E6%B2%B3",
+          "quote": "用于核对「海河中心城区段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%B5%B7%E6%B2%B3%E4%B8%AD%E5%BF%83%E5%9F%8E%E5%8C%BA%E6%AE%B5",
+          "quote": "按名称核对「海河中心城区段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jingjin",
+          "nearStations": [
+            "天津"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tianjin-haihe-estuary",
+      "name": "海河入海段",
+      "province": "天津",
+      "lng": 117.73,
+      "lat": 38.99,
+      "intro": "津秦高铁过滨海站南侧，海河入海口与防潮闸河面远眺可及，河海交汇水色分明，四季可望，晨昏最好。",
+      "visibility": "distant",
+      "maxDistKm": 16,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "天津",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%B5%B7%E6%B2%B3",
+          "quote": "用于核对「海河入海段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%B5%B7%E6%B2%B3%E5%85%A5%E6%B5%B7%E6%AE%B5",
+          "quote": "按名称核对「海河入海段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jinqin",
+          "nearStations": [
+            "滨海"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tianjin-haihe-tanggu",
+      "name": "海河塘沽段",
+      "province": "天津",
+      "lng": 117.65,
+      "lat": 39,
+      "intro": "津秦高铁过塘沽站，海河下游船闸与外滩江岸远眺可及，河面货轮往来繁忙，四季河景，晨昏光线最好。",
+      "visibility": "distant",
+      "maxDistKm": 10,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "天津",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%B5%B7%E6%B2%B3",
+          "quote": "用于核对「海河塘沽段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%B5%B7%E6%B2%B3%E5%A1%98%E6%B2%BD%E6%AE%B5",
+          "quote": "按名称核对「海河塘沽段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jinqin",
+          "nearStations": [
+            "塘沽",
+            "滨海"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tianjin-beidagang",
+      "name": "北大港湿地",
+      "province": "天津",
+      "lng": 117.55,
+      "lat": 38.85,
+      "intro": "津秦高铁过滨海站，西南远眺北大港湿地水面与芦苇荡，候鸟万羽群集栖息，四季湿地景观，冬季观鸟最好。",
+      "visibility": "distant",
+      "maxDistKm": 24,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "wetland",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "天津",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%8C%97%E5%A4%A7%E6%B8%AF%E6%B0%B4%E5%BA%93",
+          "quote": "用于核对「北大港湿地」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%8C%97%E5%A4%A7%E6%B8%AF%E6%B9%BF%E5%9C%B0",
+          "quote": "按名称核对「北大港湿地」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jinqin",
+          "nearStations": [
+            "滨海"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tianjin-qilihai",
+      "name": "七里海湿地",
+      "province": "天津",
+      "lng": 117.57,
+      "lat": 39.44,
+      "intro": "津秦高铁过滨海北站，西北远眺七里海湿地水面与芦苇滩，古泻湖湿地生态原始，四季可望，秋季候鸟最好。",
+      "visibility": "distant",
+      "maxDistKm": 28,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "wetland",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "天津",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E4%B8%83%E9%87%8C%E6%B5%B7",
+          "quote": "用于核对「七里海湿地」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E4%B8%83%E9%87%8C%E6%B5%B7%E6%B9%BF%E5%9C%B0",
+          "quote": "按名称核对「七里海湿地」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jinqin",
+          "nearStations": [
+            "滨海北"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tianjin-beitang-estuary",
+      "name": "北塘永定新河口",
+      "province": "天津",
+      "lng": 117.7,
+      "lat": 39.1,
+      "intro": "津秦高铁过滨海站北侧，永定新河入海口与北塘渔港即在车窗旁，河海交汇渔船往来，四季河口景观，晨昏最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "天津",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%8C%97%E5%A1%98",
+          "quote": "用于核对「北塘永定新河口」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%8C%97%E5%A1%98%E6%B0%B8%E5%AE%9A%E6%96%B0%E6%B2%B3%E5%8F%A3",
+          "quote": "按名称核对「北塘永定新河口」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jinqin",
+          "nearStations": [
+            "滨海",
+            "滨海北"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tianjin-beiyun-canal",
+      "name": "北运河武清段",
+      "province": "天津",
+      "lng": 117.05,
+      "lat": 39.39,
+      "intro": "京津城际过武清站，北运河与京杭大运河故道即在车窗旁，河道笔直绿带相伴，四季河景，晨昏光线最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "天津",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%8C%97%E8%BF%90%E6%B2%B3",
+          "quote": "用于核对「北运河武清段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%8C%97%E8%BF%90%E6%B2%B3%E6%AD%A6%E6%B8%85%E6%AE%B5",
+          "quote": "按名称核对「北运河武清段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jingjin",
+          "nearStations": [
+            "武清"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tianjin-dongli-lake",
+      "name": "东丽湖",
+      "province": "天津",
+      "lng": 117.38,
+      "lat": 39.13,
+      "intro": "津秦高铁过军粮城北站，北侧远眺东丽湖湖面与温泉度假区，湖面开阔水鸟翔集，四季湖景，晨昏最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "lake",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "天津",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E4%B8%9C%E4%B8%BD%E6%B9%96",
+          "quote": "用于核对「东丽湖」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E4%B8%9C%E4%B8%BD%E6%B9%96",
+          "quote": "按名称核对「东丽湖」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "jinqin",
+          "nearStations": [
+            "军粮城北"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ningxia-shapotou",
+      "name": "沙坡头沙漠黄河段",
+      "province": "宁夏",
+      "lng": 105.02,
+      "lat": 37.47,
+      "intro": "包兰铁路过沙坡头段，列车直接穿越腾格里沙漠东缘，麦草方格锁沙与黄河大拐弯即在车窗两侧，四季景观，晨昏光线最好。",
+      "visibility": "on_track",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "desert",
+      "subtype": "desert_gobi",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "宁夏",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%B2%99%E5%9D%A1%E5%A4%B4",
+          "quote": "用于核对「沙坡头沙漠黄河段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%B2%99%E5%9D%A1%E5%A4%B4%E6%B2%99%E6%BC%A0%E9%BB%84%E6%B2%B3%E6%AE%B5",
+          "quote": "按名称核对「沙坡头沙漠黄河段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "baolan",
+          "nearStations": [
+            "中卫",
+            "沙坡头"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ningxia-helan-suyukou",
+      "name": "贺兰山苏峪口",
+      "province": "宁夏",
+      "lng": 105.95,
+      "lat": 38.73,
+      "intro": "包兰铁路过银川段，西侧远眺贺兰山苏峪口山势与岩壁，贺兰晴雪闻名塞上，四季山色，冬季雪景最好。",
+      "visibility": "distant",
+      "maxDistKm": 26,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "宁夏",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E8%B4%BA%E5%85%B0%E5%B1%B1",
+          "quote": "用于核对「贺兰山苏峪口」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E8%B4%BA%E5%85%B0%E5%B1%B1%E8%8B%8F%E5%B3%AA%E5%8F%A3",
+          "quote": "按名称核对「贺兰山苏峪口」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "baolan",
+          "nearStations": [
+            "银川"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ningxia-qingtongxia-gorge",
+      "name": "青铜峡黄河大峡谷",
+      "province": "宁夏",
+      "lng": 106.03,
+      "lat": 37.95,
+      "intro": "银西高铁过吴忠段，西侧远眺青铜峡黄河大峡谷与拦河大坝，峡口锁黄河十里山水相接，四季水景，晨昏最好。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "gorge",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "宁夏",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E9%9D%92%E9%93%9C%E5%B3%A1",
+          "quote": "用于核对「青铜峡黄河大峡谷」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E9%9D%92%E9%93%9C%E5%B3%A1%E9%BB%84%E6%B2%B3%E5%A4%A7%E5%B3%A1%E8%B0%B7",
+          "quote": "按名称核对「青铜峡黄河大峡谷」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "yinxi",
+          "nearStations": [
+            "吴忠"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ningxia-yuehai-wetland",
+      "name": "阅海湿地",
+      "province": "宁夏",
+      "lng": 106.24,
+      "lat": 38.6,
+      "intro": "包兰铁路过银川段，东侧远眺阅海湿地湖面与芦苇荡，塞上湖城水鸟翔集，四季湖景，夏季荷花最好。",
+      "visibility": "distant",
+      "maxDistKm": 14,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "wetland",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "宁夏",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E9%98%85%E6%B5%B7",
+          "quote": "用于核对「阅海湿地」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E9%98%85%E6%B5%B7%E6%B9%BF%E5%9C%B0",
+          "quote": "按名称核对「阅海湿地」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "baolan",
+          "nearStations": [
+            "银川"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ningxia-mingcui-lake",
+      "name": "鸣翠湖湿地",
+      "province": "宁夏",
+      "lng": 106.34,
+      "lat": 38.49,
+      "intro": "包兰铁路过银川段，东侧远眺鸣翠湖湿地湖面与迷宫水道，芦苇丛生百鸟鸣翠，四季湖景，夏季最好。",
+      "visibility": "distant",
+      "maxDistKm": 16,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "wetland",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "宁夏",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E9%B8%A3%E7%BF%A0%E6%B9%96",
+          "quote": "用于核对「鸣翠湖湿地」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E9%B8%A3%E7%BF%A0%E6%B9%96%E6%B9%BF%E5%9C%B0",
+          "quote": "按名称核对「鸣翠湖湿地」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "baolan",
+          "nearStations": [
+            "银川"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ningxia-liupan-mountain",
+      "name": "六盘山",
+      "province": "宁夏",
+      "lng": 106.25,
+      "lat": 35.28,
+      "intro": "宝中铁路过固原段，南侧远眺六盘山主峰与层叠山峦，泾渭分水岭高原绿岛，四季山色，秋季层林最好。",
+      "visibility": "distant",
+      "maxDistKm": 48,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "宁夏",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%85%AD%E7%9B%98%E5%B1%B1",
+          "quote": "用于核对「六盘山」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%85%AD%E7%9B%98%E5%B1%B1",
+          "quote": "按名称核对「六盘山」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "baozhong",
+          "nearStations": [
+            "固原"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ningxia-zhongning-huanghe",
+      "name": "中宁黄河段",
+      "province": "宁夏",
+      "lng": 105.68,
+      "lat": 37.5,
+      "intro": "包兰铁路过中宁段，黄河与枸杞园灌溉渠网即在车窗旁，塞上江南水田相连，四季河景，夏秋枸杞红时最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "宁夏",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%AE%81%E5%8E%BF",
+          "quote": "用于核对「中宁黄河段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E4%B8%AD%E5%AE%81%E9%BB%84%E6%B2%B3%E6%AE%B5",
+          "quote": "按名称核对「中宁黄河段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "baolan",
+          "nearStations": [
+            "中宁"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ningxia-niushou-mountain",
+      "name": "牛首山",
+      "province": "宁夏",
+      "lng": 106.05,
+      "lat": 37.85,
+      "intro": "银西高铁过吴忠段，西北远眺牛首山双峰与寺庙群轮廓，黄河东岸佛教名山，四季山色，晨昏光线最好。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "宁夏",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E7%89%9B%E9%A6%96%E5%B1%B1%20(%E5%AE%81%E5%A4%8F)",
+          "quote": "用于核对「牛首山」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E7%89%9B%E9%A6%96%E5%B1%B1",
+          "quote": "按名称核对「牛首山」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "yinxi",
+          "nearStations": [
+            "吴忠"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-qinghai-lake-north",
+      "name": "青海湖北岸",
+      "province": "青海",
+      "lng": 100.2,
+      "lat": 37.2,
+      "intro": "青藏铁路过刚察段，南侧车窗可见青海湖北岸湖面与沙岛相接，中国最大内陆咸水湖碧波接天，四季湖景，夏季最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "lake",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E9%9D%92%E6%B5%B7%E6%B9%96",
+          "quote": "用于核对「青海湖北岸」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E9%9D%92%E6%B5%B7%E6%B9%96%E5%8C%97%E5%B2%B8",
+          "quote": "按名称核对「青海湖北岸」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "刚察",
+            "哈尔盖"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-jinyintan",
+      "name": "金银滩原子城草原",
+      "province": "青海",
+      "lng": 100.99,
+      "lat": 36.95,
+      "intro": "青藏铁路过海晏站，金银滩草原与原子城纪念地远眺可及，两弹一星摇篮草原辽阔，四季草色，夏季最好。",
+      "visibility": "distant",
+      "maxDistKm": 10,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "grassland",
+      "subtype": "grassland",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E9%87%91%E9%93%B6%E6%BB%A9%E8%8D%89%E5%8E%9F",
+          "quote": "用于核对「金银滩原子城草原」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E9%87%91%E9%93%B6%E6%BB%A9%E5%8E%9F%E5%AD%90%E5%9F%8E%E8%8D%89%E5%8E%9F",
+          "quote": "按名称核对「金银滩原子城草原」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "海晏"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-huangyuan-gorge",
+      "name": "湟源峡谷",
+      "province": "青海",
+      "lng": 101.2,
+      "lat": 36.62,
+      "intro": "青藏铁路过湟源站西侧，湟水峡谷与丹噶尔古城山口即在车窗旁，峡口水急山势逼仄，四季河谷景观，晨昏最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "gorge",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%B9%9F%E6%BA%90%E5%8E%BF",
+          "quote": "用于核对「湟源峡谷」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%B9%9F%E6%BA%90%E5%B3%A1%E8%B0%B7",
+          "quote": "按名称核对「湟源峡谷」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "湟源"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-buha-river-mouth",
+      "name": "布哈河口",
+      "province": "青海",
+      "lng": 99.8,
+      "lat": 37.05,
+      "intro": "青藏铁路过刚察西段，南侧远眺布哈河入湖河口与湿地三角洲，青海湖最大入湖河流水色清浑相接，四季水景，夏季最好。",
+      "visibility": "distant",
+      "maxDistKm": 16,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%B8%83%E5%93%88%E6%B2%B3",
+          "quote": "用于核对「布哈河口」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%B8%83%E5%93%88%E6%B2%B3%E5%8F%A3",
+          "quote": "按名称核对「布哈河口」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "刚察",
+            "鸟岛"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-tianjun-buha",
+      "name": "天峻布哈河谷",
+      "province": "青海",
+      "lng": 99.03,
+      "lat": 37.3,
+      "intro": "青藏铁路过天峻站，布哈河河谷与草原曲流远眺可及，河汊纵横牛羊散牧，四季河谷景观，夏季最好。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%A4%A9%E5%B3%BB%E5%8E%BF",
+          "quote": "用于核对「天峻布哈河谷」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%A4%A9%E5%B3%BB%E5%B8%83%E5%93%88%E6%B2%B3%E8%B0%B7",
+          "quote": "按名称核对「天峻布哈河谷」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "天峻"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-keruke-lake",
+      "name": "可鲁克湖",
+      "province": "青海",
+      "lng": 97.17,
+      "lat": 37.27,
+      "intro": "青藏铁路过德令哈西段，北侧远眺可鲁克湖湖面与芦苇沼泽，柴达木盆地淡水湖生态孤岛，四季湖景，晨昏最好。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "lake",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%8F%AF%E9%B2%81%E5%85%8B%E6%B9%96",
+          "quote": "用于核对「可鲁克湖」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%8F%AF%E9%B2%81%E5%85%8B%E6%B9%96",
+          "quote": "按名称核对「可鲁克湖」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "德令哈",
+            "戈碧"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-chaerhan-salt-lake",
+      "name": "察尔汗盐湖",
+      "province": "青海",
+      "lng": 95.2,
+      "lat": 36.75,
+      "intro": "青藏铁路过察尔汗盐湖段，列车直接行驶在万丈盐桥盐盖路基上，左右两侧卤水盐田晶光闪烁，四季奇观，晴日最好。",
+      "visibility": "on_track",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "lake",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%AF%9F%E5%B0%94%E6%B1%97%E7%9B%90%E6%B9%96",
+          "quote": "用于核对「察尔汗盐湖」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%AF%9F%E5%B0%94%E6%B1%97%E7%9B%90%E6%B9%96",
+          "quote": "按名称核对「察尔汗盐湖」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "察尔汗",
+            "格尔木"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-geermu-huyang",
+      "name": "格尔木胡杨林",
+      "province": "青海",
+      "lng": 94.55,
+      "lat": 36.35,
+      "intro": "青藏铁路过格尔木段，西侧远眺格尔木河畔胡杨林与荒漠河岸林带，高原胡杨秋色金黄，四季景观，秋季最好。",
+      "visibility": "distant",
+      "maxDistKm": 32,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "wetland",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%A0%BC%E5%B0%94%E6%9C%A8%E8%83%A1%E6%9D%A8%E6%9E%97",
+          "quote": "用于核对「格尔木胡杨林」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%A0%BC%E5%B0%94%E6%9C%A8%E8%83%A1%E6%9D%A8%E6%9E%97",
+          "quote": "按名称核对「格尔木胡杨林」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "格尔木"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-kunlun-pass",
+      "name": "昆仑山口",
+      "province": "青海",
+      "lng": 94.05,
+      "lat": 35.63,
+      "intro": "青藏铁路过昆仑山口段，列车爬升穿越昆仑山垭口，两侧雪山连绵冻土广布，四季雪山景观，晴日远眺最好。",
+      "visibility": "on_track",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%98%86%E4%BB%91%E5%B1%B1%E5%8F%A3",
+          "quote": "用于核对「昆仑山口」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%98%86%E4%BB%91%E5%B1%B1%E5%8F%A3",
+          "quote": "按名称核对「昆仑山口」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "纳赤台",
+            "玉珠峰"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-yuzhu-peak",
+      "name": "玉珠峰",
+      "province": "青海",
+      "lng": 94.25,
+      "lat": 35.7,
+      "intro": "青藏铁路过西大滩段，南侧车窗远眺玉珠峰雪顶与冰川末梢，六千米级雪山近在咫尺，四季雪景，晨昏光线最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "snow_mountain",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E7%8E%89%E7%8F%A0%E5%B3%B0",
+          "quote": "用于核对「玉珠峰」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E7%8E%89%E7%8F%A0%E5%B3%B0",
+          "quote": "按名称核对「玉珠峰」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "西大滩",
+            "玉珠峰"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-kekexili-station",
+      "name": "可可西里保护站",
+      "province": "青海",
+      "lng": 92.85,
+      "lat": 35.35,
+      "intro": "青藏铁路过五道梁至沱沱河段，西侧远眺可可西里高原草场与藏羚羊栖息地边缘，四季荒原景观，夏季最好。",
+      "visibility": "distant",
+      "maxDistKm": 28,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "grassland",
+      "subtype": "grassland",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%8F%AF%E5%8F%AF%E8%A5%BF%E9%87%8C",
+          "quote": "用于核对「可可西里保护站」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%8F%AF%E5%8F%AF%E8%A5%BF%E9%87%8C%E4%BF%9D%E6%8A%A4%E7%AB%99",
+          "quote": "按名称核对「可可西里保护站」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "五道梁",
+            "沱沱河"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-tanggula-pass",
+      "name": "唐古拉山口",
+      "province": "青海",
+      "lng": 91.71,
+      "lat": 33.44,
+      "intro": "青藏铁路过唐古拉山口段，列车在海拔五千零七十二米的世界铁路最高点穿越垭口，左右两侧雪峰绵延，四季雪景，晴日最好。",
+      "visibility": "distant",
+      "maxDistKm": 22,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%94%90%E5%8F%A4%E6%8B%89%E5%B1%B1%E5%8F%A3",
+          "quote": "用于核对「唐古拉山口」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%94%90%E5%8F%A4%E6%8B%89%E5%B1%B1%E5%8F%A3",
+          "quote": "按名称核对「唐古拉山口」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "唐古拉"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-aiken-spring",
+      "name": "艾肯泉",
+      "province": "青海",
+      "lng": 90.55,
+      "lat": 38.27,
+      "intro": "格库铁路过茫崖段，南侧远眺艾肯泉泉眼与红色环状泉华，恶魔之眼镶嵌戈壁，四季泉景，晴日远眺最好。",
+      "visibility": "distant",
+      "maxDistKm": 30,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "water_feature",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E8%89%BE%E8%82%AF%E6%B3%89",
+          "quote": "用于核对「艾肯泉」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E8%89%BE%E8%82%AF%E6%B3%89",
+          "quote": "按名称核对「艾肯泉」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "geku",
+          "nearStations": [
+            "茫崖",
+            "花土沟"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qinghai-geermu-river-gorge",
+      "name": "格尔木河出山峡谷",
+      "province": "青海",
+      "lng": 94.85,
+      "lat": 36.35,
+      "intro": "青藏铁路过格尔木站北上，西侧车窗可见格尔木河出山峡谷与河谷水线，昆仑雪水穿峡而下，四季河谷景观，晨昏最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "gorge",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "青海",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%A0%BC%E5%B0%94%E6%9C%A8%E6%B2%B3",
+          "quote": "用于核对「格尔木河出山峡谷」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%A0%BC%E5%B0%94%E6%9C%A8%E6%B2%B3%E5%87%BA%E5%B1%B1%E5%B3%A1%E8%B0%B7",
+          "quote": "按名称核对「格尔木河出山峡谷」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "qingzang",
+          "nearStations": [
+            "格尔木",
+            "南山口"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guizhou-hongfeng-lake",
+      "name": "红枫湖",
+      "province": "贵州",
+      "lng": 106.43,
+      "lat": 26.55,
+      "intro": "沪昆高铁过安顺段，北侧远眺红枫湖湖面与岛屿星罗，湖光山色相映成趣，四季湖景，秋季红枫最好。",
+      "visibility": "distant",
+      "maxDistKm": 12,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "lake",
+      "subtype": "lake",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "贵州",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E7%BA%A2%E6%9E%AB%E6%B9%96",
+          "quote": "用于核对「红枫湖」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E7%BA%A2%E6%9E%AB%E6%B9%96",
+          "quote": "按名称核对「红枫湖」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hukun",
+          "nearStations": [
+            "贵安",
+            "清镇"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guizhou-doupeng-mountain",
+      "name": "斗篷山",
+      "province": "贵州",
+      "lng": 107.5,
+      "lat": 26.35,
+      "intro": "贵广高铁过都匀东站，西北侧远眺斗篷山主峰与原始森林，黔南第一峰满目苍翠，四季山色，晨昏光线最好。",
+      "visibility": "distant",
+      "maxDistKm": 12,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "贵州",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E6%96%97%E7%AF%B7%E5%B1%B1",
+          "quote": "用于核对「斗篷山」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E6%96%97%E7%AF%B7%E5%B1%B1",
+          "quote": "按名称核对「斗篷山」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "guiguang",
+          "nearStations": [
+            "都匀东"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guizhou-duliu-river",
+      "name": "都柳江榕江段",
+      "province": "贵州",
+      "lng": 108.52,
+      "lat": 25.93,
+      "intro": "贵广高铁过榕江站，都柳江河湾与侗寨吊脚楼即在车窗旁，江水碧绿两岸青山，四季河谷景观，晨昏光线最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "贵州",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E9%83%BD%E6%9F%B3%E6%B1%9F",
+          "quote": "用于核对「都柳江榕江段」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E9%83%BD%E6%9F%B3%E6%B1%9F%E6%A6%95%E6%B1%9F%E6%AE%B5",
+          "quote": "按名称核对「都柳江榕江段」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "guiguang",
+          "nearStations": [
+            "榕江"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guizhou-tianhe-tan",
+      "name": "天河潭",
+      "province": "贵州",
+      "lng": 106.62,
+      "lat": 26.44,
+      "intro": "沪昆高铁过贵阳段，西南远眺天河潭喀斯特峡谷与溶洞瀑布，山水洞潭浑然一体，四季景观，夏秋水量最好。",
+      "visibility": "distant",
+      "maxDistKm": 15,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "gorge",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "贵州",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%A4%A9%E6%B2%B3%E6%BD%AD",
+          "quote": "用于核对「天河潭」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%A4%A9%E6%B2%B3%E6%BD%AD",
+          "quote": "按名称核对「天河潭」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hukun",
+          "nearStations": [
+            "贵阳北",
+            "平坝南"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guizhou-loushan-pass",
+      "name": "娄山关",
+      "province": "贵州",
+      "lng": 106.83,
+      "lat": 28.18,
+      "intro": "渝黔高铁过桐梓东站，南侧远眺娄山关雄关要隘与群山叠嶂，长空雁叫霜晨月故地，四季可望，晨雾最好。",
+      "visibility": "window",
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "mountain",
+      "subtype": "mountain_range",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "贵州",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%A8%84%E5%B1%B1%E5%85%B3",
+          "quote": "用于核对「娄山关」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%A8%84%E5%B1%B1%E5%85%B3",
+          "quote": "按名称核对「娄山关」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "yugui",
+          "nearStations": [
+            "桐梓东"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guizhou-wumeng-grassland",
+      "name": "乌蒙大草原",
+      "province": "贵州",
+      "lng": 104.45,
+      "lat": 25.9,
+      "intro": "沪昆高铁过盘州段，西北远眺乌蒙大草原高原草场与风电风车，贵州海拔最高草原，四季景观，夏秋草绿最好。",
+      "visibility": "distant",
+      "maxDistKm": 20,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "grassland",
+      "subtype": "grassland",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "贵州",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E4%B9%8C%E8%92%99%E5%A4%A7%E8%8D%89%E5%8E%9F",
+          "quote": "用于核对「乌蒙大草原」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E4%B9%8C%E8%92%99%E5%A4%A7%E8%8D%89%E5%8E%9F",
+          "quote": "按名称核对「乌蒙大草原」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hukun",
+          "nearStations": [
+            "盘州"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guizhou-beipan-bridge",
+      "name": "北盘江特大桥",
+      "province": "贵州",
+      "lng": 105.28,
+      "lat": 25.93,
+      "intro": "沪昆高铁经北盘江特大桥过江，列车在桥上左右两侧均见峡谷深谷与江面，世界最高铁路桥凌空，四季谷景，晴日最好。",
+      "visibility": "window",
+      "maxDistKm": 5,
+      "viewScale": "near",
+      "viewMinutes": 3,
+      "category": "engineering",
+      "subtype": "bridge",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "贵州",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E5%8C%97%E7%9B%98%E6%B1%9F%E5%A4%A7%E6%A1%A5",
+          "quote": "用于核对「北盘江特大桥」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E5%8C%97%E7%9B%98%E6%B1%9F%E7%89%B9%E5%A4%A7%E6%A1%A5",
+          "quote": "按名称核对「北盘江特大桥」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hukun",
+          "nearStations": [
+            "关岭",
+            "普安县"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guizhou-huaxi-river",
+      "name": "花溪十里河滩",
+      "province": "贵州",
+      "lng": 106.65,
+      "lat": 26.42,
+      "intro": "沪昆高铁过贵阳段，南侧远眺花溪河十里河滩湿地，河湾曲折花木扶疏，四季水景，夏秋花季最好。",
+      "visibility": "distant",
+      "maxDistKm": 18,
+      "viewScale": "far",
+      "viewMinutes": 3,
+      "category": "gorge",
+      "subtype": "river",
+      "dimensions": [
+        "geo",
+        "nature"
+      ],
+      "tags": [
+        "贵州",
+        "自然景区"
+      ],
+      "bestView": {
+        "months": [],
+        "timeOfDay": "day",
+        "light": "any",
+        "note": "地点坐标标记景观本体；能否从具体列车区段看到需结合线路和地形判断。",
+        "blocked": []
+      },
+      "source": "curated",
+      "reviewedAt": "2026-10-05",
+      "reviewRound": "2026-10-scarce-prov",
+      "sources": [
+        {
+          "type": "wiki",
+          "level": "A",
+          "ref": "https://zh.wikipedia.org/wiki/%E8%8A%B1%E6%BA%AA%E5%9B%BD%E5%AE%B6%E5%9F%8E%E5%B8%82%E6%B9%BF%E5%9C%B0%E5%85%AC%E5%9B%AD",
+          "quote": "用于核对「花溪十里河滩」名称、地点和公开地理位置。",
+          "checkedAt": "2026-10-05"
+        },
+        {
+          "type": "osm",
+          "level": "A",
+          "ref": "https://www.openstreetmap.org/search?query=%E8%8A%B1%E6%BA%AA%E5%8D%81%E9%87%8C%E6%B2%B3%E6%BB%A9",
+          "quote": "按名称核对「花溪十里河滩」对应地理实体与地图位置。",
+          "checkedAt": "2026-10-05"
+        }
+      ],
+      "verification": {
+        "status": "probable",
+        "checkedAt": "2026-10-05",
+        "checkedBy": "Codex",
+        "method": "WGS84 地点坐标与公开地图实体交叉核对；铁路视线按地理关系估计。"
+      },
+      "lineHints": [
+        {
+          "corridorId": "hukun",
+          "nearStations": [
+            "贵阳南",
+            "贵阳北"
+          ]
+        }
+      ]
+    }
+  ]
+}

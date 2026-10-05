@@ -633,12 +633,10 @@ watch(gps, (sample) => {
               进入地图
             </button>
             <p v-if="hasGaps" class="drive-trip-map__gap-note">
-              虚线 = 未贯通段（{{ segmentPaths.length }} 段
-              <template v-if="maxGapKm > 0"> · 最大断口 {{ maxGapKm.toFixed(0) }} km</template>
-              ）
+              虚线未贯通 · {{ segmentPaths.length }} 段<template v-if="maxGapKm > 0"> · 最大断口 {{ maxGapKm.toFixed(0) }} km</template>
             </p>
             <p class="drive-trip-map__hint">
-              {{ roadRoute.engineNote || '示意地图（OSM 众包还原，非导航）' }} · 圆点 = 沿程景点 · 点击进入全屏地图
+              {{ roadRoute.engineNote || 'OSM 示意' }}
             </p>
           </section>
 

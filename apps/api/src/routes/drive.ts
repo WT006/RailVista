@@ -171,12 +171,10 @@ driveRoute.get('/along', async (c) => {
     const nominalKm = roadKey ? officialLengthKm(roadKey) || entry?.lengthKm || 0 : 0;
     const connectedKm = Math.round(route.lengthKm * 10) / 10;
     const pct = nominalKm > 0 ? Math.round((connectedKm / nominalKm) * 100) : null;
-    const segNote = route.segments?.length ? `，另有 ${route.segments.length} 段未贯通` : '';
     route.engineNote =
-      `OSM 众包还原：已贯通 ${connectedKm} km` +
-      (pct !== null ? ` / 官方里程 ${nominalKm} km（${pct}%）` : '') +
-      segNote +
-      '，非官方线位，不作为导航依据';
+      `已贯通 ${connectedKm} km` +
+      (pct !== null ? ` / 官方 ${nominalKm} km（${pct}%）` : '') +
+      ' · OSM 示意';
   } else if (routeId) {
     // 榜单 / 路书条目（v1 DriveRoute 打样数据）
     const legacy = getDriveRoute(routeId);

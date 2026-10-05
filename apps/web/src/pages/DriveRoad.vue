@@ -1095,11 +1095,9 @@ function fmtKm(v: number): string {
             <!-- R4：图例 + 状态条（三行纵向排列，互不压字） -->
             <div class="drive-trip-map__bar">
               <p v-if="hasGaps" class="drive-trip-map__gap-note">
-                ⚠ {{ gapAnnotations.length }} 处未贯通（最大断口约 {{ maxGapKm }} km），虚线段为其余连通分量
+                虚线未贯通 · {{ gapAnnotations.length }} 处<template v-if="maxGapKm"> · 最大断口 {{ maxGapKm }} km</template>
               </p>
-              <p class="drive-trip-map__hint">
-                全线走向（OSM 众包还原，{{ precisionText }}）
-              </p>
+              <p class="drive-trip-map__hint">{{ precisionText }}</p>
               <p v-if="activeSegment !== null" class="drive-trip-map__scope">
                 {{ focusScopeText }}
                 <button type="button" class="drive-trip-map__back" @click="selectSegment(activeSegment)">返回全线</button>

@@ -52,9 +52,48 @@ export function isWithinChinaLand(lng: number, lat: number): boolean {
   );
 }
 
+const CJK_RE = /[\u4e00-\u9fff]/;
+const CN_COUNTRY_RE =
+  /^(CN|CHN|China|PRC|HK|MO|TW|中国|中华人民共和国|香港|澳门|台湾)$/i;
+/** 喜马拉雅南坡常见境外拉丁名（即便坐标被错标成西藏也不入库） */
+const FOREIGN_NAME_RE =
+  /\b(Nepal|Kathmandu|Pokhara|Namche|Lukla|Sikkim|Gangtok|Thimphu|Paro|Hanuman|Chorten|Melamchi|Lobuche|Kongma|Chukhung|Everest viewpoint|Haa valley|Bahrabise|Nasim Pati)\b/i;
+
+type SpotCountryTags = {
+  osmTags?: Record<string, string | undefined>;
+};
+
 /**
- * 剔除落在国境外的 POI；NaN 坐标一并丢弃。
- * 返回 { kept, dropped }，dropped 是被过滤掉的下标列表（便于上层审计 / 写报告）。
+ * 喜马拉雅南坡矩形：西藏省 bbox 会扫进尼泊尔 / 锡金 / 不丹。
+ * 中文名（樟木、聂拉木、亚东、马卡鲁山）保留；纯拉丁名视为邻国 POI。
+ */
+export function inHimalayaExteriorBand(lng: number, lat: number): boolean {
+  if (lng >= 80 && lng < 88.35 && lat >= 26.2 && lat < 28.15) return true;
+  if (lng >= 88.35 && lng <= 92.2 && lat >= 26.4 && lat < 27.72) return true;
+  return false;
+}
+
+/**
+ * 公路侧景点是否可展示 / 入库。
+ * 比 CHINA_LAND_BBOX 更严：挡邻国 country 标签、喜马拉雅南坡拉丁名。
+ */
+export function isAdmissibleChinaPoi(
+  spot: Pick<RoadsideSpot, 'lng' | 'lat' | 'name'> & SpotCountryTags,
+): boolean {
+  if (!isWithinChinaLand(spot.lng, spot.lat)) return false;
+  const tags = spot.osmTags;
+  if (tags) {
+    const country = tags['addr:country'] || tags['is_in:country'] || tags.country;
+    if (country && !CN_COUNTRY_RE.test(String(country).trim())) return false;
+  }
+  const name = String(spot.name ?? '');
+  if (inHimalayaExteriorBand(spot.lng, spot.lat) && !CJK_RE.test(name)) return false;
+  if (FOREIGN_NAME_RE.test(name) && !CJK_RE.test(name)) return false;
+  return true;
+}
+
+/**
+ * 剔除国境外 / 邻国错标 POI；NaN 坐标一并丢弃。
  */
 export function partitionByChinaLand(spots: RoadsideSpot[]): {
   kept: RoadsideSpot[];
@@ -63,7 +102,7 @@ export function partitionByChinaLand(spots: RoadsideSpot[]): {
   const kept: RoadsideSpot[] = [];
   const dropped: RoadsideSpot[] = [];
   for (const s of spots) {
-    if (isWithinChinaLand(s.lng, s.lat)) kept.push(s);
+    if (isAdmissibleChinaPoi(s as RoadsideSpot & SpotCountryTags)) kept.push(s);
     else dropped.push(s);
   }
   return { kept, dropped };
@@ -83,15 +122,13 @@ function cellKeyOf(lng: number, lat: number): number {
 }
 
 /**
- * 建网格：O(M)。境外 POI（不在 CHINA_LAND_BBOX 内）直接跳过：
- * 防止它们被 grid 索引收录后，再随 bbox 外扩命中任何途径外东北/南亚的路线。
- * 坐标非法的景点同样跳过（不参与任何查询）。
+ * 建网格：O(M)。不可展示的境外 / 邻国错标 POI 直接跳过。
  */
 export function buildSpotGrid(spots: RoadsideSpot[]): SpotGrid {
   const cells = new Map<number, number[]>();
   for (let i = 0; i < spots.length; i += 1) {
     const s = spots[i]!;
-    if (!isWithinChinaLand(s.lng, s.lat)) continue;
+    if (!isAdmissibleChinaPoi(s as RoadsideSpot & SpotCountryTags)) continue;
     const key = cellKeyOf(s.lng, s.lat);
     const list = cells.get(key);
     if (list) list.push(i);

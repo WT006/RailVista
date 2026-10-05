@@ -110,14 +110,14 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   min-width: 0;
 }
 
-/* 移动端：缩小品牌与导航的间距，导航仍保持可见（提供自驾入口） */
+/* 移动端：顶栏只留品牌，主导航改到底栏 AppBottomNav */
 @media (max-width: 599px) {
   .appbar__left {
     gap: var(--space-2);
   }
 
   .appbar__nav {
-    gap: 0;
+    display: none;
   }
 }
 

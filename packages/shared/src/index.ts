@@ -13,6 +13,7 @@ export * from './schedule/delayField.js';
 export * from './schedule/solar.js';
 export * from './schedule/scenic.js';
 export * from './schedule/spotSide.js';
+export * from './schedule/spotWeather.js';
 export * from './drive/index.js';
 export * from './ticket.js';
 export * from './roadSign.js';

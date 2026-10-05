@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-10-02",
+ "updated": "2026-10-05",
  "roads": [
   {
    "ref": "G101",
@@ -364,14 +364,16 @@
   },
   {
    "ref": "G215",
-   "name": "柳格线",
+   "name": "马宁线",
    "fromPlace": "马鬃山",
    "toPlace": "宁洱",
    "provinces": [
     "甘肃",
-    "青海"
+    "青海",
+    "四川",
+    "云南"
    ],
-   "officialLengthKm": 660
+   "officialLengthKm": 0
   },
   {
    "ref": "G216",
@@ -481,14 +483,16 @@
   },
   {
    "ref": "G227",
-   "name": "宁张线",
+   "name": "张孟线",
    "fromPlace": "张掖",
    "toPlace": "孟连",
    "provinces": [
+    "甘肃",
     "青海",
-    "甘肃"
+    "四川",
+    "云南"
    ],
-   "officialLengthKm": 341
+   "officialLengthKm": 0
   },
   {
    "ref": "G228",
@@ -2530,53 +2534,6 @@
    "fromPlace": "白玉",
    "toPlace": "波密",
    "provinces": [],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G255",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "福建"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G256",
-   "name": "城港大道",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "福建"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G288",
-   "name": "凌海大桥",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "辽宁"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G388",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "宁夏"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G150",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "山东"
-   ],
    "officialLengthKm": 0
   }
  ]

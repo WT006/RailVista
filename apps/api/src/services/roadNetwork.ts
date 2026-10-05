@@ -23,6 +23,20 @@ export function isValidRoadKey(key: string): boolean {
   return KEY_RE.test(key);
 }
 
+function geomFilePath(key: string): string {
+  return join(ROADS_DIR, 'geom', `${key.replace(/[:/\\*?"<>|]/g, '_')}.json`);
+}
+
+/**
+ * 索引 hasGeom 是上次完整构建留下的；本机 gitignore 掉 1.5 万条几何后会谎报「有折线」。
+ * 加载时按磁盘文件纠正，搜索仍能命中省道，点开则诚实显示「几何待构建」。
+ */
+function reconcileHasGeomFromDisk(entries: RoadIndexEntry[]): void {
+  for (const e of entries) {
+    e.hasGeom = existsSync(geomFilePath(e.key));
+  }
+}
+
 interface IndexFile {
   version: number;
   updated: string;
@@ -67,6 +81,7 @@ export function loadRoadIndex(): { entries: RoadIndexEntry[]; updated: string } 
     }
   }
   indexCache = { mtime, entries, updated };
+  reconcileHasGeomFromDisk(entries);
   return { entries, updated };
 }
 
@@ -332,6 +347,7 @@ const COVERAGE_NOTES = [
   '里程为「去重后里程」：双向分隔道路的平行对向车道只计一条，与官方里程可比',
   '精度分级 A/B/C：A=与官方里程偏差≤10%，B=≤25%，C=偏差更大或官方里程未知（多为规划调整过编号的老路）',
   '几何由 OSM 共享节点拓扑装配（连通分量 + 直行优先），未贯通处如实标注断点，不做插值拼接',
+  '省道/县道/乡道几何是构建产物（data/roads/geom，仓库不入库）。本机需 pnpm roads:build 才能打开编号折线；首页底图 PNG 仍含全等级路网',
 ];
 
 /**
@@ -363,8 +379,43 @@ function readCoverageQuality(): NonNullable<RoadNetworkStats['quality']> {
   return out;
 }
 
+/** 《国家公路网规划》权威名录 ref 集合（mtime 随索引一起失效即可） */
+let authRefCache: { mtime: number; national: Set<string>; expressway: Set<string> } | null = null;
+
+function loadAuthoritativeRefs(): { national: Set<string>; expressway: Set<string> } {
+  const mtime = indexMtime();
+  if (authRefCache && authRefCache.mtime === mtime) {
+    return { national: authRefCache.national, expressway: authRefCache.expressway };
+  }
+  const load = (file: string): Set<string> => {
+    const out = new Set<string>();
+    const p = join(ROADS_DIR, 'authoritative', file);
+    if (!existsSync(p)) return out;
+    try {
+      const raw = JSON.parse(readFileSync(p, 'utf8')) as {
+        roads?: Array<{ key?: string; ref?: string }>;
+      };
+      for (const r of raw.roads ?? []) {
+        const k = r.key ?? r.ref;
+        if (k) out.add(k);
+      }
+    } catch {
+      /* 单文件损坏不阻塞 */
+    }
+    return out;
+  };
+  const national = load('national.json');
+  const expressway = load('expressway.json');
+  authRefCache = { mtime, national, expressway };
+  return { national, expressway };
+}
+
 export function networkStats(spotCount: number): RoadNetworkStats {
   const { entries, updated } = loadRoadIndex();
+  const auth = loadAuthoritativeRefs();
+  /** 国道/高速「在册」只计权威名录交集，避免 OSM 多编号把分母冲破（曾出现 306/301） */
+  const countOfficial = (cls: 'national' | 'expressway', refs: Set<string>) =>
+    entries.filter((r) => r.class === cls && refs.has(r.key)).length;
   const count = (cls: RoadIndexEntry['class']) => entries.filter((r) => r.class === cls).length;
   const withGeom = entries.filter((r) => r.hasGeom);
   const totalKm = entries.reduce((s, r) => s + (r.hasGeom ? r.lengthKm : 0), 0);
@@ -388,8 +439,8 @@ export function networkStats(spotCount: number): RoadNetworkStats {
   });
   return {
     coverageByClass,
-    national: count('national'),
-    expressway: count('expressway'),
+    national: countOfficial('national', auth.national),
+    expressway: countOfficial('expressway', auth.expressway),
     provincial: count('provincial'),
     county: count('county'),
     township: count('township'),
@@ -400,8 +451,8 @@ export function networkStats(spotCount: number): RoadNetworkStats {
     spotCount,
     quality: readCoverageQuality(),
     coverage: {
-      targetNational: 301,
-      targetExpressway: 278,
+      targetNational: auth.national.size || 301,
+      targetExpressway: auth.expressway.size || 278,
       notes: COVERAGE_NOTES,
     },
     updated,

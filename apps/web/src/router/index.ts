@@ -6,7 +6,7 @@ import CorridorMap from '../pages/CorridorMap.vue';
 import AtlasMap from '../pages/AtlasMap.vue';
 import DriveHome from '../pages/DriveHome.vue';
 import DriveTrip from '../pages/DriveTrip.vue';
-import DriveRoad from '../pages/DriveRoad.vue';
+import DriveTripMap from '../pages/DriveTripMap.vue';
 import DriveRankings from '../pages/DriveRankings.vue';
 import DriveBoard from '../pages/DriveBoard.vue';
 import DriveRoadbook from '../pages/DriveRoadbook.vue';
@@ -25,7 +25,16 @@ export const router = createRouter({
     // ── 万里路书 · 全国公路旅游网（PRD §2.1 路由表） ─────────────────────────
     { path: '/drive', name: 'drive-home', component: DriveHome },
     { path: '/drive/trip', name: 'drive-trip', component: DriveTrip },
-    { path: '/drive/road/:code', name: 'drive-road', component: DriveRoad },
+    { path: '/drive/trip/map', name: 'drive-trip-map', component: DriveTripMap },
+    // 公路详情统一走沿程页布局（原 DriveRoad 双栏改为 DriveTrip 三栏）
+    {
+      path: '/drive/road/:code',
+      name: 'drive-road',
+      redirect: (to) => ({
+        path: '/drive/trip',
+        query: { road: String(to.params.code ?? '') },
+      }),
+    },
     // /drive/atlas 复用全国地图（公路图层与铁路图层共存）
     {
       path: '/drive/atlas',
@@ -36,11 +45,11 @@ export const router = createRouter({
     { path: '/drive/rankings', name: 'drive-rankings', component: DriveRankings },
     { path: '/drive/rankings/:boardId', name: 'drive-board', component: DriveBoard },
     { path: '/drive/roadbook/:routeId', name: 'drive-roadbook', component: DriveRoadbook },
-    // v0.3.0 旧路径兼容：/drive/:id → 路书页；/drive/:id/nav → 沿程页实时态
+    // v0.3.0 旧路径兼容：/drive/:id → 路书页；/drive/:id/nav → 沿程页
     { path: '/drive/:routeId', redirect: (to) => `/drive/roadbook/${to.params.routeId}` },
     {
       path: '/drive/:routeId/nav',
-      redirect: (to) => `/drive/trip?route=${to.params.routeId}&mode=live`,
+      redirect: (to) => `/drive/trip?route=${to.params.routeId}`,
     },
   ],
 });

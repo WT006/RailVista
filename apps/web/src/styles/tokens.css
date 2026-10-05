@@ -149,6 +149,7 @@
   --gutter: 16px;
   --shell-max: 100%;
   --appbar-h: 56px;
+  --bottomnav-h: 0px; /* 桌面端无底栏 */
   --col-ratio-main: 7; /* 主栏占 12 栅格中的 7 列 */
   --col-ratio-side: 5; /* 侧栏占 12 栅格中的 5 列 */
 
@@ -159,6 +160,9 @@
      同时靠 backdrop-filter 保证正文对比度不受影响。 */
   --backdrop-map-opacity: 0.48;
   --backdrop-map-color: #b3cfff;
+  /* 自驾背景：干线骨架清晰；景点星点再压低，避免和路网抢视线 */
+  --backdrop-road-net-opacity: 0.48;
+  --backdrop-road-heat-opacity: 0.16;
 }
 
 /* ── 断点：sm ≥600 / md ≥840 / lg ≥1200 ────────────────────────────────────
@@ -167,11 +171,18 @@
  *   600–1199        → 全宽 - 2×gutter（双栏，尽量吃满屏幕，不做人为收窄）
  *   ≥1200 桌面      → 收窄到 1120px，保证双栏阅读宽度与行宽舒适
  */
+@media (max-width: 599px) {
+  :root {
+    --bottomnav-h: 68px;
+  }
+}
+
 @media (min-width: 600px) {
   :root {
     --gutter: 20px;
     --shell-max: 100%;
     --appbar-h: 56px;
+    --bottomnav-h: 0px;
   }
 }
 

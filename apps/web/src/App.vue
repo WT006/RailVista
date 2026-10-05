@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import AppBackdrop from './components/AppBackdrop.vue';
+import AppBottomNav from './components/AppBottomNav.vue';
 import AppTopBar from './components/AppTopBar.vue';
 
 const route = useRoute();
@@ -33,6 +34,7 @@ const showTopBar = computed(
     模糊保持稳定；滚动加深背景的过渡也按沉浸光感规范做成平滑渐变。
   -->
   <AppTopBar v-if="showTopBar" />
+  <AppBottomNav />
 
   <RouterView v-slot="{ Component }">
     <Transition name="page" mode="out-in">

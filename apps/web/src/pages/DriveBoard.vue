@@ -88,7 +88,6 @@ onMounted(async () => {
           </p>
           <h1>{{ board.title }}</h1>
           <p v-if="board.subtitle" class="sub">{{ board.subtitle }}</p>
-          <p v-if="board.source.doc" class="drive-board-source">依据：{{ board.source.doc }}</p>
         </header>
 
         <section class="drive-board-items">

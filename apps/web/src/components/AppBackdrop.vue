@@ -25,8 +25,9 @@
  *   路网折线单独占一个 canvas，就绪后由 CSS 走 700ms 淡入；星点层的 opacity 恒定，
  *   不再出现"整层亮度 0.24 → 0.46 且内容被瞬间替换"的双跳。
  *
- * 体积纪律：全国路网是构建期渲染的位图（apps/web/public/drive-network.png，约 1.6MB），
+ * 体积纪律：全国路网是构建期渲染的位图（apps/web/public/drive-network.png），
  * 由浏览器按需加载并缓存；主 bundle 只含轮廓与星点。
+ * 背景只画干线（国道/高速几何），不加 OSM 全可通行密网底。
  */
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue';
 import { useRoute } from 'vue-router';
@@ -92,10 +93,9 @@ function hotIndices(buckets: Buckets, px: number, py: number): number[] {
   return out;
 }
 
-// ── 全国路网位图（构建期离线渲染，见 scripts/build-drive-network-raster.mjs） ──
-// v0.6.0：折线方案无法承载"全国 790 万条可通行道路 / 1.5 万条编号公路"，
-// 改为一张按同一墨卡托投影预渲染的 PNG，运行时只做一次 drawImage。
-const ROAD_IMAGE_URL = '/drive-network.png';
+// ── 全国干线位图（构建期：仅编号国道/高速，见 scripts/build-drive-network-raster.mjs） ──
+// 版本后缀强制刷新浏览器缓存（旧图含数百万条乡道村道，会糊成蜘蛛网）
+const ROAD_IMAGE_URL = '/drive-network.png?v=trunk-20261005';
 let roadImg: HTMLImageElement | null = null;
 /** 指针高光用的离屏画布（复用，避免每帧新建） */
 let scratchLayer: HTMLCanvasElement | null = null;
@@ -182,7 +182,7 @@ function paintHotSpots(
     if (!pt) continue;
     const cx = pt[0]! * scale;
     const cy = pt[1]! * scale;
-    const glowR = 15 * scale;
+    const glowR = (warm ? 6 : 15) * scale;
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
     grad.addColorStop(0, `rgba(${inner}, 0.92)`);
     grad.addColorStop(0.35, `rgba(${outer}, ${(0.4 * (pt[2] ?? 0.6)).toFixed(3)})`);
@@ -211,11 +211,13 @@ function buildLayer(kind: LayerKind, width: number, height: number): HTMLCanvasE
   if (kind === 'rail') {
     paintPoints(ctx, CHINA_SCENIC_HEAT, scale, false, () => 1, 7);
   } else if (kind === 'heat') {
-    paintPoints(ctx, CHINA_ROAD_HEAT, scale, true, () => 1, 6);
+    // 全国视野下 glowScale=6 会糊成覆盖轮廓的光斑；背景星点只做点缀
+    paintPoints(ctx, CHINA_ROAD_HEAT, scale, true, () => 1, 2.15);
   } else {
     // 路网：构建期离线渲染的全国路网位图（含无编号的乡道村道与编号公路分级着色）
     if (roadImg && roadImg.complete && roadImg.naturalWidth > 0) {
-      ctx.globalAlpha = 0.92;
+      // 干线位图本身已稀疏；略抬绘制 alpha，靠 CSS 控整体氛围
+      ctx.globalAlpha = 0.9;
       ctx.drawImage(roadImg, 0, 0, width, height);
       ctx.globalAlpha = 1;
     }
@@ -488,12 +490,15 @@ onBeforeUnmount(() => {
   opacity: calc(var(--backdrop-map-opacity) * 0.75);
 }
 
+/* 公路背景：单独压低路网/星点，避免东部密网糊成亮白块（见 tokens.css） */
 .app-backdrop.is-road .app-backdrop__layer--heat {
-  opacity: calc(var(--backdrop-map-opacity) * 0.75);
+  opacity: var(--backdrop-road-heat-opacity);
 }
 
 .app-backdrop.is-road.is-net-ready .app-backdrop__layer--net {
-  opacity: calc(var(--backdrop-map-opacity) * 0.95);
+  opacity: var(--backdrop-road-net-opacity);
+  /* 轻微柔化即可；过模糊会抹掉干线骨架 */
+  filter: brightness(0.88) saturate(0.9);
 }
 
 /* 指针径向高光：只改 CSS 变量，由合成层完成，不触发布局与重绘。

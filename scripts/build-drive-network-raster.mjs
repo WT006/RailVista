@@ -7,7 +7,10 @@
  * 任何"把折线打进前端"的方案都不可行（旧实现因此只能画 33 条）。
  * 构建期一次性把整张路网渲染成 PNG，前端只加载一张图 —— 体积可控、观感完整。
  *
- * 用法：node scripts/build-drive-network-raster.mjs [--width 1800] [--no-base]
+ * 用法：node scripts/build-drive-network-raster.mjs [--width 1800] [--with-base] [--classes expressway,national,provincial]
+ *
+ * 默认不加「全可通行道路」底网（否则东部糊成蜘蛛网）；只画干线编号公路。
+ * 需要旧版密网观感时再显式加 --with-base。
  */
 import { readdirSync, readFileSync, existsSync, writeFileSync, mkdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -23,7 +26,13 @@ const OUT = join(ROOT, 'apps/web/public/drive-network.png');
 
 const args = process.argv.slice(2);
 const OUT_W = Number(args.includes('--width') ? args[args.indexOf('--width') + 1] : 1800);
-const WITH_BASE = !args.includes('--no-base');
+/** 默认不画密网底；仅 --with-base 时启用（兼容旧行为） */
+const WITH_BASE = args.includes('--with-base');
+const DEFAULT_CLASSES = ['expressway', 'national'];
+const classArg = args.includes('--classes') ? args[args.indexOf('--classes') + 1] : '';
+const ALLOWED = new Set(
+  (classArg ? classArg.split(',') : DEFAULT_CLASSES).map((s) => s.trim()).filter(Boolean),
+);
 
 // 与 chinaBackdrop.ts 严格一致的墨卡托参数（背景与铁路页同坐标系）
 const B = { minX: 1.2828581027, maxX: 2.3578445245, minY: 0.0670400688, maxY: 1.1112870864 };
@@ -43,22 +52,22 @@ const CLASS_COLOR = {
   other: '#6b7280',
 };
 const CLASS_ALPHA = {
-  expressway: 1.0,
-  national: 0.95,
-  provincial: 0.62,
-  county: 0.5,
-  township: 0.34,
-  village: 0.28,
-  other: 0.26,
+  expressway: 0.88,
+  national: 0.78,
+  provincial: 0.48,
+  county: 0.32,
+  township: 0.16,
+  village: 0.1,
+  other: 0.12,
 };
 const CLASS_GLOW = {
-  expressway: 0.22,
-  national: 0.16,
-  provincial: 0.08,
-  county: 0.05,
-  township: 0.03,
-  village: 0.025,
-  other: 0.02,
+  expressway: 0.14,
+  national: 0.1,
+  provincial: 0.05,
+  county: 0.03,
+  township: 0.015,
+  village: 0.01,
+  other: 0.01,
 };
 
 const scale = RW / VIEW_W;
@@ -108,7 +117,7 @@ if (WITH_BASE) {
       }
       // 基础层（全部可通行道路）刻意压暗：东部路网极密，alpha 稍高就会糊成白块，
       // 反而看不出等级结构。编号公路层随后以等级色覆盖上去。
-      if (buf.length >= 2) raster.polyline(buf, bgColor, 0.085);
+      if (buf.length >= 2) raster.polyline(buf, bgColor, 0.045);
       ways += 1;
     }
     r.close();
@@ -127,6 +136,7 @@ if (existsSync(GEOM_DIR)) {
       g = JSON.parse(readFileSync(join(GEOM_DIR, f), 'utf8'));
     } catch { continue; }
     const cls = g.class ?? 'other';
+    if (!ALLOWED.has(cls)) continue;
     const color = hexToRgb(CLASS_COLOR[cls] ?? CLASS_COLOR.other);
     const alpha = CLASS_ALPHA[cls] ?? 0.3;
     const glow = CLASS_GLOW[cls] ?? 0.05;
@@ -151,7 +161,8 @@ if (existsSync(GEOM_DIR)) {
     }
   }
 }
-console.log('  [numbered] 折线 ' + drawn + ' 条 (' + ((Date.now() - t1) / 1000).toFixed(0) + 's)');
+console.log('  [numbered] 折线 ' + drawn + ' 条 classes=[' + [...ALLOWED].join(',') + '] (' + ((Date.now() - t1) / 1000).toFixed(0) + 's)');
+if (!WITH_BASE) console.log('  [base] skipped（默认不加密网底；需要时传 --with-base）');
 
 // ── 3. 输出 PNG ─────────────────────────────────────────────────────────────
 const { width, height, rgb } = raster.toRgb(SS, 0.95);

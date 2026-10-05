@@ -363,6 +363,10 @@ export const api = {
   },
   /** 地图公路图层（抽稀折线） */
   getDriveNetworkOverview() {
+    const qs = new URLSearchParams({
+      classes: 'expressway,national,provincial',
+      limit: '800',
+    });
     return request<{
       roads: Array<{
         key: string;
@@ -373,7 +377,7 @@ export const api = {
         lengthKm: number;
       }>;
       updated: string;
-    }>('/drive/network/overview');
+    }>(`/drive/network/overview?${qs}`);
   },
   /** 榜单列表 */
   getDriveBoards() {
@@ -387,5 +391,25 @@ export const api = {
       board: import('@railvista/shared').RankingBoard;
       geomAvailable: boolean[];
     }>(`/drive/board/${encodeURIComponent(boardId)}`);
+  },
+  /** 景点到达时刻天气（和风优先，未配置 Key 时服务端回退 Open-Meteo） */
+  getSpotWeathers(
+    spots: Array<{
+      spotId: string;
+      lng: number;
+      lat: number;
+      atIso: string;
+      visibility?: string;
+    }>,
+  ) {
+    return request<{
+      items: import('@railvista/shared').SpotWeather[];
+      provider: string;
+      configured: { qweather: boolean };
+    }>('/weather/spots', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ spots }),
+    });
   },
 };

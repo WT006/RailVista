@@ -73,14 +73,27 @@ export function resolveSpotDimensions(input: {
   return mapped ? [mapped] : [];
 }
 
-/** 点位主色：取第一个已知维度，无维度用中性灰 */
+/**
+ * 点位主色。
+ * - 无 `preferKeys`：取第一个已知维度（未筛选时的默认）
+ * - 有 `preferKeys`（侧栏维度筛选）：优先取景点与选中标签的交集色；
+ *   双重身份也跟当前筛选走；多选且同时命中时取 preferKeys 中第一个即可
+ * - 无维度：中性灰
+ */
 export function dimensionColor(
   dimensions?: string[] | null,
   category?: string | null,
+  preferKeys?: readonly string[] | null,
 ): string {
   const list = resolveSpotDimensions({ dimensions, category });
-  if (list.length) return dimensionMeta(list[0]).color;
-  return UNCLASSIFIED_DIMENSION.color;
+  if (!list.length) return UNCLASSIFIED_DIMENSION.color;
+  if (preferKeys?.length) {
+    for (const key of preferKeys) {
+      if (key === 'other') continue;
+      if (list.includes(key)) return dimensionMeta(key).color;
+    }
+  }
+  return dimensionMeta(list[0]).color;
 }
 
 /** 转义后用于 AMap InfoWindow / Marker 的 HTML 片段 */

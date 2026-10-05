@@ -17,6 +17,13 @@ body {
   background: var(--surface-0);
 }
 
+/* 移动端底栏：全屏地图页侧栏/面板让出导航高度 */
+@media (max-width: 599px) {
+  .atlas-dock {
+    bottom: calc(var(--bottomnav-h) + 8px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* 滚动条：与深色表面统一，避免默认亮色滚动条割裂观感 */
 html {
   scrollbar-color: var(--line-strong) transparent;
@@ -67,7 +74,7 @@ html {
   position: relative;
   isolation: isolate;
   min-height: 100dvh;
-  padding-bottom: var(--space-8);
+  padding-bottom: calc(var(--space-8) + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
   /*
    * 末层底色改为 transparent：背景层已从各页面内提升到 App 根（AppBackdrop），
    * 页面若仍铺一层不透明 --surface-0 就会把背景整块盖住。

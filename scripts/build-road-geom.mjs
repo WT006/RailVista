@@ -38,10 +38,10 @@ const keyFilter = getArg('--key');
 const DP_TOL = { expressway: 18, national: 22, provincial: 40, county: 55, township: 70, village: 90, other: 120 };
 
 /**
- * 紧公差缝合上限（米）：城区 ref 断档多在 100~500m，取 1.5km 可再吃掉一批；
- * 上限刻意远小于旧实现的 5km —— 那正是 G318 被拼到西藏去的原因。
+ * 紧公差缝合上限（米）：同一编号分量端点 ≤8km 才接（城区 ref 断档常见 0.1~5km）。
+ * 仍禁止跨编号、禁止用距离猜「是不是同一条路」（旧 5km 贪心曾把 G318 拼飞）。
  */
-const STITCH_GAP_M = Number(process.env.ROAD_STITCH_M || 1500);
+const STITCH_GAP_M = Number(process.env.ROAD_STITCH_M || 8000);
 
 /** 端点/沿线锚点匹配半径（米） */
 const ANCHOR_NEAR_M = 3000;

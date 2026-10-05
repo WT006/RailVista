@@ -28,10 +28,13 @@ import {
   approachWindow,
   honorLabels,
   withinApproach,
+  spotWeatherParts,
   type CalibrationRecord,
   type ScenicSpot,
   type SpotEta,
   type SpotSide,
+  type SpotWeather,
+  type SpotWeatherParts,
   type Stop,
 } from '@railvista/shared';
 import { api } from '../api/client';
@@ -43,7 +46,7 @@ import {
   markStayOnSelect,
   tripCacheKey,
 } from '../lib/tripCache';
-import { loadAmap } from '../map/amap';
+import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 import { readSimulatedProgress, useGeolocation, useNow } from '../composables/useGeolocation';
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import PreciseRoutePanel from '../components/PreciseRoutePanel.vue';
@@ -67,6 +70,10 @@ const progress = ref(0);
 const mode = ref('时刻表估算');
 const stationKmRef = ref<number[]>([]);
 const etasRef = ref<SpotEta[]>([]);
+/** 景点 ETA 天气（按 spotId）；批量拉取，点击卡片直接读缓存 */
+const weatherBySpotId = ref<Record<string, SpotWeather>>({});
+let weatherFetchTimer: number | undefined;
+let weatherFetchSeq = 0;
 const legendOpen = ref(false);
 const calibrateOpen = ref(false);
 const STATUS_COLLAPSE_KEY = 'railvista:map:statusCollapsed';
@@ -145,6 +152,17 @@ const approachingSpot = computed<ScenicSpot | null>(() => {
   }
   return null;
 });
+
+const approachingWeather = computed(() => {
+  const s = approachingSpot.value;
+  if (!s) return null;
+  const w = weatherBySpotId.value[String(s.id)];
+  return w?.queried ? w : null;
+});
+
+const approachingWeatherParts = computed(() =>
+  spotWeatherParts(approachingWeather.value, approachingSpot.value?.visibility),
+);
 
 /** 图例用：左右侧含义说明 */
 const SIDE_LEGEND: Array<{ side: SpotSide; text: string }> = [
@@ -329,26 +347,34 @@ function getMapPadding() {
   return [top, side, bottom, side];
 }
 
+/** 景点气泡 / 底栏共用：只展示时间区间 */
 function formatEtaLabel(eta: SpotEta, departure: Date): string {
-  if (!eta.etaIso) return '—';
-  const etaDate = new Date(eta.etaIso);
-  const etaTime = formatTime(etaDate);
-  const isNextDay = etaDate.getDate() !== departure.getDate();
-  const prefix = isNextDay ? '次日 ' : '';
-  const sigma = eta.sigmaMin != null ? ` ±${Math.round(eta.sigmaMin)} 分钟` : '';
-  const conf = eta.confidence ? ` [${eta.confidence === 'high' ? '高' : eta.confidence === 'mid' ? '中' : '低'}]` : '';
-  const basisLabel = basisDescription(eta.basis);
-  return `${prefix}${etaTime}${sigma}${conf} · 依据：${basisLabel}`;
+  return formatEtaRange(eta, departure) || '—';
 }
 
-function basisDescription(basis: SpotEta['basis']): string {
-  switch (basis) {
-    case 'schedule': return '时刻表';
-    case 'gps': return 'GPS 实测';
-    case 'calibrated': return '已校准';
-    case 'mixed': return 'GPS 实测 + 时刻表';
-    default: return '时刻表';
-  }
+/** 底栏：ETA 区间，如 03:49~04:11 / 次日 03:49~04:11 */
+function formatEtaBrief(eta: SpotEta, departure: Date): string {
+  return formatEtaRange(eta, departure);
+}
+
+/** 中心时刻 ±σ → 时间窗文案 */
+function formatEtaRange(eta: SpotEta, departure: Date): string {
+  if (!eta.etaIso) return '';
+  const center = new Date(eta.etaIso);
+  if (Number.isNaN(center.getTime())) return '';
+  const sigmaMin = Math.max(0, Math.round(eta.sigmaMin ?? 0));
+  const start = new Date(center.getTime() - sigmaMin * 60_000);
+  const end = new Date(center.getTime() + sigmaMin * 60_000);
+  const startStr = formatTime(start);
+  const endStr = formatTime(end);
+  const depDay = departure.getDate();
+  const startNext = start.getDate() !== depDay;
+  const endNext = end.getDate() !== depDay;
+
+  if (sigmaMin <= 0) return startNext ? `次日 ${startStr}` : startStr;
+  if (startNext && endNext) return `次日 ${startStr}~${endStr}`;
+  if (!startNext && endNext) return `${startStr}~次日 ${endStr}`;
+  return `${startStr}~${endStr}`;
 }
 
 function spotNight(spot: ScenicSpot, eta: SpotEta | undefined): boolean {
@@ -400,6 +426,7 @@ function tick() {
   } catch {
     etasRef.value = [];
   }
+  scheduleWeatherFetch();
   const point = pointAtProgress(pathMetrics.path, pathMetrics.lengthKm, result.progress);
   if (trainMarker) trainTarget.value = [point.lng, point.lat];
   if (gpsMarker) {
@@ -432,29 +459,68 @@ const upcoming = computed(() => {
   });
   const spot = trip.scenicSpots.find((s) => s.name === u.name);
   const eta = etasRef.value.find((e) => e.spotId === String(spot?.id));
-  const timeLabel = eta?.etaIso
-    ? formatEtaLabel(eta, sch.departure)
-    : spot?.at
-    ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
-    : u.timeLabel;
-  return { ...u, timeLabel };
+
+  // 底栏只展示简短时刻；气泡详情仍用 formatEtaLabel
+  let timeBrief = '';
+  if (eta?.etaIso) timeBrief = formatEtaBrief(eta, sch.departure);
+  else if (spot?.at) timeBrief = formatSpotTimeLabel(spot.timeLabel, shifted(spot.at)) || '';
+  else if (u.timeLabel) timeBrief = u.timeLabel;
+
+  // 相对时间 / 状态提示：过滤掉「发车·首个计划风景点」这类冗长拼接
+  let hint = '';
+  if (progress.value >= 1) hint = '行程已结束';
+  else if (progress.value <= 0) hint = u.kind === 'spot' ? '发车后经过' : '发车后到达';
+  else if (u.reason && !u.reason.includes('发车') && !u.reason.includes('首个')) hint = u.reason;
+
+  const weather = spot ? weatherBySpotId.value[String(spot.id)] : undefined;
+  const wx = weather?.queried ? spotWeatherParts(weather, spot?.visibility) : null;
+
+  return { ...u, timeBrief, hint, wx, spotId: spot ? String(spot.id) : '', visibility: spot?.visibility };
 });
+
+const upcomingTitle = computed(() => {
+  if (progress.value >= 1) return '已到达';
+  const kind = upcoming.value?.kind;
+  if (progress.value <= 0) {
+    if (kind === 'spot') return '首个景点';
+    if (kind === 'station') return '下一站';
+    return '行程起点';
+  }
+  if (kind === 'spot') return '即将到达';
+  if (kind === 'station') return '下一站';
+  return '即将到达';
+});
+
+const upcomingMetaLine = computed(() => {
+  const u = upcoming.value;
+  if (!u) return '';
+  const parts: string[] = [];
+  if (u.timeBrief) parts.push(u.timeBrief);
+  if (u.hint) parts.push(u.hint);
+  return parts.join(' · ');
+});
+
+function wxHintClass(hint?: SpotWeatherParts['viewHint']): string {
+  if (hint === 'good') return 'is-good';
+  if (hint === 'poor') return 'is-poor';
+  if (hint === 'fair') return 'is-fair';
+  return '';
+}
 
 const locationInfo = computed(() => {
   const seg = segment.value;
   if (!seg) return { segment: '', meta: '' };
-  const pct = Math.round(progress.value * 100);
   const km = pathMetrics.lengthKm;
   if (progress.value <= 0) {
     return {
       segment: `${seg.fromName}站 · 尚未发车`,
-      meta: `全程约 ${Math.round(km)} 公里 · 进度 ${pct}%`,
+      meta: `全程约 ${Math.round(km)} 公里`,
     };
   }
   if (progress.value >= 1) {
     return {
       segment: `${seg.toName}站 · 已到达`,
-      meta: `全程 ${Math.round(km)} 公里 · 进度 100%`,
+      meta: `全程 ${Math.round(km)} 公里`,
     };
   }
   const n = Math.max(seg.stops.length - 1, 1);
@@ -469,7 +535,7 @@ const locationInfo = computed(() => {
   }
   return {
     segment: `${from.name} → ${to.name}`,
-    meta: `已行约 ${Math.round(progress.value * km)} km · 剩余 ${Math.round((1 - progress.value) * km)} km · ${pct}%`,
+    meta: `已行 ${Math.round(progress.value * km)} km · 剩余 ${Math.round((1 - progress.value) * km)} km`,
   };
 });
 
@@ -586,6 +652,88 @@ function toggleSatellite() {
   applySatelliteLayers();
 }
 
+/** 未经过景点按 ETA 批量拉天气；签名不变则跳过，避免 tick 刷爆 */
+function scheduleWeatherFetch() {
+  if (typeof window === 'undefined') return;
+  if (weatherFetchTimer) window.clearTimeout(weatherFetchTimer);
+  weatherFetchTimer = window.setTimeout(() => {
+    void fetchSpotWeathers();
+  }, 900);
+}
+
+async function fetchSpotWeathers() {
+  const etas = etasRef.value;
+  if (!etas.length) return;
+  const spotMap = new Map(trip.scenicSpots.map((s) => [String(s.id), s]));
+  const payload: Array<{
+    spotId: string;
+    lng: number;
+    lat: number;
+    atIso: string;
+    visibility?: string;
+  }> = [];
+  for (const eta of etas) {
+    if (eta.passed || !eta.etaIso) continue;
+    const spot = spotMap.get(String(eta.spotId));
+    if (!spot || !Number.isFinite(spot.lng) || !Number.isFinite(spot.lat)) continue;
+    payload.push({
+      spotId: String(spot.id),
+      lng: spot.lng,
+      lat: spot.lat,
+      atIso: eta.etaIso,
+      visibility: spot.visibility,
+    });
+    if (payload.length >= 40) break;
+  }
+  if (!payload.length) return;
+
+  const sig = payload.map((p) => `${p.spotId}:${p.atIso.slice(0, 13)}`).join('|');
+  if (sig === (fetchSpotWeathers as { _sig?: string })._sig) return;
+  (fetchSpotWeathers as { _sig?: string })._sig = sig;
+
+  const seq = ++weatherFetchSeq;
+  try {
+    const data = await api.getSpotWeathers(payload);
+    if (seq !== weatherFetchSeq) return;
+    const next: Record<string, SpotWeather> = { ...weatherBySpotId.value };
+    for (const item of data.items || []) {
+      if (item?.spotId) next[item.spotId] = item;
+    }
+    weatherBySpotId.value = next;
+  } catch {
+    /* 天气失败不阻断行程主流程 */
+  }
+}
+
+function weatherLineHtml(spotId: string, visibility?: string): string {
+  const w = weatherBySpotId.value[String(spotId)];
+  if (!w?.queried) return '';
+  const p = spotWeatherParts(w, visibility);
+  if (!p) return '';
+  const hintClass =
+    p.viewHint === 'good'
+      ? 'is-good'
+      : p.viewHint === 'poor'
+        ? 'is-poor'
+        : p.viewHint === 'fair'
+          ? 'is-fair'
+          : '';
+  const temp = p.temp ? `<span class="wx-strip__temp">${escHtml(p.temp)}</span>` : '';
+  const hint = p.hint
+    ? `<span class="wx-strip__hint ${hintClass}">${escHtml(p.hint)}</span>`
+    : p.vis
+      ? `<span class="wx-strip__vis">${escHtml(p.vis)}</span>`
+      : '';
+  return `<div class="wx-strip map-info-card__wx">
+      <div class="wx-strip__main">
+        <span class="wx-strip__emoji" aria-hidden="true">${escHtml(p.emoji)}</span>
+        ${p.cond ? `<span class="wx-strip__cond">${escHtml(p.cond)}</span>` : ''}
+        ${temp}
+      </div>
+      ${hint}
+    </div>`;
+}
+
 /**
  * 景点标记工厂：单个景点 → Marker（含点开后的详情气泡）。
  * 抽成函数是为了 B1：折线升级为精准路线后能整体重建标记层。
@@ -621,7 +769,12 @@ function buildSpotMarker(spot: ScenicSpot, idx: number) {
         ? formatSpotTimeLabel(spot.timeLabel, shifted(spot.at))
         : spot.timeLabel || '';
     const isNight = spotNight(spot, eta);
-    const isDegraded = eta?.basis === 'schedule' && eta?.confidence === 'low';
+    const weatherHtml = weatherLineHtml(String(spot.id), spot.visibility);
+    // 有天气观景提示时，不再单独挂「远眺/窗外」，避免与「远眺条件好」重复
+    const hideVisBadge = Boolean(
+      weatherBySpotId.value[String(spot.id)]?.queried &&
+        weatherBySpotId.value[String(spot.id)]?.viewHint,
+    );
     const sideBadgeHtml = (() => {
       const key = spotSideKey(spot);
       const text =
@@ -644,16 +797,12 @@ function buildSpotMarker(spot: ScenicSpot, idx: number) {
       : '';
     const badges = [
       sideBadgeHtml,
-      visLabel && visClass
+      !hideVisBadge && visLabel && visClass
         ? `<span class="map-info-card__badge map-info-card__badge--${visClass}">${escHtml(visLabel)}</span>`
         : '',
-      isNight ? `<span class="map-info-card__badge map-info-card__badge--night">夜间 🌙</span>` : '',
-      isDegraded ? `<span class="map-info-card__badge map-info-card__badge--degraded">按时刻表推算</span>` : '',
+      isNight ? `<span class="map-info-card__badge map-info-card__badge--night">夜间</span>` : '',
       timeLabel
         ? `<span class="map-info-card__badge map-info-card__badge--time">${escHtml(timeLabel)}</span>`
-        : '',
-      spot.sideConfidence === 'low'
-        ? `<span class="map-info-card__badge map-info-card__badge--lowSide">低置信度</span>`
         : '',
     ]
       .filter(Boolean)
@@ -666,6 +815,7 @@ function buildSpotMarker(spot: ScenicSpot, idx: number) {
           <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
           <div class="map-info-card__title">${escHtml(spot.name)}</div>
           ${badges ? `<div class="map-info-card__meta">${badges}</div>` : ''}
+          ${weatherHtml}
           ${honorHtml}
           ${spot.intro ? `<p class="map-info-card__intro">${escHtml(spot.intro)}</p>` : ''}
           <div class="map-info-card__arrow" aria-hidden="true"></div>
@@ -736,7 +886,7 @@ async function initMap() {
     zoom: 5,
     center: coords[0] || [104, 35],
     viewMode: '2D',
-    mapStyle: 'amap://styles/dark',
+    mapStyle: AMAP_MAP_STYLE,
   });
 
   if (coords.length >= 2) {
@@ -1066,6 +1216,7 @@ watch(approachingSpot, async () => {
 });
 
 onUnmounted(() => {
+  if (weatherFetchTimer) window.clearTimeout(weatherFetchTimer);
   window.removeEventListener('pagehide', onPageHidePersist);
   document.removeEventListener('visibilitychange', onVisibilityPersist);
   window.removeEventListener('resize', onWindowResize);
@@ -1249,29 +1400,51 @@ onUnmounted(() => {
         :spot="approachingSpot"
         :current-km="currentKm"
         :compact="compact"
+        :weather="approachingWeatherParts"
       />
 
       <footer class="bottom-panel">
         <section class="location-card">
           <div class="location-card__head">
             <h2>当前位置</h2>
-            <span class="location-mode" :class="{ 'is-schedule': mode.includes('时刻表') }">{{ mode }}</span>
+            <span
+              class="location-mode"
+              :class="{ 'is-schedule': mode.includes('时刻表') }"
+              :title="modeParts.note ? mode : undefined"
+            >
+              {{ modeParts.main }}
+            </span>
           </div>
           <div class="location-segment">{{ locationInfo.segment }}</div>
-          <div class="location-meta">{{ locationInfo.meta }}</div>
+          <div v-if="locationInfo.meta" class="location-meta">{{ locationInfo.meta }}</div>
         </section>
         <div class="panel-divider" />
         <section class="upcoming-card">
           <div class="bottom-panel__head">
-            <h2>{{ progress >= 1 ? '已到达' : progress <= 0 ? '发车后首站' : '即将到达' }}</h2>
-            <span class="progress-text">{{ Math.round(progress * 100) }}%</span>
+            <h2>{{ upcomingTitle }}</h2>
           </div>
-          <div class="next-name">{{ upcoming?.name }}</div>
-          <div class="next-meta">
-            <template v-if="upcoming?.timeLabel">计划 {{ upcoming.timeLabel }} · </template>
-            {{ upcoming?.reason }}
+          <div class="next-name">{{ upcoming?.name || '—' }}</div>
+          <div v-if="upcomingMetaLine" class="next-meta">{{ upcomingMetaLine }}</div>
+          <div v-if="upcoming?.wx" class="wx-strip">
+            <div class="wx-strip__main">
+              <span class="wx-strip__emoji" aria-hidden="true">{{ upcoming.wx.emoji }}</span>
+              <span v-if="upcoming.wx.cond" class="wx-strip__cond">{{ upcoming.wx.cond }}</span>
+              <span v-if="upcoming.wx.temp" class="wx-strip__temp">{{ upcoming.wx.temp }}</span>
+            </div>
+            <span
+              v-if="upcoming.wx.hint"
+              class="wx-strip__hint"
+              :class="wxHintClass(upcoming.wx.viewHint)"
+            >{{ upcoming.wx.hint }}</span>
+            <span v-else-if="upcoming.wx.vis" class="wx-strip__vis">{{ upcoming.wx.vis }}</span>
           </div>
-          <div class="progress-track"><div class="progress-bar" :style="{ transform: `scaleX(${progress})` }" /></div>
+          <div class="progress-track" role="progressbar" :aria-valuenow="progressPct" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar" :style="{ transform: `scaleX(${progress})` }" />
+          </div>
+          <div class="progress-foot">
+            <span>全程进度</span>
+            <span class="progress-foot__pct">{{ progressPct }}%</span>
+          </div>
         </section>
       </footer>
     </template>

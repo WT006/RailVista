@@ -1,0 +1,50 @@
+---
+description: RailVista 公路几何入库与沿程总览硬约束（索引≠可画、章节地名、进度跨度、总览取景）
+alwaysApply: true
+---
+
+# 公路入库与总览硬约束
+
+补 / 改 `data/roads/geom`、公路索引、沿程页地图时**必须**遵守。  
+详解与踩坑表：`docs/road-geometry-quality-playbook.md`。金标准观感对照 **G331**。
+
+## 1. 索引 ≠ 可展示
+
+- 搜索命中只说明 L0 在册；**地图展示以磁盘 `data/roads/geom/{key}.json` 为准**。
+- 禁止索引写 `hasGeom:true` 却无 geom 文件。
+- **单条补几何禁止**裸跑 `build-road-index.mjs --merge`（无 `--from-net` 会把省道打回 12 条种子）；只 patch 该 key，或全量用 `--from-net --merge`。
+
+## 2. 几何诚实
+
+- 长线抓取优先 `--provincial-tiling` 或 `pnpm roads:build`；禁止用「最长连通分量」冒充全线官方走向。
+- UI / API 必须标明「已贯通 km / 官方 km（%）」；端点与声明起讫 >50 km → `endpointsUnverified`。
+- orphan 段可虚线保留，禁止静默丢掉已知段又装作已贯通。
+
+## 3. 章节必须是「地名 — 地名」
+
+- 抓完几何后跑：`node scripts/fill-road-place-anchors.mjs --keys {key} --force`。
+- `/along` 的 `chapters[].title` 须为 `A — B`；**禁止**验收时仍是 `第 N 段 · a—b km`。
+- 末段 `toKm` 接到主链尽头；进度条徽章段号与标题地名不重复堆砌。
+
+## 4. 沿程进度与即将到达
+
+- **进度条 span = max(章节末, 主链 cumKm)**；禁止把 orphan 偏移里程 / 最远景点 progressKm 并进 span（否则章节挤左侧）。
+- 「即将到达」前方窗口空时，回退展示下一处起的最近景点；禁止有下游景点却空表。
+
+## 5. 总览地图
+
+- 主链实线 + 未贯通虚线；取景 **只跟路线几何**，勿被离线景点主导 bbox。
+- 多段用 `meet`，避免 `slice` 裁边段；观感对齐 G331「一条走廊带子」，不是碎线团。
+- 底部保留诚实断口说明。
+
+## 6. 单条入库清单
+
+```
+fetch-road-geometry（长线加 --provincial-tiling）
+→ fill-road-place-anchors --force
+→ patch 该 key 的 index（或 --from-net --merge）
+→ verify-road-network
+→ 冒烟 /drive/trip?road={key}（章节地名 + 总览 + 即将到达 + 进度条）
+```
+
+过不了 §1–§5 的不得当「已可展示」关闭任务。

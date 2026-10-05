@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.6.5`**（2026-10-03）
+**当前版本：`0.6.7`**（2026-10-05）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,49 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.6.7] — 2026-10-05
+
+**公路地图标记缩小，不再盖住中国轮廓。**
+
+- 国道详情 SVG：未贯通分量改为 `stroke-width: 0.55`、透明度 0.34；主链略细并 `non-scaling-stroke`。
+- 全线最多绘制 36 个高分景点圆点（`r=0.85`，原 160×`r=2.4`）；里程刻度仅在局部聚焦时显示。
+- 图集：单点 7px、省聚合 20–28px、铁路聚合 22–32px；热力半径 16。
+- 自驾页背景星点：光晕半径 6→2.15，图层透明度 0.26→0.16，避免盖住中国轮廓。
+- 国道详情选中分段后：圆点/「km」刻度按屏幕像素换算，不再随 viewBox 放大成巨圆巨字。
+- `@railvista/shared` 补上 `@types/node`，`spotGrid.test.ts` 可解析 `node:test`。
+
+---
+
+## [0.6.6] — 2026-10-05
+
+**公路三件事：境外景点、省道几何诚实披露、国道碎段拟合。**
+
+### 境外景点
+
+- 公路侧 1.2 万 POI 里，西藏省矩形把尼泊尔 / 锡金 / 不丹扫进来（`Everest viewpoint` 等）。
+- `isAdmissibleChinaPoi`：喜马拉雅南坡纯拉丁名 + 非 CN/HK/MO/TW 的 `addr:country` 剔除；中文名边境点（樟木、马卡鲁山）保留。
+- harvest 使用同一规则；运行时 `partitionByChinaLand` 再挡一层。
+
+### 省道及以下
+
+- 索引 `hasGeom` 按磁盘纠正：本机 `data/roads/geom` 只有 33 条国道时，不再谎称 1.4 万省道「已有几何」。
+- 搜索 limit 提到 80；首页 overview 请求含省道。无 `pnpm roads:build` 产物时点开省道仍显示待构建。
+- 覆盖说明写明几何目录 gitignore、需本地重建。
+
+### 国道拟合
+
+- `orderAndStitchAlongAxis`：按 2022 规划起讫轴定向分量，8km 内缝合城区断档。
+- 详情页未贯通段与主链同色绘制（不再 45% 虚线）。
+- G215 / G227 的 1981 官方里程作废（2022 已改线），避免 500%+ 假偏差。
+
+涉及：`spotGrid.ts`、`china-land.mjs`、`road-assemble.mjs`、`repair-road-corridor.mjs`、`roadNetwork.ts`、`DriveRoad.vue`、`DriveHome.vue`。
+
+验证：`pnpm --filter @railvista/shared test`；`node scripts/selftest-road-assemble.mjs`；`node scripts/repair-road-corridor.mjs`。
+
+已知限制：完整省道折线仍需 `data/roads/net/*.rvwn`（约 2.5GB）后 `pnpm roads:build`。国道大断口（>8km）仍分段，不飞线。
 
 ---
 

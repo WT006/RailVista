@@ -16,7 +16,7 @@ import {
   escHtml,
   isKnownDimension,
 } from '../data/spotDimensions';
-import { loadAmap } from '../map/amap';
+import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 
 const route = useRoute();
 const router = useRouter();
@@ -425,7 +425,7 @@ async function initMap() {
     zoom: 5,
     center: displayPath.value[0] || [104, 35],
     viewMode: '2D',
-    mapStyle: 'amap://styles/dark',
+    mapStyle: AMAP_MAP_STYLE,
   });
   map.getContainer().addEventListener('click', (event: MouseEvent) => {
     const t = event.target as HTMLElement;

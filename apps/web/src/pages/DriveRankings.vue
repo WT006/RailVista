@@ -22,6 +22,7 @@ const LEVEL_LABEL: Record<string, string> = {
   national: '官方榜',
   provincial: '省级',
   media: '媒体榜',
+  international: '国际榜',
 };
 
 onMounted(async () => {
@@ -46,8 +47,9 @@ onMounted(async () => {
       <header class="drive-hero">
         <h1>最美公路榜单</h1>
         <p class="sub">
-          榜单是路网之上的过滤器：国家精品自驾旅游公路、中国国家地理「中国最美公路」、
-          各地文旅/媒体榜单。点进任何一条，都复用主功能加载沿程景点。
+          榜单是路网之上的过滤器：国家精品自驾旅游公路、全国最美农村路、中国国家地理「中国最美公路」、
+          「此生必驾」国民公路榜、高德热门路线，以及美国国家地理、BBC、孤独星球等国际榜单。
+          国内条目点进去复用主功能加载沿程景点，海外路线仅供灵感参考。
         </p>
       </header>
 

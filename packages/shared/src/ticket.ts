@@ -192,7 +192,7 @@ export function createTicketConfig(kind: TicketKind): TicketConfig {
       route: {
         ends: [{ name: '西宁' }, { name: '西宁' }],
         waypoints: ['西宁', '青海湖', '茶卡', '敦煌', '西宁'],
-        shields: ['G6', 'G3011', 'G30', 'G109'],
+        shields: ['此生必驾109', 'G6', 'G3011', 'G109'],
         elevPoints: [2200, 3200, 3100, 3400, 3817, 1100, 2200],
         elevPeakLabel: '当金山口 3,817m',
       },

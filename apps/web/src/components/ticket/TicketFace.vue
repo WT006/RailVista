@@ -7,6 +7,7 @@
 import { computed } from 'vue';
 import type { TicketConfig } from '@railvista/shared';
 import { AIRLINES, ALLIANCES, TICKET_KIND_META, ticketTheme } from '../../data/ticket';
+import RoadShield from './RoadShield.vue';
 import brandLockup from '../../assets/heyworld-brand.png';
 import brandMark from '../../assets/heyworld-logo.png';
 
@@ -41,13 +42,8 @@ const alliance = computed(() => {
   return id ? ALLIANCES[id] ?? null : null;
 });
 
-/** 路牌制式：G+3位数字=国道红盾，其余 G/S 编号=高速绿盾 */
-const shields = computed(() =>
-  (props.config.route.shields ?? []).map((ref) => ({
-    ref,
-    national: /^G\d{3}$/.test(ref.trim().toUpperCase()),
-  })),
-);
+/** 路牌编号原样透传；制式（国家高速/国道/省道/此生必驾…）由 RoadShield 按 GB 自动识别 */
+const shields = computed(() => props.config.route.shields ?? []);
 
 /** 海拔剖面归一化路径（viewBox 320x52） */
 const elev = computed(() => {
@@ -225,21 +221,9 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
         </div>
 
         <!-- 自驾：路牌 + 海拔剖面 -->
+        <!-- 自驾：GB 制式路牌（自动识别国家高速/国道/省道/此生必驾） -->
         <div v-if="shields.length" class="tk__shields">
-          <svg v-for="s in shields" :key="s.ref" class="tk__shield" viewBox="0 0 40 44" aria-hidden="true">
-            <template v-if="!s.national">
-              <rect x="1" y="1" width="38" height="42" rx="5" fill="#0a7a3d" stroke="#fff" stroke-width="2" />
-              <rect x="1" y="1" width="38" height="11" rx="5" fill="#d0342c" />
-              <rect x="1" y="8" width="38" height="4" fill="#d0342c" />
-              <text x="20" y="9.5" font-size="6" fill="#fff" text-anchor="middle" font-family="sans-serif">国家高速</text>
-              <text x="20" y="33" :font-size="s.ref.length > 3 ? 12 : 15" fill="#fff" text-anchor="middle" font-weight="bold" font-family="sans-serif">{{ s.ref }}</text>
-            </template>
-            <template v-else>
-              <rect x="1" y="1" width="38" height="42" rx="5" fill="#d0342c" stroke="#fff" stroke-width="2" />
-              <text x="20" y="17" font-size="7" fill="#fff" text-anchor="middle" font-family="sans-serif">国道</text>
-              <text x="20" y="34" font-size="13" fill="#fff" text-anchor="middle" font-weight="bold" font-family="sans-serif">{{ s.ref }}</text>
-            </template>
-          </svg>
+          <RoadShield v-for="r in shields" :key="r" :code="r" />
         </div>
         <svg v-if="elev" class="tk__elev" viewBox="0 0 320 52" preserveAspectRatio="none" aria-hidden="true">
           <path :d="elev.area" fill="var(--tk-acc)" opacity=".16" />
@@ -495,8 +479,7 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
   border-top: 1.5px dashed color-mix(in srgb, var(--tk-acc) 55%, transparent); z-index: 1;
 }
 
-.tk__shields { display: flex; gap: 7px; flex-wrap: wrap; }
-.tk__shield { width: 38px; height: 42px; }
+.tk__shields { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
 .tk__elev { width: 100%; height: 52px; display: block; }
 
 .tk__routemeta { display: flex; justify-content: space-between; gap: var(--space-1); font-size: 11px; color: var(--tk-tx2); }

@@ -885,7 +885,7 @@ export interface RankingBoard {
     url?: string;
     publishedAt?: string;
   };
-  level: 'national' | 'provincial' | 'media';
+  level: 'national' | 'provincial' | 'media' | 'international';
   cover?: string;
   itemCount: number;
   items: RankingItem[];

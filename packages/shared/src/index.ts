@@ -15,3 +15,5 @@ export * from './schedule/scenic.js';
 export * from './schedule/spotSide.js';
 export * from './drive/index.js';
 export * from './ticket.js';
+export * from './roadSign.js';
+export * from './travelbook/index.js';

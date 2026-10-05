@@ -1,0 +1,31 @@
+{
+ "generatedAt": "2026-10-05T14:11:51.619Z",
+ "date": "2026-10-05",
+ "keyCount": 1,
+ "byClass": {
+  "national": {
+   "keys": 1,
+   "km": 10006.7,
+   "A": 1,
+   "B": 0,
+   "C": 0,
+   "X": 0,
+   "segments": 86,
+   "multiComponent": 1,
+   "dup": 0
+  }
+ },
+ "items": [
+  {
+   "key": "G219",
+   "cls": "national",
+   "totalKm": 10006.7,
+   "officialKm": 10065,
+   "deviationPct": -0.6,
+   "precision": "A",
+   "componentCount": 86,
+   "wayCount": 3161,
+   "points": 2579
+  }
+ ]
+}

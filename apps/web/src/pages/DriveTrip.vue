@@ -611,7 +611,7 @@ watch(gps, (sample) => {
                 class="drive-trip-map__dot"
                 :cx="spotPos(s)[0]"
                 :cy="spotPos(s)[1]"
-                r="2.4"
+                r="0.85"
                 :fill="tierColor(s.tier)"
                 :class="{ 'is-expanded': expandedSpotId === s.id }"
                 @click.stop="toggleSpot(s)"

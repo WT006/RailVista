@@ -182,7 +182,7 @@ function paintHotSpots(
     if (!pt) continue;
     const cx = pt[0]! * scale;
     const cy = pt[1]! * scale;
-    const glowR = 15 * scale;
+    const glowR = (warm ? 6 : 15) * scale;
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
     grad.addColorStop(0, `rgba(${inner}, 0.92)`);
     grad.addColorStop(0.35, `rgba(${outer}, ${(0.4 * (pt[2] ?? 0.6)).toFixed(3)})`);
@@ -211,7 +211,8 @@ function buildLayer(kind: LayerKind, width: number, height: number): HTMLCanvasE
   if (kind === 'rail') {
     paintPoints(ctx, CHINA_SCENIC_HEAT, scale, false, () => 1, 7);
   } else if (kind === 'heat') {
-    paintPoints(ctx, CHINA_ROAD_HEAT, scale, true, () => 1, 6);
+    // 全国视野下 glowScale=6 会糊成覆盖轮廓的光斑；背景星点只做点缀
+    paintPoints(ctx, CHINA_ROAD_HEAT, scale, true, () => 1, 2.15);
   } else {
     // 路网：构建期离线渲染的全国路网位图（含无编号的乡道村道与编号公路分级着色）
     if (roadImg && roadImg.complete && roadImg.naturalWidth > 0) {

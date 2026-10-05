@@ -24,6 +24,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { overpassQuery, haversineKm } from './lib/overpass.mjs';
 import { PROVINCE_BBOXES } from './lib/province-bbox.mjs';
+import { isAdmissibleHarvestPoi } from './lib/china-land.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const R = join(__dirname, '..');
@@ -322,9 +323,9 @@ function toSpot(row, provName) {
   const t = row.tags ?? {};
   const name = pickName(t);
   if (!name || name.length < 2) return null;
-  // 邻国境内景点对国内自驾无意义（G318 延伸段会把尼泊尔/印度的点带进来）
   if (row.lon < CN_BOUNDS.minLng || row.lon > CN_BOUNDS.maxLng) return null;
   if (row.lat < CN_BOUNDS.minLat || row.lat > CN_BOUNDS.maxLat) return null;
+  if (!isAdmissibleHarvestPoi({ lng: row.lon, lat: row.lat, name, tags: t })) return null;
   // 乐园/景区内部的单个游乐设施、店铺、餐饮：类别与真景点重叠，只能按名称剔除
   if (FACILITY_NAME_RE.test(name)) return null;
   let cat = null;

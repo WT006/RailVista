@@ -23,6 +23,20 @@ export function isValidRoadKey(key: string): boolean {
   return KEY_RE.test(key);
 }
 
+function geomFilePath(key: string): string {
+  return join(ROADS_DIR, 'geom', `${key.replace(/[:/\\*?"<>|]/g, '_')}.json`);
+}
+
+/**
+ * 索引 hasGeom 是上次完整构建留下的；本机 gitignore 掉 1.5 万条几何后会谎报「有折线」。
+ * 加载时按磁盘文件纠正，搜索仍能命中省道，点开则诚实显示「几何待构建」。
+ */
+function reconcileHasGeomFromDisk(entries: RoadIndexEntry[]): void {
+  for (const e of entries) {
+    e.hasGeom = existsSync(geomFilePath(e.key));
+  }
+}
+
 interface IndexFile {
   version: number;
   updated: string;
@@ -67,6 +81,7 @@ export function loadRoadIndex(): { entries: RoadIndexEntry[]; updated: string } 
     }
   }
   indexCache = { mtime, entries, updated };
+  reconcileHasGeomFromDisk(entries);
   return { entries, updated };
 }
 
@@ -332,6 +347,7 @@ const COVERAGE_NOTES = [
   '里程为「去重后里程」：双向分隔道路的平行对向车道只计一条，与官方里程可比',
   '精度分级 A/B/C：A=与官方里程偏差≤10%，B=≤25%，C=偏差更大或官方里程未知（多为规划调整过编号的老路）',
   '几何由 OSM 共享节点拓扑装配（连通分量 + 直行优先），未贯通处如实标注断点，不做插值拼接',
+  '省道/县道/乡道几何是构建产物（data/roads/geom，仓库不入库）。本机需 pnpm roads:build 才能打开编号折线；首页底图 PNG 仍含全等级路网',
 ];
 
 /**

@@ -6,7 +6,7 @@
  *
  * 用法：node scripts/selftest-road-assemble.mjs   （退出码 0 = 全绿）
  */
-import { assembleComponents, computeGaps } from './lib/road-assemble.mjs';
+import { assembleComponents, computeGaps, orderAndStitchAlongAxis } from './lib/road-assemble.mjs';
 const mk = (id, ref, pts) => ({
   id, ref, name: 't', highway: 'primary', cls: 'G', flag: 0,
   nodeIds: Float64Array.from(pts.map((p) => p[2])),
@@ -53,6 +53,13 @@ const eq = (name, cond, extra = '') => { if (cond) { pass++; console.log('  ✓ 
   const ways = [mk(1,'G1',[[0,0,1],[0.01,0,2],[0.01,0.01,3],[0,0.01,4],[0,0,1]])];
   const r = assembleComponents(ways);
   eq('闭环保留为一条分量', r.components.length === 1 && r.components[0].lengthM > 4000, String(r.components[0]?.lengthM));
+}
+// 7) 按起讫轴定向：东段排在上海→聂拉木方向的前方
+{
+  const east = [[120, 31], [121, 31]];
+  const west = [[86, 28], [87, 28]];
+  const r = orderAndStitchAlongAxis([west, east], [121.5, 31.2], [86, 28], 8000);
+  eq('轴向排序：靠近起点的分量在前', r.components[0].points[0][0] > 119, JSON.stringify(r.components[0].points[0]));
 }
 console.log('\n' + (fail ? 'FAIL ' + fail : 'PASS') + '（' + pass + ' 项通过）');
 process.exit(fail ? 1 : 0);

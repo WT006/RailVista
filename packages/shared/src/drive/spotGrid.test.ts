@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -5,6 +6,8 @@ import {
   SPOT_GRID_CELL_DEG,
   bboxOfCoords,
   buildSpotGrid,
+  inHimalayaExteriorBand,
+  isAdmissibleChinaPoi,
   isWithinChinaLand,
   partitionByChinaLand,
   queryGrid,
@@ -50,6 +53,41 @@ describe('drive/spotGrid CHINA_LAND_BBOX', () => {
   it('isWithinChinaLand returns false for NaN', () => {
     assert.equal(isWithinChinaLand(NaN, 30), false);
     assert.equal(isWithinChinaLand(100, NaN), false);
+  });
+});
+
+describe('drive/spotGrid Himalaya / foreign POI', () => {
+  it('keeps Chinese-named border towns, drops Nepal latin names in the same bbox', () => {
+    assert.equal(inHimalayaExteriorBand(86.68, 27.96), true);
+    assert.equal(
+      isAdmissibleChinaPoi({ name: 'Everest viewpoint', lng: 86.68, lat: 27.96 }),
+      false,
+    );
+    assert.equal(
+      isAdmissibleChinaPoi({ name: '樟木口岸', lng: 85.98, lat: 27.97 }),
+      true,
+    );
+    assert.equal(
+      isAdmissibleChinaPoi({ name: '马卡鲁山', lng: 87.09, lat: 27.89 }),
+      true,
+    );
+  });
+
+  it('drops osmTags country outside CN/HK/MO/TW', () => {
+    assert.equal(
+      isAdmissibleChinaPoi({
+        id: 'np',
+        name: 'Some Peak',
+        lng: 100,
+        lat: 30,
+        tier: 'B',
+        category: 'x',
+        score: 60,
+        source: 'osm',
+        osmTags: { 'addr:country': 'NP' },
+      } as RoadsideSpot & { osmTags: Record<string, string> }),
+      false,
+    );
   });
 });
 

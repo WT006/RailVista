@@ -524,7 +524,7 @@ function renderRailSpots(list: AtlasSpotLite[]) {
       clusterByZoomChange: false,
       renderClusterMarker: (context: any) => {
         const count = context.count || 0;
-        const size = count < 10 ? 30 : count < 50 ? 36 : 44;
+        const size = count < 10 ? 22 : count < 50 ? 26 : 32;
         const color = dominantClusterColor(clusterItems(context));
         context.marker.setContent(
           `<div class="atlas-cluster" style="--cluster:${color};width:${size}px;height:${size}px">${count}</div>`,
@@ -539,7 +539,7 @@ function renderRailSpots(list: AtlasSpotLite[]) {
         context.marker.setContent(
           `<span class="atlas-dot" style="--dot:${color}" title="${escHtml(spot.name)}"></span>`,
         );
-        context.marker.setOffset(new AMapRef.Pixel(-6, -6));
+        context.marker.setOffset(new AMapRef.Pixel(-3.5, -3.5));
         context.marker.on('click', () => selectSpot(spot));
       },
     });
@@ -604,7 +604,7 @@ function renderRoadSpots(list: AtlasSpotLite[]) {
       scoreSum += s.score ?? 60;
     }
     const count = items.length;
-    const size = count < 50 ? 28 : count < 300 ? 34 : 42;
+    const size = count < 50 ? 20 : count < 300 ? 24 : 28;
     const label = prov || '未标注省份';
     const marker = new AMapRef.Marker({
       position: [lng / count, lat / count],
@@ -698,7 +698,7 @@ function renderHeat() {
 
   try {
     heat = new HeatMapCtor(map, {
-      radius: 28,
+      radius: 16,
       opacity: [0, 0.72],
       gradient: {
         0.25: '#38bdf8',
@@ -2165,8 +2165,8 @@ watch(spotOrigin, (v) => {
 /* AMap 注入 DOM 的全局片段 */
 .atlas-dot {
   display: block;
-  width: 12px;
-  height: 12px;
+  width: 7px;
+  height: 7px;
   border-radius: 999px;
   background: var(--dot, #94a3b8);
   box-shadow:

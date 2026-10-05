@@ -218,7 +218,7 @@ async function refreshRoadCandidates() {
   }
   roadBusy.value = true;
   try {
-    const data = await api.suggestDrivePlaces(q, 'road', 60);
+    const data = await api.suggestDrivePlaces(q, 'road', 80);
     let hits = data.hits;
     if (needsProvince.value && selectedProvince.value) {
       hits = hits.filter((h) => h.id.startsWith(`${selectedProvince.value}:`));

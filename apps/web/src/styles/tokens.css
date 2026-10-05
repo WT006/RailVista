@@ -161,7 +161,7 @@
   --backdrop-map-color: #b3cfff;
   /* 自驾页公路网背景（AppBackdrop is-road）：低于铁路星点，避免密网过亮 */
   --backdrop-road-net-opacity: 0.22;
-  --backdrop-road-heat-opacity: 0.26;
+  --backdrop-road-heat-opacity: 0.16;
 }
 
 /* ── 断点：sm ≥600 / md ≥840 / lg ≥1200 ────────────────────────────────────

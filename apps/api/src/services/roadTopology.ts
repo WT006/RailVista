@@ -400,6 +400,6 @@ export function roadTopologyInfo(): { loaded: boolean; nodeCount: number; edgeCo
     loaded: !!state?.loaded,
     nodeCount: state?.nodeCount || 0,
     edgeCount: state?.edgeCount || 0,
-    roadKeyCount: state?.roadKeys.length || 0,
+    roadKeyCount: state?.roadKeys?.length || 0,
   };
 }

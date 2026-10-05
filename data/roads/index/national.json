@@ -756,11 +756,13 @@
   {
    "key": "G215",
    "ref": "G215",
-   "name": "柳格线",
+   "name": "马宁线",
    "class": "national",
    "provinces": [
     "甘肃",
-    "青海"
+    "青海",
+    "四川",
+    "云南"
    ],
    "fromPlace": "马鬃山",
    "toPlace": "宁洱",
@@ -1038,11 +1040,13 @@
   {
    "key": "G227",
    "ref": "G227",
-   "name": "宁张线",
+   "name": "张孟线",
    "class": "national",
    "provinces": [
+    "甘肃",
     "青海",
-    "甘肃"
+    "四川",
+    "云南"
    ],
    "fromPlace": "张掖",
    "toPlace": "孟连",

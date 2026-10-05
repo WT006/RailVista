@@ -363,6 +363,10 @@ export const api = {
   },
   /** 地图公路图层（抽稀折线） */
   getDriveNetworkOverview() {
+    const qs = new URLSearchParams({
+      classes: 'expressway,national,provincial',
+      limit: '800',
+    });
     return request<{
       roads: Array<{
         key: string;
@@ -373,7 +377,7 @@ export const api = {
         lengthKm: number;
       }>;
       updated: string;
-    }>('/drive/network/overview');
+    }>(`/drive/network/overview?${qs}`);
   },
   /** 榜单列表 */
   getDriveBoards() {

@@ -1365,16 +1365,27 @@
 .drive-trip-map__route {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 2.6;
-  stroke-opacity: 0.95;
+  stroke-width: 1.35;
+  stroke-opacity: 0.92;
   stroke-linejoin: round;
   stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* 未贯通分量：发丝线，不与中国轮廓抢视觉 */
+.drive-trip-map__segment {
+  fill: none;
+  stroke-width: 0.55;
+  stroke-opacity: 0.34;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .drive-trip-map__dot {
   cursor: pointer;
   stroke: var(--surface-0);
-  stroke-width: 0.8;
+  stroke-width: 0.25;
 }
 
 .drive-trip-map__dot.is-expanded {
@@ -2455,11 +2466,10 @@
 
 .drive-trip-map__tick-text {
   fill: var(--text-3);
-  font-size: 7px;
   font-family: var(--font-mono, monospace);
   paint-order: stroke;
   stroke: var(--surface-0);
-  stroke-width: 2px;
+  stroke-width: 0.12em;
   stroke-linejoin: round;
 }
 

@@ -68,10 +68,15 @@ html {
   isolation: isolate;
   min-height: 100dvh;
   padding-bottom: var(--space-8);
+  /*
+   * 末层底色改为 transparent：背景层已从各页面内提升到 App 根（AppBackdrop），
+   * 页面若仍铺一层不透明 --surface-0 就会把背景整块盖住。
+   * 页面底色由 body（base.css 的 --surface-0）兜底，观感不变。
+   */
   background:
     radial-gradient(ellipse 70% 42% at 10% -8%, var(--accent-soft), transparent 58%),
     radial-gradient(ellipse 60% 38% at 92% 4%, var(--fill-accent), transparent 55%),
-    var(--surface-0);
+    transparent;
   color: var(--text-1);
 }
 
@@ -380,7 +385,9 @@ html {
 }
 
 .select-form label,
-.od-panel label {
+.od-panel label,
+/* 自驾页 OD 搜索复用铁路版「站点输入」观感（station-field 结构一致） */
+.drive-od .station-field {
   display: grid;
   gap: var(--space-2);
   font-size: var(--fs-meta);
@@ -388,7 +395,8 @@ html {
 }
 
 .select-form input,
-.od-panel select {
+.od-panel select,
+.drive-od .station-field input {
   width: 100%;
   padding: 0 var(--space-3);
   min-height: 46px;
@@ -409,17 +417,20 @@ html {
 }
 
 /* 输入框占位符：弱化但保持可辨识 */
-.select-form input::placeholder {
+.select-form input::placeholder,
+.drive-od .station-field input::placeholder {
   color: var(--text-3);
 }
 
 .select-form input:hover,
-.od-panel select:hover {
+.od-panel select:hover,
+.drive-od .station-field input:hover {
   border-color: var(--line-strong);
 }
 
 .select-form input:focus,
-.od-panel select:focus {
+.od-panel select:focus,
+.drive-od .station-field input:focus {
   outline: none;
   border-color: var(--accent);
   background: var(--surface-3);
@@ -446,7 +457,11 @@ html {
   border-radius: var(--radius-md);
   /* 弹出层压在卡内字段上：提高不透明度 + 玻璃模糊，避免「乘车日期」等透字重叠。
    * 父级 .rv-card 已有 backdrop-filter 时，嵌套 blur 在部分引擎会弱化，
-   * 故底色需比 --surface-1 更实，blur 作为增强而非唯一屏障。 */
+   * 故底色需比 --surface-1 更实，blur 作为增强而非唯一屏障。
+   * V1-1：color-mix() 在 Chrome 111 以下 / Safari 16.2 以下 / 鸿蒙早期 ArkWeb 不支持，
+   * 该条声明会被整条丢弃 → 下拉框完全透明 → 与卡片玻璃叠加后文字重叠。
+   * 用「不透明声明在前、color-mix 在后」的双声明兜底：不支持时自动回退到不透明底色。 */
+  background: var(--surface-0);
   background: color-mix(in srgb, var(--surface-0) 88%, transparent);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));

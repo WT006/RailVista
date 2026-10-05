@@ -19,6 +19,7 @@ import {
   api,
   type AtlasCorridorLite,
   type AtlasOverviewData,
+  type AtlasRoadCorridorLite,
   type AtlasSpotLite,
 } from '../api/client';
 import { RANKINGS } from '../data/beautifulRailings';
@@ -50,11 +51,63 @@ const heatOn = ref(false);
 const sidebarOpen = ref(true);
 const query = ref('');
 const activeDims = ref<string[]>([]);
+/** 省份筛选（铁路侧仅 192/624 有值，公路侧已全量补齐） */
+const activeProvinces = ref<string[]>([]);
 const selectedCorridorId = ref('');
 const stats = ref<AtlasOverviewData['meta'] | null>(null);
 
 const corridors = ref<AtlasCorridorLite[]>([]);
 const spots = ref<AtlasSpotLite[]>([]);
+/** 双源融合：公路线路与公路景点（公路景点已排除从铁路迁移来的条目） */
+const roadCorridors = ref<AtlasRoadCorridorLite[]>([]);
+const roadSpots = ref<AtlasSpotLite[]>([]);
+/**
+ * 景点来源筛选：all=铁路+公路都显示，rail/road=只看一侧。
+ * /drive/atlas 进来默认 'road'（此前该页标题硬编码「铁路景点地图」、
+ * Top10 与排行榜全是铁路数据，公路侧等于空壳 —— 需求方指出的严重问题）。
+ */
+const spotOrigin = ref<'all' | 'rail' | 'road'>(props.drive ? 'road' : 'all');
+/** 公路榜单（快捷入口用） */
+const roadBoards = ref<Array<{ id: string; title: string; level: string; itemCount: number }>>([]);
+
+/**
+ * v0.6.3：公路侧数据改为**按需加载**。
+ * 之前 /atlas/overview 一次返回 4.4MB（624 铁路 + 1.2 万公路景点），
+ * 浏览器解析 4.2 万行 JSON 再把 1.2 万个点丢给 AMap 聚类，主线程长时间阻塞，
+ * 侧栏一直停在「正在加载」且景点统计全为 0。现在 overview 只回铁路（~200KB），
+ * 公路明细走 /atlas/road：切到公路来源、或打开公路图层时才拉。
+ */
+const roadLoading = ref(false);
+const roadLoaded = ref(false);
+const roadError = ref('');
+
+async function loadRoad(): Promise<void> {
+  if (roadLoaded.value || roadLoading.value) return;
+  roadLoading.value = true;
+  roadError.value = '';
+  try {
+    const d = await api.getAtlasRoad();
+    roadCorridors.value = d.roadCorridors || [];
+    roadSpots.value = (d.roadSpots || []).map((s) => ({ ...s, origin: 'road' as const }));
+    roadLoaded.value = true;
+    if (stats.value) {
+      stats.value = {
+        ...stats.value,
+        roadCorridorCount: d.meta.roadCorridorCount,
+        roadSpotCount: d.meta.roadSpotCount,
+        roadMigratedExcluded: d.meta.roadMigratedExcluded,
+      };
+    }
+    renderSpots();
+    // 公路点进来后热力图要跟着重算，否则仍按铁路的 624 点渲染
+    if (heatOn.value) renderHeat();
+    if (roadLayerOn.value) renderRoadLayer();
+  } catch (e) {
+    roadError.value = e instanceof Error ? e.message : '公路图层加载失败';
+  } finally {
+    roadLoading.value = false;
+  }
+}
 
 let map: any = null;
 let AMapRef: any = null;
@@ -65,23 +118,16 @@ let highlightLine: any = null;
 let focusMarker: any = null;
 let baseLines: any[] = [];
 let plainMarkers: any[] = [];
+/** 公路侧普通 Marker 列表（renderRoadSpots 维护） */
+let roadPlainMarkers: any[] = [];
 /** corridorId → 折线，供点击/搜索后 fitView */
 const lineByCorridor = new Map<string, any>();
 
-// ── 公路图层（/drive/atlas）：与铁路图层共存，独立开关 ────────────────────────
+// ── 公路图层：与铁路图层共存，独立开关 ────────────────────────────────────────
+// v0.5.5：数据直接取 /atlas/overview 的 roadCorridors，不再单独请求
+// /drive/network/overview —— 同一份折线在同页出现两次是纯浪费。
 const roadLayerOn = ref(false);
-const roadLines = ref<Array<{ key: string; ref: string; name?: string; class: string; polyline: [number, number][]; lengthKm: number }>>([]);
 let roadPolylines: any[] = [];
-
-async function loadRoadLayer() {
-  if (roadLines.value.length) return;
-  try {
-    const data = await api.getDriveNetworkOverview();
-    roadLines.value = data.roads;
-  } catch {
-    /* 公路图层加载失败不影响铁路图 */
-  }
-}
 
 function renderRoadLayer() {
   if (!map || !AMapRef) return;
@@ -94,8 +140,8 @@ function renderRoadLayer() {
   }
   roadPolylines = [];
   if (!roadLayerOn.value) return;
-  for (const r of roadLines.value) {
-    if (r.polyline.length < 2) continue;
+  for (const r of roadCorridors.value) {
+    if (!r.polyline || r.polyline.length < 2) continue;
     const line = new AMapRef.Polyline({
       path: r.polyline,
       strokeColor: roadColor(r.class),
@@ -116,34 +162,127 @@ function renderRoadLayer() {
 
 async function toggleRoadLayer() {
   roadLayerOn.value = !roadLayerOn.value;
-  if (roadLayerOn.value) await loadRoadLayer();
+  if (roadLayerOn.value) await loadRoad();
   renderRoadLayer();
 }
 
 const corridorName = computed(() => {
   const map = new Map<string, string>();
   for (const c of corridors.value) map.set(c.id, c.name);
+  // 公路线路的 corridorIds 存的是 road key，名册里一并登记，弹窗才能显示线路名
+  for (const r of roadCorridors.value) map.set(r.key, r.name ? `${r.ref} ${r.name}` : r.ref);
   return map;
+});
+
+/** 按来源筛选后的景点全集（铁路 + 公路） */
+const spotsByOrigin = computed(() => {
+  const o = spotOrigin.value;
+  if (o === 'rail') return spots.value;
+  if (o === 'road') return roadSpots.value;
+  return spots.value.concat(roadSpots.value);
 });
 
 const selectedCorridor = computed(
   () => corridors.value.find((c) => c.id === selectedCorridorId.value) || null,
 );
 
-/** 六维筛选：未选 = 全部；选中后 = 命中任一维度（含「其它」= 无有效维度的景点） */
+/**
+ * 六维 + 省份筛选：未选 = 全部；选中后 = 同时命中（维度取"任一"，省份取"任一"）。
+ * 先按来源（铁路/公路）筛，再按维度与省份筛 —— 来源筛选是双源融合后新增的一层。
+ */
 const filteredSpots = computed(() => {
-  if (!activeDims.value.length) return spots.value;
-  const set = new Set(activeDims.value);
-  return spots.value.filter((s) => {
-    const dims = resolveSpotDimensions(s);
-    if (!dims.length) return set.has('other');
-    return dims.some((d) => set.has(d));
-  });
+  let base = spotsByOrigin.value;
+  if (activeDims.value.length) {
+    const set = new Set(activeDims.value);
+    base = base.filter((s) => {
+      const dims = resolveSpotDimensions(s);
+      if (!dims.length) return set.has('other');
+      return dims.some((d) => set.has(d));
+    });
+  }
+  if (activeProvinces.value.length) {
+    const ps = new Set(activeProvinces.value);
+    base = base.filter((s) => (s.province ?? '').length > 0 && ps.has(s.province!));
+  }
+  return base;
 });
+
+/** 省份选项：按当前来源范围内出现的省份聚合，计数从多到少 */
+const provinceOptions = computed(() => {
+  const counter = new Map<string, number>();
+  for (const s of spotsByOrigin.value) {
+    if (!s.province) continue;
+    counter.set(s.province, (counter.get(s.province) ?? 0) + 1);
+  }
+  return [...counter.entries()]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'zh'));
+});
+
+function toggleProvince(name: string) {
+  if (activeProvinces.value.includes(name)) {
+    activeProvinces.value = activeProvinces.value.filter((p) => p !== name);
+  } else {
+    activeProvinces.value = [...activeProvinces.value, name];
+  }
+}
+
+/**
+ * 景点统计（侧栏顶部）：当前筛选范围内的来源分布与分级分布。
+ * 用 Progress 条呈现（鸿蒙展示类规范：数据可视化用进度/占比表达，不用纯数字堆砌）。
+ *
+ * 公路明细按需加载期间不显示数字 —— 直接算会得到 0，表现为"切来源后统计先掉 0
+ * 再跳到一万多"，正是需求方说的"切换时跳一下"。此时显示加载态。
+ */
+const spotStats = computed(() => {
+  const roadPending = roadLoading.value && spotOrigin.value !== 'rail';
+  if (roadPending) {
+    return { total: spotsByOrigin.value.length, rail: spotsByOrigin.value.length, road: 0, byTier: {}, pending: true };
+  }
+  const list = filteredSpots.value;
+  const rail = list.filter((s) => s.origin === 'rail').length;
+  const road = list.length - rail;
+  const byTier: Record<string, number> = {};
+  for (const s of list) {
+    const t = s.tier ?? '—';
+    byTier[t] = (byTier[t] ?? 0) + 1;
+  }
+  return { total: list.length, rail, road, byTier, pending: false };
+});
+
+/**
+ * 景点排名（铁路 / 公路各一份）。
+ * 公路侧有 score（0–100）直接按分排序；铁路侧数据源没有评分字段，
+ * 退化为"被多条铁路线路收录 = 知名度高"，并在 UI 上如实标注依据。
+ */
+const topRailSpots = computed(() =>
+  spots.value
+    .slice()
+    .sort(
+      (a, b) =>
+        (b.corridorIds?.length ?? 0) - (a.corridorIds?.length ?? 0) ||
+        a.name.localeCompare(b.name, 'zh'),
+    )
+    .slice(0, 10),
+);
+
+const topRoadSpots = computed(() =>
+  roadSpots.value
+    .slice()
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || a.name.localeCompare(b.name, 'zh'))
+    .slice(0, 10),
+);
 
 const dimOptions = [...SPOT_DIMENSIONS, UNCLASSIFIED_DIMENSION];
 
-/** 沿线景点最多的线路 Top10（按客户端统计的 spotCount） */
+/** 景点来源筛选选项：冷蓝=铁路（与铁路侧星点同色），琥珀=公路（与公路侧星点同色） */
+const ORIGIN_OPTIONS = [
+  { key: 'all' as const, label: '全部', color: '#9aa7b8' },
+  { key: 'rail' as const, label: '铁路', color: '#4d9fff' },
+  { key: 'road' as const, label: '公路', color: '#ffb84d' },
+];
+
+/** 铁路：沿线景点最多的线路 Top10（按客户端统计的 spotCount） */
 const topCorridors = computed(() =>
   corridors.value
     .filter((c) => c.spotCount > 0)
@@ -152,7 +291,18 @@ const topCorridors = computed(() =>
     .slice(0, 10),
 );
 
-const maxSpotCount = computed(() => topCorridors.value[0]?.spotCount || 1);
+/** 公路：沿线景点最多的编号公路 Top10（此前 /drive/atlas 完全没有这一块，是空壳） */
+const topRoadCorridors = computed(() =>
+  roadCorridors.value
+    .filter((r) => r.spotCount > 0)
+    .slice()
+    .sort((a, b) => b.spotCount - a.spotCount || b.lengthKm - a.lengthKm)
+    .slice(0, 10),
+);
+
+const maxSpotCount = computed(
+  () => Math.max(topCorridors.value[0]?.spotCount || 1, topRoadCorridors.value[0]?.spotCount || 1),
+);
 
 /** 排行榜快捷清单：去重后的上榜线路 */
 const rankingShortcuts = computed(() => {
@@ -213,6 +363,12 @@ function toggleDim(key: string) {
 
 function clearDims() {
   activeDims.value = [];
+}
+
+/** 一键清空全部筛选条件（维度 + 省份） */
+function clearFilters() {
+  activeDims.value = [];
+  activeProvinces.value = [];
 }
 
 function corridorSpotsText(spot: AtlasSpotLite): string {
@@ -338,12 +494,29 @@ function clearCluster() {
 
 function renderSpots() {
   if (!map || !AMapRef) return;
+  /*
+   * v0.6.4 按来源分流渲染，消除"切换来源时地图跳一下"：
+   *   · 铁路点（≤ ~1k）走 MarkerCluster，保留聚合圆圈与维度着色；
+   *   · 公路点（1.2 万）走独立图层 + 4000 个绘制上限，
+   *     全部塞进 MarkerCluster 会长时间阻塞主线程，表现为切到公路时地图卡住再跳一下。
+   * 两侧各自独立重建/销毁，切换来源时另一侧保持不动。
+   */
   const list = filteredSpots.value;
+  const railList = list.filter((s) => s.origin !== 'road');
+  const roadList = list.filter((s) => s.origin === 'road');
+
+  renderRailSpots(railList);
+  renderRoadSpots(roadList);
+}
+
+function renderRailSpots(list: AtlasSpotLite[]) {
+  if (!map || !AMapRef) return;
   const data = list.map((s) => ({ lnglat: [s.lng, s.lat], spot: s }));
 
   if (typeof AMapRef.MarkerCluster === 'function') {
     // 着色逻辑变更后必须重建，避免沿用旧的全蓝 renderClusterMarker
     clearCluster();
+    if (!data.length) return;
     cluster = new AMapRef.MarkerCluster(map, data, {
       gridSize: 70,
       maxZoom: 12,
@@ -373,7 +546,7 @@ function renderSpots() {
     return;
   }
 
-  // 降级：聚合插件不可用时直接画普通 Marker（点位上限 600，避免过载）
+  // 降级：聚合插件不可用时直接画普通 Marker
   clearCluster();
   for (const item of data.slice(0, 600)) {
     const spot = item.spot;
@@ -387,6 +560,94 @@ function renderSpots() {
     map.add(m);
     plainMarkers.push(m);
   }
+}
+
+/**
+/**
+/**
+ * 公路侧点渲染：**省级聚合标记**（不是逐点画）。
+ *
+ * 走过的两条弯路，都留在这里别再踩：
+ *  1. AMap.MassMarks（Canvas 批量绘制）—— 实测在当前环境下**一个点都不画**，
+ *     MassMarks 是图片标记 API，内联 SVG data URI + anchor 都不生效。
+ *  2. 普通 Marker 逐点画 —— 实测 4000 个 Marker 产生 **10.7 秒主线程长任务**
+ *     （约 2.7ms/Marker），页面直接卡死。1.2 万点这条路根本走不通。
+ *
+ * 现在的方案：按省份聚合成 30 来个标记（瞬时渲染），
+ * 密度交给热力图层承载（AMap.HeatMap 走 canvas，1.2 万点无压力，
+ * 权重口径见 renderHeat）。这与参考 UI 的聚合圆圈是同一种表达。
+ * 点击省标记 = 切换该省的筛选，侧栏统计与榜单随之收敛。
+ */
+function renderRoadSpots(list: AtlasSpotLite[]) {
+  if (!map || !AMapRef) return;
+  // 切到公路来源但明细还在加载时保持上一次渲染，避免"点先消失再冒出来"
+  if (!list.length && roadLoading.value) return;
+  clearRoadSpots();
+  if (!list.length) return;
+
+  // 按省份聚合
+  const groups = new Map<string, AtlasSpotLite[]>();
+  for (const s of list) {
+    const key = s.province ?? '';
+    const arr = groups.get(key);
+    if (arr) arr.push(s);
+    else groups.set(key, [s]);
+  }
+
+  for (const [prov, items] of groups) {
+    let lng = 0;
+    let lat = 0;
+    let scoreSum = 0;
+    for (const s of items) {
+      lng += s.lng;
+      lat += s.lat;
+      scoreSum += s.score ?? 60;
+    }
+    const count = items.length;
+    const size = count < 50 ? 28 : count < 300 ? 34 : 42;
+    const label = prov || '未标注省份';
+    const marker = new AMapRef.Marker({
+      position: [lng / count, lat / count],
+      content:
+        '<div class="atlas-prov-cluster" data-prov="' + escHtml(prov) + '" style="width:' + size + 'px;height:' + size + 'px">' +
+        '<span class="atlas-prov-cluster__name">' + escHtml(label) + '</span>' +
+        '<em class="atlas-prov-cluster__num">' + count + '</em>' +
+        '</div>',
+      offset: new AMapRef.Pixel(-size / 2, -size / 2),
+      zIndex: 95,
+      cursor: 'pointer',
+      title: label + ' · ' + count + ' 处景点（点击只看该省）',
+    });
+    map.add(marker);
+    roadPlainMarkers.push(marker);
+  }
+}
+
+/**
+ * 省聚合标记的点击：走**地图容器上的事件委托**而不是 Marker.on('click')。
+ * AMap 2.0 的 Marker 事件在部分环境下不稳定触发（合成点击测不到），
+ * 委托到容器上用 data-prov 判定最可靠，行为与用户直觉一致。
+ */
+function onMapClickDelegated(event: MouseEvent) {
+  const el = (event.target as HTMLElement)?.closest?.('[data-prov]') as HTMLElement | null;
+  const prov = el?.dataset?.prov;
+  if (!prov) return;
+  if (activeProvinces.value.includes(prov)) {
+    activeProvinces.value = activeProvinces.value.filter((p) => p !== prov);
+  } else {
+    activeProvinces.value = [prov];
+  }
+}
+
+function clearRoadSpots() {
+  for (const m of roadPlainMarkers) {
+    try {
+      map?.remove(m);
+    } catch {
+      /* ignore */
+    }
+  }
+  roadPlainMarkers = [];
 }
 
 function resolveHeatMapCtor(): (new (...args: any[]) => any) | null {
@@ -415,10 +676,24 @@ function renderHeat() {
     return;
   }
 
-  // HeatMap 走 canvas，颜色必须是实色；CSS 变量无效会导致整层不渲染
+  /*
+   * HeatMap 走 canvas，颜色必须是实色；CSS 变量无效会导致整层不渲染。
+   *
+   * 权重口径（v0.6.4 修正）：原先每点 count 固定 1、max 按总数动态
+   * （`points.length / 80`）。切到公路来源后点数从 624 涨到 1.2 万，
+   * max 随之变成 ~151，单点相对强度降到 1/151 —— 热力层几乎不可见，
+   * 表现为「热力图开关打开但看不到东西」。
+   * 改为：max 固定 12（有评分用评分、无评分用 1），密度差异由点数与评分共同表达，
+   * 两侧来源的观感一致，且高评分景点自然更热。
+   */
   const points = filteredSpots.value
     .filter((s) => Number.isFinite(s.lng) && Number.isFinite(s.lat))
-    .map((s) => ({ lng: s.lng, lat: s.lat, count: 1 }));
+    .map((s) => ({
+      lng: s.lng,
+      lat: s.lat,
+      // 评分 0–100 → 1–12；无评分（铁路侧数据源无 score）按 6 计
+      count: Number.isFinite(s.score) ? Math.max(1, Math.min(12, s.score! / 8)) : 6,
+    }));
   if (!points.length) return;
 
   try {
@@ -436,7 +711,8 @@ function renderHeat() {
       zIndex: 120,
     });
     heat.setDataSet({
-      max: Math.max(3, Math.ceil(points.length / 80)),
+      // 固定上限：与来源无关，铁路/公路两侧观感一致
+      max: 12,
       data: points,
     });
     heat.show?.();
@@ -639,9 +915,24 @@ function selectSpot(spot: AtlasSpotLite) {
 }
 
 function focusSpotById(id: string) {
-  const spot = spots.value.find((s) => s.id === id);
+  // 公路景点不在 spots 里，两源都要找（v0.6.3 双源后榜单可点）
+  const spot = spots.value.find((s) => s.id === id) ?? roadSpots.value.find((s) => s.id === id);
   if (!spot) return;
   selectSpot(spot);
+}
+
+/** 景点榜点击：选中并把地图移到该点（榜单条目可点开的核心交互） */
+function focusSpot(spot: AtlasSpotLite) {
+  if (!map || !AMapRef) {
+    selectSpot(spot);
+    return;
+  }
+  selectSpot(spot);
+  try {
+    map.setZoomAndCenter(Math.max(map.getZoom(), 7), [spot.lng, spot.lat]);
+  } catch {
+    /* 地图尚未就绪时忽略 */
+  }
 }
 
 function onResultClick(hit: { kind: 'corridor' | 'spot'; id: string }) {
@@ -670,6 +961,42 @@ function goBack() {
 function goRouteDetail() {
   if (!selectedCorridorId.value) return;
   void router.push(`/route/${selectedCorridorId.value}`);
+}
+
+/** 聚焦一条编号公路：加粗高亮 + fitView（与铁路走廊同一套交互） */
+function focusRoad(key: string) {
+  const target = roadCorridors.value.find((r) => r.key === key);
+  if (!target || !map || !AMapRef) return;
+  selectedCorridorId.value = key;
+  if (highlightLine) {
+    try {
+      map.remove(highlightLine);
+    } catch {
+      /* ignore */
+    }
+  }
+  highlightLine = new AMapRef.Polyline({
+    path: target.polyline,
+    strokeColor: roadColor(target.class),
+    strokeWeight: 5,
+    strokeOpacity: 0.95,
+    lineJoin: 'round',
+    lineCap: 'round',
+    zIndex: 50,
+    clickable: false,
+    bubble: true,
+  });
+  map.add(highlightLine);
+  try {
+    map.setFitView([highlightLine], false, getMapChromeInsets());
+  } catch {
+    map.setZoomAndCenter(7, target.polyline[0]!);
+  }
+}
+
+/** 公路榜单击详情 */
+function goRoadBoard(boardId: string) {
+  void router.push(`/drive/rankings/${encodeURIComponent(boardId)}`);
 }
 
 async function loadPlugins() {
@@ -722,6 +1049,8 @@ async function initMap() {
       closeSpotInfo();
       return;
     }
+    // 省聚合标记：点击只看该省（事件委托，见 onMapClickDelegated 注释）
+    onMapClickDelegated(event);
   });
   // 点空白处收起高亮蓝线（路网已不可点，避免密线区误触）
   map.on('click', () => {
@@ -738,12 +1067,37 @@ async function load() {
   try {
     const data = await api.getAtlasOverview();
     corridors.value = data.corridors || [];
-    spots.value = data.spots || [];
+    spots.value = (data.spots || []).map((s) => ({ ...s, origin: 'rail' as const }));
     stats.value = data.meta || null;
   } catch (e) {
     loadError.value = e instanceof Error ? e.message : '地图数据加载失败';
   } finally {
     loading.value = false;
+  }
+  // 公路榜单（快捷入口）：失败不影响地图主体
+  try {
+    const b = await api.getDriveBoards();
+    roadBoards.value = (b.boards || []).map((x) => ({
+      id: x.id,
+      title: x.title,
+      level: x.level,
+      itemCount: x.itemCount,
+    }));
+  } catch {
+    roadBoards.value = [];
+  }
+}
+
+/** P4 防御加固：错误态不再是一行死文本，提供重试按钮，避免"页面闪一下就回不去" */
+async function reloadAll() {
+  mapError.value = '';
+  loadError.value = '';
+  await load();
+  if (!map) await initMap();
+  else {
+    renderNetwork();
+    renderSpots();
+    if (roadLayerOn.value) renderRoadLayer();
   }
 }
 
@@ -753,8 +1107,16 @@ onMounted(async () => {
   // /drive/atlas 模式：默认打开公路图层（铁路图层共存，可再手动切换）
   if (props.drive && map) {
     roadLayerOn.value = true;
-    await loadRoadLayer();
+    await loadRoad();
     renderRoadLayer();
+  } else if (spotOrigin.value === 'all') {
+    // 默认「全部」来源：首屏渲染完成后再后台拉公路（3.8MB），不阻塞地图可用。
+    // 否则用户看到统计只有铁路 624 处，会以为数据缺失。
+    const idle =
+      typeof window.requestIdleCallback === 'function'
+        ? window.requestIdleCallback(() => void loadRoad(), { timeout: 4000 })
+        : window.setTimeout(() => void loadRoad(), 2000);
+    void idle;
   }
 });
 
@@ -766,6 +1128,7 @@ onUnmounted(() => {
   }
   clearFocusMarker();
   clearCluster();
+  clearRoadSpots();
   for (const l of baseLines) {
     try {
       map?.remove(l);
@@ -813,6 +1176,10 @@ watch([filteredSpots], () => {
   if (heatOn.value) renderHeat();
 });
 watch(heatOn, () => renderHeat());
+// 切到含公路的来源时才拉公路明细（按需加载，避免默认路径背 4.4MB）
+watch(spotOrigin, (v) => {
+  if (v === 'road' || v === 'all') void loadRoad();
+});
 </script>
 
 <template>
@@ -853,10 +1220,13 @@ watch(heatOn, () => renderHeat());
           <div class="atlas-dock__title">
             <div class="atlas-dock__identity">
               <span class="train-badge">全国</span>
-              <h1 class="atlas-dock__name">{{ drive ? '公路旅游网' : '铁路景点地图' }}</h1>
+              <!-- 此前标题硬编码「铁路景点地图」，/drive/atlas 也显示这个，属空壳遗留 -->
+              <h1 class="atlas-dock__name">
+                {{ spotOrigin === 'road' ? '公路景点地图' : spotOrigin === 'rail' ? '铁路景点地图' : '铁路 + 公路景点地图' }}
+              </h1>
             </div>
             <p class="atlas-dock__sub">
-              {{ drive ? '浏览公路干线与沿线风景，点击道路可查看详情' : '浏览全国铁路线与沿线风景，点击线路可查看详情' }}
+              铁路线与编号公路共存，铁路景点与公路景点可分别或同时查看
             </p>
           </div>
         </header>
@@ -885,6 +1255,73 @@ watch(heatOn, () => renderHeat());
         </section>
 
         <section class="atlas-block">
+          <h2 class="atlas-block__title">景点来源</h2>
+          <div class="atlas-dims">
+            <button
+              v-for="o in ORIGIN_OPTIONS"
+              :key="o.key"
+              type="button"
+              class="atlas-dim"
+              :class="{ 'is-on': spotOrigin === o.key }"
+              :style="{ '--dot': o.color }"
+              :aria-pressed="spotOrigin === o.key"
+              @click.stop="spotOrigin = o.key"
+            >
+              <span class="atlas-dim__dot" aria-hidden="true"></span>{{ o.label }}
+            </button>
+          </div>
+          <div class="atlas-dim-actions">
+            <span class="atlas-count">
+              <template v-if="roadLoading">公路数据加载中…</template>
+              <template v-else-if="roadError">
+                公路数据加载失败：{{ roadError }}
+                <button type="button" class="atlas-link" @click="loadRoad">重试</button>
+              </template>
+              <template v-else>
+                铁路 {{ spots.length }} · 公路 {{ roadLoaded ? roadSpots.length : (stats?.roadSpotCount ?? 0) }}
+                <template v-if="stats?.roadMigratedExcluded">
+                  （已排除 {{ stats.roadMigratedExcluded }} 条铁路迁移条）
+                </template>
+              </template>
+            </span>
+            <button v-if="activeDims.length || activeProvinces.length" type="button" class="atlas-link" @click="clearFilters">
+              清空筛选
+            </button>
+          </div>
+          <!-- 公路侧为省级聚合标记，密度请配合热力图查看 -->
+          <p class="atlas-block__note">
+            地图上公路景点按省份聚合显示（数字为该省景点数，点击只看该省）；
+            开启「热力图」可查看全国密度分布。
+          </p>
+
+          <!-- 景点统计：当前筛选范围的来源与分级占比（鸿蒙展示类：数据可视化用进度条表达） -->
+          <div class="atlas-stats" role="group" aria-label="景点统计">
+            <div class="atlas-stat">
+              <span class="atlas-stat__num">{{ spotStats.pending ? '…' : spotStats.total }}</span>
+              <span class="atlas-stat__label">当前筛选景点</span>
+            </div>
+            <div class="atlas-stat">
+              <span class="atlas-stat__num">{{ spotStats.rail }}</span>
+              <span class="atlas-stat__label">铁路景点</span>
+            </div>
+            <div class="atlas-stat">
+              <span class="atlas-stat__num">{{ spotStats.pending ? '…' : spotStats.road }}</span>
+              <span class="atlas-stat__label">公路景点</span>
+            </div>
+          </div>
+          <div v-if="spotStats.total > 0" class="atlas-split" aria-hidden="true">
+            <span
+              class="atlas-split__rail"
+              :style="{ flexGrow: spotStats.rail || 0.001 }"
+            ></span>
+            <span
+              class="atlas-split__road"
+              :style="{ flexGrow: spotStats.road || 0.001 }"
+            ></span>
+          </div>
+        </section>
+
+        <section class="atlas-block">
           <h2 class="atlas-block__title">景点维度<span class="atlas-block__hint">（可多选）</span></h2>
           <div class="atlas-dims">
             <button
@@ -901,15 +1338,79 @@ watch(heatOn, () => renderHeat());
             </button>
           </div>
           <div class="atlas-dim-actions">
-            <span class="atlas-count">{{ filteredSpots.length }} / {{ spots.length }} 处</span>
-            <button v-if="activeDims.length" type="button" class="atlas-link" @click="clearDims">
+            <span class="atlas-count">{{ filteredSpots.length }} / {{ spotsByOrigin.length }} 处</span>
+            <button v-if="activeDims.length || activeProvinces.length" type="button" class="atlas-link" @click="clearFilters">
               清空筛选
             </button>
           </div>
         </section>
 
+        <section v-if="provinceOptions.length" class="atlas-block">
+          <h2 class="atlas-block__title">
+            省份<span class="atlas-block__hint">（可多选）</span>
+          </h2>
+          <div class="atlas-provinces">
+            <button
+              v-for="p in provinceOptions"
+              :key="p.name"
+              type="button"
+              class="atlas-province"
+              :class="{ 'is-on': activeProvinces.includes(p.name) }"
+              :aria-pressed="activeProvinces.includes(p.name)"
+              @click.stop="toggleProvince(p.name)"
+            >
+              {{ p.name }}<em>{{ p.count }}</em>
+            </button>
+          </div>
+          <p v-if="!provinceOptions.length && roadLoaded" class="atlas-none">
+            当前来源的景点暂无省份信息
+          </p>
+        </section>
+
         <section class="atlas-block">
-          <h2 class="atlas-block__title">沿线景点最多的线路 Top10</h2>
+          <h2 class="atlas-block__title">
+            铁路景点榜 Top10
+            <span class="atlas-block__hint">按被线路收录数</span>
+          </h2>
+          <ul class="atlas-rank-list">
+            <li v-for="(s, i) in topRailSpots" :key="s.id">
+              <button type="button" class="atlas-rank-row" @click="focusSpot(s)">
+                <span class="atlas-rank-row__no">{{ i + 1 }}</span>
+                <span class="atlas-rank-row__name">{{ s.name }}</span>
+                <span class="atlas-rank-row__src">{{ s.corridorIds?.length ?? 0 }} 条线路</span>
+              </button>
+            </li>
+          </ul>
+          <p class="atlas-block__note">
+            铁路景点库无评分字段，按「被几条铁路线路收录」排序，收录越多说明线路交集越广。
+          </p>
+        </section>
+
+        <section class="atlas-block">
+          <h2 class="atlas-block__title">
+            公路景点榜 Top10
+            <span class="atlas-block__hint">按观赏评分</span>
+          </h2>
+          <ul v-if="topRoadSpots.length" class="atlas-rank-list">
+            <li v-for="(s, i) in topRoadSpots" :key="s.id">
+              <button type="button" class="atlas-rank-row" @click="focusSpot(s)">
+                <span class="atlas-rank-row__no">{{ i + 1 }}</span>
+                <span class="atlas-rank-row__name">{{ s.name }}</span>
+                <span class="atlas-rank-row__src">
+                  <em class="atlas-tier" :class="'is-' + (s.tier ?? 'C')">{{ s.tier ?? 'C' }}</em>
+                  {{ s.score ?? '—' }} 分
+                </span>
+              </button>
+            </li>
+          </ul>
+          <p v-else-if="roadLoading" class="atlas-none">公路景点加载中…</p>
+          <p v-else class="atlas-none">切到「公路」来源可加载公路景点榜</p>
+        </section>
+
+        <section class="atlas-block">
+          <h2 class="atlas-block__title">
+            铁路线 · 沿线景点最多 Top10
+          </h2>
           <ul class="atlas-top-list">
             <li v-for="(c, i) in topCorridors" :key="c.id">
               <button
@@ -934,7 +1435,54 @@ watch(heatOn, () => renderHeat());
         </section>
 
         <section class="atlas-block">
-          <h2 class="atlas-block__title">排行榜线路快捷入口</h2>
+          <h2 class="atlas-block__title">
+            编号公路 · 沿线景点最多 Top10
+          </h2>
+          <ul class="atlas-top-list">
+            <li v-for="(r, i) in topRoadCorridors" :key="r.key">
+              <button
+                type="button"
+                class="atlas-top-row"
+                :class="{ 'is-active': r.key === selectedCorridorId }"
+                @click="focusRoad(r.key)"
+              >
+                <span class="atlas-top-row__no">{{ i + 1 }}</span>
+                <span class="atlas-top-row__name">
+                  <b class="atlas-top-row__ref" :style="{ color: roadColor(r.class) }">{{ r.ref }}</b>
+                  {{ r.name ?? '' }}
+                </span>
+                <span class="atlas-top-row__bar">
+                  <span
+                    class="atlas-top-row__fill"
+                    :style="{
+                      transform: `scaleX(${r.spotCount / maxSpotCount})`,
+                      background: roadColor(r.class),
+                    }"
+                  ></span>
+                </span>
+                <span class="atlas-top-row__num">{{ r.spotCount }}</span>
+              </button>
+            </li>
+          </ul>
+          <p v-if="!topRoadCorridors.length" class="atlas-none">
+            暂无公路统计（需先补齐公路几何）
+          </p>
+        </section>
+
+        <section v-if="roadBoards.length" class="atlas-block">
+          <h2 class="atlas-block__title">公路榜单</h2>
+          <ul class="atlas-rank-list">
+            <li v-for="b in roadBoards" :key="b.id">
+              <button type="button" class="atlas-rank-row" @click="goRoadBoard(b.id)">
+                <span class="atlas-rank-row__name">{{ b.title }}</span>
+                <span class="atlas-rank-row__src">{{ b.itemCount }} 条</span>
+              </button>
+            </li>
+          </ul>
+        </section>
+
+        <section class="atlas-block">
+          <h2 class="atlas-block__title">铁路排行榜线路快捷入口</h2>
           <ul class="atlas-rank-list">
             <li v-for="r in rankingShortcuts" :key="r.corridorId">
               <button
@@ -976,8 +1524,10 @@ watch(heatOn, () => renderHeat());
     </aside>
 
     <p v-if="loading" class="atlas-status">正在加载全国铁路与景点数据…</p>
-    <p v-else-if="loadError" class="atlas-status atlas-status--err">{{ loadError }}</p>
-    <p v-else-if="mapError" class="atlas-status atlas-status--err">{{ mapError }}</p>
+    <div v-else-if="loadError || mapError" class="atlas-status atlas-status--err">
+      <p class="atlas-status__text">{{ loadError || mapError }}</p>
+      <button type="button" class="btn ghost btn-sm" @click="reloadAll">重新加载</button>
+    </div>
     <p v-else-if="!heatSupported" class="atlas-status atlas-status--warn">
       热力图插件不可用，已自动隐藏开关
     </p>
@@ -1421,6 +1971,15 @@ watch(heatOn, () => renderHeat());
 .atlas-status--err {
   border-color: var(--danger);
   color: var(--danger);
+  /* P4：错误态容器需要容纳文本 + 重试按钮 */
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.atlas-status__text {
+  margin: 0;
 }
 
 .atlas-status--warn {
@@ -1471,6 +2030,146 @@ watch(heatOn, () => renderHeat());
     max-height: 16vh;
     overflow-y: auto;
   }
+}
+
+/* ══════════ 侧栏新增组件（鸿蒙展示类：统计用进度/占比表达，筛选用可点选胶囊） ══════════ */
+
+/* 景点统计：三个关键数字 + 一条来源占比条 */
+.atlas-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.atlas-stat {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-2);
+  border: 1px solid var(--line-hairline);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  min-width: 0;
+}
+
+.atlas-stat__num {
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
+}
+
+.atlas-stat__label {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 来源占比条：flex-grow 表达比例，比数字堆砌更容易读 */
+.atlas-split {
+  display: flex;
+  gap: 2px;
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--fill-subtle);
+}
+
+.atlas-split__rail {
+  background: var(--accent);
+}
+
+.atlas-split__road {
+  background: #ffb84d;
+}
+
+/* 省份筛选：可点选胶囊 + 计数 */
+.atlas-provinces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 168px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.atlas-province {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--line-hairline);
+  border-radius: 999px;
+  background: var(--surface-1);
+  color: var(--text-2);
+  font-size: var(--fs-cap);
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+
+.atlas-province em {
+  font-style: normal;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.atlas-province:hover {
+  border-color: var(--line-default);
+}
+
+.atlas-province.is-on {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--text-1);
+}
+
+.atlas-province.is-on em {
+  color: var(--accent);
+}
+
+/* 榜单行：序号 + 名称 + 依据 */
+.atlas-rank-row__no {
+  flex: none;
+  width: 1.4em;
+  color: var(--text-3);
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
+}
+
+.atlas-tier {
+  display: inline-block;
+  padding: 0 5px;
+  margin-right: 4px;
+  border-radius: 4px;
+  font-style: normal;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  line-height: 1.5;
+  background: var(--fill-subtle);
+  color: var(--text-2);
+}
+
+.atlas-tier.is-A {
+  background: color-mix(in srgb, var(--success) 22%, transparent);
+  color: var(--success);
+}
+.atlas-tier.is-B {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+}
+
+.atlas-block__note {
+  margin: 6px 0 0;
+  font-size: var(--fs-micro);
+  line-height: 1.6;
+  color: var(--text-3);
 }
 </style>
 
@@ -1608,5 +2307,249 @@ watch(heatOn, () => renderHeat());
   font-size: 11px;
   color: var(--text-secondary);
   line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   v0.6.4 布局修复
+   下面这组样式在 ba6d8d6「走廊全屏地图页」那次提交里连同旧侧栏结构
+   一起被删除，但模板仍在引用它们，后果是：
+     · .atlas-side 退化成无样式的裸块流 —— 侧栏横跨整个屏幕压住地图；
+     · 顶部条与「公路图层 / 热力图 / 收起侧栏」按钮失去玻璃质感、挤在左上角。
+   按 c00bc19 原样恢复，并补齐同批引入的 .atlas-dock* 内部结构样式
+   （那批只改了模板结构、没写样式）。
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── 顶部条 ── */
+.atlas-top {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-raised);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.atlas-top__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.atlas-top__eyebrow {
+  margin: 0;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.atlas-top__title h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── 图层 / 热力图 / 收起侧栏 开关 ── */
+.atlas-toggle {
+  flex: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
+}
+
+.atlas-toggle.is-on {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 52%, transparent);
+  color: var(--text-primary);
+}
+
+.atlas-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── 侧栏：地图之上的窄栏（≤720vp 落到底部） ── */
+.atlas-side {
+  position: absolute;
+  top: 66px;
+  left: 12px;
+  bottom: 12px;
+  z-index: 4;
+  width: 302px;
+  padding: 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-raised);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  transition: width var(--dur-base) var(--ease-out), padding var(--dur-base) var(--ease-out);
+}
+
+.atlas-side.is-collapsed {
+  width: 34px;
+  padding: 6px;
+  overflow: hidden;
+}
+
+.atlas-side__open,
+.atlas-dock__open {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: var(--border-hairline);
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ── 侧栏内部结构（ba6d8d6 引入的 dock 结构） ── */
+.atlas-dock__head {
+  display: grid;
+  gap: 8px;
+}
+
+.atlas-dock__nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.atlas-dock__title {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.atlas-dock__identity {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.atlas-dock__name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.atlas-dock__sub {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.atlas-dock__body {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+/* 线路聚焦时地图上的定位点 */
+.route-dot {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--dot, var(--accent));
+  color: var(--bg-base);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* 公路景点：琥珀色小点（与铁路侧的六维着色区分） */
+.atlas-dot--road {
+  --dot: #ffb84d;
+  width: 7px;
+  height: 7px;
+  box-shadow: 0 0 6px rgba(255, 184, 77, 0.55);
+}
+
+/*
+ * 公路侧省级聚合标记。
+ * 1.2 万个点逐个画 Marker 实测产生 10.7 秒主线程长任务（≈2.7ms/个），
+ * 页面直接卡死；改为按省聚合（30 来个标记）后瞬时完成，
+ * 密度分布交给热力图层（AMap.HeatMap 走 canvas，1.2 万点无压力）。
+ */
+.atlas-prov-cluster {
+  display: grid;
+  place-content: center;
+  gap: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 184, 77, 0.75);
+  background: radial-gradient(circle at 35% 30%, rgba(255, 208, 138, 0.95), rgba(255, 160, 40, 0.85));
+  color: #1a1206;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 0 14px rgba(255, 168, 60, 0.45);
+  cursor: pointer;
+  /* 数字为主、省名为辅：省名太长会挤爆小圆，截断即可 */
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.atlas-prov-cluster__name {
+  font-size: 8px;
+  line-height: 1.1;
+  opacity: 0.85;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.atlas-prov-cluster__num {
+  font-size: 12px;
+  line-height: 1.1;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 响应式：窄屏侧栏改为底部抽屉 ── */
+@media (max-width: 720px) {
+  .atlas-side {
+    top: auto;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: 46vh;
+  }
+
+  .atlas-top {
+    right: 12px;
+  }
 }
 </style>

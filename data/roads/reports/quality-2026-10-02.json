@@ -1,0 +1,135 @@
+{
+ "generatedAt": "2026-10-02T16:49:32.437Z",
+ "date": "2026-10-02",
+ "byClass": {
+  "national": {
+   "total": 306,
+   "geom": 259,
+   "inOsm": 259,
+   "A": 26,
+   "B": 15,
+   "C": 196,
+   "X": 22,
+   "km": 312161.8000000001,
+   "jumps": 110,
+   "multi": 222,
+   "corrupt": 0
+  },
+  "expressway": {
+   "total": 289,
+   "geom": 251,
+   "inOsm": 251,
+   "A": 31,
+   "B": 16,
+   "C": 197,
+   "X": 7,
+   "km": 157484.90000000002,
+   "jumps": 9,
+   "multi": 173,
+   "corrupt": 0
+  },
+  "county": {
+   "total": 5728,
+   "geom": 5721,
+   "inOsm": 5728,
+   "A": 0,
+   "B": 0,
+   "C": 5721,
+   "X": 0,
+   "km": 172141.5999999999,
+   "jumps": 361,
+   "multi": 2477,
+   "corrupt": 0
+  },
+  "provincial": {
+   "total": 4153,
+   "geom": 4136,
+   "inOsm": 4153,
+   "A": 2,
+   "B": 1,
+   "C": 4124,
+   "X": 9,
+   "km": 369115.8,
+   "jumps": 496,
+   "multi": 2460,
+   "corrupt": 0
+  },
+  "township": {
+   "total": 4276,
+   "geom": 4273,
+   "inOsm": 4276,
+   "A": 0,
+   "B": 0,
+   "C": 4273,
+   "X": 0,
+   "km": 51780.10000000002,
+   "jumps": 94,
+   "multi": 1919,
+   "corrupt": 0
+  },
+  "village": {
+   "total": 478,
+   "geom": 477,
+   "inOsm": 478,
+   "A": 0,
+   "B": 0,
+   "C": 477,
+   "X": 0,
+   "km": 1675.5000000000002,
+   "jumps": 2,
+   "multi": 32,
+   "corrupt": 0
+  }
+ },
+ "gates": [
+  {
+   "gate": "expressway 有几何率（OSM 在册口径）",
+   "value": "100.0%（251/251）",
+   "expect": "= 100%",
+   "pass": true
+  },
+  {
+   "gate": "expressway 全量口径覆盖率",
+   "value": "86.9%",
+   "expect": "参考值（含官方规划在册、OSM 尚无数据者）",
+   "pass": true
+  },
+  {
+   "gate": "expressway 几何损坏",
+   "value": "0",
+   "expect": "= 0",
+   "pass": true
+  },
+  {
+   "gate": "expressway 有官方里程者 A+B 占比",
+   "value": "82.5%（47/57）",
+   "expect": "≥ 75%",
+   "pass": true
+  },
+  {
+   "gate": "national 有几何率（OSM 在册口径）",
+   "value": "100.0%（259/259）",
+   "expect": "= 100%",
+   "pass": true
+  },
+  {
+   "gate": "national 全量口径覆盖率",
+   "value": "84.6%",
+   "expect": "参考值（含官方规划在册、OSM 尚无数据者）",
+   "pass": true
+  },
+  {
+   "gate": "national 几何损坏",
+   "value": "0",
+   "expect": "= 0",
+   "pass": true
+  },
+  {
+   "gate": "national 有官方里程者 A+B 占比",
+   "value": "56.2%（41/73）",
+   "expect": "≥ 75%",
+   "pass": false
+  }
+ ],
+ "items": 15230
+}

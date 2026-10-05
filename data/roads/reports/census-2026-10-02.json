@@ -1,0 +1,95 @@
+{
+ "generatedAt": "2026-10-02T15:58:44.528Z",
+ "source": "OpenStreetMap via download.openstreetmap.fr/extracts/asia/china/{prov}-latest.osm.pbf",
+ "date": "2026-10-02",
+ "provinceCount": 1,
+ "totals": {
+  "ways": 123928,
+  "highwayWays": 53142,
+  "roadWays": 48480,
+  "wayNodes": 650444,
+  "nodes": 1427682,
+  "noRef": 43344,
+  "namedNoRef": 3432,
+  "bareNumberRef": 0,
+  "byClass": {
+   "expressway": 1976,
+   "national": 1020,
+   "provincial": 1805,
+   "county": 681,
+   "township": 97,
+   "village": 0,
+   "other": 0
+  },
+  "refValueCount": {
+   "expressway": 6,
+   "national": 6,
+   "provincial": 41,
+   "county": 93,
+   "township": 28,
+   "village": 0,
+   "other": 0
+  }
+ },
+ "provinces": [
+  {
+   "province": "hainan",
+   "ways": 123928,
+   "highwayWays": 53142,
+   "roadWays": 48480,
+   "wayNodes": 650444,
+   "nodes": 1427682,
+   "byClass": {
+    "expressway": 1976,
+    "national": 1020,
+    "provincial": 1805,
+    "county": 681,
+    "township": 97,
+    "village": 0,
+    "other": 0
+   },
+   "byHighway": {
+    "primary": 1901,
+    "pedestrian": 192,
+    "service": 6858,
+    "trunk": 1175,
+    "tertiary": 4438,
+    "residential": 9345,
+    "unclassified": 14706,
+    "secondary": 2930,
+    "motorway": 2783,
+    "motorway_link": 1669,
+    "track": 1406,
+    "trunk_link": 303,
+    "primary_link": 294,
+    "road": 21,
+    "path": 585,
+    "secondary_link": 271,
+    "footway": 3121,
+    "tertiary_link": 140,
+    "steps": 201,
+    "cycleway": 31,
+    "construction": 469,
+    "living_street": 240,
+    "proposed": 13,
+    "services": 40,
+    "raceway": 3,
+    "rest_area": 6,
+    "ladder": 1
+   },
+   "noRef": 43344,
+   "namedNoRef": 3432,
+   "bareNumberRef": 0,
+   "refValueCount": {
+    "expressway": 6,
+    "national": 6,
+    "provincial": 41,
+    "county": 93,
+    "township": 28,
+    "village": 0,
+    "other": 0
+   },
+   "ms": 783
+  }
+ ]
+}

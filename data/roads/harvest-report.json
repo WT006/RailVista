@@ -1,0 +1,245 @@
+{
+  "generatedAt": "2026-10-02T17:11:32.602Z",
+  "elapsedMs": 75708,
+  "provinces": [
+    {
+      "code": "11",
+      "name": "北京",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "12",
+      "name": "天津",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "31",
+      "name": "上海",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "50",
+      "name": "重庆",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "13",
+      "name": "河北",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "14",
+      "name": "山西",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "21",
+      "name": "辽宁",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "22",
+      "name": "吉林",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "23",
+      "name": "黑龙江",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "32",
+      "name": "江苏",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "33",
+      "name": "浙江",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "34",
+      "name": "安徽",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "35",
+      "name": "福建",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "36",
+      "name": "江西",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "37",
+      "name": "山东",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "41",
+      "name": "河南",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "42",
+      "name": "湖北",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "43",
+      "name": "湖南",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "44",
+      "name": "广东",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "46",
+      "name": "海南",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "51",
+      "name": "四川",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "52",
+      "name": "贵州",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "53",
+      "name": "云南",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "61",
+      "name": "陕西",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "62",
+      "name": "甘肃",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "63",
+      "name": "青海",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "71",
+      "name": "内蒙古",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "45",
+      "name": "广西",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "54",
+      "name": "西藏",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "64",
+      "name": "宁夏",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "65",
+      "name": "新疆",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "91",
+      "name": "香港",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "92",
+      "name": "澳门",
+      "count": 0,
+      "from": "cache"
+    },
+    {
+      "code": "71T",
+      "name": "台湾",
+      "count": 0,
+      "from": "cache"
+    }
+  ],
+  "candidateCount": 12029,
+  "addedCount": 11693,
+  "beforeCount": 1035,
+  "afterCount": 12728,
+  "nativeCount": 12104,
+  "migratedCount": 624,
+  "withProvinceCount": 11693,
+  "byCategory": {
+    "viewpoint.landmark": 2867,
+    "nature.mountain": 2599,
+    "viewpoint.observation-deck": 2557,
+    "culture.heritage": 1507,
+    "nature.forest": 800,
+    "nature.canyon": 663,
+    "culture.ruin": 501,
+    "nature.river": 414,
+    "experience.hot-spring": 398,
+    "culture.ancient-town": 134,
+    "engineering.dam": 78,
+    "nature.lake": 74,
+    "engineering.bridge": 52,
+    "nature.desert": 29,
+    "nature.grassland": 27,
+    "engineering.pass": 10,
+    "viewpoint.scenic-byway": 5,
+    "culture.village": 3,
+    "culture.temple": 3,
+    "engineering.service-area": 2,
+    "engineering.tunnel": 1,
+    "engineering.spiral-road": 1,
+    "nature.glacier": 1,
+    "viewpoint.sunrise": 1,
+    "culture.red": 1
+  },
+  "roadPointCount": 2113466
+}

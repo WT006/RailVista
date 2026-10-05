@@ -8,10 +8,21 @@
   isolation: isolate;
   min-height: 100dvh;
   padding-bottom: var(--space-8);
+  /*
+   * P1：自驾页背景是构建期渲染的全国路网位图（亮线密集）+ 景点星点，
+   * 比铁路页"淡轮廓 + 稀疏星点"的背景亮得多。两页卡片本身用的是同一个
+   * .rv-card（实测 computed style 完全一致：rgba(19,24,32,0.62) + blur(26px)），
+   * 但同样的透明度在更亮的背景上透出更多内容，观感上"卡片过透、文字发飘"。
+   * 这里只在自驾作用域内把两级玻璃表面调实一档，让自驾卡片与铁路页的
+   * 实际观感对齐（沉浸光感材质层厚度按背景复杂度自适应，属规范内做法）。
+   */
+  --surface-1: rgba(19, 24, 32, 0.78); /* 全局 0.62 → 自驾 0.78 */
+  --surface-2: rgba(26, 33, 43, 0.7); /* 全局 0.55 → 自驾 0.70 */
+  /* 与 .rv-page 同一纪律：末层底色透出 App 级背景层（见 base.css .rv-page 注释） */
   background:
     radial-gradient(ellipse 70% 42% at 10% -8%, var(--accent-soft), transparent 58%),
     radial-gradient(ellipse 60% 38% at 92% 4%, var(--fill-accent), transparent 55%),
-    var(--surface-0);
+    transparent;
   color: var(--text-1);
 }
 
@@ -49,6 +60,7 @@
   border: 1px solid var(--line-hairline);
   background: var(--surface-1);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
 
 .drive-stat__value {
@@ -81,6 +93,7 @@
   border: 1px solid var(--line-hairline);
   background: var(--surface-1);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   color: inherit;
   font-family: inherit;
   cursor: pointer;
@@ -176,6 +189,7 @@
   border: 1px solid var(--line-hairline);
   background: var(--surface-1);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: var(--elev-2);
 }
 
@@ -236,6 +250,7 @@
   border: 1px solid var(--line-hairline);
   background: var(--surface-2);
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
 }
 
 .drive-highlight::before {
@@ -335,6 +350,7 @@
   border: 1px solid var(--line-accent);
   background: var(--surface-1);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: var(--elev-3);
   text-align: center;
 }
@@ -545,6 +561,7 @@
   border: 1px solid var(--line-hairline);
   background: var(--surface-2);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: var(--elev-3);
   display: grid;
   gap: 2px;
@@ -582,66 +599,15 @@
 }
 
 /* —— 首屏主结构：地图 + 面板 —— */
+/* P3：与下方「普通国道 / 国家高速 / 已挂几何」统计区之间原本没有间距，
+ * 图例与上方组件紧贴。main.rv-shell 不是 gap 布局，区块间靠自身 margin 撑开，
+ * 这里补上与 .drive-stats 的 margin-bottom(--space-5) 同级的呼吸间距。 */
 .drive-home-main {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-3);
   align-items: stretch;
-}
-
-.drive-netmap {
-  position: relative;
-  min-height: 46vh;
-  padding: var(--space-2);
-  overflow: hidden;
-  display: flex;
-}
-
-.drive-netmap__svg {
-  width: 100%;
-  flex: 1;
-  min-height: 0;
-}
-
-.drive-netmap__outline :deep(path),
-.drive-netmap__outline path {
-  fill: var(--fill-subtle);
-  fill-opacity: 0.5;
-  stroke: var(--line-default);
-  stroke-opacity: 0.6;
-  stroke-width: 0.7;
-  vector-effect: non-scaling-stroke;
-}
-
-.drive-netmap__road {
-  fill: none;
-  stroke-width: 2;
-  stroke-opacity: 0.85;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  cursor: pointer;
-}
-
-.drive-netmap__road:hover {
-  stroke-opacity: 1;
-  stroke-width: 3.2;
-}
-
-.drive-netmap__note,
-.drive-netmap__hint {
-  position: absolute;
-  left: var(--space-3);
-  margin: 0;
-  font-size: var(--fs-micro);
-  color: var(--text-3);
-}
-
-.drive-netmap__note {
-  top: var(--space-2);
-}
-
-.drive-netmap__hint {
-  bottom: var(--space-2);
+  margin-bottom: var(--space-5);
 }
 
 .drive-home-panel {
@@ -650,10 +616,126 @@
   align-content: start;
 }
 
+/* —— 路网速览（背景地图的图例与快捷入口，不重复画一张地图） —— */
+.drive-netpanel {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  padding: var(--space-3);
+}
+
+.drive-netpanel__title {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.drive-netpanel__sub,
+.drive-netpanel__note {
+  margin: 0;
+  font-size: var(--fs-micro);
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+.drive-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.drive-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-cap);
+  color: var(--text-2);
+}
+
+.drive-legend__dot {
+  width: 10px;
+  height: 3px;
+  border-radius: 999px;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.drive-hotroads {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drive-hotroads__label,
+.drive-hotroads__label + * {
+  font-size: var(--fs-micro);
+}
+
+.drive-hotroads__label {
+  color: var(--text-3);
+  letter-spacing: 0.08em;
+}
+
+.drive-hotroads__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.drive-hotroads__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--prefix-color) 42%, transparent);
+  border: 1px solid var(--line-default);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--prefix-color) 12%, transparent);
+  background: var(--fill-subtle);
+  color: var(--text-1);
+  font: inherit;
+  font-size: var(--fs-cap);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background var(--dur-fast) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard);
+}
+
+.drive-hotroads__chip b {
+  color: var(--prefix-color);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-hotroads__chip em {
+  font-style: normal;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-hotroads__chip:hover {
+  border-color: var(--prefix-color);
+  background: color-mix(in srgb, var(--prefix-color) 20%, transparent);
+  background: var(--fill-accent);
+  transform: translateY(-1px);
+}
+
 /* —— OD 搜索 —— */
 .drive-od {
   display: grid;
   gap: var(--space-2);
+}
+
+/* V1-1：联想展开时把 OD 卡片提到相邻卡片（.road-kbd 等）之上。
+ * .rv-card 自带 isolation:isolate，子元素的 z-index 只在卡内有效，
+ * 压不过兄弟卡片，因此需要在卡片自身层级抬升。 */
+.drive-od.has-suggest-open {
+  position: relative;
+  z-index: 50;
 }
 
 .drive-od__row {
@@ -866,6 +948,33 @@
   background: var(--fill-accent);
 }
 
+/* A2：已点选态 —— 明确区分「选中用于设为起终点」与「仅查看」 */
+.road-kbd__candidate.is-picked {
+  background: var(--fill-accent);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.road-kbd__candidate-go {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--text-3);
+  font-size: var(--fs-micro);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-standard);
+}
+
+.road-kbd__candidate:hover .road-kbd__candidate-go,
+.road-kbd__candidate.is-picked .road-kbd__candidate-go {
+  opacity: 1;
+}
+
+.road-kbd__hint {
+  margin: 0 auto 0 0;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
 .road-kbd__badge {
   flex-shrink: 0;
   padding: 1px var(--space-2);
@@ -945,6 +1054,7 @@
   border: 1px solid var(--line-hairline);
   background: var(--surface-1);
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   color: inherit;
   text-decoration: none;
 }
@@ -1273,6 +1383,9 @@
   stroke-width: 1.6;
 }
 
+/* v0.6.5：公路详情页把 hint / gap-note 收进 .drive-trip-map__bar 容器内纵向排列
+   （见文件末尾 v0.6.5 段的 .drive-road-layout 作用域规则），
+   避免它们与聚焦提示条在地图左下角互相压字。沿程页 DriveTrip 仍用下面的绝对定位版。 */
 .drive-trip-map__hint {
   position: absolute;
   bottom: var(--space-2);
@@ -1432,6 +1545,30 @@
   gap: 2px;
 }
 
+/* B3：部分降级提示（几何/景点单独失败时的可重试区块） */
+.drive-road-degraded {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  margin: 0;
+  padding: var(--space-2) 0;
+  color: var(--text-3);
+  font-size: var(--fs-micro);
+  line-height: 1.6;
+}
+
+.drive-road-degraded p {
+  margin: 0;
+}
+
+/* B3：榜单条目无可用 OD 时的禁用按钮 */
+.btn.is-disabled,
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: auto;
+}
+
 .drive-road-spots li {
   display: flex;
   align-items: baseline;
@@ -1487,12 +1624,14 @@
 }
 
 @media (min-width: 840px) {
+  /* 搜索面板必须比路网速览更宽（验收项：搜索框视觉权重 > 任何非搜索元素） */
   .drive-home-main {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-columns: minmax(0, 8fr) minmax(0, 5fr);
   }
 
-  .drive-netmap {
-    min-height: 420px;
+  .drive-netpanel {
+    position: sticky;
+    top: calc(var(--appbar-h) + var(--space-3));
   }
 
   .drive-road-grid {
@@ -1630,6 +1769,7 @@
 .drive-spot {
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
 }
 
 /* 无障碍降级 */
@@ -1699,6 +1839,11 @@
 }
 /* ══════════ P5 路线绘制与滚动揭示 ══════════ */
 
+/* 关键安全阀（A1）：初始 opacity:0 依赖 JS 加 .is-revealed 才可见。
+   一旦 composable 失效（元素异步渲染 / JS 异常），内容会永久不可见。
+   用 animation 兜底：CSS 动画在 1.2s 内无条件把元素推到终态 opacity:1，
+   即使 JS 从未添加 is-revealed，内容也一定可见。is-revealed 命中时
+   transition-delay 仍生效，动画已结束故不冲突。 */
 @keyframes drive-scroll-reveal {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
@@ -1709,11 +1854,13 @@
   transform: translateY(8px);
   transition: opacity var(--dur-base) var(--ease-standard),
               transform var(--dur-base) var(--ease-standard);
+  animation: drive-scroll-reveal 1.2s var(--ease-standard) 0.35s forwards;
 }
 
 .drive-scroll-reveal.is-revealed {
   opacity: 1;
   transform: none;
+  animation: none;
 }
 
 /* SVG 路线绘制（useRoadDraw composable 设置 stroke-dasharray/offset） */
@@ -1728,6 +1875,7 @@
     opacity: 1;
     transform: none;
     transition: none;
+    animation: none;
   }
   .drive-trip-map__route,
   .drive-netmap__road {
@@ -1845,4 +1993,869 @@
   .drive-chapterbar__seg::after {
     transition: none;
   }
+}
+
+/* ═══════════ P6 公路详情页重构（鸿蒙布局/排版/动效规范） ═══════════ */
+
+/* ── 详情页 hero：编号徽章 + 标题层级 ── */
+.drive-road-hero {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  animation: drive-road-rise var(--dur-enter) var(--ease-emphasized) both;
+}
+
+.drive-road-hero__id {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* 编号徽章：等级色描边 + 微弱外发光，是整页的锚点 */
+.drive-road-hero__ref {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.4em;
+  padding: 10px 14px;
+  border: 1.5px solid color-mix(in srgb, var(--prefix-color, var(--accent)) 62%, transparent);
+  border: 1.5px solid var(--prefix-color, var(--accent));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--prefix-color, var(--accent)) 12%, transparent);
+  background: var(--surface-1);
+  color: var(--prefix-color, var(--accent));
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 22px color-mix(in srgb, var(--prefix-color, var(--accent)) 26%, transparent);
+  box-shadow: none;
+  text-shadow: 0 0 14px color-mix(in srgb, var(--prefix-color, var(--accent)) 55%, transparent);
+}
+
+.drive-road-hero__names {
+  min-width: 0;
+}
+
+.drive-road-hero__class {
+  margin: 0 0 2px;
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+.drive-road-hero__title {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-1);
+  /* 中文长标题在窄屏允许折行，但保持词内不碎 */
+  overflow-wrap: anywhere;
+}
+
+/* ── 事实卡栅格（meta 不再是裸 span 串） ── */
+.drive-road-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.drive-road-fact {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--line-hairline);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  min-width: 0;
+}
+
+.drive-road-fact dt {
+  margin: 0 0 2px;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+.drive-road-fact dd {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-road-fact dd small {
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.drive-road-fact__sub {
+  display: block;
+  margin-top: 1px;
+  font-style: normal;
+  font-size: var(--fs-micro);
+  font-weight: 400;
+  color: var(--text-3);
+  white-space: normal;
+}
+
+.drive-road-fact__provs {
+  white-space: normal;
+  line-height: 1.5;
+}
+
+/* 事实卡逐个入场（鸿蒙动效规范：克制、错落） */
+.drive-road-fact {
+  animation: drive-road-rise var(--dur-enter) var(--ease-emphasized) both;
+}
+.drive-road-fact:nth-child(1) { animation-delay: 30ms; }
+.drive-road-fact:nth-child(2) { animation-delay: 70ms; }
+.drive-road-fact:nth-child(3) { animation-delay: 110ms; }
+.drive-road-fact:nth-child(4) { animation-delay: 150ms; }
+.drive-road-fact:nth-child(5) { animation-delay: 190ms; }
+
+/* ── 提示条 note 组件：左色条 + 玻璃底，替代散落的 drive-empty rv-card ── */
+.drive-road-note {
+  display: grid;
+  gap: 4px;
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  border-left: 3px solid var(--accent);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  animation: drive-road-rise var(--dur-enter) var(--ease-emphasized) both;
+}
+
+.drive-road-note strong {
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.drive-road-note p {
+  margin: 0;
+  font-size: var(--fs-cap);
+  line-height: 1.7;
+  color: var(--text-2);
+}
+
+.drive-road-note[data-grade='warn'] {
+  border-left-color: var(--warning);
+}
+.drive-road-note[data-grade='danger'] {
+  border-left-color: var(--danger);
+}
+.drive-road-note[data-grade='info'] {
+  border-left-color: var(--accent);
+}
+
+.drive-road-note a {
+  color: var(--accent);
+}
+
+/* ── 入场动效（克制：仅位移+淡入，无缩放弹跳） ── */
+@keyframes drive-road-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drive-road-hero,
+  .drive-road-fact,
+  .drive-road-note {
+    animation: none;
+  }
+}
+/* ══════════ 详情页侧栏重设计（鸿蒙展示类：列表可点 + 进度条表达密度） ══════════ */
+
+/* 分段条目：序号 + 里程范围 + 景点密度进度条 + 数量 */
+.drive-seg {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-2);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+
+.drive-seg:hover {
+  background: var(--fill-subtle);
+}
+
+.drive-seg.is-on {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+  color: var(--text-1);
+}
+
+.drive-seg__no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 6px;
+  background: var(--fill-subtle);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.drive-seg.is-on .drive-seg__no {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--text-1);
+}
+
+.drive-seg__body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.drive-seg__range {
+  font-size: var(--fs-cap);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-seg__bar {
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--fill-subtle);
+  overflow: hidden;
+}
+
+.drive-seg__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transform-origin: left center;
+  transition: transform var(--dur-base) var(--ease-standard);
+}
+
+.drive-seg__num {
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.drive-seg.is-on .drive-seg__num {
+  color: var(--accent);
+}
+
+.drive-seg__hint {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-micro);
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+/* 沿线景点行：里程徽标 + 名称/分类 + 分级 */
+.drive-road-spot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 6px var(--space-1);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.drive-road-spot:hover {
+  background: var(--fill-subtle);
+}
+
+.drive-road-spot__main {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.drive-road-spot__name {
+  font-size: var(--fs-cap);
+  color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-road-spot__cat {
+  flex: none;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--fill-subtle);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  color: var(--text-3);
+}
+
+/* 地图上的选中定位环 */
+/* 定位环尺寸：SVG 用户单位。聚焦时 viewBox 会缩小到全局的 22%（G318 上
+   全局宽 666 → 聚焦 146），旧值 r=7/14 在聚焦态下会被放大 4.5 倍，
+   实测屏幕上直径达 198px、糊住整张图。这里压到 r=3.5/7/1.2。 */
+.drive-trip-map__focus-pulse {
+  fill: color-mix(in srgb, var(--accent) 22%, transparent);
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: drive-focus-pulse 1.8s var(--ease-standard) infinite;
+}
+
+.drive-trip-map__focus-ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.1;
+}
+
+.drive-trip-map__focus-core {
+  fill: #fff;
+}
+
+@keyframes drive-focus-pulse {
+  0% { transform: scale(0.55); opacity: 0.9; }
+  70% { transform: scale(1.5); opacity: 0; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drive-trip-map__focus-pulse { animation: none; }
+}
+/* ══════════ v0.6.5 公路详情页改版：地名分段 / 精选景点 / 可点地图 / 排版重构 ══════════ */
+
+/* ── R4：两栏布局。桌面端左图为主（≥420px 高），右侧独立滚动信息栏 ──
+   旧版复用 .drive-trip-grid（.drive-road-grid 在 840px 断点被覆盖成 8fr/4fr），
+   右栏 minmax(240px,4fr) 在 1440 视口下占掉 ~1/3 且内部三张卡纵向堆叠，
+   地图被压到不足 420px —— 用户反馈「地图被挤小、右栏凌乱」的直接原因。 */
+.drive-road-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  align-items: start;
+  margin-top: var(--space-4);
+}
+
+.drive-road-side {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .drive-road-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+  }
+
+  /* 右栏独立滚动：与左侧地图解耦，滚信息不带动地图 */
+  .drive-road-side {
+    position: sticky;
+    top: calc(var(--appbar-h) + var(--space-3));
+    max-height: calc(100vh - var(--appbar-h) - var(--space-6));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 2px;
+  }
+}
+
+/* 移动端（≤720px）：纵向堆叠，地图在上、信息在下；地图高度自适应 */
+@media (max-width: 720px) {
+  .drive-road-layout {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .drive-trip-map {
+    min-height: 300px;
+  }
+
+  .drive-road-side {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/* ── 地图容器：桌面端保证 ≥420px 的可用高度 ── */
+.drive-road-layout .drive-trip-map {
+  min-height: 420px;
+}
+
+@media (min-width: 900px) {
+  .drive-road-layout .drive-trip-map {
+    min-height: 520px;
+  }
+}
+
+/* ── R3：选中分段时主链变暗，高亮段加粗 ── */
+.drive-trip-map__route.is-dim {
+  stroke-opacity: 0.28;
+  stroke-width: 2;
+}
+
+/* v0.6.5（P0-2）：non-scaling-stroke 让线宽以**屏幕像素**计，不随 viewBox 缩放。
+   没有它时，为「保证短边 ≥24px」而放大缩放比会把线宽一起放大成巨条
+   （stroke-width 是用户单位，缩放比 40 时 5 单位 → 200px）。
+   解耦之后缩放比可以放开，长而扁的段也能达到 24px 判据。 */
+.drive-trip-map__route.is-active {
+  stroke-width: 4px;
+  stroke-opacity: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 55%, transparent));
+  transition: stroke-width var(--dur-base) var(--ease-standard),
+    stroke-opacity var(--dur-base) var(--ease-standard);
+}
+
+/* 分段筛选时非选中点位变暗（保留轮廓，不完全消失） */
+.drive-trip-map__dot.is-dim {
+  opacity: 0.22;
+}
+
+/* ── R4：里程刻度 ── */
+.drive-trip-map__tick-dot {
+  fill: var(--text-3);
+}
+
+.drive-trip-map__tick-text {
+  fill: var(--text-3);
+  font-size: 7px;
+  font-family: var(--font-mono, monospace);
+  paint-order: stroke;
+  stroke: var(--surface-0);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+}
+
+/* ── R4：地图底部状态条（图例 + 聚焦状态 + 返回按钮）──
+   纵向排列：hint / scope / gap-note 三行各自独立，不再互相压字。 */
+.drive-trip-map__bar {
+  position: absolute;
+  inset: auto var(--space-3) var(--space-2) var(--space-3);
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  pointer-events: none;
+}
+
+.drive-trip-map__bar > * {
+  pointer-events: auto;
+  max-width: 100%;
+}
+
+/* 断口提示移入状态条容器（不再是绝对定位的独立元素），避免与 hint/scope 重叠。
+   作用域限定在 .drive-road-layout 内：沿程页 DriveTrip 的 hint / gap-note
+   仍沿用文件前段的绝对定位版，不受本次改版影响。 */
+.drive-road-layout .drive-trip-map__gap-note {
+  position: static;
+  margin: 0;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
+  font-size: var(--fs-micro);
+  color: var(--warning);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.drive-road-layout .drive-trip-map__hint {
+  position: static;
+  margin: 0;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--surface-0) 55%, transparent);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  color: var(--text-3);
+}
+
+.drive-trip-map__scope {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-accent);
+  background: var(--accent-soft);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--text-1);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-trip-map__back {
+  flex: none;
+  padding: 1px var(--space-2);
+  border: none;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--text-1);
+  font-family: inherit;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.drive-trip-map__back:hover {
+  background: var(--accent);
+  color: var(--surface-0);
+}
+
+/* ── R4：轻量提示 chip 行（替代大块 note，信息不删）── */
+.drive-road-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.drive-road-flag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-hairline);
+  background: var(--fill-subtle);
+  font-size: var(--fs-micro);
+  line-height: 1.6;
+  color: var(--text-3);
+  white-space: nowrap;
+  cursor: help;
+}
+
+.drive-road-flag[data-grade='warn'] {
+  border-color: color-mix(in srgb, var(--warning) 42%, transparent);
+  background: var(--warning-soft);
+  color: var(--warning);
+  font-weight: 600;
+}
+
+.drive-road-flag[data-grade='info'] {
+  border-color: var(--line-accent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+/* ── R4：侧栏区块标题行 ── */
+.drive-road-side__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.drive-road-side__head .drive-block-title {
+  margin: 0;
+}
+
+.drive-road-side__count {
+  flex: none;
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+/* ── R1：分段列表（覆盖旧 .drive-chapterlist 的 nowrap/ellipsis，段名要能读全）── */
+.drive-road-seglist {
+  max-height: 320px;
+  margin-top: 0;
+}
+
+.drive-road-seglist li {
+  display: block;
+  white-space: normal;
+  overflow: visible;
+}
+
+.drive-seg {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.drive-seg__title {
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  color: var(--text-1);
+  /* 中文地名永不折行：超长省略而不是断字 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-seg__range {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-seg.is-on .drive-seg__title {
+  color: var(--text-1);
+}
+
+.drive-seg__body {
+  gap: 3px;
+}
+
+/* ── R2：精选景点卡片（比普通列表更大，展示评分/分级/里程）── */
+.drive-featured__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.drive-featured__card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--line-hairline);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--dur-base) var(--ease-standard),
+    border-color var(--dur-base), background-color var(--dur-base);
+  animation: drive-road-rise var(--dur-enter) var(--ease-emphasized) both;
+}
+
+.drive-featured__card.is-on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.drive-featured__card:nth-child(1) { animation-delay: 20ms; }
+.drive-featured__card:nth-child(2) { animation-delay: 50ms; }
+.drive-featured__card:nth-child(3) { animation-delay: 80ms; }
+.drive-featured__card:nth-child(4) { animation-delay: 110ms; }
+.drive-featured__card:nth-child(5) { animation-delay: 140ms; }
+.drive-featured__card:nth-child(6) { animation-delay: 170ms; }
+.drive-featured__card:nth-child(7) { animation-delay: 200ms; }
+.drive-featured__card:nth-child(8) { animation-delay: 230ms; }
+
+@media (hover: hover) and (pointer: fine) {
+  .drive-featured__card:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-accent);
+  }
+}
+
+.drive-featured__rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
+}
+
+.drive-featured__main {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.drive-featured__name {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  color: var(--text-1);
+  /* 中文名永不折行 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drive-featured__meta {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+.drive-featured__km {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.drive-featured__cat,
+.drive-featured__prov {
+  flex: none;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--fill-subtle);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.drive-featured__score {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  flex: none;
+}
+
+.drive-featured__score-num {
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+/* 普通景点行的选中态（与精选卡片一致） */
+.drive-road-spot.is-on {
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drive-featured__card {
+    animation: none;
+    transition: none;
+  }
+
+  .drive-trip-map__route.is-active {
+    transition: none;
+  }
+}
+
+
+/* ══════════ v0.6.5 第二轮：地名来源分级 + 未译名标注 ══════════ */
+
+/* 段名里的「站名推测」角标：弱化但不隐藏（数据诚实性要求） */
+.drive-anchor-src {
+  flex: none;
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--warning) 32%, transparent);
+  background: color-mix(in srgb, var(--warning) 10%, transparent);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-3);
+  vertical-align: 1px;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.drive-anchor-src[data-src='station'] {
+  color: color-mix(in srgb, var(--warning) 78%, var(--text-2));
+}
+
+/* 「未译名」角标：说明该条目为何显示为外文（OSM 无中文名，未做机器翻译） */
+.drive-untranslated {
+  flex: none;
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--fill-subtle);
+  font-size: var(--fs-micro);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-3);
+  vertical-align: 1px;
+  white-space: nowrap;
+  cursor: help;
+}
+
+/* 普通列表里的外文名条目：整体弱化（仍可点击定位，只是不抢视觉） */
+.drive-road-spot.is-latin .drive-road-spot__name {
+  color: var(--text-3);
+  font-style: italic;
+}
+
+.drive-road-spot.is-latin .drive-spot__km,
+.drive-road-spot.is-latin .drive-spot__tier {
+  opacity: 0.6;
+}
+
+/* ══════════ v0.6.5 第三轮（返工）：P0 高亮可见性 / P1 类型语义 / 覆盖率披露 ══════════ */
+
+/* P1-2：非聚落类锚点角标（山口 / 地标 / 站名）。
+   与「站名推测」共用 .drive-anchor-src 基座，仅换色与语义。 */
+.drive-anchor-src[data-src='pass'] {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.drive-anchor-src[data-src='landmark'] {
+  border-color: var(--line-default);
+  background: var(--fill-subtle);
+  color: var(--text-3);
+}
+
+/* P1-3：分段覆盖率披露行 */
+.drive-seg__cover {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-sunken);
+  font-size: var(--fs-micro);
+  line-height: 1.7;
+  color: var(--text-3);
+}
+
+.drive-seg__cover strong {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
 }

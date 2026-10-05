@@ -1,9 +1,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  CHINA_LAND_BBOX,
   SPOT_GRID_CELL_DEG,
   bboxOfCoords,
   buildSpotGrid,
+  isWithinChinaLand,
+  partitionByChinaLand,
   queryGrid,
   spotsAlongRoute,
 } from './spotGrid.js';
@@ -19,6 +22,61 @@ const route: [number, number][] = [
   [101.0, 30.0],
   [102.0, 30.0],
 ];
+
+describe('drive/spotGrid CHINA_LAND_BBOX', () => {
+  it('frozen + bounded to the envelope agreed in PRD §6.2', () => {
+    // 必须是 frozen（下游可放心当作常量引用，不会被运行时改写）
+    assert.ok(Object.isFrozen(CHINA_LAND_BBOX));
+    assert.ok(CHINA_LAND_BBOX.minLng < CHINA_LAND_BBOX.maxLng);
+    assert.ok(CHINA_LAND_BBOX.minLat < CHINA_LAND_BBOX.maxLat);
+    // 东边界必须小于 135°：把 lng≈135 的伯力 / 哈巴罗夫斯克（俄罗斯远东，
+    // province 错放为"黑龙江"的典型误抓点）排除掉；同时抚远市（lng≈134.3）仍在内。
+    assert.ok(CHINA_LAND_BBOX.maxLng <= 135);
+  });
+
+  it('isWithinChinaLand accepts interior points', () => {
+    assert.equal(isWithinChinaLand(116.4, 39.9), true); // 北京
+    assert.equal(isWithinChinaLand(121.5, 31.2), true); // 上海
+    assert.equal(isWithinChinaLand(134.3, 48.4), true); // 抚远附近（省内）
+  });
+
+  it('isWithinChinaLand rejects out-of-bounds points', () => {
+    assert.equal(isWithinChinaLand(135.05, 48.48), false); // 哈巴罗夫斯克
+    assert.equal(isWithinChinaLand(73.0, 38.0), false);   // 塔吉克斯坦
+    assert.equal(isWithinChinaLand(116.0, 16.0), false);  // 越南北部
+    assert.equal(isWithinChinaLand(116.0, 54.0), false);  // 漠河北以外
+  });
+
+  it('isWithinChinaLand returns false for NaN', () => {
+    assert.equal(isWithinChinaLand(NaN, 30), false);
+    assert.equal(isWithinChinaLand(100, NaN), false);
+  });
+});
+
+describe('drive/spotGrid partitionByChinaLand', () => {
+  it('splits into kept and dropped buckets', () => {
+    const spots: RoadsideSpot[] = [
+      spot('in', 100.5, 30.0),
+      spot('oob', 135.05, 48.48),
+      { id: 'bad', name: 'bad', lng: Number.NaN, lat: 30, tier: 'B', category: 'x', score: 50, source: 'seed' },
+    ];
+    const { kept, dropped } = partitionByChinaLand(spots);
+    assert.equal(kept.length, 1);
+    assert.equal(kept[0]!.id, 'in');
+    assert.equal(dropped.length, 2);
+    assert.deepEqual(dropped.map((s) => s.id).sort(), ['bad', 'oob']);
+  });
+
+  it('drops NaN coordinates into the dropped bucket', () => {
+    const spots: RoadsideSpot[] = [
+      { id: 'nan', name: 'nan', lng: Number.NaN, lat: 30, tier: 'B', category: 'x', score: 50, source: 'seed' },
+      spot('ok', 100, 30),
+    ];
+    const { kept, dropped } = partitionByChinaLand(spots);
+    assert.equal(kept.length, 1);
+    assert.equal(dropped.length, 1);
+  });
+});
 
 describe('drive/spotGrid buildSpotGrid', () => {
   it('buckets spots into 0.05° cells', () => {
@@ -36,6 +94,26 @@ describe('drive/spotGrid buildSpotGrid', () => {
     const grid = buildSpotGrid([spot('a', NaN, 30), spot('b', 100, 30)]);
     assert.equal(grid.size, 2);
     assert.equal(grid.cells.size, 1);
+  });
+
+  it('skips out-of-China spots so they can never match any route (P2-3)', () => {
+    // 三条 POI：境内哈尔滨 + 境外哈巴罗夫斯克 + 境外德黑兰；只有哈尔滨应入网。
+    // khv / khv2 故意放在同一 cellKey（用极接近的 lng/lat 制造同格），
+    // 用来证明即使网格能召回它们，也会因它们不在入网下标里而被整体丢弃。
+    // irn 放在西边一格，验证另一侧的境外点也被同样丢弃。
+    const grid = buildSpotGrid([
+      spot('hrb', 126.6, 45.75),
+      spot('khv', 135.05, 48.48), // lng>135 → 哈巴罗夫斯克，错放 province=黑龙江
+      spot('khv2', 135.06, 48.49), // 与 khv 同格，但仍在境外
+      spot('irn', 51.4, 35.7),     // lng<73.5 → 德黑兰（境外，西侧一格）
+    ]);
+    assert.equal(grid.size, 4);                    // size 仍是原始数组长度
+    assert.equal(grid.cells.size, 1);              // 仅哈尔滨入网
+    const [, idxList] = [...grid.cells.entries()][0]!;
+    assert.deepEqual(idxList, [0]);
+    // 路线 bbox 即使扩到 5000km 也不能再把它们召回
+    const candidates = queryGrid(grid, { minLng: -180, maxLng: 180, minLat: -90, maxLat: 90 });
+    assert.deepEqual(candidates, [0]);
   });
 
   it('cell size is 0.05 degrees', () => {

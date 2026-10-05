@@ -215,7 +215,7 @@ async function amapGeocode(name: string): Promise<PlaceAnchor | null> {
   const qs = new URLSearchParams({ key, address: name });
   try {
     const res = await fetch(`https://restapi.amap.com/v3/geocode/geo?${qs}`, {
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(3500),
       headers: { 'User-Agent': 'RailVista/0.4.0 (drive-geocode)' },
     });
     if (!res.ok) return null;
@@ -240,7 +240,7 @@ async function nominatimGeocode(name: string): Promise<PlaceAnchor | null> {
   const qs = new URLSearchParams({ format: 'json', q: name, countrycodes: 'cn', limit: '1' });
   try {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?${qs}`, {
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(3500),
       headers: { 'User-Agent': 'RailVista/0.4.0 (drive-geocode)' },
     });
     if (!res.ok) return null;
@@ -256,18 +256,46 @@ async function nominatimGeocode(name: string): Promise<PlaceAnchor | null> {
   }
 }
 
-/** 本地未命中时的兜底 geocode：高德优先，Nominatim 兜底；命中回写本地锚点 */
+/**
+ * A4：geocode 结果缓存（24h）。
+ * 原实现每次未命中都要走网络，且高德失败后才串行试Nominatim，最长阻塞 12s；
+ * 用户表现为「输入了没反应」（前端 DriveHome 是空 catch）。
+ */
+const geocodeCache = new Map<string, { at: number; hit: PlaceHit | null }>();
+const GEOCODE_TTL_MS = 24 * 3600 * 1000;
+const GEOCACHE_MAX = 200;
+
+/** 本地未命中时的兜底 geocode：高德与 Nominatim 并行取先成功者，命中回写本地锚点 */
 export async function geocodeFallback(name: string): Promise<PlaceHit | null> {
-  const anchor = (await amapGeocode(name)) ?? (await nominatimGeocode(name));
-  if (!anchor) return null;
-  rememberPlace(anchor);
-  return {
-    kind: 'place',
-    id: anchor.name,
-    name: anchor.name,
-    sub: [anchor.province, '网络定位'].filter(Boolean).join(' · '),
-    lng: anchor.lng,
-    lat: anchor.lat,
-    score: 30,
-  };
+  const key = name.trim();
+  if (!key) return null;
+  const cached = geocodeCache.get(key);
+  if (cached && Date.now() - cached.at < GEOCODE_TTL_MS) return cached.hit;
+
+  // A4：原为串行 await（高德 6s 超时后才试 Nominatim 再 6s，最长 12s）。
+  // 改为并行竞速，总耗时 = min(两者)，并把超时压到 3.5s。
+  const hit = await Promise.any(
+    [amapGeocode(key), nominatimGeocode(key)].map((p) =>
+      p.catch(() => null),
+    ),
+  ).then((anchor) => {
+    if (!anchor) return null;
+    rememberPlace(anchor);
+    return {
+      kind: 'place' as const,
+      id: anchor.name,
+      name: anchor.name,
+      sub: [anchor.province, '网络定位'].filter(Boolean).join(' · '),
+      lng: anchor.lng,
+      lat: anchor.lat,
+      score: 30,
+    };
+  });
+
+  if (geocodeCache.size >= GEOCACHE_MAX) {
+    const oldest = geocodeCache.keys().next().value;
+    if (oldest) geocodeCache.delete(oldest);
+  }
+  geocodeCache.set(key, { at: Date.now(), hit });
+  return hit;
 }

@@ -195,8 +195,8 @@ buf.write('RVRT', 0, 'ascii');
 buf.writeInt32LE(1, 4); // version
 buf.writeInt32LE(N, 8);
 buf.writeInt32LE(E, 12);
-buf.writeInt32LE(1, 16); // reserved=1：尾部含 nodeFlag
-buf.writeInt32LE(0, 20);
+buf.writeInt32LE(1, 16); // reserved=1：尾部含 nodeFlag（读端见 roadTopology.ts，必须读 offset 16）
+buf.writeInt32LE(0, 20); // pad
 
 // CSR：edgeOffset + 双向边（u 的邻接里存 (v)，v 的邻接里存 (u)）
 const byNode = new Map();

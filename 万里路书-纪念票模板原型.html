@@ -3,1065 +3,783 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>万里路书 · 旅行纪念票模板系统</title>
+<title>万里路书 · 旅行纪念票模板系统 v2</title>
 <style>
+/* ============================================================
+   万里路书 · 旅行纪念票 模板原型 v2
+   设计语言：典藏票据感 —— 烫金 / 防伪底纹 / 钢印边框 / 齿孔撕线
+   资产目录：ticket-assets/brand（品牌logo） ticket-assets/logos（航司/联盟官方logo）
+   ============================================================ */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --brand-gold: #D4A853;
-  --brand-dark: #1a1a2e;
-  --brand-navy: #16213e;
-  --brand-accent: #e94560;
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255,255,255,0.7);
-  --text-muted: rgba(255,255,255,0.5);
-  --card-radius: 16px;
-  --ticket-ratio: 0.618;
+  --page-bg: #0a0a10;
+  --gold: #D4A853;
+  --gold-hi: #f6e2a5;
+  --gold-dk: #8a6d2f;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
-  background: #0f0f1a;
-  color: var(--text-primary);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212,168,83,0.07), transparent 60%),
+    var(--page-bg);
+  color: #fff;
   min-height: 100vh;
-  padding: 40px 20px;
+  padding: 44px 20px 80px;
 }
 
-.app-header {
-  text-align: center;
-  margin-bottom: 48px;
+/* ---------- 页头 ---------- */
+.app-header { text-align: center; margin-bottom: 34px; }
+.app-header .brand-lockup {
+  height: 40px; opacity: .92; margin-bottom: 14px;
+  filter: drop-shadow(0 2px 12px rgba(212,168,83,.25));
 }
-
 .app-header h1 {
-  font-size: 32px;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--brand-gold), #f5d799);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 8px;
+  font-size: 30px; font-weight: 800; letter-spacing: 6px;
+  background: linear-gradient(100deg, var(--gold-dk), var(--gold-hi) 30%, var(--gold) 55%, var(--gold-hi) 80%, var(--gold-dk));
+  background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: foil 5s linear infinite;
 }
+.app-header p { color: rgba(255,255,255,.45); font-size: 12px; letter-spacing: 3px; margin-top: 8px; }
+@keyframes foil { to { background-position: 200% 0; } }
 
-.app-header p {
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-/* Tab Navigation */
-.tab-nav {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
-}
-
+/* ---------- Tab ---------- */
+.tab-nav { display: flex; justify-content: center; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
 .tab-btn {
-  padding: 10px 20px;
-  border: 1px solid rgba(212,168,83,0.3);
-  border-radius: 24px;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
+  padding: 9px 18px; border: 1px solid rgba(212,168,83,.28); border-radius: 22px;
+  background: transparent; color: rgba(255,255,255,.6); font-size: 13px; cursor: pointer;
+  transition: all .25s; font-family: inherit; letter-spacing: 1px;
 }
-
-.tab-btn:hover {
-  border-color: var(--brand-gold);
-  color: var(--brand-gold);
-}
-
+.tab-btn:hover { border-color: var(--gold); color: var(--gold); }
 .tab-btn.active {
-  background: linear-gradient(135deg, var(--brand-gold), #c49b3f);
-  border-color: var(--brand-gold);
-  color: #1a1a2e;
-  font-weight: 600;
+  background: linear-gradient(135deg, var(--gold), #c49b3f); border-color: var(--gold);
+  color: #1a1a2e; font-weight: 700; box-shadow: 0 4px 18px rgba(212,168,83,.3);
 }
 
-/* Ticket Container */
-.ticket-showcase {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 40px;
-  flex-wrap: wrap;
-  max-width: 1200px;
-  margin: 0 auto;
+/* ---------- 控制条 ---------- */
+.controls { display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 26px; min-height: 36px; flex-wrap: wrap; }
+.seg { display: flex; border: 1px solid rgba(212,168,83,.3); border-radius: 20px; overflow: hidden; }
+.seg-btn {
+  padding: 7px 16px; background: transparent; border: none; color: rgba(255,255,255,.55);
+  font-size: 12px; cursor: pointer; font-family: inherit; letter-spacing: 1px; transition: all .2s;
 }
+.seg-btn.active { background: rgba(212,168,83,.9); color: #141428; font-weight: 700; }
+.ctl-label { font-size: 12px; color: rgba(255,255,255,.4); letter-spacing: 1px; }
+select.airline-sel {
+  background: rgba(255,255,255,.06); color: #fff; border: 1px solid rgba(212,168,83,.35);
+  border-radius: 8px; padding: 7px 12px; font-size: 13px; font-family: inherit; outline: none; cursor: pointer;
+}
+select.airline-sel option { background: #14142a; color: #fff; }
 
-.ticket-panel {
-  display: none;
-}
-.ticket-panel.active {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  flex-wrap: wrap;
-}
+/* ---------- 舞台 ---------- */
+.stage { display: none; justify-content: center; align-items: flex-start; gap: 44px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto; }
+.stage.active { display: flex; }
 
-/* Ticket Base */
+/* ============================================================
+   票据通用骨架
+   ============================================================ */
 .ticket {
-  width: 380px;
-  min-height: 600px;
-  border-radius: var(--card-radius);
-  position: relative;
+  --acc: var(--gold); --acc-hi: var(--gold-hi);
+  --tx: #ffffff; --tx2: rgba(255,255,255,.72); --tx3: rgba(255,255,255,.45);
+  --line: rgba(255,255,255,.14); --chip: rgba(255,255,255,.06); --chip-line: rgba(255,255,255,.12);
+  width: 400px; min-height: 640px; border-radius: 20px; position: relative;
+  box-shadow: 0 24px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(212,168,83,.18), 0 0 40px rgba(212,168,83,.06);
+  transition: transform .35s ease, box-shadow .35s ease;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 1px rgba(212,168,83,0.3);
-  transition: transform 0.3s ease;
+}
+.ticket:hover { transform: translateY(-5px); box-shadow: 0 32px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(212,168,83,.35), 0 0 60px rgba(212,168,83,.12); }
+
+/* 钢印双层内框 */
+.frame { position: absolute; inset: 9px; border: 1px solid color-mix(in srgb, var(--acc) 34%, transparent); border-radius: 14px; pointer-events: none; z-index: 3; }
+.frame::before { content: ''; position: absolute; inset: 4px; border: 1px solid color-mix(in srgb, var(--acc) 14%, transparent); border-radius: 10px; }
+/* 四角饰纹 */
+.corner { position: absolute; width: 18px; height: 18px; z-index: 4; pointer-events: none; opacity: .8; }
+.corner.tl { top: 14px; left: 14px; border-top: 2px solid var(--acc); border-left: 2px solid var(--acc); border-top-left-radius: 8px; }
+.corner.tr { top: 14px; right: 14px; border-top: 2px solid var(--acc); border-right: 2px solid var(--acc); border-top-right-radius: 8px; }
+.corner.bl { bottom: 14px; left: 14px; border-bottom: 2px solid var(--acc); border-left: 2px solid var(--acc); border-bottom-left-radius: 8px; }
+.corner.br { bottom: 14px; right: 14px; border-bottom: 2px solid var(--acc); border-right: 2px solid var(--acc); border-bottom-right-radius: 8px; }
+/* 品牌水印（弱化处理） */
+.wm { position: absolute; left: 50%; top: 46%; transform: translate(-50%,-50%); width: 76%; opacity: .05; z-index: 1; pointer-events: none; }
+/* 防伪底纹 */
+.guil { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cg fill='none' stroke='%23D4A853' stroke-opacity='.09'%3E%3Cpath d='M0 35 Q35 10 70 35 T140 35'/%3E%3Cpath d='M0 70 Q35 45 70 70 T140 70'/%3E%3Cpath d='M0 105 Q35 80 70 105 T140 105'/%3E%3Ccircle cx='70' cy='70' r='46' stroke-opacity='.05'/%3E%3Ccircle cx='70' cy='70' r='30' stroke-opacity='.04'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-.ticket:hover {
-  transform: translateY(-4px) scale(1.01);
+.t-inner { position: relative; z-index: 2; padding: 30px 26px 24px; min-height: 640px; display: flex; flex-direction: column; }
+
+/* 顶部品牌行 */
+.microtop { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.microtop .brand { display: flex; align-items: center; gap: 7px; }
+.microtop .brand img { height: 15px; opacity: .85; }
+.microtop .brand span { font-size: 9px; letter-spacing: 2.5px; color: var(--tx3); }
+.typechip {
+  font-size: 9px; letter-spacing: 2px; color: var(--acc); border: 1px solid color-mix(in srgb, var(--acc) 45%, transparent);
+  padding: 3px 9px; border-radius: 3px; background: color-mix(in srgb, var(--acc) 8%, transparent);
 }
 
-/* Perforated edge */
-.ticket::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 24px;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 8px,
-    rgba(0,0,0,0.15) 8px,
-    rgba(0,0,0,0.15) 10px,
-    transparent 10px,
-    transparent 18px
-  );
-  border-right: 1px dashed rgba(255,255,255,0.15);
-  z-index: 2;
+/* 序列号 + 条码 */
+.serialrow { display: flex; justify-content: space-between; align-items: center; margin: 8px 0 4px; }
+.serial { font-family: 'SF Mono','JetBrains Mono','Consolas',monospace; font-size: 10px; letter-spacing: 1px; color: var(--tx3); }
+.barcode { width: 96px; height: 20px; opacity: .8;
+  background: repeating-linear-gradient(90deg, var(--tx2) 0 1.5px, transparent 1.5px 3px, var(--tx2) 3px 4.5px, transparent 4.5px 6px, var(--tx2) 6px 8px, transparent 8px 10.5px, var(--tx2) 10.5px 12px, transparent 12px 14px);
 }
 
-.ticket-inner {
-  padding: 32px 28px 28px 44px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 1;
-}
+/* 标题区 */
+.t-title { font-size: 19px; font-weight: 800; letter-spacing: 3px; color: var(--tx); margin-top: 10px; }
+.t-title .dia { color: var(--acc); font-size: 12px; vertical-align: 2px; }
+.t-sub { font-size: 11px; color: var(--tx2); letter-spacing: 2px; margin-top: 5px; }
 
-/* === Railway Ticket === */
-.ticket--railway {
-  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
-}
-.ticket--railway::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 80 Q60 20 100 80 T180 80' fill='none' stroke='rgba(212,168,83,0.05)' stroke-width='1'/%3E%3Cpath d='M20 120 Q60 60 100 120 T180 120' fill='none' stroke='rgba(212,168,83,0.03)' stroke-width='1'/%3E%3Cpath d='M20 160 Q60 100 100 160 T180 160' fill='none' stroke='rgba(212,168,83,0.04)' stroke-width='1'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
+/* 路线区 */
+.routebox { margin: 16px 0 12px; padding: 15px 14px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); position: relative; }
+.route-line { display: flex; align-items: center; gap: 10px; }
+.station { text-align: center; }
+.station .cn { font-size: 24px; font-weight: 800; color: var(--tx); letter-spacing: 2px; }
+.station .py { font-size: 8px; letter-spacing: 2px; color: var(--tx3); margin-top: 3px; }
+.arrowline { flex: 1; position: relative; height: 14px; }
+.arrowline .rail { position: absolute; left: 0; right: 0; top: 6px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--acc) 15%, var(--acc) 85%, transparent); border-radius: 1px; }
+.arrowline .rail::after { content: ''; position: absolute; left: 0; right: 0; top: 4px; height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--acc) 45%, transparent) 15%, color-mix(in srgb, var(--acc) 45%, transparent) 85%, transparent); }
+.arrowline .train { position: absolute; left: 50%; top: -3px; transform: translateX(-50%); font-size: 12px; color: var(--acc);
+  background: color-mix(in srgb, var(--acc) 12%, transparent); padding: 1px 6px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--acc) 35%, transparent); }
+.route-meta { display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; color: var(--tx2); }
+.route-meta b { color: var(--acc); font-weight: 600; }
 
-/* === Drive Ticket === */
-.ticket--drive {
-  background: linear-gradient(160deg, #2d1b4e 0%, #8b3a62 40%, #d4654a 100%);
-}
-.ticket--drive::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='300' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 90 Q50 70 80 85 T150 60 T220 75 T300 50' fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='2'/%3E%3Cpath d='M0 50 L30 45 L60 55 L90 30 L120 40 L150 20 L180 35 L210 25 L240 40 L270 20 L300 30' fill='none' stroke='rgba(255,255,255,0.04)' stroke-width='1'/%3E%3C/svg%3E") repeat-x bottom;
-  pointer-events: none;
-}
+/* 数据格 */
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin: 12px 0; }
+.stat { background: color-mix(in srgb, var(--chip) 80%, transparent); backdrop-filter: blur(2px); padding: 9px 12px; }
+.stat .lb { font-size: 9px; letter-spacing: 1.5px; color: var(--tx3); }
+.stat .vl { font-size: 15px; font-weight: 700; color: var(--tx); margin-top: 3px; }
+.stat .vl small { font-size: 10px; font-weight: 400; color: var(--tx2); }
 
-/* === Flight Ticket === */
-.ticket--flight {
-  background: linear-gradient(160deg, #0a1628 0%, #1e3a5f 40%, #4a90d9 100%);
-}
-.ticket--flight::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='40' r='1' fill='rgba(255,255,255,0.15)'/%3E%3Ccircle cx='80' cy='20' r='0.8' fill='rgba(255,255,255,0.1)'/%3E%3Ccircle cx='150' cy='60' r='1.2' fill='rgba(255,255,255,0.12)'/%3E%3Ccircle cx='50' cy='120' r='0.6' fill='rgba(255,255,255,0.08)'/%3E%3Ccircle cx='170' cy='140' r='1' fill='rgba(255,255,255,0.1)'/%3E%3Ccircle cx='100' cy='170' r='0.8' fill='rgba(255,255,255,0.06)'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
+/* 标签行 */
+.tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 10px; }
+.tag { font-size: 10px; color: var(--tx2); border: 1px solid var(--chip-line); background: var(--chip); padding: 3px 9px; border-radius: 12px; }
+.tag.hot { color: var(--acc); border-color: color-mix(in srgb, var(--acc) 40%, transparent); background: color-mix(in srgb, var(--acc) 10%, transparent); }
 
-/* === Combined Ticket === */
-.ticket--combined {
-  background: linear-gradient(160deg, #1a2e1a 0%, #2d5a3f 40%, #3d8b5f 100%);
-}
+/* 感言 */
+.quote { margin-top: auto; padding: 11px 14px; font-size: 12.5px; line-height: 1.7; color: var(--tx2); font-style: italic;
+  border-left: 2px solid var(--acc); background: color-mix(in srgb, var(--acc) 7%, transparent); border-radius: 0 8px 8px 0; }
 
-/* === Annual Ticket === */
-.ticket--annual {
-  background: linear-gradient(160deg, #0a0a0f 0%, #1a1a2e 40%, #0f0f1a 100%);
-  border: 1px solid rgba(212,168,83,0.3);
-}
-.ticket--annual::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: 
-    radial-gradient(ellipse at 30% 20%, rgba(212,168,83,0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 80%, rgba(233,69,96,0.05) 0%, transparent 50%);
-  pointer-events: none;
-}
+/* 页脚 */
+.t-foot { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.t-foot .micro { font-size: 8px; letter-spacing: 1.5px; color: var(--tx3); line-height: 1.8; }
+.qrbox { text-align: center; }
+.qrbox svg { width: 46px; height: 46px; background: #fff; border-radius: 5px; padding: 4px; }
+.qrbox .cap { font-size: 7.5px; color: var(--tx3); letter-spacing: 1px; margin-top: 3px; }
 
-/* Ticket Header */
-.ticket-header {
-  margin-bottom: 24px;
+/* ============================================================
+   票种 1 · 铁路（典藏深蓝 / 经典蓝票 双风格）
+   ============================================================ */
+.t-rail { background: linear-gradient(165deg, #131327 0%, #16213e 45%, #0e315c 100%); }
+.t-rail.t-blue {
+  --acc: #0d5c8c; --acc-hi: #0d5c8c;
+  --tx: #0d3b66; --tx2: rgba(13,59,102,.78); --tx3: rgba(13,59,102,.52);
+  --line: rgba(13,59,102,.2); --chip: rgba(255,255,255,.35); --chip-line: rgba(13,59,102,.22);
+  background: linear-gradient(170deg, #f3fbff 0%, #dceef9 55%, #c8e2f2 100%);
+  box-shadow: 0 24px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(13,92,140,.25);
 }
-
-.ticket-brand {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--brand-gold);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
+.t-rail.t-blue .guil {
+  opacity: .9;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cg fill='none' stroke='%237fb8d4' stroke-opacity='.38'%3E%3Cpath d='M0 40 Q40 12 80 40 T160 40'/%3E%3Cpath d='M0 80 Q40 52 80 80 T160 80'/%3E%3Cpath d='M0 120 Q40 92 80 120 T160 120'/%3E%3Ccircle cx='80' cy='80' r='52' stroke-opacity='.22'/%3E%3Ccircle cx='80' cy='80' r='36' stroke-opacity='.16'/%3E%3Ccircle cx='80' cy='80' r='22' stroke-opacity='.12'/%3E%3C/g%3E%3C/svg%3E");
 }
+.t-rail.t-blue .wm { opacity: .07; filter: invert(.35) sepia(1) saturate(3) hue-rotate(170deg); }
+.t-rail.t-blue .serial { color: #d0342c; font-weight: 700; }
+.t-rail.t-blue .barcode { background: repeating-linear-gradient(90deg, #0d3b66 0 1.5px, transparent 1.5px 3px, #0d3b66 3px 4.5px, transparent 4.5px 6px, #0d3b66 6px 8px, transparent 8px 10.5px); }
+.t-rail.t-blue .qrbox svg { background: #fff; }
+.cr-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.cr-row svg { width: 20px; height: 20px; }
+.cr-row span { font-size: 9px; letter-spacing: 2px; color: var(--tx3); }
 
-.ticket-brand .diamond { font-size: 8px; }
+/* ============================================================
+   票种 2 · 自驾
+   ============================================================ */
+.t-drive { background: linear-gradient(168deg, #221232 0%, #63284c 48%, #b8503c 100%); }
+.t-drive .mountains { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; pointer-events: none; opacity: .5; }
+.shields { display: flex; gap: 7px; margin: 10px 0 4px; flex-wrap: wrap; }
+.shield { width: 40px; height: 44px; position: relative; }
+.shield svg { width: 100%; height: 100%; }
+.wp-row { display: flex; align-items: flex-start; margin: 12px 0 6px; }
+.wp { text-align: center; flex: 1; position: relative; }
+.wp .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--acc); margin: 0 auto; box-shadow: 0 0 8px color-mix(in srgb, var(--acc) 80%, transparent); position: relative; z-index: 2; }
+.wp .nm { font-size: 11px; color: var(--tx); margin-top: 6px; font-weight: 600; }
+.wp:not(:last-child)::after { content: ''; position: absolute; top: 3.5px; left: calc(50% + 7px); right: calc(-50% + 7px); border-top: 1.5px dashed color-mix(in srgb, var(--acc) 55%, transparent); z-index: 1; }
+.elev { margin: 8px 0 2px; }
+.elev svg { width: 100%; height: 52px; display: block; }
 
-.ticket-type {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
+/* ============================================================
+   票种 3 · 飞行（登机牌式：主券 + 副券撕线）
+   ============================================================ */
+.t-flight { background: linear-gradient(168deg, #071120 0%, #10304f 52%, #27619b 100%); width: 430px; }
+.t-flight .t-inner { min-height: 620px; padding-right: 0; }
+.bp-wrap { display: flex; flex: 1; }
+.bp-main { flex: 1; padding-right: 18px; display: flex; flex-direction: column; }
+.bp-stub { width: 104px; position: relative; padding-left: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 6px; }
+.perf-v { position: absolute; left: 0; top: -30px; bottom: -24px; border-left: 2px dashed rgba(255,255,255,.28); }
+.notch { position: absolute; left: -11px; width: 22px; height: 22px; border-radius: 50%; background: var(--page-bg); }
+.notch.n-top { top: -34px; } .notch.n-bot { bottom: -35px; }
+.al-row { display: flex; align-items: center; gap: 9px; margin: 10px 0 4px; }
+.al-logo { height: 34px; min-width: 44px; background: #fff; border-radius: 7px; padding: 4px 7px; object-fit: contain;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.15); }
+.al-name { font-size: 14px; font-weight: 700; color: var(--tx); letter-spacing: 1px; }
+.al-en { font-size: 8.5px; letter-spacing: 1.5px; color: var(--tx3); margin-top: 2px; }
+.al-no { margin-left: auto; font-family: 'SF Mono','Consolas',monospace; font-size: 17px; font-weight: 700; color: var(--acc); letter-spacing: 1px; }
+.alliance-chip { display: inline-flex; align-items: center; gap: 5px; margin: 6px 0 2px; padding: 3px 9px 3px 4px; border-radius: 12px;
+  background: rgba(255,255,255,.92); box-shadow: 0 1px 5px rgba(0,0,0,.3); }
+.alliance-chip img { height: 15px; object-fit: contain; }
+.alliance-chip span { font-size: 9px; color: #333; letter-spacing: .5px; font-weight: 600; }
+.alliance-chip.hidden { display: none; }
+.iata-row { display: flex; align-items: center; gap: 8px; margin: 12px 0 2px; }
+.iata { font-size: 38px; font-weight: 800; letter-spacing: 2px; color: var(--tx); line-height: 1; }
+.iata-sub { font-size: 10px; color: var(--tx2); letter-spacing: 1px; margin-top: 4px; }
+.fly-arc { flex: 1; height: 44px; position: relative; }
+.fly-arc svg { width: 100%; height: 100%; overflow: visible; }
+.board-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin: 12px 0; }
+.board-grid .stat { background: rgba(8,20,36,.55); }
+.stub-vtext { writing-mode: vertical-rl; font-family: 'SF Mono','Consolas',monospace; font-size: 11px; letter-spacing: 3px; color: var(--tx2); }
+.stub-barcode { width: 22px; height: 110px;
+  background: repeating-linear-gradient(0deg, var(--tx2) 0 1.5px, transparent 1.5px 3px, var(--tx2) 3px 5px, transparent 5px 6.5px, var(--tx2) 6.5px 8px, transparent 8px 11px); opacity: .8; }
+.stub-item { text-align: center; }
+.stub-item .lb { font-size: 8px; letter-spacing: 1.5px; color: var(--tx3); }
+.stub-item .vl { font-size: 13px; font-weight: 700; color: var(--tx); margin-top: 2px; }
 
-.ticket-subtitle {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
+/* ============================================================
+   票种 4 · 综合
+   ============================================================ */
+.t-combined { background: linear-gradient(168deg, #0e1d14 0%, #1c4030 52%, #2e6a4e 100%); }
+.seg-tl { margin: 12px 0; position: relative; padding-left: 20px; }
+.seg-tl::before { content: ''; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 1.5px;
+  background: linear-gradient(180deg, var(--acc), color-mix(in srgb, var(--acc) 20%, transparent)); }
+.seg-item { position: relative; padding: 6px 0; }
+.seg-item::before { content: ''; position: absolute; left: -19px; top: 12px; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--acc); box-shadow: 0 0 8px color-mix(in srgb, var(--acc) 70%, transparent); }
+.seg-item .k { font-size: 12px; color: var(--tx); font-weight: 600; }
+.seg-item .v { font-size: 10.5px; color: var(--tx2); margin-top: 2px; }
+.city-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 8px 0; }
+.city-chain .c { font-size: 12px; color: var(--tx); font-weight: 600; }
+.city-chain .sep { color: var(--acc); font-size: 10px; }
 
-/* Route Section */
-.ticket-route {
-  margin: 20px 0;
-  padding: 16px 0;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
+/* ============================================================
+   票种 5 · 年度（全息限定）
+   ============================================================ */
+.t-annual { background: linear-gradient(165deg, #08080c 0%, #14141f 50%, #0a0a12 100%); }
+.t-annual .holo-sweep { position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: screen; opacity: .5;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,95,109,.12) 42%, rgba(255,195,113,.12) 48%, rgba(71,232,145,.12) 54%, rgba(79,172,254,.12) 60%, rgba(185,103,255,.12) 66%, transparent 78%);
+  background-size: 250% 100%; animation: sweep 7s linear infinite; }
+@keyframes sweep { to { background-position: -250% 0; } }
+.t-annual .constel { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .5; }
+.limited-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 12px; border-radius: 14px;
+  border: 1px solid rgba(212,168,83,.5); background: linear-gradient(100deg, rgba(212,168,83,.16), rgba(246,226,165,.08));
+  font-size: 9.5px; letter-spacing: 2px; color: var(--gold-hi); }
+.annual-hero { text-align: center; padding: 20px 0 16px; margin: 12px 0; position: relative;
+  border-top: 1px solid rgba(212,168,83,.25); border-bottom: 1px solid rgba(212,168,83,.25); }
+.annual-hero .lead { font-size: 12px; color: var(--tx2); letter-spacing: 2px; }
+.annual-hero .num { font-size: 52px; font-weight: 900; letter-spacing: 2px; line-height: 1.15;
+  background: linear-gradient(100deg, var(--gold-dk), var(--gold-hi) 30%, var(--gold) 55%, var(--gold-hi) 80%, var(--gold-dk));
+  background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: foil 4s linear infinite; }
+.annual-hero .unit { font-size: 15px; color: var(--tx2); letter-spacing: 4px; }
+.annual-hero .equiv { font-size: 10.5px; color: var(--tx3); margin-top: 7px; letter-spacing: 1px; }
+.holo-strip { height: 5px; border-radius: 3px; margin: 10px 0;
+  background: linear-gradient(90deg, #ff5f6d, #ffc371, #47e891, #4facfe, #b967ff, #ff5f6d);
+  background-size: 300% 100%; animation: foil 6s linear infinite; opacity: .8; }
 
-.route-line {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
+/* ---------- 信息面板 ---------- */
+.info-panel { max-width: 340px; padding: 6px 0; }
+.info-panel h3 { font-size: 15px; color: var(--gold); margin-bottom: 14px; font-weight: 700; letter-spacing: 2px; }
+.info-sec { margin-bottom: 16px; }
+.info-sec h4 { font-size: 12px; color: rgba(255,255,255,.6); margin-bottom: 7px; font-weight: 600; letter-spacing: 1px; }
+.info-sec ul { list-style: none; }
+.info-sec li { font-size: 11.5px; color: rgba(255,255,255,.42); padding: 3px 0 3px 12px; position: relative; line-height: 1.6; }
+.info-sec li::before { content: '·'; position: absolute; left: 0; color: var(--gold); font-weight: bold; }
+.swatches { display: flex; gap: 7px; margin-top: 6px; }
+.sw { width: 30px; height: 30px; border-radius: 7px; border: 1px solid rgba(255,255,255,.12); }
 
-.route-city {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.route-arrow {
-  flex: 1;
-  height: 2px;
-  background: linear-gradient(90deg, var(--brand-gold), rgba(212,168,83,0.3));
-  position: relative;
-  border-radius: 1px;
-}
-
-.route-arrow::after {
-  content: '▶';
-  position: absolute;
-  right: -4px;
-  top: -7px;
-  font-size: 10px;
-  color: var(--brand-gold);
-}
-
-.route-detail {
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.8;
-}
-
-.route-detail span {
-  color: var(--brand-gold);
-  font-weight: 500;
-}
-
-/* Stats Grid */
-.ticket-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin: 16px 0;
-}
-
-.stat-item {
-  background: rgba(255,255,255,0.05);
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-
-.stat-label {
-  font-size: 10px;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-  letter-spacing: 1px;
-}
-
-.stat-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.stat-value .unit {
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--text-secondary);
-}
-
-/* Highlights */
-.ticket-highlights {
-  margin: 16px 0;
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.highlight {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.highlight .icon { font-size: 14px; }
-.highlight .count { color: var(--brand-gold); font-weight: 600; }
-
-/* Quote */
-.ticket-quote {
-  margin: auto 0 20px;
-  padding: 12px 16px;
-  background: rgba(212,168,83,0.08);
-  border-left: 3px solid var(--brand-gold);
-  border-radius: 0 8px 8px 0;
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-style: italic;
-  line-height: 1.6;
-}
-
-/* Footer */
-.ticket-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-
-.ticket-serial {
-  font-size: 10px;
-  color: var(--text-muted);
-  font-family: 'SF Mono', 'Fira Code', monospace;
-  letter-spacing: 0.5px;
-}
-
-.ticket-qr {
-  width: 48px;
-  height: 48px;
-  background: rgba(255,255,255,0.9);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  color: #333;
-  font-weight: 600;
-}
-
-/* Annual special */
-.annual-hero {
-  text-align: center;
-  padding: 24px 0;
-  margin: 16px 0;
-  border-top: 1px solid rgba(212,168,83,0.2);
-  border-bottom: 1px solid rgba(212,168,83,0.2);
-}
-
-.annual-number {
-  font-size: 48px;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--brand-gold), #f5d799, var(--brand-gold));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1.2;
-}
-
-.annual-unit {
-  font-size: 18px;
-  color: var(--text-secondary);
-  margin-top: 4px;
-}
-
-.annual-equiv {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 8px;
-}
-
-.annual-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin: 16px 0;
-}
-
-.annual-stat {
-  text-align: center;
-  padding: 8px 4px;
-  background: rgba(212,168,83,0.06);
-  border-radius: 8px;
-}
-
-.annual-stat .num {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--brand-gold);
-}
-
-.annual-stat .label {
-  font-size: 10px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-/* Route waypoints (drive ticket) */
-.route-waypoints {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  margin: 12px 0;
-  flex-wrap: wrap;
-}
-
-.waypoint {
-  font-size: 13px;
-  color: var(--text-primary);
-  font-weight: 500;
-}
-
-.waypoint-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--brand-gold);
-  margin: 0 6px;
-  flex-shrink: 0;
-}
-
-.waypoint-line {
-  width: 16px;
-  height: 1px;
-  background: rgba(212,168,83,0.5);
-  margin: 0 2px;
-}
-
-/* Info panel beside ticket */
-.info-panel {
-  max-width: 360px;
-  padding: 24px;
-}
-
-.info-panel h3 {
-  font-size: 16px;
-  color: var(--brand-gold);
-  margin-bottom: 16px;
-  font-weight: 600;
-}
-
-.info-section {
-  margin-bottom: 20px;
-}
-
-.info-section h4 {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-.info-section ul {
-  list-style: none;
-  padding: 0;
-}
-
-.info-section li {
-  font-size: 12px;
-  color: var(--text-muted);
-  padding: 4px 0;
-  padding-left: 12px;
-  position: relative;
-}
-
-.info-section li::before {
-  content: '·';
-  position: absolute;
-  left: 0;
-  color: var(--brand-gold);
-  font-weight: bold;
-}
-
-.color-swatches {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.swatch {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 2px solid rgba(255,255,255,0.1);
-}
-
-/* Responsive */
-@media (max-width: 860px) {
-  .ticket-showcase { gap: 24px; }
-  .ticket { width: 340px; min-height: 540px; }
-  .info-panel { max-width: 340px; }
-}
-
-@media (max-width: 420px) {
-  .ticket { width: 100%; }
-  .tab-nav { gap: 4px; }
-  .tab-btn { padding: 8px 14px; font-size: 12px; }
-}
+@media (max-width: 900px) { .stage { gap: 26px; } .info-panel { max-width: 400px; } }
+@media (max-width: 460px) { .ticket, .t-flight { width: 100%; min-height: auto; } .t-inner { min-height: auto; } }
 </style>
 </head>
 <body>
 
 <header class="app-header">
+  <img class="brand-lockup" src="ticket-assets/brand/heyworld-brand.png" alt="Hey World 万里路书">
   <h1>万里路书 · 旅行纪念票</h1>
-  <p>模板系统设计原型 · 视界HeyWorld · v1.0</p>
+  <p>TEMPLATE SYSTEM v2 · 典藏票据设计语言</p>
 </header>
 
 <nav class="tab-nav">
-  <button class="tab-btn active" data-tab="railway">🚄 铁路纪念票</button>
+  <button class="tab-btn active" data-tab="rail">🚄 铁路纪念票</button>
   <button class="tab-btn" data-tab="drive">🚗 自驾纪念票</button>
   <button class="tab-btn" data-tab="flight">✈️ 飞行纪念票</button>
   <button class="tab-btn" data-tab="combined">🗺️ 综合纪念票</button>
   <button class="tab-btn" data-tab="annual">🏆 年度纪念票</button>
 </nav>
 
-<main class="ticket-showcase">
+<!-- ============ 铁路 ============ -->
+<div class="controls" id="ctl-rail">
+  <span class="ctl-label">票面风格</span>
+  <div class="seg">
+    <button class="seg-btn active" data-railstyle="dark">典藏 · 玄蓝烫金</button>
+    <button class="seg-btn" data-railstyle="blue">经典蓝票 · 铁路纪念</button>
+  </div>
+</div>
+<!-- ============ 飞行 ============ -->
+<div class="controls" id="ctl-flight" style="display:none">
+  <span class="ctl-label">承运航司（官方logo自动匹配）</span>
+  <select class="airline-sel" id="airlineSel"></select>
+</div>
+<div class="controls" id="ctl-none" style="display:none"></div>
 
-  <!-- ====== 铁路纪念票 ====== -->
-  <div class="ticket-panel active" id="panel-railway">
-    <div class="ticket ticket--railway">
-      <div class="ticket-inner">
-        <div class="ticket-header">
-          <div class="ticket-brand">
-            <span class="diamond">✦</span> 万里路书 · 铁路纪念票 <span class="diamond">✦</span>
-          </div>
-          <div class="ticket-subtitle">视界HeyWorld 联名款</div>
-        </div>
-
-        <div class="ticket-route">
-          <div class="route-line">
-            <span class="route-city">西宁西</span>
-            <span class="route-arrow"></span>
-            <span class="route-city">拉萨</span>
-          </div>
-          <div class="route-detail">
-            <span>Z8991次</span> · 青藏铁路<br>
-            2026.07.15 &nbsp; 19:40 发车
-          </div>
-        </div>
-
-        <div class="ticket-stats">
-          <div class="stat-item">
-            <div class="stat-label">里程</div>
-            <div class="stat-value">1,972 <span class="unit">km</span></div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">时长</div>
-            <div class="stat-value">21h40m</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">海拔爬升</div>
-            <div class="stat-value">+4,543 <span class="unit">m</span></div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">最高海拔</div>
-            <div class="stat-value">5,072 <span class="unit">m</span></div>
-          </div>
-        </div>
-
-        <div class="route-detail" style="margin:8px 0;font-size:12px;">
-          座位：07车15号下铺 · <span>风景侧</span>
-        </div>
-
-        <div class="ticket-highlights">
-          <div class="highlight">
-            <span class="icon">✨</span> 小确幸 <span class="count">5</span> 处已打卡
-          </div>
-          <div class="highlight">
-            <span class="icon">📸</span> 取景框 <span class="count">12</span> 张
-          </div>
-        </div>
-
-        <div class="ticket-quote">
-          "在可可西里看到了藏羚羊"
-        </div>
-
-        <div class="ticket-footer">
-          <div class="ticket-serial">No. HW-RAIL-20260715-001</div>
-          <div class="ticket-qr">QR</div>
-        </div>
+<main>
+<!-- ================= 铁路纪念票 ================= -->
+<section class="stage active" id="stage-rail">
+  <div class="ticket t-rail" id="railTicket">
+    <div class="guil"></div>
+    <img class="wm" src="ticket-assets/brand/heyworld-brand.png" alt="">
+    <div class="frame"></div>
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <div class="t-inner">
+      <div class="microtop">
+        <div class="brand"><img src="ticket-assets/brand/heyworld-logo.png" alt=""><span>WANLI ROADBOOK · 万里路书</span></div>
+        <span class="typechip">RAILWAY PASS</span>
       </div>
-    </div>
-
-    <div class="info-panel">
-      <h3>铁路纪念票 · 设计规范</h3>
-      <div class="info-section">
-        <h4>配色方案</h4>
-        <div class="color-swatches">
-          <div class="swatch" style="background:#1a1a2e"></div>
-          <div class="swatch" style="background:#16213e"></div>
-          <div class="swatch" style="background:#0f3460"></div>
-          <div class="swatch" style="background:linear-gradient(135deg,#D4A853,#f5d799)"></div>
+      <div class="serialrow">
+        <span class="serial">No. HW-RAIL-20260715-001</span>
+        <span class="barcode"></span>
+      </div>
+      <div class="t-title"><span class="dia">✦</span> 铁路纪念票 <span class="dia">✦</span></div>
+      <div class="t-sub">青藏铁路 · 天路之旅</div>
+      <div class="cr-row">
+        <svg viewBox="0 0 48 48" fill="none"><path d="M24 4c7 7 11 13 11 19H13c0-6 4-12 11-19z" fill="currentColor" opacity=".9" style="color:var(--acc)"/><rect x="10" y="27" width="28" height="4" rx="2" fill="currentColor" style="color:var(--acc)"/><rect x="16" y="33" width="16" height="4" rx="2" fill="currentColor" style="color:var(--acc)"/><rect x="8" y="39" width="32" height="4" rx="2" fill="currentColor" style="color:var(--acc)"/></svg>
+        <span>中国铁路 CHINA RAILWAY · 纪念制票</span>
+      </div>
+      <div class="routebox">
+        <div class="route-line">
+          <div class="station"><div class="cn">西宁西</div><div class="py">XININGXI</div></div>
+          <div class="arrowline"><div class="rail"></div><span class="train">Z8991</span></div>
+          <div class="station"><div class="cn">拉萨</div><div class="py">LHASA</div></div>
         </div>
+        <div class="route-meta"><span>2026.07.15 · <b>19:40</b> 开</span><span>07车15号下铺 · <b>风景侧</b></span></div>
       </div>
-      <div class="info-section">
-        <h4>数据字段</h4>
-        <ul>
-          <li>出发站 / 到达站（必填）</li>
-          <li>车次号 + 线路名（必填）</li>
-          <li>发车日期时间（必填）</li>
-          <li>里程 / 时长 / 海拔爬升（自动计算）</li>
-          <li>座位信息（选填，可隐藏）</li>
-          <li>小确幸打卡数（自动同步）</li>
-          <li>取景框照片数（自动同步）</li>
-          <li>一句话感言（用户填写/AI建议）</li>
-        </ul>
+      <div class="stats">
+        <div class="stat"><div class="lb">里程 MILEAGE</div><div class="vl">1,972 <small>km</small></div></div>
+        <div class="stat"><div class="lb">时长 DURATION</div><div class="vl">21h40m</div></div>
+        <div class="stat"><div class="lb">海拔爬升 ASCENT</div><div class="vl">+4,543 <small>m</small></div></div>
+        <div class="stat"><div class="lb">最高海拔 APEX</div><div class="vl">5,072 <small>m</small></div></div>
       </div>
-      <div class="info-section">
-        <h4>风格变体</h4>
-        <ul>
-          <li>青藏线·雪山蓝金（默认）</li>
-          <li>川渝线·巴蜀墨绿</li>
-          <li>京沪线·都市银灰</li>
-          <li>成昆线·峡谷暖橙</li>
-        </ul>
+      <div class="tags">
+        <span class="tag hot">✨ 小确幸 5 处已打卡</span>
+        <span class="tag hot">📸 取景框 12 张</span>
+        <span class="tag">供氧车厢</span>
+      </div>
+      <div class="quote">"在可可西里看到了藏羚羊"</div>
+      <div class="t-foot">
+        <div class="micro">万里路书 HEY WORLD<br>扫码查看完整路书</div>
+        <div class="qrbox">
+          <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><g fill="#1a1a2e"><rect x="0" y="0" width="7" height="7"/><rect x="14" y="0" width="7" height="7"/><rect x="0" y="14" width="7" height="7"/><rect x="2" y="2" width="3" height="3" fill="#fff"/><rect x="16" y="2" width="3" height="3" fill="#fff"/><rect x="2" y="16" width="3" height="3" fill="#fff"/><rect x="3" y="3" width="1" height="1" fill="#1a1a2e"/><rect x="17" y="3" width="1" height="1" fill="#1a1a2e"/><rect x="3" y="17" width="1" height="1" fill="#1a1a2e"/><rect x="9" y="1" width="2" height="2"/><rect x="12" y="3" width="1" height="2"/><rect x="9" y="5" width="3" height="1"/><rect x="1" y="9" width="2" height="2"/><rect x="5" y="10" width="2" height="1"/><rect x="9" y="9" width="2" height="2"/><rect x="13" y="9" width="2" height="1"/><rect x="17" y="9" width="2" height="2"/><rect x="3" y="12" width="1" height="2"/><rect x="9" y="13" width="2" height="1"/><rect x="14" y="12" width="1" height="2"/><rect x="18" y="13" width="2" height="1"/><rect x="9" y="16" width="1" height="2"/><rect x="12" y="17" width="2" height="2"/><rect x="16" y="16" width="1" height="1"/><rect x="18" y="18" width="2" height="2"/></g></svg>
+          <div class="cap">SCAN · 路书</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== 自驾纪念票 ====== -->
-  <div class="ticket-panel" id="panel-drive">
-    <div class="ticket ticket--drive">
-      <div class="ticket-inner">
-        <div class="ticket-header">
-          <div class="ticket-brand">
-            <span class="diamond">✦</span> 万里路书 · 自驾纪念票 <span class="diamond">✦</span>
-          </div>
-          <div class="ticket-subtitle">青甘环线 · 国家级精品自驾公路</div>
-        </div>
+  <aside class="info-panel">
+    <h3>铁路纪念票 · 设计说明</h3>
+    <div class="info-sec"><h4>双风格切换</h4><ul>
+      <li>典藏款：玄蓝底 + 烫金 + 防伪底纹，收藏质感</li>
+      <li>经典蓝票款：致敬 12306 蓝磁票 —— 波纹防伪底、红色票号、站名拼音、检票信息</li>
+    </ul></div>
+    <div class="info-sec"><h4>铁路元素</h4><ul>
+      <li>中国铁路徽意象图形（车头 + 钢轨断面）</li>
+      <li>站名 + 拼音双行（真实车票排版）</li>
+      <li>双线铁轨箭头 + 车次胶囊</li>
+      <li>里程 / 时长 / 海拔爬升 / 最高海拔 四宫格</li>
+    </ul></div>
+    <div class="info-sec"><h4>品牌处理</h4><ul>
+      <li>Hey World 山峰标 + 万里路书字标：顶部微标 + 5% 透明度水印，克制不抢戏</li>
+      <li>不再使用"联名款"字样</li>
+    </ul></div>
+    <div class="info-sec"><h4>配色</h4><div class="swatches">
+      <div class="sw" style="background:#131327"></div><div class="sw" style="background:#16213e"></div>
+      <div class="sw" style="background:#0e315c"></div><div class="sw" style="background:linear-gradient(120deg,#8a6d2f,#f6e2a5)"></div>
+      <div class="sw" style="background:linear-gradient(160deg,#f3fbff,#c8e2f2)"></div>
+    </div></div>
+  </aside>
+</section>
 
-        <div class="ticket-route">
-          <div class="route-waypoints">
-            <span class="waypoint">西宁</span>
-            <span class="waypoint-dot"></span>
-            <span class="waypoint">青海湖</span>
-            <span class="waypoint-dot"></span>
-            <span class="waypoint">茶卡</span>
-            <span class="waypoint-dot"></span>
-            <span class="waypoint">敦煌</span>
-            <span class="waypoint-dot"></span>
-            <span class="waypoint">西宁</span>
-          </div>
-          <div class="route-detail">
-            <span>7天6晚</span> · 2,200km · 驾驶38h<br>
-            2026.08.01 - 2026.08.07
-          </div>
-        </div>
-
-        <div class="ticket-stats">
-          <div class="stat-item">
-            <div class="stat-label">经过</div>
-            <div class="stat-value">3省 <span class="unit">/</span> 8市</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">最高海拔</div>
-            <div class="stat-value">3,817 <span class="unit">m</span></div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">加油</div>
-            <div class="stat-value">12 <span class="unit">次</span></div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">车型</div>
-            <div class="stat-value" style="font-size:13px">坦克300</div>
-          </div>
-        </div>
-
-        <div class="ticket-highlights">
-          <div class="highlight">
-            <span class="icon">✨</span> 小确幸 <span class="count">8</span> 处已打卡
-          </div>
-          <div class="highlight">
-            <span class="icon">📸</span> 取景框 <span class="count">23</span> 张
-          </div>
-        </div>
-
-        <div class="ticket-quote">
-          "当金山口的日落，值得所有的颠簸"
-        </div>
-
-        <div class="ticket-footer">
-          <div class="ticket-serial">No. HW-DRIVE-20260801-003</div>
-          <div class="ticket-qr">QR</div>
-        </div>
+<!-- ================= 自驾纪念票 ================= -->
+<section class="stage" id="stage-drive">
+  <div class="ticket t-drive">
+    <div class="guil"></div>
+    <img class="wm" src="ticket-assets/brand/heyworld-brand.png" alt="">
+    <svg class="mountains" viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M0 120 L50 66 L96 92 L150 38 L205 84 L262 50 L318 88 L360 62 L400 84 V120 Z" fill="rgba(10,5,20,.45)"/><path d="M0 120 L70 88 L130 104 L190 70 L250 100 L320 78 L400 102 V120 Z" fill="rgba(10,5,20,.6)"/></svg>
+    <div class="frame"></div>
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <div class="t-inner">
+      <div class="microtop">
+        <div class="brand"><img src="ticket-assets/brand/heyworld-logo.png" alt=""><span>WANLI ROADBOOK · 万里路书</span></div>
+        <span class="typechip">DRIVE PASS</span>
       </div>
-    </div>
-
-    <div class="info-panel">
-      <h3>自驾纪念票 · 设计规范</h3>
-      <div class="info-section">
-        <h4>配色方案</h4>
-        <div class="color-swatches">
-          <div class="swatch" style="background:#2d1b4e"></div>
-          <div class="swatch" style="background:#8b3a62"></div>
-          <div class="swatch" style="background:#d4654a"></div>
-          <div class="swatch" style="background:linear-gradient(135deg,#D4A853,#f5d799)"></div>
+      <div class="serialrow">
+        <span class="serial">No. HW-DRIVE-20260801-003</span>
+        <span class="barcode"></span>
+      </div>
+      <div class="t-title"><span class="dia">✦</span> 自驾纪念票 <span class="dia">✦</span></div>
+      <div class="t-sub">青甘环线 · 国家级精品自驾公路</div>
+      <div class="shields">
+        <span class="shield"><svg viewBox="0 0 40 44"><rect x="1" y="1" width="38" height="42" rx="5" fill="#0a7a3d" stroke="#fff" stroke-width="2"/><rect x="1" y="1" width="38" height="11" rx="5" fill="#d0342c"/><rect x="1" y="8" width="38" height="4" fill="#d0342c"/><text x="20" y="9.5" font-size="6" fill="#fff" text-anchor="middle" font-family="sans-serif">国家高速</text><text x="20" y="33" font-size="15" fill="#fff" text-anchor="middle" font-weight="bold" font-family="sans-serif">G6</text></svg></span>
+        <span class="shield"><svg viewBox="0 0 40 44"><rect x="1" y="1" width="38" height="42" rx="5" fill="#0a7a3d" stroke="#fff" stroke-width="2"/><rect x="1" y="1" width="38" height="11" rx="5" fill="#d0342c"/><rect x="1" y="8" width="38" height="4" fill="#d0342c"/><text x="20" y="9.5" font-size="6" fill="#fff" text-anchor="middle" font-family="sans-serif">国家高速</text><text x="20" y="33" font-size="13" fill="#fff" text-anchor="middle" font-weight="bold" font-family="sans-serif">G3011</text></svg></span>
+        <span class="shield"><svg viewBox="0 0 40 44"><rect x="1" y="1" width="38" height="42" rx="5" fill="#0a7a3d" stroke="#fff" stroke-width="2"/><rect x="1" y="1" width="38" height="11" rx="5" fill="#d0342c"/><rect x="1" y="8" width="38" height="4" fill="#d0342c"/><text x="20" y="9.5" font-size="6" fill="#fff" text-anchor="middle" font-family="sans-serif">国家高速</text><text x="20" y="33" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold" font-family="sans-serif">G30</text></svg></span>
+        <span class="shield"><svg viewBox="0 0 40 44"><rect x="1" y="1" width="38" height="42" rx="5" fill="#d0342c" stroke="#fff" stroke-width="2"/><text x="20" y="17" font-size="7" fill="#fff" text-anchor="middle" font-family="sans-serif">国道</text><text x="20" y="34" font-size="13" fill="#fff" text-anchor="middle" font-weight="bold" font-family="sans-serif">G109</text></svg></span>
+        <span class="tag" style="align-self:center;margin-left:4px">里程碑 K2,200</span>
+      </div>
+      <div class="wp-row">
+        <div class="wp"><div class="dot"></div><div class="nm">西宁</div></div>
+        <div class="wp"><div class="dot"></div><div class="nm">青海湖</div></div>
+        <div class="wp"><div class="dot"></div><div class="nm">茶卡</div></div>
+        <div class="wp"><div class="dot"></div><div class="nm">敦煌</div></div>
+        <div class="wp"><div class="dot"></div><div class="nm">西宁</div></div>
+      </div>
+      <div class="elev">
+        <svg viewBox="0 0 320 52" preserveAspectRatio="none">
+          <defs><linearGradient id="eg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D4A853" stop-opacity=".35"/><stop offset="1" stop-color="#D4A853" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0 34 L45 22 L85 25 L130 18 L175 8 L215 40 L265 30 L320 34 V52 H0 Z" fill="url(#eg)"/>
+          <path d="M0 34 L45 22 L85 25 L130 18 L175 8 L215 40 L265 30 L320 34" fill="none" stroke="#D4A853" stroke-width="1.5" stroke-opacity=".8"/>
+          <circle cx="175" cy="8" r="3" fill="#f6e2a5"/><text x="182" y="10" font-size="8" fill="#f6e2a5" font-family="sans-serif">当金山口 3,817m</text>
+        </svg>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="lb">行程 TRIP</div><div class="vl">7天6晚</div></div>
+        <div class="stat"><div class="lb">总里程 DISTANCE</div><div class="vl">2,200 <small>km</small></div></div>
+        <div class="stat"><div class="lb">驾驶 DRIVING</div><div class="vl">38 <small>h</small></div></div>
+        <div class="stat"><div class="lb">途经 VIA</div><div class="vl">3省 <small>/</small> 8市</div></div>
+      </div>
+      <div class="tags">
+        <span class="tag hot">✨ 小确幸 8 处</span>
+        <span class="tag hot">📸 取景框 23 张</span>
+        <span class="tag">⛽ 加油 12 次</span>
+        <span class="tag">🚙 坦克300</span>
+      </div>
+      <div class="quote">"当金山口的日落，值得所有的颠簸"</div>
+      <div class="t-foot">
+        <div class="micro">万里路书 HEY WORLD<br>扫码查看完整路书</div>
+        <div class="qrbox">
+          <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><g fill="#1a1a2e"><rect x="0" y="0" width="7" height="7"/><rect x="14" y="0" width="7" height="7"/><rect x="0" y="14" width="7" height="7"/><rect x="2" y="2" width="3" height="3" fill="#fff"/><rect x="16" y="2" width="3" height="3" fill="#fff"/><rect x="2" y="16" width="3" height="3" fill="#fff"/><rect x="3" y="3" width="1" height="1" fill="#1a1a2e"/><rect x="17" y="3" width="1" height="1" fill="#1a1a2e"/><rect x="3" y="17" width="1" height="1" fill="#1a1a2e"/><rect x="9" y="1" width="2" height="2"/><rect x="12" y="3" width="1" height="2"/><rect x="9" y="5" width="3" height="1"/><rect x="1" y="9" width="2" height="2"/><rect x="5" y="10" width="2" height="1"/><rect x="9" y="9" width="2" height="2"/><rect x="13" y="9" width="2" height="1"/><rect x="17" y="9" width="2" height="2"/><rect x="3" y="12" width="1" height="2"/><rect x="9" y="13" width="2" height="1"/><rect x="14" y="12" width="1" height="2"/><rect x="18" y="13" width="2" height="1"/><rect x="9" y="16" width="1" height="2"/><rect x="12" y="17" width="2" height="2"/><rect x="16" y="16" width="1" height="1"/><rect x="18" y="18" width="2" height="2"/></g></svg>
+          <div class="cap">SCAN · 路书</div>
         </div>
-      </div>
-      <div class="info-section">
-        <h4>数据字段</h4>
-        <ul>
-          <li>途经点列表（必填，支持多个）</li>
-          <li>线路名称 + 等级标签</li>
-          <li>天数 / 总里程 / 驾驶时长</li>
-          <li>经过省市数 / 最高海拔</li>
-          <li>加油/充电次数</li>
-          <li>车型（选填，可隐藏）</li>
-          <li>小确幸打卡数 + 照片数</li>
-          <li>一句话感言</li>
-        </ul>
-      </div>
-      <div class="info-section">
-        <h4>风格变体</h4>
-        <ul>
-          <li>青甘环线·大漠落霞（默认）</li>
-          <li>川藏318·天路翠蓝</li>
-          <li>海南环岛·椰风海韵</li>
-          <li>独库公路·天山雪域</li>
-        </ul>
       </div>
     </div>
   </div>
 
-  <!-- ====== 飞行纪念票 ====== -->
-  <div class="ticket-panel" id="panel-flight">
-    <div class="ticket ticket--flight">
-      <div class="ticket-inner">
-        <div class="ticket-header">
-          <div class="ticket-brand">
-            <span class="diamond">✦</span> 万里路书 · 飞行纪念票 <span class="diamond">✦</span>
-          </div>
-          <div class="ticket-subtitle">云端之旅记录</div>
-        </div>
+  <aside class="info-panel">
+    <h3>自驾纪念票 · 设计说明</h3>
+    <div class="info-sec"><h4>公路语言</h4><ul>
+      <li>真实制式路牌：国家高速绿盾（红顶band）+ 国道红盾，按实际途经路网自动生成</li>
+      <li>海拔剖面图：GPS 轨迹高程渲染，峰值自动标注山口名</li>
+      <li>途经点星链 + 里程碑编号</li>
+    </ul></div>
+    <div class="info-sec"><h4>层次设计</h4><ul>
+      <li>落霞三段渐变 + 双层山峦剪影 + 防伪底纹 + 品牌水印</li>
+      <li>数据四宫格发丝分割线，标签胶囊化</li>
+    </ul></div>
+    <div class="info-sec"><h4>配色</h4><div class="swatches">
+      <div class="sw" style="background:#221232"></div><div class="sw" style="background:#63284c"></div>
+      <div class="sw" style="background:#b8503c"></div><div class="sw" style="background:#0a7a3d"></div><div class="sw" style="background:#d0342c"></div>
+    </div></div>
+  </aside>
+</section>
 
-        <div class="ticket-route">
-          <div class="route-line">
-            <span class="route-city">广州白云</span>
-            <span class="route-arrow"></span>
-            <span class="route-city">拉萨贡嘎</span>
-          </div>
-          <div class="route-detail">
-            <span>CAN</span> → <span>LXA</span> &nbsp;|&nbsp; <span>CZ3467</span> · 中国南方航空<br>
-            2026.07.15 &nbsp; 起飞 08:30 → 降落 12:45
-          </div>
-        </div>
-
-        <div class="ticket-stats">
-          <div class="stat-item">
-            <div class="stat-label">飞行时长</div>
-            <div class="stat-value">4h15m</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">里程</div>
-            <div class="stat-value">2,850 <span class="unit">km</span></div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">座位</div>
-            <div class="stat-value">32A <span class="unit">左舷窗</span></div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">巡航高度</div>
-            <div class="stat-value">10,668 <span class="unit">m</span></div>
-          </div>
-        </div>
-
-        <div class="ticket-highlights">
-          <div class="highlight">
-            <span class="icon">✨</span> 舷窗小确幸 <span class="count">2</span> 处（雪山/云海）
-          </div>
-        </div>
-
-        <div class="ticket-quote">
-          "万米高空之上，雪山就在窗外"
-        </div>
-
-        <div class="ticket-footer">
-          <div class="ticket-serial">No. HW-FLIGHT-20260715-007</div>
-          <div class="ticket-qr">QR</div>
-        </div>
+<!-- ================= 飞行纪念票 ================= -->
+<section class="stage" id="stage-flight">
+  <div class="ticket t-flight">
+    <div class="guil"></div>
+    <img class="wm" src="ticket-assets/brand/heyworld-brand.png" alt="">
+    <div class="frame"></div>
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <div class="t-inner">
+      <div class="microtop" style="padding-right:110px">
+        <div class="brand"><img src="ticket-assets/brand/heyworld-logo.png" alt=""><span>WANLI ROADBOOK · 万里路书</span></div>
+        <span class="typechip">BOARDING PASS</span>
       </div>
-    </div>
-
-    <div class="info-panel">
-      <h3>飞行纪念票 · 设计规范</h3>
-      <div class="info-section">
-        <h4>配色方案</h4>
-        <div class="color-swatches">
-          <div class="swatch" style="background:#0a1628"></div>
-          <div class="swatch" style="background:#1e3a5f"></div>
-          <div class="swatch" style="background:#4a90d9"></div>
-          <div class="swatch" style="background:linear-gradient(135deg,#D4A853,#f5d799)"></div>
+      <div class="serialrow" style="padding-right:110px">
+        <span class="serial">No. HW-FLIGHT-20260715-007</span>
+        <span class="barcode"></span>
+      </div>
+      <div class="bp-wrap">
+        <div class="bp-main">
+          <div class="al-row">
+            <img class="al-logo" id="alLogo" src="ticket-assets/logos/cz.jpg" alt="airline logo">
+            <div>
+              <div class="al-name" id="alName">中国南方航空</div>
+              <div class="al-en" id="alEn">CHINA SOUTHERN</div>
+            </div>
+            <div class="al-no" id="alNo">CZ3467</div>
+          </div>
+          <span class="alliance-chip hidden" id="alChip"><img id="alChipLogo" src="" alt=""><span id="alChipName"></span></span>
+          <div class="iata-row">
+            <div><div class="iata">CAN</div><div class="iata-sub">广州白云</div></div>
+            <div class="fly-arc">
+              <svg viewBox="0 0 200 44">
+                <path d="M6 36 Q100 -4 194 36" fill="none" stroke="#D4A853" stroke-width="1.4" stroke-dasharray="4 4" stroke-opacity=".8"/>
+                <circle cx="6" cy="36" r="3" fill="#D4A853"/><circle cx="194" cy="36" r="3" fill="#D4A853"/>
+                <text x="100" y="14" font-size="15" fill="#f6e2a5" text-anchor="middle" transform="rotate(8 100 14)">✈</text>
+              </svg>
+            </div>
+            <div style="text-align:right"><div class="iata">LXA</div><div class="iata-sub">拉萨贡嘎</div></div>
+          </div>
+          <div class="board-grid">
+            <div class="stat"><div class="lb">日期 DATE</div><div class="vl" style="font-size:13px">2026.07.15</div></div>
+            <div class="stat"><div class="lb">起飞 DEPART</div><div class="vl" style="font-size:13px">08:30</div></div>
+            <div class="stat"><div class="lb">降落 ARRIVE</div><div class="vl" style="font-size:13px">12:45</div></div>
+            <div class="stat"><div class="lb">登机口 GATE</div><div class="vl">B12</div></div>
+            <div class="stat"><div class="lb">座位 SEAT</div><div class="vl">32A</div></div>
+            <div class="stat"><div class="lb">舱位 CLASS</div><div class="vl" style="font-size:13px">经济舱</div></div>
+          </div>
+          <div class="tags">
+            <span class="tag hot">🪟 左舷窗 · 看雪山侧</span>
+            <span class="tag">巡航 10,668 m</span>
+            <span class="tag hot">✨ 舷窗小确幸 2（雪山/云海）</span>
+          </div>
+          <div class="quote">"万米高空之上，雪山就在窗外"</div>
+          <div class="t-foot">
+            <div class="micro">万里路书 HEY WORLD<br>扫码查看飞行记录</div>
+            <div class="qrbox">
+              <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><g fill="#1a1a2e"><rect x="0" y="0" width="7" height="7"/><rect x="14" y="0" width="7" height="7"/><rect x="0" y="14" width="7" height="7"/><rect x="2" y="2" width="3" height="3" fill="#fff"/><rect x="16" y="2" width="3" height="3" fill="#fff"/><rect x="2" y="16" width="3" height="3" fill="#fff"/><rect x="3" y="3" width="1" height="1" fill="#1a1a2e"/><rect x="17" y="3" width="1" height="1" fill="#1a1a2e"/><rect x="3" y="17" width="1" height="1" fill="#1a1a2e"/><rect x="9" y="1" width="2" height="2"/><rect x="12" y="3" width="1" height="2"/><rect x="9" y="5" width="3" height="1"/><rect x="1" y="9" width="2" height="2"/><rect x="5" y="10" width="2" height="1"/><rect x="9" y="9" width="2" height="2"/><rect x="13" y="9" width="2" height="1"/><rect x="17" y="9" width="2" height="2"/><rect x="3" y="12" width="1" height="2"/><rect x="9" y="13" width="2" height="1"/><rect x="14" y="12" width="1" height="2"/><rect x="18" y="13" width="2" height="1"/><rect x="9" y="16" width="1" height="2"/><rect x="12" y="17" width="2" height="2"/><rect x="16" y="16" width="1" height="1"/><rect x="18" y="18" width="2" height="2"/></g></svg>
+              <div class="cap">SCAN · 记录</div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="info-section">
-        <h4>数据字段</h4>
-        <ul>
-          <li>出发机场(三字码) / 到达机场</li>
-          <li>航班号 + 航司名</li>
-          <li>日期 + 起降时间</li>
-          <li>飞行时长 / 里程</li>
-          <li>座位号 + 舷窗侧（选填）</li>
-          <li>巡航高度</li>
-          <li>舷窗小确幸（特殊：雪山/云海/日出等）</li>
-          <li>一句话感言</li>
-        </ul>
-      </div>
-      <div class="info-section">
-        <h4>风格变体</h4>
-        <ul>
-          <li>星空夜航·深蓝（默认）</li>
-          <li>朝霞航班·暖金</li>
-          <li>高原航线·雪峰白</li>
-          <li>跨洋航班· ocean 蓝绿</li>
-        </ul>
+        <div class="bp-stub">
+          <div class="perf-v"></div><span class="notch n-top"></span><span class="notch n-bot"></span>
+          <div class="stub-item"><div class="lb">FLIGHT</div><div class="vl" id="stubNo">CZ3467</div></div>
+          <div class="stub-barcode"></div>
+          <div class="stub-item"><div class="lb">SEAT</div><div class="vl">32A</div></div>
+          <div class="stub-item"><div class="lb">GATE</div><div class="vl">B12</div></div>
+          <div class="stub-vtext">HEY WORLD · 2026</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== 综合纪念票 ====== -->
-  <div class="ticket-panel" id="panel-combined">
-    <div class="ticket ticket--combined">
-      <div class="ticket-inner">
-        <div class="ticket-header">
-          <div class="ticket-brand">
-            <span class="diamond">✦</span> 万里路书 · 旅行纪念票 <span class="diamond">✦</span>
-          </div>
-          <div class="ticket-subtitle">川西秘境 · 我的毕业旅行</div>
-        </div>
+  <aside class="info-panel">
+    <h3>飞行纪念票 · 设计说明</h3>
+    <div class="info-sec"><h4>登机牌制式</h4><ul>
+      <li>主券 + 副券撕线齿孔，还原真实登机牌结构</li>
+      <li>IATA 三字码大字 + 虚线航迹弧 + 机型 glyph</li>
+      <li>六宫格登机信息：日期/起降/登机口/座位/舱位</li>
+    </ul></div>
+    <div class="info-sec"><h4>航司官方logo</h4><ul>
+      <li>内置 10 家国内航司官方标识：国航/南航/东航/海航/厦航/川航/深航/山航/春秋/吉祥</li>
+      <li>按所选航司或航班号前缀自动匹配</li>
+      <li>联盟徽章联动：星空联盟 / 天合联盟 / oneworld（白底胶囊保证任何票面上清晰）</li>
+      <li>口径提示：南航 2019 年已退出天合联盟，故不挂联盟徽章</li>
+    </ul></div>
+    <div class="info-sec"><h4>资产位置</h4><ul>
+      <li>ticket-assets/logos/*.png|jpg —— 上线前可整体替换为航司官方 VI 包</li>
+    </ul></div>
+  </aside>
+</section>
 
-        <div class="ticket-route">
-          <div class="route-detail" style="font-size:14px;margin-bottom:8px;">
-            2026.06.15 - 2026.06.22 &nbsp; <span>8天7晚</span>
-          </div>
-          <div class="route-waypoints">
-            <span class="waypoint">成都</span>
-            <span class="waypoint-dot"></span>
-            <span class="waypoint">康定</span>
-            <span class="waypoint-dot"></span>
-            <span class="waypoint">理塘</span>
-            <span class="waypoint-dot"></span>
-            <span class="waypoint">稻城</span>
-            <span class="waypoint-dot"></span>
-            <span class="waypoint">亚丁</span>
-          </div>
-        </div>
-
-        <div class="ticket-stats">
-          <div class="stat-item">
-            <div class="stat-label">总里程</div>
-            <div class="stat-value">3,450 <span class="unit">km</span></div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">最高海拔</div>
-            <div class="stat-value">4,700 <span class="unit">m</span></div>
-          </div>
-        </div>
-
-        <div class="ticket-highlights" style="flex-direction:column;gap:8px;">
-          <div class="highlight">
-            <span class="icon">✈️</span> 1段 &nbsp;
-            <span class="icon">🚄</span> 2段 &nbsp;
-            <span class="icon">🚗</span> 自驾5天
-          </div>
-          <div class="highlight">
-            <span class="icon">✨</span> 小确幸 <span class="count">12</span> 处 &nbsp;
-            <span class="icon">📸</span> 照片 <span class="count">87</span> 张
-          </div>
-        </div>
-
-        <div class="ticket-quote">
-          "22岁，看到了稻城亚丁的星空"
-        </div>
-
-        <div class="ticket-footer">
-          <div class="ticket-serial">No. HW-TRIP-20260615-001</div>
-          <div class="ticket-qr">QR</div>
-        </div>
+<!-- ================= 综合纪念票 ================= -->
+<section class="stage" id="stage-combined">
+  <div class="ticket t-combined">
+    <div class="guil"></div>
+    <img class="wm" src="ticket-assets/brand/heyworld-brand.png" alt="">
+    <div class="frame"></div>
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <div class="t-inner">
+      <div class="microtop">
+        <div class="brand"><img src="ticket-assets/brand/heyworld-logo.png" alt=""><span>WANLI ROADBOOK · 万里路书</span></div>
+        <span class="typechip">TRIP PASS</span>
       </div>
-    </div>
-
-    <div class="info-panel">
-      <h3>综合纪念票 · 设计规范</h3>
-      <div class="info-section">
-        <h4>配色方案</h4>
-        <div class="color-swatches">
-          <div class="swatch" style="background:#1a2e1a"></div>
-          <div class="swatch" style="background:#2d5a3f"></div>
-          <div class="swatch" style="background:#3d8b5f"></div>
-          <div class="swatch" style="background:linear-gradient(135deg,#D4A853,#f5d799)"></div>
+      <div class="serialrow">
+        <span class="serial">No. HW-TRIP-20260615-001</span>
+        <span class="barcode"></span>
+      </div>
+      <div class="t-title"><span class="dia">✦</span> 旅行纪念票 <span class="dia">✦</span></div>
+      <div class="t-sub">川西秘境 · 我的毕业旅行</div>
+      <div class="tags" style="margin-top:10px">
+        <span class="tag hot">2026.06.15 - 06.22</span>
+        <span class="tag">8天7晚</span>
+        <span class="tag">总里程 3,450 km</span>
+      </div>
+      <div class="seg-tl">
+        <div class="seg-item"><div class="k">✈️ 飞行 1 段</div><div class="v">广州 CAN → 成都 TFU · 2h05m</div></div>
+        <div class="seg-item"><div class="k">🚄 铁路 2 段</div><div class="v">成都东 → 康定 · 康定 → 理塘</div></div>
+        <div class="seg-item"><div class="k">🚗 自驾 5 天</div><div class="v">理塘 → 稻城 → 亚丁 · 1,180km</div></div>
+      </div>
+      <div class="city-chain">
+        <span class="c">成都</span><span class="sep">→</span>
+        <span class="c">康定</span><span class="sep">→</span>
+        <span class="c">理塘</span><span class="sep">→</span>
+        <span class="c">稻城</span><span class="sep">→</span>
+        <span class="c">亚丁</span>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="lb">最高海拔 APEX</div><div class="vl">4,700 <small>m · 稻城亚丁</small></div></div>
+        <div class="stat"><div class="lb">小确幸 HIGHLIGHTS</div><div class="vl">12 <small>处</small></div></div>
+        <div class="stat"><div class="lb">照片 PHOTOS</div><div class="vl">87 <small>张</small></div></div>
+        <div class="stat"><div class="lb">交通段 SEGMENTS</div><div class="vl">✈1 🚄2 🚗5</div></div>
+      </div>
+      <div class="quote">"22岁，看到了稻城亚丁的星空"</div>
+      <div class="t-foot">
+        <div class="micro">万里路书 HEY WORLD<br>扫码查看完整路书</div>
+        <div class="qrbox">
+          <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><g fill="#1a1a2e"><rect x="0" y="0" width="7" height="7"/><rect x="14" y="0" width="7" height="7"/><rect x="0" y="14" width="7" height="7"/><rect x="2" y="2" width="3" height="3" fill="#fff"/><rect x="16" y="2" width="3" height="3" fill="#fff"/><rect x="2" y="16" width="3" height="3" fill="#fff"/><rect x="3" y="3" width="1" height="1" fill="#1a1a2e"/><rect x="17" y="3" width="1" height="1" fill="#1a1a2e"/><rect x="3" y="17" width="1" height="1" fill="#1a1a2e"/><rect x="9" y="1" width="2" height="2"/><rect x="12" y="3" width="1" height="2"/><rect x="9" y="5" width="3" height="1"/><rect x="1" y="9" width="2" height="2"/><rect x="5" y="10" width="2" height="1"/><rect x="9" y="9" width="2" height="2"/><rect x="13" y="9" width="2" height="1"/><rect x="17" y="9" width="2" height="2"/><rect x="3" y="12" width="1" height="2"/><rect x="9" y="13" width="2" height="1"/><rect x="14" y="12" width="1" height="2"/><rect x="18" y="13" width="2" height="1"/><rect x="9" y="16" width="1" height="2"/><rect x="12" y="17" width="2" height="2"/><rect x="16" y="16" width="1" height="1"/><rect x="18" y="18" width="2" height="2"/></g></svg>
+          <div class="cap">SCAN · 路书</div>
         </div>
-      </div>
-      <div class="info-section">
-        <h4>数据字段</h4>
-        <ul>
-          <li>旅行标题（用户自定义）</li>
-          <li>起止日期 + 天数</li>
-          <li>途经城市列表</li>
-          <li>总里程 / 最高海拔</li>
-          <li>交通方式段数统计</li>
-          <li>小确幸总数 + 照片总数</li>
-          <li>一句话感言</li>
-        </ul>
-      </div>
-      <div class="info-section">
-        <h4>风格变体</h4>
-        <ul>
-          <li>秘境森林·翠绿（默认）</li>
-          <li>海岸线·湛蓝</li>
-          <li>丝路·大漠金</li>
-          <li>雪域·高原白</li>
-        </ul>
       </div>
     </div>
   </div>
 
-  <!-- ====== 年度纪念票 ====== -->
-  <div class="ticket-panel" id="panel-annual">
-    <div class="ticket ticket--annual">
-      <div class="ticket-inner">
-        <div class="ticket-header">
-          <div class="ticket-brand">
-            <span class="diamond">✦</span> 万里路书 · 2026年度纪念票 <span class="diamond">✦</span>
-          </div>
-          <div class="ticket-subtitle">视界HeyWorld · 年度限定</div>
-        </div>
+  <aside class="info-panel">
+    <h3>综合纪念票 · 设计说明</h3>
+    <div class="info-sec"><h4>多段行程叙事</h4><ul>
+      <li>左侧金色时间轴串联 飞行/铁路/自驾 段</li>
+      <li>城市链横排，箭头用品牌金</li>
+      <li>日期/天数/总里程胶囊前置</li>
+    </ul></div>
+    <div class="info-sec"><h4>层次设计</h4><ul>
+      <li>秘境森林三段渐变 + 防伪底纹 + 水印</li>
+      <li>钢印双框 + 四角饰纹统一全系票种</li>
+    </ul></div>
+  </aside>
+</section>
 
-        <div class="annual-hero">
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">2026年，你一共走了</div>
-          <div class="annual-number">18,750</div>
-          <div class="annual-unit">公里</div>
-          <div class="annual-equiv">相当于绕地球赤道 0.47 圈</div>
-        </div>
-
-        <div class="annual-stats">
-          <div class="annual-stat">
-            <div class="num">12</div>
-            <div class="label">旅行</div>
-          </div>
-          <div class="annual-stat">
-            <div class="num">47</div>
-            <div class="label">天数</div>
-          </div>
-          <div class="annual-stat">
-            <div class="num">15</div>
-            <div class="label">省份</div>
-          </div>
-          <div class="annual-stat">
-            <div class="num">28</div>
-            <div class="label">城市</div>
-          </div>
-        </div>
-
-        <div class="ticket-highlights" style="flex-direction:column;gap:8px;margin:12px 0;">
-          <div class="highlight">
-            <span class="icon">✈️</span> 4 &nbsp;
-            <span class="icon">🚄</span> 6 &nbsp;
-            <span class="icon">🚗</span> 3
-          </div>
-          <div class="highlight">
-            最远：<span class="count">拉萨 2,850km</span> &nbsp; 最高：<span class="count">唐古拉山 5,072m</span>
-          </div>
-          <div class="highlight">
-            <span class="icon">✨</span> 小确幸 <span class="count">47</span> 处 &nbsp;
-            <span class="icon">📸</span> 照片 <span class="count">326</span> 张
-          </div>
-        </div>
-
-        <div class="ticket-quote">
-          "2026，你在路上的时间，比在家多。"
-        </div>
-
-        <div class="ticket-footer">
-          <div class="ticket-serial">No. HW-YEAR-2026-08973</div>
-          <div class="ticket-qr">QR</div>
-        </div>
+<!-- ================= 年度纪念票 ================= -->
+<section class="stage" id="stage-annual">
+  <div class="ticket t-annual">
+    <div class="holo-sweep"></div>
+    <svg class="constel" viewBox="0 0 400 640" preserveAspectRatio="none"><g stroke="rgba(255,255,255,.14)" stroke-width=".6"><polyline points="40,80 90,140 150,110 210,170" fill="none"/><polyline points="300,90 340,150 290,210" fill="none"/><polyline points="60,420 120,470 90,530" fill="none"/><polyline points="320,440 280,500 330,560" fill="none"/></g><g fill="rgba(255,255,255,.5)"><circle cx="40" cy="80" r="1.4"/><circle cx="90" cy="140" r="1"/><circle cx="150" cy="110" r="1.6"/><circle cx="210" cy="170" r="1"/><circle cx="300" cy="90" r="1.3"/><circle cx="340" cy="150" r="1"/><circle cx="290" cy="210" r="1.5"/><circle cx="60" cy="420" r="1.2"/><circle cx="120" cy="470" r="1"/><circle cx="90" cy="530" r="1.4"/><circle cx="320" cy="440" r="1.1"/><circle cx="280" cy="500" r="1.5"/><circle cx="330" cy="560" r="1"/></g></svg>
+    <img class="wm" src="ticket-assets/brand/heyworld-brand.png" alt="" style="opacity:.04">
+    <div class="frame"></div>
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <div class="t-inner">
+      <div class="microtop">
+        <div class="brand"><img src="ticket-assets/brand/heyworld-logo.png" alt=""><span>WANLI ROADBOOK · 万里路书</span></div>
+        <span class="typechip">ANNUAL 2026</span>
       </div>
-    </div>
-
-    <div class="info-panel">
-      <h3>年度纪念票 · 设计规范</h3>
-      <div class="info-section">
-        <h4>配色方案</h4>
-        <div class="color-swatches">
-          <div class="swatch" style="background:#0a0a0f"></div>
-          <div class="swatch" style="background:#1a1a2e"></div>
-          <div class="swatch" style="background:linear-gradient(135deg,#D4A853,#f5d799)"></div>
-          <div class="swatch" style="background:linear-gradient(135deg,#e94560,#ff6b8a)"></div>
+      <div class="serialrow">
+        <span class="serial">No. HW-YEAR-2026-08973</span>
+        <span class="barcode"></span>
+      </div>
+      <div class="t-title"><span class="dia">✦</span> 2026 年度纪念票 <span class="dia">✦</span></div>
+      <span class="limited-badge">◆ 年度限定 · HOLOGRAPHIC EDITION ◆</span>
+      <div class="annual-hero">
+        <div class="lead">2026 年，你一共走了</div>
+        <div class="num">18,750</div>
+        <div class="unit">公 里</div>
+        <div class="equiv">相当于绕地球赤道 0.47 圈</div>
+      </div>
+      <div class="holo-strip"></div>
+      <div class="stats">
+        <div class="stat"><div class="lb">旅行 TRIPS</div><div class="vl">12 <small>次</small></div></div>
+        <div class="stat"><div class="lb">天数 DAYS</div><div class="vl">47 <small>天</small></div></div>
+        <div class="stat"><div class="lb">省份 PROVINCES</div><div class="vl">15 <small>个</small></div></div>
+        <div class="stat"><div class="lb">城市 CITIES</div><div class="vl">28 <small>座</small></div></div>
+      </div>
+      <div class="tags">
+        <span class="tag">✈️ 4</span><span class="tag">🚄 6</span><span class="tag">🚗 3</span>
+        <span class="tag hot">最远 拉萨 2,850km</span>
+        <span class="tag hot">最高 唐古拉山 5,072m</span>
+      </div>
+      <div class="tags">
+        <span class="tag hot">✨ 小确幸 47 处</span>
+        <span class="tag hot">📸 照片 326 张</span>
+      </div>
+      <div class="quote">"2026，你在路上的时间，比在家多。"</div>
+      <div class="t-foot">
+        <div class="micro">万里路书 HEY WORLD<br>#我的万里路书年度票#</div>
+        <div class="qrbox">
+          <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><g fill="#1a1a2e"><rect x="0" y="0" width="7" height="7"/><rect x="14" y="0" width="7" height="7"/><rect x="0" y="14" width="7" height="7"/><rect x="2" y="2" width="3" height="3" fill="#fff"/><rect x="16" y="2" width="3" height="3" fill="#fff"/><rect x="2" y="16" width="3" height="3" fill="#fff"/><rect x="3" y="3" width="1" height="1" fill="#1a1a2e"/><rect x="17" y="3" width="1" height="1" fill="#1a1a2e"/><rect x="3" y="17" width="1" height="1" fill="#1a1a2e"/><rect x="9" y="1" width="2" height="2"/><rect x="12" y="3" width="1" height="2"/><rect x="9" y="5" width="3" height="1"/><rect x="1" y="9" width="2" height="2"/><rect x="5" y="10" width="2" height="1"/><rect x="9" y="9" width="2" height="2"/><rect x="13" y="9" width="2" height="1"/><rect x="17" y="9" width="2" height="2"/><rect x="3" y="12" width="1" height="2"/><rect x="9" y="13" width="2" height="1"/><rect x="14" y="12" width="1" height="2"/><rect x="18" y="13" width="2" height="1"/><rect x="9" y="16" width="1" height="2"/><rect x="12" y="17" width="2" height="2"/><rect x="16" y="16" width="1" height="1"/><rect x="18" y="18" width="2" height="2"/></g></svg>
+          <div class="cap">SCAN · 年报</div>
         </div>
-      </div>
-      <div class="info-section">
-        <h4>数据字段（自动汇总）</h4>
-        <ul>
-          <li>年度总里程 + 赤道换算</li>
-          <li>旅行次数 / 总天数</li>
-          <li>覆盖省份 / 城市数</li>
-          <li>各交通方式段数</li>
-          <li>最远目的地 + 最高海拔</li>
-          <li>小确幸总数 + 照片总数</li>
-          <li>年度金句（AI生成 / 用户选）</li>
-        </ul>
-      </div>
-      <div class="info-section">
-        <h4>特殊规则</h4>
-        <ul>
-          <li>每年12月自动生成</li>
-          <li>限定全息金色边框</li>
-          <li>编号含年份+用户序号</li>
-          <li>支持 #我的万里路书年度票# 话题</li>
-          <li>年度限定徽章联动</li>
-        </ul>
       </div>
     </div>
   </div>
 
+  <aside class="info-panel">
+    <h3>年度纪念票 · 设计说明</h3>
+    <div class="info-sec"><h4>限定质感</h4><ul>
+      <li>全息扫光动画（holo-sweep）+ 彩虹箔条</li>
+      <li>星图连线底纹，呼应"走过的路即星轨"</li>
+      <li>核心数字烫金流动光泽</li>
+    </ul></div>
+    <div class="info-sec"><h4>传播设计</h4><ul>
+      <li>页脚内置话题 #我的万里路书年度票#</li>
+      <li>12 月 20 日全量自动生成 + 推送</li>
+    </ul></div>
+  </aside>
+</section>
 </main>
 
 <script>
-// Tab switching
+/* ---------- Tab 切换 ---------- */
+const CTL = { rail: 'ctl-rail', drive: 'ctl-none', flight: 'ctl-flight', combined: 'ctl-none', annual: 'ctl-none' };
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.ticket-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.controls').forEach(c => c.style.display = 'none');
     btn.classList.add('active');
-    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    document.getElementById('stage-' + btn.dataset.tab).classList.add('active');
+    document.getElementById(CTL[btn.dataset.tab]).style.display = 'flex';
   });
 });
-</script>
 
+/* ---------- 铁路双风格 ---------- */
+document.querySelectorAll('[data-railstyle]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-railstyle]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('railTicket').classList.toggle('t-blue', btn.dataset.railstyle === 'blue');
+  });
+});
+
+/* ---------- 航司官方logo数据 ---------- */
+const ALLIANCES = {
+  staralliance: { name: '星空联盟 Star Alliance', logo: 'ticket-assets/logos/staralliance-crop.png' },
+  skyteam:      { name: '天合联盟 SkyTeam',       logo: 'ticket-assets/logos/skyteam.jpg' },
+  oneworld:     { name: '寰宇一家 oneworld',      logo: 'ticket-assets/logos/oneworld.jpg' }
+};
+const AIRLINES = {
+  cz: { name: '中国南方航空', en: 'CHINA SOUTHERN',    prefix: 'CZ', logo: 'ticket-assets/logos/cz.jpg',        alliance: null },
+  ca: { name: '中国国际航空', en: 'AIR CHINA',         prefix: 'CA', logo: 'ticket-assets/logos/ca.jpg',        alliance: 'staralliance' },
+  mu: { name: '中国东方航空', en: 'CHINA EASTERN',     prefix: 'MU', logo: 'ticket-assets/logos/mu.jpg',        alliance: 'skyteam' },
+  hu: { name: '海南航空',     en: 'HAINAN AIRLINES',   prefix: 'HU', logo: 'ticket-assets/logos/hu.jpg',        alliance: null },
+  mf: { name: '厦门航空',     en: 'XIAMENAIR',         prefix: 'MF', logo: 'ticket-assets/logos/mf.jpg',        alliance: 'skyteam' },
+  '3u': { name: '四川航空',   en: 'SICHUAN AIRLINES',  prefix: '3U', logo: 'ticket-assets/logos/3u.png',        alliance: null },
+  zh: { name: '深圳航空',     en: 'SHENZHEN AIRLINES', prefix: 'ZH', logo: 'ticket-assets/logos/zh.png',        alliance: 'staralliance' },
+  sc: { name: '山东航空',     en: 'SHANDONG AIRLINES', prefix: 'SC', logo: 'ticket-assets/logos/sc-crop.png',   alliance: 'staralliance' },
+  '9c': { name: '春秋航空',   en: 'SPRING AIRLINES',   prefix: '9C', logo: 'ticket-assets/logos/9c.jpg',        alliance: null },
+  ho: { name: '吉祥航空',     en: 'JUNEYAO AIR',       prefix: 'HO', logo: 'ticket-assets/logos/ho.png',        alliance: null }
+};
+const sel = document.getElementById('airlineSel');
+Object.entries(AIRLINES).forEach(([k, v]) => {
+  const o = document.createElement('option');
+  o.value = k; o.textContent = v.name + ' ' + v.prefix;
+  sel.appendChild(o);
+});
+function applyAirline(key) {
+  const a = AIRLINES[key];
+  document.getElementById('alLogo').src = a.logo;
+  document.getElementById('alName').textContent = a.name;
+  document.getElementById('alEn').textContent = a.en;
+  const no = a.prefix + '3467';
+  document.getElementById('alNo').textContent = no;
+  document.getElementById('stubNo').textContent = no;
+  const chip = document.getElementById('alChip');
+  if (a.alliance) {
+    chip.classList.remove('hidden');
+    document.getElementById('alChipLogo').src = ALLIANCES[a.alliance].logo;
+    document.getElementById('alChipName').textContent = ALLIANCES[a.alliance].name;
+  } else {
+    chip.classList.add('hidden');
+  }
+}
+sel.addEventListener('change', e => applyAirline(e.target.value));
+applyAirline('cz');
+</script>
 </body>
 </html>

@@ -331,4 +331,24 @@ export const api = {
       geomAvailable: boolean[];
     }>(`/drive/board/${encodeURIComponent(boardId)}`);
   },
+  /** 景点到达时刻天气（和风优先，未配置 Key 时服务端回退 Open-Meteo） */
+  getSpotWeathers(
+    spots: Array<{
+      spotId: string;
+      lng: number;
+      lat: number;
+      atIso: string;
+      visibility?: string;
+    }>,
+  ) {
+    return request<{
+      items: import('@railvista/shared').SpotWeather[];
+      provider: string;
+      configured: { qweather: boolean };
+    }>('/weather/spots', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ spots }),
+    });
+  },
 };

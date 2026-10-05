@@ -6,10 +6,11 @@
  */
 import type { TicketKind } from '@railvista/shared';
 
-import logoCa from '../assets/ticket/ca.jpg';
-import logoCz from '../assets/ticket/cz.jpg';
+// 航司官方素材（透明底）：ca/cz 2026-10 接入透明底新素材，mu 为正方形版
+import logoCa from '../assets/ticket/ca.png';
+import logoCz from '../assets/ticket/cz.png';
 import logoMu from '../assets/ticket/mu.png';
-import logoHu from '../assets/ticket/hu.jpg';
+import logoHu from '../assets/ticket/hu.png';
 import logoMf from '../assets/ticket/mf.jpg';
 import logo3u from '../assets/ticket/3u.png';
 import logoZh from '../assets/ticket/zh.png';

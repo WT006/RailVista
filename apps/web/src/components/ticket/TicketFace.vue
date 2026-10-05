@@ -138,12 +138,16 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
 
       <!-- 印章行 -->
       <div v-if="config.seal.enabled && config.seal.text" class="tk__seal">
-        <svg v-if="config.seal.emblem === 'rail'" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-          <path d="M24 4c7 7 11 13 11 19H13c0-6 4-12 11-19z" fill="var(--tk-acc)" />
-          <rect x="10" y="27" width="28" height="4" rx="2" fill="var(--tk-acc)" />
-          <rect x="16" y="33" width="16" height="4" rx="2" fill="var(--tk-acc)" />
-          <rect x="8" y="39" width="32" height="4" rx="2" fill="var(--tk-acc)" />
-        </svg>
+        <template v-if="config.seal.emblem === 'rail'">
+          <!-- 中国铁路官方路徽：SVG mask + 主题色着色；不支持 mask 时回退意象图形 -->
+          <span class="tk__seal-cr" aria-hidden="true"></span>
+          <svg class="tk__seal-cr-fallback" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+            <path d="M24 4c7 7 11 13 11 19H13c0-6 4-12 11-19z" fill="var(--tk-acc)" />
+            <rect x="10" y="27" width="28" height="4" rx="2" fill="var(--tk-acc)" />
+            <rect x="16" y="33" width="16" height="4" rx="2" fill="var(--tk-acc)" />
+            <rect x="8" y="39" width="32" height="4" rx="2" fill="var(--tk-acc)" />
+          </svg>
+        </template>
         <svg v-else-if="config.seal.emblem === 'road'" viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <path d="M14 42 L20 8 h8 l6 34 z" fill="var(--tk-acc)" opacity=".85" />
           <path d="M23 12 v26" stroke="var(--tk-grad)" stroke-width="2" stroke-dasharray="4 3" />
@@ -403,6 +407,20 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
 
 .tk__seal { display: flex; align-items: center; gap: 6px; }
 .tk__seal svg { width: 20px; height: 20px; flex-shrink: 0; }
+/* 中国铁路官方路徽：mask 仅取 SVG alpha 通道，background-color 即着色色源（唯一 var(--tk-acc)） */
+.tk__seal-cr {
+  display: block;
+  width: 20px; height: 20px; flex-shrink: 0;
+  background-color: var(--tk-acc);
+  -webkit-mask: url('../../assets/ticket/china-railway.svg') center / contain no-repeat;
+  mask: url('../../assets/ticket/china-railway.svg') center / contain no-repeat;
+}
+.tk__seal-cr-fallback { display: none; }
+/* 回退：连 -webkit-mask 都不支持的极旧环境，改用意象图形（互斥渲染） */
+@supports not ((mask-image: url('x')) or (-webkit-mask-image: url('x'))) {
+  .tk__seal-cr { display: none; }
+  .tk__seal-cr-fallback { display: block; }
+}
 .tk__seal-text { font-size: 9px; letter-spacing: 2px; color: var(--tk-tx3); }
 .tk__seal-text em { font-style: normal; margin-left: 6px; color: var(--tk-acc); }
 
@@ -411,9 +429,9 @@ const stubYear = computed(() => (props.config.dateText || '').slice(0, 4) || new
    厦航深蓝在深色票面上几乎不可见 —— 故按原型 .al-logo 保留白底，
    但缩小并柔化，降低"贴了个白方块"的突兀感。*/
 .tk__allogo {
-  height: 30px; min-width: 40px; background: rgba(255, 255, 255, .92);
+  height: 30px; min-width: 30px; background: rgba(255, 255, 255, .92);
   border-radius: 6px;
-  padding: 3px 6px; object-fit: contain;
+  padding: 4px; object-fit: contain;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .18), 0 0 0 1px rgba(255, 255, 255, .1);
 }
 .tk__alname { display: flex; flex-direction: column; min-width: 0; }

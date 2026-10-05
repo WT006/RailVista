@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -59,15 +60,15 @@ describe('drive/spotGrid Himalaya / foreign POI', () => {
   it('keeps Chinese-named border towns, drops Nepal latin names in the same bbox', () => {
     assert.equal(inHimalayaExteriorBand(86.68, 27.96), true);
     assert.equal(
-      isAdmissibleChinaPoi({ id: 'a', name: 'Everest viewpoint', lng: 86.68, lat: 27.96, tier: 'B', category: 'x', score: 60, source: 'osm' }),
+      isAdmissibleChinaPoi({ name: 'Everest viewpoint', lng: 86.68, lat: 27.96 }),
       false,
     );
     assert.equal(
-      isAdmissibleChinaPoi({ id: 'b', name: '樟木口岸', lng: 85.98, lat: 27.97, tier: 'A', category: 'x', score: 80, source: 'osm' }),
+      isAdmissibleChinaPoi({ name: '樟木口岸', lng: 85.98, lat: 27.97 }),
       true,
     );
     assert.equal(
-      isAdmissibleChinaPoi({ id: 'c', name: '马卡鲁山', lng: 87.09, lat: 27.89, tier: 'A', category: 'x', score: 80, source: 'osm' }),
+      isAdmissibleChinaPoi({ name: '马卡鲁山', lng: 87.09, lat: 27.89 }),
       true,
     );
   });

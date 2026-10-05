@@ -11,7 +11,7 @@
  *   R4 排版重做：桌面端左图（≥420px 高）+ 右侧独立滚动信息栏，地图内加里程刻度条。
  *   R5 顶栏由 App.vue 全局挂载，本页不再重复挂 AppTopBar。
  */
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
 import DriveSubNav from '../components/DriveSubNav.vue';
@@ -339,6 +339,13 @@ const featuredSpots = computed<AlongSpot[]>(() => {
   return [...named, ...latin].slice(0, FEATURED_LIMIT);
 });
 
+/** 地图圆点：全线最多画 36 个高分点，避免上百个圆点盖住中国轮廓 */
+const MAP_DOT_LIMIT = 36;
+const mapDots = computed<AlongSpot[]>(() => {
+  const list = [...spots.value].sort((a, b) => b.score - a.score || a.progressKm - b.progressKm);
+  return list.slice(0, MAP_DOT_LIMIT);
+});
+
 /** 精选里外文名的占比，用于如实说明「补位」情况 */
 const featuredLatinCount = computed(() => featuredSpots.value.filter((s) => !hasChineseName(s.name)).length);
 
@@ -469,6 +476,43 @@ const viewBoxAttr = computed(() => {
   const p = VIEWBOX_PRECISION(vb.w);
   return `${vb.x.toFixed(p)} ${vb.y.toFixed(p)} ${vb.w.toFixed(p)} ${vb.h.toFixed(p)}`;
 });
+
+/**
+ * 圆点 / 刻度字必须按**屏幕像素**换算成 viewBox 半径。
+ * 选中短段时缩放可达数千倍，写死 r="0.85"、font-size:4.5px 会变成盖住折线的巨圆和「km」。
+ */
+const svgCssW = ref(704);
+let mapSvgRO: ResizeObserver | null = null;
+watch(
+  mapSvgRef,
+  (el) => {
+    mapSvgRO?.disconnect();
+    mapSvgRO = null;
+    if (!el) return;
+    svgCssW.value = el.clientWidth || 704;
+    if (typeof ResizeObserver === 'undefined') return;
+    mapSvgRO = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) svgCssW.value = w;
+    });
+    mapSvgRO.observe(el);
+  },
+  { flush: 'post' },
+);
+onBeforeUnmount(() => mapSvgRO?.disconnect());
+
+const userPerPx = computed(() => {
+  const vb = focusViewBox.value ?? globalViewBox.value;
+  return vb.w / Math.max(1, svgCssW.value);
+});
+const mapDotR = computed(() => 3.25 * userPerPx.value);
+const mapTickR = computed(() => 1.6 * userPerPx.value);
+const mapTickFont = computed(() => 11 * userPerPx.value);
+const mapTickDx = computed(() => 7 * userPerPx.value);
+const mapTickDy = computed(() => -4 * userPerPx.value);
+const focusPulseR = computed(() => 10 * userPerPx.value);
+const focusRingR = computed(() => 5.5 * userPerPx.value);
+const focusCoreR = computed(() => 2.2 * userPerPx.value);
 
 /**
  * R3 关键：把选中景点平移到视野中心。
@@ -1063,22 +1107,27 @@ function fmtKm(v: number): string {
                 :stroke="roadColor(entryView.class)"
               />
               <circle
-                v-for="s in spots.slice(0, 160)"
+                v-for="s in mapDots"
                 :key="s.id"
                 class="drive-trip-map__dot"
                 :class="{ 'is-dim': !spotInActiveSegment(s) }"
                 :cx="lngLatToViewBox(s.lng, s.lat)[0]"
                 :cy="lngLatToViewBox(s.lng, s.lat)[1]"
-                :r="2.4"
+                :r="mapDotR"
                 :fill="tierColor(s.tier)"
               >
                 <title>{{ s.name }} · K{{ Math.round(s.progressKm) }}</title>
               </circle>
-              <!-- R4：里程刻度（让人看得懂这是哪条路） -->
+              <!-- 全线才画里程刻度；分段放大时字号若按 viewBox 单位会爆炸，只保留折线 -->
               <g v-if="mileTicks.length && focusViewBox === null" class="drive-trip-map__ticks">
                 <g v-for="t in mileTicks" :key="t.km" :transform="`translate(${t.x} ${t.y})`">
-                  <circle class="drive-trip-map__tick-dot" r="1.6" />
-                  <text class="drive-trip-map__tick-text" x="4" y="-3">{{ fmtKm(t.km) }} km</text>
+                  <circle class="drive-trip-map__tick-dot" :r="mapTickR" />
+                  <text
+                    class="drive-trip-map__tick-text"
+                    :x="mapTickDx"
+                    :y="mapTickDy"
+                    :font-size="mapTickFont"
+                  >{{ fmtKm(t.km) }} km</text>
                 </g>
               </g>
               <!-- R3：选中景点的高亮定位环（点击景点后出现，视野已聚焦到该点） -->
@@ -1088,16 +1137,16 @@ function fmtKm(v: number): string {
                 class="drive-trip-map__focus"
                 :transform="`translate(${lngLatToViewBox(focusTarget.lng, focusTarget.lat)[0]} ${lngLatToViewBox(focusTarget.lng, focusTarget.lat)[1]})`"
               >
-                <circle class="drive-trip-map__focus-pulse" r="7" />
-                <circle class="drive-trip-map__focus-ring" r="3.5" />
-                <circle class="drive-trip-map__focus-core" r="1.2" />
+                <circle class="drive-trip-map__focus-pulse" :r="focusPulseR" />
+                <circle class="drive-trip-map__focus-ring" :r="focusRingR" />
+                <circle class="drive-trip-map__focus-core" :r="focusCoreR" />
               </g>
             </svg>
 
             <!-- R4：图例 + 状态条（三行纵向排列，互不压字） -->
             <div class="drive-trip-map__bar">
               <p v-if="hasGaps" class="drive-trip-map__gap-note">
-                ⚠ {{ gapAnnotations.length }} 处未贯通（最大断口约 {{ maxGapKm }} km），虚线段为其余连通分量
+                ⚠ {{ gapAnnotations.length }} 处未贯通（最大断口约 {{ maxGapKm }} km），细线为其余连通分量
               </p>
               <p class="drive-trip-map__hint">
                 全线走向（OSM 众包还原，{{ precisionText }}）

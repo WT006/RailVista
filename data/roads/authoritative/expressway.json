@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-10-02",
+ "updated": "2026-10-05",
  "roads": [
   {
    "ref": "G1",
@@ -2295,114 +2295,6 @@
    "fromPlace": "南宁市绕城高速",
    "toPlace": "南宁市绕城高速",
    "provinces": [],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G3531",
-   "name": "新康大道",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "重庆"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G6026",
-   "name": "筑曲高速",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "贵州"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G8311",
-   "name": "南阳北绕城高速",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "河南"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G4521",
-   "name": "南龙高速",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "江西"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G1202",
-   "name": "松原绕城高速",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "吉林"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G3022",
-   "name": "渭南过境高速",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "陕西"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G3023",
-   "name": "西安高架快速干道",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "陕西"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G3024",
-   "name": "宝鸡过境高速",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "陕西"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G1502",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "山东"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G0521",
-   "name": "汉蓉高速",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "四川"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G3300",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "浙江"
-   ],
    "officialLengthKm": 0
   }
  ]

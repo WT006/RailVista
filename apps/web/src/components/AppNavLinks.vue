@@ -1,25 +1,20 @@
 <script setup lang="ts">
 /**
- * 主导航链接组（注入 AppTopBar 的 nav slot）。
+ * 主导航链接组（注入 AppTopBar 的 nav slot，仅桌面端可见）。
  * 沿用 Cinematic Ink：当前项文字提亮 + 下方 2px 光感滑块（::after）。
  */
 import { useRoute } from 'vue-router';
+import { APP_NAV_ITEMS } from '../data/appNav';
 
 const route = useRoute();
-
-const links = [
-  { to: '/', label: '行程', match: (p: string) => p === '/' || p === '/trip' || p.startsWith('/route/') },
-  { to: '/drive', label: '自驾', match: (p: string) => p.startsWith('/drive') },
-  { to: '/atlas', label: '全国地图', match: (p: string) => p.startsWith('/atlas') },
-  { to: '/ticket', label: '纪念票', match: (p: string) => p.startsWith('/ticket') },
-];
+const desktopLinks = APP_NAV_ITEMS.filter((item) => item.to && !item.placeholder);
 </script>
 
 <template>
   <RouterLink
-    v-for="l in links"
-    :key="l.to"
-    :to="l.to"
+    v-for="l in desktopLinks"
+    :key="l.id"
+    :to="l.to!"
     class="navlink"
     :class="{ 'is-active': l.match(route.path) }"
   >

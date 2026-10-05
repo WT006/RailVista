@@ -153,7 +153,7 @@ function renderRoadLayer() {
       cursor: 'pointer',
     });
     line.on('click', () => {
-      void router.push(`/drive/road/${encodeURIComponent(r.key)}`);
+      void router.push({ path: '/drive/trip', query: { road: r.key } });
     });
     map.add(line);
     roadPolylines.push(line);

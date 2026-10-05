@@ -6,7 +6,7 @@
  * 搜索框视觉权重 > 榜单入口，榜单放在第二屏。
  *
  * 结构：
- *   1. 全国公路网背景层 DriveBackdropMap（与铁路行程页同规格：地图只做背景）
+ *   1. App 级背景与铁路选行程页一致（淡轮廓 + 冷蓝景点星点）
  *   2. 起终点 OD 搜索（suggest 四类索引 + geocode 兜底）+ ⇄ 交换
  *   3. 公路编号键盘（对标车次号前缀键盘：G/S/X/Y/C + 数字；S 需先选省）
  *   4. 路网统计 + 覆盖诚实说明（PRD §3.1）
@@ -24,12 +24,7 @@ import type { PlaceHit, RoadClass } from '@railvista/shared';
 
 const router = useRouter();
 
-/**
- * ── 全国公路网 ──────────────────────────────────────────────────────────────
- * 路网几何由 `DriveBackdropMap` 作为**整页背景**渲染（与铁路行程页同一规格：
- * 地图只做背景，前景是内容）。这里只取索引，用于「干线直达」快捷入口与等级图例。
- * 此前前景另有一张 46vh 的路网 SVG 卡，与背景重复且深色填充轮廓在背景上成斑块，已移除。
- */
+/** 路网索引：用于右侧「干线直达」快捷入口与等级图例（背景不再铺路网位图） */
 interface RoadBrief {
   key: string;
   ref: string;
@@ -71,7 +66,7 @@ const LEGEND = (['national', 'expressway', 'provincial', 'county'] as RoadClass[
 }));
 
 function openRoad(key: string) {
-  void router.push(`/drive/road/${encodeURIComponent(key)}`);
+  void router.push({ path: '/drive/trip', query: { road: key } });
 }
 
 // ── OD 搜索 ──────────────────────────────────────────────────────────────────
@@ -166,7 +161,7 @@ function goTrip() {
   // 与点对点规划不同 —— 直接跳单条公路页，不再混在同一个 OD 请求里。
   const roadHit = fromHit.value?.kind === 'road' ? fromHit.value : toHit.value?.kind === 'road' ? toHit.value : null;
   if (roadHit) {
-    void router.push(`/drive/road/${encodeURIComponent(roadHit.id)}`);
+    void router.push({ path: '/drive/trip', query: { road: roadHit.id } });
     return;
   }
   odError.value = '';
@@ -260,7 +255,7 @@ function backspace() {
 
 function openRoadHit(hit: PlaceHit) {
   if (hit.kind === 'road') {
-    void router.push(`/drive/road/${encodeURIComponent(hit.id)}`);
+    void router.push({ path: '/drive/trip', query: { road: hit.id } });
   }
 }
 
@@ -285,27 +280,6 @@ function setRoadAsConstraint(field: 'from' | 'to') {
 
 // ── 路网统计 + 榜单入口（第二屏） ────────────────────────────────────────────
 const stats = ref<Awaited<ReturnType<typeof api.getDriveNetworkStats>> | null>(null);
-
-/**
- * v0.6.0 覆盖口径：按等级动态生成"已收录走向"说明。
- * 数据来自省份 PBF 全量要素库装配，覆盖数是实测值，不再写死"85~95%"这类估计。
- */
-const coverageLine = computed(() => {
-  const rows = stats.value?.coverageByClass;
-  if (!rows?.length) return '';
-  const label: Record<string, string> = {
-    expressway: '国家高速',
-    national: '普通国道',
-    provincial: '省道',
-    county: '县道',
-    township: '乡道',
-    village: '村道',
-  };
-  const parts = rows
-    .filter((r) => r.total > 0)
-    .map((r) => `${label[r.class] ?? r.class} ${r.withGeometry}/${r.total}`);
-  return parts.length ? `已收录走向：${parts.join('、')}。` : '';
-});
 const boards = ref<Awaited<ReturnType<typeof api.getDriveBoards>>['boards']>([]);
 
 onMounted(async () => {
@@ -521,7 +495,7 @@ const levelLabel: Record<string, string> = {
         <!-- 路网速览：图例 + 干线直达（背景图即全国公路网，此处不再重复画一张地图） -->
         <aside class="drive-netpanel rv-card" data-spotlight>
           <h2 class="drive-netpanel__title">全国公路网</h2>
-          <p class="drive-netpanel__sub">页面背景即为已挂几何的公路干线，颜色按等级区分</p>
+          <p class="drive-netpanel__sub">按等级区分已入库干线，可一键进入详情</p>
 
           <ul class="drive-legend">
             <li v-for="l in LEGEND" :key="l.cls">
@@ -551,20 +525,24 @@ const levelLabel: Record<string, string> = {
               路网几何加载中…（暂无可直达的干线）
             </p>
             <p v-else class="drive-netpanel__note">
-              里程为已绘制几何长度（估算），非官方里程；全国公路网背景层不阻塞页面加载。
+              里程为已绘制几何长度（估算），非官方里程。
             </p>
           </div>
         </aside>
       </section>
 
-      <!-- 路网统计 + 诚实边界 -->
-      <section v-if="stats" class="drive-stats">
+      <!-- 路网统计（国道/高速分母取《国家公路网规划》权威名录） -->
+      <section v-if="stats" class="drive-stats" aria-label="路网统计">
         <div class="drive-stat">
-          <div class="drive-stat__value">{{ stats.national }}<span class="drive-stat__target">/301</span></div>
+          <div class="drive-stat__value">
+            {{ stats.national }}<span class="drive-stat__target">/{{ stats.coverage.targetNational }}</span>
+          </div>
           <div class="drive-stat__label">普通国道在册</div>
         </div>
         <div class="drive-stat">
-          <div class="drive-stat__value">{{ stats.expressway }}<span class="drive-stat__target">/278</span></div>
+          <div class="drive-stat__value">
+            {{ stats.expressway }}<span class="drive-stat__target">/{{ stats.coverage.targetExpressway }}</span>
+          </div>
           <div class="drive-stat__label">国家高速在册</div>
         </div>
         <div class="drive-stat">
@@ -576,11 +554,6 @@ const levelLabel: Record<string, string> = {
           <div class="drive-stat__label">公路侧景点</div>
         </div>
       </section>
-      <p v-if="stats" class="drive-coverage-note">
-        {{ stats.coverage.notes[0] }}。
-        <template v-if="coverageLine">{{ coverageLine }}</template>
-        精品线走向为 OSM 编号还原的近似线位。
-      </p>
 
       <!-- 第二屏：榜单入口（从属，视觉权重低于搜索） -->
       <section class="drive-boards">

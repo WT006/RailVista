@@ -1168,36 +1168,6 @@
 }
 
 /* —— 沿程页（DriveTrip）：左路线卡 / 中地图 / 右景点流 —— */
-.drive-trip-top {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
-  flex-wrap: wrap;
-}
-
-.drive-trip-back {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px var(--space-3);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--line-hairline);
-  background: var(--surface-1);
-  color: var(--text-2);
-  font-size: var(--fs-cap);
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: border-color var(--dur-fast), color var(--dur-fast), background-color var(--dur-fast);
-}
-
-.drive-trip-back:hover {
-  border-color: var(--line-accent);
-  color: var(--text-1);
-  background: var(--accent-soft);
-}
-
 .drive-trip-tabs {
   display: flex;
   gap: var(--space-1);
@@ -1762,25 +1732,30 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 沿程地图（离线 SVG） */
+/* 沿程地图（离线 SVG）——铺满卡片，避免 meet 留黑边 */
 .drive-trip-map {
   position: relative;
   min-height: 380px;
-  padding: var(--space-2);
-  display: flex;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  display: block;
+  overflow: hidden;
 }
 
 .drive-trip-map__svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  flex: 1;
-  min-height: 0;
+  height: 100%;
+  display: block;
 }
 
 .drive-trip-map__svg .drive-netmap__outline path {
   fill: var(--fill-subtle);
-  fill-opacity: 0.35;
+  fill-opacity: 0.28;
   stroke: var(--line-default);
-  stroke-opacity: 0.4;
+  stroke-opacity: 0.32;
+  stroke-width: 0.5;
 }
 
 .drive-trip-map__route {
@@ -1788,6 +1763,17 @@
   stroke: var(--accent);
   stroke-width: 2.6;
   stroke-opacity: 0.95;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 50%, transparent));
+}
+
+.drive-trip-map__segment {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-opacity: 0.45;
+  stroke-dasharray: 5 4;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
@@ -1811,19 +1797,24 @@
   position: absolute;
   bottom: var(--space-2);
   left: var(--space-3);
+  right: var(--space-3);
+  z-index: 1;
   margin: 0;
   font-size: var(--fs-micro);
   color: var(--text-3);
+  line-height: 1.35;
+  max-width: calc(100% - 7rem);
 }
 
 .drive-trip-map__gap-note {
   position: absolute;
-  bottom: calc(var(--space-2) + 18px);
+  bottom: calc(var(--space-2) + 2.4em);
   left: var(--space-3);
   margin: 0;
   font-size: var(--fs-micro);
   color: var(--warning);
   font-weight: 600;
+  z-index: 1;
 }
 
 /* 沿程景点流 */
@@ -2886,6 +2877,37 @@
   }
 }
 
+/* 移动端（≤839px）：路线卡 → 地图 → 进度/即将到达 → 景点流
+   aside 用 contents 让子项参与父级 grid，再用 order 把地图插到路线卡正下方 */
+@media (max-width: 839px) {
+  .drive-trip-side {
+    display: contents;
+  }
+
+  .drive-trip-grid > .drive-route-card,
+  .drive-trip-side > .drive-route-card {
+    order: 1;
+  }
+
+  .drive-trip-grid > .drive-trip-map {
+    order: 2;
+    min-height: 280px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .drive-trip-side > .drive-chprog {
+    order: 3;
+  }
+
+  .drive-trip-side > .drive-upcoming {
+    order: 4;
+  }
+
+  .drive-trip-grid > .drive-trip-flow {
+    order: 5;
+  }
+}
+
 /* 移动端（≤720px）：纵向堆叠，地图在上、信息在下；地图高度自适应 */
 @media (max-width: 720px) {
   .drive-road-layout {
@@ -2894,7 +2916,7 @@
   }
 
   .drive-trip-map {
-    min-height: 300px;
+    min-height: 260px;
   }
 
   .drive-road-side {
@@ -3350,4 +3372,459 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--text-1);
+}
+
+/* ══════════ 沿程全屏地图（DriveTripMap） ══════════ */
+
+.drive-trip-map.is-enterable {
+  cursor: pointer;
+}
+
+.drive-trip-map.is-enterable .drive-trip-map__svg {
+  cursor: pointer;
+}
+
+.drive-trip-map__enter {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 0 12px 0 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--surface-0) 72%, transparent);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.28),
+    0 0 0 1px color-mix(in srgb, var(--accent) 10%, transparent) inset;
+  color: var(--text-1);
+  font-size: var(--fs-cap);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast),
+    border-color var(--dur-fast),
+    box-shadow var(--dur-fast),
+    color var(--dur-fast),
+    transform var(--dur-fast);
+}
+
+.drive-trip-map__enter:hover {
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface-0));
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--accent-hover);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.32),
+    0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent) inset;
+  transform: translateY(-1px);
+}
+
+.drive-trip-map__enter:active {
+  transform: translateY(0);
+}
+
+.drive-trip-map__enter-icon {
+  flex: none;
+  opacity: 0.9;
+}
+
+/* 景点标记：公路专用 pin（区别于铁路编号圆点） */
+.drive-map-pin {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+  pointer-events: auto;
+}
+
+.drive-map-pin__head {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 6px 6px 6px 2px;
+  background: linear-gradient(165deg, color-mix(in srgb, var(--pin-color) 92%, #fff), var(--pin-color));
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  transform: rotate(-4deg);
+}
+
+.drive-map-pin__km {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #0a1220;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.drive-map-pin__tail {
+  width: 0;
+  height: 0;
+  margin-top: -1px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid var(--pin-color);
+}
+
+.drive-map-pin.is-tier-a .drive-map-pin__head {
+  min-width: 38px;
+  height: 24px;
+}
+
+.drive-map-pin.is-tier-c .drive-map-pin__head {
+  opacity: 0.92;
+}
+
+.drive-map-pin.is-compact .drive-map-pin__head {
+  min-width: 28px;
+  height: 18px;
+  border-width: 1.5px;
+}
+
+.drive-map-pin.is-compact .drive-map-pin__km {
+  font-size: 8px;
+}
+
+.drive-map-pin.is-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--pin-color, var(--accent));
+  border: 1.5px solid #0a1628;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--pin-color, var(--accent)) 45%, transparent);
+  pointer-events: auto;
+}
+
+.drive-map-pin.is-dot.is-tier-c {
+  width: 8px;
+  height: 8px;
+  opacity: 0.85;
+}
+
+/* 当前位置：菱形车辆标记 */
+.drive-map-vehicle {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+
+.drive-map-vehicle__core {
+  position: absolute;
+  inset: 2px;
+  background: var(--accent);
+  border: 2.5px solid #fff;
+  border-radius: 4px;
+  transform: rotate(45deg);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.drive-map-vehicle__ring {
+  position: absolute;
+  inset: -6px;
+  border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: 50%;
+  animation: drive-vehicle-ring 2.4s ease-out infinite;
+}
+
+.drive-map-vehicle.is-compact {
+  width: 14px;
+  height: 14px;
+}
+
+.drive-map-gps {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  background: var(--info);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--info) 35%, transparent);
+}
+
+.drive-map-gps__pulse {
+  position: absolute;
+  inset: -8px;
+  border: 2px solid color-mix(in srgb, var(--info) 55%, transparent);
+  border-radius: 50%;
+  animation: drive-gps-pulse 2s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes drive-gps-pulse {
+  0% { transform: scale(0.7); opacity: 0.7; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.drive-map-page .locate-btn.is-live {
+  border-color: var(--info);
+  color: var(--info);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--info) 22%, transparent), 0 4px 16px rgba(0, 0, 0, 0.22);
+}
+
+.drive-map-page .location-mode.is-live {
+  color: var(--info);
+  background: color-mix(in srgb, var(--info) 14%, transparent);
+  border-color: color-mix(in srgb, var(--info) 32%, transparent);
+}
+
+.drive-map-page .location-mode.is-off {
+  color: var(--warning);
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--warning) 28%, transparent);
+}
+
+@keyframes drive-vehicle-ring {
+  0% { transform: scale(0.75); opacity: 0.65; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+/* 景点详情气泡 */
+.drive-map-card {
+  position: relative;
+  width: max-content;
+  max-width: min(320px, 82vw);
+  padding: 12px 14px 14px;
+  border-radius: 14px;
+  background: linear-gradient(165deg, var(--surface-2), var(--surface-1));
+  border: 1px solid color-mix(in srgb, var(--card-accent, var(--accent)) 40%, var(--line-default));
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.42),
+    0 0 0 1px color-mix(in srgb, var(--card-accent, var(--accent)) 18%, transparent) inset;
+  color: var(--text-1);
+  font-family: inherit;
+  line-height: 1.45;
+}
+
+.drive-map-card__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: var(--fill-subtle);
+  color: var(--text-3);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.drive-map-card__close:hover {
+  background: var(--line-default);
+  color: var(--text-1);
+}
+
+.drive-map-card__km {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--card-accent, var(--accent));
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-map-card__title {
+  margin: 0 28px 8px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.drive-map-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px;
+}
+
+.drive-map-card__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 650;
+  background: var(--fill-subtle);
+  border: 1px solid var(--line-hairline);
+  color: var(--text-2);
+}
+
+.drive-map-card__badge.is-tier-a {
+  color: color-mix(in srgb, var(--warning) 85%, var(--text-1));
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--warning) 35%, transparent);
+}
+
+.drive-map-card__badge.is-tier-b {
+  color: var(--accent-hover);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.drive-map-card__badge.is-tier-c {
+  color: color-mix(in srgb, var(--success) 85%, var(--text-1));
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  border-color: color-mix(in srgb, var(--success) 35%, transparent);
+}
+
+.drive-map-card__badge.is-vis {
+  color: var(--text-3);
+}
+
+.drive-map-card__detour {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.drive-map-card__intro {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-3);
+  line-height: 1.55;
+}
+
+.drive-map-card__arrow {
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  background: var(--surface-1);
+  border-right: 1px solid color-mix(in srgb, var(--card-accent, var(--accent)) 35%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--card-accent, var(--accent)) 35%, transparent);
+  transform: rotate(45deg);
+}
+
+.drive-map-status__badge {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent-hover);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* 全屏地图内的沿程进度：浮层玻璃卡，复用 .drive-chprog 结构 */
+.drive-map-chprog {
+  pointer-events: auto;
+  width: min(360px, calc(100vw - 24px));
+  max-height: min(52vh, 420px);
+  overflow: auto;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--bg-raised) 92%, transparent);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.drive-map-chprog .drive-chprog__list {
+  max-height: min(28vh, 220px);
+}
+
+.drive-map-progress {
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 70%, var(--success)));
+}
+
+.drive-map-legend .legend-item i.spot {
+  background: var(--accent);
+}
+
+/* 全览：独立胶囊按钮，不塞进图例（避免默认 button 白底与底栏「预览」重叠） */
+.drive-map-page .drive-map-fit-btn {
+  position: fixed;
+  right: calc(10px + var(--safe-right));
+  bottom: calc(var(--bottom-overlay) + 106px);
+  z-index: 101;
+  box-sizing: border-box;
+  width: 88px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: var(--panel-bg);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+}
+
+.drive-map-page .drive-map-fit-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+/* 为「全览」腾出一层：图例开关再抬高一格 */
+.drive-map-page .legend-toggle {
+  bottom: calc(var(--bottom-overlay) + 154px);
+}
+
+.drive-map-page .legend {
+  bottom: calc(var(--bottom-overlay) + 202px);
+}
+
+/* 底栏右侧给图例留空，避免「偏离约 / 预览」徽标和图例横向重叠 */
+.drive-map-page .bottom-panel {
+  padding-right: calc(118px + var(--safe-right));
+}
+
+.drive-map-page .drive-map-legend {
+  max-height: min(42vh, 280px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 721px) {
+  /* 桌面图例常显：贴底栏上方；右侧按钮用实测图例高度抬升 */
+  .drive-map-page .legend {
+    display: block;
+    bottom: var(--bottom-overlay);
+    max-height: min(46vh, 300px);
+  }
+
+  .drive-map-page .legend-toggle {
+    display: none;
+  }
+
+  .drive-map-page .locate-btn {
+    bottom: calc(var(--bottom-overlay) + var(--drive-map-controls-lift, 220px));
+  }
+
+  .drive-map-page .satellite-btn {
+    bottom: calc(var(--bottom-overlay) + var(--drive-map-controls-lift, 220px) + 48px);
+  }
+
+  .drive-map-page .drive-map-fit-btn {
+    bottom: calc(var(--bottom-overlay) + var(--drive-map-controls-lift, 220px) + 96px);
+  }
+}
+
+@media (max-width: 640px) {
+  .drive-map-chprog {
+    width: min(100%, calc(100vw - 20px));
+    max-height: min(42vh, 340px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drive-map-vehicle__ring,
+  .drive-map-gps__pulse {
+    animation: none;
+  }
 }

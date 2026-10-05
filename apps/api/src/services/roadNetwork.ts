@@ -363,8 +363,43 @@ function readCoverageQuality(): NonNullable<RoadNetworkStats['quality']> {
   return out;
 }
 
+/** 《国家公路网规划》权威名录 ref 集合（mtime 随索引一起失效即可） */
+let authRefCache: { mtime: number; national: Set<string>; expressway: Set<string> } | null = null;
+
+function loadAuthoritativeRefs(): { national: Set<string>; expressway: Set<string> } {
+  const mtime = indexMtime();
+  if (authRefCache && authRefCache.mtime === mtime) {
+    return { national: authRefCache.national, expressway: authRefCache.expressway };
+  }
+  const load = (file: string): Set<string> => {
+    const out = new Set<string>();
+    const p = join(ROADS_DIR, 'authoritative', file);
+    if (!existsSync(p)) return out;
+    try {
+      const raw = JSON.parse(readFileSync(p, 'utf8')) as {
+        roads?: Array<{ key?: string; ref?: string }>;
+      };
+      for (const r of raw.roads ?? []) {
+        const k = r.key ?? r.ref;
+        if (k) out.add(k);
+      }
+    } catch {
+      /* 单文件损坏不阻塞 */
+    }
+    return out;
+  };
+  const national = load('national.json');
+  const expressway = load('expressway.json');
+  authRefCache = { mtime, national, expressway };
+  return { national, expressway };
+}
+
 export function networkStats(spotCount: number): RoadNetworkStats {
   const { entries, updated } = loadRoadIndex();
+  const auth = loadAuthoritativeRefs();
+  /** 国道/高速「在册」只计权威名录交集，避免 OSM 多编号把分母冲破（曾出现 306/301） */
+  const countOfficial = (cls: 'national' | 'expressway', refs: Set<string>) =>
+    entries.filter((r) => r.class === cls && refs.has(r.key)).length;
   const count = (cls: RoadIndexEntry['class']) => entries.filter((r) => r.class === cls).length;
   const withGeom = entries.filter((r) => r.hasGeom);
   const totalKm = entries.reduce((s, r) => s + (r.hasGeom ? r.lengthKm : 0), 0);
@@ -388,8 +423,8 @@ export function networkStats(spotCount: number): RoadNetworkStats {
   });
   return {
     coverageByClass,
-    national: count('national'),
-    expressway: count('expressway'),
+    national: countOfficial('national', auth.national),
+    expressway: countOfficial('expressway', auth.expressway),
     provincial: count('provincial'),
     county: count('county'),
     township: count('township'),
@@ -400,8 +435,8 @@ export function networkStats(spotCount: number): RoadNetworkStats {
     spotCount,
     quality: readCoverageQuality(),
     coverage: {
-      targetNational: 301,
-      targetExpressway: 278,
+      targetNational: auth.national.size || 301,
+      targetExpressway: auth.expressway.size || 278,
       notes: COVERAGE_NOTES,
     },
     updated,

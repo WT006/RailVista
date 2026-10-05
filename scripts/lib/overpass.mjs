@@ -510,40 +510,64 @@ export async function fetchConnectingWaysAround(pt, radiusM = 2000, { timeoutSec
   return { ways, status: ways.length > 0 ? 'normal' : 'no_connect' };
 }
 /**
- * 按省分片抓取：遍历 34 省 bbox，每片独立缓存（key 含省码），合并去重，断点续抓。
+ * 按省分片抓取：遍历省 bbox，每片独立缓存（key 含省码），合并去重，断点续抓。
  * 单条全国查询易超时/限流；分片命中率高且可断点续抓（已完成的省分片缓存命中即跳过）。
  * 单省超时记入 provincesFailed，不中断整体。
+ *
+ * @param {string[]} [opts.provinceNames] 索引途经省名（如「辽宁」）。有则只查这些省，
+ *   避免对 30+ 空省打 Overpass（G102 曾因此卡死数十分钟）。未传则扫全 34 省。
  */
-export async function fetchWaysByProvincialTiling(ref, officialKm = 0, { timeoutSec = 90 } = {}) {
+export async function fetchWaysByProvincialTiling(ref, officialKm = 0, { timeoutSec = 90, provinceNames = null } = {}) {
   const waysByProvince = [];
   const provincesHit = [];
   const provincesFailed = [];
-  for (const prov of PROVINCE_BBOXES) {
+  const nameFilter =
+    Array.isArray(provinceNames) && provinceNames.length > 0
+      ? new Set(provinceNames.map((n) => String(n).replace(/省|市|自治区|壮族|回族|维吾尔|特别行政区/g, '').trim()).filter(Boolean))
+      : null;
+  const targets = nameFilter
+    ? PROVINCE_BBOXES.filter((p) => nameFilter.has(p.name) || [...nameFilter].some((n) => p.name.includes(n) || n.includes(p.name)))
+    : PROVINCE_BBOXES;
+  if (nameFilter) {
+    console.log(`    途经省过滤：${targets.map((p) => p.name).join('、') || '（无匹配，回退全量）'}（跳过 ${PROVINCE_BBOXES.length - targets.length} 省）`);
+  }
+  const loop = targets.length ? targets : PROVINCE_BBOXES;
+  for (const prov of loop) {
     const cacheFile = join(ROADS_CACHE_DIR, `ways-${String(ref).replace(/[^\w]/g, '')}-${prov.code}.json`);
     let cached = null;
+    let cacheHit = false;
     try {
-      if (existsSync(cacheFile)) cached = JSON.parse(readFileSync(cacheFile, 'utf8'));
+      if (existsSync(cacheFile)) {
+        cached = JSON.parse(readFileSync(cacheFile, 'utf8'));
+        cacheHit = true;
+      }
     } catch {
       /* ignore broken cache */
     }
-    if (cached && cached.length > 0) {
-      console.log(`    ${prov.name}（缓存命中 ${cached.length} ways）`);
-      waysByProvince.push(cached);
-      provincesHit.push(prov.code);
+    if (cacheHit && Array.isArray(cached)) {
+      if (cached.length > 0) {
+        console.log(`    ${prov.name}（缓存命中 ${cached.length} ways）`);
+        waysByProvince.push(cached);
+        provincesHit.push(prov.code);
+      } else {
+        console.log(`    ${prov.name}（缓存命中：空）`);
+      }
       continue;
     }
     try {
       const result = await fetchWaysForRef(ref, prov.bbox, { timeoutSec, useCache: false, officialKm });
+      try {
+        mkdirSync(ROADS_CACHE_DIR, { recursive: true });
+        writeFileSync(cacheFile, JSON.stringify(result.ways), 'utf8');
+      } catch {
+        /* cache write best-effort */
+      }
       if (result.ways.length > 0) {
-        try {
-          mkdirSync(ROADS_CACHE_DIR, { recursive: true });
-          writeFileSync(cacheFile, JSON.stringify(result.ways), 'utf8');
-        } catch {
-          /* cache write best-effort */
-        }
         waysByProvince.push(result.ways);
         provincesHit.push(prov.code);
         console.log(`    ${prov.name}（${result.ways.length} ways，${result.source}）`);
+      } else {
+        console.log(`    ${prov.name}（0 ways）`);
       }
     } catch (e) {
       provincesFailed.push({ code: prov.code, name: prov.name, error: e.message });

@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-10-02",
+ "updated": "2026-10-05",
  "roads": [
   {
    "ref": "G101",
@@ -2530,53 +2530,6 @@
    "fromPlace": "白玉",
    "toPlace": "波密",
    "provinces": [],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G255",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "福建"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G256",
-   "name": "城港大道",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "福建"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G288",
-   "name": "凌海大桥",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "辽宁"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G388",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "宁夏"
-   ],
-   "officialLengthKm": 0
-  },
-  {
-   "ref": "G150",
-   "fromPlace": "",
-   "toPlace": "",
-   "provinces": [
-    "山东"
-   ],
    "officialLengthKm": 0
   }
  ]

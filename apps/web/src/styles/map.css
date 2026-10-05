@@ -9,6 +9,13 @@
   --panel-bg: var(--bg-raised);
 }
 
+@media (max-width: 599px) {
+  :root {
+    --bottom-overlay: calc(168px + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
+    --bottom-panel-clearance: calc(168px + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -38,9 +45,11 @@ body {
 html:has(.trip-page),
 html:has(.atlas-page),
 html:has(.corridor-map-page),
+html:has(.drive-map-page),
 body:has(.trip-page),
 body:has(.atlas-page),
-body:has(.corridor-map-page) {
+body:has(.corridor-map-page),
+body:has(.drive-map-page) {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
@@ -49,7 +58,8 @@ body:has(.corridor-map-page) {
 /* #app 的高度锁同样只在页面级地图生效：.trip-page{height:100%} 需要父级有确定高度 */
 html:has(.trip-page) #app,
 html:has(.atlas-page) #app,
-html:has(.corridor-map-page) #app {
+html:has(.corridor-map-page) #app,
+html:has(.drive-map-page) #app {
   height: 100%;
 }
 

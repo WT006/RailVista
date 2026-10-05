@@ -192,12 +192,15 @@ async function runBatched(jobs, batchSize, sleepMs) {
   return { results, failed };
 }
 
-async function fetchOne({ key, ref, bbox, fromPlace, toPlace, officialKm = 0, provincialTiling = false }) {
+async function fetchOne({ key, ref, bbox, fromPlace, toPlace, officialKm = 0, provincialTiling = false, provinces = null }) {
   console.log(`▶ ${key}（${fromPlace} → ${toPlace}）${officialKm ? ` 官方里程参考 ${officialKm}km` : ''}`);
   const t0 = Date.now();
   let ways, source;
   if (provincialTiling) {
-    const result = await fetchWaysByProvincialTiling(ref, officialKm, { timeoutSec: 300 });
+    const result = await fetchWaysByProvincialTiling(ref, officialKm, {
+      timeoutSec: 300,
+      provinceNames: provinces,
+    });
     ways = result.ways;
     source = result.source;
   } else {
@@ -298,6 +301,7 @@ if (args.batch) {
       toPlace: entry?.toPlace ?? ref,
       officialKm: officialKmByRef.get(ref) ?? 0,
       provincialTiling: args.provincialTiling,
+      provinces: entry?.provinces ?? null,
     });
   }
 } else if (args.key) {
@@ -310,6 +314,7 @@ if (args.batch) {
     toPlace: entry?.toPlace ?? args.key,
     officialKm: officialKmByRef.get(args.key) ?? 0,
     provincialTiling: args.provincialTiling,
+    provinces: entry?.provinces ?? null,
   });
 } else {
   const refs = args.refs.length ? args.refs : FLAGSHIP_REFS;
@@ -323,6 +328,7 @@ if (args.batch) {
       toPlace: entry?.toPlace ?? ref,
       officialKm: officialKmByRef.get(ref) ?? 0,
       provincialTiling: args.provincialTiling,
+      provinces: entry?.provinces ?? null,
     });
   }
 }

@@ -137,7 +137,16 @@ export function buildChapters(
         toType: b.type,
       });
     }
-    if (chapters.length) return chapters;
+    if (chapters.length) {
+      // 末锚点常停在终点站名前，主链还多出几公里——把末段 toKm 接到主链尽头，
+      // 避免进度条末尾一段「无章节」空白（G101：沈阳北@355 / 主链 367km）。
+      const chainKm = coords.length >= 2 ? (computeCumKm(coords)[coords.length - 1] ?? 0) : 0;
+      const last = chapters[chapters.length - 1]!;
+      if (chainKm > last.toKm + 1) {
+        last.toKm = Math.round(chainKm * 10) / 10;
+      }
+      return chapters;
+    }
   }
   // ── 退化：等里程窗口 ──
   //

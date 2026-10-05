@@ -66,7 +66,7 @@ const LEGEND = (['national', 'expressway', 'provincial', 'county'] as RoadClass[
 }));
 
 function openRoad(key: string) {
-  void router.push(`/drive/road/${encodeURIComponent(key)}`);
+  void router.push({ path: '/drive/trip', query: { road: key } });
 }
 
 // ── OD 搜索 ──────────────────────────────────────────────────────────────────
@@ -161,7 +161,7 @@ function goTrip() {
   // 与点对点规划不同 —— 直接跳单条公路页，不再混在同一个 OD 请求里。
   const roadHit = fromHit.value?.kind === 'road' ? fromHit.value : toHit.value?.kind === 'road' ? toHit.value : null;
   if (roadHit) {
-    void router.push(`/drive/road/${encodeURIComponent(roadHit.id)}`);
+    void router.push({ path: '/drive/trip', query: { road: roadHit.id } });
     return;
   }
   odError.value = '';
@@ -255,7 +255,7 @@ function backspace() {
 
 function openRoadHit(hit: PlaceHit) {
   if (hit.kind === 'road') {
-    void router.push(`/drive/road/${encodeURIComponent(hit.id)}`);
+    void router.push({ path: '/drive/trip', query: { road: hit.id } });
   }
 }
 
@@ -280,27 +280,6 @@ function setRoadAsConstraint(field: 'from' | 'to') {
 
 // ── 路网统计 + 榜单入口（第二屏） ────────────────────────────────────────────
 const stats = ref<Awaited<ReturnType<typeof api.getDriveNetworkStats>> | null>(null);
-
-/**
- * v0.6.0 覆盖口径：按等级动态生成"已收录走向"说明。
- * 数据来自省份 PBF 全量要素库装配，覆盖数是实测值，不再写死"85~95%"这类估计。
- */
-const coverageLine = computed(() => {
-  const rows = stats.value?.coverageByClass;
-  if (!rows?.length) return '';
-  const label: Record<string, string> = {
-    expressway: '国家高速',
-    national: '普通国道',
-    provincial: '省道',
-    county: '县道',
-    township: '乡道',
-    village: '村道',
-  };
-  const parts = rows
-    .filter((r) => r.total > 0)
-    .map((r) => `${label[r.class] ?? r.class} ${r.withGeometry}/${r.total}`);
-  return parts.length ? `已收录走向：${parts.join('、')}。` : '';
-});
 const boards = ref<Awaited<ReturnType<typeof api.getDriveBoards>>['boards']>([]);
 
 onMounted(async () => {
@@ -552,14 +531,18 @@ const levelLabel: Record<string, string> = {
         </aside>
       </section>
 
-      <!-- 路网统计 + 诚实边界 -->
-      <section v-if="stats" class="drive-stats">
+      <!-- 路网统计（国道/高速分母取《国家公路网规划》权威名录） -->
+      <section v-if="stats" class="drive-stats" aria-label="路网统计">
         <div class="drive-stat">
-          <div class="drive-stat__value">{{ stats.national }}<span class="drive-stat__target">/301</span></div>
+          <div class="drive-stat__value">
+            {{ stats.national }}<span class="drive-stat__target">/{{ stats.coverage.targetNational }}</span>
+          </div>
           <div class="drive-stat__label">普通国道在册</div>
         </div>
         <div class="drive-stat">
-          <div class="drive-stat__value">{{ stats.expressway }}<span class="drive-stat__target">/278</span></div>
+          <div class="drive-stat__value">
+            {{ stats.expressway }}<span class="drive-stat__target">/{{ stats.coverage.targetExpressway }}</span>
+          </div>
           <div class="drive-stat__label">国家高速在册</div>
         </div>
         <div class="drive-stat">
@@ -571,11 +554,6 @@ const levelLabel: Record<string, string> = {
           <div class="drive-stat__label">公路侧景点</div>
         </div>
       </section>
-      <p v-if="stats" class="drive-coverage-note">
-        {{ stats.coverage.notes[0] }}。
-        <template v-if="coverageLine">{{ coverageLine }}</template>
-        精品线走向为 OSM 编号还原的近似线位。
-      </p>
 
       <!-- 第二屏：榜单入口（从属，视觉权重低于搜索） -->
       <section class="drive-boards">

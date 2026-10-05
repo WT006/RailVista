@@ -149,6 +149,7 @@
   --gutter: 16px;
   --shell-max: 100%;
   --appbar-h: 56px;
+  --bottomnav-h: 0px; /* 桌面端无底栏 */
   --col-ratio-main: 7; /* 主栏占 12 栅格中的 7 列 */
   --col-ratio-side: 5; /* 侧栏占 12 栅格中的 5 列 */
 
@@ -170,11 +171,18 @@
  *   600–1199        → 全宽 - 2×gutter（双栏，尽量吃满屏幕，不做人为收窄）
  *   ≥1200 桌面      → 收窄到 1120px，保证双栏阅读宽度与行宽舒适
  */
+@media (max-width: 599px) {
+  :root {
+    --bottomnav-h: 68px;
+  }
+}
+
 @media (min-width: 600px) {
   :root {
     --gutter: 20px;
     --shell-max: 100%;
     --appbar-h: 56px;
+    --bottomnav-h: 0px;
   }
 }
 

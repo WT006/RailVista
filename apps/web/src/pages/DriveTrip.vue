@@ -9,10 +9,10 @@
  *
  * 布局：左路线卡 + 进度 + 即将到达 / 中地图 / 右沿程景点流。
  * 有定位时静默投影到折线推进进度；无定位可点进度条预览。
- * 地图为离线 SVG（中国轮廓 + 动态取景框），零密钥依赖。
+ * 地图为离线 SVG（中国轮廓 + 当前路线 + 动态取景框），零密钥依赖。
  */
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { projectToRoute, type AlongSpot, type RoadChapter, type RoadRoute } from '@railvista/shared';
 import { api } from '../api/client';
 import DriveSubNav from '../components/DriveSubNav.vue';
@@ -22,12 +22,14 @@ import { useRoadDraw } from '../composables/useRoadDraw';
 import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
 import { ROAD_COLORS } from '../data/roadColors';
+import { loadAmap } from '../map/amap';
 
 usePointerSpotlight();
 const routePathRef = ref<SVGPathElement | null>(null);
 useRoadDraw(routePathRef);
 
 const route = useRoute();
+const router = useRouter();
 
 const VIEW_W = CHINA_OUTLINE_VIEWBOX.width;
 const VIEW_H = CHINA_OUTLINE_VIEWBOX.height;
@@ -88,18 +90,41 @@ async function load() {
 }
 
 onMounted(load);
+watch(
+  () => [route.query.road, route.query.route, route.query.from, route.query.to],
+  () => {
+    void load();
+  },
+);
 
-// ── 地图（离线 SVG，动态取景框） ─────────────────────────────────────────────
-const routePath = computed(() => {
-  const coords = roadRoute.value?.coords;
+// ── 地图（离线 SVG：主链 + 未贯通段 + 动态取景框） ─────────────────────────────
+function pathFromCoords(coords: [number, number][] | undefined): string {
   if (!coords || coords.length < 2) return '';
   let d = '';
-  coords.forEach(([lng, lat], i) => {
+  for (let i = 0; i < coords.length; i++) {
+    const [lng, lat] = coords[i]!;
     const [x, y] = lngLatToViewBox(lng, lat);
     d += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
-  });
+  }
   return d;
+}
+
+const routePath = computed(() => pathFromCoords(roadRoute.value?.coords as [number, number][] | undefined));
+
+/** 未贯通 orphan 段：虚线绘制，与 DriveRoad 一致——景点挂在这些段上，不画就会「点飞线外」 */
+const segmentPaths = computed(() => {
+  const segs = roadRoute.value?.segments;
+  if (!segs?.length) return [] as string[];
+  return segs
+    .map((seg) => pathFromCoords(seg as [number, number][]))
+    .filter(Boolean);
 });
+
+const gapAnnotations = computed(() => roadRoute.value?.gapAnnotations ?? []);
+const hasGaps = computed(() => gapAnnotations.value.length > 0 || segmentPaths.value.length > 0);
+const maxGapKm = computed(() =>
+  gapAnnotations.value.reduce((m, g) => Math.max(m, g.gapKm), 0),
+);
 
 const focusBbox = computed<[number, number, number, number]>(() => {
   const coords = roadRoute.value?.coords;
@@ -113,22 +138,36 @@ const focusBbox = computed<[number, number, number, number]>(() => {
     if (y > maxY) maxY = y;
   };
   for (const [lng, lat] of coords) absorb(lng, lat);
-  // 景点一并纳入取景，避免圆点贴边或被裁掉
+  // 未贯通段必须纳入取景，否则北京段景点会把中心拉飞、主链被 slice 裁没
+  for (const seg of roadRoute.value?.segments ?? []) {
+    for (const pt of seg) absorb(pt[0], pt[1]);
+  }
   for (const s of spots.value.slice(0, 80)) absorb(s.lng, s.lat);
 
   const contentW = Math.max(maxX - minX, 4);
   const contentH = Math.max(maxY - minY, 4);
-  const padX = Math.max(contentW * 0.14, 24);
-  const padY = Math.max(contentH * 0.14, 24);
-  // ⚠️ 必须返回 [x, y, width, height]。此前误把 maxX/maxY 当作 w/h，
-  // 视野被撑到「原点附近一整块中国」，路线只剩左上角一小撮。
-  return [minX - padX, minY - padY, contentW + padX * 2, contentH + padY * 2];
+  // 多段公路跨度大：用 meet 等比居中，不用 slice（避免裁掉边段）
+  const TARGET_AR = 4 / 3;
+  let boxW = contentW;
+  let boxH = contentH;
+  if (boxW / boxH > TARGET_AR) boxH = boxW / TARGET_AR;
+  else boxW = boxH * TARGET_AR;
+  const padX = Math.max(boxW * 0.12, contentW * 0.1, 20);
+  const padY = Math.max(boxH * 0.12, contentH * 0.1, 20);
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  return [cx - boxW / 2 - padX, cy - boxH / 2 - padY, boxW + padX * 2, boxH + padY * 2];
 });
 
 const viewBoxAttr = computed(() => {
   const [x, y, w, h] = focusBbox.value;
   return `${x.toFixed(1)} ${y.toFixed(1)} ${Math.max(w, 4).toFixed(1)} ${Math.max(h, 4).toFixed(1)}`;
 });
+
+/** 有未贯通段时用 meet，保证全部分量可见；单链仍用 slice 铺满预览卡 */
+const mapAspectRatio = computed(() =>
+  segmentPaths.value.length ? 'xMidYMid meet' : 'xMidYMid slice',
+);
 
 function spotPos(s: AlongSpot): [number, number] {
   return lngLatToViewBox(s.lng, s.lat);
@@ -138,6 +177,18 @@ const expandedSpotId = ref('');
 
 function toggleSpot(s: AlongSpot) {
   expandedSpotId.value = expandedSpotId.value === s.id ? '' : s.id;
+}
+
+function openFullMap() {
+  // 提前拉高德脚本，进入全屏页时少等一轮网络
+  const key = import.meta.env.VITE_AMAP_KEY as string | undefined;
+  if (key) {
+    void loadAmap(key, import.meta.env.VITE_AMAP_SECURITY as string | undefined);
+  }
+  void router.push({
+    path: '/drive/trip/map',
+    query: { ...route.query, progress: String(progress.value) },
+  });
 }
 
 // ── 景点流过滤 ────────────────────────────────────────────────────────────────
@@ -234,7 +285,11 @@ const chainKm = computed(() => {
   if (cum?.length) return cum[cum.length - 1]!;
   return 0;
 });
-/** 进度条可走跨度（主链 + 章节覆盖） */
+/**
+ * 进度条跨度只认「章节 / 主链」——不要把未贯通段与飞点景点里程并进来。
+ * 并入会把章节挤到左侧一小截（G101 章节 367km、景点偏移到 1000+km），
+ * 进度条看起来像坏了。断段景点仍在右侧列表与「即将到达」回退里可见。
+ */
 const spanKm = computed(() => {
   const span = Math.max(chapterSpanKm.value, chainKm.value);
   return span > 0 ? span : nominalKm.value;
@@ -265,24 +320,57 @@ const activeChapterIndex = computed(() => {
 
 const activeChapter = computed(() => chapters.value[activeChapterIndex.value] ?? null);
 
+/** 当前段标题：优先「地名 — 地名」；退化里程段则直接展示区间 */
+const activeChapterTitle = computed(() => {
+  const ch = activeChapter.value;
+  if (!ch) return '';
+  // 去掉「第 N 段 ·」前缀（徽章已有段号），只留地名或里程区间
+  return ch.title.replace(/^第\s*\d+\s*段\s*[·•]\s*/, '');
+});
+
+const activeChapterRange = computed(() => {
+  const ch = activeChapter.value;
+  if (!ch) return '';
+  // 地名标题时补一行里程区间；本身已是「0—120 km」则不再重复
+  if (/km\s*$/i.test(ch.title)) return '';
+  return `${Math.round(ch.fromKm)}—${Math.round(ch.toKm)} km`;
+});
+
 const routeEndpoints = computed(() => {
   if (!chapters.value.length) return { start: '', end: '' };
   const split = (title: string) => {
     const parts = title.split(/\s*[—–-]\s*/);
-    if (parts.length >= 2) return { from: parts[0].trim(), to: parts[parts.length - 1].trim() };
+    if (parts.length >= 2) return { from: parts[0]!.trim(), to: parts[parts.length - 1]!.trim() };
     return { from: title.trim(), to: '' };
   };
-  const first = split(chapters.value[0].title);
-  const last = split(chapters.value[chapters.value.length - 1].title);
-  return { start: first.from, end: last.to || last.from };
+  const first = split(chapters.value[0]!.title);
+  const last = split(chapters.value[chapters.value.length - 1]!.title);
+  // 退化标题「第 1 段 · 0—120 km」拆出来会是「第 1 段 · 0」——此时用起讫声明兜底
+  const looksLikeKmFallback = (s: string) => /第\s*\d+\s*段/.test(s) || /^\d+(\.\d+)?$/.test(s) || /km$/i.test(s);
+  const start = looksLikeKmFallback(first.from) ? (roadRoute.value?.name?.split(/\s+/)[0] ?? first.from) : first.from;
+  let end = last.to || last.from;
+  if (looksLikeKmFallback(end)) end = '';
+  return { start, end };
 });
 
+/**
+ * 即将到达：优先前方 UPCOMING_LOOKAHEAD_KM 内；
+ * 窗口为空时回退到「下一处起」的最近 N 个（G101 首景点在 K169，
+ * 进度 0 时若死守 80km 窗口会永远空表，用户误以为没数据）。
+ */
 const upcomingSpots = computed(() => {
   const km = progressKm.value;
-  return spots.value
-    .filter((s) => s.progressKm > km - 0.2 && s.progressKm <= km + UPCOMING_LOOKAHEAD_KM)
-    .sort((a, b) => a.progressKm - b.progressKm || b.score - a.score)
-    .slice(0, UPCOMING_LIMIT);
+  const ahead = spots.value
+    .filter((s) => s.progressKm > km - 0.2)
+    .sort((a, b) => a.progressKm - b.progressKm || b.score - a.score);
+  const inWindow = ahead.filter((s) => s.progressKm <= km + UPCOMING_LOOKAHEAD_KM);
+  return (inWindow.length ? inWindow : ahead).slice(0, UPCOMING_LIMIT);
+});
+
+const upcomingBeyondLookahead = computed(() => {
+  if (!upcomingSpots.value.length) return false;
+  const km = progressKm.value;
+  return upcomingSpots.value.every((s) => s.progressKm > km + UPCOMING_LOOKAHEAD_KM);
 });
 
 function aheadText(s: AlongSpot): string {
@@ -368,10 +456,6 @@ watch(gps, (sample) => {
       </div>
 
       <template v-else>
-        <div class="drive-trip-top">
-          <router-link class="drive-trip-back" to="/drive">← 返回选路线</router-link>
-        </div>
-
         <div class="drive-trip-grid">
           <!-- 左：路线卡 -->
           <aside class="drive-trip-side">
@@ -435,12 +519,13 @@ watch(gps, (sample) => {
                 </div>
 
                 <p v-if="progressPartial" class="drive-chprog__partial">
-                  章节覆盖已贯通主链 {{ Math.round(spanKm) }} km · 全线名义 {{ Math.round(nominalKm) }} km
+                  章节覆盖已贯通主链 {{ Math.round(Math.max(chapterSpanKm, chainKm)) }} km · 全线名义 {{ Math.round(nominalKm) }} km
                 </p>
 
                 <div v-if="!chaptersExpanded && activeChapter" class="drive-chprog__now">
                   <span class="drive-chprog__now-badge">第 {{ activeChapterIndex + 1 }}/{{ chapters.length }} 段</span>
-                  <span class="drive-chprog__now-title">{{ activeChapter.title }}</span>
+                  <span class="drive-chprog__now-title">{{ activeChapterTitle }}</span>
+                  <span v-if="activeChapterRange" class="drive-chprog__hint">{{ activeChapterRange }}</span>
                   <span class="drive-chprog__hint">
                     <template v-if="gpsFollowing">定位跟随中 · </template>点击标题展开全部章节
                   </span>
@@ -475,7 +560,9 @@ watch(gps, (sample) => {
             <section class="rv-card drive-upcoming">
               <div class="drive-upcoming__head">
                 <h2 class="drive-block-title">即将到达</h2>
-                <span class="drive-upcoming__range">前方 {{ UPCOMING_LOOKAHEAD_KM }} km</span>
+                <span class="drive-upcoming__range">
+                  {{ upcomingBeyondLookahead ? '下一处起' : `前方 ${UPCOMING_LOOKAHEAD_KM} km` }}
+                </span>
               </div>
               <ul v-if="upcomingSpots.length" class="drive-upcoming__list">
                 <li v-for="(s, i) in upcomingSpots" :key="s.id">
@@ -500,17 +587,24 @@ watch(gps, (sample) => {
             </section>
           </aside>
 
-          <!-- 中：地图 -->
-          <section class="drive-trip-map rv-card" data-spotlight>
+          <!-- 中：地图（主链 + 未贯通段；点击进入全屏高德地图） -->
+          <section class="drive-trip-map rv-card is-enterable" data-spotlight>
             <svg
               :viewBox="viewBoxAttr"
-              preserveAspectRatio="xMidYMid meet"
+              :preserveAspectRatio="mapAspectRatio"
               class="drive-trip-map__svg"
               role="img"
-              aria-label="路线示意图"
+              aria-label="路线示意图，点击进入全屏地图"
+              @click="openFullMap"
             >
               <g class="drive-netmap__outline" v-html="outlinePaths" />
               <path ref="routePathRef" class="drive-trip-map__route" :d="routePath" />
+              <path
+                v-for="(d, i) in segmentPaths"
+                :key="'seg-' + i"
+                class="drive-trip-map__segment"
+                :d="d"
+              />
               <circle
                 v-for="s in filteredSpots"
                 :key="s.id"
@@ -520,12 +614,32 @@ watch(gps, (sample) => {
                 r="2.4"
                 :fill="tierColor(s.tier)"
                 :class="{ 'is-expanded': expandedSpotId === s.id }"
-                @click="toggleSpot(s)"
+                @click.stop="toggleSpot(s)"
               >
                 <title>{{ s.name }} · {{ kmText(s.progressKm) }}</title>
               </circle>
             </svg>
-            <p class="drive-trip-map__hint">示意地图（OSM 众包还原，非导航） · 圆点 = 沿程景点（点按查看）</p>
+            <button type="button" class="drive-trip-map__enter" @click="openFullMap">
+              <svg class="drive-trip-map__enter-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"
+                />
+              </svg>
+              进入地图
+            </button>
+            <p v-if="hasGaps" class="drive-trip-map__gap-note">
+              虚线 = 未贯通段（{{ segmentPaths.length }} 段
+              <template v-if="maxGapKm > 0"> · 最大断口 {{ maxGapKm.toFixed(0) }} km</template>
+              ）
+            </p>
+            <p class="drive-trip-map__hint">
+              {{ roadRoute.engineNote || '示意地图（OSM 众包还原，非导航）' }} · 圆点 = 沿程景点 · 点击进入全屏地图
+            </p>
           </section>
 
           <!-- 右：沿程景点流 -->

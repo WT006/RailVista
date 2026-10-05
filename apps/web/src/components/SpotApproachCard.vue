@@ -6,7 +6,7 @@
  * 夜间通过 / 声屏障等阻挡情形给出「本次错过」提示，避免用户白等。
  */
 import { computed } from 'vue';
-import { honorLabels, type ScenicSpot } from '@railvista/shared';
+import { honorLabels, type ScenicSpot, type SpotWeatherParts } from '@railvista/shared';
 import { AlertTriangle } from 'lucide-vue-next';
 import SideBadge from './SideBadge.vue';
 
@@ -16,8 +16,10 @@ const props = withDefaults(
     /** 列车当前里程（沿本次行程折线） */
     currentKm?: number;
     compact?: boolean;
+    /** 结构化天气（emoji / 气温 / 观景提示） */
+    weather?: SpotWeatherParts | null;
   }>(),
-  { currentKm: 0, compact: false },
+  { currentKm: 0, compact: false, weather: null },
 );
 
 const TIME_OF_DAY: Record<string, string> = {
@@ -98,6 +100,24 @@ const countdownText = computed(() => {
         <span v-if="monthsText" class="approach-card__chip">{{ monthsText }}</span>
         <span v-if="distText" class="approach-card__chip approach-card__chip--muted">{{ distText }}</span>
         <span v-if="spot.nightOnly" class="approach-card__chip approach-card__chip--night">夜间</span>
+      </div>
+
+      <div v-if="weather" class="wx-strip approach-card__wx">
+        <div class="wx-strip__main">
+          <span class="wx-strip__emoji" aria-hidden="true">{{ weather.emoji }}</span>
+          <span v-if="weather.cond" class="wx-strip__cond">{{ weather.cond }}</span>
+          <span v-if="weather.temp" class="wx-strip__temp">{{ weather.temp }}</span>
+        </div>
+        <span
+          v-if="weather.hint"
+          class="wx-strip__hint"
+          :class="{
+            'is-good': weather.viewHint === 'good',
+            'is-fair': weather.viewHint === 'fair',
+            'is-poor': weather.viewHint === 'poor',
+          }"
+        >{{ weather.hint }}</span>
+        <span v-else-if="weather.vis" class="wx-strip__vis">{{ weather.vis }}</span>
       </div>
 
       <p v-if="spot.intro" class="approach-card__intro">{{ spot.intro }}</p>
@@ -196,23 +216,30 @@ const countdownText = computed(() => {
 }
 
 .approach-card__chip {
-  padding: 1px 7px;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
   border-radius: 999px;
-  border: 1px solid var(--border-default);
-  background: var(--border-hairline);
-  color: var(--text-secondary);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 650;
+  color: var(--text-secondary);
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.18);
 }
 
 .approach-card__chip--muted {
-  opacity: 0.8;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .approach-card__chip--night {
   color: var(--warning);
-  border-color: rgba(223, 179, 87, 0.4);
-  background: rgba(223, 179, 87, 0.14);
+  background: rgba(223, 179, 87, 0.12);
+  border-color: rgba(223, 179, 87, 0.28);
+}
+
+.approach-card__wx {
+  margin-top: 8px;
 }
 
 .approach-card__intro {
@@ -234,42 +261,35 @@ const countdownText = computed(() => {
 }
 
 .approach-card__honor {
-  padding: 1px 6px;
-  border-radius: 6px;
-  background: var(--accent-container);
-  border: 1px solid var(--accent-container);
-  color: var(--accent-hover);
   font-size: 10.5px;
-  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: var(--accent-hover);
+  background: var(--accent-container);
 }
 
 .approach-card__honor--more {
-  background: var(--border-hairline);
-  border-color: var(--border-default);
-  color: var(--text-secondary);
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px dashed var(--border-default);
 }
 
 .approach-card__blocked {
-  margin: 7px 0 0;
-  color: var(--danger);
-  font-size: 11.5px;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  color: var(--warning);
+  font-size: 12px;
 }
 
 .approach-enter-active,
 .approach-leave-active {
-  transition:
-    transform var(--dur-base) var(--ease-out),
-    opacity var(--dur-base) var(--ease-out);
+  transition: opacity 0.22s ease, transform 0.22s ease;
 }
-
-.approach-enter-from {
-  transform: translateY(16px);
-  opacity: 0;
-}
-
+.approach-enter-from,
 .approach-leave-to {
-  transform: translateY(10px);
   opacity: 0;
+  transform: translateY(8px);
 }
 </style>

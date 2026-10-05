@@ -6,7 +6,13 @@
  *   onload/onerror 都不会触发，Promise 会永远 pending —— 页面表现为
  *   "可选要素一直不加载、页面停在不完整状态"。这里加 12s 硬超时，到点 reject，
  *   让上层进入带重试按钮的错误态，而不是无限等待。
+ *
+ * 底图样式：
+ * - darkblue（极夜蓝）/ grey（雅士灰）等官方样式；当前默认雅士灰
+ * @see https://developer.amap.com/api/javascript-api-v2/guide/map/map-style
  */
+export const AMAP_MAP_STYLE = 'amap://styles/grey';
+
 export function loadAmap(key: string, security?: string): Promise<typeof window.AMap> {
   if (window.AMap) return Promise.resolve(window.AMap);
   if (security) {

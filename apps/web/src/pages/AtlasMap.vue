@@ -31,7 +31,7 @@ import {
   escHtml,
   resolveSpotDimensions,
 } from '../data/spotDimensions';
-import { loadAmap } from '../map/amap';
+import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 import { roadColor } from '../data/roadColors';
 
 const props = defineProps<{
@@ -393,14 +393,19 @@ function closeSpotInfo() {
   }
 }
 
-/** 聚合气泡主色：取簇内出现最多的维度色 */
+/** 地图点位色：跟随侧栏维度筛选（双重身份也显示当前选中色） */
+function spotMarkerColor(spot: AtlasSpotLite): string {
+  return dimensionColor(spot.dimensions, spot.category, activeDims.value);
+}
+
+/** 聚合气泡主色：取簇内出现最多的维度色（同样尊重当前筛选） */
 function dominantClusterColor(items: unknown[]): string {
   const counts = new Map<string, number>();
   for (const item of items) {
     const raw = item as { spot?: AtlasSpotLite } | AtlasSpotLite | null;
     const spot = raw && typeof raw === 'object' && 'spot' in raw ? raw.spot : (raw as AtlasSpotLite | undefined);
     if (!spot?.id) continue;
-    const color = dimensionColor(spot.dimensions, spot.category);
+    const color = spotMarkerColor(spot);
     counts.set(color, (counts.get(color) || 0) + 1);
   }
   let best = UNCLASSIFIED_DIMENSION.color;
@@ -530,7 +535,7 @@ function renderRailSpots(list: AtlasSpotLite[]) {
         const raw = Array.isArray(context.data) ? context.data[0] : context.data;
         const spot: AtlasSpotLite | undefined = raw?.spot || raw;
         if (!spot) return;
-        const color = dimensionColor(spot.dimensions, spot.category);
+        const color = spotMarkerColor(spot);
         context.marker.setContent(
           `<span class="atlas-dot" style="--dot:${color}" title="${escHtml(spot.name)}"></span>`,
         );
@@ -549,7 +554,7 @@ function renderRailSpots(list: AtlasSpotLite[]) {
       position: item.lnglat,
       anchor: 'center',
       title: spot.name,
-      content: `<span class="atlas-dot" style="--dot:${dimensionColor(spot.dimensions, spot.category)}"></span>`,
+      content: `<span class="atlas-dot" style="--dot:${spotMarkerColor(spot)}"></span>`,
     });
     m.on('click', () => selectSpot(spot));
     map.add(m);
@@ -844,7 +849,7 @@ function clearFocusMarker() {
 function showFocusMarker(spot: AtlasSpotLite) {
   if (!map || !AMapRef) return;
   clearFocusMarker();
-  const color = dimensionColor(spot.dimensions, spot.category);
+  const color = spotMarkerColor(spot);
   focusMarker = new AMapRef.Marker({
     position: [spot.lng, spot.lat],
     anchor: 'center',
@@ -1036,7 +1041,7 @@ async function initMap() {
     zoom: 4.4,
     center: [104.5, 34.5],
     viewMode: '2D',
-    mapStyle: 'amap://styles/dark',
+    mapStyle: AMAP_MAP_STYLE,
   });
   map.getContainer().addEventListener('click', (event: MouseEvent) => {
     const t = event.target as HTMLElement;
@@ -1181,36 +1186,8 @@ watch(spotOrigin, (v) => {
   <div class="atlas-page">
     <div ref="mapEl" class="atlas-map"></div>
 
-    <header class="atlas-top">
-      <button type="button" class="back-link" aria-label="返回首页" @click="goBack">‹</button>
-      <div class="atlas-top__title">
-        <p class="atlas-top__eyebrow">{{ drive ? 'ROAD ATLAS' : 'RAIL ATLAS' }}</p>
-        <h1>{{ drive ? '全国公路旅游网' : '全国铁路景点地图' }}</h1>
-      </div>
-      <button
-        type="button"
-        class="atlas-toggle"
-        :class="{ 'is-on': roadLayerOn }"
-        :disabled="!!mapError"
-        @click="toggleRoadLayer"
-      >
-        公路图层 {{ roadLayerOn ? '开' : '关' }}
-      </button>
-      <button
-        type="button"
-        class="atlas-toggle"
-        :class="{ 'is-on': heatOn }"
-        :disabled="!heatSupported || !!mapError"
-        @click="heatOn = !heatOn"
-      >
-        热力图 {{ heatOn ? '开' : '关' }}
-      </button>
-      <button type="button" class="atlas-toggle" @click="sidebarOpen = !sidebarOpen">
-        {{ sidebarOpen ? '收起侧栏' : '展开侧栏' }}
-      </button>
-    </header>
-
-    <aside class="atlas-side" :class="{ 'is-collapsed': !sidebarOpen }">
+    <!-- 外层必须是 .atlas-dock：样式 / fitView 避让都认这个类；勿改回 atlas-side（会沉到地图下面） -->
+    <aside class="atlas-dock" :class="{ 'is-collapsed': !sidebarOpen }">
       <template v-if="sidebarOpen">
         <header class="atlas-dock__head">
           <div class="atlas-dock__nav">
@@ -1221,28 +1198,31 @@ watch(spotOrigin, (v) => {
             <button
               type="button"
               class="map-new-trip-btn"
+              :class="{ 'is-active': roadLayerOn }"
+              :disabled="!!mapError"
+              @click="toggleRoadLayer"
+            >
+              公路 {{ roadLayerOn ? '开' : '关' }}
+            </button>
+            <button
+              type="button"
+              class="map-new-trip-btn"
               :class="{ 'is-active': heatOn }"
               :disabled="!heatSupported || !!mapError"
               @click="heatOn = !heatOn"
             >
-              热力图 {{ heatOn ? '开' : '关' }}
+              热力 {{ heatOn ? '开' : '关' }}
             </button>
             <button type="button" class="map-new-trip-btn" @click="sidebarOpen = false">
               收起
             </button>
           </div>
-            <div class="atlas-dock__title">
-              <div class="atlas-dock__identity">
-                <span class="train-badge">全国</span>
-                <!-- 此前标题硬编码「铁路景点地图」，/drive/atlas 也显示这个，属空壳遗留 -->
-                <h1 class="atlas-dock__name">
-                  {{ spotOrigin === 'road' ? '公路景点地图' : spotOrigin === 'rail' ? '铁路景点地图' : '铁路 + 公路景点地图' }}
-                </h1>
-              </div>
-              <p class="atlas-dock__sub">
-                铁路线与编号公路共存，铁路景点与公路景点可分别或同时查看
-              </p>
+          <div class="atlas-dock__title">
+            <div class="atlas-dock__identity">
+              <span class="train-badge">全国</span>
+              <h1 class="atlas-dock__name">全国景点地图</h1>
             </div>
+          </div>
         </header>
 
         <div class="atlas-dock__body">
@@ -1293,9 +1273,6 @@ watch(spotOrigin, (v) => {
               </template>
               <template v-else>
                 铁路 {{ spots.length }} · 公路 {{ roadLoaded ? roadSpots.length : (stats?.roadSpotCount ?? 0) }}
-                <template v-if="stats?.roadMigratedExcluded">
-                  （已排除 {{ stats.roadMigratedExcluded }} 条铁路迁移条）
-                </template>
               </template>
             </span>
             <button v-if="activeDims.length || activeProvinces.length" type="button" class="atlas-link" @click="clearFilters">
@@ -1304,7 +1281,7 @@ watch(spotOrigin, (v) => {
           </div>
           <!-- 公路侧为省级聚合标记，密度请配合热力图查看 -->
           <p class="atlas-block__note">
-            地图上公路景点按省份聚合显示（数字为该省景点数，点击只看该省）；
+            地图上公路景点按省份聚合显示（数字为该省景点数）；
             开启「热力图」可查看全国密度分布。
           </p>
 
@@ -1395,9 +1372,6 @@ watch(spotOrigin, (v) => {
               </button>
             </li>
           </ul>
-          <p class="atlas-block__note">
-            铁路景点库无评分字段，按「被几条铁路线路收录」排序，收录越多说明线路交集越广。
-          </p>
         </section>
 
         <section class="atlas-block">
@@ -1617,7 +1591,7 @@ watch(spotOrigin, (v) => {
 
 .atlas-dock__name {
   margin: 0;
-  font-size: var(--fs-h3);
+  font-size: var(--fs-h1);
   font-weight: 700;
   line-height: var(--lh-tight);
   color: var(--text-1);
@@ -2469,7 +2443,7 @@ watch(spotOrigin, (v) => {
 
 .atlas-dock__name {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--fs-h1);
   font-weight: 700;
   line-height: 1.3;
   color: var(--text-primary);

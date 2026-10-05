@@ -586,7 +586,7 @@ html:has(.corridor-map-page) #app {
 }
 
 .location-card {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .location-card__head,
@@ -595,7 +595,7 @@ html:has(.corridor-map-page) #app {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .location-card h2,
@@ -644,12 +644,143 @@ html:has(.corridor-map-page) #app {
 }
 
 .upcoming-card .next-name {
-  font-size: clamp(18px, 5vw, 22px);
+  font-size: clamp(17px, 4.8vw, 21px);
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.25;
   margin-bottom: 4px;
   word-break: break-word;
+}
+
+.upcoming-card .next-meta {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+/* 天气条：左现象+气温，右观景提示徽章 */
+.wx-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 8px 0 2px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  min-width: 0;
+}
+
+.wx-strip__main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.wx-strip__emoji {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.wx-strip__cond {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.wx-strip__temp {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  margin-left: 2px;
+  padding-left: 8px;
+  border-left: 1px solid var(--border-default);
+}
+
+.wx-strip__vis {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.wx-strip__hint {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  background: rgba(148, 163, 184, 0.14);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.wx-strip__hint.is-good {
+  color: var(--success);
+  background: var(--success-container);
+  border-color: transparent;
+}
+
+.wx-strip__hint.is-fair {
+  color: var(--warning);
+  background: rgba(223, 179, 87, 0.14);
+  border-color: rgba(223, 179, 87, 0.28);
+}
+
+.wx-strip__hint.is-poor {
+  color: #e07171;
+  background: rgba(224, 113, 113, 0.14);
+  border-color: rgba(224, 113, 113, 0.28);
+}
+
+.map-info-card__wx {
+  margin: 0 0 8px;
+}
+
+.progress-track {
+  margin-top: 10px;
+  height: 4px;
+  background: var(--border-default);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--accent-press), var(--info));
+  transition: transform var(--dur-slow) var(--ease-out);
+  will-change: transform;
+}
+
+.progress-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.progress-foot__pct {
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
 }
 
 .bottom-panel .meta {

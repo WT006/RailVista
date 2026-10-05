@@ -23,7 +23,7 @@ import {
   isKnownDimension,
   type DimensionMeta,
 } from '../data/spotDimensions';
-import { loadAmap } from '../map/amap';
+import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 
 const route = useRoute();
 const router = useRouter();
@@ -261,7 +261,7 @@ async function initMap() {
     zoom: 5,
     center: displayPath.value[0] || [104, 35],
     viewMode: '2D',
-    mapStyle: 'amap://styles/grey',
+    mapStyle: AMAP_MAP_STYLE,
   });
   await drawMap();
 }

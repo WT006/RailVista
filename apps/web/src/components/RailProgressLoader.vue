@@ -24,8 +24,9 @@ const props = withDefaults(
 
 const emit = defineEmits<{ retry: []; cancel: []; settled: [] }>();
 
-const SLOW_AFTER_MS = 8000;
-const HOLD_AFTER_MS = 15000;
+/** 经停/拼线等链路 15s+ 仍常见，慢提示与临时停车阈值留足余量 */
+const SLOW_AFTER_MS = 20_000;
+const HOLD_AFTER_MS = 60_000;
 /** 假进度软顶：成功前停在这里，不冻结在「假 100%」 */
 const SOFT_CAP = 98;
 const TICK_MS = 180;

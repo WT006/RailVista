@@ -215,7 +215,8 @@ function buildLayer(kind: LayerKind, width: number, height: number): HTMLCanvasE
   } else {
     // 路网：构建期离线渲染的全国路网位图（含无编号的乡道村道与编号公路分级着色）
     if (roadImg && roadImg.complete && roadImg.naturalWidth > 0) {
-      ctx.globalAlpha = 0.92;
+      // 位图含乡道村道底网，alpha 过高东部会糊成亮块；压低后再由 CSS 层控整体亮度
+      ctx.globalAlpha = 0.62;
       ctx.drawImage(roadImg, 0, 0, width, height);
       ctx.globalAlpha = 1;
     }
@@ -488,12 +489,14 @@ onBeforeUnmount(() => {
   opacity: calc(var(--backdrop-map-opacity) * 0.75);
 }
 
+/* 公路背景：单独压低路网/星点，避免东部密网糊成亮白块（见 tokens.css） */
 .app-backdrop.is-road .app-backdrop__layer--heat {
-  opacity: calc(var(--backdrop-map-opacity) * 0.75);
+  opacity: var(--backdrop-road-heat-opacity);
 }
 
 .app-backdrop.is-road.is-net-ready .app-backdrop__layer--net {
-  opacity: calc(var(--backdrop-map-opacity) * 0.95);
+  opacity: var(--backdrop-road-net-opacity);
+  filter: blur(0.55px) brightness(0.72) saturate(0.82);
 }
 
 /* 指针径向高光：只改 CSS 变量，由合成层完成，不触发布局与重绘。

@@ -589,7 +589,7 @@
       zoom: 5,
       center: [92.5, 34.5],
       viewMode: '2D',
-      mapStyle: 'amap://styles/grey',
+      mapStyle: 'amap://styles/darkblue', // 极夜蓝（勿改回 dark/grey）
       dragEnable: true,
       zoomEnable: true,
       doubleClickZoom: true,

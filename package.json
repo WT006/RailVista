@@ -1,7 +1,7 @@
 {
   "name": "railvista",
   "private": true,
-  "version": "0.6.7",
+  "version": "0.6.15",
   "description": "RailVista — 铁路旅客车上沿途风景与行程定位伴侣",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
@@ -9,7 +9,7 @@
     "dev:web": "pnpm --filter @railvista/web dev",
     "dev:api": "pnpm --filter @railvista/api dev",
     "build": "pnpm --filter @railvista/shared build && pnpm -r --filter @railvista/api --filter @railvista/web run build",
-    "test": "pnpm --filter @railvista/shared test",
+    "test": "pnpm --filter @railvista/shared test && pnpm --filter @railvista/shared exec tsx --test ../../apps/web/src/data/prefectureSeeds.test.ts",
     "build:rail-graph": "node scripts/build-rail-graph.mjs",
     "warmup:precise": "node scripts/warmup-precise-routes.mjs",
     "roads:fetch": "node scripts/fetch-china-pbf.mjs --all",

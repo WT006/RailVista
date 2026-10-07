@@ -1,50 +1,60 @@
 /**
- * 用省 bbox 反查补齐公路景点的 province 字段（scripts/fill-spot-province.mjs）。
+ * 用省 bbox 反查 / 纠正公路景点的 province 字段（scripts/fill-spot-province.mjs）。
  *
- * 背景：早期手工种子（source=hand-curated，411 条）没有 province 字段，
- * 地图上会聚成「未标注省份」的一个大块，点它也没法下钻。
- * OSM 抓取的 12126 条在 harvest 阶段已按分片写入省份，只有这批种子是缺口。
- * 这里用 scripts/lib/province-bbox.mjs 的 34 省 bbox 做点落省判定（纯几何、可复现）。
+ * 重叠框按面积最小归属（见 provinceOfPoint）：甘肃外扩框不再抢走青海湖、茶卡。
  *
- * 用法：node scripts/fill-spot-province.mjs [--dry]
+ * 用法：
+ *   node scripts/fill-spot-province.mjs           # 只补空 province
+ *   node scripts/fill-spot-province.mjs --force    # 按坐标重算全部省名
+ *   node scripts/fill-spot-province.mjs --dry
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PROVINCE_BBOXES } from './lib/province-bbox.mjs';
+import { provinceOfPoint } from './lib/province-bbox.mjs';
 
 const R = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SPOTS = join(R, 'data/roads/roadside-spots.json');
 const DRY = process.argv.includes('--dry');
+const FORCE = process.argv.includes('--force');
 
 const file = JSON.parse(readFileSync(SPOTS, 'utf8'));
 const spots = Array.isArray(file.spots) ? file.spots : [];
 
-/** 点是否落在省 bbox 内；同一省可能多个框（按 PROVINCE_BBOXES 原顺序取首个命中） */
-function provinceOf(lng, lat) {
-  for (const p of PROVINCE_BBOXES) {
-    const [s, w, n, e] = p.bbox;
-    if (lat >= s && lat <= n && lng >= w && lng <= e) return p.name;
-  }
-  return '';
-}
-
 let filled = 0;
+let reassigned = 0;
 let unresolved = 0;
 const unresolvedNames = [];
+const moved = new Map();
 for (const s of spots) {
-  if (s.province) continue;
-  const p = provinceOf(Number(s.lng), Number(s.lat));
-  if (p) {
-    s.province = p;
+  const next = provinceOfPoint(Number(s.lng), Number(s.lat), String(s.province ?? ''));
+  if (!next) {
+    if (!s.province) {
+      unresolved += 1;
+      if (unresolvedNames.length < 8) unresolvedNames.push(`${s.name}(${s.lng},${s.lat})`);
+    }
+    continue;
+  }
+  if (!s.province) {
+    s.province = next;
     filled += 1;
-  } else {
-    unresolved += 1;
-    if (unresolvedNames.length < 8) unresolvedNames.push(`${s.name}(${s.lng},${s.lat})`);
+    continue;
+  }
+  if (FORCE && s.province !== next) {
+    const key = `${s.province}→${next}`;
+    moved.set(key, (moved.get(key) || 0) + 1);
+    s.province = next;
+    reassigned += 1;
   }
 }
 
-console.log(`总 ${spots.length} 条 | 补齐省份 ${filled} | 仍无法判定 ${unresolved}`);
+console.log(
+  `总 ${spots.length} 条 | 补空 ${filled} | 重算改挂 ${reassigned} | 仍无法判定 ${unresolved}`,
+);
+if (moved.size) {
+  const top = [...moved.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
+  console.log('改挂 TOP:', top.map(([k, v]) => `${k} ${v}`).join(' · '));
+}
 if (unresolvedNames.length) console.log('未判定样例:', unresolvedNames.join(', '));
 
 if (!DRY) {

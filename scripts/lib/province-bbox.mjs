@@ -42,6 +42,31 @@ export const PROVINCE_BBOXES = [
   { code: '71T', name: '台湾', bbox: [21.8, 119.6, 25.6, 122.1] },
 ];
 
+function inProvinceBbox(lng, lat, bbox) {
+  const [s, w, n, e] = bbox;
+  return lat >= s && lat <= n && lng >= w && lng <= e;
+}
+
+/** 嵌在邻省框内的特别行政区：有大陆省命中时不抢标签 */
+const NESTED_SA = new Set(['香港', '澳门', '台湾']);
+
+/**
+ * 点落省。分片 bbox 外扩后会重叠：甘肃框盖住青海湖/茶卡，若按数组顺序取首个命中
+ * 会把青海景点写成甘肃。重叠时青海优先于甘肃/四川；港/澳/台不从广东/福建抢走。
+ * `current` 若仍命中则保留（避免把湖南/湖北重叠区整批改挂）。
+ */
+export function provinceOfPoint(lng, lat, current = '') {
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return current || '';
+  const hits = PROVINCE_BBOXES.filter((p) => inProvinceBbox(lng, lat, p.bbox)).map((p) => p.name);
+  if (!hits.length) return current || '';
+  if (hits.includes('青海') && (hits.includes('甘肃') || hits.includes('四川'))) return '青海';
+  const mainland = hits.filter((n) => !NESTED_SA.has(n));
+  const pool = mainland.length ? mainland : hits;
+  if (current && pool.includes(current)) return current;
+  if (pool.length === 1) return pool[0] ?? '';
+  return pool[0] ?? current ?? '';
+}
+
 /**
  * 跨省去重：边界 way 按 way.id 去重，保留首次出现。
  * 分片抓取时同一条 way 可能被相邻两省的 bbox 都覆盖到，合并时需去重。

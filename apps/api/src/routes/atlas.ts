@@ -19,6 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { loadScenicSpots } from '../services/scenicSpots.js';
 import { roadNetworkOverview } from '../services/roadNetwork.js';
 import { getRoadsideSpots } from '../services/roadsideSpots.js';
+import { isAtlasRoadDisplaySpot } from '@railvista/shared';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const presetsDir = join(__dirname, '../../../../data/presets');
@@ -80,12 +81,18 @@ export type AtlasSpot = {
   matchKind: 'line' | 'geo' | null;
   /** 数据来源：rail=铁路景点库，road=公路景点库（前端合并筛选/着色时用） */
   origin?: 'rail' | 'road';
-  /** 省份（铁路侧仅 192/624 有值，公路侧已全量补齐） */
+  /** 采集/库内省份。公路侧只作来源标签；展示用前端 displayProvince / displayCity */
   province?: string;
   /** 观赏评分（0–100）：公路侧有，铁路侧数据源无此字段 */
   score?: number;
   /** 质量分级 A/B/C */
   tier?: string;
+  /** 公路景点来源：hand-curated / osm_batch … */
+  source?: string;
+  /** OSM 海拔（米），图集用来挡测绘小山峰 */
+  ele?: number;
+  /** OSM 是否挂了 wikipedia / wikipedia:zh / wikidata */
+  hasWiki?: boolean;
 };
 
 /** 线路详情页用：景点在该走廊上的里程位置 */
@@ -400,7 +407,7 @@ function buildOverview(): AtlasOverview {
       intro: s.intro,
       category: s.category,
       dimensions: Array.isArray(s.dimensions) ? s.dimensions : undefined,
-      // v0.6.3：透出省份供前端省份筛选（铁路侧 192/624 有值，如实透传，不补假数据）
+      // v0.6.3：透出省份供前端省份筛选（铁路侧约 328/760 有值，如实透传，不补假数据）
       province:
         typeof (s as unknown as Record<string, unknown>).province === 'string' &&
         String((s as unknown as Record<string, unknown>).province)
@@ -508,24 +515,45 @@ function buildRoadLayer(): RoadLayerCache['data'] {
       const lat = Number(s.lat);
       const id = String(s.id ?? s.name ?? '');
       if (!Number.isFinite(lng) || !Number.isFinite(lat) || !id) continue;
+      const tags = s.osmTags && typeof s.osmTags === 'object' ? (s.osmTags as Record<string, unknown>) : {};
+      const ele = Number.parseFloat(String(tags.ele ?? ''));
+      const name = String(s.name ?? id);
+      const score = Number.isFinite(Number(s.score)) ? Number(s.score) : undefined;
+      const category = typeof s.category === 'string' ? s.category : undefined;
+      const source = typeof s.source === 'string' && s.source ? s.source : undefined;
+      if (
+        !isAtlasRoadDisplaySpot({
+          name,
+          lng,
+          lat,
+          score,
+          category,
+          source,
+          ele: Number.isFinite(ele) ? ele : undefined,
+        })
+      ) {
+        continue;
+      }
       const keys = [...geoMatch(roadGrid, lng, lat, 20).keys()];
       for (const k of keys) {
         const arr = roadIdsByKey.get(k);
         if (arr) arr.push(id);
         else roadIdsByKey.set(k, [id]);
       }
+      const hasWiki = Boolean(tags.wikipedia || tags['wikipedia:zh'] || tags.wikidata);
       roadSpots.push({
         id,
-        name: String(s.name ?? id),
+        name,
         lng: round4(lng),
         lat: round4(lat),
         intro: typeof s.intro === 'string' ? s.intro.slice(0, 60) : undefined,
-        category: typeof s.category === 'string' ? s.category : undefined,
-        // v0.6.3：透出省份/评分/分级，前端据此做省份筛选与景点排名，
-        // 不必再发一次请求。铁路侧数据源无 score，前端排名会自动退化为按关联线路数。
+        category,
         province: typeof s.province === 'string' && s.province ? s.province : undefined,
-        score: Number.isFinite(Number(s.score)) ? Number(s.score) : undefined,
+        score,
         tier: typeof s.tier === 'string' ? s.tier : undefined,
+        source,
+        ele: Number.isFinite(ele) ? ele : undefined,
+        hasWiki: hasWiki || undefined,
         corridorIds: keys,
         matchKind: keys.length ? 'geo' : null,
         origin: 'road',

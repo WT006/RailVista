@@ -23,7 +23,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { overpassQuery, haversineKm } from './lib/overpass.mjs';
-import { PROVINCE_BBOXES } from './lib/province-bbox.mjs';
+import { PROVINCE_BBOXES, provinceOfPoint } from './lib/province-bbox.mjs';
 import { isAdmissibleHarvestPoi } from './lib/china-land.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -63,7 +63,7 @@ const POI_FILTERS = [
  * 这类点 OSM 分类与真实景点重叠，只能按名称语义剔除。
  */
 const FACILITY_NAME_RE =
-  /(过山车|摩天轮|旋转木马|碰碰车|矿山车|轨道车|小火车|观光车|游船|快艇|鬼屋|4D|动感影院|影城|影院|剧场|游乐|餐厅|快餐|咖啡|商店|纪念品|服务中心|游客中心|售票|停车场|洗手间|卫生间|母婴室|医务室|加油站|充电站|服务区|观景台出口)/i;
+  /(过山车|摩天轮|旋转木马|碰碰车|矿山车|轨道车|小火车|观光车|游船|快艇|鬼屋|4D|动感影院|影城|影院|剧场|游乐|奇航|漂流|娱乐天地|Jump\s*360|餐厅|快餐|咖啡|商店|纪念品|服务中心|游客中心|售票|停车场|洗手间|卫生间|母婴室|医务室|加油站|充电站|服务区|观景台出口)/i;
 
 /** 单 0.01° 格（≈1.1km）内最多保留几条：压掉城市密集区的爆量 */
 const PER_CELL_KEEP = 2;
@@ -328,6 +328,7 @@ function toSpot(row, provName) {
   if (!isAdmissibleHarvestPoi({ lng: row.lon, lat: row.lat, name, tags: t })) return null;
   // 乐园/景区内部的单个游乐设施、店铺、餐饮：类别与真景点重叠，只能按名称剔除
   if (FACILITY_NAME_RE.test(name)) return null;
+  if (/(坑道|砲陣|據點|据点|觀測所|观测所|碉堡|鐵漢堡|铁汉堡|鐵堡)/.test(name)) return null;
   let cat = null;
   for (const f of POI_FILTERS) {
     const v = t[f.tag];
@@ -362,7 +363,7 @@ function toSpot(row, provName) {
     name,
     lng: Math.round(row.lon * 1e5) / 1e5,
     lat: Math.round(row.lat * 1e5) / 1e5,
-    province: provName,
+    province: provinceOfPoint(row.lon, row.lat, provName) || provName,
     tier: tierOf(score),
     category: cat,
     score,

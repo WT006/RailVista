@@ -33,6 +33,12 @@ import {
 } from '../data/spotDimensions';
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 import { roadColor } from '../data/roadColors';
+import { roadDisplayPlace } from '../data/prefectureSeeds';
+import { ROAD_ATLAS_MIN_SCORE, isAtlasRoadDisplaySpot } from '../data/atlasRoadDisplay';
+/** 低于此缩放只画省圈；达到后按市降密 */
+const ROAD_ZOOM_CITY = 6.2;
+/** 点开某市后，最多画几处单点（避免再塞几千个 Marker） */
+const CITY_EXPAND_MARKERS = 20;
 
 const props = defineProps<{
   /** 公路图层模式（/drive/atlas 复用本页，PRD §2.1：公路图层与铁路图层共存、可切换） */
@@ -51,8 +57,10 @@ const heatOn = ref(false);
 const sidebarOpen = ref(true);
 const query = ref('');
 const activeDims = ref<string[]>([]);
-/** 省份筛选（铁路侧仅 192/624 有值，公路侧已全量补齐） */
+/** 省份筛选（铁路用库字段；公路用 displayProvince，与地图省圈一致） */
 const activeProvinces = ref<string[]>([]);
+/** 点开的地级市：展开该市高分单点；空 = 全国按市聚合 */
+const activeCity = ref('');
 const selectedCorridorId = ref('');
 const stats = ref<AtlasOverviewData['meta'] | null>(null);
 
@@ -72,7 +80,7 @@ const roadBoards = ref<Array<{ id: string; title: string; level: string; itemCou
 
 /**
  * v0.6.3：公路侧数据改为**按需加载**。
- * 之前 /atlas/overview 一次返回 4.4MB（624 铁路 + 1.2 万公路景点），
+ * 之前 /atlas/overview 一次返回 4.4MB（约 760 铁路 + 1.2 万公路景点），
  * 浏览器解析 4.2 万行 JSON 再把 1.2 万个点丢给 AMap 聚类，主线程长时间阻塞，
  * 侧栏一直停在「正在加载」且景点统计全为 0。现在 overview 只回铁路（~200KB），
  * 公路明细走 /atlas/road：切到公路来源、或打开公路图层时才拉。
@@ -88,7 +96,7 @@ async function loadRoad(): Promise<void> {
   try {
     const d = await api.getAtlasRoad();
     roadCorridors.value = d.roadCorridors || [];
-    roadSpots.value = (d.roadSpots || []).map((s) => ({ ...s, origin: 'road' as const }));
+    roadSpots.value = (d.roadSpots || []).map((s) => attachRoadDisplayPlace({ ...s, origin: 'road' as const }));
     roadLoaded.value = true;
     if (stats.value) {
       stats.value = {
@@ -116,6 +124,10 @@ let cluster: any = null;
 let heat: any = null;
 let highlightLine: any = null;
 let focusMarker: any = null;
+/** 当前选中的景点 id；再点同一处或点空白取消 */
+let focusedSpotId = '';
+/** 刚从景点 Marker 点进去时，挡住随后冒泡的地图 click，避免选中立刻被清掉 */
+let ignoreMapClickClear = false;
 let baseLines: any[] = [];
 let plainMarkers: any[] = [];
 /** 公路侧普通 Marker 列表（renderRoadSpots 维护） */
@@ -182,6 +194,14 @@ const spotsByOrigin = computed(() => {
   return spots.value.concat(roadSpots.value);
 });
 
+/**
+ * 图集可见集：公路只计落图门槛内的点，与省/市聚合圆同一口径。
+ * 铁路仍用全量库字段。
+ */
+const atlasVisibleByOrigin = computed(() =>
+  spotsByOrigin.value.filter((s) => s.origin !== 'road' || isAtlasRoadDisplaySpot(s)),
+);
+
 const selectedCorridor = computed(
   () => corridors.value.find((c) => c.id === selectedCorridorId.value) || null,
 );
@@ -190,29 +210,35 @@ const selectedCorridor = computed(
  * 六维 + 省份筛选：未选 = 全部；选中后 = 同时命中（维度取"任一"，省份取"任一"）。
  * 先按来源（铁路/公路）筛，再按维度与省份筛 —— 来源筛选是双源融合后新增的一层。
  */
+function applyDimFilter(list: AtlasSpotLite[]): AtlasSpotLite[] {
+  if (!activeDims.value.length) return list;
+  const set = new Set(activeDims.value);
+  return list.filter((s) => {
+    const dims = resolveSpotDimensions(s);
+    if (!dims.length) return set.has('other');
+    return dims.some((d) => set.has(d));
+  });
+}
+
 const filteredSpots = computed(() => {
-  let base = spotsByOrigin.value;
-  if (activeDims.value.length) {
-    const set = new Set(activeDims.value);
-    base = base.filter((s) => {
-      const dims = resolveSpotDimensions(s);
-      if (!dims.length) return set.has('other');
-      return dims.some((d) => set.has(d));
-    });
-  }
+  let base = applyDimFilter(atlasVisibleByOrigin.value);
   if (activeProvinces.value.length) {
     const ps = new Set(activeProvinces.value);
-    base = base.filter((s) => (s.province ?? '').length > 0 && ps.has(s.province!));
+    base = base.filter((s) => {
+      const p = spotFilterProvince(s);
+      return p.length > 0 && ps.has(p);
+    });
   }
   return base;
 });
 
-/** 省份选项：按当前来源范围内出现的省份聚合，计数从多到少 */
+/** 省份选项：与当前维度下的地图省圈同一列表、同一归属字段 */
 const provinceOptions = computed(() => {
   const counter = new Map<string, number>();
-  for (const s of spotsByOrigin.value) {
-    if (!s.province) continue;
-    counter.set(s.province, (counter.get(s.province) ?? 0) + 1);
+  for (const s of applyDimFilter(atlasVisibleByOrigin.value)) {
+    const name = spotFilterProvince(s);
+    if (!name) continue;
+    counter.set(name, (counter.get(name) ?? 0) + 1);
   }
   return [...counter.entries()]
     .map(([name, count]) => ({ name, count }))
@@ -220,6 +246,7 @@ const provinceOptions = computed(() => {
 });
 
 function toggleProvince(name: string) {
+  activeCity.value = '';
   if (activeProvinces.value.includes(name)) {
     activeProvinces.value = activeProvinces.value.filter((p) => p !== name);
   } else {
@@ -267,7 +294,7 @@ const topRailSpots = computed(() =>
 );
 
 const topRoadSpots = computed(() =>
-  roadSpots.value
+  atlasRoadDisplayList(roadSpots.value)
     .slice()
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || a.name.localeCompare(b.name, 'zh'))
     .slice(0, 10),
@@ -350,6 +377,18 @@ const searchResults = computed(() => {
     }
     if (hits.length >= 12) break;
   }
+  if (hits.length < 12) {
+    for (const s of atlasRoadDisplayList(roadSpots.value)) {
+      if (!s.name.toLowerCase().includes(lower)) continue;
+      hits.push({
+        kind: 'spot',
+        id: s.id,
+        name: s.name,
+        desc: roadPlaceText(s),
+      });
+      if (hits.length >= 12) break;
+    }
+  }
   return hits.slice(0, 12);
 });
 
@@ -365,10 +404,115 @@ function clearDims() {
   activeDims.value = [];
 }
 
-/** 一键清空全部筛选条件（维度 + 省份） */
+/** 一键清空全部筛选条件（维度 + 省份 + 市展开） */
 function clearFilters() {
   activeDims.value = [];
   activeProvinces.value = [];
+  activeCity.value = '';
+}
+
+function attachRoadDisplayPlace(s: AtlasSpotLite): AtlasSpotLite {
+  const { displayProvince, displayCity } = roadDisplayPlace(s.lng, s.lat, s.province);
+  return { ...s, displayProvince, displayCity };
+}
+
+function ensureRoadDisplay(s: AtlasSpotLite): AtlasSpotLite {
+  if (s.displayProvince && s.displayCity) return s;
+  return attachRoadDisplayPlace(s);
+}
+
+function roadSpotCity(s: AtlasSpotLite): string {
+  return ensureRoadDisplay(s).displayCity || '未分市';
+}
+
+function roadSpotProvince(s: AtlasSpotLite): string {
+  return ensureRoadDisplay(s).displayProvince || '未标注省份';
+}
+
+function roadPlaceText(s: AtlasSpotLite): string {
+  const prov = roadSpotProvince(s);
+  const city = roadSpotCity(s);
+  return city && city !== prov ? `${prov} / ${city}` : prov;
+}
+
+/** 筛选/计数用省份：公路用展示归属，铁路仍用库字段 */
+function spotFilterProvince(s: AtlasSpotLite): string {
+  return s.origin === 'road' ? roadSpotProvince(s) : (s.province ?? '');
+}
+
+/** 公路图集真正落图的点：提高 score 门槛并去掉测绘小山，不改库 */
+function atlasRoadDisplayList(list: AtlasSpotLite[]): AtlasSpotLite[] {
+  return list.filter(isAtlasRoadDisplaySpot);
+}
+
+function roadSpotLod(): 'province' | 'city' | 'spots' {
+  const z = Number(map?.getZoom?.() ?? 4.4);
+  if (activeCity.value && z >= ROAD_ZOOM_CITY) return 'spots';
+  if (z >= ROAD_ZOOM_CITY) return 'city';
+  return 'province';
+}
+
+function lngLatInView(lng: number, lat: number, padDeg = 1.2): boolean {
+  const b = map?.getBounds?.();
+  if (!b) return true;
+  const sw = b.getSouthWest?.();
+  const ne = b.getNorthEast?.();
+  if (!sw || !ne) return true;
+  return (
+    lng >= Number(sw.lng) - padDeg &&
+    lng <= Number(ne.lng) + padDeg &&
+    lat >= Number(sw.lat) - padDeg &&
+    lat <= Number(ne.lat) + padDeg
+  );
+}
+
+function addRoadClusterMarker(opts: {
+  keyAttr: 'data-prov' | 'data-city';
+  key: string;
+  label: string;
+  count: number;
+  lng: number;
+  lat: number;
+  size: number;
+  title: string;
+}) {
+  const marker = new AMapRef.Marker({
+    position: [opts.lng, opts.lat],
+    content:
+      '<div class="atlas-prov-cluster" ' +
+      opts.keyAttr +
+      '="' +
+      escHtml(opts.key) +
+      '" style="width:' +
+      opts.size +
+      'px;height:' +
+      opts.size +
+      'px">' +
+      '<span class="atlas-prov-cluster__name">' +
+      escHtml(opts.label) +
+      '</span>' +
+      '<em class="atlas-prov-cluster__num">' +
+      opts.count +
+      '</em>' +
+      '</div>',
+    offset: new AMapRef.Pixel(-opts.size / 2, -opts.size / 2),
+    zIndex: 95,
+    cursor: 'pointer',
+    title: opts.title,
+  });
+  map.add(marker);
+  roadPlainMarkers.push(marker);
+}
+
+function groupCentroid(items: AtlasSpotLite[]): { lng: number; lat: number; count: number } {
+  let lng = 0;
+  let lat = 0;
+  for (const s of items) {
+    lng += s.lng;
+    lat += s.lat;
+  }
+  const count = items.length;
+  return { lng: lng / count, lat: lat / count, count };
 }
 
 function corridorSpotsText(spot: AtlasSpotLite): string {
@@ -391,6 +535,12 @@ function closeSpotInfo() {
   } catch {
     /* ignore */
   }
+}
+
+function clearSpotSelection() {
+  focusedSpotId = '';
+  clearFocusMarker();
+  closeSpotInfo();
 }
 
 /** 地图点位色：跟随侧栏维度筛选（双重身份也显示当前选中色） */
@@ -433,9 +583,12 @@ function openSpotInfo(spot: AtlasSpotLite) {
         `<span class="atlas-iw-dim" style="--dot:${dimensionColor([d])}">${escHtml(dimensionMeta(d).short)}</span>`,
     )
     .join('');
+  const placeLine =
+    spot.origin === 'road' ? `<p class="atlas-iw__line">${escHtml(roadPlaceText(spot))}</p>` : '';
   const html = `<div class="atlas-iw">
     <button type="button" class="atlas-iw__close" data-info-close aria-label="关闭">×</button>
     <p class="atlas-iw__name">${escHtml(spot.name)}</p>
+    ${placeLine}
     <p class="atlas-iw__line">${escHtml(corridorSpotsText(spot))}</p>
     ${dims ? `<p class="atlas-iw__dims">${dims}</p>` : ''}
     ${spot.intro ? `<p class="atlas-iw__intro">${escHtml(spot.intro)}</p>` : ''}
@@ -466,7 +619,7 @@ function openSpotInfo(spot: AtlasSpotLite) {
       (e) => {
         e.preventDefault();
         e.stopPropagation();
-        closeSpotInfo();
+        clearSpotSelection();
       },
       { once: true },
     );
@@ -563,80 +716,116 @@ function renderRailSpots(list: AtlasSpotLite[]) {
 }
 
 /**
-/**
-/**
- * 公路侧点渲染：**省级聚合标记**（不是逐点画）。
- *
- * 走过的两条弯路，都留在这里别再踩：
- *  1. AMap.MassMarks（Canvas 批量绘制）—— 实测在当前环境下**一个点都不画**，
- *     MassMarks 是图片标记 API，内联 SVG data URI + anchor 都不生效。
- *  2. 普通 Marker 逐点画 —— 实测 4000 个 Marker 产生 **10.7 秒主线程长任务**
- *     （约 2.7ms/Marker），页面直接卡死。1.2 万点这条路根本走不通。
- *
- * 现在的方案：按省份聚合成 30 来个标记（瞬时渲染），
- * 密度交给热力图层承载（AMap.HeatMap 走 canvas，1.2 万点无压力，
- * 权重口径见 renderHeat）。这与参考 UI 的聚合圆圈是同一种表达。
- * 点击省标记 = 切换该省的筛选，侧栏统计与榜单随之收敛。
+ * 公路侧点渲染：展示层降密（不改库）。
+ * 全国缩放只画省圈；放大过 ROAD_ZOOM_CITY 后按真实市界聚合；点开某市飞到质心再画高分单点。
  */
 function renderRoadSpots(list: AtlasSpotLite[]) {
   if (!map || !AMapRef) return;
-  // 切到公路来源但明细还在加载时保持上一次渲染，避免"点先消失再冒出来"
   if (!list.length && roadLoading.value) return;
   clearRoadSpots();
-  if (!list.length) return;
+  const display = atlasRoadDisplayList(list);
+  if (!display.length) return;
 
-  // 按省份聚合
+  const lod = roadSpotLod();
+  if (lod === 'spots') {
+    const cityKey = activeCity.value;
+    const inCity = display
+      .filter((s) => (cityKey ? roadSpotCity(s) === cityKey : lngLatInView(s.lng, s.lat, 0.4)))
+      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+      .slice(0, CITY_EXPAND_MARKERS);
+    for (const spot of inCity) {
+      const m = new AMapRef.Marker({
+        position: [spot.lng, spot.lat],
+        anchor: 'center',
+        title: `${spot.name} · ${spot.score ?? '—'}分`,
+        content: `<span class="atlas-dot atlas-dot--road" data-spot="${escHtml(spot.id)}" title="${escHtml(spot.name)}"></span>`,
+        zIndex: 96,
+      });
+      m.on('click', () => selectSpot(spot));
+      map.add(m);
+      roadPlainMarkers.push(m);
+    }
+    return;
+  }
+
   const groups = new Map<string, AtlasSpotLite[]>();
-  for (const s of list) {
-    const key = s.province ?? '';
+  for (const s of display) {
+    const key = lod === 'province' ? roadSpotProvince(s) : roadSpotCity(s);
     const arr = groups.get(key);
     if (arr) arr.push(s);
     else groups.set(key, [s]);
   }
 
-  for (const [prov, items] of groups) {
-    let lng = 0;
-    let lat = 0;
-    let scoreSum = 0;
-    for (const s of items) {
-      lng += s.lng;
-      lat += s.lat;
-      scoreSum += s.score ?? 60;
+  for (const [name, items] of groups) {
+    const { lng, lat, count } = groupCentroid(items);
+    if (lod === 'city' && !lngLatInView(lng, lat)) continue;
+    if (lod === 'province') {
+      const size = count < 50 ? 22 : count < 300 ? 26 : 30;
+      addRoadClusterMarker({
+        keyAttr: 'data-prov',
+        key: name === '未标注省份' ? '' : name,
+        label: name,
+        count,
+        lng,
+        lat,
+        size,
+        title: name + ' · ' + count + ' 处高分景点（放大或点击查看各市）',
+      });
+    } else {
+      const size = count < 8 ? 18 : count < 40 ? 22 : 26;
+      addRoadClusterMarker({
+        keyAttr: 'data-city',
+        key: name,
+        label: name,
+        count,
+        lng,
+        lat,
+        size,
+        title: name + ' · ' + count + ' 处高分景点（点击展开）',
+      });
     }
-    const count = items.length;
-    const size = count < 50 ? 20 : count < 300 ? 24 : 28;
-    const label = prov || '未标注省份';
-    const marker = new AMapRef.Marker({
-      position: [lng / count, lat / count],
-      content:
-        '<div class="atlas-prov-cluster" data-prov="' + escHtml(prov) + '" style="width:' + size + 'px;height:' + size + 'px">' +
-        '<span class="atlas-prov-cluster__name">' + escHtml(label) + '</span>' +
-        '<em class="atlas-prov-cluster__num">' + count + '</em>' +
-        '</div>',
-      offset: new AMapRef.Pixel(-size / 2, -size / 2),
-      zIndex: 95,
-      cursor: 'pointer',
-      title: label + ' · ' + count + ' 处景点（点击只看该省）',
-    });
-    map.add(marker);
-    roadPlainMarkers.push(marker);
   }
 }
 
-/**
- * 省聚合标记的点击：走**地图容器上的事件委托**而不是 Marker.on('click')。
- * AMap 2.0 的 Marker 事件在部分环境下不稳定触发（合成点击测不到），
- * 委托到容器上用 data-prov 判定最可靠，行为与用户直觉一致。
- */
 function onMapClickDelegated(event: MouseEvent) {
+  const cityEl = (event.target as HTMLElement)?.closest?.('[data-city]') as HTMLElement | null;
+  const city = cityEl?.dataset?.city;
+  if (city) {
+    activeCity.value = city;
+    const ofCity = atlasRoadDisplayList(filteredSpots.value.filter((s) => s.origin === 'road')).filter(
+      (s) => roadSpotCity(s) === city,
+    );
+    if (ofCity.length) {
+      const c = groupCentroid(ofCity);
+      map?.setZoomAndCenter?.(Math.max(map.getZoom?.() ?? 5, 8.2), [c.lng, c.lat]);
+    }
+    renderRoadSpots(filteredSpots.value.filter((s) => s.origin === 'road'));
+    return;
+  }
   const el = (event.target as HTMLElement)?.closest?.('[data-prov]') as HTMLElement | null;
   const prov = el?.dataset?.prov;
   if (!prov) return;
-  if (activeProvinces.value.includes(prov)) {
-    activeProvinces.value = activeProvinces.value.filter((p) => p !== prov);
-  } else {
-    activeProvinces.value = [prov];
+  activeCity.value = '';
+  // 与侧栏省份筛选同源：公路用 displayProvince，点省圈即筛到该省再放大看各市
+  activeProvinces.value = [prov];
+  const ofProv = atlasRoadDisplayList(
+    filteredSpots.value.filter((s) => s.origin === 'road' && roadSpotProvince(s) === prov),
+  );
+  if (ofProv.length) {
+    const c = groupCentroid(ofProv);
+    map?.setZoomAndCenter?.(ROAD_ZOOM_CITY + 0.15, [c.lng, c.lat]);
   }
+}
+
+let roadLodRedrawTimer: ReturnType<typeof setTimeout> | null = null;
+function onRoadMapViewChange() {
+  if (Number(map?.getZoom?.() ?? 4.4) < ROAD_ZOOM_CITY && activeCity.value) {
+    activeCity.value = '';
+  }
+  if (roadLodRedrawTimer) clearTimeout(roadLodRedrawTimer);
+  roadLodRedrawTimer = setTimeout(() => {
+    renderRoadSpots(filteredSpots.value.filter((s) => s.origin === 'road'));
+  }, 80);
 }
 
 function clearRoadSpots() {
@@ -688,6 +877,7 @@ function renderHeat() {
    */
   const points = filteredSpots.value
     .filter((s) => Number.isFinite(s.lng) && Number.isFinite(s.lat))
+    .filter((s) => s.origin !== 'road' || isAtlasRoadDisplaySpot(s))
     .map((s) => ({
       lng: s.lng,
       lat: s.lat,
@@ -857,7 +1047,10 @@ function showFocusMarker(spot: AtlasSpotLite) {
     content: `<span class="atlas-focus" style="--dot:${color}" title="${escHtml(spot.name)}"><i></i></span>`,
     offset: new AMapRef.Pixel(0, 0),
   });
-  focusMarker.on('click', () => openSpotInfo(spot));
+  focusMarker.on('click', () => {
+    ignoreMapClickClear = true;
+    clearSpotSelection();
+  });
   map.add(focusMarker);
 }
 
@@ -909,6 +1102,13 @@ function selectSpot(spot: AtlasSpotLite) {
   const lng = Number(spot.lng);
   const lat = Number(spot.lat);
   if (!Number.isFinite(lng) || !Number.isFinite(lat)) return;
+  if (focusedSpotId && focusedSpotId === spot.id) {
+    ignoreMapClickClear = true;
+    clearSpotSelection();
+    return;
+  }
+  ignoreMapClickClear = true;
+  focusedSpotId = spot.id;
   showFocusMarker(spot);
   centerSpotInView(lng, lat, 12);
   openSpotInfo(spot);
@@ -937,7 +1137,7 @@ function focusSpot(spot: AtlasSpotLite) {
 
 function onResultClick(hit: { kind: 'corridor' | 'spot'; id: string }) {
   if (hit.kind === 'corridor') {
-    clearFocusMarker();
+    clearSpotSelection();
     focusCorridor(hit.id);
   } else {
     focusSpotById(hit.id);
@@ -946,8 +1146,7 @@ function onResultClick(hit: { kind: 'corridor' | 'spot'; id: string }) {
 
 function resetView() {
   if (!map) return;
-  clearFocusMarker();
-  closeSpotInfo();
+  clearSpotSelection();
   clearCorridorHighlight();
   map.setZoomAndCenter(4.4, [104.5, 34.5]);
 }
@@ -1046,16 +1245,27 @@ async function initMap() {
   map.getContainer().addEventListener('click', (event: MouseEvent) => {
     const t = event.target as HTMLElement;
     if (t.closest?.('[data-info-close]')) {
-      closeSpotInfo();
+      clearSpotSelection();
       return;
     }
     // 省聚合标记：点击只看该省（事件委托，见 onMapClickDelegated 注释）
     onMapClickDelegated(event);
   });
-  // 点空白处收起高亮蓝线（路网已不可点，避免密线区误触）
-  map.on('click', () => {
+  // 点空白处收起高亮蓝线与景点选中（路网已不可点，避免密线区误触）
+  map.on('click', (e: { originEvent?: Event }) => {
+    const t = e?.originEvent?.target as HTMLElement | undefined;
+    if (t?.closest?.('.atlas-focus, .atlas-dot, .atlas-cluster, .atlas-iw, .atlas-prov-cluster')) {
+      return;
+    }
+    if (ignoreMapClickClear) {
+      ignoreMapClickClear = false;
+      return;
+    }
     clearCorridorHighlight();
+    clearSpotSelection();
   });
+  map.on('zoomend', onRoadMapViewChange);
+  map.on('moveend', onRoadMapViewChange);
   await loadPlugins();
   renderNetwork();
   renderSpots();
@@ -1162,6 +1372,16 @@ onUnmounted(() => {
     }
     heat = null;
   }
+  if (roadLodRedrawTimer) {
+    clearTimeout(roadLodRedrawTimer);
+    roadLodRedrawTimer = null;
+  }
+  try {
+    map?.off?.('zoomend', onRoadMapViewChange);
+    map?.off?.('moveend', onRoadMapViewChange);
+  } catch {
+    /* ignore */
+  }
   try {
     map?.destroy?.();
   } catch {
@@ -1176,8 +1396,12 @@ watch([filteredSpots], () => {
   if (heatOn.value) renderHeat();
 });
 watch(heatOn, () => renderHeat());
+watch(activeCity, () => {
+  if (map) renderRoadSpots(filteredSpots.value.filter((s) => s.origin === 'road'));
+});
 // 切到含公路的来源时才拉公路明细（按需加载，避免默认路径背 4.4MB）
 watch(spotOrigin, (v) => {
+  activeCity.value = '';
   if (v === 'road' || v === 'all') void loadRoad();
 });
 </script>
@@ -1275,14 +1499,17 @@ watch(spotOrigin, (v) => {
                 铁路 {{ spots.length }} · 公路 {{ roadLoaded ? roadSpots.length : (stats?.roadSpotCount ?? 0) }}
               </template>
             </span>
-            <button v-if="activeDims.length || activeProvinces.length" type="button" class="atlas-link" @click="clearFilters">
+            <button v-if="activeDims.length || activeProvinces.length || activeCity" type="button" class="atlas-link" @click="clearFilters">
               清空筛选
             </button>
           </div>
-          <!-- 公路侧为省级聚合标记，密度请配合热力图查看 -->
           <p class="atlas-block__note">
-            地图上公路景点按省份聚合显示（数字为该省景点数）；
-            开启「热力图」可查看全国密度分布。
+            公路景点：地图只画真正会去的点（名山/博物馆/地标；不含 OSM 测绘点、低分观景、残墓和金门工事）。
+            省/市圈与省份筛选按经纬度重算归属，不用采集时的 province 标签。
+          </p>
+          <p v-if="activeCity" class="atlas-block__note">
+            当前展开：{{ activeCity }}
+            <button type="button" class="atlas-link" @click="activeCity = ''">返回全市聚合</button>
           </p>
 
           <!-- 景点统计：当前筛选范围的来源与分级占比（鸿蒙展示类：数据可视化用进度条表达） -->
@@ -1329,7 +1556,7 @@ watch(spotOrigin, (v) => {
             </button>
           </div>
           <div class="atlas-dim-actions">
-            <span class="atlas-count">{{ filteredSpots.length }} / {{ spotsByOrigin.length }} 处</span>
+            <span class="atlas-count">{{ filteredSpots.length }} / {{ atlasVisibleByOrigin.length }} 处</span>
             <button v-if="activeDims.length || activeProvinces.length" type="button" class="atlas-link" @click="clearFilters">
               清空筛选
             </button>
@@ -1386,7 +1613,7 @@ watch(spotOrigin, (v) => {
                 <span class="atlas-rank-row__name">{{ s.name }}</span>
                 <span class="atlas-rank-row__src">
                   <em class="atlas-tier" :class="'is-' + (s.tier ?? 'C')">{{ s.tier ?? 'C' }}</em>
-                  {{ s.score ?? '—' }} 分
+                  {{ roadPlaceText(s) }} · {{ s.score ?? '—' }} 分
                 </span>
               </button>
             </li>
@@ -2487,10 +2714,8 @@ watch(spotOrigin, (v) => {
 }
 
 /*
- * 公路侧省级聚合标记。
- * 1.2 万个点逐个画 Marker 实测产生 10.7 秒主线程长任务（≈2.7ms/个），
- * 页面直接卡死；改为按省聚合（30 来个标记）后瞬时完成，
- * 密度分布交给热力图层（AMap.HeatMap 走 canvas，1.2 万点无压力）。
+ * 公路侧地级市聚合标记（评分门槛之后）。
+ * 全量 Marker 会卡死；按市聚合后约一两百个圆点。
  */
 .atlas-prov-cluster {
   display: grid;

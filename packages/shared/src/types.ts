@@ -5,6 +5,7 @@ export interface StationRef {
   lng?: number;
   lat?: number;
   city?: string;
+  pinyin?: string;
 }
 
 /** 车次列表项 */

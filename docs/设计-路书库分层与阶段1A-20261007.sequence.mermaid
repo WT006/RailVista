@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant U as 用户
+    participant V as RoadbookHome.vue
+    participant R as routes/travel.ts
+    participant S as services/travelRoutes.ts
+    participant P as shared/travelbook (纯函数)
+    participant D as data/presets/roadbooks
+
+    U->>V: 点击「景区几日游」chip (layer=L3)
+    V->>R: GET /api/travel/routes?layer=L3&sort=recommend&limit=100
+    R->>R: readQuery(): layer 命中 LAYERS 白名单 → q.layer='L3'
+    R->>S: listTravelRoutes(q)
+    S->>D: snapshot()（首次：readdirSync().sort() 读全部 json）
+    D-->>S: routes[]（解析失败的文件进入 skipped，不抛错）
+    S->>S: applyRouteCoverage(provinces, routes)
+    S->>P: toTravelSummary(r) 每条
+    P->>P: layer = resolveLayer(r)（显式优先，否则 tier+days 推断）
+    P-->>S: TravelRouteSummary[]（layer 必填）
+    S->>P: queryTravelRoutes(summaries, q)
+    P->>P: filter(status='published') → matchTravelRoute(q.layer)
+    P->>P: sort='recommend' → 分 5 组 → 组内 rank/id 升序
+    P->>P: 按 [L3,L4,L2,L1,L5] 轮转，每层每轮 2 条
+    P->>P: slice(offset, offset+limit)
+    P-->>S: 有序 routes[]
+    S->>P: summarizeTravel(全部 summaries)
+    P-->>S: counts（含 byLayer）
+    S-->>R: { total, routes, counts }
+    R-->>V: { ok: true, data }
+    V->>V: 渲染卡片 + 层标签 + chip 角标
+    V-->>U: 首屏出现 L3/L4/L2/L1/L5 混合

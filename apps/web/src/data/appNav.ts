@@ -37,9 +37,9 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
     match: (p) => p.startsWith('/ticket'),
   },
   {
-    id: 'more',
-    label: '待开放',
-    placeholder: true,
-    match: () => false,
+    id: 'roadbook',
+    to: '/roadbook',
+    label: '旅行路书',
+    match: (p) => p.startsWith('/roadbook'),
   },
 ];

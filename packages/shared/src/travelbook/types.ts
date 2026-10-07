@@ -77,6 +77,48 @@ export const TRAVEL_TIER_LABEL: Record<TravelTier, string> = {
   city: '城市级',
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 内容分层 L1~L5（PRD §3.1 / 设计 §1）
+//
+// tier 只有 national/regional/city 三值，无法区分「景区几日游 / 周末线 / 小众城市」，
+// 故新增 layer 作为第二维：`tier` 决定行政影响力，`layer` 决定内容颗粒度。
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * 内容分层。与 `editorRank` 的分层区间一一对应（见 `LAYER_RANK_RANGE`）：
+ * L1 1~99 / L2 100~199 / L3 200~299 / L4 300~399 / L5 400~499。
+ */
+export type TravelLayer = 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
+
+export const TRAVEL_LAYER_LABEL: Record<TravelLayer, string> = {
+  L1: '国家级大环线',
+  L2: '区域级省域环线',
+  L3: '景区几日游',
+  L4: '周末周边',
+  L5: '小众目的地',
+};
+
+/** 固定层序 L1→L5（用于统计初始化、UI 固定序展示，与轮转层序区分） */
+export const TRAVEL_LAYERS: TravelLayer[] = ['L1', 'L2', 'L3', 'L4', 'L5'];
+
+/**
+ * `editorRank` 分层区间 `[min, max)`（左闭右开）。
+ * 判据 G 保证全库 rank 唯一，本表保证「rank 落在所属层的区间内」（构建期判据 V11）。
+ */
+export const LAYER_RANK_RANGE: Record<TravelLayer, [number, number]> = {
+  L1: [1, 100],
+  L2: [100, 200],
+  L3: [200, 300],
+  L4: [300, 400],
+  L5: [400, 500],
+};
+
+/** 分层轮转的层序（PRD §3.5）：先给「说走就走」的短内容，再给大线。 */
+export const RECOMMEND_LAYER_ROTATION: TravelLayer[] = ['L3', 'L4', 'L2', 'L1', 'L5'];
+
+/** 轮转时每层每轮取几条 */
+export const RECOMMEND_ROTATION_STEP = 2;
+
 /** 道路等级（分段用） */
 export type TravelRoadClass =
   | '国道'
@@ -363,6 +405,12 @@ export interface TravelRouteDetail {
   primaryMode: TravelMode;
   shape: TravelShape;
   tier: TravelTier;
+  /**
+   * 内容分层（L1~L5）。**可选**：
+   * 缺省时由 `resolveLayer()` 按 `tier + days` 推断，保证存量数据不填也能跑。
+   * 推断永不产出 L5（冷门是主观判断，只能人工显式标注）。
+   */
+  layer?: TravelLayer;
   tags: string[];
   /** 一句话速写 */
   summary: string;
@@ -406,6 +454,8 @@ export interface TravelRouteSummary {
   primaryMode: TravelMode;
   shape: TravelShape;
   tier: TravelTier;
+  /** 内容分层。**必填**：由 `toTravelSummary()` 用 `resolveLayer()` 解析得出，调用方永远拿得到确定值 */
+  layer: TravelLayer;
   tags: string[];
   summary: string;
   totalKm: number;
@@ -435,6 +485,8 @@ export interface TravelCounts {
   citiesCovered: number;
   /** 按玩法分布 */
   byMode: Partial<Record<TravelMode, number>>;
+  /** 按内容分层分布，5 个键恒存在（缺层填 0），便于列表页 chip 角标直接读 */
+  byLayer: Record<TravelLayer, number>;
   /** 省份简称 → 路线数 */
   byProvince: Record<string, number>;
   /** 城市名 → 路线数 */
@@ -471,15 +523,109 @@ export interface TravelQuery {
   maxKm?: number;
   /** 形态 */
   shape?: TravelShape;
-  /** 层级 */
+  /** 层级（行政影响力） */
   tier?: TravelTier;
-  sort?: 'recommend' | 'km-desc' | 'km-asc' | 'days-asc' | 'days-desc';
+  /** 内容分层（颗粒度）。缺省不过滤；命中判定走 `resolveLayer()` 的结果 */
+  layer?: TravelLayer;
+  /**
+   * - recommend（默认）：分层轮转，见 `RECOMMEND_LAYER_ROTATION`
+   * - layer：**回归基线**，纯 `editorRank` 升序（等价改动前的 recommend 行为），不参与轮转
+   * - 其余为单标量排序
+   */
+  sort?: 'recommend' | 'km-desc' | 'km-asc' | 'days-asc' | 'days-desc' | 'layer';
   limit?: number;
   offset?: number;
 }
 
 function includesText(hay: (string | undefined)[], needle: string): boolean {
   return hay.some((h) => !!h && h.includes(needle));
+}
+
+/** id 字典序比较器：作为 editorRank 相同（脏数据）时的确定性兜底 */
+function compareId(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
+/**
+ * `resolveLayer()` 的入参形态。
+ *
+ * `tier` / `days` 刻意做成可选：调用方可能拿到尚未经过类型收口的脏数据
+ * （JSON 直读、构建期校验器接入前），缺字段时函数须按最保守的 L4 兜底，而不是抛错。
+ * `TravelRouteDetail` 与 `TravelRouteSummary` 都满足该结构。
+ */
+export type TravelLayerSeed = Pick<TravelRouteDetail, 'layer'> &
+  Partial<Pick<TravelRouteDetail, 'tier' | 'days'>>;
+
+/**
+ * 解析路线的内容分层。
+ *
+ * 优先级：**显式 `layer` > `tier` 推断**（`tier` 为 city / 非法值时再退化到 `days`）。
+ *
+ * | tier | days | 结果 |
+ * |---|---|---|
+ * | national | 任意 | L1 |
+ * | regional | 任意 | L2 |
+ * | city | ≤ 2 | L4 |
+ * | city | ≥ 3 | L3 |
+ * | 缺失/非法 | 缺失/非法 | L4（最保守，避免把未知数据塞进 L3 抢首屏） |
+ *
+ * **推断永不产出 L5** —— 冷门是主观判断，只能人工标注。
+ */
+export function resolveLayer(r: TravelLayerSeed): TravelLayer {
+  if (r?.layer) return r.layer;
+  if (r?.tier === 'national') return 'L1';
+  if (r?.tier === 'regional') return 'L2';
+  // tier === 'city' 或缺失 / 非法
+  const raw = typeof r?.days === 'number' ? r.days : Number.NaN;
+  // days 缺失 / 非有限值 / 非正数时按 2 天兜底 → L4（最保守，避免把未知数据塞进 L3 抢首屏）
+  const d = Number.isFinite(raw) && raw > 0 ? raw : 2;
+  return d <= 2 ? 'L4' : 'L3';
+}
+
+/**
+ * 分层轮转排序（设计文档 §2）。
+ *
+ * ① 按 `r.layer` 分 5 组，组内按 `(editorRank asc, id asc)` 稳定排序；
+ * ② 按 `RECOMMEND_LAYER_ROTATION` 层序，每层每轮取 `RECOMMEND_ROTATION_STEP` 条，取尽的层跳过；
+ * ③ 取尽为止，保证 `out.length === routes.length`。
+ *
+ * 输出仅由 `(layer, editorRank, id)` 决定，**与输入数组原始顺序无关**（多次调用/翻页完全一致）。
+ */
+export function sortRecommendByLayer(routes: TravelRouteSummary[]): TravelRouteSummary[] {
+  const groups: Record<TravelLayer, TravelRouteSummary[]> = {
+    L1: [],
+    L2: [],
+    L3: [],
+    L4: [],
+    L5: [],
+  };
+  for (const r of routes) {
+    // r.layer 原则上恒为合法层值（toTravelSummary 已解析），脏数据时回退推断，避免出现 undefined 分组
+    const layer: TravelLayer = TRAVEL_LAYERS.includes(r.layer) ? r.layer : resolveLayer(r);
+    groups[layer].push(r);
+  }
+  for (const layer of TRAVEL_LAYERS) {
+    groups[layer].sort((a, b) => a.editorRank - b.editorRank || compareId(a.id, b.id));
+  }
+
+  const out: TravelRouteSummary[] = [];
+  const cursor: Record<TravelLayer, number> = { L1: 0, L2: 0, L3: 0, L4: 0, L5: 0 };
+  let remaining = routes.length;
+  while (remaining > 0) {
+    let progressed = false;
+    for (const layer of RECOMMEND_LAYER_ROTATION) {
+      const group = groups[layer];
+      const from = cursor[layer];
+      const take = Math.min(RECOMMEND_ROTATION_STEP, group.length - from);
+      if (take <= 0) continue; // 该层已取尽，跳过
+      for (let i = from; i < from + take; i += 1) out.push(group[i]);
+      cursor[layer] = from + take;
+      remaining -= take;
+      progressed = true;
+    }
+    if (!progressed) break; // 防御性出口，正常路径不会触发（杜绝死循环）
+  }
+  return out;
 }
 
 /** 单条路线是否命中查询 */
@@ -489,6 +635,7 @@ export function matchTravelRoute(r: TravelRouteSummary, q: TravelQuery): boolean
   if (q.mode && !r.modes.includes(q.mode)) return false;
   if (q.shape && r.shape !== q.shape) return false;
   if (q.tier && r.tier !== q.tier) return false;
+  if (q.layer && resolveLayer(r) !== q.layer) return false;
   if (q.month !== undefined && !r.bestSeason.includes(q.month)) return false;
   if (q.maxDifficulty !== undefined && r.difficulty > q.maxDifficulty) return false;
   if (q.maxDays !== undefined && r.days > q.maxDays) return false;
@@ -527,11 +674,13 @@ export function queryTravelRoutes(
     case 'days-desc':
       out = [...out].sort((a, b) => b.days - a.days);
       break;
+    case 'layer':
+      // 回归基线：纯 editorRank 升序（同 rank 按里程降序），与改动前 recommend 完全一致
+      out = [...out].sort((a, b) => a.editorRank - b.editorRank || b.totalKm - a.totalKm);
+      break;
     default:
-      // 推荐序：先看热度（editorRank），同 Rank 按里程降序（大线在前）
-      out = [...out].sort(
-        (a, b) => a.editorRank - b.editorRank || b.totalKm - a.totalKm,
-      );
+      // 推荐序：分层轮转（L3/L4/L2/L1/L5，每层每轮 2 条），先给「说走就走」的短内容再给大线
+      out = sortRecommendByLayer(out);
   }
   const offset = Math.max(0, q.offset ?? 0);
   const limit = q.limit && q.limit > 0 ? q.limit : out.length;
@@ -552,6 +701,7 @@ export function toTravelSummary(r: TravelRouteDetail): TravelRouteSummary {
     primaryMode: r.primaryMode,
     shape: r.shape,
     tier: r.tier,
+    layer: resolveLayer(r),
     tags: r.tags,
     summary: r.summary,
     totalKm: r.totalKm,
@@ -577,12 +727,17 @@ export function summarizeTravel(routes: TravelRouteSummary[]): TravelCounts {
   const byMode: Partial<Record<TravelMode, number>> = {};
   const byProvince: Record<string, number> = {};
   const byCity: Record<string, number> = {};
+  // 5 个键恒存在，缺层填 0 —— 列表页 chip 角标可以直接读而不必判空
+  const byLayer: Record<TravelLayer, number> = { L1: 0, L2: 0, L3: 0, L4: 0, L5: 0 };
   for (const r of routes) {
     for (const m of r.modes) byMode[m] = (byMode[m] ?? 0) + 1;
     for (const p of r.provinces) byProvince[p] = (byProvince[p] ?? 0) + 1;
     for (const c of new Set([...r.cities, r.anchorCity])) {
       byCity[c] = (byCity[c] ?? 0) + 1;
     }
+    // layer 理论上必填（toTravelSummary 已解析），脏数据时回退推断，避免统计键被写成 undefined
+    const layer: TravelLayer = TRAVEL_LAYERS.includes(r.layer) ? r.layer : resolveLayer(r);
+    if (layer in byLayer) byLayer[layer] += 1;
   }
   return {
     provinces: Object.keys(byProvince).length,
@@ -591,6 +746,7 @@ export function summarizeTravel(routes: TravelRouteSummary[]): TravelCounts {
     pois: routes.reduce((s, r) => s + r.poiCount, 0),
     citiesCovered: Object.keys(byCity).length,
     byMode,
+    byLayer,
     byProvince,
     byCity,
   };

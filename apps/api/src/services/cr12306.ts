@@ -163,8 +163,8 @@ function parseTrainRow(raw: string, date: string): TrainSummary | null {
   return {
     trainCode,
     trainNo,
-    from: { name: fromSt?.name || fromCode, telecode: fromCode },
-    to: { name: toSt?.name || toCode, telecode: toCode },
+    from: { name: fromSt?.name || fromCode, telecode: fromCode, pinyin: fromSt?.pinyin || undefined },
+    to: { name: toSt?.name || toCode, telecode: toCode, pinyin: toSt?.pinyin || undefined },
     departTime,
     arriveTime,
     duration,

@@ -422,6 +422,7 @@ function tick() {
       now: now.value.getTime(),
       prof,
       geoSigma: geoSigmaFor('station', 0),
+      shiftMs: sch.offsetMs,
     });
   } catch {
     etasRef.value = [];
@@ -661,6 +662,9 @@ function scheduleWeatherFetch() {
   }, 900);
 }
 
+/** 后端单次最多 40 个景点；全程超过 40 个时分批拉取，避免后半程景点永远没有天气 */
+const WEATHER_BATCH = 40;
+
 async function fetchSpotWeathers() {
   const etas = etasRef.value;
   if (!etas.length) return;
@@ -683,7 +687,6 @@ async function fetchSpotWeathers() {
       atIso: eta.etaIso,
       visibility: spot.visibility,
     });
-    if (payload.length >= 40) break;
   }
   if (!payload.length) return;
 
@@ -693,13 +696,15 @@ async function fetchSpotWeathers() {
 
   const seq = ++weatherFetchSeq;
   try {
-    const data = await api.getSpotWeathers(payload);
-    if (seq !== weatherFetchSeq) return;
     const next: Record<string, SpotWeather> = { ...weatherBySpotId.value };
-    for (const item of data.items || []) {
-      if (item?.spotId) next[item.spotId] = item;
+    for (let i = 0; i < payload.length; i += WEATHER_BATCH) {
+      const data = await api.getSpotWeathers(payload.slice(i, i + WEATHER_BATCH));
+      if (seq !== weatherFetchSeq) return;
+      for (const item of data.items || []) {
+        if (item?.spotId) next[item.spotId] = item;
+      }
+      weatherBySpotId.value = next;
     }
-    weatherBySpotId.value = next;
   } catch {
     /* 天气失败不阻断行程主流程 */
   }

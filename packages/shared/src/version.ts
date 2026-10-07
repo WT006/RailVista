@@ -5,13 +5,13 @@
  * 并在需要时按 SemVer 递增这里的 APP_VERSION（小迭代递增修订号）。
  * 前端首页显示的版本号直接读取本文件，因此不会出现文档与界面不一致。
  */
-export const APP_VERSION = '0.6.7';
+export const APP_VERSION = '0.7.0';
 
 /** 版本对应的发布/变更摘要，便于 UI 展示（与 CHANGELOG.md 首条一致） */
 export const APP_VERSION_SUMMARY =
-  '公路地图标记缩小：背景星点与国道碎段不再盖住中国轮廓';
+  '旅行路书库上线：省→市→路线攻略层，13 条国民级线路，不限自驾';
 
-export const APP_VERSION_DATE = '2026-10-05';
+export const APP_VERSION_DATE = '2026-10-06';
 
 export type AppVersionInfo = {
   version: string;

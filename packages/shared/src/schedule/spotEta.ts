@@ -61,12 +61,14 @@ export function estimateSpotEtas(params: {
   prof: TrainProfile;
   geoSigma: number;
   delays?: DelayField;
+  /** 发车时刻相对图定基准的整体偏移（用户改发车时间时传入），ETA 随之平移 */
+  shiftMs?: number;
 }): SpotEta[] {
-  const { curve, spots, now, fusion, prof, geoSigma, delays } = params;
+  const { curve, spots, now, fusion, prof, geoSigma, delays, shiftMs = 0 } = params;
 
   return spots.map((spot) => {
     const km = (spot.progressKm ?? 0) * 1000;
-    const tPlan = curve.timeAtKm(km);
+    const tPlan = curve.timeAtKm(km) + shiftMs;
 
     const etaPlanIso = new Date(tPlan).toISOString();
 

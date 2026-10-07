@@ -163,3 +163,29 @@ export function scenicPresets(): { ref: string; label: string; name: string }[] 
     name,
   }));
 }
+
+/**
+ * 「此生必驾」经典自驾国道编号集合（黑金色盾牌）。
+ * 票面 shields 中只要出现这些编号，就渲染对应黑金盾牌。
+ */
+export const MUST_DRIVE_NUMBERS = new Set([
+  '318', '219', '317', '315', '109', '217', '227', '214', '216', '228', '331',
+]);
+
+/** 从 shields 列表中找出首个「此生必驾」经典路线编号；无则 null */
+export function mustDriveFromShields(shields: string[] | undefined | null): string | null {
+  for (const s of shields ?? []) {
+    const digits = String(s).replace(/[A-Za-z\u4e00-\u9fa5\s]/g, '');
+    if (MUST_DRIVE_NUMBERS.has(digits)) return digits;
+  }
+  return null;
+}
+
+/** 把任意路牌输入规范化为纯编号（G109 / S203）；去除「此生必驾」等中文前缀 */
+export function normalizeShieldCode(raw: string): string {
+  const s = String(raw ?? '').trim().toUpperCase();
+  const m = /([GSXYC])?\s*0*(\d{1,4})/.exec(s);
+  if (!m) return s;
+  const letter = m[1] ?? 'G';
+  return `${letter}${m[2]}`;
+}

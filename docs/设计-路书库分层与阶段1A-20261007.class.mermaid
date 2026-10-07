@@ -1,0 +1,123 @@
+classDiagram
+    class TravelLayer {
+        <<enumeration>>
+        L1
+        L2
+        L3
+        L4
+        L5
+    }
+    class TravelTier {
+        <<enumeration>>
+        national
+        regional
+        city
+    }
+    class TravelRouteDetail {
+        +string id
+        +string name
+        +string subtitle
+        +string[] alias
+        +string[] provinces
+        +string[] cities
+        +string anchorCity
+        +TravelMode[] modes
+        +TravelMode primaryMode
+        +TravelShape shape
+        +TravelTier tier
+        +TravelLayer layer?
+        +string[] tags
+        +number totalKm
+        +string mileageNote
+        +number days
+        +TravelIntro intro
+        +TravelNode[] nodes
+        +TravelSegment[] segments
+        +TravelPoi[] pois
+        +TravelDay[] plan
+        +TravelPractical practical
+        +TravelSourceRef[] sources
+        +number editorRank
+        +string status
+        +string updatedAt
+    }
+    class TravelRouteSummary {
+        +TravelTier tier
+        +TravelLayer layer
+        +number editorRank
+        +number poiCount
+        +number mustSeeCount
+        +number planCount
+        +number totalKm
+        +number days
+    }
+    class TravelQuery {
+        +string province?
+        +string city?
+        +TravelMode mode?
+        +TravelLayer layer?
+        +TravelTier tier?
+        +string q?
+        +string sort?
+        +number limit?
+        +number offset?
+    }
+    class TravelCounts {
+        +number routes
+        +Record byMode
+        +Record byProvince
+        +Record byCity
+        +Record~TravelLayer,number~ byLayer
+    }
+    class RoadbookCity {
+        +string name
+        +string[] alias
+        +string coverage
+        +string[] routeIds
+    }
+    class RoadbookProvince {
+        +string name
+        +string shortName
+        +RoadbookCity[] cities
+    }
+    class TravelbookPure {
+        <<module>>
+        +resolveLayer(r) TravelLayer
+        +matchTravelRoute(r, q) bool
+        +queryTravelRoutes(routes, q) TravelRouteSummary[]
+        +toTravelSummary(d) TravelRouteSummary
+        +summarizeTravel(routes) TravelCounts
+        +validateTravelRoute(d) ValidationIssue[]
+        +applyRouteCoverage(provinces, routes) void
+    }
+    class TravelRoutesService {
+        <<service>>
+        +loadAll() LoadResult
+        +listTravelRoutes(q) TravelRouteListResult
+        +getTravelFacets() TravelFacets
+        +getTravelOverview() TravelOverview
+    }
+    class RoadbookHomeVue {
+        <<component>>
+        +province ref
+        +city ref
+        +mode ref
+        +layer ref
+        +sort ref
+        +loadRoutes()
+    }
+
+    TravelRouteDetail "1" --> "1" TravelTier : tier
+    TravelRouteDetail "1" ..> "1" TravelLayer : layer? 缺失时推断
+    TravelRouteSummary "1" --> "1" TravelLayer : layer 必填(派生)
+    TravelRouteSummary "1" --> "1" TravelTier : tier
+    TravelRouteDetail "1" --> "n" TravelPoi
+    TravelRouteDetail "1" --> "n" TravelSegment
+    TravelRouteDetail "1" --> "n" TravelDay
+    TravelRouteSummary ..|> TravelRouteDetail : 派生
+    TravelbookPure ..> TravelRouteSummary : 生成
+    TravelbookPure ..> TravelCounts : 统计
+    RoadbookProvince "1" --> "n" RoadbookCity
+    TravelRoutesService ..> TravelbookPure : 调用
+    RoadbookHomeVue ..> TravelRoutesService : GET /api/travel/routes
+    TravelRoutesService ..> RoadbookProvince : applyRouteCoverage 回写 coverage

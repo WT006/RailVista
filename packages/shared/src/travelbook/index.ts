@@ -9,24 +9,40 @@ export * from './types.js';
 import type {
   RoadbookCity,
   RoadbookProvince,
+  TravelLayer,
   TravelPoiCategory,
   TravelRouteDetail,
   TravelSegment,
+  TravelTier,
 } from './types.js';
 import {
-  TRAVEL_POI_CATEGORY_LABEL,
+  LAYER_RANK_RANGE,
+  RECOMMEND_LAYER_ROTATION,
+  RECOMMEND_ROTATION_STEP,
+  TRAVEL_DIFFICULTY_LABEL,
+  TRAVEL_LAYER_LABEL,
   TRAVEL_MODE_LABEL,
+  TRAVEL_POI_CATEGORY_LABEL,
   TRAVEL_SHAPE_LABEL,
   TRAVEL_TIER_LABEL,
-  TRAVEL_DIFFICULTY_LABEL,
   TravelDifficulty,
+  resolveLayer,
 } from './types.js';
 
 export const ROADBOOK_POI_CATEGORIES = Object.keys(
   TRAVEL_POI_CATEGORY_LABEL,
 ) as TravelPoiCategory[];
 
-export { TRAVEL_MODE_LABEL, TRAVEL_SHAPE_LABEL, TRAVEL_TIER_LABEL, TRAVEL_DIFFICULTY_LABEL };
+export {
+  TRAVEL_MODE_LABEL,
+  TRAVEL_SHAPE_LABEL,
+  TRAVEL_TIER_LABEL,
+  TRAVEL_DIFFICULTY_LABEL,
+  TRAVEL_LAYER_LABEL,
+  LAYER_RANK_RANGE,
+  RECOMMEND_LAYER_ROTATION,
+  RECOMMEND_ROTATION_STEP,
+};
 
 export function difficultyText(d: number): string {
   return TRAVEL_DIFFICULTY_LABEL[(Math.min(5, Math.max(1, d)) as TravelDifficulty)] ?? '中等';
@@ -42,6 +58,11 @@ export function shapeText(shape: string): string {
 
 export function tierText(tier: string): string {
   return TRAVEL_TIER_LABEL[tier as keyof typeof TRAVEL_TIER_LABEL] ?? tier;
+}
+
+/** 内容分层文案；未知值原样返回（与 modeText / shapeText 同风格） */
+export function layerText(layer: string): string {
+  return TRAVEL_LAYER_LABEL[layer as TravelLayer] ?? layer;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -65,6 +86,21 @@ const REQUIRED_STRING_FIELDS: (keyof TravelRouteDetail)[] = [
   'endNode',
 ];
 
+/** V9：`layer` → 允许搭配的 `tier`。L5 允许 city 或 regional（区域级冷门目的地）。 */
+const LAYER_EXPECTED_TIERS: Record<TravelLayer, TravelTier[]> = {
+  L1: ['national'],
+  L2: ['regional'],
+  L3: ['city'],
+  L4: ['city'],
+  L5: ['city', 'regional'],
+};
+
+/** V6：`practical.carFree` 的最小字数（低于此视为「写了等于没写」） */
+const MIN_CARFREE_LENGTH = 20;
+
+/** V7：`mileageNote` 的建议最小字数（低于此降级为 warn） */
+const MIN_MILEAGE_NOTE_LENGTH = 8;
+
 /** 校验单条路线。返回 error/warn 列表；装载器遇到 error 应拒绝入库。 */
 export function validateTravelRoute(r: TravelRouteDetail): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
@@ -85,8 +121,9 @@ export function validateTravelRoute(r: TravelRouteDetail): ValidationIssue[] {
   if (!r.intro?.bestSeason) push('warn', '缺少最佳季节文字说明', 'intro.bestSeason');
   if (!r.intro?.difficultyNote) push('warn', '缺少难度成因说明', 'intro.difficultyNote');
   if (!r.intro?.audience?.length) push('warn', '缺少适合人群', 'intro.audience');
+  // V5：intro.days / plan.length 必须与 days 三者一致（原为 warn，升级为 error）
   if (r.intro?.days && r.intro.days !== r.days) {
-    push('warn', `intro.days(${r.intro.days}) 与 days(${r.days}) 不一致`, 'intro.days');
+    push('error', `intro.days(${r.intro.days}) 与 days(${r.days}) 不一致`, 'intro.days');
   }
 
   const nodeNames = new Set<string>();
@@ -159,6 +196,90 @@ export function validateTravelRoute(r: TravelRouteDetail): ValidationIssue[] {
     for (const pid of d.poiIds ?? []) {
       if (!actualPoiIds.has(pid)) push('error', `第 ${d.day} 天引用了不存在的景点 id：${pid}`, 'plan.poiIds');
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // 内容完整性判据（设计文档 §3.2 的 V1~V9、V13、V16、V17）
+  // ═══════════════════════════════════════════════════════════════════════
+
+  const nodes = Array.isArray(r.nodes) ? r.nodes : [];
+  const segments = Array.isArray(r.segments) ? r.segments : [];
+  const pois = Array.isArray(r.pois) ? r.pois : [];
+  const plan = Array.isArray(r.plan) ? r.plan : [];
+  const modes = Array.isArray(r.modes) ? r.modes : [];
+
+  // V1 景点下限：低于 6 个撑不起一条成品行程
+  if (pois.length < 6) push('error', `pois 不足 6 个（当前 ${pois.length} 个）`, 'pois');
+  // V2 必去景点下限：没有 3 个必去说明路线缺乏核心卖点
+  const mustSeeCount = pois.filter((p) => p?.mustSee).length;
+  if (mustSeeCount < 3) push('error', `mustSee 景点不足 3 个（当前 ${mustSeeCount} 个）`, 'pois');
+  // V3 骨架节点下限
+  if (nodes.length < 4) push('error', `nodes 不足 4 个（当前 ${nodes.length} 个）`, 'nodes');
+  // V4 关键路段下限
+  if (segments.length < 3) push('error', `segments 不足 3 段（当前 ${segments.length} 段）`, 'segments');
+
+  // V5 逐日行程条数必须与建议天数一致
+  if (typeof r.days === 'number' && r.days > 0 && plan.length !== r.days) {
+    push('error', `plan.length(${plan.length}) 必须等于 days(${r.days})`, 'plan');
+  }
+
+  // V6 无车方案：必须写，且不能是敷衍的一句话
+  const carFree = (r.practical?.carFree ?? '').trim();
+  if (carFree.length < MIN_CARFREE_LENGTH) {
+    push(
+      'error',
+      `practical.carFree 需写清无车接驳方案且不少于 ${MIN_CARFREE_LENGTH} 字（当前 ${carFree.length} 字）`,
+      'practical.carFree',
+    );
+  }
+
+  // V7 里程口径说明：非空为 error，过短降级 warn（避免把估算值包装成实测值）
+  const mileageNote = (r.mileageNote ?? '').trim();
+  if (!mileageNote) push('error', '缺少里程口径说明 mileageNote', 'mileageNote');
+  else if (mileageNote.length < MIN_MILEAGE_NOTE_LENGTH) {
+    push('warn', `mileageNote 过短（${mileageNote.length} 字），建议写明估算口径与构成`, 'mileageNote');
+  }
+
+  // V8 自驾兜底：本库默认每条路线都要能自驾；纯徒步 / 岛屿步行类允许例外，但必须在 summary 里注明
+  if (modes.length && !modes.includes('selfdrive')) {
+    const summaryText = r.summary ?? '';
+    const hikingException = r.primaryMode === 'hiking' && /徒步|步道/.test(summaryText);
+    const islandException = r.shape === 'point' && /岛屿|步行/.test(summaryText);
+    if (!hikingException && !islandException) {
+      push(
+        'error',
+        'modes 需包含 selfdrive（徒步/岛屿类例外须满足 primaryMode=hiking 或 shape=point 且在 summary 中注明）',
+        'modes',
+      );
+    }
+  }
+
+  // V9 layer 与 tier 一致性（仅在显式标注 layer 时校验；缺省走推断，不报错）
+  if (r.layer) {
+    const expectedTiers = LAYER_EXPECTED_TIERS[r.layer];
+    if (r.tier && expectedTiers && !expectedTiers.includes(r.tier)) {
+      push(
+        'error',
+        `layer=${r.layer} 与 tier=${r.tier} 不一致（${r.layer} 期望 tier=${expectedTiers.join('/')}）`,
+        'layer',
+      );
+    }
+  }
+
+  // V13 资料来源（warn 级，但数据组必写）
+  if (!r.sources?.length) push('warn', '缺少数据来源 sources（至少 1 条）', 'sources');
+
+  // V16 L4 周末线：一半用户是高铁 + 租车/公交，必须同时支持自驾与公共交通
+  // （用 resolveLayer 结果判定，layer 缺省走推断时同样生效）
+  if (modes.length && resolveLayer(r) === 'L4') {
+    if (!modes.includes('selfdrive') || !modes.includes('public')) {
+      push('error', 'L4（周末周边）路线需同时支持 selfdrive 与 public 两种玩法', 'modes');
+    }
+  }
+
+  // V17 anchorCity 应落在 cities 内（applyRouteCoverage 会 union，不算硬错，但通常是笔误）
+  if (r.anchorCity && Array.isArray(r.cities) && r.cities.length && !r.cities.includes(r.anchorCity)) {
+    push('warn', `anchorCity「${r.anchorCity}」不在 cities 中（通常是笔误）`, 'anchorCity');
   }
 
   return issues;

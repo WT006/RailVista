@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.6.7`**（2026-10-05）
+**当前版本：`0.7.0`**（2026-10-06）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,49 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.7.0] — 2026-10-06
+
+**旅行路书库上线：按「省份 → 城市」组织的旅行攻略层，路线类型不限于自驾。**
+
+动机：此前「自驾线」只有 12 条精品线路书（v1 雷达·轨迹口径），没有全国热门环线的
+「怎么玩」内容，也没有包车/公共交通/骑行/徒步玩法；本版本新增第三个内容层
+TravelRoute（技术底座 RoadIndex 之上、纪念票之外），并把「待开放」导航位换成路书库。
+
+- **数据结构**（`packages/shared/src/travelbook/`）：`TravelRouteDetail` / `TravelNode` /
+  `TravelSegment`（含 `refPending` 诚实标注无稳定编号路段）/ `TravelPoi` / `TravelDay` /
+  `TravelPractical`；玩法六枚举 `selfdrive|charter|public|cycling|hiking|mixed`；
+  省市区划底座 `data/presets/roadbooks/_regions.json`（34 省级 + 393 地级，
+  `coverage=covered|partial|todo`，`applyRouteCoverage` 回写路线归属）。
+- **数据内容**（`data/presets/roadbooks/*.json`）：13 条路线 / 145 个景点，
+  覆盖 7 省 34 市。推荐序按国民热度：青甘大环线、川藏南线、呼伦贝尔—大兴安岭、
+  伊犁大环线、阿勒泰环线、西藏大环线、香格里拉—稻城亚丁、川西大环线、南疆大环线、
+  阿里大环线、滇藏线、青藏线、新藏线。每条含整体介绍（季节/天数/难度/适合人群）、
+  道路分段表（G/S 编号 + 起止 + 里程 + 路况）、逐日行程、景点介绍、无车方案与风险提示。
+  道路编号全部对照 `data/roads/index/` 核验，官方口径（如 G331 青富阿段 445.144km、
+  禾木公路 48.2km）写入 `sources`。
+- **API**（`apps/api/src/services/travelRoutes.ts` + `routes/travel.ts`）：
+  `GET /api/travel/overview|regions|facets|routes|by-road/:ref|route/:id`、
+  `POST /api/travel/reload`；筛选支持省/市/玩法/关键词/月份/难度/天数/里程/排序；
+  overview 31.8KB、routes 14.8KB、详情 ~30KB，均远低于 1MB 聚合阈值。
+- **前端**（`apps/web`）：`RoadbookHome.vue`（省→市两级联动 chips + 玩法筛选 +
+  关键词防抖搜索 + 排序 + 卡片列表）、`RoadbookDetail.vue`（整体介绍/道路分段/
+  逐日行程/沿途景点/实用信息 5 Tab）；路由 `/roadbook`、`/roadbook/:routeId`；
+  主导航「待开放」占位替换为「旅行路书」入口。
+- **校验脚本**（`scripts/build-roadbook-index.mjs`）：JSON 合法性、乱码/占位符扫描、
+  枚举合法性、`days===plan.length`、`Σplan≈totalKm`、`Σsegment` 偏差 ≤25%、
+  节点/景点引用完整、省市级名核对、G/S 编号对照公路索引、`editorRank` 唯一。
+  本轮据此修正 8 条路线的 `totalKm` 口径（向逐日累加对齐，官方口径保留在
+  `mileageNote`）并为 3 个俗称路段补 `refPending`。
+- **探针**（`scripts/roadbook-probe.mjs`）：headless Edge 实测列表页联动
+  （新疆→4 条、玩法筛选、重置）与详情页 5 Tab 渲染、横向溢出、传输体积。
+- 验证：`vue-tsc --noEmit` + api/shared `tsc` 零错误；shared 200 单测全过；
+  headless 探针 1280px 与 390px 双断点无横向溢出。
+- 已知限制：34 市已覆盖、其余地级为 `todo` 待补；省道编号在 provincial.json
+  未命中的仅告警不阻断（索引覆盖不全）；阿里大环线等 `totalKm` 与官方口径
+  差额已写入 `mileageNote` 说明。
 
 ---
 

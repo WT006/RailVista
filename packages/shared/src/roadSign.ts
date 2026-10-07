@@ -75,7 +75,7 @@ const PALETTES: Record<RoadSignKind, RoadSignPalette> = {
   county: { bg: WHITE, fg: INK, border: INK, band: '', bandFg: INK },
   township: { bg: WHITE, fg: INK, border: INK, band: '', bandFg: INK },
   village: { bg: WHITE, fg: INK, border: INK, band: '', bandFg: INK },
-  scenic: { bg: CRIMSON, fg: WHITE, border: GOLD, band: GOLD, bandFg: '#3a0a10' },
+  scenic: { bg: '#14110a', fg: '#f7c325', border: '#f7c325', band: '#f7c325', bandFg: '#14110a' },
 };
 
 const LABELS: Record<RoadSignKind, string> = {

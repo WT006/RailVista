@@ -10,7 +10,6 @@ import { computed } from 'vue';
 import { mustDriveFromShields, type TicketConfig } from '@railvista/shared';
 import { AIRLINES, ALLIANCES, TICKET_KIND_META, ticketTheme } from '../../data/ticket';
 import RoadShield from './RoadShield.vue';
-import MustDriveShield from './MustDriveShield.vue';
 import brandLockup from '../../assets/heyworld-brand.png';
 import brandMark from '../../assets/heyworld-logo.png';
 import railwayMark from '../../assets/ticket/china-railway-mark.png';
@@ -38,17 +37,29 @@ const styleVars = computed<Record<string, string>>(() => {
 const kindMeta = computed(() => TICKET_KIND_META[props.config.kind]);
 const airline = computed(() => {
   const ref = props.config.airline;
-  if (!ref) return null;
-  return AIRLINES[ref.code] ?? null;
+  if (!ref?.code) return null;
+  return AIRLINES[ref.code.toLowerCase()] ?? null;
 });
+const ALLIANCE_KEY_MAP: Record<string, string> = {
+  '星空联盟': 'staralliance',
+  '天合联盟': 'skyteam',
+  '寰宇一家': 'oneworld',
+};
 const alliance = computed(() => {
   const id = props.config.airline?.alliance;
-  return id ? ALLIANCES[id] ?? null : null;
+  if (!id) return null;
+  const key = ALLIANCE_KEY_MAP[id] ?? id;
+  return ALLIANCES[key] ?? null;
 });
 
 const shields = computed(() => props.config.route.shields ?? []);
 const waypoints = computed(() => props.config.route.waypoints ?? []);
 const mustNumber = computed(() => mustDriveFromShields(shields.value));
+/** 路牌展示列表：若已出现此生必驾徽记，则隐藏同编号的普通国道路牌，避免重复 */
+const displayShields = computed(() => {
+  if (!mustNumber.value) return shields.value;
+  return shields.value.filter((s) => s.replace(/^[A-Za-z]/, '') !== mustNumber.value);
+});
 
 /** 确定性伪二维码（由 qr.value 哈希播种） */
 const qrCells = computed(() => {
@@ -186,10 +197,6 @@ const endB = computed(() => props.config.route.ends[1]);
           <span class="dr-head__serial">{{ config.serial }}</span>
         </header>
 
-        <div v-if="mustNumber" class="dr-must">
-          <MustDriveShield :code="mustNumber" />
-        </div>
-
         <h2 class="dr-name">{{ config.subtitle || '我的自驾路线' }}</h2>
         <p v-if="config.metaLeft" class="dr-summary">{{ config.metaLeft }}</p>
 
@@ -201,8 +208,9 @@ const endB = computed(() => props.config.route.ends[1]);
           </template>
         </section>
 
-        <section v-if="shields.length" class="dr-shields">
-          <RoadShield v-for="(s, i) in shields" :key="s + i" :code="s" />
+        <section v-if="mustNumber || displayShields.length" class="dr-shields">
+          <RoadShield v-if="mustNumber" :key="'must'" :code="`此生必驾${mustNumber}`" />
+          <RoadShield v-for="(s, i) in displayShields" :key="s + i" :code="s" />
         </section>
 
         <div class="tk-stats">
@@ -222,11 +230,14 @@ const endB = computed(() => props.config.route.ends[1]);
       <template v-else>
         <header class="fl-head">
           <div class="fl-head__air">
-            <strong>{{ config.airline?.name || '航班' }}</strong>
-            <span>{{ config.airline?.en || 'AIRLINE' }}</span>
+            <img v-if="airline?.logo" :src="airline.logo" class="fl-head__logo" :alt="airline.name" />
+            <div class="fl-head__txt">
+              <strong>{{ airline?.name || config.airline?.name || '航班' }}</strong>
+              <span>{{ airline?.en || config.airline?.en || 'AIRLINE' }}</span>
+            </div>
           </div>
           <div class="fl-head__right">
-            <span v-if="alliance" class="fl-head__alliance">{{ alliance.name }}</span>
+            <img v-if="alliance?.logo" :src="alliance.logo" class="fl-head__alliance-logo" :alt="alliance.name" />
             <span class="fl-head__no">{{ config.route.middleLabel }}</span>
           </div>
         </header>
@@ -408,24 +419,24 @@ const endB = computed(() => props.config.route.ends[1]);
 .dr-head__brand strong { font-size: 14.5px; }
 .dr-head__brand span { font-size: 8.5px; letter-spacing: 0.2em; color: var(--tk-tx3); }
 .dr-head__serial { font-size: 9.5px; color: var(--tk-serial); font-family: Arial; }
-.dr-must { display: flex; justify-content: center; margin: 14px 0 4px; }
-.dr-must :deep(svg) { width: 120px; height: auto; }
-.dr-name { margin: 10px 0 0; font-size: 21px; font-weight: 800; text-align: center; letter-spacing: 0.02em; }
+.dr-name { margin: 14px 0 0; font-size: 21px; font-weight: 800; text-align: center; letter-spacing: 0.02em; }
 .dr-summary { margin: 7px 0 0; font-size: 11.5px; color: var(--tk-tx2); text-align: center; letter-spacing: 0.04em; }
-.dr-way { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 7px; margin-top: 16px; }
+.dr-way { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 5px 7px; margin-top: 16px; }
 .dr-way__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--tk-tx3); }
 .dr-way__dot--end { width: 10px; height: 10px; background: var(--tk-acc); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tk-acc) 25%, transparent); }
 .dr-way__name { font-size: 12px; color: var(--tk-tx2); }
 .dr-way__seg { width: 16px; border-top: 1.5px dashed var(--tk-line); }
-.dr-shields { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: flex-end; }
+.dr-shields { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; justify-content: center; }
 
 /* ────────── 飞行 ────────── */
-.fl-head { display: flex; align-items: flex-start; justify-content: space-between; }
-.fl-head__air { display: flex; flex-direction: column; gap: 3px; }
-.fl-head__air strong { font-size: 16px; letter-spacing: 0.03em; }
-.fl-head__air span { font-size: 8.5px; letter-spacing: 0.2em; color: var(--tk-tx3); }
-.fl-head__right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-.fl-head__alliance { font-size: 9px; letter-spacing: 0.1em; color: var(--tk-tx3); }
+.fl-head { display: flex; align-items: center; justify-content: space-between; }
+.fl-head__air { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.fl-head__logo { width: 38px; height: 38px; object-fit: contain; background: #fff; border-radius: 8px; padding: 4px; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+.fl-head__txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fl-head__txt strong { font-size: 15px; letter-spacing: 0.03em; line-height: 1.2; }
+.fl-head__txt span { font-size: 8px; letter-spacing: 0.18em; color: var(--tk-tx3); }
+.fl-head__right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.fl-head__alliance-logo { height: 20px; width: auto; max-width: 80px; object-fit: contain; background: rgba(255,255,255,0.92); border-radius: 4px; padding: 3px 6px; }
 .fl-head__no { font-size: 20px; font-weight: 800; color: var(--tk-acc-hi); font-family: Arial; letter-spacing: 0.5px; }
 .fl-route { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin-top: 20px; }
 .fl-city { display: flex; flex-direction: column; gap: 3px; }

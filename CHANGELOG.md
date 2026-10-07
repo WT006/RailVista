@@ -40,13 +40,40 @@ TravelRoute（技术底座 RoadIndex 之上、纪念票之外），并把「待�
   `TravelPractical`；玩法六枚举 `selfdrive|charter|public|cycling|hiking|mixed`；
   省市区划底座 `data/presets/roadbooks/_regions.json`（34 省级 + 393 地级，
   `coverage=covered|partial|todo`，`applyRouteCoverage` 回写路线归属）。
-- **数据内容**（`data/presets/roadbooks/*.json`）：13 条路线 / 145 个景点，
-  覆盖 7 省 34 市。推荐序按国民热度：青甘大环线、川藏南线、呼伦贝尔—大兴安岭、
-  伊犁大环线、阿勒泰环线、西藏大环线、香格里拉—稻城亚丁、川西大环线、南疆大环线、
-  阿里大环线、滇藏线、青藏线、新藏线。每条含整体介绍（季节/天数/难度/适合人群）、
-  道路分段表（G/S 编号 + 起止 + 里程 + 路况）、逐日行程、景点介绍、无车方案与风险提示。
-  道路编号全部对照 `data/roads/index/` 核验，官方口径（如 G331 青富阿段 445.144km、
-  禾木公路 48.2km）写入 `sources`。
+- **数据内容**（`data/presets/roadbooks/*.json`）：**37 条路线 / 344 个景点，
+  覆盖 17 省 58 市**，16 个数据文件。
+  - *首批 13 条*（西部大线）：青甘大环线、川藏南线、呼伦贝尔—大兴安岭、伊犁大环线、
+    阿勒泰环线、西藏大环线、香格里拉—稻城亚丁、川西大环线、南疆大环线、阿里大环线、
+    滇藏线、青藏线、新藏线。
+  - *阶段 1A 补 12 条*（东部）：皖南山乡环线、黄山 3 日、三清山 2 日、泰山 2 日、
+    武夷山 3 日、杭州西郊径山—莫干山、上海近郊朱家角—淀山湖—崇明、湘西山水环线、
+    桂北漓江—龙脊、深圳大鹏半岛 2 日、张家界 4 日、潮州古城 2 日。
+  - *阶段 1B 补 12 条*（江浙沪 + 浙南闽赣皖南）：苏南水乡古镇环线、南京东郊、
+    千岛湖、西湖+西溪、雁荡山、普陀山、浙南山水廊、松阳古村群、九华山、庐山、
+    赣东北山水古村环线、厦门环岛。
+  - 每条含整体介绍（季节/天数/难度/适合人群）、道路分段表（G/S 编号 + 起止 + 里程 +
+    路况）、逐日行程、景点介绍、无车方案与风险提示。道路编号对照 `data/roads/index/` 核验；
+    核对不到的一律 `refPending: true` + 俗称（**不硬写编号**），官方口径（如 G331 青富阿段
+    445.144km、禾木公路 48.2km）写入 `sources`。里程一律标注为估算口径。
+- **五层内容分层**（`layer` 字段）：L1 国家级大环线 / L2 区域级省域环线 / L3 景区深度几日游 /
+  L4 城市周边周末 / L5 小众冷门。`editorRank` 按层分段编号（L1 1-99 / L2 100-199 / L3 200-299 /
+  L4 300-399 / L5 400-499，全库唯一）；缺省时按 `tier + days` 推断（`resolveLayer()`，推断永不产出 L5）。
+  当前分布 L1:13 / L2:6 / L3:11 / L4:5 / L5:2。
+- **默认排序改分层轮转**（`sortRecommendByLayer()`）：层序 [L3, L4, L2, L1, L5] 每层每轮取 2 条，
+  层内按 `(editorRank, id)`。**不做这一步，新补的城市级路线（rank 200~499）会被存量 13 条
+  大线永久压在首屏外**。`sort='layer'` 保留纯 rank 升序作回归基线。
+- **校验补强 17 条**：shared 的 `validateTravelRoute()` 新增 11 条（pois≥6、mustSee≥3、
+  nodes≥4、segments≥3、`plan.length===days===intro.days`、`carFree` 非空且 ≥20 字、
+  `mileageNote` 非空、modes 含 selfdrive、layer↔tier 一致、L4 必含 selfdrive+public、
+  anchorCity∈cities）；构建脚本新增 6 条（**anchorCity 必须存在于 `_regions.json`**——
+  这是「幽灵城市」的根因、editorRank 落在 layer 区间、路线 id 全局唯一、单文件 >600KB、
+  layer 缺省提示、shared 判据接线）。
+  ⚠️ `validateTravelRoute()` 此前**全仓无任何调用方**，补强它运行时不会生效 —— 本版本将其
+  接入唯一构建闸门 `scripts/build-roadbook-index.mjs`，并新增 **`pnpm roadbook:check`**
+  （有 error 时退出码非 0）。存量 13 条走 `LEGACY_FILES` 白名单降级为 warn，不阻断。
+- **列表页内容分层筛选**：`RoadbookHome.vue` 新增「内容分层」chip 一排，
+  顺序直接取 shared 的 `RECOMMEND_LAYER_ROTATION`（**不写死字面量**，避免与后端轮转层序漂移），
+  与省份、玩法筛选是「与」关系；卡片加分层角标。
 - **API**（`apps/api/src/services/travelRoutes.ts` + `routes/travel.ts`）：
   `GET /api/travel/overview|regions|facets|routes|by-road/:ref|route/:id`、
   `POST /api/travel/reload`；筛选支持省/市/玩法/关键词/月份/难度/天数/里程/排序；
@@ -62,11 +89,21 @@ TravelRoute（技术底座 RoadIndex 之上、纪念票之外），并把「待�
   `mileageNote`）并为 3 个俗称路段补 `refPending`。
 - **探针**（`scripts/roadbook-probe.mjs`）：headless Edge 实测列表页联动
   （新疆→4 条、玩法筛选、重置）与详情页 5 Tab 渲染、横向溢出、传输体积。
-- 验证：`vue-tsc --noEmit` + api/shared `tsc` 零错误；shared 200 单测全过；
+- 验证：`vue-tsc --noEmit` + api/shared `tsc` 零错误；shared 单测全过；
   headless 探针 1280px 与 390px 双断点无横向溢出。
-- 已知限制：34 市已覆盖、其余地级为 `todo` 待补；省道编号在 provincial.json
-  未命中的仅告警不阻断（索引覆盖不全）；阿里大环线等 `totalKm` 与官方口径
-  差额已写入 `mileageNote` 说明。
+  路书库补全后：单测 **290 / 290 全绿**（新增 76 条 `travelbook` 用例，覆盖
+  `resolveLayer` 推断表 / `sortRecommendByLayer` 稳定性与分页 / `LAYER_RANK_RANGE` 边界 /
+  V1~V17 每条判据的正反例）；`pnpm roadbook:check` 退出码 0、ERROR 0；
+  自写脚本 827 条断言 0 FAIL；接口实测 `overview` 37 条 / `skipped` 空、
+  `facets.layers` 5 层齐全、翻页 5×5 拼接与全量顺序完全一致无重无漏；
+  页面实测分层 chip 顺序与 `RECOMMEND_LAYER_ROTATION` 一致、首卡为黄山 3 日深度游、
+  点「景区几日游」收敛到 5 条。
+- 已知限制：多数地级市仍为 `todo` 待补（阶段 2~6 继续）；省道编号在 provincial.json
+  未命中的仅告警不阻断（索引覆盖不全）；`refPending` 目前是**路段级**布尔，
+  无法表达「一段里 G321 已核实、俗称待核实」（已累积 6 处，后续考虑下沉为 `pendingRefs`）；
+  存量 2 条路线 `anchorCity` 为幽灵城市（`海拉尔` 实为呼伦贝尔的市辖区、`喀什` 主名为喀什地区），
+  按数据纪律未擅自改动，已列入遗留清单；
+  `sources` 引用的资料原文、海拔官方测绘值、班次真实数量**未经权威源核验**。
 
 ---
 

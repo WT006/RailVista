@@ -73,6 +73,12 @@ describe('drive/spotGrid Himalaya / foreign POI', () => {
     );
   });
 
+  it('drops Kinmen / Matsu swept in by Fujian harvest bbox', () => {
+    assert.equal(isAdmissibleChinaPoi({ name: '翟山坑道', lng: 118.32, lat: 24.39 }), false);
+    assert.equal(isAdmissibleChinaPoi({ name: '東碇燈塔', lng: 118.23, lat: 24.16 }), false);
+    assert.equal(isAdmissibleChinaPoi({ name: '厦门鼓浪屿', lng: 118.06, lat: 24.45 }), true);
+  });
+
   it('drops osmTags country outside CN/HK/MO/TW', () => {
     assert.equal(
       isAdmissibleChinaPoi({

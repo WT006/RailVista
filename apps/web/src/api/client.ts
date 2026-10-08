@@ -88,12 +88,19 @@ export type AtlasSpotLite = {
   matchKind: 'line' | 'geo' | null;
   /** 数据来源：rail=铁路景点库，road=公路景点库 */
   origin?: 'rail' | 'road';
-  /** 省份（铁路侧仅 192/624 有值，公路侧已全量补齐） */
+  /** 采集/库内省份（铁路侧展示用；公路侧只作采集来源，展示用 display*） */
   province?: string;
+  /** 公路景点按经纬度重算的展示省（铁路侧不使用） */
+  displayProvince?: string;
+  /** 公路景点按经纬度重算的展示市（铁路侧不使用） */
+  displayCity?: string;
   /** 观赏评分（0–100）：公路侧有，铁路侧数据源无此字段 */
   score?: number;
   /** 质量分级 A/B/C */
   tier?: string;
+  source?: string;
+  ele?: number;
+  hasWiki?: boolean;
 };
 
 /** 公路线路（编号公路，仅含已挂几何的） */

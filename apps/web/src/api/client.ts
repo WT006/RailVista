@@ -419,4 +419,73 @@ export const api = {
       body: JSON.stringify({ spots }),
     });
   },
+  // ── 万里路书 · 路书库（省 → 市 → 路线，玩法不限于自驾） ───────────────────
+  /** 列表页一次拿齐：区划底座 + 统计 + 源文件清单 */
+  getTravelOverview() {
+    return request<{
+      totalRoutes: number;
+      totalPois: number;
+      provinces: import('@railvista/shared').RoadbookProvince[];
+      files: Array<{
+        file: string;
+        area?: string;
+        updated: string;
+        routeCount: number;
+        routeIds: string[];
+      }>;
+      skipped: string[];
+      latestUpdated: string;
+    }>('/travel/overview');
+  },
+  /** 省 → 地级行政区底座（含 coverage / routeIds 回写） */
+  getTravelRegions() {
+    return request<{
+      version: number;
+      updated: string;
+      provinces: import('@railvista/shared').RoadbookProvince[];
+    }>('/travel/regions');
+  },
+  /** 筛选面板分面值（每项带路线数） */
+  getTravelFacets() {
+    return request<{
+      provinces: Array<{ name: string; shortName: string; count: number }>;
+      cities: Array<{ name: string; province: string; count: number; coverage: string }>;
+      modes: Array<{ mode: string; label: string; count: number }>;
+      tags: Array<{ tag: string; count: number }>;
+    }>('/travel/facets');
+  },
+  /** 路线列表（筛选 / 排序 / 分页） */
+  getTravelRoutes(params: Record<string, string | number | undefined> = {}) {
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== '' && v !== null) qs.set(k, String(v));
+    }
+    const suffix = qs.toString() ? `?${qs}` : '';
+    return request<{
+      total: number;
+      routes: import('@railvista/shared').TravelRouteSummary[];
+      counts: import('@railvista/shared').TravelCounts;
+    }>(`/travel/routes${suffix}`);
+  },
+  /** 单条路线详情（分段 / 逐日 / 景点 / 实用信息） */
+  getTravelRoute(id: string) {
+    return request<import('@railvista/shared').TravelRouteDetail>(
+      `/travel/route/${encodeURIComponent(id)}`,
+    );
+  },
+  /** 按公路编号反查玩法（G318 有哪些线路可以玩） */
+  getTravelRoutesByRoad(ref: string) {
+    return request<{
+      ref: string;
+      total: number;
+      routes: import('@railvista/shared').TravelRouteSummary[];
+      note?: string;
+    }>(`/travel/by-road/${encodeURIComponent(ref)}`);
+  },
+  // ── 万里路书 · 飞行纪念票 ─────────────────────────────────────────────────
+  /** 航班号 + 日期查询航班（在线服务可用时自动带出起降机场/时刻/登机口；否则本地兜底） */
+  lookupFlight(flightNo: string, date: string) {
+    const qs = new URLSearchParams({ flightNo, date });
+    return request<import('@railvista/shared').FlightLookup>(`/flights/lookup?${qs}`);
+  },
 };

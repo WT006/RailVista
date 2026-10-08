@@ -8,6 +8,8 @@ import { presetsRoute } from './routes/presets.js';
 import { railGeometryRoute } from './routes/railGeometry.js';
 import { atlasRoute } from './routes/atlas.js';
 import { driveRoute } from './routes/drive.js';
+import { flightsRoute } from './routes/flights.js';
+import { travelRoute } from './routes/travel.js';
 import { weatherRoute } from './routes/weather.js';
 import { loadStationIndex } from './services/stationIndex.js';
 import { trustedClientIp } from './lib/clientIdentity.js';
@@ -100,6 +102,8 @@ app.route('/presets', presetsRoute);
 app.route('/rail-geometry', railGeometryRoute);
 app.route('/atlas', atlasRoute);
 app.route('/drive', driveRoute);
+app.route('/flights', flightsRoute);
+app.route('/travel', travelRoute);
 app.route('/weather', weatherRoute);
 
 const port = Number(process.env.PORT || 3000);

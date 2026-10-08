@@ -1,0 +1,147 @@
+{
+  "id": "natgeo-drives-lifetime",
+  "title": "美国国家地理 · 一生必驾公路",
+  "subtitle": "National Geographic《Drives of a Lifetime（一生必驾）》全书收录全球 500 条公路。本榜为其中最具代表性的 13 条口碑精选；原书按地区编排、无统一名次，序号为聚合展示，海外路线在本产品中仅供灵感。",
+  "source": {
+    "org": "美国国家地理 National Geographic",
+    "doc": "《Drives of a Lifetime: 500 of the World's Greatest Road Trips》（2nd Edition, 2020；初版 2015）",
+    "url": "https://www.nationalgeographic.com/",
+    "publishedAt": "2015初版/2020第2版"
+  },
+  "level": "international",
+  "itemCount": 13,
+  "items": [
+    {
+      "rank": 1,
+      "routeId": "",
+      "name": "加州 1 号公路（Pacific Coast Highway）",
+      "roadKeys": [],
+      "province": ["美国"],
+      "lengthKm": 1056,
+      "highlight": "旧金山—洛杉矶：太平洋悬崖海岸，比克斯比大桥、大苏尔、十七英里 Drive，海景与牧场交替",
+      "tags": ["海岸", "悬崖", "SR1"]
+    },
+    {
+      "rank": 2,
+      "routeId": "",
+      "name": "66 号公路（Route 66）",
+      "roadKeys": [],
+      "province": ["美国"],
+      "lengthKm": 3939,
+      "highlight": "芝加哥—圣莫尼卡：美国母亲之路穿越 8 州，经典霓虹、汽车旅馆与西部荒原，公路文化图腾",
+      "tags": ["母亲之路", "西部", "经典"]
+    },
+    {
+      "rank": 3,
+      "routeId": "",
+      "name": "冰原大道（Icefields Parkway）",
+      "roadKeys": [],
+      "province": ["加拿大"],
+      "lengthKm": 232,
+      "highlight": "班夫—贾斯珀：落基山脉脊梁上的 93 号公路，百座冰川、翡翠色湖泊与群峰",
+      "tags": ["落基山", "冰川", "湖泊"]
+    },
+    {
+      "rank": 4,
+      "routeId": "",
+      "name": "大洋路（Great Ocean Road）",
+      "roadKeys": [],
+      "province": ["澳大利亚"],
+      "lengthKm": 243,
+      "highlight": "托尔坎—瓦南布尔：一战退伍军人筑成的海岸悬崖公路，十二使徒岩、洛克阿德峡谷与冲浪海岸",
+      "tags": ["海岸", "十二使徒岩"]
+    },
+    {
+      "rank": 5,
+      "routeId": "",
+      "name": "蓝岭公园道（Blue Ridge Parkway）",
+      "roadKeys": [],
+      "province": ["美国"],
+      "lengthKm": 755,
+      "highlight": "谢南多厄—大雾山：阿巴拉契亚山脊线上的景观公园道，无一处红绿灯，秋景红叶最佳",
+      "tags": ["山脊", "红叶", "公园道"]
+    },
+    {
+      "rank": 6,
+      "routeId": "",
+      "name": "冰岛 1 号环岛公路（Ring Road）",
+      "roadKeys": [],
+      "province": ["冰岛"],
+      "lengthKm": 1322,
+      "highlight": "雷克雅未克环线：瀑布、黑沙滩、冰河湖、地热温泉与峡湾，冰与火之国全景展线",
+      "tags": ["环岛", "瀑布", "冰川"]
+    },
+    {
+      "rank": 7,
+      "routeId": "",
+      "name": "大西洋之路（Atlantic Road）",
+      "roadKeys": [],
+      "province": ["挪威"],
+      "lengthKm": 8,
+      "highlight": "克里斯蒂安松—莫尔德：8.3km 岛桥公路跃过群岛与惊涛，斯托尔桑德特大桥凌空划出弧线",
+      "tags": ["群岛桥梁", "峡湾", "工程奇观"]
+    },
+    {
+      "rank": 8,
+      "routeId": "",
+      "name": "花园大道（Garden Route）",
+      "roadKeys": [],
+      "province": ["南非"],
+      "lengthKm": 770,
+      "highlight": "开普敦—伊丽莎白港：印度洋海岸，好望角、厄加勒斯角、齐齐卡马森林与泻湖小镇",
+      "tags": ["海岸", "荒野", "国家公园"]
+    },
+    {
+      "rank": 9,
+      "routeId": "",
+      "name": "米尔福德公路（Milford Road, SH94）",
+      "roadKeys": [],
+      "province": ["新西兰"],
+      "lengthKm": 120,
+      "highlight": "蒂阿瑙—米尔福德峡湾：通往世界第八大奇迹，荷马隧道、镜湖、雪山瀑布直落峡湾",
+      "tags": ["峡湾", "雪山", "隧道"]
+    },
+    {
+      "rank": 10,
+      "routeId": "",
+      "name": "喀喇昆仑公路（Karakoram Highway）",
+      "roadKeys": ["G314"],
+      "fromPlace": "喀什",
+      "toPlace": "伊斯兰堡",
+      "province": ["新疆（中国）", "巴基斯坦"],
+      "lengthKm": 1300,
+      "highlight": "世界最高的跨境铺装公路：帕米尔与喀喇昆仑群山、冰川与古丝路；中国段即 G314，可查看沿程",
+      "tags": ["最高公路", "G314", "古丝路"]
+    },
+    {
+      "rank": 11,
+      "routeId": "",
+      "name": "阿马尔菲海岸公路（SS163）",
+      "roadKeys": [],
+      "province": ["意大利"],
+      "lengthKm": 50,
+      "highlight": "萨莱诺—波西塔诺：地中海悬崖上的丝带，柠檬园、彩色山城与绝壁隧道，世界遗产海岸",
+      "tags": ["地中海", "悬崖", "世界遗产"]
+    },
+    {
+      "rank": 12,
+      "routeId": "",
+      "name": "佛罗里达跨海公路（Overseas Highway）",
+      "roadKeys": [],
+      "province": ["美国"],
+      "lengthKm": 182,
+      "highlight": "迈阿密—基韦斯特：US1 跨越佛罗里达群岛，42 座桥与堤道串起珊瑚礁岛，七里桥横跨海面",
+      "tags": ["跨海桥梁", "群岛", "热带"]
+    },
+    {
+      "rank": 13,
+      "routeId": "",
+      "name": "伊吕波山道（Irohzaka Winding Road）",
+      "roadKeys": [],
+      "province": ["日本"],
+      "lengthKm": 16,
+      "highlight": "日光—中禅寺湖：双层发卡山道，48 个弯道对应伊吕波歌，红叶季日本最美山路之一",
+      "tags": ["发卡弯", "红叶", "山道"]
+    }
+  ]
+}

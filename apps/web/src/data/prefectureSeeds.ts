@@ -16,7 +16,10 @@ type PrefUnit = {
   g: number[][][];
 };
 
-const UNITS = (boundsFile as { units: PrefUnit[] }).units;
+// prefectureBounds.json 由构建脚本生成（scripts/build-prefecture-bounds.mjs），
+// resolveJsonModule 推断出的是 b: number[]，无法直接赋给 b 的四元组类型，
+// 故经 unknown 中转一次再断言——这是纯类型层收敛，不改变运行时数据。
+const UNITS = (boundsFile as unknown as { units: PrefUnit[] }).units;
 
 /** [省, 市, lng, lat] */
 const RAW: Array<[string, string, number, number]> = [

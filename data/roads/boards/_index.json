@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-10-01",
+  "updated": "2026-10-05",
   "boards": [
     {
       "id": "mot-2026-12",
@@ -12,12 +12,39 @@
       "itemCount": 12
     },
     {
+      "id": "mot-rural-roads-2024",
+      "title": "全国十大最美农村路（2024年度）",
+      "subtitle": "464 万公里农村公路中的年度样板（官方评选，排名不分先后）",
+      "level": "national",
+      "org": "交通运输部",
+      "publishedAt": "2025-05",
+      "itemCount": 10
+    },
+    {
       "id": "cng-beautiful-roads",
       "title": "中国最美公路",
       "subtitle": "历年评选条目（媒体榜单，非官方）",
       "level": "media",
       "org": "中国国家地理",
       "publishedAt": "历年",
+      "itemCount": 10
+    },
+    {
+      "id": "life-must-drive",
+      "title": "此生必驾 · 国民公路榜",
+      "subtitle": "每条国道都有自驾圈公认的称号（网络口碑聚合，非官方排名）",
+      "level": "media",
+      "org": "爱驾传媒 · 自驾口碑聚合",
+      "publishedAt": "2019年起",
+      "itemCount": 10
+    },
+    {
+      "id": "amap-holiday-top10",
+      "title": "高德 · 全国驾车游热门路线TOP10",
+      "subtitle": "10 亿用户导航大数据聚合的假期热门驾车路线（平台热度榜）",
+      "level": "media",
+      "org": "高德地图（高德扫街榜）",
+      "publishedAt": "2025-09",
       "itemCount": 10
     },
     {
@@ -37,6 +64,33 @@
       "org": "各省交通运输厅 / 文旅厅",
       "publishedAt": "历年",
       "itemCount": 5
+    },
+    {
+      "id": "natgeo-drives-lifetime",
+      "title": "美国国家地理 · 一生必驾公路",
+      "subtitle": "《Drives of a Lifetime》500 条中 13 条口碑精选（海外路线仅供灵感）",
+      "level": "international",
+      "org": "美国国家地理 National Geographic",
+      "publishedAt": "2015/2020",
+      "itemCount": 13
+    },
+    {
+      "id": "bbc-best-drives",
+      "title": "BBC · 全球最佳自驾公路",
+      "subtitle": "Top Gear 特辑与 BBC Travel 专题聚合（无统一编号排名，海外路线仅供灵感）",
+      "level": "international",
+      "org": "BBC Travel · BBC Top Gear",
+      "publishedAt": "2007年起",
+      "itemCount": 10
+    },
+    {
+      "id": "lonelyplanet-epic-drives",
+      "title": "孤独星球 · 史诗级自驾公路",
+      "subtitle": "《Epic Drives of the World》50 条中 10 条精选（海外路线仅供灵感）",
+      "level": "international",
+      "org": "Lonely Planet 孤独星球",
+      "publishedAt": "2017",
+      "itemCount": 10
     }
   ]
 }

@@ -1,0 +1,843 @@
+{
+  "version": 1,
+  "updated": "2026-10-05",
+  "note": "全国「省 → 地级行政区」区划底座，供路书库按省份/城市层级组织与筛选。坐标仅在已被路线覆盖或与路线直接相关的城市上给出（WGS-84 近似值），其余城市先占位（coverage=todo），路线内容再逐一补全。coverage/routeIds 由装载器依据 data/presets/roadbooks/*.json 实时回写，不要在手抄维护。",
+  "provinces": [
+    {
+      "code": "110000",
+      "name": "北京市",
+      "shortName": "北京",
+      "region": "华北",
+      "lng": 116.41,
+      "lat": 39.9,
+      "cities": [
+        { "name": "延庆区", "coverage": "todo" },
+        { "name": "怀柔区", "coverage": "todo" },
+        { "name": "密云区", "coverage": "todo" },
+        { "name": "平谷区", "coverage": "todo" },
+        { "name": "昌平区", "coverage": "todo" },
+        { "name": "房山区", "coverage": "todo" },
+        { "name": "门头沟区", "coverage": "todo" },
+        { "name": "海淀区", "coverage": "todo" },
+        { "name": "东城区", "coverage": "todo" },
+        { "name": "西城区", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "120000",
+      "name": "天津市",
+      "shortName": "天津",
+      "region": "华北",
+      "lng": 117.2,
+      "lat": 39.13,
+      "cities": [
+        { "name": "蓟州区", "coverage": "todo" },
+        { "name": "滨海新区", "coverage": "todo" },
+        { "name": "和平区", "coverage": "todo" },
+        { "name": "南开区", "coverage": "todo" },
+        { "name": "武清区", "coverage": "todo" },
+        { "name": "西青区", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "130000",
+      "name": "河北省",
+      "shortName": "河北",
+      "region": "华北",
+      "lng": 114.51,
+      "lat": 38.04,
+      "cities": [
+        { "name": "石家庄", "coverage": "todo" },
+        { "name": "唐山", "coverage": "todo" },
+        { "name": "秦皇岛", "coverage": "todo" },
+        { "name": "邯郸", "coverage": "todo" },
+        { "name": "邢台", "coverage": "todo" },
+        { "name": "保定", "coverage": "todo" },
+        { "name": "张家口", "coverage": "todo" },
+        { "name": "承德", "lng": 117.94, "lat": 40.95, "coverage": "todo" },
+        { "name": "沧州", "coverage": "todo" },
+        { "name": "廊坊", "coverage": "todo" },
+        { "name": "衡水", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "140000",
+      "name": "山西省",
+      "shortName": "山西",
+      "region": "华北",
+      "lng": 112.55,
+      "lat": 37.87,
+      "cities": [
+        { "name": "太原", "coverage": "todo" },
+        { "name": "大同", "lng": 113.3, "lat": 40.08, "coverage": "todo" },
+        { "name": "阳泉", "coverage": "todo" },
+        { "name": "长治", "coverage": "todo" },
+        { "name": "晋城", "coverage": "todo" },
+        { "name": "朔州", "coverage": "todo" },
+        { "name": "晋中", "coverage": "todo" },
+        { "name": "运城", "lng": 111.0, "lat": 35.03, "coverage": "todo" },
+        { "name": "忻州", "coverage": "todo" },
+        { "name": "临汾", "lng": 111.52, "lat": 36.09, "coverage": "todo" },
+        { "name": "吕梁", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "150000",
+      "name": "内蒙古自治区",
+      "shortName": "内蒙古",
+      "region": "华北",
+      "lng": 111.75,
+      "lat": 40.84,
+      "cities": [
+        { "name": "呼和浩特", "coverage": "todo" },
+        { "name": "包头", "coverage": "todo" },
+        { "name": "乌海", "coverage": "todo" },
+        { "name": "赤峰", "lng": 118.87, "lat": 42.26, "coverage": "todo" },
+        { "name": "通辽", "coverage": "todo" },
+        { "name": "鄂尔多斯", "coverage": "todo" },
+        {
+          "name": "呼伦贝尔",
+          "lng": 119.76,
+          "lat": 49.21,
+          "coverage": "todo",
+          "cardNote": "草原 + 大兴安岭林区，全国最经典的草原环驾起点"
+        },
+        { "name": "巴彦淖尔", "coverage": "todo" },
+        { "name": "乌兰察布", "coverage": "todo" },
+        {
+          "name": "兴安盟",
+          "lng": 122.04,
+          "lat": 46.04,
+          "coverage": "todo",
+          "cardNote": "阿尔山国家森林公园与中蒙边境口岸"
+        },
+        { "name": "锡林郭勒盟", "lng": 116.09, "lat": 43.93, "coverage": "todo" },
+        { "name": "阿拉善盟", "lng": 105.73, "lat": 38.84, "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "210000",
+      "name": "辽宁省",
+      "shortName": "辽宁",
+      "region": "东北",
+      "lng": 123.43,
+      "lat": 41.8,
+      "cities": [
+        { "name": "沈阳", "coverage": "todo" },
+        { "name": "大连", "coverage": "todo" },
+        { "name": "鞍山", "coverage": "todo" },
+        { "name": "抚顺", "coverage": "todo" },
+        { "name": "本溪", "lng": 123.76, "lat": 41.29, "coverage": "todo" },
+        { "name": "丹东", "lng": 124.36, "lat": 40.13, "coverage": "todo" },
+        { "name": "锦州", "coverage": "todo" },
+        { "name": "营口", "coverage": "todo" },
+        { "name": "阜新", "coverage": "todo" },
+        { "name": "辽阳", "coverage": "todo" },
+        { "name": "盘锦", "lng": 122.07, "lat": 41.12, "coverage": "todo" },
+        { "name": "铁岭", "coverage": "todo" },
+        { "name": "朝阳", "coverage": "todo" },
+        { "name": "葫芦岛", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "220000",
+      "name": "吉林省",
+      "shortName": "吉林",
+      "region": "东北",
+      "lng": 125.32,
+      "lat": 43.82,
+      "cities": [
+        { "name": "长春", "coverage": "todo" },
+        { "name": "吉林", "coverage": "todo" },
+        { "name": "四平", "coverage": "todo" },
+        { "name": "辽源", "coverage": "todo" },
+        { "name": "通化", "coverage": "todo" },
+        { "name": "白山", "lng": 126.42, "lat": 41.94, "coverage": "todo" },
+        { "name": "松原", "coverage": "todo" },
+        { "name": "白城", "coverage": "todo" },
+        {
+          "name": "延边朝鲜族自治州",
+          "alias": ["延边"],
+          "lng": 129.51,
+          "lat": 42.9,
+          "coverage": "todo",
+          "cardNote": "长白山北坡门户，G331 边境线的东端"
+        }
+      ]
+    },
+    {
+      "code": "230000",
+      "name": "黑龙江省",
+      "shortName": "黑龙江",
+      "region": "东北",
+      "lng": 126.66,
+      "lat": 45.76,
+      "cities": [
+        {
+          "name": "哈尔滨",
+          "lng": 126.53,
+          "lat": 45.8,
+          "coverage": "todo",
+          "cardNote": "冰雪线出发：「哈亚雪」公路进雪乡"
+        },
+        { "name": "齐齐哈尔", "coverage": "todo" },
+        { "name": "鸡西", "coverage": "todo" },
+        { "name": "鹤岗", "coverage": "todo" },
+        { "name": "双鸭山", "coverage": "todo" },
+        { "name": "大庆", "coverage": "todo" },
+        { "name": "伊春", "coverage": "todo" },
+        { "name": "佳木斯", "coverage": "todo" },
+        { "name": "七台河", "coverage": "todo" },
+        {
+          "name": "牡丹江",
+          "lng": 129.62,
+          "lat": 44.58,
+          "coverage": "todo",
+          "cardNote": "雪乡（双峰林场）与镜泊湖所在地"
+        },
+        { "name": "黑河", "coverage": "todo" },
+        { "name": "绥化", "coverage": "todo" },
+        { "name": "大兴安岭地区", "lng": 124.11, "lat": 52.34, "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "310000",
+      "name": "上海市",
+      "shortName": "上海",
+      "region": "华东",
+      "lng": 121.47,
+      "lat": 31.23,
+      "cities": [
+        { "name": "黄浦区", "coverage": "todo" },
+        { "name": "徐汇区", "coverage": "todo" },
+        { "name": "浦东新区", "coverage": "todo" },
+        { "name": "崇明区", "coverage": "todo" },
+        { "name": "青浦区", "coverage": "todo" },
+        { "name": "松江区", "coverage": "todo" },
+        { "name": "金山区", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "320000",
+      "name": "江苏省",
+      "shortName": "江苏",
+      "region": "华东",
+      "lng": 118.8,
+      "lat": 32.06,
+      "cities": [
+        { "name": "南京", "coverage": "todo" },
+        { "name": "无锡", "coverage": "todo" },
+        { "name": "徐州", "coverage": "todo" },
+        { "name": "常州", "coverage": "todo" },
+        { "name": "苏州", "coverage": "todo" },
+        { "name": "南通", "coverage": "todo" },
+        { "name": "连云港", "coverage": "todo" },
+        { "name": "淮安", "coverage": "todo" },
+        { "name": "盐城", "coverage": "todo" },
+        { "name": "扬州", "coverage": "todo" },
+        { "name": "镇江", "coverage": "todo" },
+        { "name": "泰州", "coverage": "todo" },
+        { "name": "宿迁", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "330000",
+      "name": "浙江省",
+      "shortName": "浙江",
+      "region": "华东",
+      "lng": 120.15,
+      "lat": 30.27,
+      "cities": [
+        { "name": "杭州", "coverage": "todo" },
+        { "name": "宁波", "coverage": "todo" },
+        { "name": "温州", "coverage": "todo" },
+        { "name": "嘉兴", "coverage": "todo" },
+        { "name": "湖州", "coverage": "todo" },
+        { "name": "绍兴", "coverage": "todo" },
+        { "name": "金华", "coverage": "todo" },
+        { "name": "衢州", "coverage": "todo" },
+        { "name": "舟山", "coverage": "todo" },
+        { "name": "台州", "coverage": "todo" },
+        { "name": "丽水", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "340000",
+      "name": "安徽省",
+      "shortName": "安徽",
+      "region": "华东",
+      "lng": 117.28,
+      "lat": 31.86,
+      "cities": [
+        { "name": "合肥", "coverage": "todo" },
+        { "name": "芜湖", "coverage": "todo" },
+        { "name": "蚌埠", "coverage": "todo" },
+        { "name": "淮南", "coverage": "todo" },
+        { "name": "马鞍山", "coverage": "todo" },
+        { "name": "淮北", "coverage": "todo" },
+        { "name": "铜陵", "coverage": "todo" },
+        { "name": "安庆", "coverage": "todo" },
+        { "name": "黄山", "lng": 118.34, "lat": 29.71, "coverage": "todo" },
+        { "name": "阜阳", "coverage": "todo" },
+        { "name": "宿州", "coverage": "todo" },
+        { "name": "滁州", "coverage": "todo" },
+        { "name": "六安", "coverage": "todo" },
+        { "name": "亳州", "coverage": "todo" },
+        { "name": "池州", "coverage": "todo" },
+        {
+          "name": "宣城",
+          "lng": 118.76,
+          "lat": 30.94,
+          "coverage": "todo",
+          "cardNote": "皖南川藏线所在地：宁国青龙乡—泾县蔡村镇"
+        }
+      ]
+    },
+    {
+      "code": "350000",
+      "name": "福建省",
+      "shortName": "福建",
+      "region": "华东",
+      "lng": 119.3,
+      "lat": 26.08,
+      "cities": [
+        { "name": "福州", "lng": 119.3, "lat": 26.08, "coverage": "todo" },
+        { "name": "厦门", "coverage": "todo" },
+        { "name": "莆田", "coverage": "todo" },
+        { "name": "三明", "coverage": "todo" },
+        { "name": "泉州", "coverage": "todo" },
+        { "name": "漳州", "coverage": "todo" },
+        { "name": "南平", "coverage": "todo" },
+        { "name": "龙岩", "coverage": "todo" },
+        {
+          "name": "宁德",
+          "lng": 119.54,
+          "lat": 26.66,
+          "coverage": "todo",
+          "cardNote": "G228 滨海线北端，霞浦滩涂摄影地"
+        }
+      ]
+    },
+    {
+      "code": "360000",
+      "name": "江西省",
+      "shortName": "江西",
+      "region": "华东",
+      "lng": 115.86,
+      "lat": 28.68,
+      "cities": [
+        { "name": "南昌", "coverage": "todo" },
+        { "name": "景德镇", "coverage": "todo" },
+        { "name": "萍乡", "coverage": "todo" },
+        { "name": "九江", "coverage": "todo" },
+        { "name": "新余", "coverage": "todo" },
+        { "name": "鹰潭", "coverage": "todo" },
+        { "name": "赣州", "coverage": "todo" },
+        { "name": "吉安", "coverage": "todo" },
+        { "name": "宜春", "coverage": "todo" },
+        { "name": "抚州", "coverage": "todo" },
+        { "name": "上饶", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "370000",
+      "name": "山东省",
+      "shortName": "山东",
+      "region": "华东",
+      "lng": 117.0,
+      "lat": 36.67,
+      "cities": [
+        { "name": "济南", "coverage": "todo" },
+        { "name": "青岛", "coverage": "todo" },
+        { "name": "淄博", "coverage": "todo" },
+        { "name": "枣庄", "coverage": "todo" },
+        { "name": "东营", "coverage": "todo" },
+        { "name": "烟台", "coverage": "todo" },
+        { "name": "潍坊", "coverage": "todo" },
+        { "name": "济宁", "coverage": "todo" },
+        { "name": "泰安", "coverage": "todo" },
+        { "name": "威海", "coverage": "todo" },
+        { "name": "日照", "coverage": "todo" },
+        { "name": "临沂", "coverage": "todo" },
+        { "name": "德州", "coverage": "todo" },
+        { "name": "聊城", "coverage": "todo" },
+        { "name": "滨州", "coverage": "todo" },
+        { "name": "菏泽", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "410000",
+      "name": "河南省",
+      "shortName": "河南",
+      "region": "华中",
+      "lng": 113.62,
+      "lat": 34.75,
+      "cities": [
+        { "name": "郑州", "coverage": "todo" },
+        { "name": "开封", "coverage": "todo" },
+        { "name": "洛阳", "coverage": "todo" },
+        { "name": "平顶山", "coverage": "todo" },
+        { "name": "安阳", "coverage": "todo" },
+        { "name": "鹤壁", "coverage": "todo" },
+        {
+          "name": "新乡",
+          "lng": 113.92,
+          "lat": 35.3,
+          "coverage": "todo",
+          "cardNote": "郭亮挂壁公路与太行南太行的门户"
+        },
+        { "name": "焦作", "coverage": "todo" },
+        { "name": "濮阳", "coverage": "todo" },
+        { "name": "许昌", "coverage": "todo" },
+        { "name": "漯河", "coverage": "todo" },
+        { "name": "三门峡", "coverage": "todo" },
+        { "name": "南阳", "coverage": "todo" },
+        { "name": "商丘", "coverage": "todo" },
+        { "name": "信阳", "coverage": "todo" },
+        { "name": "周口", "coverage": "todo" },
+        { "name": "驻马店", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "420000",
+      "name": "湖北省",
+      "shortName": "湖北",
+      "region": "华中",
+      "lng": 114.3,
+      "lat": 30.6,
+      "cities": [
+        { "name": "武汉", "coverage": "todo" },
+        { "name": "黄石", "coverage": "todo" },
+        { "name": "十堰", "coverage": "todo" },
+        { "name": "宜昌", "coverage": "todo" },
+        { "name": "襄阳", "coverage": "todo" },
+        { "name": "鄂州", "coverage": "todo" },
+        { "name": "荆门", "coverage": "todo" },
+        { "name": "孝感", "coverage": "todo" },
+        { "name": "荆州", "coverage": "todo" },
+        { "name": "黄冈", "coverage": "todo" },
+        { "name": "咸宁", "coverage": "todo" },
+        { "name": "随州", "coverage": "todo" },
+        { "name": "恩施土家族苗族自治州", "alias": ["恩施"], "lng": 109.49, "lat": 30.27, "coverage": "todo" },
+        { "name": "神农架林区", "lng": 110.53, "lat": 31.74, "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "430000",
+      "name": "湖南省",
+      "shortName": "湖南",
+      "region": "华中",
+      "lng": 112.94,
+      "lat": 28.23,
+      "cities": [
+        { "name": "长沙", "coverage": "todo" },
+        { "name": "株洲", "coverage": "todo" },
+        { "name": "湘潭", "coverage": "todo" },
+        { "name": "衡阳", "coverage": "todo" },
+        { "name": "邵阳", "coverage": "todo" },
+        { "name": "岳阳", "coverage": "todo" },
+        { "name": "常德", "coverage": "todo" },
+        {
+          "name": "张家界",
+          "lng": 110.48,
+          "lat": 29.12,
+          "coverage": "todo",
+          "cardNote": "石英砂岩峰林，武陵源世界自然遗产"
+        },
+        { "name": "益阳", "coverage": "todo" },
+        { "name": "郴州", "coverage": "todo" },
+        { "name": "永州", "coverage": "todo" },
+        { "name": "怀化", "coverage": "todo" },
+        { "name": "娄底", "coverage": "todo" },
+        {
+          "name": "湘西土家族苗族自治州",
+          "alias": ["湘西"],
+          "lng": 109.74,
+          "lat": 28.31,
+          "coverage": "todo",
+          "cardNote": "凤凰古城、芙蓉镇、矮寨大桥"
+        }
+      ]
+    },
+    {
+      "code": "440000",
+      "name": "广东省",
+      "shortName": "广东",
+      "region": "华南",
+      "lng": 113.26,
+      "lat": 23.13,
+      "cities": [
+        { "name": "广州", "coverage": "todo" },
+        { "name": "深圳", "coverage": "todo" },
+        { "name": "珠海", "coverage": "todo" },
+        { "name": "汕头", "coverage": "todo" },
+        { "name": "佛山", "coverage": "todo" },
+        { "name": "韶关", "coverage": "todo" },
+        { "name": "湛江", "coverage": "todo" },
+        { "name": "肇庆", "coverage": "todo" },
+        { "name": "江门", "coverage": "todo" },
+        { "name": "茂名", "coverage": "todo" },
+        { "name": "惠州", "coverage": "todo" },
+        { "name": "梅州", "coverage": "todo" },
+        { "name": "汕尾", "coverage": "todo" },
+        { "name": "河源", "coverage": "todo" },
+        { "name": "阳江", "coverage": "todo" },
+        { "name": "清远", "coverage": "todo" },
+        { "name": "东莞", "coverage": "todo" },
+        { "name": "中山", "coverage": "todo" },
+        { "name": "潮州", "coverage": "todo" },
+        { "name": "揭阳", "coverage": "todo" },
+        { "name": "云浮", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "450000",
+      "name": "广西壮族自治区",
+      "shortName": "广西",
+      "region": "华南",
+      "lng": 108.37,
+      "lat": 22.82,
+      "cities": [
+        { "name": "南宁", "coverage": "todo" },
+        { "name": "柳州", "coverage": "todo" },
+        {
+          "name": "桂林",
+          "lng": 110.29,
+          "lat": 25.27,
+          "coverage": "todo",
+          "cardNote": "漓江喀斯特，阳朔与龙脊梯田"
+        },
+        { "name": "梧州", "coverage": "todo" },
+        { "name": "北海", "lng": 109.12, "lat": 21.48, "coverage": "todo" },
+        { "name": "防城港", "coverage": "todo" },
+        { "name": "钦州", "coverage": "todo" },
+        { "name": "贵港", "coverage": "todo" },
+        { "name": "玉林", "coverage": "todo" },
+        { "name": "百色", "coverage": "todo" },
+        { "name": "贺州", "coverage": "todo" },
+        { "name": "河池", "coverage": "todo" },
+        { "name": "来宾", "coverage": "todo" },
+        { "name": "崇左", "lng": 107.36, "lat": 22.4, "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "460000",
+      "name": "海南省",
+      "shortName": "海南",
+      "region": "华南",
+      "lng": 110.33,
+      "lat": 20.02,
+      "cities": [
+        { "name": "海口", "lng": 110.33, "lat": 20.02, "coverage": "todo" },
+        { "name": "三亚", "lng": 109.51, "lat": 18.25, "coverage": "todo" },
+        { "name": "儋州", "lng": 109.58, "lat": 19.52, "coverage": "todo" },
+        { "name": "文昌", "lng": 110.8, "lat": 19.61, "coverage": "todo" },
+        { "name": "琼海", "lng": 110.47, "lat": 19.26, "coverage": "todo" },
+        { "name": "万宁", "lng": 110.39, "lat": 18.8, "coverage": "todo" },
+        { "name": "东方", "lng": 108.63, "lat": 19.1, "coverage": "todo" },
+        { "name": "澄迈", "coverage": "todo" },
+        { "name": "临高", "coverage": "todo" },
+        { "name": "昌江", "lng": 109.06, "lat": 19.3, "coverage": "todo" },
+        { "name": "乐东", "coverage": "todo" },
+        { "name": "陵水", "lng": 109.94, "lat": 18.51, "coverage": "todo" },
+        { "name": "五指山", "coverage": "todo" },
+        { "name": "保亭", "coverage": "todo" },
+        { "name": "琼中", "coverage": "todo" },
+        { "name": "白沙", "coverage": "todo" },
+        { "name": "屯昌", "coverage": "todo" },
+        { "name": "定安", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "500000",
+      "name": "重庆市",
+      "shortName": "重庆",
+      "region": "西南",
+      "lng": 106.55,
+      "lat": 29.56,
+      "cities": [
+        { "name": "渝中区", "coverage": "todo" },
+        { "name": "渝北区", "coverage": "todo" },
+        { "name": "南岸区", "coverage": "todo" },
+        { "name": "沙坪坝区", "coverage": "todo" },
+        { "name": "万州区", "coverage": "todo" },
+        { "name": "黔江区", "coverage": "todo" },
+        { "name": "武隆区", "lng": 107.76, "lat": 29.32, "coverage": "todo" },
+        { "name": "奉节县", "coverage": "todo" },
+        { "name": "巫山县", "coverage": "todo" },
+        { "name": "酉阳县", "coverage": "todo" },
+        { "name": "彭水县", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "510000",
+      "name": "四川省",
+      "shortName": "四川",
+      "region": "西南",
+      "lng": 104.07,
+      "lat": 30.67,
+      "cities": [
+        {
+          "name": "成都",
+          "lng": 104.07,
+          "lat": 30.67,
+          "coverage": "todo",
+          "cardNote": "川藏南线/北线与川西大环线的总门户"
+        },
+        { "name": "自贡", "coverage": "todo" },
+        { "name": "攀枝花", "coverage": "todo" },
+        { "name": "泸州", "coverage": "todo" },
+        { "name": "德阳", "coverage": "todo" },
+        { "name": "绵阳", "coverage": "todo" },
+        { "name": "广元", "coverage": "todo" },
+        { "name": "遂宁", "coverage": "todo" },
+        { "name": "内江", "coverage": "todo" },
+        { "name": "乐山", "lng": 103.77, "lat": 29.55, "coverage": "todo" },
+        { "name": "南充", "coverage": "todo" },
+        { "name": "眉山", "coverage": "todo" },
+        { "name": "宜宾", "coverage": "todo" },
+        { "name": "广安", "coverage": "todo" },
+        { "name": "达州", "coverage": "todo" },
+        { "name": "雅安", "lng": 103.0, "lat": 29.98, "coverage": "todo" },
+        { "name": "巴中", "coverage": "todo" },
+        { "name": "资阳", "coverage": "todo" },
+        { "name": "阿坝藏族羌族自治州", "alias": ["阿坝"], "lng": 102.22, "lat": 31.9, "coverage": "todo" },
+        { "name": "甘孜藏族自治州", "alias": ["甘孜"], "lng": 101.96, "lat": 30.05, "coverage": "todo" },
+        { "name": "凉山彝族自治州", "alias": ["凉山"], "lng": 102.26, "lat": 27.89, "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "520000",
+      "name": "贵州省",
+      "shortName": "贵州",
+      "region": "西南",
+      "lng": 106.63,
+      "lat": 26.65,
+      "cities": [
+        { "name": "贵阳", "lng": 106.63, "lat": 26.65, "coverage": "todo" },
+        { "name": "六盘水", "coverage": "todo" },
+        { "name": "遵义", "lng": 106.93, "lat": 27.73, "coverage": "todo" },
+        { "name": "安顺", "lng": 105.95, "lat": 26.25, "coverage": "todo" },
+        { "name": "毕节", "coverage": "todo" },
+        { "name": "铜仁", "lng": 109.19, "lat": 27.72, "coverage": "todo" },
+        { "name": "黔西南布依族苗族自治州", "alias": ["黔西南"], "lng": 104.9, "lat": 25.09, "coverage": "todo" },
+        {
+          "name": "黔东南苗族侗族自治州",
+          "alias": ["黔东南"],
+          "lng": 107.98,
+          "lat": 26.58,
+          "coverage": "todo",
+          "cardNote": "西江千户苗寨、镇远古城、肇兴侗寨"
+        },
+        { "name": "黔南布依族苗族自治州", "alias": ["黔南"], "lng": 107.52, "lat": 26.26, "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "530000",
+      "name": "云南省",
+      "shortName": "云南",
+      "region": "西南",
+      "lng": 102.71,
+      "lat": 25.05,
+      "cities": [
+        { "name": "昆明", "lng": 102.71, "lat": 25.05, "coverage": "todo" },
+        { "name": "曲靖", "coverage": "todo" },
+        { "name": "玉溪", "coverage": "todo" },
+        { "name": "保山", "coverage": "todo" },
+        { "name": "昭通", "coverage": "todo" },
+        { "name": "丽江", "lng": 100.23, "lat": 26.86, "coverage": "todo" },
+        { "name": "普洱", "coverage": "todo" },
+        { "name": "临沧", "coverage": "todo" },
+        { "name": "楚雄彝族自治州", "alias": ["楚雄"], "lng": 101.53, "lat": 25.05, "coverage": "todo" },
+        { "name": "红河哈尼族彝族自治州", "alias": ["红河"], "lng": 103.38, "lat": 23.36, "coverage": "todo" },
+        { "name": "文山壮族苗族自治州", "alias": ["文山"], "lng": 104.24, "lat": 23.4, "coverage": "todo" },
+        { "name": "西双版纳傣族自治州", "alias": ["西双版纳"], "lng": 100.8, "lat": 22.0, "coverage": "todo" },
+        { "name": "大理白族自治州", "alias": ["大理"], "lng": 100.23, "lat": 25.6, "coverage": "todo" },
+        { "name": "德宏傣族景颇族自治州", "alias": ["德宏"], "lng": 98.58, "lat": 24.44, "coverage": "todo" },
+        { "name": "怒江傈僳族自治州", "alias": ["怒江"], "lng": 98.86, "lat": 25.85, "coverage": "todo" },
+        {
+          "name": "迪庆藏族自治州",
+          "alias": ["迪庆", "香格里拉"],
+          "lng": 99.7,
+          "lat": 27.83,
+          "coverage": "todo",
+          "cardNote": "香格里拉、梅里雪山、虎跳峡，滇藏线起点"
+        }
+      ]
+    },
+    {
+      "code": "540000",
+      "name": "西藏自治区",
+      "shortName": "西藏",
+      "region": "西南",
+      "lng": 91.14,
+      "lat": 29.65,
+      "cities": [
+        {
+          "name": "拉萨",
+          "lng": 91.14,
+          "lat": 29.65,
+          "coverage": "todo",
+          "cardNote": "所有进藏线路的交汇点，布达拉宫与大昭寺"
+        },
+        { "name": "日喀则", "lng": 88.88, "lat": 29.27, "coverage": "todo" },
+        { "name": "昌都", "lng": 97.17, "lat": 31.14, "coverage": "todo" },
+        { "name": "林芝", "lng": 94.36, "lat": 29.65, "coverage": "todo" },
+        { "name": "山南", "lng": 91.77, "lat": 29.24, "coverage": "todo" },
+        { "name": "那曲", "lng": 92.06, "lat": 31.48, "coverage": "todo" },
+        { "name": "阿里地区", "lng": 80.11, "lat": 32.5, "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "610000",
+      "name": "陕西省",
+      "shortName": "陕西",
+      "region": "西北",
+      "lng": 108.94,
+      "lat": 34.34,
+      "cities": [
+        { "name": "西安", "coverage": "todo" },
+        { "name": "铜川", "coverage": "todo" },
+        { "name": "宝鸡", "coverage": "todo" },
+        { "name": "咸阳", "coverage": "todo" },
+        { "name": "渭南", "coverage": "todo" },
+        { "name": "延安", "lng": 109.49, "lat": 36.6, "coverage": "todo" },
+        { "name": "汉中", "coverage": "todo" },
+        { "name": "榆林", "coverage": "todo" },
+        { "name": "安康", "coverage": "todo" },
+        { "name": "商洛", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "620000",
+      "name": "甘肃省",
+      "shortName": "甘肃",
+      "region": "西北",
+      "lng": 103.83,
+      "lat": 36.06,
+      "cities": [
+        { "name": "兰州", "lng": 103.83, "lat": 36.06, "coverage": "todo" },
+        { "name": "嘉峪关", "lng": 98.29, "lat": 39.77, "coverage": "todo" },
+        { "name": "金昌", "coverage": "todo" },
+        { "name": "白银", "coverage": "todo" },
+        { "name": "天水", "lng": 105.72, "lat": 34.58, "coverage": "todo" },
+        { "name": "武威", "lng": 102.64, "lat": 37.93, "coverage": "todo" },
+        { "name": "张掖", "lng": 100.45, "lat": 38.93, "coverage": "todo" },
+        { "name": "平凉", "coverage": "todo" },
+        { "name": "酒泉", "lng": 98.51, "lat": 39.73, "coverage": "todo" },
+        { "name": "庆阳", "coverage": "todo" },
+        { "name": "定西", "coverage": "todo" },
+        { "name": "陇南", "coverage": "todo" },
+        { "name": "临夏回族自治州", "alias": ["临夏"], "lng": 103.21, "lat": 35.6, "coverage": "todo" },
+        { "name": "甘南藏族自治州", "alias": ["甘南"], "lng": 102.91, "lat": 34.98, "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "630000",
+      "name": "青海省",
+      "shortName": "青海",
+      "region": "西北",
+      "lng": 101.78,
+      "lat": 36.62,
+      "cities": [
+        { "name": "西宁", "lng": 101.78, "lat": 36.62, "coverage": "todo" },
+        { "name": "海东", "lng": 102.1, "lat": 36.5, "coverage": "todo" },
+        { "name": "海北藏族自治州", "alias": ["海北"], "lng": 100.9, "lat": 36.96, "coverage": "todo" },
+        { "name": "黄南藏族自治州", "alias": ["黄南"], "lng": 102.02, "lat": 35.52, "coverage": "todo" },
+        { "name": "海南藏族自治州", "alias": ["海南州"], "lng": 100.62, "lat": 36.28, "coverage": "todo" },
+        { "name": "果洛藏族自治州", "alias": ["果洛"], "lng": 100.24, "lat": 34.47, "coverage": "todo" },
+        { "name": "玉树藏族自治州", "alias": ["玉树"], "lng": 96.97, "lat": 33.0, "coverage": "todo" },
+        {
+          "name": "海西蒙古族藏族自治州",
+          "alias": ["海西州"],
+          "lng": 97.37,
+          "lat": 37.38,
+          "coverage": "todo",
+          "cardNote": "察尔汗盐湖、水上雅丹、德令哈，G315 核心区段"
+        }
+      ]
+    },
+    {
+      "code": "640000",
+      "name": "宁夏回族自治区",
+      "shortName": "宁夏",
+      "region": "西北",
+      "lng": 106.28,
+      "lat": 38.47,
+      "cities": [
+        { "name": "银川", "lng": 106.28, "lat": 38.47, "coverage": "todo" },
+        { "name": "石嘴山", "coverage": "todo" },
+        { "name": "吴忠", "lng": 106.19, "lat": 37.99, "coverage": "todo" },
+        { "name": "固原", "coverage": "todo" },
+        { "name": "中卫", "lng": 105.19, "lat": 37.51, "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "650000",
+      "name": "新疆维吾尔自治区",
+      "shortName": "新疆",
+      "region": "西北",
+      "lng": 87.62,
+      "lat": 43.79,
+      "cities": [
+        {
+          "name": "乌鲁木齐",
+          "lng": 87.62,
+          "lat": 43.79,
+          "coverage": "todo",
+          "cardNote": "南北疆环线的总集散地"
+        },
+        { "name": "克拉玛依", "lng": 84.87, "lat": 45.6, "coverage": "todo" },
+        { "name": "吐鲁番", "lng": 89.19, "lat": 42.95, "coverage": "todo" },
+        { "name": "哈密", "lng": 93.51, "lat": 42.83, "coverage": "todo" },
+        { "name": "昌吉回族自治州", "alias": ["昌吉"], "lng": 87.31, "lat": 44.01, "coverage": "todo" },
+        { "name": "博尔塔拉蒙古自治州", "alias": ["博州"], "lng": 82.06, "lat": 44.9, "coverage": "todo" },
+        { "name": "巴音郭楞蒙古自治州", "alias": ["巴州"], "lng": 86.15, "lat": 41.73, "coverage": "todo" },
+        { "name": "阿克苏地区", "alias": ["阿克苏"], "lng": 80.26, "lat": 41.17, "coverage": "todo" },
+        { "name": "克孜勒苏柯尔克孜自治州", "alias": ["克州"], "lng": 76.16, "lat": 39.71, "coverage": "todo" },
+        { "name": "喀什地区", "alias": ["喀什"], "lng": 75.99, "lat": 39.47, "coverage": "todo" },
+        { "name": "和田地区", "alias": ["和田"], "lng": 79.92, "lat": 37.11, "coverage": "todo" },
+        { "name": "伊犁哈萨克自治州", "alias": ["伊犁"], "lng": 81.32, "lat": 43.92, "coverage": "todo" },
+        { "name": "塔城地区", "alias": ["塔城"], "lng": 82.98, "lat": 46.75, "coverage": "todo" },
+        { "name": "阿勒泰地区", "alias": ["阿勒泰"], "lng": 88.14, "lat": 47.85, "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "710000",
+      "name": "台湾省",
+      "shortName": "台湾",
+      "region": "华东",
+      "lng": 121.52,
+      "lat": 25.03,
+      "cities": [
+        { "name": "台北", "coverage": "todo" },
+        { "name": "高雄", "coverage": "todo" },
+        { "name": "台中", "coverage": "todo" },
+        { "name": "台南", "coverage": "todo" },
+        { "name": "花莲", "coverage": "todo" },
+        { "name": "台东", "coverage": "todo" },
+        { "name": "屏东", "coverage": "todo" },
+        { "name": "宜兰", "coverage": "todo" },
+        { "name": "南投", "coverage": "todo" }
+      ]
+    },
+    {
+      "code": "810000",
+      "name": "香港特别行政区",
+      "shortName": "香港",
+      "region": "华南",
+      "lng": 114.17,
+      "lat": 22.32,
+      "cities": [{ "name": "全境", "lng": 114.17, "lat": 22.32, "coverage": "todo" }]
+    },
+    {
+      "code": "820000",
+      "name": "澳门特别行政区",
+      "shortName": "澳门",
+      "region": "华南",
+      "lng": 113.55,
+      "lat": 22.2,
+      "cities": [{ "name": "全境", "lng": 113.55, "lat": 22.2, "coverage": "todo" }]
+    }
+  ]
+}

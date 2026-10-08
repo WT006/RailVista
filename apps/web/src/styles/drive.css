@@ -1065,6 +1065,7 @@
 .drive-board-card__level.is-national { background: var(--accent-soft); color: var(--accent-hover); }
 .drive-board-card__level.is-provincial { background: var(--success-soft); color: var(--success); }
 .drive-board-card__level.is-media { background: var(--warning-soft); color: var(--warning); }
+.drive-board-card__level.is-international { background: var(--purple-soft); color: var(--purple); }
 
 .drive-board-card__title {
   font-size: var(--fs-h3);

@@ -16,3 +16,6 @@ export * from './schedule/spotSide.js';
 export * from './schedule/spotWeather.js';
 export * from './drive/index.js';
 export * from './ticket.js';
+export * from './roadSign.js';
+export * from './aviation.js';
+export * from './travelbook/index.js';

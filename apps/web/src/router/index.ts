@@ -11,6 +11,8 @@ import DriveRankings from '../pages/DriveRankings.vue';
 import DriveBoard from '../pages/DriveBoard.vue';
 import DriveRoadbook from '../pages/DriveRoadbook.vue';
 import TicketHome from '../pages/TicketHome.vue';
+import RoadbookHome from '../pages/RoadbookHome.vue';
+import RoadbookDetail from '../pages/RoadbookDetail.vue';
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -22,6 +24,13 @@ export const router = createRouter({
     { path: '/atlas', name: 'atlas', component: AtlasMap },
     // ── 万里路书 · 旅行纪念票（顶部菜单第 4 入口） ──────────────────────────
     { path: '/ticket', name: 'ticket', component: TicketHome },
+    // ── 旅行路书 · 省 → 市 → 路线（攻略层，含非自驾玩法） ───────────────────
+    { path: '/roadbook', name: 'roadbook', component: RoadbookHome },
+    {
+      path: '/roadbook/:routeId',
+      name: 'roadbook-detail',
+      component: RoadbookDetail,
+    },
     // ── 万里路书 · 全国公路旅游网（PRD §2.1 路由表） ─────────────────────────
     { path: '/drive', name: 'drive-home', component: DriveHome },
     { path: '/drive/trip', name: 'drive-trip', component: DriveTrip },

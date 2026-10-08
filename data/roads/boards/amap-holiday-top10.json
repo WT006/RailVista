@@ -1,0 +1,125 @@
+{
+  "id": "amap-holiday-top10",
+  "title": "高德 · 全国驾车游热门路线 TOP10",
+  "subtitle": "高德交通大数据「扫街榜」基于 10 亿用户真实导航规划聚合的假期热门驾车路线（以 2025 国庆预测为录入口径）。平台热度榜，非官方评选；路线按起终点 OD 规划，可直接查看沿程。",
+  "source": {
+    "org": "高德地图（高德扫街榜）",
+    "doc": "《2025 国庆假期全国驾车游热门路线 TOP10》（高德交通大数据，2025-09 发布）",
+    "url": "https://www.amap.com/",
+    "publishedAt": "2025-09"
+  },
+  "level": "media",
+  "itemCount": 10,
+  "items": [
+    {
+      "rank": 1,
+      "routeId": "",
+      "name": "深圳 · 南澳—小梅沙—大梅沙滨海线",
+      "roadKeys": [],
+      "fromPlace": "南澳第一沙滩",
+      "toPlace": "大梅沙海滨公园",
+      "province": ["广东"],
+      "highlight": "大鹏半岛海岸串连沙滩，2025 国庆自驾热度全国第一",
+      "tags": ["滨海", "沙滩", "短途"]
+    },
+    {
+      "rank": 2,
+      "routeId": "",
+      "name": "京冀 · 十渡—野三坡—白洋淀线",
+      "roadKeys": [],
+      "fromPlace": "房山十渡风景名胜区",
+      "toPlace": "白洋淀景区",
+      "province": ["北京", "河北"],
+      "highlight": "拒马河峡谷、野三坡山水到华北明珠白洋淀",
+      "tags": ["峡谷", "山水", "京郊"]
+    },
+    {
+      "rank": 3,
+      "routeId": "",
+      "name": "青海 · 塔尔寺—青海湖—茶卡盐湖线",
+      "roadKeys": [],
+      "fromPlace": "塔尔寺",
+      "toPlace": "茶卡盐湖景区",
+      "province": ["青海"],
+      "highlight": "藏传古刹、高原圣湖到天空之镜，经典青海小环线",
+      "tags": ["高原", "湖泊", "盐湖"]
+    },
+    {
+      "rank": 4,
+      "routeId": "",
+      "name": "山西 · 平遥—王家大院—乔家大院线",
+      "roadKeys": [],
+      "fromPlace": "平遥古城",
+      "toPlace": "乔家大院",
+      "province": ["山西"],
+      "highlight": "世界遗产古城与晋商大院群，晋中民俗文化走廊",
+      "tags": ["古城", "晋商大院", "世界遗产"]
+    },
+    {
+      "rank": 5,
+      "routeId": "",
+      "name": "安徽 · 皖南川藏线（青龙湾—水墨汀溪—月亮湾）",
+      "roadKeys": [],
+      "fromPlace": "青龙湾原生态旅游度假区",
+      "toPlace": "月亮湾风景区",
+      "province": ["安徽"],
+      "highlight": "江南天路、皖南 318：湖湾、桃岭六道弯、峡谷溪流与竹海",
+      "tags": ["皖南川藏线", "盘山", "竹海"]
+    },
+    {
+      "rank": 6,
+      "routeId": "",
+      "name": "四川 · 若尔盖草原—花湖—黄河九曲第一湾线",
+      "roadKeys": [],
+      "fromPlace": "若尔盖大草原",
+      "toPlace": "黄河九曲第一湾",
+      "province": ["四川"],
+      "highlight": "川西北高原湿地：花湖黑颈鹤、唐克黄河落日与草原牧歌",
+      "tags": ["草原", "湿地", "高原"]
+    },
+    {
+      "rank": 7,
+      "routeId": "",
+      "name": "宁夏 · 沙坡头—镇北堡—沙湖线",
+      "roadKeys": [],
+      "fromPlace": "沙坡头景区",
+      "toPlace": "沙湖景区",
+      "province": ["宁夏"],
+      "highlight": "大漠黄河、贺兰山影城与塞上湖城，经典宁夏穿越线",
+      "tags": ["沙漠", "黄河", "影城"]
+    },
+    {
+      "rank": 8,
+      "routeId": "",
+      "name": "河北 · 草原天路—桦皮岭—闪电湖线",
+      "roadKeys": [],
+      "fromPlace": "桦皮岭",
+      "toPlace": "闪电湖景区",
+      "province": ["河北"],
+      "highlight": "坝上风电天路接京北湿地草原，秋色层林尽染",
+      "tags": ["草原天路", "坝上", "风电"]
+    },
+    {
+      "rank": 9,
+      "routeId": "",
+      "name": "江浙 · 西塘—周庄—乌镇江南水乡线",
+      "roadKeys": [],
+      "fromPlace": "西塘古镇",
+      "toPlace": "乌镇风景区",
+      "province": ["浙江", "江苏"],
+      "highlight": "三大江南古镇水巷摇橹，长三角最热门的人文短途",
+      "tags": ["古镇", "水乡", "短途"]
+    },
+    {
+      "rank": 10,
+      "routeId": "",
+      "name": "河南 · 少林寺—龙门石窟—白马寺线",
+      "roadKeys": [],
+      "fromPlace": "少林寺",
+      "toPlace": "白马寺",
+      "province": ["河南"],
+      "highlight": "禅宗祖庭、世界遗产石窟到中国第一古刹，河洛文化走廊",
+      "tags": ["世界遗产", "古都", "禅修"]
+    }
+  ]
+}

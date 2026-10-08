@@ -5439,6 +5439,39 @@ spots.push(
   }
 }
 
+// —— 2026-10-05 六省（皖鄂津宁青黔）铁路景点补全批次：ID/名称归一化/500m 近邻三重去重 ——
+// 策展源 data/presets/scenic-spots-supplement-20261005.json（v3 结构，带 lineHints），
+// 经 spot() + enrichV3Spots(validateV3Spot) 门禁后并入；文件缺失仅告警跳过。
+{
+  const supPath = join(__dirname, '../data/presets/scenic-spots-supplement-20261005.json');
+  if (existsSync(supPath)) {
+    const sup = JSON.parse(readFileSync(supPath, 'utf8'));
+    const list = Array.isArray(sup.spots) ? sup.spots : [];
+    const norm = (n) => String(n || '').replace(/（[^）]*）/g, '').replace(/[·・\s]/g, '');
+    const existIds = new Set(spots.map((s) => s.id));
+    const existNames = new Set(spots.map((s) => norm(s.name)));
+    let addedN = 0;
+    let skipN = 0;
+    for (const o of list) {
+      if (existIds.has(o.id) || existNames.has(norm(o.name))) { skipN += 1; continue; }
+      let prox = false;
+      for (const s of spots) {
+        const dx = (s.lng - o.lng) * 111.32 * Math.cos((o.lat * Math.PI) / 180);
+        const dy = (s.lat - o.lat) * 110.574;
+        if (Math.hypot(dx, dy) < 0.5) { prox = true; break; }
+      }
+      if (prox) { skipN += 1; continue; }
+      spots.push(spot(o));
+      existIds.add(o.id);
+      existNames.add(norm(o.name));
+      addedN += 1;
+    }
+    console.log(`supplement 20261005: +${addedN} new, ${skipN} skipped (dup id/name/<0.5km)`);
+  } else {
+    console.warn('skip supplement 20261005: file missing');
+  }
+}
+
 enrichV3Spots(spots);
 
 // —— 省区字段 harmonize：tags[0] 为省区名且缺 province 者回填 province（与 2026-10-01 批次一致，满足"标注所在省区"）——

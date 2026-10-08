@@ -12,6 +12,7 @@ import type {
 } from '@railvista/shared';
 import { useTicketStore } from '../../stores/ticketStore';
 import { AIRLINES, ALLIANCES, themesForKind } from '../../data/ticket';
+import { classifyRoadSign, scenicPresets } from '@railvista/shared';
 
 const store = useTicketStore();
 const config = computed(() => store.config);
@@ -35,6 +36,15 @@ const shieldsText = computed({
   set: (v: string) =>
     patchRoute({ shields: v.split(/[,，\s]/).map((s) => s.trim()).filter(Boolean) }),
 });
+
+/** 实时回显每个编号被识别成的国标制式，方便确认自动识别是否正确 */
+const shieldSpecs = computed(() => (config.value.route.shields ?? []).map((r) => classifyRoadSign(r)));
+
+function appendShield(token: string) {
+  const cur = config.value.route.shields ?? [];
+  if (cur.includes(token)) return;
+  patchRoute({ shields: [...cur, token] });
+}
 const elevText = computed({
   get: () => (config.value.route.elevPoints ?? []).join(', '),
   set: (v: string) =>
@@ -173,7 +183,20 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
       <label class="ed__row"><span>终点三字码</span><input class="ed__input" :value="config.route.ends[1].code ?? ''" @input="patchEnd(1, { code: ($event.target as HTMLInputElement).value || undefined })" /></label>
       <label class="ed__row"><span>中线胶囊</span><input class="ed__input" placeholder="车次号 / 航班号" :value="config.route.middleLabel ?? ''" @input="patchRoute({ middleLabel: ($event.target as HTMLInputElement).value || undefined })" /></label>
       <label class="ed__row"><span>途经点链</span><input class="ed__input" placeholder="逗号分隔，>2 项时启用" v-model="waypointsText" /></label>
-      <label class="ed__row"><span>路牌编号</span><input class="ed__input" placeholder="G6, G3011, G109" v-model="shieldsText" /></label>
+      <label class="ed__row"><span>路牌编号</span><input class="ed__input" placeholder="G6, G3011, G109, S203, 此生必驾318" v-model="shieldsText" /></label>
+      <div class="ed__row">
+        <span>此生必驾</span>
+        <div class="ed__chips">
+          <button v-for="p in scenicPresets()" :key="p.ref" class="ed__chip" type="button" @click="appendShield(p.ref)">{{ p.label }}</button>
+          <button class="ed__chip" type="button" @click="appendShield('G6')">+ G6</button>
+          <button class="ed__chip" type="button" @click="appendShield('G109')">+ G109</button>
+          <button class="ed__chip" type="button" @click="appendShield('S203')">+ S203</button>
+        </div>
+      </div>
+      <p v-if="shieldSpecs.length" class="ed__hint">
+        自动识别：{{ shieldSpecs.map((s) => `${s.ref}→${s.label}${s.scenicName ? '·' + s.scenicName : ''}`).join('；') }}
+      </p>
+      <p class="ed__hint">制式按 GB 5768 自动判定：G+1/2/4 位=国家高速（绿底红顶条）、G+3 位=国道（红底）、S+3 位=省道（黄底）、X/Y/C=县/乡/村道（白底）；「此生必驾」为收藏向主题徽记。</p>
       <label class="ed__row"><span>海拔采样</span><input class="ed__input" placeholder="2200, 3200, 3817…" v-model="elevText" /></label>
       <label class="ed__row"><span>峰值标注</span><input class="ed__input" :value="config.route.elevPeakLabel ?? ''" @input="patchRoute({ elevPeakLabel: ($event.target as HTMLInputElement).value || undefined })" /></label>
     </section>
@@ -280,6 +303,14 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
 .ed__check input { accent-color: var(--accent); }
 .ed__listrow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .ed__listrow .ed__input { flex: 1; min-width: 70px; }
+.ed__chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.ed__chip {
+  font-size: var(--fs-cap); color: var(--text-2);
+  background: var(--surface-2); border: 1px solid var(--surface-3);
+  border-radius: var(--radius-full); padding: 3px 10px; cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+.ed__chip:hover { border-color: var(--accent); color: var(--accent); }
 .ed__hint { font-size: var(--fs-cap); color: var(--text-3); margin: 0; line-height: 1.6; }
 .ed__actions { display: flex; gap: var(--space-1); justify-content: flex-end; }
 </style>

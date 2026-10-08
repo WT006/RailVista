@@ -27,6 +27,7 @@ const LEVEL_LABEL: Record<string, string> = {
   national: '官方榜',
   provincial: '省级榜',
   media: '媒体榜',
+  international: '国际榜',
 };
 
 /**
@@ -115,9 +116,11 @@ onMounted(async () => {
               <span
                 v-else
                 class="btn ghost btn-sm is-disabled"
-                title="该条目尚未关联公路编号，也没有起终点数据，暂时无法查看沿程景点"
+                :title="board.level === 'international'
+                  ? '海外路线暂不支持查看沿程景点，本产品路网覆盖中国公路'
+                  : '该条目尚未关联公路编号，也没有起终点数据，暂时无法查看沿程景点'"
               >
-                暂无 OD 数据
+                {{ board.level === 'international' ? '海外路线 · 仅供灵感' : '暂无 OD 数据' }}
               </span>
               <router-link
                 v-if="roadbookHref(item)"
@@ -148,7 +151,12 @@ onMounted(async () => {
           <template v-if="board.level === 'media'">
             来源：{{ board.source.org }}<template v-if="board.source.publishedAt"> · {{ board.source.publishedAt }}</template>，媒体榜单不冒充官方。
           </template>
-          政策 12 条精品线官方尚未发布逐桩走向表，本产品中的走向为 OSM 编号还原的近似线位。
+          <template v-else-if="board.level === 'international'">
+            来源：{{ board.source.org }}<template v-if="board.source.publishedAt"> · {{ board.source.publishedAt }}</template>，国际媒体榜单按原书/专题聚合、无统一名次；海外路线暂无沿程数据，G314 等中国段可查看。
+          </template>
+          <template v-if="board.level === 'national'">
+            政策 12 条精品线官方尚未发布逐桩走向表，本产品中的走向为 OSM 编号还原的近似线位。
+          </template>
         </footer>
       </template>
     </main>

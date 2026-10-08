@@ -1,0 +1,117 @@
+{
+  "id": "bbc-best-drives",
+  "title": "BBC · 全球最佳自驾公路",
+  "subtitle": "BBC 从未发布过统一编号的公路排名。本榜聚合自 BBC Top Gear 历年特辑（2007 斯泰尔维奥 / 2008 越南 / 2009 罗马尼亚·玻利维亚）与 BBC Travel 自驾专题，序号为聚合展示，海外路线仅供灵感。",
+  "source": {
+    "org": "BBC Travel · BBC Top Gear",
+    "doc": "Top Gear S10（2007）、S12 越南特辑（2008）、S14 罗马尼亚/玻利维亚特辑（2009）及 BBC Travel 自驾专题",
+    "url": "https://www.bbc.com/travel",
+    "publishedAt": "2007年起（历年）"
+  },
+  "level": "international",
+  "itemCount": 10,
+  "items": [
+    {
+      "rank": 1,
+      "routeId": "",
+      "name": "Transfăgărășan 公路（DN7C）",
+      "roadKeys": [],
+      "province": ["罗马尼亚"],
+      "lengthKm": 151,
+      "highlight": "皮特什蒂—阿尔帕舒：Top Gear S14（2009）称其为「世界最佳公路」，喀尔巴阡山发卡弯、水坝湖与隧道",
+      "tags": ["世界最佳", "发卡弯", "喀尔巴阡山"]
+    },
+    {
+      "rank": 2,
+      "routeId": "",
+      "name": "斯泰尔维奥山口（Stelvio Pass, SS38）",
+      "roadKeys": [],
+      "province": ["意大利"],
+      "lengthKm": 50,
+      "highlight": "博尔米奥—普拉托：Top Gear S10（2007）最初认定的世界最佳驾驶公路，北侧 48 道发卡弯、海拔 2757m",
+      "tags": ["48道发卡弯", "阿尔卑斯", "山口"]
+    },
+    {
+      "rank": 3,
+      "routeId": "",
+      "name": "大西洋之路（Atlantic Road）",
+      "roadKeys": [],
+      "province": ["挪威"],
+      "lengthKm": 8,
+      "highlight": "克里斯蒂安松—莫尔德：BBC Travel 多次专题，岛桥跃过群岛，风暴中巨浪拍桥成为北欧公路标志",
+      "tags": ["群岛桥梁", "峡湾"]
+    },
+    {
+      "rank": 4,
+      "routeId": "",
+      "name": "冰岛 1 号环岛公路（Ring Road）",
+      "roadKeys": [],
+      "province": ["冰岛"],
+      "lengthKm": 1322,
+      "highlight": "雷克雅未克环线：BBC Travel 经典环岛专题，南岸瀑布群、冰河湖与北部火山地貌，极光季尤佳",
+      "tags": ["环岛", "极光", "瀑布"]
+    },
+    {
+      "rank": 5,
+      "routeId": "",
+      "name": "喀喇昆仑公路（Karakoram Highway）",
+      "roadKeys": ["G314"],
+      "fromPlace": "喀什",
+      "toPlace": "伊斯兰堡",
+      "province": ["新疆（中国）", "巴基斯坦"],
+      "lengthKm": 1300,
+      "highlight": "BBC 镜头下的世界最高跨境公路：罕萨河谷、帕米尔冰川与古丝路；中国段即 G314，可查看沿程",
+      "tags": ["最高公路", "G314", "古丝路"]
+    },
+    {
+      "rank": 6,
+      "routeId": "",
+      "name": "胡志明公路（Ho Chi Minh Road）",
+      "roadKeys": [],
+      "province": ["越南"],
+      "lengthKm": 1900,
+      "highlight": "胡志明市—河内：Top Gear 越南特辑（2008）骑摩托纵贯南北，穿越雨林、石灰岩峰丛与沿海渔村",
+      "tags": ["摩托之旅", "雨林", "海岸"]
+    },
+    {
+      "rank": 7,
+      "routeId": "",
+      "name": "永加斯死亡公路（North Yungas Road）",
+      "roadKeys": [],
+      "province": ["玻利维亚"],
+      "lengthKm": 64,
+      "highlight": "拉巴斯—科罗伊科：Top Gear 玻利维亚特辑（2009），安第斯雪山直下亚马逊云雾林，悬崖单车道曾是最险公路",
+      "tags": ["死亡公路", "悬崖", "云雾林"]
+    },
+    {
+      "rank": 8,
+      "routeId": "",
+      "name": "66 号公路（Route 66）",
+      "roadKeys": [],
+      "province": ["美国"],
+      "lengthKm": 3939,
+      "highlight": "芝加哥—圣莫尼卡：BBC Travel 公路文化专题，母亲之路穿越 8 州，霓虹招牌与荒漠公路的 Americana",
+      "tags": ["母亲之路", "西部", "经典"]
+    },
+    {
+      "rank": 9,
+      "routeId": "",
+      "name": "大洋路（Great Ocean Road）",
+      "roadKeys": [],
+      "province": ["澳大利亚"],
+      "lengthKm": 243,
+      "highlight": "托尔坎—瓦南布尔：BBC Travel 海岸公路专题，十二使徒岩、冲浪海岸与桉树林，南半球最美海岸线之一",
+      "tags": ["海岸", "十二使徒岩"]
+    },
+    {
+      "rank": 10,
+      "routeId": "",
+      "name": "北海岸 500（North Coast 500）",
+      "roadKeys": [],
+      "province": ["苏格兰"],
+      "lengthKm": 830,
+      "highlight": "因弗内斯环线：BBC 称誉的苏格兰高地环线，北海峡海岸、孤山、城堡与单行道桥，英国版 66 号公路",
+      "tags": ["高地", "海岸", "环线"]
+    }
+  ]
+}

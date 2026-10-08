@@ -1,0 +1,115 @@
+{
+  "id": "lonelyplanet-epic-drives",
+  "title": "孤独星球 · 史诗级自驾公路",
+  "subtitle": "Lonely Planet《Epic Drives of the World（世界史诗级自驾）》收录全球 50 条经典公路。本榜精选其中 10 条；原书按大洲编排、无统一名次，序号为聚合展示，海外路线仅供灵感。",
+  "source": {
+    "org": "Lonely Planet 孤独星球",
+    "doc": "《Epic Drives of the World》（2017，50 条经典自驾线 + 150 条延展推荐）",
+    "url": "https://www.lonelyplanet.com/",
+    "publishedAt": "2017"
+  },
+  "level": "international",
+  "itemCount": 10,
+  "items": [
+    {
+      "rank": 1,
+      "routeId": "",
+      "name": "哈纳公路（Road to Hana）",
+      "roadKeys": [],
+      "province": ["美国（夏威夷）"],
+      "lengthKm": 104,
+      "highlight": "卡胡卢伊—哈纳：茂宜岛东北海岸，600 个弯道、59 座桥、瀑布雨林与黑沙滩，以慢著称",
+      "tags": ["雨林", "瀑布", "海岸"]
+    },
+    {
+      "rank": 2,
+      "routeId": "",
+      "name": "乌尤尼盐沼环线（Salar de Uyuni）",
+      "roadKeys": [],
+      "province": ["玻利维亚"],
+      "lengthKm": 200,
+      "highlight": "乌尤尼—图皮萨：天空之镜雨季倒映整个天空，越野车队串起火烈鸟湖、彩色泻湖与间歇泉",
+      "tags": ["天空之镜", "高原", "越野"]
+    },
+    {
+      "rank": 3,
+      "routeId": "",
+      "name": "南方公路（Carretera Austral, Ruta 7）",
+      "roadKeys": [],
+      "province": ["智利"],
+      "lengthKm": 1240,
+      "highlight": "蒙特港—奥希金斯别墅：巴塔哥尼亚秘境，冰川、峡湾、火山与渡轮接驳的 gravel 公路",
+      "tags": ["巴塔哥尼亚", "冰川", "荒野"]
+    },
+    {
+      "rank": 4,
+      "routeId": "",
+      "name": "冰原大道（Icefields Parkway）",
+      "roadKeys": [],
+      "province": ["加拿大"],
+      "lengthKm": 232,
+      "highlight": "班夫—贾斯珀：落基山群峰与冰原之间，露易丝湖、佩托湖、哥伦比亚冰原，北美最美山地公路",
+      "tags": ["落基山", "冰川", "湖泊"]
+    },
+    {
+      "rank": 5,
+      "routeId": "",
+      "name": "帕米尔公路（Pamir Highway, M41）",
+      "roadKeys": [],
+      "province": ["吉尔吉斯斯坦", "塔吉克斯坦"],
+      "lengthKm": 1970,
+      "highlight": "奥什—杜尚别：世界屋脊上的苏联古道，列宁峰、阿赖山谷、帕米尔蓝湖与瓦罕走廊，苍凉高原天路",
+      "tags": ["帕米尔", "高原", "M41"]
+    },
+    {
+      "rank": 6,
+      "routeId": "",
+      "name": "胡志明公路（Ho Chi Minh Road）",
+      "roadKeys": [],
+      "province": ["越南"],
+      "lengthKm": 1900,
+      "highlight": "河内—胡志明市：纵贯长山山脉，国家公园、溶洞、少数民族村寨与历史战区，比沿海公路更野性",
+      "tags": ["雨林", "山地", "历史"]
+    },
+    {
+      "rank": 7,
+      "routeId": "",
+      "name": "黑森林高山公路（Black Forest High Road）",
+      "roadKeys": [],
+      "province": ["德国"],
+      "lengthKm": 60,
+      "highlight": "巴登巴登—弗罗伊登施塔特：B500 穿越黑森林山脊，杉林、湖泊、温泉小镇与咕咕钟作坊",
+      "tags": ["黑森林", "山脊", "温泉"]
+    },
+    {
+      "rank": 8,
+      "routeId": "",
+      "name": "全景大道（Panorama Route）",
+      "roadKeys": [],
+      "province": ["南非"],
+      "lengthKm": 200,
+      "highlight": "内尔斯普雷特—布莱德河峡谷：姆普马兰加高地，上帝之窗、布莱德河峡谷、幸运壶穴与克鲁格门户",
+      "tags": ["峡谷", "高地", "全景"]
+    },
+    {
+      "rank": 9,
+      "routeId": "",
+      "name": "大洋路（Great Ocean Road）",
+      "roadKeys": [],
+      "province": ["澳大利亚"],
+      "lengthKm": 243,
+      "highlight": "托尔坎—瓦南布尔：十二使徒岩、洛克阿德峡谷与奥特威雨林，海岸与森林交替的南半球地标",
+      "tags": ["海岸", "十二使徒岩"]
+    },
+    {
+      "rank": 10,
+      "routeId": "",
+      "name": "马拉喀什—塔鲁丹特（Marrakesh to Taroudannt）",
+      "roadKeys": [],
+      "province": ["摩洛哥"],
+      "lengthKm": 230,
+      "highlight": "马拉喀什—塔鲁丹特：翻越阿特拉斯山，橄榄谷、柏柏尔村落、红土古城到苏斯绿洲，色彩浓郁的北非之路",
+      "tags": ["阿特拉斯山", "柏柏尔", "古城"]
+    }
+  ]
+}

@@ -74,3 +74,6 @@ ticket-assets/
 
 # 文件回收站（工具删除的文件暂存于此，不入库）
 .trash/
+
+# 公路堵点填补脚本的中间缓存（158MB，远超 GitHub 100MB 单文件上限）
+data/roads/gapfill/

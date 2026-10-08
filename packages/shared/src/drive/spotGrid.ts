@@ -73,6 +73,14 @@ export function inHimalayaExteriorBand(lng: number, lat: number): boolean {
   return false;
 }
 
+/** 金门 / 马祖：福建 bbox 会扫进来，不能算厦门/福州公路景点 */
+export function inKinmenMatsu(lng: number, lat: number): boolean {
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return false;
+  if (lng >= 118.2 && lng <= 118.55 && lat >= 24.16 && lat <= 24.55) return true;
+  if (lng >= 119.85 && lng <= 120.55 && lat >= 25.9 && lat <= 26.45) return true;
+  return false;
+}
+
 /**
  * 公路侧景点是否可展示 / 入库。
  * 比 CHINA_LAND_BBOX 更严：挡邻国 country 标签、喜马拉雅南坡拉丁名。
@@ -81,6 +89,7 @@ export function isAdmissibleChinaPoi(
   spot: Pick<RoadsideSpot, 'lng' | 'lat' | 'name'> & SpotCountryTags,
 ): boolean {
   if (!isWithinChinaLand(spot.lng, spot.lat)) return false;
+  if (inKinmenMatsu(spot.lng, spot.lat)) return false;
   const tags = spot.osmTags;
   if (tags) {
     const country = tags['addr:country'] || tags['is_in:country'] || tags.country;
@@ -122,7 +131,9 @@ function cellKeyOf(lng: number, lat: number): number {
 }
 
 /**
- * 建网格：O(M)。不可展示的境外 / 邻国错标 POI 直接跳过。
+ * 建网格：O(M)。境外 POI（不在 CHINA_LAND_BBOX 内）直接跳过：
+ * 防止它们被 grid 索引收录后，再随 bbox 外扩命中任何途径外东北/南亚的路线。
+ * 坐标非法的景点同样跳过（不参与任何查询）。
  */
 export function buildSpotGrid(spots: RoadsideSpot[]): SpotGrid {
   const cells = new Map<number, number[]>();

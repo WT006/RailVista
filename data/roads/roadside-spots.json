@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updated": "2026-10-05",
-  "note": "公路侧景点库：既有手工种子 + OSM 全国批量抓取（11693 条，source=osm_batch）；另有 624 条早期从铁路侧迁移（source=migrated:*），公路网默认不展示。；2026-10-05 剔除喜马拉雅南坡境外拉丁名与非 CN country 标签",
+  "updated": "2026-10-08",
+  "note": "公路侧景点库：既有手工种子 + OSM 全国批量抓取（11693 条，source=osm_batch）；另有 624 条早期从铁路侧迁移（source=migrated:*），公路网默认不展示。；2026-10-05 剔除喜马拉雅南坡境外拉丁名与非 CN country 标签；2026-10-08 合入 main：按经纬度重算的省份归属修正（青海/重庆等279 条）已回写 province 字段",
   "spots": [
     {
       "id": "hc-001-二郎山隧道",
@@ -301,7 +301,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-021-黑马河·青海湖日出",
@@ -316,7 +316,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-022-茶卡盐湖",
@@ -331,7 +331,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-023-察尔汗盐湖",
@@ -346,7 +346,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-024-昆仑山口",
@@ -361,7 +361,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-025-索南达杰保护站",
@@ -556,7 +556,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-038-大柴旦翡翠湖",
@@ -571,7 +571,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-039-乌素特水上雅丹",
@@ -586,7 +586,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-040-东台吉乃尔湖",
@@ -601,7 +601,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-041-西台吉乃尔·双色湖",
@@ -616,7 +616,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-042-南八仙雅丹",
@@ -631,7 +631,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-043-茫崖翡翠湖",
@@ -676,7 +676,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-046-门源百里油菜花",
@@ -691,7 +691,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-047-卓尔山",
@@ -706,7 +706,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-048-扁都口",
@@ -721,7 +721,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-049-映秀地震遗址",
@@ -766,7 +766,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "hc-052-雀儿山垭口",
@@ -781,7 +781,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "hc-053-德格印经院",
@@ -796,7 +796,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "hc-054-玛多·黄河源",
@@ -811,7 +811,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-055-巴颜喀拉山口",
@@ -826,7 +826,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-056-文成公主庙",
@@ -841,7 +841,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-057-白马雪山垭口",
@@ -961,7 +961,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-065-兰州中山桥",
@@ -1021,7 +1021,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-069-郎木寺镇",
@@ -1036,7 +1036,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "hc-070-若尔盖花湖",
@@ -1051,7 +1051,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "hc-071-黄河九曲第一湾",
@@ -1066,7 +1066,7 @@
       "canPark": true,
       "source": "hand-curated",
       "verified": true,
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "hc-072-九寨沟",
@@ -1350,7 +1350,7 @@
       "intro": "中国最大的内陆咸水湖，青藏铁路沿湖北岸一带穿行，可饱览碧湖、草原与雪山同框的高原盛景。",
       "source": "migrated:preset",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-chaerhan-salt-bridge",
@@ -1364,7 +1364,7 @@
       "intro": "中国最大天然盐湖，青藏铁路从约 32 公里「万丈盐桥」上通过，路基由盐壳筑成，是罕见的盐质铁路通道。",
       "source": "migrated:preset",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-qaidam-gobi",
@@ -1378,7 +1378,7 @@
       "intro": "柴达木盆地核心荒漠带，铁路横穿戈壁与雅丹地貌，是全线苍茫感最强、人烟稀少的荒漠穿行区段。",
       "source": "migrated:preset",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-kunlun-pass",
@@ -1392,7 +1392,7 @@
       "intro": "海拔约 4768 米，青藏铁路翻越昆仑山的核心隘口，素有「进藏第一关」之称。",
       "source": "migrated:preset",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-yuzhu-peak",
@@ -1406,7 +1406,7 @@
       "intro": "昆仑山东段高峰，海拔 6178 米，是沿线第一座醒目的 6000 米级雪山，终年积雪。",
       "source": "migrated:preset",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-kekexili",
@@ -1420,7 +1420,7 @@
       "intro": "世界自然遗产地，铁路沿其北缘穿行，是藏羚羊、藏野驴等高原野生动物较集中的观测区段。",
       "source": "migrated:preset",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-wudaoliang",
@@ -1434,7 +1434,7 @@
       "intro": "高寒缺氧典型段，气候极端，是全线含氧量低、荒原感极强的高原穿行区。",
       "source": "migrated:preset",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-fenghuoshan",
@@ -1448,7 +1448,7 @@
       "intro": "世界海拔最高冻土隧道——风火山隧道所在地，青藏铁路攻克多年冻土难题的标志性工程点。",
       "source": "migrated:preset",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-tuotuohe-source",
@@ -1462,7 +1462,7 @@
       "intro": "长江正源水系，铁路跨越长江源特大桥，可近距离俯瞰江源宽谷风光。",
       "source": "migrated:preset",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-tongtian-river",
@@ -1770,7 +1770,7 @@
       "intro": "青海门源夏季万亩油菜花海闻名，西宁—门源段是「花海列车」热门观景主题。",
       "source": "migrated:curated",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-qilian-snow-lanxin",
@@ -1784,7 +1784,7 @@
       "intro": "河西走廊南侧祁连山脉，民乐—张掖一带可远眺皑皑雪峰。",
       "source": "migrated:curated",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-hexi-corridor-gobi",
@@ -1896,7 +1896,7 @@
       "intro": "敦格线翻越当金山一带，可见祁连西段山地与柴达木北缘过渡风光。",
       "source": "migrated:curated",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-emerald-lake-distant",
@@ -1910,7 +1910,7 @@
       "intro": "大柴旦翡翠湖等盐湖群方向，柴达木段可感受盐湖盆地苍茫气质。",
       "source": "migrated:curated",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-altun-mountains",
@@ -1924,7 +1924,7 @@
       "intro": "格库/敦格铁路穿越阿尔金山地区，可见高原荒漠与山脉交错的无人区气质。",
       "source": "migrated:curated",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-taklamakan-south-geku",
@@ -3674,7 +3674,7 @@
       "intro": "敦格线翻越当金山，祁连西段与柴达木北缘的地理分界山口。",
       "source": "migrated:curated",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-dunge-qaidam-salt",
@@ -3688,7 +3688,7 @@
       "intro": "大柴旦—饮马峡盐湖盆地，戈壁与盐湖交织的「大漠新丝路」南段。",
       "source": "migrated:curated",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-yiwan-enshi-karst",
@@ -6474,7 +6474,7 @@
       "intro": "青藏铁路可可西里超长铁路桥，兼作藏羚羊迁徙通道的标志工程。",
       "source": "migrated:curated",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-xingfuyuan-bridge",
@@ -6866,7 +6866,7 @@
       "intro": "青藏铁路出西宁穿西石峡，与 G109、G6 同挤湟水峡谷，丹霞状山体夹峙。",
       "source": "migrated:curated",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-laoya-gorge-lanqing",
@@ -6880,7 +6880,7 @@
       "intro": "民和—乐都间湟水老鸦峡，铁路与公路并行穿峡，两岸陡崖夹峙。",
       "source": "migrated:curated",
       "verified": false,
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "rs-dabancheng-wetland-bridge",
@@ -13377,7 +13377,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-4227692189",
@@ -13393,7 +13393,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-4247881891",
@@ -13409,7 +13409,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-4350784888",
@@ -13425,7 +13425,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-4843134835",
@@ -13441,7 +13441,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-4843137619",
@@ -13457,7 +13457,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-4843139143",
@@ -13473,7 +13473,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-4933584333",
@@ -13489,7 +13489,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-5183235621",
@@ -13505,7 +13505,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-5183235721",
@@ -13521,7 +13521,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-5290649339",
@@ -13537,7 +13537,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-5324657621",
@@ -13553,7 +13553,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-5636234042",
@@ -13569,7 +13569,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-5695990821",
@@ -13585,7 +13585,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-5695990822",
@@ -13601,7 +13601,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-5698512922",
@@ -13617,7 +13617,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-5717577222",
@@ -13633,7 +13633,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-5719673621",
@@ -13649,7 +13649,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-5719673922",
@@ -13665,7 +13665,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-6021697685",
@@ -13681,7 +13681,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-6304966294",
@@ -13697,7 +13697,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-6539412787",
@@ -13713,7 +13713,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-7867081285",
@@ -13729,7 +13729,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-8899901117",
@@ -13745,7 +13745,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-9411747360",
@@ -13761,7 +13761,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-9999728325",
@@ -13777,7 +13777,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-10002329661",
@@ -13793,7 +13793,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-10108543309",
@@ -13809,7 +13809,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-10823642025",
@@ -13825,7 +13825,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-10826159739",
@@ -13857,7 +13857,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-12096668831",
@@ -13873,7 +13873,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-12913787525",
@@ -13889,7 +13889,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-13093927525",
@@ -13905,7 +13905,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-13105759899",
@@ -13921,7 +13921,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-13105759900",
@@ -13937,7 +13937,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-13143944591",
@@ -13953,7 +13953,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-13470355868",
@@ -13969,7 +13969,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-13506794074",
@@ -13985,7 +13985,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-13790654157",
@@ -14001,7 +14001,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-14230510362",
@@ -14017,7 +14017,7 @@
       "tags": [
         "沿G109"
       ],
-      "province": "四川"
+      "province": "青海"
     },
     {
       "id": "osm-node-3751516266",
@@ -14609,7 +14609,7 @@
       "tags": [
         "沿G315"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-7857974985",
@@ -14641,7 +14641,7 @@
       "tags": [
         "沿G315"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-8900385519",
@@ -14657,7 +14657,7 @@
       "tags": [
         "沿G315"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-8900403017",
@@ -14673,7 +14673,7 @@
       "tags": [
         "沿G315"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-8900456917",
@@ -14689,7 +14689,7 @@
       "tags": [
         "沿G315"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-13098719148",
@@ -14705,7 +14705,7 @@
       "tags": [
         "沿G315"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-13320794185",
@@ -14721,7 +14721,7 @@
       "tags": [
         "沿G315"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-3323564394",
@@ -14737,7 +14737,7 @@
       "tags": [
         "沿G227"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-4774774025",
@@ -14753,7 +14753,7 @@
       "tags": [
         "沿G227"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-5906238928",
@@ -14769,7 +14769,7 @@
       "tags": [
         "沿G227"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-9270854252",
@@ -14785,7 +14785,7 @@
       "tags": [
         "沿G227"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-9409105213",
@@ -14801,7 +14801,7 @@
       "tags": [
         "沿G227"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-9411660855",
@@ -14817,7 +14817,7 @@
       "tags": [
         "沿G227"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-13963503205",
@@ -14833,7 +14833,7 @@
       "tags": [
         "沿G227"
       ],
-      "province": "甘肃"
+      "province": "青海"
     },
     {
       "id": "osm-node-221435536",
@@ -17344,7 +17344,7 @@
       "name": "直波碉楼",
       "lng": 102.10476,
       "lat": 31.91579,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 73,
@@ -17454,7 +17454,7 @@
       "name": "直波碉楼",
       "lng": 102.10321,
       "lat": 31.91573,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 73,
@@ -19202,7 +19202,7 @@
       "name": "圆通寺塔",
       "lng": 100.72401,
       "lat": 38.64865,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 73,
@@ -20289,7 +20289,7 @@
       "name": "天梯山石窟",
       "lng": 102.74282,
       "lat": 37.5637,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 73,
@@ -21100,7 +21100,7 @@
       "name": "鲁土司衙门旧址",
       "lng": 102.8357,
       "lat": 36.58952,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 70,
@@ -34184,7 +34184,7 @@
       "name": "甘孜香根时轮佛塔",
       "lng": 99.98639,
       "lat": 31.62666,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 61,
@@ -37310,7 +37310,7 @@
       "name": "佐钦满愿塔",
       "lng": 98.85747,
       "lat": 32.10747,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 61,
@@ -38616,7 +38616,7 @@
       "name": "长城",
       "lng": 102.93605,
       "lat": 37.69029,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 61,
@@ -41623,7 +41623,7 @@
       "name": "Kanbula National Park West Entrance",
       "lng": 101.64702,
       "lat": 36.15333,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -42114,7 +42114,7 @@
       "name": "尕海",
       "lng": 102.3616,
       "lat": 34.26176,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -42703,7 +42703,7 @@
       "name": "Sanke Wetland Park",
       "lng": 102.46117,
       "lat": 35.13962,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -43467,7 +43467,7 @@
       "name": "七彩甲足",
       "lng": 102.90599,
       "lat": 32.12489,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -44546,7 +44546,7 @@
       "name": "若尔盖大草原湿地保护区",
       "lng": 102.48458,
       "lat": 33.71396,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -44606,7 +44606,7 @@
       "name": "贵德国家地质公园",
       "lng": 101.58,
       "lat": 36.14046,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -45631,7 +45631,7 @@
       "name": "达古冰山旅游区入口",
       "lng": 102.94139,
       "lat": 32.11987,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -45651,7 +45651,7 @@
       "name": "Dagu glacier cableway",
       "lng": 102.78396,
       "lat": 32.23865,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -46702,7 +46702,7 @@
       "name": "若尔盖大草原国家公园",
       "lng": 102.54808,
       "lat": 33.24917,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -47531,7 +47531,7 @@
       "name": "玛尔琼凯克古冰川遗址",
       "lng": 102.97155,
       "lat": 34.31132,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -48071,7 +48071,7 @@
       "name": "Ancient watchtower on a cliff",
       "lng": 102.63162,
       "lat": 31.88679,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -48235,7 +48235,7 @@
       "name": "赞巴拉圣洞(财神洞)",
       "lng": 102.97066,
       "lat": 34.31099,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -48846,7 +48846,7 @@
       "name": "卓克基会议旧址",
       "lng": 102.29174,
       "lat": 31.86854,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -48867,7 +48867,7 @@
       "name": "悠牧部落",
       "lng": 102.61222,
       "lat": 33.16111,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -49567,7 +49567,7 @@
       "name": "Kanbula National Park East Entrance",
       "lng": 101.81747,
       "lat": 36.1155,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -51272,7 +51272,7 @@
       "name": "唐克古城城址",
       "lng": 102.4865,
       "lat": 33.45126,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -52082,7 +52082,7 @@
       "name": "Wetlands",
       "lng": 102.46346,
       "lat": 35.14159,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -52102,7 +52102,7 @@
       "name": "平安区莲花山冰雪大世界",
       "lng": 101.99741,
       "lat": 36.30786,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -53388,7 +53388,7 @@
       "name": "北川冰雪世界",
       "lng": 101.76677,
       "lat": 36.70682,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -57059,7 +57059,7 @@
       "name": "Ruins / Summit of the park",
       "lng": 102.20723,
       "lat": 31.90375,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -60658,7 +60658,7 @@
       "name": "湿地公园",
       "lng": 102.62015,
       "lat": 33.13293,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -60763,7 +60763,7 @@
       "name": "Sand Park",
       "lng": 100.77852,
       "lat": 36.73897,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -61136,7 +61136,7 @@
       "name": "Market",
       "lng": 102.21806,
       "lat": 31.90236,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -61699,7 +61699,7 @@
       "name": "辩经场",
       "lng": 102.91167,
       "lat": 35.00739,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -62517,7 +62517,7 @@
       "name": "汾果尔公玛",
       "lng": 102.5597,
       "lat": 33.22162,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -62597,7 +62597,7 @@
       "name": "老爷山度假山庄滑雪场",
       "lng": 101.70398,
       "lat": 36.93924,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -63220,7 +63220,7 @@
       "name": "积石民俗村",
       "lng": 102.8585,
       "lat": 35.70631,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -63741,7 +63741,7 @@
       "name": "华德花园广场",
       "lng": 101.77273,
       "lat": 36.61991,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -64734,7 +64734,7 @@
       "name": "International Village - Guojicun",
       "lng": 101.78848,
       "lat": 36.61199,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -65211,7 +65211,7 @@
       "name": "Xining Market",
       "lng": 101.77432,
       "lat": 36.61918,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -67474,7 +67474,7 @@
       "name": "若尔盖大草原格萨尔骑马露营地",
       "lng": 102.5961,
       "lat": 33.18377,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -67580,7 +67580,7 @@
       "name": "肖红坪景区",
       "lng": 102.80313,
       "lat": 35.75246,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.landmark",
       "score": 58,
@@ -72389,7 +72389,7 @@
       "name": "贝大日如来佛石窟寺和勒巴沟摩崖",
       "lng": 97.07583,
       "lat": 32.89694,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 72,
@@ -81639,7 +81639,7 @@
       "name": "Xining City Wall",
       "lng": 101.78255,
       "lat": 36.61063,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -82784,7 +82784,7 @@
       "name": "岗托十八路军渡江纪念馆",
       "lng": 98.58883,
       "lat": 31.62581,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -82824,7 +82824,7 @@
       "name": "三江源",
       "lng": 97.24741,
       "lat": 33.00868,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -82967,7 +82967,7 @@
       "name": "Art Museum",
       "lng": 102.05002,
       "lat": 35.55132,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -83563,7 +83563,7 @@
       "name": "天地人缘",
       "lng": 101.58424,
       "lat": 36.1384,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -83796,7 +83796,7 @@
       "name": "热贡艺术博物馆",
       "lng": 102.05154,
       "lat": 35.56233,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -85079,7 +85079,7 @@
       "name": "积石山民族民俗博物馆",
       "lng": 102.86901,
       "lat": 35.71018,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -89974,7 +89974,7 @@
       "name": "Art museum",
       "lng": 102.04787,
       "lat": 35.56092,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -91288,7 +91288,7 @@
       "name": "Qinghai Folk-customs museum",
       "lng": 101.80413,
       "lat": 36.61771,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -92963,7 +92963,7 @@
       "name": "烈士纪念碑",
       "lng": 100.00062,
       "lat": 31.61629,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -93837,7 +93837,7 @@
       "name": "青海湖藏族民宿博物馆",
       "lng": 100.49417,
       "lat": 36.58166,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -94599,7 +94599,7 @@
       "name": "青海省科学技术馆",
       "lng": 101.71181,
       "lat": 36.64687,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -98589,7 +98589,7 @@
       "name": "都兰县博物馆",
       "lng": 98.0922,
       "lat": 36.28734,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -99356,7 +99356,7 @@
       "name": "中国藏医药文化博物馆",
       "lng": 101.74577,
       "lat": 36.68901,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -100286,7 +100286,7 @@
       "name": "观音",
       "lng": 101.44142,
       "lat": 36.02267,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -100657,7 +100657,7 @@
       "name": "Yak museum",
       "lng": 101.74359,
       "lat": 36.6792,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -100845,7 +100845,7 @@
       "name": "黄河源头第一县纪念碑",
       "lng": 95.79374,
       "lat": 34.11985,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -100865,7 +100865,7 @@
       "name": "永昌县博物馆",
       "lng": 101.97219,
       "lat": 38.24643,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -102200,7 +102200,7 @@
       "name": "Kunlun jade museum",
       "lng": 101.74317,
       "lat": 36.68148,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -102468,7 +102468,7 @@
       "name": "青海湟源古道博物馆",
       "lng": 101.09711,
       "lat": 36.446,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.heritage",
       "score": 60,
@@ -133807,7 +133807,7 @@
       "name": "Entire Valley Viewpoint",
       "lng": 102.20707,
       "lat": 31.90383,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -133927,7 +133927,7 @@
       "name": "4825m pass",
       "lng": 97.66298,
       "lat": 34.13115,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -133947,7 +133947,7 @@
       "name": "4600m (approx) pass",
       "lng": 97.49764,
       "lat": 33.13993,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -134802,7 +134802,7 @@
       "name": "Tibet Land Landmark",
       "lng": 98.58754,
       "lat": 31.63295,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -134822,7 +134822,7 @@
       "name": "Yilhun Latso Viewpoint",
       "lng": 99.10948,
       "lat": 31.86653,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -134842,7 +134842,7 @@
       "name": "Yilhun Latso Viewpoint",
       "lng": 99.10978,
       "lat": 31.86649,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -134922,7 +134922,7 @@
       "name": "Tibetan traditional village",
       "lng": 99.98203,
       "lat": 31.63246,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135203,7 +135203,7 @@
       "name": "small trail go up on the side of Valley",
       "lng": 98.92262,
       "lat": 31.67212,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135224,7 +135224,7 @@
       "name": "good landscap view",
       "lng": 98.93141,
       "lat": 31.66925,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135245,7 +135245,7 @@
       "name": "Sun Lake",
       "lng": 98.28251,
       "lat": 33.06114,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135265,7 +135265,7 @@
       "name": "S456 111KM Road Marker",
       "lng": 98.4366,
       "lat": 32.49179,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135285,7 +135285,7 @@
       "name": "Sharshok Township Lamgong Pass",
       "lng": 100.1819,
       "lat": 31.60054,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135305,7 +135305,7 @@
       "name": "S217 11KM Road Marker",
       "lng": 97.59647,
       "lat": 33.13702,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135325,7 +135325,7 @@
       "name": "Viewpoint",
       "lng": 97.49921,
       "lat": 33.14118,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135345,7 +135345,7 @@
       "name": "Glacier Viewing Platform Mt. Chola",
       "lng": 99.14715,
       "lat": 31.87988,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135365,7 +135365,7 @@
       "name": "Viewpoint 4829M",
       "lng": 97.65773,
       "lat": 34.12673,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135385,7 +135385,7 @@
       "name": "S307 11KM Road Maker",
       "lng": 97.45301,
       "lat": 33.11281,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135405,7 +135405,7 @@
       "name": "Golden monkey lake",
       "lng": 102.8918,
       "lat": 32.20188,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135425,7 +135425,7 @@
       "name": "Tears lake",
       "lng": 102.75655,
       "lat": 32.22088,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135445,7 +135445,7 @@
       "name": "No. 1 Glacier",
       "lng": 102.75637,
       "lat": 32.22108,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135465,7 +135465,7 @@
       "name": "River and red rocks",
       "lng": 102.8165,
       "lat": 32.26451,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135485,7 +135485,7 @@
       "name": "Dagu lake",
       "lng": 102.80417,
       "lat": 32.25998,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135505,7 +135505,7 @@
       "name": "Zena lake",
       "lng": 102.87933,
       "lat": 32.2524,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135585,7 +135585,7 @@
       "name": "View point of langmu",
       "lng": 102.64214,
       "lat": 34.08994,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -135605,7 +135605,7 @@
       "name": "Temple View",
       "lng": 102.63398,
       "lat": 34.09478,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -136342,7 +136342,7 @@
       "name": "九大元帅走过的草原",
       "lng": 102.69062,
       "lat": 33.50352,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -136363,7 +136363,7 @@
       "name": "黄河大草原",
       "lng": 102.54476,
       "lat": 33.4099,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -136384,7 +136384,7 @@
       "name": "朝霞夕照",
       "lng": 102.08757,
       "lat": 32.74464,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -136405,7 +136405,7 @@
       "name": "游牧味道",
       "lng": 101.86083,
       "lat": 32.91508,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -136426,7 +136426,7 @@
       "name": "坝上农耕",
       "lng": 101.76336,
       "lat": 32.90443,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -136551,7 +136551,7 @@
       "name": "忠克观景台",
       "lng": 102.1606,
       "lat": 34.06429,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -136572,7 +136572,7 @@
       "name": "财宝山观景台",
       "lng": 102.62531,
       "lat": 34.12044,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -137193,7 +137193,7 @@
       "name": "Glass Bodem platform",
       "lng": 102.96726,
       "lat": 34.29456,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144343,7 +144343,7 @@
       "name": "Pagoda",
       "lng": 101.71545,
       "lat": 36.08533,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144383,7 +144383,7 @@
       "name": "西宁电视塔高原明珠",
       "lng": 101.74744,
       "lat": 36.62014,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144403,7 +144403,7 @@
       "name": "Qingshan saddle 3699m",
       "lng": 94.5519,
       "lat": 38.3498,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144443,7 +144443,7 @@
       "name": "Yellow river and mountains",
       "lng": 101.84961,
       "lat": 36.12226,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144463,7 +144463,7 @@
       "name": "Saddle 3518m",
       "lng": 98.17326,
       "lat": 36.06898,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144483,7 +144483,7 @@
       "name": "Saddle 3670m",
       "lng": 98.7747,
       "lat": 36.66763,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144503,7 +144503,7 @@
       "name": "Yuzhu Peak Viewpoint",
       "lng": 93.87989,
       "lat": 35.52519,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144523,7 +144523,7 @@
       "name": "Landscape Viewpoint Yuzhu Peak",
       "lng": 93.35386,
       "lat": 35.35939,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144583,7 +144583,7 @@
       "name": "Viewpoint",
       "lng": 94.05425,
       "lat": 35.61581,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144603,7 +144603,7 @@
       "name": "G214 Road Marker 555",
       "lng": 97.92999,
       "lat": 34.35692,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144623,7 +144623,7 @@
       "name": "G214 777km Road Marker",
       "lng": 97.26303,
       "lat": 33.01481,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144663,7 +144663,7 @@
       "name": "Viewing platform",
       "lng": 100.41353,
       "lat": 38.47824,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144704,7 +144704,7 @@
       "name": "翡翠湖2号观景点",
       "lng": 95.26262,
       "lat": 37.84791,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 65,
@@ -144726,7 +144726,7 @@
       "name": "郭莽湿地",
       "lng": 102.30601,
       "lat": 34.30759,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144747,7 +144747,7 @@
       "name": "吉拉观景台",
       "lng": 102.27175,
       "lat": 34.35021,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144768,7 +144768,7 @@
       "name": "分水岭观景台",
       "lng": 102.32045,
       "lat": 34.48398,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144789,7 +144789,7 @@
       "name": "黑力宁巴观景台",
       "lng": 102.66201,
       "lat": 34.78449,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144810,7 +144810,7 @@
       "name": "阿木去乎观景台",
       "lng": 102.70097,
       "lat": 34.81409,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144851,7 +144851,7 @@
       "name": "经幡观景台",
       "lng": 102.93852,
       "lat": 34.34302,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -144894,7 +144894,7 @@
       "name": "洛克观光点",
       "lng": 102.97958,
       "lat": 34.30419,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -145035,7 +145035,7 @@
       "name": "黑独山",
       "lng": 93.58236,
       "lat": 38.80184,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -145055,7 +145055,7 @@
       "name": "Baishi Mijing Tourist Spot",
       "lng": 102.56223,
       "lat": 35.43827,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -145075,7 +145075,7 @@
       "name": "来西野! 看雪豹, 雪豹之乡 (关注CFCA谢谢喵)",
       "lng": 101.72839,
       "lat": 36.62438,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -145096,7 +145096,7 @@
       "name": "今日雪豹: 凌小蛰",
       "lng": 101.72844,
       "lat": 36.62428,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -145117,7 +145117,7 @@
       "name": "鹦鹉馆",
       "lng": 101.73301,
       "lat": 36.62831,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -145138,7 +145138,7 @@
       "name": "豹馆",
       "lng": 101.73361,
       "lat": 36.62814,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "viewpoint.observation-deck",
       "score": 62,
@@ -151249,7 +151249,7 @@
       "name": "巴颜喀拉山脉",
       "lng": 98.09883,
       "lat": 34.69283,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "A",
       "category": "nature.mountain",
       "score": 79,
@@ -151853,7 +151853,7 @@
       "name": "乌鞘岭",
       "lng": 102.8838,
       "lat": 37.18338,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "A",
       "category": "nature.mountain",
       "score": 79,
@@ -152594,7 +152594,7 @@
       "name": "下毛娘",
       "lng": 102.28267,
       "lat": 35.31438,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "A",
       "category": "nature.mountain",
       "score": 79,
@@ -152619,7 +152619,7 @@
       "name": "折戈里山",
       "lng": 101.80761,
       "lat": 35.75401,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "A",
       "category": "nature.mountain",
       "score": 79,
@@ -152927,7 +152927,7 @@
       "name": "地家伊白干",
       "lng": 102.30954,
       "lat": 35.12944,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "A",
       "category": "nature.mountain",
       "score": 79,
@@ -153587,7 +153587,7 @@
       "name": "雀儿山",
       "lng": 99.07211,
       "lat": 31.78598,
-      "province": "四川",
+      "province": "青海",
       "tier": "A",
       "category": "nature.mountain",
       "score": 79,
@@ -154029,7 +154029,7 @@
       "name": "牦牛山",
       "lng": 98.04002,
       "lat": 36.89892,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "A",
       "category": "nature.mountain",
       "score": 79,
@@ -154083,7 +154083,7 @@
       "name": "阿尼玛卿山",
       "lng": 99.47304,
       "lat": 34.76616,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "A",
       "category": "nature.mountain",
       "score": 79,
@@ -154143,7 +154143,7 @@
       "name": "岗什卡",
       "lng": 101.50573,
       "lat": 37.69297,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "A",
       "category": "nature.mountain",
       "score": 79,
@@ -154225,7 +154225,7 @@
       "name": "嘎朵觉悟",
       "lng": 96.57808,
       "lat": 33.78766,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "A",
       "category": "nature.mountain",
       "score": 79,
@@ -166285,7 +166285,7 @@
       "name": "牛板颈",
       "lng": 100.18541,
       "lat": 38.20328,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -170607,7 +170607,7 @@
       "name": "萨汗加玉",
       "lng": 93.27753,
       "lat": 32.60621,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -171105,7 +171105,7 @@
       "name": "高楞",
       "lng": 100.31246,
       "lat": 38.12437,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -184059,7 +184059,7 @@
       "name": "冰沟脑阳山",
       "lng": 100.16405,
       "lat": 38.15762,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -184794,7 +184794,7 @@
       "name": "旭日加营卡山",
       "lng": 101.42521,
       "lat": 35.20002,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -185604,7 +185604,7 @@
       "name": "尖顶山",
       "lng": 101.86225,
       "lat": 36.94307,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -185652,7 +185652,7 @@
       "name": "加布龙",
       "lng": 100.46815,
       "lat": 38.08903,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -186089,7 +186089,7 @@
       "name": "尕东索",
       "lng": 100.27722,
       "lat": 38.09635,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -187228,7 +187228,7 @@
       "name": "斗合力",
       "lng": 100.37824,
       "lat": 37.95604,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -187836,7 +187836,7 @@
       "name": "牛心山",
       "lng": 100.23235,
       "lat": 38.11371,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -188876,7 +188876,7 @@
       "name": "哈青",
       "lng": 103.05378,
       "lat": 33.53266,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -189858,7 +189858,7 @@
       "name": "加格",
       "lng": 102.56744,
       "lat": 33.74231,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -190772,7 +190772,7 @@
       "name": "加绒拉热尔",
       "lng": 101.65981,
       "lat": 33.11379,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -191050,7 +191050,7 @@
       "name": "玛卿岗日山",
       "lng": 99.29318,
       "lat": 34.92406,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -191544,7 +191544,7 @@
       "name": "拉脊山",
       "lng": 102.01941,
       "lat": 36.26098,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -192621,7 +192621,7 @@
       "name": "草达坂山",
       "lng": 100.3163,
       "lat": 38.02852,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -193061,7 +193061,7 @@
       "name": "江仓山",
       "lng": 100.33031,
       "lat": 38.15173,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -194924,7 +194924,7 @@
       "name": "锁口山",
       "lng": 102.71015,
       "lat": 35.95083,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -195950,7 +195950,7 @@
       "name": "夏赞龙洼",
       "lng": 100.39882,
       "lat": 38.11821,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -197625,7 +197625,7 @@
       "name": "日梗吉合",
       "lng": 99.63109,
       "lat": 38.09543,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -199717,7 +199717,7 @@
       "name": "毛毛山",
       "lng": 102.91379,
       "lat": 37.19613,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -200353,7 +200353,7 @@
       "name": "黑山",
       "lng": 101.1235,
       "lat": 36.56658,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -200513,7 +200513,7 @@
       "name": "大西山",
       "lng": 100.15303,
       "lat": 38.04663,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -201127,7 +201127,7 @@
       "name": "克日杂贡玛",
       "lng": 100.21437,
       "lat": 37.92222,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -202696,7 +202696,7 @@
       "name": "谢达",
       "lng": 99.63131,
       "lat": 31.63975,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -203456,7 +203456,7 @@
       "name": "折戈里山",
       "lng": 101.78583,
       "lat": 35.75958,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -203874,7 +203874,7 @@
       "name": "达里加山",
       "lng": 102.705,
       "lat": 35.52195,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -204133,7 +204133,7 @@
       "name": "Rebu Gang",
       "lng": 101.474,
       "lat": 32.43232,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -205540,7 +205540,7 @@
       "name": "瓦翁",
       "lng": 100.43846,
       "lat": 37.95001,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -205802,7 +205802,7 @@
       "name": "西岔脑山",
       "lng": 101.50182,
       "lat": 37.63618,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -206735,7 +206735,7 @@
       "name": "隆宝赛日钦",
       "lng": 100.65326,
       "lat": 36.46492,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -207796,7 +207796,7 @@
       "name": "来门赛图岗",
       "lng": 101.62499,
       "lat": 35.63559,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "nature.mountain",
       "score": 67,
@@ -209342,7 +209342,7 @@
       "name": "湄公河源頭",
       "lng": 94.68667,
       "lat": 33.75972,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "experience.hot-spring",
       "score": 61,
@@ -211901,7 +211901,7 @@
       "name": "Rongpatsa hot springs",
       "lng": 99.72857,
       "lat": 31.67431,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "experience.hot-spring",
       "score": 58,
@@ -213313,7 +213313,7 @@
       "name": "大泉",
       "lng": 94.41784,
       "lat": 38.14444,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "experience.hot-spring",
       "score": 58,
@@ -249805,7 +249805,7 @@
       "name": "热水墓群",
       "lng": 98.3317,
       "lat": 36.168,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 71,
@@ -250159,7 +250159,7 @@
       "name": "拉毛遗址",
       "lng": 102.0572,
       "lat": 35.88213,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 71,
@@ -250443,7 +250443,7 @@
       "name": "炳灵寺石窟",
       "lng": 103.04834,
       "lat": 35.81043,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 71,
@@ -250637,7 +250637,7 @@
       "name": "夏塘古城",
       "lng": 99.9642,
       "lat": 35.50471,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 71,
@@ -250920,7 +250920,7 @@
       "name": "哈休遗址",
       "lng": 102.15487,
       "lat": 32.17175,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 68,
@@ -253206,7 +253206,7 @@
       "name": "日芒告巴",
       "lng": 102.36968,
       "lat": 35.0725,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 59,
@@ -253230,7 +253230,7 @@
       "name": "尕告尔囊热",
       "lng": 102.36277,
       "lat": 35.05499,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 59,
@@ -253369,7 +253369,7 @@
       "name": "岗岔",
       "lng": 102.40367,
       "lat": 35.06885,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 59,
@@ -253488,7 +253488,7 @@
       "name": "尕告尔拉若",
       "lng": 102.35535,
       "lat": 35.0613,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 59,
@@ -253869,7 +253869,7 @@
       "name": "长城",
       "lng": 102.95355,
       "lat": 37.66715,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 59,
@@ -253899,7 +253899,7 @@
       "name": "长城",
       "lng": 102.9502,
       "lat": 37.67201,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 59,
@@ -253952,7 +253952,7 @@
       "name": "长城",
       "lng": 102.9466,
       "lat": 37.67693,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 59,
@@ -254268,7 +254268,7 @@
       "name": "金塔寺石窟",
       "lng": 100.46313,
       "lat": 38.4224,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 59,
@@ -256644,7 +256644,7 @@
       "name": "卓木碉会议遗址",
       "lng": 102.02757,
       "lat": 31.99949,
-      "province": "四川",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 56,
@@ -258281,7 +258281,7 @@
       "name": "Shenna site protection shed",
       "lng": 101.75345,
       "lat": 36.65279,
-      "province": "甘肃",
+      "province": "青海",
       "tier": "B",
       "category": "culture.ruin",
       "score": 56,

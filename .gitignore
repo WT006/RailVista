@@ -47,6 +47,9 @@ data/roads/geom.prev/
 coverage
 .turbo
 
+# 仅本机生效的配置目录，不入库
+/config/
+
 # local tooling / IDE backups (not project files)
 .agents/
 .idea.bak-route/

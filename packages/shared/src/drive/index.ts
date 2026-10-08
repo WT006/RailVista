@@ -3,3 +3,4 @@ export * from './radar.js';
 export * from './trackSampler.js';
 export * from './alongRoute.js';
 export * from './spotGrid.js';
+export * from './spotQuality.js';

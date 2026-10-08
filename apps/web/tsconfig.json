@@ -9,5 +9,7 @@
     "types": ["vite/client"],
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "env.d.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "env.d.ts"],
+  "//": "Node 测试文件由根 `pnpm test` 经 shared 的 tsx 执行，不参与 web 的浏览器类型检查（web 未装 @types/node，且测试用 .ts 扩展名导入）。",
+  "exclude": ["src/**/*.test.ts"]
 }

@@ -71,3 +71,6 @@ packages/*/.node_modules.bak/
 # 纪念票航司/联盟 logo 的**裁剪前原始素材**；
 # 代码只引用已裁剪压缩的 apps/web/src/assets/ticket/，源件仅本地留档
 ticket-assets/
+
+# 文件回收站（工具删除的文件暂存于此，不入库）
+.trash/

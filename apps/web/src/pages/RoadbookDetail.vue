@@ -12,7 +12,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
-import type { TravelRouteDetail } from '@railvista/shared';
+import { TRAVEL_LAYER_LABEL, type TravelRouteDetail } from '@railvista/shared';
 
 const route = useRoute();
 const router = useRouter();
@@ -116,7 +116,11 @@ onMounted(async () => {
         <button class="rd-back" @click="router.push('/roadbook')">返回路书库</button>
       </div>
 
-      <template v-else-if="detail">
+      <div
+        v-else-if="detail"
+        class="rd-detail"
+        :class="detail.layer ? `is-${detail.layer}` : ''"
+      >
         <nav class="rd-crumb">
           <RouterLink to="/roadbook">路书库</RouterLink>
           <span>/</span>
@@ -126,47 +130,60 @@ onMounted(async () => {
         </nav>
 
         <header class="rd-hero">
-          <div class="rd-hero-top">
-            <h1>{{ detail.name }}</h1>
-            <span class="rd-badge">{{ SHAPE[detail.shape] ?? detail.shape }}</span>
+          <div class="rd-card-badges">
+            <span
+              v-if="detail.layer"
+              class="rd-badge rd-badge--layer"
+              :class="`is-${detail.layer}`"
+            >
+              {{ TRAVEL_LAYER_LABEL[detail.layer] ?? detail.layer }}
+            </span>
+            <span class="rd-badge rd-badge--shape" :class="`is-${detail.shape}`">
+              {{ SHAPE[detail.shape] ?? detail.shape }}
+            </span>
             <span class="rd-badge">{{ TIER[detail.tier] ?? detail.tier }}</span>
           </div>
+          <h1>{{ detail.name }}</h1>
           <p class="rd-subtitle">{{ detail.subtitle }}</p>
 
-          <div class="rd-metrics">
-            <div class="rd-metric"><i>{{ detail.days }}</i><span>建议天数</span></div>
-            <div class="rd-metric"><i>{{ detail.totalKm }}</i><span>总里程 km</span></div>
-            <div class="rd-metric">
-              <i>{{ DIFFICULTY[detail.difficulty] ?? detail.difficulty }}</i><span>难度</span>
-            </div>
-            <div class="rd-metric"><i>{{ seasonText(detail.bestSeason) }}</i><span>最佳季节</span></div>
-            <div class="rd-metric"><i>{{ detail.pois.length }}</i><span>核心景点</span></div>
+          <ul class="rd-metrics" aria-label="路线要点">
+            <li><b>{{ detail.days }}</b><span>天</span></li>
+            <li><b>{{ detail.totalKm }}</b><span>km</span></li>
+            <li class="rd-diff" :class="`is-d${detail.difficulty}`">
+              <b>{{ DIFFICULTY[detail.difficulty] ?? detail.difficulty }}</b><span>难度</span>
+            </li>
+            <li class="rd-season"><b>{{ seasonText(detail.bestSeason) }}</b><span>季节</span></li>
+            <li><b>{{ detail.pois.length }}</b><span>景点</span></li>
+          </ul>
+
+          <div class="rd-route-line">
+            <span class="rd-node-pin">{{ detail.startNode }}</span>
+            <span class="rd-line" aria-hidden="true" />
+            <span class="rd-node-pin rd-node-pin--end">{{ detail.endNode }}</span>
+            <span v-if="detail.cities.length" class="rd-cities">{{ detail.cities.join(' · ') }}</span>
           </div>
 
           <div class="rd-modes">
             <span v-for="m in detail.modes" :key="m" class="rd-tag rd-tag--mode">
               {{ modeLabel(m) }}
             </span>
-            <span v-for="t in detail.tags" :key="t" class="rd-tag">#{{ t }}</span>
+            <span v-for="ref in detail.roadRefs.slice(0, 8)" :key="ref" class="rd-tag rd-tag--road">
+              {{ ref }}
+            </span>
+            <span v-for="t in detail.tags.slice(0, 6)" :key="t" class="rd-tag">#{{ t }}</span>
           </div>
 
           <p class="rd-summary">{{ detail.summary }}</p>
-
-          <div class="rd-route-line">
-            <span class="rd-node-pin">{{ detail.startNode }}</span>
-            <span class="rd-line"></span>
-            <span class="rd-node-pin rd-node-pin--end">{{ detail.endNode }}</span>
-            <span class="rd-cities">{{ detail.cities.join(' · ') }}</span>
-          </div>
         </header>
 
-        <nav class="rd-tabs">
+        <nav class="rd-tabs" aria-label="路书章节">
           <button
             v-for="t in TABS"
             :key="t.key"
+            type="button"
             class="rd-tab"
             :class="{ on: activeTab === t.key }"
-            @click="activeTab = t.key as any"
+            @click="activeTab = t.key"
           >
             {{ t.label }}
           </button>
@@ -342,7 +359,7 @@ onMounted(async () => {
           <button class="rd-back" @click="router.push('/roadbook')">← 返回路书库</button>
           <span v-if="detail.updatedAt">最后更新 {{ detail.updatedAt }}</span>
         </footer>
-      </template>
+      </div>
     </main>
   </div>
 </template>
@@ -369,7 +386,7 @@ onMounted(async () => {
 }
 
 .rd-crumb a {
-  color: var(--accent);
+  color: var(--rd-tone, var(--accent));
   text-decoration: none;
 }
 
@@ -378,16 +395,51 @@ onMounted(async () => {
   font-weight: 500;
 }
 
-.rd-hero {
-  padding: var(--space-4) 0 var(--space-5);
-  border-bottom: 1px solid var(--line-default);
+.rd-detail {
+  --rd-tone: var(--accent);
+  --rd-tone-soft: var(--accent-soft);
+  --rd-tone-border: var(--accent-border);
 }
 
-.rd-hero-top {
+.rd-detail.is-L3 {
+  --rd-tone: var(--train);
+  --rd-tone-soft: rgba(116, 189, 137, 0.14);
+  --rd-tone-border: rgba(116, 189, 137, 0.42);
+}
+.rd-detail.is-L4 {
+  --rd-tone: var(--accent);
+  --rd-tone-soft: var(--accent-soft);
+  --rd-tone-border: var(--accent-border);
+}
+.rd-detail.is-L2 {
+  --rd-tone: var(--warning);
+  --rd-tone-soft: var(--warning-soft);
+  --rd-tone-border: rgba(224, 177, 85, 0.42);
+}
+.rd-detail.is-L1 {
+  --rd-tone: var(--purple);
+  --rd-tone-soft: var(--purple-soft);
+  --rd-tone-border: rgba(157, 140, 240, 0.42);
+}
+.rd-detail.is-L5 {
+  --rd-tone: var(--spot);
+  --rd-tone-soft: rgba(224, 145, 90, 0.14);
+  --rd-tone-border: rgba(224, 145, 90, 0.42);
+}
+
+.rd-hero {
+  margin: 0 calc(-1 * var(--space-4, 16px));
+  padding: var(--space-4) var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--line-default);
+  border-radius: var(--radius-md);
+  background: linear-gradient(165deg, var(--rd-tone-soft) 0%, transparent 48%);
+}
+
+.rd-card-badges {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--space-2);
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
 }
 
 .rd-hero h1 {
@@ -395,56 +447,118 @@ onMounted(async () => {
   font-size: var(--fs-display);
   font-weight: 600;
   color: var(--text-1);
+  line-height: 1.3;
 }
 
 .rd-badge {
-  padding: 2px var(--space-2);
+  padding: 1px 8px;
   border: 1px solid var(--line-default);
   border-radius: var(--radius-xs);
   color: var(--text-3);
   font-size: var(--fs-micro);
 }
 
+.rd-badge--layer {
+  border-color: var(--rd-tone-border);
+  background: var(--rd-tone-soft);
+  color: var(--rd-tone);
+}
+
+.rd-badge--shape.is-loop {
+  border-color: rgba(116, 189, 137, 0.35);
+  color: var(--train);
+  background: rgba(116, 189, 137, 0.1);
+}
+.rd-badge--shape.is-outback {
+  border-color: rgba(127, 180, 216, 0.35);
+  color: var(--info);
+  background: rgba(127, 180, 216, 0.1);
+}
+.rd-badge--shape.is-point {
+  border-color: rgba(224, 177, 85, 0.35);
+  color: var(--warning);
+  background: var(--warning-soft);
+}
+.rd-badge--shape.is-corridor {
+  border-color: rgba(157, 140, 240, 0.35);
+  color: var(--purple);
+  background: var(--purple-soft);
+}
+
 .rd-subtitle {
   margin: var(--space-2) 0 0;
-  font-size: var(--fs-h3);
-  color: var(--text-2);
+  font-size: var(--fs-meta);
+  color: var(--text-3);
+  line-height: 1.55;
 }
 
 .rd-metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin: var(--space-4) 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.rd-metric {
+.rd-metrics li {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--line-default);
+  padding: var(--space-3) var(--space-2);
   border-radius: var(--radius-sm);
   background: var(--surface-2);
-  min-width: 84px;
+  text-align: center;
+  min-width: 0;
 }
 
-.rd-metric i {
-  font-style: normal;
+.rd-metrics b {
   font-size: var(--fs-h3);
   font-weight: 600;
   color: var(--text-1);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.rd-metric span {
+.rd-metrics span {
   font-size: var(--fs-micro);
   color: var(--text-3);
+}
+
+.rd-diff.is-d1 b,
+.rd-diff.is-d2 b {
+  color: var(--success);
+}
+.rd-diff.is-d3 b {
+  color: var(--warning);
+}
+.rd-diff.is-d4 b,
+.rd-diff.is-d5 b {
+  color: var(--danger);
+}
+.rd-diff.is-d1,
+.rd-diff.is-d2 {
+  background: var(--success-soft);
+}
+.rd-diff.is-d3 {
+  background: var(--warning-soft);
+}
+.rd-diff.is-d4,
+.rd-diff.is-d5 {
+  background: var(--danger-soft);
+}
+
+.rd-season b {
+  color: var(--info);
 }
 
 .rd-modes {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .rd-tag {
@@ -456,14 +570,18 @@ onMounted(async () => {
 }
 
 .rd-tag--mode {
-  border-color: var(--accent-border);
-  background: var(--accent-soft);
-  color: var(--accent);
+  border-color: var(--rd-tone-border);
+  background: var(--rd-tone-soft);
+  color: var(--rd-tone);
+}
+
+.rd-tag--road {
+  font-variant-numeric: tabular-nums;
 }
 
 .rd-summary {
   margin: var(--space-4) 0 0;
-  max-width: 70ch;
+  max-width: 68ch;
   font-size: var(--fs-body);
   line-height: 1.8;
   color: var(--text-2);
@@ -480,9 +598,9 @@ onMounted(async () => {
 
 .rd-node-pin {
   padding: 2px var(--space-3);
-  border: 1px solid var(--accent-border);
+  border: 1px solid var(--rd-tone-border);
   border-radius: var(--radius-full);
-  color: var(--accent);
+  color: var(--rd-tone);
 }
 
 .rd-node-pin--end {
@@ -491,7 +609,7 @@ onMounted(async () => {
 }
 
 .rd-line {
-  flex: 0 1 60px;
+  flex: 0 1 48px;
   height: 1px;
   background: var(--line-strong);
 }
@@ -501,15 +619,19 @@ onMounted(async () => {
   font-size: var(--fs-cap);
 }
 
-/* ── Tab ──────────────────────────────────────────────────────────────── */
+/* ── Tab（吸顶，方便长文切换） ─────────────────────────────────────────── */
 .rd-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   display: flex;
   gap: var(--space-1);
-  margin: var(--space-5) 0 var(--space-4);
+  margin: var(--space-4) 0;
   padding: var(--space-1);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-lg);
-  background: var(--surface-1);
+  background: color-mix(in srgb, var(--surface-0) 72%, var(--surface-1));
+  backdrop-filter: blur(var(--glass-blur-tile));
   overflow-x: auto;
 }
 
@@ -531,8 +653,8 @@ onMounted(async () => {
 }
 
 .rd-tab.on {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--rd-tone-soft, var(--accent-soft));
+  color: var(--rd-tone, var(--accent));
 }
 
 .rd-section {
@@ -562,6 +684,7 @@ onMounted(async () => {
 .rd-info-card {
   padding: var(--space-4);
   border: 1px solid var(--line-default);
+  border-left: 3px solid var(--rd-tone-border, var(--accent-border));
   border-radius: var(--radius-md);
   background: var(--surface-1);
 }
@@ -630,8 +753,8 @@ onMounted(async () => {
   display: grid;
   place-items: center;
   border-radius: var(--radius-full);
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--rd-tone-soft, var(--accent-soft));
+  color: var(--rd-tone, var(--accent));
   font-size: var(--fs-micro);
   font-weight: 600;
 }
@@ -672,10 +795,10 @@ onMounted(async () => {
 
 .rd-road {
   padding: 2px var(--space-2);
-  border: 1px solid var(--accent-border);
+  border: 1px solid var(--rd-tone-border, var(--accent-border));
   border-radius: var(--radius-xs);
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--rd-tone-soft, var(--accent-soft));
+  color: var(--rd-tone, var(--accent));
   font-size: var(--fs-cap);
   font-variant-numeric: tabular-nums;
 }
@@ -746,8 +869,8 @@ onMounted(async () => {
 .rd-day-no {
   padding: 2px var(--space-2);
   border-radius: var(--radius-xs);
-  background: var(--surface-3);
-  color: var(--accent);
+  background: var(--rd-tone-soft, var(--accent-soft));
+  color: var(--rd-tone, var(--accent));
   font-size: var(--fs-cap);
   font-weight: 600;
 }
@@ -796,7 +919,8 @@ onMounted(async () => {
 }
 
 .rd-spot.is-must {
-  border-color: var(--accent-border);
+  border-color: var(--rd-tone-border, var(--accent-border));
+  background: color-mix(in srgb, var(--rd-tone-soft, var(--accent-soft)) 55%, var(--surface-1));
 }
 
 .rd-spot-head h3 {
@@ -810,8 +934,8 @@ onMounted(async () => {
   margin-left: var(--space-2);
   padding: 1px 6px;
   border-radius: var(--radius-xs);
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--rd-tone-soft, var(--accent-soft));
+  color: var(--rd-tone, var(--accent));
   font-size: var(--fs-micro);
   font-weight: 400;
 }
@@ -839,7 +963,7 @@ onMounted(async () => {
 .rd-spot-tagline {
   margin: var(--space-3) 0 0;
   font-size: var(--fs-meta);
-  color: var(--accent);
+  color: var(--rd-tone, var(--accent));
 }
 
 .rd-spot-intro {
@@ -955,8 +1079,15 @@ onMounted(async () => {
 }
 
 .rd-back:hover {
-  color: var(--text-1);
-  border-color: var(--line-strong);
+  color: var(--rd-tone, var(--text-1));
+  border-color: var(--rd-tone-border, var(--line-strong));
+  background: var(--rd-tone-soft, var(--surface-2));
+}
+
+@media (max-width: 720px) {
+  .rd-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
@@ -965,8 +1096,12 @@ onMounted(async () => {
     gap: var(--space-1);
   }
 
-  .rd-metric {
-    flex: 1 1 40%;
+  .rd-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rd-tabs {
+    top: 0;
   }
 }
 </style>

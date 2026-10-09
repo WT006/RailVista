@@ -21,7 +21,7 @@ import {
 import { api } from '../api/client';
 import { useGeolocation } from '../composables/useGeolocation';
 import { escHtml } from '../data/spotDimensions';
-import { ROAD_COLORS } from '../data/roadColors';
+import { DRIVE_TIER_COLORS, ROAD_COLORS, driveTierColor } from '../data/roadColors';
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 
 const route = useRoute();
@@ -39,6 +39,9 @@ const loadError = ref('');
 const mapError = ref('');
 const roadRoute = ref<RoadRoute | null>(null);
 const spots = ref<AlongSpot[]>([]);
+/** 未贯通段景点：地图可打点，不参与章节/即将到达进度 */
+const orphanSpots = ref<AlongSpot[]>([]);
+const spotStats = ref<{ main: number; orphan: number } | null>(null);
 const chapters = ref<RoadChapter[]>([]);
 const progress = ref(0);
 /** 用户开启实时跟随（点「定位」开启；拖进度条暂停） */
@@ -75,10 +78,12 @@ let routeLine: any = null;
 let routeShadow: any = null;
 let vehicleMarker: any = null;
 let gpsMarker: any = null;
-let spotMarkers: any[] = [];
+/** 已挂载的景点 Marker（含 tier，图例开关只 show/hide，避免整层重建闪烁） */
+let spotMarkers: { marker: any; tier: string }[] = [];
 let satelliteLayer: any = null;
 let roadNetLayer: any = null;
 let openInfo: any = null;
+let openSpot: AlongSpot | null = null;
 /** 分批挂载景点 Marker 的 rAF / 超时句柄 */
 let markerBatchRaf = 0;
 let markerBatchTimer = 0;
@@ -142,14 +147,19 @@ const routeEndpoints = computed(() => {
   return { start: first.from, end: last.to || last.from };
 });
 
-const visibleSpots = computed(() =>
-  spots.value.filter((s) => {
-    if (s.tier === 'A' && !showTierA.value) return false;
-    if (s.tier === 'B' && !showTierB.value) return false;
-    if (s.tier === 'C' && !showTierC.value) return false;
-    return true;
-  }),
+/** 地图可打点景点（主链 + 未贯通段）；图例显隐不改这份列表，只 show/hide Marker */
+const mapSpots = computed(() =>
+  [...spots.value, ...orphanSpots.value].filter(
+    (s) => Number.isFinite(s.lng) && Number.isFinite(s.lat),
+  ),
 );
+
+function isTierVisible(tier: string): boolean {
+  if (tier === 'A') return showTierA.value;
+  if (tier === 'B') return showTierB.value;
+  if (tier === 'C') return showTierC.value;
+  return true;
+}
 
 const upcomingSpot = computed(() => {
   const km = progressKm.value;
@@ -275,9 +285,7 @@ const VIS_LABEL: Record<string, string> = {
 };
 
 function tierColor(tier: string): string {
-  if (tier === 'A') return ROAD_COLORS.expressway;
-  if (tier === 'C') return ROAD_COLORS.provincial;
-  return ROAD_COLORS.national;
+  return driveTierColor(tier);
 }
 
 function kmText(km: number): string {
@@ -350,6 +358,11 @@ async function load() {
     const data = await api.getDriveAlong(params);
     roadRoute.value = data.route;
     spots.value = data.spots;
+    orphanSpots.value = data.orphanSpots ?? [];
+    spotStats.value = data.spotStats ?? {
+      main: data.spots.length,
+      orphan: (data.orphanSpots ?? []).length,
+    };
     chapters.value = data.chapters ?? [];
     const p = Number(route.query.progress);
     if (Number.isFinite(p)) progress.value = Math.max(0, Math.min(1, p));
@@ -466,8 +479,24 @@ function buildSpotMarker(spot: AlongSpot) {
   return marker;
 }
 
+function closeOpenInfo() {
+  try {
+    openInfo?.close?.();
+  } catch {
+    /* ignore */
+  }
+  openInfo = null;
+  openSpot = null;
+  try {
+    map?.clearInfoWindow?.();
+  } catch {
+    /* ignore */
+  }
+}
+
 function openSpotCard(spot: AlongSpot) {
   if (!map || !AMapRef) return;
+  if (!isTierVisible(spot.tier)) return;
   const color = tierColor(spot.tier);
   const badges = [
     `<span class="drive-map-card__badge is-tier-${spot.tier.toLowerCase()}">${TIER_LABEL[spot.tier] ?? spot.tier}</span>`,
@@ -494,12 +523,9 @@ function openSpotCard(spot: AlongSpot) {
     </div>`,
     offset: new AMapRef.Pixel(0, -36),
   });
-  try {
-    openInfo?.close?.();
-  } catch {
-    /* ignore */
-  }
+  closeOpenInfo();
   openInfo = info;
+  openSpot = spot;
   info.open(map, [spot.lng, spot.lat]);
 }
 
@@ -516,20 +542,16 @@ function cancelMarkerBatch() {
 
 function clearSpotMarkers() {
   cancelMarkerBatch();
-  try {
-    map?.clearInfoWindow?.();
-  } catch {
-    /* ignore */
-  }
-  openInfo = null;
+  closeOpenInfo();
   if (!map || !spotMarkers.length) {
     spotMarkers = [];
     return;
   }
+  const markers = spotMarkers.map((e) => e.marker);
   try {
-    map.remove(spotMarkers);
+    map.remove(markers);
   } catch {
-    for (const m of spotMarkers) {
+    for (const m of markers) {
       try {
         map.remove(m);
       } catch {
@@ -540,12 +562,23 @@ function clearSpotMarkers() {
   spotMarkers = [];
 }
 
+/** 图例开关：只显隐，不销毁重建（避免其它等级闪一下） */
+function applySpotTierVisibility() {
+  for (const { marker, tier } of spotMarkers) {
+    try {
+      if (isTierVisible(tier)) marker.show();
+      else marker.hide();
+    } catch {
+      /* ignore */
+    }
+  }
+  if (openSpot && !isTierVisible(openSpot.tier)) closeOpenInfo();
+}
+
 function rebuildSpotMarkers() {
   if (!map || !AMapRef) return;
   clearSpotMarkers();
-  const list = visibleSpots.value.filter(
-    (s) => Number.isFinite(s.lng) && Number.isFinite(s.lat),
-  );
+  const list = mapSpots.value;
   if (!list.length) return;
 
   let i = 0;
@@ -555,15 +588,26 @@ function rebuildSpotMarkers() {
     const batch: any[] = [];
     const end = Math.min(i + MARKER_CHUNK, list.length);
     for (; i < end; i += 1) {
-      const marker = buildSpotMarker(list[i]!);
+      const spot = list[i]!;
+      const marker = buildSpotMarker(spot);
       batch.push(marker);
-      spotMarkers.push(marker);
+      spotMarkers.push({ marker, tier: spot.tier });
     }
     if (batch.length) {
       try {
         map.add(batch);
       } catch {
         for (const m of batch) map.add(m);
+      }
+      // 先挂上地图再 hide，避免高德对未入图 Marker 的 hide 状态异常
+      for (const { marker, tier } of spotMarkers.slice(spotMarkers.length - batch.length)) {
+        if (!isTierVisible(tier)) {
+          try {
+            marker.hide();
+          } catch {
+            /* ignore */
+          }
+        }
       }
     }
     if (i < list.length) {
@@ -840,7 +884,7 @@ watch(progress, () => {
 watch(
   () => [showTierA.value, showTierB.value, showTierC.value],
   () => {
-    rebuildSpotMarkers();
+    applySpotTierVisibility();
   },
 );
 
@@ -951,7 +995,12 @@ onUnmounted(() => {
                   </div>
                   <div class="status-meta__item">
                     <span class="status-meta__k">景点</span>
-                    <span class="status-meta__v">{{ spots.length }} 处</span>
+                    <span class="status-meta__v">
+                      {{ spotStats?.main ?? spots.length }} 处
+                      <template v-if="(spotStats?.orphan ?? orphanSpots.length) > 0">
+                        ·未贯通{{ spotStats?.orphan ?? orphanSpots.length }}
+                      </template>
+                    </span>
                   </div>
                   <div class="status-meta__item">
                     <span class="status-meta__k">定位</span>
@@ -1098,7 +1147,7 @@ onUnmounted(() => {
           :aria-pressed="showTierA"
           @click="showTierA = !showTierA"
         >
-          <i class="spot" aria-hidden="true" />
+          <i class="spot spot-tier-a" :style="{ background: DRIVE_TIER_COLORS.A }" aria-hidden="true" />
           讲解级 (A)
         </button>
         <button
@@ -1107,7 +1156,7 @@ onUnmounted(() => {
           :aria-pressed="showTierB"
           @click="showTierB = !showTierB"
         >
-          <i class="spot" aria-hidden="true" />
+          <i class="spot spot-tier-b" :style="{ background: DRIVE_TIER_COLORS.B }" aria-hidden="true" />
           沿途可看 (B)
         </button>
         <button
@@ -1116,7 +1165,7 @@ onUnmounted(() => {
           :aria-pressed="showTierC"
           @click="showTierC = !showTierC"
         >
-          <i class="spot" aria-hidden="true" />
+          <i class="spot spot-tier-c" :style="{ background: DRIVE_TIER_COLORS.C }" aria-hidden="true" />
           小确幸 (C)
         </button>
       </div>

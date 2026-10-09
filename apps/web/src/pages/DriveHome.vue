@@ -17,6 +17,13 @@ import { useRouter } from 'vue-router';
 import { api } from '../api/client';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
+import {
+  listDriveRecent,
+  pushDriveRecentOd,
+  pushDriveRecentRoad,
+  removeDriveRecent,
+  type DriveRecentEntry,
+} from '../lib/driveRecent';
 
 usePointerSpotlight();
 import { ROAD_COLORS, roadColor, roadClassLabel, classOfRef } from '../data/roadColors';
@@ -65,8 +72,45 @@ const LEGEND = (['national', 'expressway', 'provincial', 'county'] as RoadClass[
   color: roadColor(cls),
 }));
 
-function openRoad(key: string) {
+function openRoad(key: string, name?: string, sub?: string) {
+  pushDriveRecentRoad(key, name || key, sub);
+  refreshRecentUi();
   void router.push({ path: '/drive/trip', query: { road: key } });
+}
+
+// ── 最近访问（对标铁路 SelectTrip：折叠列表 + 可删除）────────────────────────
+const recent = ref<DriveRecentEntry[]>([]);
+const recentOpen = ref(false);
+
+function refreshRecentUi() {
+  recent.value = listDriveRecent();
+}
+
+function openRecent(item: DriveRecentEntry) {
+  if (item.kind === 'od') {
+    pushDriveRecentOd(item.from, item.to);
+    refreshRecentUi();
+    void router.push({
+      path: '/drive/trip',
+      query: { from: item.from, to: item.to },
+    });
+    return;
+  }
+  openRoad(item.id, item.name, item.sub);
+}
+
+function removeRecent(key: string) {
+  removeDriveRecent(key);
+  refreshRecentUi();
+}
+
+function formatRecentTime(at: number): string {
+  const d = new Date(at);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  return `${mm}-${dd} ${hh}:${mi}`;
 }
 
 // ── OD 搜索 ──────────────────────────────────────────────────────────────────
@@ -151,11 +195,15 @@ function goTrip() {
   // 与点对点规划不同 —— 直接跳单条公路页，不再混在同一个 OD 请求里。
   const roadHit = fromHit.value?.kind === 'road' ? fromHit.value : toHit.value?.kind === 'road' ? toHit.value : null;
   if (roadHit) {
-    void router.push({ path: '/drive/trip', query: { road: roadHit.id } });
+    openRoad(roadHit.id, roadHit.name, roadHit.sub);
     return;
   }
   odError.value = '';
-  void router.push({ path: '/drive/trip', query: { from: from.value.trim(), to: to.value.trim() } });
+  const f = from.value.trim();
+  const t = to.value.trim();
+  pushDriveRecentOd(f, t);
+  refreshRecentUi();
+  void router.push({ path: '/drive/trip', query: { from: f, to: t } });
 }
 
 // ── 公路编号键盘（PRD §4.2，对标车次号前缀键盘） ────────────────────────────
@@ -244,7 +292,7 @@ function backspace() {
 
 function openRoadHit(hit: PlaceHit) {
   if (hit.kind === 'road') {
-    void router.push({ path: '/drive/trip', query: { road: hit.id } });
+    openRoad(hit.id, hit.name, hit.sub);
   }
 }
 
@@ -272,6 +320,7 @@ const stats = ref<Awaited<ReturnType<typeof api.getDriveNetworkStats>> | null>(n
 const boards = ref<Awaited<ReturnType<typeof api.getDriveBoards>>['boards']>([]);
 
 onMounted(async () => {
+  refreshRecentUi();
   void loadNetwork();
   try {
     stats.value = await api.getDriveNetworkStats();
@@ -477,6 +526,53 @@ const levelLabel: Record<string, string> = {
               </button>
             </div>
           </div>
+
+          <!-- 最近访问：默认折叠在查询区之下（对标铁路 SelectTrip） -->
+          <section v-if="recent.length" class="recent-list rv-card" data-spotlight>
+            <button
+              type="button"
+              class="recent-list__toggle"
+              :aria-expanded="recentOpen"
+              @click="recentOpen = !recentOpen"
+            >
+              <h2 class="rv-head__title">最近访问</h2>
+              <span class="recent-list__count">{{ recent.length }}</span>
+              <span
+                class="recent-list__chevron"
+                :class="{ 'is-open': recentOpen }"
+                aria-hidden="true"
+                >›</span
+              >
+            </button>
+            <div v-show="recentOpen" class="recent-list__body">
+              <div v-for="item in recent" :key="item.key" class="recent-row">
+                <button type="button" class="recent-card" @click="openRecent(item)">
+                  <span class="recent-card__main">
+                    <template v-if="item.kind === 'od'">
+                      <strong>{{ item.from }}</strong>
+                      <span>→ {{ item.to }}</span>
+                    </template>
+                    <template v-else>
+                      <strong>{{ item.name }}</strong>
+                      <span v-if="item.sub">{{ item.sub }}</span>
+                    </template>
+                  </span>
+                  <span class="recent-card__meta">
+                    {{ item.kind === 'od' ? '起终点' : '公路' }}
+                    · {{ formatRecentTime(item.at) }}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  class="recent-delete"
+                  title="从最近访问删除"
+                  @click="removeRecent(item.key)"
+                >
+                  删除
+                </button>
+              </div>
+            </div>
+          </section>
         </div>
 
         <!-- 路网速览：图例 + 干线直达（背景图即全国公路网，此处不再重复画一张地图） -->
@@ -501,7 +597,7 @@ const levelLabel: Record<string, string> = {
                 class="drive-hotroads__chip"
                 :style="{ '--prefix-color': roadColor(r.class) }"
                 :title="`${r.ref} ${r.name ?? ''} · 已绘几何 ${Math.round(r.lengthKm)} km（估算，非官方里程）`"
-                @click="openRoad(r.key)"
+                @click="openRoad(r.key, r.ref, r.name)"
               >
                 <b>{{ r.ref }}</b>
                 <em>{{ Math.round(r.lengthKm) }} km</em>

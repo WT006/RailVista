@@ -1773,6 +1773,11 @@
   stroke-width: 1.6;
 }
 
+.drive-trip-map__dot.is-orphan {
+  stroke-dasharray: 0.4 0.35;
+  stroke-opacity: 0.7;
+}
+
 /* v0.6.5：公路详情页把 hint / gap-note 收进 .drive-trip-map__bar 容器内纵向排列
    （见文件末尾 v0.6.5 段的 .drive-road-layout 作用域规则），
    避免它们与聚焦提示条在地图左下角互相压字。沿程页 DriveTrip 仍用下面的绝对定位版。 */
@@ -1892,7 +1897,10 @@
 }
 
 .drive-spot__tier.is-A { background: var(--warning-soft); color: var(--warning); }
-.drive-spot__tier.is-B { background: var(--accent-soft); color: var(--accent-hover); }
+.drive-spot__tier.is-B {
+  background: color-mix(in srgb, #ff9a76 18%, transparent);
+  color: #ff9a76;
+}
 .drive-spot__tier.is-C { background: var(--success-soft); color: var(--success); }
 
 .drive-spot__meta {
@@ -2044,7 +2052,8 @@
   }
 
   .drive-home-panel > .drive-od.rv-card,
-  .drive-home-panel > .road-kbd.rv-card {
+  .drive-home-panel > .road-kbd.rv-card,
+  .drive-home-panel > .recent-list.rv-card {
     padding: var(--space-3);
   }
 
@@ -3542,16 +3551,25 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--pin-color, var(--accent));
+  background: var(--pin-color, #ff9a76);
   border: 1.5px solid #0a1628;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--pin-color, var(--accent)) 45%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--pin-color, #ff9a76) 45%, transparent);
   pointer-events: auto;
+}
+
+.drive-map-pin.is-dot.is-tier-b {
+  width: 11px;
+  height: 11px;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--pin-color) 55%, transparent),
+    0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
 .drive-map-pin.is-dot.is-tier-c {
   width: 8px;
   height: 8px;
-  opacity: 0.85;
+  opacity: 0.88;
+  border-style: dashed;
 }
 
 /* 当前位置：菱形车辆标记 */
@@ -3564,17 +3582,17 @@
 .drive-map-vehicle__core {
   position: absolute;
   inset: 2px;
-  background: var(--accent);
+  background: var(--train);
   border: 2.5px solid #fff;
   border-radius: 4px;
   transform: rotate(45deg);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--train) 35%, transparent);
 }
 
 .drive-map-vehicle__ring {
   position: absolute;
   inset: -6px;
-  border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border: 2px solid color-mix(in srgb, var(--train) 55%, transparent);
   border-radius: 50%;
   animation: drive-vehicle-ring 2.4s ease-out infinite;
 }
@@ -3710,9 +3728,9 @@
 }
 
 .drive-map-card__badge.is-tier-b {
-  color: var(--accent-hover);
-  background: var(--accent-soft);
-  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: color-mix(in srgb, #ff9a76 90%, var(--text-1));
+  background: color-mix(in srgb, #ff9a76 12%, transparent);
+  border-color: color-mix(in srgb, #ff9a76 35%, transparent);
 }
 
 .drive-map-card__badge.is-tier-c {
@@ -3781,8 +3799,38 @@
   background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 70%, var(--success)));
 }
 
+/* 图例分级色：与 DRIVE_TIER_COLORS 一致；形状也区分（A 方徽 / B 圆 / C 小圆） */
 .drive-map-legend .legend-item i.spot {
-  background: var(--accent);
+  background: #ff9a76;
+}
+
+.drive-map-legend .legend-item i.spot-tier-a {
+  width: 12px;
+  height: 10px;
+  border-radius: 3px;
+  background: #ffb84d;
+}
+
+.drive-map-legend .legend-item i.spot-tier-b {
+  background: #ff9a76;
+}
+
+.drive-map-legend .legend-item i.spot-tier-c {
+  width: 8px;
+  height: 8px;
+  background: #7ee0c0;
+}
+
+.drive-map-legend .legend-item i.rail {
+  background: var(--rail);
+}
+
+.drive-map-legend .legend-item i.train {
+  background: var(--train);
+}
+
+.drive-map-legend .legend-item i.gps {
+  background: var(--gps);
 }
 
 /* 全览：独立胶囊按钮，不塞进图例（避免默认 button 白底与底栏「预览」重叠） */

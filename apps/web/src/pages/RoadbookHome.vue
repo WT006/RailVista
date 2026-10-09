@@ -168,10 +168,25 @@ function openDetail(id: string) {
   router.push(`/roadbook/${id}`);
 }
 
+/** 卡片用短季节：4-5·9-11月，避免指标格被「4、5、9、10、11 月」撑爆 */
 function seasonText(months: number[]): string {
   if (!months.length || months.length === 12) return '全年';
   const sorted = [...new Set(months)].sort((a, b) => a - b);
-  return sorted.join('、') + ' 月';
+  const ranges: string[] = [];
+  let start = sorted[0]!;
+  let end = start;
+  for (let i = 1; i <= sorted.length; i += 1) {
+    const n = sorted[i];
+    if (n === end + 1) {
+      end = n;
+      continue;
+    }
+    ranges.push(start === end ? `${start}` : `${start}-${end}`);
+    if (n == null) break;
+    start = n;
+    end = n;
+  }
+  return `${ranges.join('·')}月`;
 }
 </script>
 
@@ -182,14 +197,13 @@ function seasonText(months: number[]): string {
         <p class="rb-eyebrow">ROUTE BOOK</p>
         <h1>路书库</h1>
         <p class="rb-sub">
-          按「省份 → 城市」组织的旅行路线库。路线类型不限于自驾——同一条线路通常同时支持
-          包车、公共交通、骑行或徒步，每条的路书里都写清楚了无车怎么走。
+          按省份与城市挑选路线。自驾、包车、公共交通、骑行、徒步均可；点进卡片看完整行程。
         </p>
         <p class="rb-stat">
-          收录 <b>{{ overview.totalRoutes }}</b> 条路线 ·
-          <b>{{ overview.totalPois }}</b> 个景点 ·
-          覆盖全国 <b>{{ provinces.length }}</b> 个省级行政区
-          <span v-if="overview.latestUpdated"> · 更新于 {{ overview.latestUpdated }}</span>
+          <b>{{ overview.totalRoutes }}</b> 条路线 ·
+          <b>{{ overview.totalPois }}</b> 处景点 ·
+          <b>{{ provinces.length }}</b> 省区
+          <span v-if="overview.latestUpdated"> · {{ overview.latestUpdated }}</span>
         </p>
       </header>
 
@@ -213,78 +227,63 @@ function seasonText(months: number[]): string {
         </div>
 
         <template v-if="citiesOfProvince.length">
-          <div class="rb-filter-head">
-            {{ province }} 的城市
-            <span class="rb-filter-hint">
-              （灰显表示尚未收录独立路线；数字为已有路线数）
-            </span>
-          </div>
+          <div class="rb-filter-head">{{ province }} · 城市</div>
           <div class="rb-chips">
-            <button class="rb-chip sm" :class="{ on: !city }" @click="pickCity('')">全部城市</button>
+            <button class="rb-chip sm" :class="{ on: !city }" @click="pickCity('')">全部</button>
             <button
-              v-for="c in citiesOfProvince"
+              v-for="c in selectableCities"
               :key="c.name"
               class="rb-chip sm"
-              :class="{ on: city === c.name, todo: !c.routeIds?.length }"
+              :class="{ on: city === c.name }"
               @click="pickCity(c.name)"
             >
               {{ c.name }}
-              <i v-if="c.routeIds?.length" class="rb-chip-n">{{ c.routeIds.length }}</i>
+              <i class="rb-chip-n">{{ c.routeIds?.length ?? 0 }}</i>
             </button>
           </div>
         </template>
       </section>
 
-      <!-- 内容分层 L1~L5（颗粒度维度，与省份 / 玩法是「与」关系） -->
-      <section class="rb-filter-block">
-        <div class="rb-filter-head">
-          内容分层
-          <span class="rb-filter-hint">
-            （顺序与推荐列表的出现先后一致：景区几日游 → 周末周边 → 区域环线 → 国家级大环线 → 小众目的地）
-          </span>
-        </div>
-        <div class="rb-chips">
-          <button class="rb-chip" :class="{ on: !layer }" @click="pickLayer('')">全部</button>
-          <button
-            v-for="l in LAYERS"
-            :key="l.key"
-            class="rb-chip"
-            :class="{ on: layer === l.key }"
-            @click="pickLayer(l.key)"
-          >
-            {{ l.label }}
-            <i class="rb-chip-n">{{ layerCounts[l.key] ?? 0 }}</i>
-          </button>
-        </div>
-      </section>
-
-      <!-- 玩法 + 关键词 + 排序 -->
-      <section class="rb-filter-block">
-        <div class="rb-filter-head">玩法</div>
-        <div class="rb-chips">
-          <button class="rb-chip" :class="{ on: !mode }" @click="mode = ''">不限</button>
-          <button
-            v-for="m in MODES"
-            :key="m.key"
-            class="rb-chip"
-            :class="{ on: mode === m.key }"
-            @click="mode = m.key"
-          >
-            {{ m.label }}
-          </button>
-        </div>
-
-        <div class="rb-row">
-          <input
-            v-model="keyword"
-            class="rb-input"
-            type="search"
-            placeholder="搜路线名 / 城市 / 公路编号（如 G318）"
-          />
-          <select v-model="sort" class="rb-select">
-            <option v-for="s in SORTS" :key="s.key" :value="s.key">{{ s.label }}</option>
-          </select>
-          <button class="rb-reset" @click="reset">重置</button>
+      <section class="rb-filter-block rb-filter-block--tools">
+        <div class="rb-tools">
+          <div class="rb-chips rb-chips--inline">
+            <button class="rb-chip" :class="{ on: !layer }" @click="pickLayer('')">全部层</button>
+            <button
+              v-for="l in LAYERS"
+              :key="l.key"
+              class="rb-chip"
+              :class="[{ on: layer === l.key }, `tone-${l.key}`]"
+              :title="l.label"
+              @click="pickLayer(l.key)"
+            >
+              {{ l.label }}
+              <i class="rb-chip-n">{{ layerCounts[l.key] ?? 0 }}</i>
+            </button>
+          </div>
+          <div class="rb-chips rb-chips--inline">
+            <button class="rb-chip" :class="{ on: !mode }" @click="mode = ''">玩法不限</button>
+            <button
+              v-for="m in MODES"
+              :key="m.key"
+              class="rb-chip"
+              :class="{ on: mode === m.key }"
+              @click="mode = m.key"
+            >
+              {{ m.label }}
+            </button>
+          </div>
+          <div class="rb-row">
+            <input
+              v-model="keyword"
+              class="rb-input"
+              type="search"
+              placeholder="搜路线 / 城市 / G318"
+            />
+            <select v-model="sort" class="rb-select">
+              <option v-for="s in SORTS" :key="s.key" :value="s.key">{{ s.label }}</option>
+            </select>
+            <button class="rb-reset" @click="reset">重置</button>
+          </div>
         </div>
       </section>
 
@@ -311,37 +310,33 @@ function seasonText(months: number[]): string {
           v-for="r in routes"
           :key="r.id"
           class="rb-card"
+          role="link"
+          tabindex="0"
           @click="openDetail(r.id)"
+          @keydown.enter.prevent="openDetail(r.id)"
         >
-          <header class="rb-card-head">
-            <div class="rb-card-title">
-              <h2>{{ r.name }}</h2>
-              <span class="rb-layer">{{ layerLabel(r.layer) }}</span>
-              <span class="rb-shape">{{ SHAPE[r.shape] ?? r.shape }}</span>
-            </div>
-            <p class="rb-card-sub">{{ r.subtitle }}</p>
-          </header>
-
-          <div class="rb-metrics">
-            <span class="rb-metric"><i>{{ r.days }}</i>天</span>
-            <span class="rb-metric"><i>{{ r.totalKm }}</i>km</span>
-            <span class="rb-metric">难度 <i>{{ DIFFICULTY[r.difficulty] ?? r.difficulty }}</i></span>
-            <span class="rb-metric">{{ seasonText(r.bestSeason) }}</span>
+          <div class="rb-card-badges">
+            <span class="rb-layer" :class="`is-${r.layer}`">{{ layerLabel(r.layer) }}</span>
+            <span class="rb-shape" :class="`is-${r.shape}`">{{ SHAPE[r.shape] ?? r.shape }}</span>
           </div>
+          <h2 class="rb-card-title">{{ r.name }}</h2>
+          <p class="rb-card-sub">{{ r.subtitle }}</p>
 
-          <p class="rb-summary">{{ r.summary }}</p>
-
-          <div class="rb-modes">
-            <span v-for="m in r.modes" :key="m" class="rb-tag rb-tag--mode">{{ modeLabel(m) }}</span>
-          </div>
-
-          <div class="rb-roads">
-            <span v-for="ref in r.roadRefs.slice(0, 6)" :key="ref" class="rb-road">{{ ref }}</span>
-          </div>
+          <ul class="rb-metrics" aria-label="路线要点">
+            <li><b>{{ r.days }}</b><span>天</span></li>
+            <li><b>{{ r.totalKm }}</b><span>km</span></li>
+            <li class="rb-diff" :class="`is-d${r.difficulty}`">
+              <b>{{ DIFFICULTY[r.difficulty] ?? r.difficulty }}</b><span>难度</span>
+            </li>
+            <li class="rb-season"><b>{{ seasonText(r.bestSeason) }}</b><span>季节</span></li>
+          </ul>
 
           <footer class="rb-card-foot">
-            <span>{{ r.poiCount }} 个景点 · {{ r.planCount }} 天行程 · {{ r.segmentCount }} 段公路</span>
-            <span class="rb-more">查看路书 →</span>
+            <span class="rb-card-place">
+              {{ r.provinces.slice(0, 2).join(' · ') }}
+              <template v-if="r.cities?.length"> · {{ r.cities[0] }}</template>
+            </span>
+            <span class="rb-more">详情</span>
           </footer>
         </article>
       </section>
@@ -350,12 +345,8 @@ function seasonText(months: number[]): string {
 </template>
 
 <style scoped>
-.rb-page-shell {
-  min-height: 100%;
-}
-
 .rb-hero {
-  padding: var(--space-6) 0 var(--space-5);
+  padding: var(--space-5) 0 var(--space-4);
 }
 
 .rb-eyebrow {
@@ -366,7 +357,7 @@ function seasonText(months: number[]): string {
 }
 
 .rb-hero h1 {
-  margin: 0 0 var(--space-3);
+  margin: 0 0 var(--space-2);
   font-size: var(--fs-display);
   font-weight: 600;
   color: var(--text-1);
@@ -375,14 +366,14 @@ function seasonText(months: number[]): string {
 .rb-sub,
 .rb-stat {
   margin: 0;
-  max-width: 62ch;
+  max-width: 52ch;
   font-size: var(--fs-body);
-  line-height: 1.7;
+  line-height: 1.65;
   color: var(--text-2);
 }
 
 .rb-stat {
-  margin-top: var(--space-3);
+  margin-top: var(--space-2);
   font-size: var(--fs-meta);
   color: var(--text-3);
 }
@@ -392,51 +383,52 @@ function seasonText(months: number[]): string {
   font-weight: 600;
 }
 
-/* ── 筛选区 ───────────────────────────────────────────────────────────── */
 .rb-filter-block {
-  margin-bottom: var(--space-5);
-  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-md);
   background: var(--surface-1);
   backdrop-filter: blur(var(--glass-blur-tile));
 }
 
-.rb-filter-head {
-  margin-bottom: var(--space-3);
-  font-size: var(--fs-h3);
-  font-weight: 600;
-  color: var(--text-1);
+.rb-filter-block--tools {
+  padding-bottom: var(--space-4);
 }
 
-.rb-filter-hint {
-  margin-left: var(--space-2);
-  font-size: var(--fs-cap);
-  font-weight: 400;
-  color: var(--text-3);
+.rb-filter-head {
+  margin-bottom: var(--space-2);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.rb-tools {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .rb-chips {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  margin-bottom: var(--space-4);
 }
 
-.rb-chips:last-child {
-  margin-bottom: 0;
+.rb-chips--inline {
+  margin: 0;
 }
 
 .rb-chip {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 6px var(--space-3);
+  padding: 5px var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-full);
   background: var(--surface-2);
   color: var(--text-2);
-  font-size: var(--fs-meta);
+  font-size: var(--fs-cap);
   cursor: pointer;
   transition:
     color var(--dur-fast) var(--ease-standard),
@@ -445,8 +437,7 @@ function seasonText(months: number[]): string {
 }
 
 .rb-chip.sm {
-  padding: 4px var(--space-3);
-  font-size: var(--fs-cap);
+  padding: 3px var(--space-2);
 }
 
 .rb-chip:hover {
@@ -460,10 +451,30 @@ function seasonText(months: number[]): string {
   background: var(--accent-soft);
 }
 
-/* 尚无路线的城市：保留可见性但弱化，把「还没补」这件事透明化 */
-.rb-chip.todo {
-  opacity: 0.42;
-  cursor: not-allowed;
+.rb-chip.tone-L3.on {
+  color: var(--train);
+  border-color: rgba(116, 189, 137, 0.45);
+  background: rgba(116, 189, 137, 0.14);
+}
+.rb-chip.tone-L4.on {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+.rb-chip.tone-L2.on {
+  color: var(--warning);
+  border-color: rgba(224, 177, 85, 0.45);
+  background: var(--warning-soft);
+}
+.rb-chip.tone-L1.on {
+  color: var(--purple);
+  border-color: rgba(157, 140, 240, 0.45);
+  background: var(--purple-soft);
+}
+.rb-chip.tone-L5.on {
+  color: var(--spot);
+  border-color: rgba(224, 145, 90, 0.45);
+  background: rgba(224, 145, 90, 0.14);
 }
 
 .rb-chip-n {
@@ -473,7 +484,8 @@ function seasonText(months: number[]): string {
 }
 
 .rb-chip.on .rb-chip-n {
-  color: var(--accent);
+  color: inherit;
+  opacity: 0.85;
 }
 
 .rb-row {
@@ -484,8 +496,8 @@ function seasonText(months: number[]): string {
 }
 
 .rb-input {
-  flex: 1 1 260px;
-  min-height: 40px;
+  flex: 1 1 220px;
+  min-height: 36px;
   padding: 0 var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-sm);
@@ -500,13 +512,13 @@ function seasonText(months: number[]): string {
 
 .rb-select,
 .rb-reset {
-  min-height: 40px;
+  min-height: 36px;
   padding: 0 var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-sm);
   background: var(--surface-2);
   color: var(--text-2);
-  font-size: var(--fs-meta);
+  font-size: var(--fs-cap);
   cursor: pointer;
 }
 
@@ -516,7 +528,7 @@ function seasonText(months: number[]): string {
 }
 
 .rb-result-head {
-  margin: var(--space-4) 0 var(--space-3);
+  margin: var(--space-3) 0 var(--space-3);
   font-size: var(--fs-meta);
   color: var(--text-3);
 }
@@ -541,151 +553,174 @@ function seasonText(months: number[]): string {
 }
 
 .rb-empty--error {
-  color: #ff8f8f;
+  color: var(--danger);
 }
 
-/* ── 路线卡片 ─────────────────────────────────────────────────────────── */
+/* ── 精简卡片：一眼扫完，点进详情看全文 ───────────────────────────────── */
 .rb-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-3);
   padding-bottom: var(--space-10);
 }
 
 .rb-card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  padding: var(--pad-card);
+  gap: var(--space-2);
+  min-height: 188px;
+  padding: var(--space-4);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-md);
   background: var(--surface-1);
   backdrop-filter: blur(var(--glass-blur-tile));
   cursor: pointer;
+  overflow: hidden;
   transition:
     border-color var(--dur-base) var(--ease-standard),
-    transform var(--dur-base) var(--ease-standard);
+    transform var(--dur-base) var(--ease-standard),
+    box-shadow var(--dur-base) var(--ease-standard);
 }
 
-.rb-card:hover {
+.rb-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  opacity: 0.75;
+}
+
+.rb-card:hover,
+.rb-card:focus-visible {
   border-color: var(--accent-border);
   transform: translateY(-2px);
+  outline: none;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
 }
 
-.rb-card-title {
+.rb-card:hover .rb-more,
+.rb-card:focus-visible .rb-more {
+  color: var(--accent-hover);
+}
+
+.rb-card-badges {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  gap: var(--space-1);
 }
 
-.rb-card-title h2 {
-  margin: 0;
-  font-size: var(--fs-h2);
-  font-weight: 600;
-  color: var(--text-1);
-}
-
-/* 内容分层角标：轮转排序会把 5 个层混排，卡片上必须能一眼看出这条是哪一层 */
-.rb-layer {
-  padding: 1px 8px;
-  border: 1px solid var(--accent-border);
-  border-radius: var(--radius-xs);
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: var(--fs-micro);
-  white-space: nowrap;
-}
-
+.rb-layer,
 .rb-shape {
   padding: 1px 8px;
   border: 1px solid var(--line-default);
   border-radius: var(--radius-xs);
+  background: var(--fill-subtle);
   color: var(--text-3);
   font-size: var(--fs-micro);
+  white-space: nowrap;
+}
+
+.rb-card-title {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-1);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .rb-card-sub {
-  margin: var(--space-2) 0 0;
-  font-size: var(--fs-meta);
-  color: var(--text-2);
-  line-height: 1.6;
+  margin: 0;
+  font-size: var(--fs-cap);
+  line-height: 1.5;
+  color: var(--text-3);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .rb-metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin: var(--space-3) 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-1);
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.rb-metric {
-  padding: 2px var(--space-2);
+.rb-metrics li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-1);
   border-radius: var(--radius-xs);
   background: var(--surface-2);
-  color: var(--text-3);
-  font-size: var(--fs-cap);
+  text-align: center;
+  min-width: 0;
 }
 
-.rb-metric i {
-  font-style: normal;
+.rb-metrics b {
+  font-size: var(--fs-meta);
   font-weight: 600;
   color: var(--text-1);
-}
-
-.rb-summary {
-  margin: 0 0 var(--space-3);
-  font-size: var(--fs-meta);
-  line-height: 1.75;
-  color: var(--text-2);
-}
-
-.rb-modes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-  margin-bottom: var(--space-2);
-}
-
-.rb-tag {
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-xs);
-  font-size: var(--fs-cap);
-}
-
-.rb-tag--mode {
-  border: 1px solid var(--accent-border);
-  background: var(--accent-soft);
-  color: var(--accent);
-}
-
-.rb-roads {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-  margin-bottom: var(--space-3);
-}
-
-.rb-road {
-  padding: 1px 6px;
-  border: 1px solid var(--line-default);
-  border-radius: var(--radius-xs);
-  color: var(--text-3);
-  font-size: var(--fs-micro);
   font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rb-metrics span {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+/* 列表卡统一灰蓝底，难度仅用字色轻区分，不铺色块 */
+.rb-diff.is-d1 b,
+.rb-diff.is-d2 b {
+  color: var(--success);
+}
+.rb-diff.is-d3 b {
+  color: var(--warning);
+}
+.rb-diff.is-d4 b,
+.rb-diff.is-d5 b {
+  color: var(--danger);
 }
 
 .rb-card-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-2);
   margin-top: auto;
   padding-top: var(--space-3);
   border-top: 1px solid var(--line-hairline);
   font-size: var(--fs-cap);
+}
+
+.rb-card-place {
   color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rb-more {
+  flex-shrink: 0;
   color: var(--accent);
+  font-weight: 500;
+}
+
+.rb-more::after {
+  content: ' →';
 }
 
 @media (max-width: 640px) {
@@ -695,6 +730,10 @@ function seasonText(months: number[]): string {
 
   .rb-input {
     flex-basis: 100%;
+  }
+
+  .rb-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 </style>

@@ -21,7 +21,7 @@ import { useRoadDraw } from '../composables/useRoadDraw';
 usePointerSpotlight();
 import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
-import { ROAD_COLORS, roadColor, roadClassLabel, classOfRef } from '../data/roadColors';
+import { driveTierColor, roadColor, roadClassLabel, classOfRef } from '../data/roadColors';
 import type { AlongSpot, RoadAnchorSource, RoadAnchorType, RoadIndexEntry, RoadRoute } from '@railvista/shared';
 
 const route = useRoute();
@@ -29,9 +29,7 @@ const router = useRouter();
 const code = String(route.params.code ?? '');
 
 function tierColor(tier: string): string {
-  if (tier === 'A') return ROAD_COLORS.expressway;
-  if (tier === 'C') return ROAD_COLORS.provincial;
-  return ROAD_COLORS.national;
+  return driveTierColor(tier);
 }
 
 const routePathRef = ref<SVGPathElement | null>(null);
@@ -53,6 +51,9 @@ const retryingAlong = ref(false);
 const entry = ref<RoadIndexEntry | null>(null);
 const roadRoute = ref<RoadRoute | null>(null);
 const spots = ref<AlongSpot[]>([]);
+/** 未贯通段景点；列表/分段统计只用主链 spots */
+const orphanSpots = ref<AlongSpot[]>([]);
+const spotStats = ref<{ main: number; orphan: number } | null>(null);
 const geometryNote = ref('');
 
 /** B2-1：端点可信度与里程覆盖率（来自 /api/drive/road/:key） */
@@ -339,11 +340,14 @@ const featuredSpots = computed<AlongSpot[]>(() => {
   return [...named, ...latin].slice(0, FEATURED_LIMIT);
 });
 
-/** 地图圆点：全线最多画 36 个高分点，避免上百个圆点盖住中国轮廓 */
+/** 地图圆点：主链优先，未贯通段补位；最多 36 个，避免盖住轮廓 */
 const MAP_DOT_LIMIT = 36;
 const mapDots = computed<AlongSpot[]>(() => {
-  const list = [...spots.value].sort((a, b) => b.score - a.score || a.progressKm - b.progressKm);
-  return list.slice(0, MAP_DOT_LIMIT);
+  const main = [...spots.value].sort((a, b) => b.score - a.score || a.progressKm - b.progressKm);
+  if (main.length >= MAP_DOT_LIMIT) return main.slice(0, MAP_DOT_LIMIT);
+  const rest = MAP_DOT_LIMIT - main.length;
+  const orphans = [...orphanSpots.value].sort((a, b) => b.score - a.score);
+  return [...main, ...orphans.slice(0, rest)];
 });
 
 /** 精选里外文名的占比，用于如实说明「补位」情况 */
@@ -944,6 +948,11 @@ async function load(): Promise<void> {
   if (alongRes.status === 'fulfilled') {
     roadRoute.value = alongRes.value.route;
     spots.value = alongRes.value.spots;
+    orphanSpots.value = alongRes.value.orphanSpots ?? [];
+    spotStats.value = alongRes.value.spotStats ?? {
+      main: alongRes.value.spots.length,
+      orphan: (alongRes.value.orphanSpots ?? []).length,
+    };
   } else {
     alongError.value = alongRes.reason instanceof Error ? alongRes.reason.message : '沿途景点加载失败';
   }
@@ -964,6 +973,11 @@ async function retryAlong(): Promise<void> {
     const data = await api.getDriveAlong({ road: code, max: 200 });
     roadRoute.value = data.route;
     spots.value = data.spots;
+    orphanSpots.value = data.orphanSpots ?? [];
+    spotStats.value = data.spotStats ?? {
+      main: data.spots.length,
+      orphan: (data.orphanSpots ?? []).length,
+    };
   } catch (e) {
     alongError.value = e instanceof Error ? e.message : '沿途景点加载失败';
   } finally {
@@ -1040,7 +1054,13 @@ function fmtKm(v: number): string {
             </div>
             <div class="drive-road-fact">
               <dt>沿线景点</dt>
-              <dd>{{ spots.length }}<small> 处</small></dd>
+              <dd>
+                {{ spotStats?.main ?? spots.length }}<small> 处</small>
+                <em
+                  v-if="(spotStats?.orphan ?? orphanSpots.length) > 0"
+                  class="drive-road-fact__sub"
+                >未贯通段另 {{ spotStats?.orphan ?? orphanSpots.length }}</em>
+              </dd>
             </div>
           </dl>
         </header>

@@ -94,6 +94,42 @@ export function matchSpotsAlong(
 }
 
 /**
+ * 主链 + 未贯通段分别匹配景点（road-route-invariants §4 / playbook §1.3）。
+ *
+ * - `spots`：只挂主链，progressKm ∈ [0, 主链里程]，供进度条 / 章节 / 总览打点
+ * - `orphanSpots`：各断段内局部里程 + orphanChainIndex；禁止里程偏移叠进主链
+ *   （旧实现 offsetKm 累加会把北京/黑瞎子岛 POI 标成 K900+，地图起终点扎堆）
+ */
+export function matchSpotsMainAndOrphans(
+  mainCoords: [number, number, number?][],
+  orphanChains: [number, number, number?][][],
+  opts: AlongRouteOptions = {},
+): { spots: AlongSpot[]; orphanSpots: AlongSpot[] } {
+  const spots = matchSpotsAlong(mainCoords, opts);
+  const chains = (orphanChains || []).filter((c) => Array.isArray(c) && c.length >= 2);
+  if (!chains.length) return { spots, orphanSpots: [] };
+
+  const seen = new Set(spots.map((s) => s.id));
+  const orphanCap = Math.min(120, opts.maxCount ?? 200);
+  const perChain = Math.max(6, Math.ceil(orphanCap / chains.length));
+  const orphanSpots: AlongSpot[] = [];
+
+  for (let i = 0; i < chains.length; i += 1) {
+    if (orphanSpots.length >= orphanCap) break;
+    const chainOpts = { ...opts, maxCount: Math.min(perChain, orphanCap - orphanSpots.length) };
+    const part = matchSpotsAlong(chains[i]!, chainOpts);
+    for (const sp of part) {
+      if (seen.has(sp.id)) continue;
+      seen.add(sp.id);
+      orphanSpots.push({ ...sp, orphanChainIndex: i });
+      if (orphanSpots.length >= orphanCap) break;
+    }
+  }
+  orphanSpots.sort((a, b) => a.progressKm - b.progressKm || b.score - a.score);
+  return { spots, orphanSpots };
+}
+
+/**
  * 沿程章节：优先按几何自带的**地名锚点**（nodes）切段，缺地名时退回 120km 里程等分。
  *
  * v0.6.5 两个关键修正（都源于实测数据缺陷，不改会写出荒谬分段）：

@@ -1,0 +1,6919 @@
+{
+  "updated": "2026-10-09",
+  "latinTotal": 927,
+  "renamed": [
+    {
+      "id": "osm-node-4908575024",
+      "from": "Haizi mountain 4500m viewing platform",
+      "to": "海子山观景台（约4500米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5187607460",
+      "from": "Chonno",
+      "to": "琼果",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6138821287",
+      "from": "Buddhist temple and viewing platform",
+      "to": "佛寺观景台",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-12234402128",
+      "from": "Mawu Aando Waterfalls",
+      "to": "马武安多瀑布",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4843134835",
+      "from": "Jialongshan Pass",
+      "to": "加龙山垭口",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-4843137619",
+      "from": "Malongchacong Pass",
+      "to": "马龙查丛垭口",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-4843139143",
+      "from": "Daqinlong Pass",
+      "to": "大勤龙垭口",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5695990821",
+      "from": "mountain pass 4475m approx",
+      "to": "垭口（约4475米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5695990822",
+      "from": "4229m mountain pass",
+      "to": "垭口（约4229米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5698512922",
+      "from": "Salala pass 4329m",
+      "to": "萨拉拉垭口（约4329米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5717577222",
+      "from": "Mountain pass 4458m",
+      "to": "垭口（约4458米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5719673621",
+      "from": "mountain pass 4660m approx",
+      "to": "垭口（约4660米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5719673922",
+      "from": "Mountain pass 4812m",
+      "to": "垭口（约4812米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-2949524785",
+      "from": "Balagezong",
+      "to": "巴拉格宗",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6483219985",
+      "from": "Ba Po Village Lookout",
+      "to": "八婆村观景台",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5065702821",
+      "from": "Red Rocks Forest National Geopark",
+      "to": "红石林国家地质公园",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-6902496585",
+      "from": "Pingjiang Road",
+      "to": "平江路",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-11514236069",
+      "from": "Tianya Haijiao",
+      "to": "天涯海角",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-4738010218",
+      "from": "Haikou",
+      "to": "海口",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-13276279601",
+      "from": "Legoland Shanghai Resort",
+      "to": "上海乐高乐园度假区",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-11252253837",
+      "from": "Henderson Cifi Tiandi",
+      "to": "恒基天汇",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-12972214538",
+      "from": "Beihai",
+      "to": "北海",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-4858657851",
+      "from": "Tang Contemporary Art",
+      "to": "唐人当代艺术中心",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-14182276539",
+      "from": "Light and Fire Show",
+      "to": "光影火秀",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-6833728085",
+      "from": "Red Beach",
+      "to": "红海滩",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-4191939757",
+      "from": "Zotter Chocolate Theatre",
+      "to": "珍德巧克力剧场",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-6816882678",
+      "from": "Kiln ruins",
+      "to": "窑址",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-4691883298",
+      "from": "Fukui garden",
+      "to": "福井杭州友好公园",
+      "via": "osm_zh",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-6833728185",
+      "from": "Liaohe Delta",
+      "to": "辽河三角洲",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-527778728",
+      "from": "Kanbula National Park West Entrance",
+      "to": "坎布拉国家公园西门",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5799600654",
+      "from": "Lexiaguo (Red Land)",
+      "to": "乐夏果红土地",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6218853486",
+      "from": "Stone Gate",
+      "to": "石门",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-5176927623",
+      "from": "Sanke Wetland Park",
+      "to": "三棵树湿地公园",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6942413787",
+      "from": "Tea Plantations",
+      "to": "茶园",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6833728189",
+      "from": "Weihai Dingxiang Resort Community",
+      "to": "威海丁香度假社区",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-5744766621",
+      "from": "Wong Fei-hong Lion Dance & Martial Arts School",
+      "to": "黄飞鸿狮艺武术馆",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-14070718801",
+      "from": "Yanji Korean Ethnic Minority Minsuyuan",
+      "to": "延吉朝鲜族民俗园",
+      "via": "dict",
+      "province": "吉林"
+    },
+    {
+      "id": "osm-node-6734228086",
+      "from": "Dagu glacier cableway",
+      "to": "达古冰川索道",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-13143785201",
+      "from": "Sacred Way exit",
+      "to": "神道出口",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-11747500169",
+      "from": "Old bridge",
+      "to": "古桥",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-14076277501",
+      "from": "Yangyushi river boat ride",
+      "to": "阳渔石游船",
+      "via": "dict",
+      "province": "吉林"
+    },
+    {
+      "id": "osm-node-13766391617",
+      "from": "Stone Flagpoles",
+      "to": "石华表",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-4863178426",
+      "from": "Gyantso La Pass 5200m",
+      "to": "加措拉山口（约5200米）",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4865997021",
+      "from": "Sunday Bazaar",
+      "to": "周日巴扎",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-6915284885",
+      "from": "Big Stupa",
+      "to": "大佛塔",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-10711186287",
+      "from": "Suzhou Aquarium",
+      "to": "苏州水族馆",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-5716035921",
+      "from": "Yandangshan scenic area",
+      "to": "雁荡山景区",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-11609650604",
+      "from": "Hidden Stream",
+      "to": "隐溪",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-13766391616",
+      "from": "Stone Flagpoles",
+      "to": "石华表",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-4782424622",
+      "from": "Valley of painted stones (Buddhist)",
+      "to": "彩石谷",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-2967433651",
+      "from": "Ancient watchtower on a cliff",
+      "to": "悬崖古哨楼",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6217641085",
+      "from": "Tropical Botanical Garden",
+      "to": "热带植物园",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-6012690087",
+      "from": "Valley of 10,000 mani stones",
+      "to": "万枚玛尼石谷",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-601470920",
+      "from": "Yunlong Natural Scenic Spot",
+      "to": "云龙自然风景区",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-6218810285",
+      "from": "Ancient house",
+      "to": "古民居",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-4305432190",
+      "from": "Jina Qiang Zhai village",
+      "to": "吉娜羌寨",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4339025594",
+      "from": "Kanbula National Park East Entrance",
+      "to": "坎布拉国家公园东门",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-4546339891",
+      "from": "Tashixiang village",
+      "to": "塔石乡",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-7142229085",
+      "from": "Street of Memorial Arches",
+      "to": "牌坊街",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-4875121021",
+      "from": "Xia Shui Bouddha",
+      "to": "下水佛",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-13995898647",
+      "from": "Beacon Tower",
+      "to": "烽火台",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-1747807331",
+      "from": "Yiling Cave",
+      "to": "伊岭岩",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-12997314701",
+      "from": "Dalian Bear’s Den Street",
+      "to": "大连熊岳街",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-7005500885",
+      "from": "ancient kiln site",
+      "to": "古窑址",
+      "via": "dict",
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-2955353671",
+      "from": "Yak village",
+      "to": "牦牛村",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4428921189",
+      "from": "Carpet Factory Hetian",
+      "to": "和田地毯厂",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-12498228424",
+      "from": "WAWA CUBE",
+      "to": "哇哇立方",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-6904597285",
+      "from": "Well of Humanity Stupa",
+      "to": "人性之井佛塔",
+      "via": "dict",
+      "province": "山西"
+    },
+    {
+      "id": "osm-node-5091014622",
+      "from": "East Entrance Wuhzen Water Town Scenic Area",
+      "to": "乌镇景区东门",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-13854830401",
+      "from": "Huanglong Cave exit",
+      "to": "黄龙洞出口",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-5221633121",
+      "from": "Cherry and Flowers Garden",
+      "to": "樱花园",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-7114743485",
+      "from": "Xinglong Tropical Botanical Garden",
+      "to": "兴隆热带植物园",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-4249432689",
+      "from": "Ruins / Summit of the park",
+      "to": "公园山顶遗址",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6556693823",
+      "from": "Huashan cliff murals visitor center",
+      "to": "花山岩画游客中心",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-6413898293",
+      "from": "clock tower and cool walking road",
+      "to": "钟楼步行道",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-4358251492",
+      "from": "Mount Nan Pastures",
+      "to": "南牧场",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-5398192823",
+      "from": "Swan lake park",
+      "to": "天鹅湖公园",
+      "via": "dict",
+      "province": "山西"
+    },
+    {
+      "id": "osm-node-6760874085",
+      "from": "Chang Shou Well",
+      "to": "长寿井",
+      "via": "dict",
+      "province": "吉林"
+    },
+    {
+      "id": "osm-node-6760874086",
+      "from": "Remains is an altar",
+      "to": "祭坛遗址",
+      "via": "dict",
+      "province": "吉林"
+    },
+    {
+      "id": "osm-node-7296534878",
+      "from": "Longchi Mountain Bicycle Park",
+      "to": "龙池山自行车公园",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-13936554701",
+      "from": "Longquan Ancient Town Drama Fantasy City",
+      "to": "龙泉古镇戏剧幻城",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-13786649501",
+      "from": "Jingzu Peak (Feng) Scenic Area",
+      "to": "景族峰景区",
+      "via": "dict",
+      "province": "黑龙江"
+    },
+    {
+      "id": "osm-node-4908434066",
+      "from": "Sand Park",
+      "to": "沙地公园",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-13936539201",
+      "from": "Zhengding Ancient City Food Street",
+      "to": "正定古城美食街",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-12286727301",
+      "from": "Jing'an Market",
+      "to": "静安市场",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-4756757817",
+      "from": "A Pillar Piercing into the Southern Sky",
+      "to": "南天一柱",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-13793221201",
+      "from": "Shuishang Mingzhu Tourism Scenic Area",
+      "to": "水上明珠旅游景区",
+      "via": "dict",
+      "province": "黑龙江"
+    },
+    {
+      "id": "osm-node-6964126989",
+      "from": "Lao jie",
+      "to": "老街",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-4464735092",
+      "from": "Ancient Town of Changshou",
+      "to": "长寿古镇",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-4974950621",
+      "from": "Gegentela Grassland",
+      "to": "葛根塔拉草原",
+      "via": "dict",
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-7062451088",
+      "from": "The Green Pearl Pool",
+      "to": "绿宝石潭",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-13196423303",
+      "from": "Old houses area",
+      "to": "旧民居区",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-6874965875",
+      "from": "Wangjiang Pavilion crossing",
+      "to": "望江亭",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-4756297145",
+      "from": "Drum Tower",
+      "to": "鼓楼",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-4340599989",
+      "from": "International Village - Guojicun",
+      "to": "国际村",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-4784459724",
+      "from": "Platform Park in the Water",
+      "to": "水上平台公园",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-1960518422",
+      "from": "Botanical garden",
+      "to": "植物园",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-4338599089",
+      "from": "Xining Market",
+      "to": "西宁市场",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-4855495322",
+      "from": "Qinglong Ancient Temple",
+      "to": "青龙古寺",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-9474003932",
+      "from": "Xiaohongcheng Fortress",
+      "to": "小红城堡垒",
+      "via": "dict",
+      "province": "山西"
+    },
+    {
+      "id": "osm-node-13205475301",
+      "from": "Entrance for Tashkorgan site visit",
+      "to": "塔什库尔干遗址入口",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-8071598217",
+      "from": "Sunac Snow Park",
+      "to": "融创雪世界",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4778659924",
+      "from": "China Peacock Court",
+      "to": "中国孔雀苑",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-4143873848",
+      "from": "Cool Breeze in Yunzhuan Mountain",
+      "to": "云篆山清风",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-4813303257",
+      "from": "Yan Village Drum Tower",
+      "to": "岩村鼓楼",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-4305603389",
+      "from": "Beichuan Qiang Tourism Area",
+      "to": "北川羌族旅游区",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4832873926",
+      "from": "Hua Hui Mausoleum",
+      "to": "花荟陵园",
+      "via": "dict",
+      "province": "陕西"
+    },
+    {
+      "id": "osm-node-8071527824",
+      "from": "Sunac Water Park",
+      "to": "融创水世界",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-12877140601",
+      "from": "Pu'er Historical City",
+      "to": "普洱古城",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-7407702787",
+      "from": "The Ming Tombs (Sacred Road)",
+      "to": "明十三陵神道",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-4443278690",
+      "from": "Post museum",
+      "to": "上海邮政博物馆",
+      "via": "osm_zh",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-5018172525",
+      "from": "Pak Tsz Lane Park",
+      "to": "柏子里公园",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-6717818085",
+      "from": "China (Hainan) Museum of The South China Sea",
+      "to": "中国（海南）南海博物馆",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-4128221389",
+      "from": "Danfeng Gate Heritage Museum",
+      "to": "丹凤门遗址博物馆",
+      "via": "dict",
+      "province": "陕西"
+    },
+    {
+      "id": "osm-node-13049002331",
+      "from": "Gallery Jeeum",
+      "to": "济阴画廊",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-4858657852",
+      "from": "Polar Bear Gallery",
+      "to": "北极熊画廊",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-4858658129",
+      "from": "Tabula Rasa Gallery",
+      "to": "白板画廊",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-8936132445",
+      "from": "maritime museum",
+      "to": "海事博物馆",
+      "via": "dict",
+      "province": "山东"
+    },
+    {
+      "id": "osm-node-14197271135",
+      "from": "The Palace Museum",
+      "to": "故宫博物院",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-10701854141",
+      "from": "Artelli",
+      "to": "阿特里",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-7975819119",
+      "from": "Sifang Art Museum",
+      "to": "四方当代美术馆",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-4324756589",
+      "from": "Xiaohuang",
+      "to": "小黄",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-4326453189",
+      "from": "Baba Village",
+      "to": "坝巴村",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-5932319187",
+      "from": "Bazar tower",
+      "to": "巴扎塔",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-4789270527",
+      "from": "Cosmodrome Museum",
+      "to": "航天博物馆",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-6926032086",
+      "from": "South Gate",
+      "to": "南门",
+      "via": "dict",
+      "province": "陕西"
+    },
+    {
+      "id": "osm-node-5549437023",
+      "from": "Xining City Wall",
+      "to": "西宁城墙",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5332379935",
+      "from": "Exhibition Hall",
+      "to": "展厅",
+      "via": "dict",
+      "province": "山东"
+    },
+    {
+      "id": "osm-node-4656568392",
+      "from": "Hainan Jingrum Pearl",
+      "to": "海南珍珠馆",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-6505640285",
+      "from": "Art Museum",
+      "to": "美术馆",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-1870894018",
+      "from": "Great Wall Jade Culture Museum",
+      "to": "长城玉文化博物馆",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-14184626901",
+      "from": "Guangzhou Xuelei Fragrance Museum",
+      "to": "广州香雪博物馆",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-10698965795",
+      "from": "Shanghai Baoshan International Folk Arts Exposition",
+      "to": "上海宝山国际民间艺术博览馆",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-5551431721",
+      "from": "Peking Man Museum",
+      "to": "北京猿人博物馆",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-11140106092",
+      "from": "Othello Kitchenware Museum",
+      "to": "奥赛罗厨具博物馆",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-13935135876",
+      "from": "Lai Wanxiang Art Gallery",
+      "to": "赖万祥美术馆",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-8510161794",
+      "from": "Sanqing Shan Geological Museum",
+      "to": "三清山地质博物馆",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-5940099585",
+      "from": "Karez system Museum",
+      "to": "坎儿井博物馆",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-6366690608",
+      "from": "Yuzhou City Ruins",
+      "to": "玉州古城遗址",
+      "via": "dict",
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-14076072401",
+      "from": "Ji'An museum",
+      "to": "集安博物馆",
+      "via": "dict",
+      "province": "吉林"
+    },
+    {
+      "id": "osm-node-9329539143",
+      "from": "Triathlon Museuam",
+      "to": "铁人三项博物馆",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-6366690795",
+      "from": "Pingquan bowuguan",
+      "to": "平泉博物馆",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-13688781452",
+      "from": "Chang Alley No. 9 Wang's Folk Home",
+      "to": "昌九弄王家民居",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-6086622600",
+      "from": "Art museum",
+      "to": "美术馆",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-3463253434",
+      "from": "Old Post Office",
+      "to": "老邮局",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-5875468833",
+      "from": "Shanghai Himalayas Museum",
+      "to": "喜玛拉雅美术馆",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-5183911834",
+      "from": "Drum tower",
+      "to": "鼓楼",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6043006285",
+      "from": "Changdu Museum",
+      "to": "昌都博物馆",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6578147685",
+      "from": "Kuqa King Palace",
+      "to": "库车王府",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-8882674117",
+      "from": "Reindeer-park",
+      "to": "驯鹿园",
+      "via": "dict",
+      "province": "黑龙江"
+    },
+    {
+      "id": "osm-node-11793355170",
+      "from": "Qinghai Folk-customs museum",
+      "to": "青海民俗博物馆",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5970967286",
+      "from": "The Grassland Culture Museum",
+      "to": "草原文化博物馆",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-7874988724",
+      "from": "How Art Museum",
+      "to": "昊美术馆",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-6763858087",
+      "from": "Liao Shangjing Museum",
+      "to": "辽上京博物馆",
+      "via": "dict",
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-4254652596",
+      "from": "Anti Fascist War Memorial Park",
+      "to": "抗日战争纪念园",
+      "via": "dict",
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-5867011275",
+      "from": "Geology Fossil Museum",
+      "to": "地质化石博物馆",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-12423580998",
+      "from": "Courtesy to Tongren",
+      "to": "同仁",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6857865959",
+      "from": "Tibetan Cultural Exposition Center",
+      "to": "藏文化博览中心",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-13457989241",
+      "from": "Run-BO Jade Gallery",
+      "to": "润博玉器馆",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-4993930321",
+      "from": "Old city wall",
+      "to": "古城墙",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5183912122",
+      "from": "Drum tower",
+      "to": "鼓楼",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-4808895924",
+      "from": "Ancient Government Offices",
+      "to": "古代官署",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-6418838686",
+      "from": "Art Museum",
+      "to": "美术馆",
+      "via": "dict",
+      "province": "山西"
+    },
+    {
+      "id": "osm-node-6428524289",
+      "from": "Silk Museum",
+      "to": "丝绸博物馆",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-4782160522",
+      "from": "Yangling Demonstration Agricultural Zone",
+      "to": "杨凌农业高新技术产业示范区",
+      "via": "dict",
+      "province": "陕西"
+    },
+    {
+      "id": "osm-node-13130609601",
+      "from": "Hefei Historical and Cultural Museum of the Three Kingdoms",
+      "to": "合肥三国历史文化博物馆",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-5992467986",
+      "from": "Stones Monument",
+      "to": "石碑",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-5649800023",
+      "from": "Luoyang Sancrai Art Museum",
+      "to": "洛阳三彩艺术博物馆",
+      "via": "dict",
+      "province": "山西"
+    },
+    {
+      "id": "osm-node-6366690500",
+      "from": "Chengdexian bowuguan",
+      "to": "承德县博物馆",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-7065807385",
+      "from": "Qingfeng Pavillion",
+      "to": "清风亭",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-3234422440",
+      "from": "Swan Entrance",
+      "to": "天鹅入口",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-13649798614",
+      "from": "Yue Yaxuan Pavilion",
+      "to": "悦雅轩",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-13232594330",
+      "from": "Xiandu Huangdi historical records exhibition hall",
+      "to": "仙都黄帝史迹展览馆",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-6934906485",
+      "from": "Jingdezhen Ceramics Folk Kiln Museum",
+      "to": "景德镇民窑博物馆",
+      "via": "dict",
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-6327905509",
+      "from": "The Monument of the former site of Armored Forces Engineering Department of Harbin Military Industry University",
+      "to": "哈军工装甲兵工程系旧址纪念碑",
+      "via": "dict",
+      "province": "吉林"
+    },
+    {
+      "id": "osm-node-3523113789",
+      "from": "Giant Stone",
+      "to": "巨石",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-6433619086",
+      "from": "Naxi Dongba Museum of Shu Worshipping",
+      "to": "纳西东巴署神博物馆",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-9997716057",
+      "from": "Dayu gallery",
+      "to": "大禹画廊",
+      "via": "dict",
+      "province": "山东"
+    },
+    {
+      "id": "osm-node-13048988901",
+      "from": "Kunlun jade museum",
+      "to": "昆仑玉博物馆",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-13235852401",
+      "from": "Paleozoological Museum of China (Baoding Natural History Museum)",
+      "to": "保定自然博物馆",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-14191133555",
+      "from": "Sunrise and sunset viewpoint",
+      "to": "日出日落观景点",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-3574553498",
+      "from": "Lake view",
+      "to": "湖景",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-4154369102",
+      "from": "Haitianyizhou scenic area",
+      "to": "海天一洲景区",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-4532231738",
+      "from": "Canal view",
+      "to": "运河观景",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-5235626021",
+      "from": "Shanghai Yard",
+      "to": "上海堆场",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-13093252230",
+      "from": "Sunrise Point",
+      "to": "日出点",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-13450833357",
+      "from": "cable car way photo spot",
+      "to": "索道观景点",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-4145984790",
+      "from": "Ba Wu Gorge",
+      "to": "巴雾峡",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-4145984991",
+      "from": "Long Men Gorge",
+      "to": "龙门峡",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-4475127989",
+      "from": "Tusi Viewing Tower",
+      "to": "土司观景塔",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-6799363187",
+      "from": "Eagle Viewing Platform",
+      "to": "老鹰观景台",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-4351191691",
+      "from": "Baiyang dian",
+      "to": "白洋淀",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-5699482533",
+      "from": "Zhixu Platform",
+      "to": "止旭台",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-9428207182",
+      "from": "16th Bridge",
+      "to": "十六号桥",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-2493706323",
+      "from": "Caves in the east hill",
+      "to": "东山溶洞",
+      "via": "dict",
+      "province": "山西"
+    },
+    {
+      "id": "osm-node-1773687590",
+      "from": "Mount Phoenix",
+      "to": "凤凰山",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-1817698147",
+      "from": "Guanyinge Shuiku Reservoir",
+      "to": "观音阁水库",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-1859711766",
+      "from": "Shenyang Water Cave",
+      "to": "沈阳水洞",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-1859711796",
+      "from": "Small Cave",
+      "to": "小溶洞",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-2250340485",
+      "from": "LongQuanShan Forest Park",
+      "to": "龙泉山森林公园",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-2376731652",
+      "from": "Pigeon Hole",
+      "to": "鸽子洞",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-2391667918",
+      "from": "Golden Rabbits",
+      "to": "金兔",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-5151296222",
+      "from": "Fuguo Park",
+      "to": "富国公园",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-14114176601",
+      "from": "Sunset point",
+      "to": "日落点",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-7052560484",
+      "from": "Cloud Dispelling Pavilion",
+      "to": "排云亭",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-4706290189",
+      "from": "Sunset over the mountains",
+      "to": "山地日落",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-7062558785",
+      "from": "Withful Pavilion",
+      "to": "随心亭",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-9847350617",
+      "from": "Fairy terrace",
+      "to": "仙女台",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-9795838517",
+      "from": "woodpecker peak",
+      "to": "啄木鸟峰",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-12468209713",
+      "from": "Sunrise Point",
+      "to": "日出点",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-9131706618",
+      "from": "Sundown viewpoint",
+      "to": "日落观景点",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-13133280914",
+      "from": "Sunset Point",
+      "to": "日落点",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-13092339622",
+      "from": "Sunset Point",
+      "to": "日落点",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-10948666411",
+      "from": "Lighthouse style view tower",
+      "to": "灯塔式观景塔",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-13119056067",
+      "from": "Sunrise Point",
+      "to": "日出点",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-13800829301",
+      "from": "Colourful Town",
+      "to": "七彩云南",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-4837075235",
+      "from": "Lower Scenic View Deck for Tianluokeng Tulou Cluster",
+      "to": "田螺坑土楼群下观景台",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-4837075266",
+      "from": "Upper Scenic View Deck for Tianluokeng Tulou Cluster",
+      "to": "田螺坑土楼群上观景台",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-5340428322",
+      "from": "House on the water",
+      "to": "水上人家",
+      "via": "dict",
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-5341954721",
+      "from": "Sea of Cloud Viewpoint - Kiosk",
+      "to": "云海观景点",
+      "via": "dict",
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-6089318137",
+      "from": "Jujing Village Overlook",
+      "to": "居敬村观景台",
+      "via": "dict",
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-5623253121",
+      "from": "Likou Mountain National Forest Park",
+      "to": "黎口山国家森林公园",
+      "via": "dict",
+      "province": "山东"
+    },
+    {
+      "id": "osm-node-9558917617",
+      "from": "Rizhao Woodchip Terminal",
+      "to": "日照木片码头",
+      "via": "dict",
+      "province": "山东"
+    },
+    {
+      "id": "osm-node-6487071285",
+      "from": "Xianggong Hill",
+      "to": "湘公山",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-1872107298",
+      "from": "Nine dragons and five tigers",
+      "to": "九龙五虎",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-4750868021",
+      "from": "Long Ao",
+      "to": "龙坳",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-4878604423",
+      "from": "Xingping Fishing Village",
+      "to": "兴坪渔村",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6737265185",
+      "from": "Tingye Pavilion",
+      "to": "听雨亭",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-5253637922",
+      "from": "River Side",
+      "to": "河畔",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-5822420953",
+      "from": "9 horse mountain",
+      "to": "九马山",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-5835288030",
+      "from": "Hanging Coffins",
+      "to": "悬棺",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6711983985",
+      "from": "Sunset viewpoint",
+      "to": "日落观景点",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-13763434801",
+      "from": "A Panorama of Rivers and Mountains",
+      "to": "千里江山",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6222751885",
+      "from": "Old Goat Mountain",
+      "to": "老君山",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6506045885",
+      "from": "Golden Whip Rock",
+      "to": "金鞭岩",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6567777985",
+      "from": "Sea suppressing needle viewpoint",
+      "to": "镇海针观景点",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6709368585",
+      "from": "The Litterateur Rock",
+      "to": "文士岩",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6709459286",
+      "from": "Colluvial Rock",
+      "to": "崩积岩",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6970753485",
+      "from": "Phoenix looking back",
+      "to": "凤凰回头",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-12116386076",
+      "from": "Ruyi Peak",
+      "to": "如意峰",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-833680736",
+      "from": "Standing Rock",
+      "to": "立石",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-1070814173",
+      "from": "Ocean Vista",
+      "to": "海景",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-6217816689",
+      "from": "2 Elephant Bench",
+      "to": "双象凳",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-1645491862",
+      "from": "Stonecutters Bridge Viewpoint",
+      "to": "昂船洲大桥观景点",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-3790942298",
+      "from": "Western Garden",
+      "to": "西园",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-2383798309",
+      "from": "Green Bridge",
+      "to": "绿桥",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-4792530294",
+      "from": "Siena Park Viewpoint",
+      "to": "锡耶纳公园观景点",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-5176904124",
+      "from": "Observing Tower",
+      "to": "瞭望塔",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-6483172787",
+      "from": "Sunset viewpoint",
+      "to": "日落观景点",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-12993969901",
+      "from": "Bamboo Patio",
+      "to": "竹院",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-13430081901",
+      "from": "Rainbow Float",
+      "to": "彩虹漂",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-6018870385",
+      "from": "Glass Bridge",
+      "to": "玻璃桥",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-1707111823",
+      "from": "Stone Moon Viewpoint",
+      "to": "石月亮观景点",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-1707159577",
+      "from": "Stone Moon Viewpoint",
+      "to": "石月亮观景点",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4064791236",
+      "from": "Ba Mei Metamorphic Stones Forest",
+      "to": "八美石林",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4166636369",
+      "from": "Danzhai Terrace Fields",
+      "to": "丹寨梯田",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4248161623",
+      "from": "View of Yubeng",
+      "to": "雨崩观景",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4249365194",
+      "from": "Entire Valley Viewpoint",
+      "to": "全谷观景点",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6745445385",
+      "from": "Farmland sightseeing area",
+      "to": "田园观光区",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6825738587",
+      "from": "Lamuyangcuo Lake",
+      "to": "拉姆央错",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4355018089",
+      "from": "Remote viewpoint on White Water Terraces (out of the official park)",
+      "to": "白水台观景点",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6449062085",
+      "from": "White Water Terraces Holy Land Of Dongba",
+      "to": "白水台东巴圣地",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4396883490",
+      "from": "4825m pass",
+      "to": "垭口（约4825米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-4403659189",
+      "from": "4600m (approx) pass",
+      "to": "垭口（约4600米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-4414245589",
+      "from": "4480m pass",
+      "to": "垭口（约4480米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4430772392",
+      "from": "4600m pass",
+      "to": "垭口（约4600米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6536608586",
+      "from": "Stairs leading to viewpoint",
+      "to": "观景台阶",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4557021291",
+      "from": "4200m Pass",
+      "to": "垭口（约4200米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4557086889",
+      "from": "3900m Pass",
+      "to": "垭口（约3900米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4563035991",
+      "from": "Kuluke pass. 4708m",
+      "to": "库鲁克垭口（约4708米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4563040390",
+      "from": "3835m Pass",
+      "to": "垭口（约3835米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4782997037",
+      "from": "Buddhist flags top of the hill",
+      "to": "山顶经幡",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4871361721",
+      "from": "View on the gorges entry",
+      "to": "峡谷入口观景",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5211545055",
+      "from": "View on Mengdingshan town",
+      "to": "蒙顶山镇观景",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5599788321",
+      "from": "Bell View Pavilion",
+      "to": "望江亭",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5672295024",
+      "from": "Ranwu township photo shot",
+      "to": "然乌镇观景点",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5919724285",
+      "from": "Tibet Land Landmark",
+      "to": "西藏里程碑",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5963221385",
+      "from": "4500m lookout",
+      "to": "观景台（约4500米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5966299639",
+      "from": "4590m pass",
+      "to": "垭口（约4590米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6023981085",
+      "from": "Tibetan traditional village",
+      "to": "藏族传统村落",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6369791886",
+      "from": "Shibao Mountains",
+      "to": "石宝山",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6477044685",
+      "from": "3900m pass",
+      "to": "垭口（约3900米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6479702086",
+      "from": "2040m Lookout",
+      "to": "观景台（约2040米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6479775887",
+      "from": "2222m Lookout",
+      "to": "观景台（约2222米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6479978885",
+      "from": "2515m Lookout",
+      "to": "观景台（约2515米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6483346085",
+      "from": "Dulong river lookout",
+      "to": "独龙江观景台",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6510002586",
+      "from": "Pass 4673m",
+      "to": "垭口（约4673米）",
+      "via": "pattern",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6720640994",
+      "from": "Sun Lake",
+      "to": "太阳湖",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6720641004",
+      "from": "Sharshok Township Lamgong Pass",
+      "to": "夏尔措乡拉贡垭口",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6720648488",
+      "from": "Glacier Viewing Platform Mt. Chola",
+      "to": "雀儿山冰川观景台",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6723339085",
+      "from": "Golden monkey lake",
+      "to": "金丝猴湖",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6723450486",
+      "from": "Tears lake",
+      "to": "眼泪湖",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6723460185",
+      "from": "No. 1 Glacier",
+      "to": "一号冰川",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6725407485",
+      "from": "River and red rocks",
+      "to": "红石河岸",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6725407486",
+      "from": "Dagu lake",
+      "to": "达古湖",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6734235585",
+      "from": "Zena lake",
+      "to": "泽纳湖",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6743415085",
+      "from": "Rainbow lake viewpoint",
+      "to": "彩虹湖观景点",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6743415185",
+      "from": "Rainbow lake",
+      "to": "彩虹湖",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6865819099",
+      "from": "Temple View",
+      "to": "寺庙观景",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6982052416",
+      "from": "3000m view point",
+      "to": "观景点（约3000米）",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-7001340885",
+      "from": "Trail to viewpoint and Black Dragon Pool Park (free)",
+      "to": "黑龙潭观景步道",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-7713697191",
+      "from": "Natural Bridge",
+      "to": "天生桥",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-9096757022",
+      "from": "Jade Dragon snow Mountain",
+      "to": "玉龙雪山",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-10267228609",
+      "from": "Runwu gorge hike",
+      "to": "然乌峡谷步道",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-12369280201",
+      "from": "Observation tower",
+      "to": "瞭望塔",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-12901817801",
+      "from": "Frog Lake Viewpoint",
+      "to": "蛙湖观景点",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-13124333101",
+      "from": "Flag viewpoint",
+      "to": "旗帜观景点",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4742530321",
+      "from": "Getu Great Arch",
+      "to": "格凸河穿洞",
+      "via": "dict",
+      "province": "贵州"
+    },
+    {
+      "id": "osm-node-12714873708",
+      "from": "Rice Terraces",
+      "to": "梯田",
+      "via": "dict",
+      "province": "贵州"
+    },
+    {
+      "id": "osm-node-1285859018",
+      "from": "Sunset Rice Terrace free",
+      "to": "梯田日落观景",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4370771787",
+      "from": "Heaven's Gate",
+      "to": "天门",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6956747385",
+      "from": "Cool viewpoint of the valley",
+      "to": "山谷观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-3282296720",
+      "from": "Valley Viewpoint - 1140m.",
+      "to": "山谷观景点（约1140米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-3844120381",
+      "from": "rice terraces",
+      "to": "梯田",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4423164196",
+      "from": "Nouzhadu Dam",
+      "to": "糯扎渡大坝",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4423635192",
+      "from": "Man Wan Dam",
+      "to": "漫湾大坝",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4423686590",
+      "from": "Gongguogiao Dam",
+      "to": "功果桥大坝",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4423693590",
+      "from": "Dachaoshan",
+      "to": "大朝山",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4423694389",
+      "from": "Xiaowan Dam",
+      "to": "小湾大坝",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6062123688",
+      "from": "Sky Path (Awesome view)",
+      "to": "天路观景",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-12291548401",
+      "from": "Nami's Viewpoint.",
+      "to": "纳米观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5030076524",
+      "from": "Qingkou Hani Ethics Folklore Village Overlook",
+      "to": "箐口哈尼民俗村观景台",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5156106025",
+      "from": "Red Lands Viewing Point",
+      "to": "红土地观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5300993321",
+      "from": "Old valley path",
+      "to": "古谷道",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5367899604",
+      "from": "Husa viewpoint",
+      "to": "户撒观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5367899687",
+      "from": "BangWanHouShan viewpoinrt",
+      "to": "傍晚后山观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5380071423",
+      "from": "Mountain Viewpoint - 390m.",
+      "to": "山地观景点（约390米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5380071425",
+      "from": "Dragon-Back Panorama Viewpoint - 638m.",
+      "to": "龙脊观景点（约638米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5380071429",
+      "from": "Valley Viewpoint",
+      "to": "山谷观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5380071722",
+      "from": "Mountain Viewpoint - 985m.",
+      "to": "山地观景点（约985米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5380071723",
+      "from": "River Viewpoint",
+      "to": "河景观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5382506832",
+      "from": "Mountain Rice Fields Viewpoint",
+      "to": "山地梯田观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5382506835",
+      "from": "Mountain Viewpoint - 615m.",
+      "to": "山地观景点（约615米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5382507225",
+      "from": "Lake Viewpoint",
+      "to": "湖景观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5382522823",
+      "from": "Mountain Viewpoint - 1190m.",
+      "to": "山地观景点（约1190米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5385207627",
+      "from": "Mountain Viewpoint - 800m.",
+      "to": "山地观景点（约800米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5385210723",
+      "from": "River Viewpoint",
+      "to": "河景观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5388518822",
+      "from": "Valley Viewpoint - 616m.",
+      "to": "山谷观景点（约616米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5388531824",
+      "from": "Mountain Viewpoint - 660m.",
+      "to": "山地观景点（约660米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5639603321",
+      "from": "Dragon road viewpoint",
+      "to": "龙路观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5526945821",
+      "from": "cute town",
+      "to": "小镇",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5844904987",
+      "from": "Pagoda Viewpoint",
+      "to": "佛塔观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6108938585",
+      "from": "360 Viewpoint",
+      "to": "环景观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5915377085",
+      "from": "Red Land Viewpoint",
+      "to": "红土地观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5915386185",
+      "from": "Red Land Viewpoint",
+      "to": "红土地观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5915416185",
+      "from": "Red Land Sacred Cedar Tree Viewpoint",
+      "to": "红土地神树观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5915548986",
+      "from": "Red Lands Viewpoint",
+      "to": "红土地观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6819872185",
+      "from": "Palm Scenic Area",
+      "to": "椰林景区",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-12241730589",
+      "from": "Peak View Pavillion",
+      "to": "峰景亭",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6341293085",
+      "from": "360 Viewpoint over rice fields",
+      "to": "梯田环景观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6438368485",
+      "from": "Free viewing platform",
+      "to": "免费观景台",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6477071390",
+      "from": "Moon Square Viewpoint",
+      "to": "月亮广场观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-7115706088",
+      "from": "Free balcony",
+      "to": "观景阳台",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6480695885",
+      "from": "rice field view",
+      "to": "稻田观景",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6520936894",
+      "from": "2075m saddle",
+      "to": "垭口（约2075米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13792453479",
+      "from": "Qingbixi Viewing Platform",
+      "to": "青碧溪观景台",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-9085981217",
+      "from": "Stone Forest - national park",
+      "to": "石林",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-10794161706",
+      "from": "Corn and rice fields viewpoint",
+      "to": "农田观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-10794161707",
+      "from": "Long Pretty Road.",
+      "to": "风景公路",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-10794161708",
+      "from": "Hills plantation Viewpoint",
+      "to": "山林种植园观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-10794161806",
+      "from": "Rice Fields Viewpoint",
+      "to": "梯田观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-10794162005",
+      "from": "Bridge Viewpoint Rest Area.",
+      "to": "桥梁观景休息区",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-11659529069",
+      "from": "Sunset viewpoint (nobody)",
+      "to": "日落观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-12529009501",
+      "from": "Buckwheat flowers",
+      "to": "荞麦花田",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-12529301003",
+      "from": "Fossil place",
+      "to": "化石点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13071189397",
+      "from": "Snake Pass",
+      "to": "蛇形垭口",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13362802483",
+      "from": "Dianchi Lake scenery",
+      "to": "滇池风光",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13362802484",
+      "from": "Bridge view",
+      "to": "桥景观景",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13362819541",
+      "from": "Dianchi View",
+      "to": "滇池观景",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13457457532",
+      "from": "Parking & Viewpoint",
+      "to": "停车观景点",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-2030193564",
+      "from": "Pagoda (nice view)",
+      "to": "佛塔观景",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-3233309443",
+      "from": "Birdlife viewing area",
+      "to": "观鸟区",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-3233309444",
+      "from": "Bird watching shed",
+      "to": "观鸟棚",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-5738418021",
+      "from": "Qingshan saddle 3699m",
+      "to": "青山垭口（约3699米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5738418121",
+      "from": "saddle 3648m",
+      "to": "垭口（约3648米）",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-6520936889",
+      "from": "Saddle 3518m",
+      "to": "垭口（约3518米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6520936987",
+      "from": "Saddle 3670m",
+      "to": "垭口（约3670米）",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6683511885",
+      "from": "Landscape Viewpoint Yuzhu Peak",
+      "to": "玉珠峰观景点",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6698784831",
+      "from": "Yardang Sphinx",
+      "to": "雅丹狮身人面",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-6792367085",
+      "from": "The wall view point",
+      "to": "城墙观景点",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-12068719554",
+      "from": "Majiayao Ruins Observatory",
+      "to": "马家窑遗址观测点",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-13015564301",
+      "from": "View of camel rock",
+      "to": "骆驼石观景",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-13048891401",
+      "from": "Tower platform viewpoint",
+      "to": "塔台观景点",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-13898423201",
+      "from": "Baishi Mijing Tourist Spot",
+      "to": "白石秘境",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-2445863711",
+      "from": "Dalai Lake Nature Reserve",
+      "to": "达赉湖自然保护区",
+      "via": "dict",
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-4382782592",
+      "from": "Expansions Bridge",
+      "to": "拓展桥",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-5372010124",
+      "from": "Mountain Viewpoint",
+      "to": "山地观景点",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-5374416822",
+      "from": "Mountain Viewpoint",
+      "to": "山地观景点",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-5374449524",
+      "from": "Mountain Viewpoint",
+      "to": "山地观景点",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-5374449523",
+      "from": "Mountain Viewpoint",
+      "to": "山地观景点",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-5374449525",
+      "from": "Valley Viewpoint",
+      "to": "山谷观景点",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-5374449621",
+      "from": "Mountain Viewpoint",
+      "to": "山地观景点",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-5482444321",
+      "from": "Stone Arch",
+      "to": "石拱门",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-6965839885",
+      "from": "Angel Eye Viewpoint",
+      "to": "天使眼观景点",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-9196652317",
+      "from": "Tieshan Port (General Cargo Terminal)",
+      "to": "铁山港",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-13625133601",
+      "from": "The scenic area of wangxin slope",
+      "to": "望乡坡景区",
+      "via": "dict",
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-9721804720",
+      "from": "View of glacier",
+      "to": "冰川观景",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4355252801",
+      "from": "Yam drok tso lake view",
+      "to": "羊卓雍错观景",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4581610384",
+      "from": "Chetola's viewpoint",
+      "to": "切托拉观景点",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4805199722",
+      "from": "River Viewpoint",
+      "to": "河景观景点",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4832468621",
+      "from": "Glacier View point",
+      "to": "冰川观景点",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-5999781585",
+      "from": "Guge Kingdom",
+      "to": "古格王国遗址",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6438254086",
+      "from": "Gungtang Pass Overlook",
+      "to": "贡塘垭口观景台",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6444494685",
+      "from": "4500m Pass Lookout",
+      "to": "垭口观景台（约4500米）",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6465945386",
+      "from": "Shuba Ancient Fortress",
+      "to": "戍边古堡",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6938699489",
+      "from": "Choku La 4290m",
+      "to": "绰库拉山口（约4290米）",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6938699785",
+      "from": "Pass 4100m",
+      "to": "垭口（约4100米）",
+      "via": "pattern",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-7959886502",
+      "from": "Lake Viewpoint",
+      "to": "湖景观景点",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-11919137970",
+      "from": "Potala view with wetlands",
+      "to": "布达拉宫湿地观景",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-13251814703",
+      "from": "View of Holy Bell",
+      "to": "神钟观景",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-4907782324",
+      "from": "Animal Bazaar",
+      "to": "牲畜巴扎",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-6576687785",
+      "from": "Old City Viewpoint",
+      "to": "古城观景点",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-5167521321",
+      "from": "Old Town",
+      "to": "古镇",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-5745031123",
+      "from": "Mountain pass 2754m",
+      "to": "垭口（约2754米）",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-5745034521",
+      "from": "Panorama platform",
+      "to": "全景观景台",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-6565748085",
+      "from": "Grand Canyon trailhead",
+      "to": "大峡谷登山口",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-6499071685",
+      "from": "4909M Viewpoint",
+      "to": "观景点（约4909米）",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-11748635523",
+      "from": "Celestial Terrace",
+      "to": "天台",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-9369002055",
+      "from": "Mt. Lung Mun",
+      "to": "龍門山",
+      "via": "osm_zh",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-4715154288",
+      "from": "Dading Shan",
+      "to": "大顶山",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-3255290255",
+      "from": "Gaodingyan",
+      "to": "高顶岩",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-9784582242",
+      "from": "Foding",
+      "to": "佛顶",
+      "via": "osm_zh",
+      "province": "山东"
+    },
+    {
+      "id": "osm-node-4676677855",
+      "from": "Jiucaiping",
+      "to": "九菜坪",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-8984600853",
+      "from": "Hutou Shan",
+      "to": "虎头山",
+      "via": "osm_zh",
+      "province": "河南"
+    },
+    {
+      "id": "osm-node-4126397361",
+      "from": "Sulong Shan",
+      "to": "苏龙山",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5981119758",
+      "from": "Solitary Beauty Peak",
+      "to": "独秀峰",
+      "via": "osm_zh",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-4397029866",
+      "from": "Wuling Shan",
+      "to": "武陵山",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-3250900343",
+      "from": "Niaoshu Shan",
+      "to": "鸟鼠山",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-4064768278",
+      "from": "Hot Water Tanggou",
+      "to": "汤沟温泉",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-12822507601",
+      "from": "Natural Hot Spring",
+      "to": "天然温泉",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-298091569",
+      "from": "Yangpachen hot springs",
+      "to": "羊八井温泉",
+      "via": "dict",
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-14157098702",
+      "from": "Guangzhou Sunac Water Park",
+      "to": "广州融创水世界",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-7039706785",
+      "from": "Tianjin Hegda Expo",
+      "to": "天津合达博览",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-13742768401",
+      "from": "Lin Lin Rain",
+      "to": "淋淋雨",
+      "via": "dict",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-298331500",
+      "from": "Rongpatsa hot springs",
+      "to": "绒坝岔温泉",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-7076734685",
+      "from": "Binglanghe",
+      "to": "槟榔河",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-8092486156",
+      "from": "Tianyi hot spring",
+      "to": "天颐温泉",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-12372896102",
+      "from": "Sea within a Sea",
+      "to": "海中海",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-8441994210",
+      "from": "Cixi north city gate",
+      "to": "慈溪北城门",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-14179815001",
+      "from": "North entrance",
+      "to": "北门",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-13964395994",
+      "from": "Jiuquan South Gate",
+      "to": "酒泉南门",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-6763858185",
+      "from": "Jinjiehao City Gate Ruins",
+      "to": "金界壕城门遗址",
+      "via": "dict",
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-13485405601",
+      "from": "Entry of renovated old city",
+      "to": "古城入口",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-13490088401",
+      "from": "Park entry",
+      "to": "公园入口",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-13410808792",
+      "from": "Long Ling Cave",
+      "to": "龙灵洞",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-6089317460",
+      "from": "Hanxu Grotto",
+      "to": "含旭石窟",
+      "via": "dict",
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-6089318138",
+      "from": "Hanxu Grotto (exit)",
+      "to": "含旭石窟出口",
+      "via": "dict",
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-9992832330",
+      "from": "Chuanshan Cave",
+      "to": "穿山溶洞",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-9992832331",
+      "from": "Chuanshan Cave",
+      "to": "穿山溶洞",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-9992832332",
+      "from": "Chuanshan Cave",
+      "to": "穿山溶洞",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-9992832333",
+      "from": "Chuanshan Cave",
+      "to": "穿山溶洞",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-13736832147",
+      "from": "Youyu Cave",
+      "to": "有鱼洞",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-2031373108",
+      "from": "Ape-King Grotto",
+      "to": "美猴王洞",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5217919748",
+      "from": "Shui Lian Dong",
+      "to": "水帘洞",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-2509040859",
+      "from": "Zhongdong cave",
+      "to": "中洞",
+      "via": "dict",
+      "province": "贵州"
+    },
+    {
+      "id": "osm-node-2909394755",
+      "from": "Hidden Dragon Tiankeng",
+      "to": "隐龙天坑",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-3844119737",
+      "from": "underground river",
+      "to": "地下河",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-7972609031",
+      "from": "Amazing river cave",
+      "to": "奇河溶洞",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-3844119985",
+      "from": "Large cave system",
+      "to": "溶洞群",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-3669539790",
+      "from": "Haizhiyun Park (East Gate)",
+      "to": "海之韵公园东门",
+      "via": "dict",
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-3270650570",
+      "from": "Park South Entrance",
+      "to": "公园南门",
+      "via": "dict",
+      "province": "山西"
+    },
+    {
+      "id": "osm-node-6275168334",
+      "from": "Hailuo Park",
+      "to": "海螺公园",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-3270650571",
+      "from": "Park West Entrance",
+      "to": "公园西门",
+      "via": "dict",
+      "province": "山西"
+    },
+    {
+      "id": "osm-node-4631142374",
+      "from": "Typhoon Adventure Park",
+      "to": "台风探险乐园",
+      "via": "dict",
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-6759204736",
+      "from": "Milan park",
+      "to": "米兰公园",
+      "via": "dict",
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-13973990001",
+      "from": "Hongguangshan ecological park",
+      "to": "红光山生态公园",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-5095443459",
+      "from": "Jiaohu",
+      "to": "椒湖",
+      "via": "dict",
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-6819908945",
+      "from": "Tianzhu Park",
+      "to": "天竺公园",
+      "via": "dict",
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-14168704169",
+      "from": "Xishuangbanna Tropical Flowers and Plants Garden",
+      "to": "西双版纳热带花卉园",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5965953978",
+      "from": "Changheba Dam",
+      "to": "长河坝电站大坝",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-9779473198",
+      "from": "Dongqing Dam",
+      "to": "东风水库大坝",
+      "via": "dict",
+      "province": "贵州"
+    },
+    {
+      "id": "osm-node-13035218305",
+      "from": "Great Wall remnant",
+      "to": "长城遗迹",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-13015565801",
+      "from": "Mud brick tower",
+      "to": "土坯塔",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-13035222502",
+      "from": "Great Wall remnant",
+      "to": "长城遗迹",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-13033369702",
+      "from": "Shenna site protection shed",
+      "to": "申扎遗址保护棚",
+      "via": "dict",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-13015565701",
+      "from": "Great wall remnant",
+      "to": "长城遗迹",
+      "via": "dict",
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-13205503002",
+      "from": "Singim grottoes",
+      "to": "胜金口石窟",
+      "via": "dict",
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-1916728637",
+      "from": "Qinglong",
+      "to": "青龙",
+      "via": "dict",
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-7555674647",
+      "from": "Yanwei Waterfall",
+      "to": "燕尾瀑布",
+      "via": "dict",
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-6789981185",
+      "from": "giloran waterfall",
+      "to": "吉洛然瀑布",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-12787549301",
+      "from": "Jinshawan Waterfall",
+      "to": "金沙湾瀑布",
+      "via": "dict",
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-5354466022",
+      "from": "Sihui Waterfall Bizarre Stone Scenic Spot",
+      "to": "四会奇石瀑布景区",
+      "via": "dict",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-5709217922",
+      "from": "Diaoluo mountain",
+      "to": "吊罗山",
+      "via": "dict",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-5271628723",
+      "from": "White Dragon Lake",
+      "to": "白龙湖",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6586852985",
+      "from": "Omnes Waterfall",
+      "to": "奥姆内斯瀑布",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-12688713801",
+      "from": "Avalokitesvara Waterfall",
+      "to": "观音瀑布",
+      "via": "dict",
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4961598822",
+      "from": "Hidden Waterfall",
+      "to": "隐瀑",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5294733030",
+      "from": "Small river",
+      "to": "小河",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6482331485",
+      "from": "50m waterfall (hard to reach)",
+      "to": "瀑布（约50米）",
+      "via": "dict",
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4773995984",
+      "from": "Yanshan Waterfall",
+      "to": "雁山瀑布",
+      "via": "dict",
+      "province": "陕西"
+    },
+    {
+      "id": "osm-node-5909254985",
+      "from": "Yanshan",
+      "to": "雁山",
+      "via": "dict",
+      "province": "陕西"
+    },
+    {
+      "id": "osm-node-12993323935",
+      "from": "Pomo Falls",
+      "to": "波莫瀑布",
+      "via": "dict",
+      "province": "西藏"
+    }
+  ],
+  "keptEn": [
+    {
+      "id": "osm-node-4693089990",
+      "name": "Mission Hills Sports & Eco Park",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-12603752201",
+      "name": "Island6",
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-4141975772",
+      "name": "Para Site",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-11807234556",
+      "name": "ArtisTree",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-4709930192",
+      "name": "Zhong Yu Museum",
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-13270362162",
+      "name": "OCAT",
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-13020102902",
+      "name": "Yak museum",
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-12810803496",
+      "name": "Wolong Panda Museum",
+      "province": "四川"
+    }
+  ],
+  "dropped": [
+    {
+      "id": "osm-node-766963426",
+      "name": "Mountain View",
+      "reason": "drop_junk",
+      "lng": 96.0344643,
+      "lat": 29.7372226,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-2955353931",
+      "name": "sunset view",
+      "reason": "drop_junk",
+      "lng": 101.9493484,
+      "lat": 30.895541,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4908294021",
+      "name": "Park",
+      "reason": "drop_junk",
+      "lng": 100.081795,
+      "lat": 29.2968226,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-8892950136",
+      "name": "Water fall 520 feet",
+      "reason": "drop_junk",
+      "lng": 95.0422372,
+      "lat": 29.1014746,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-9255848481",
+      "name": "Buddha flags",
+      "reason": "drop_junk",
+      "lng": 101.7571237,
+      "lat": 29.9392659,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4227692189",
+      "name": "Place of birth of first Karmapa",
+      "reason": "drop_junk",
+      "lng": 99.8231635,
+      "lat": 31.6205984,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-4349079496",
+      "name": "Holy Hill",
+      "reason": "drop_junk",
+      "lng": 99.701045,
+      "lat": 27.859204,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-13591678802",
+      "name": "Amazing view on the city",
+      "reason": "drop_junk",
+      "lng": 99.6912788,
+      "lat": 27.8509145,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4573241888",
+      "name": "Jump 360",
+      "reason": "drop_junk",
+      "lng": 121.49311,
+      "lat": 31.35071,
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-4191955090",
+      "name": "Chinese Cooking Workshop",
+      "reason": "drop_junk",
+      "lng": 121.44644,
+      "lat": 31.21053,
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-4869383921",
+      "name": "Treffpunkt zwi Wanda Vista",
+      "reason": "drop_foreign",
+      "lng": 123.3845,
+      "lat": 41.75807,
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-4426261189",
+      "name": "Forest Park Entrance",
+      "reason": "drop_junk",
+      "lng": 106.15294,
+      "lat": 32.76382,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4875110923",
+      "name": "Big bouddha found in 2017",
+      "reason": "drop_junk",
+      "lng": 106.71888,
+      "lat": 26.71188,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4872147521",
+      "name": "318",
+      "reason": "drop_junk",
+      "lng": 92.16041,
+      "lat": 29.70943,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4417430002",
+      "name": "Hehe national park entrance",
+      "reason": "drop_junk",
+      "lng": 108.02724,
+      "lat": 33.88605,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4426223994",
+      "name": "Xue Xi pavillon and cave",
+      "reason": "drop_junk",
+      "lng": 105.91979,
+      "lat": 32.65514,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5822788212",
+      "name": "Karez",
+      "reason": "drop_junk",
+      "lng": 89.12911,
+      "lat": 42.98065,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-2526349765",
+      "name": "BG5FHB",
+      "reason": "drop_junk",
+      "lng": 121.27473,
+      "lat": 28.64772,
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-2514609095",
+      "name": "BG5FIM",
+      "reason": "drop_junk",
+      "lng": 121.27261,
+      "lat": 28.64792,
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-5513784726",
+      "name": "MF",
+      "reason": "drop_junk",
+      "lng": 118.77802,
+      "lat": 31.59697,
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-14182069878",
+      "name": "Fountain show",
+      "reason": "drop_junk",
+      "lng": 117.2707,
+      "lat": 40.65253,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-4789775322",
+      "name": "Dragon mountain kungfu academy",
+      "reason": "drop_junk",
+      "lng": 119.57514,
+      "lat": 35.51849,
+      "province": "山东"
+    },
+    {
+      "id": "osm-node-13378657632",
+      "name": "Pa Phi Viewpoint",
+      "reason": "drop_junk",
+      "lng": 106.53738,
+      "lat": 22.92423,
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-6435152085",
+      "name": "Fantasy town park,",
+      "reason": "drop_junk",
+      "lng": 109.7279,
+      "lat": 18.3549,
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-4895108726",
+      "name": "Eingang See",
+      "reason": "drop_foreign",
+      "lng": 123.63567,
+      "lat": 41.94024,
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-10244720019",
+      "name": "An imposing huge fold",
+      "reason": "drop_junk",
+      "lng": 84.62812,
+      "lat": 28.69777,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4941771726",
+      "name": "Nice View for rice terraces (turn right on fork after ban luoc)",
+      "reason": "drop_foreign",
+      "lng": 104.6666,
+      "lat": 22.66786,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5052221287",
+      "name": "Ban Samakhixay",
+      "reason": "drop_foreign",
+      "lng": 102.00673,
+      "lat": 21.62033,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13035218307",
+      "name": "Statue of man on a horse",
+      "reason": "drop_junk",
+      "lng": 96.19905,
+      "lat": 40.27089,
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-6786941386",
+      "name": "Start point",
+      "reason": "drop_junk",
+      "lng": 113.71392,
+      "lat": 39.65675,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11738318670",
+      "name": "Beautiful landscape",
+      "reason": "drop_junk",
+      "lng": 110.3394,
+      "lat": 24.39668,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-4277465197",
+      "name": "Mirador",
+      "reason": "drop_foreign",
+      "lng": 117.25197,
+      "lat": 40.24033,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-6226614587",
+      "name": "Gate",
+      "reason": "drop_junk",
+      "lng": 109.16274,
+      "lat": 18.37233,
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-13515984705",
+      "name": "CSJS",
+      "reason": "drop_junk",
+      "lng": 120.97429,
+      "lat": 30.88581,
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-5767874755",
+      "name": "The house of Pig's wife (from Monkey King)",
+      "reason": "drop_junk",
+      "lng": 94.09439,
+      "lat": 39.94821,
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-6799022586",
+      "name": "Cementerio chino",
+      "reason": "drop_foreign",
+      "lng": 75.97915,
+      "lat": 39.59244,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-7135204886",
+      "name": "Special Villa",
+      "reason": "drop_junk",
+      "lng": 116.22954,
+      "lat": 24.30203,
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-5039161722",
+      "name": "Monday Market",
+      "reason": "drop_junk",
+      "lng": 75.53931,
+      "lat": 39.30209,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-4686816893",
+      "name": "Cafe factory",
+      "reason": "drop_junk",
+      "lng": 117.36331,
+      "lat": 24.53753,
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-12986673765",
+      "name": "1517 - 2024 (End)",
+      "reason": "drop_junk",
+      "lng": 114.30129,
+      "lat": 25.68979,
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-4920725723",
+      "name": "Buddah",
+      "reason": "drop_junk",
+      "lng": 106.73489,
+      "lat": 26.71452,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5993348885",
+      "name": "Entrance",
+      "reason": "drop_junk",
+      "lng": 115.88501,
+      "lat": 29.41703,
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-9291557851",
+      "name": "sat dish",
+      "reason": "drop_junk",
+      "lng": 104.69828,
+      "lat": 31.46603,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5909322285",
+      "name": "Wetlands",
+      "reason": "drop_junk",
+      "lng": 102.46346,
+      "lat": 35.14159,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-8659443517",
+      "name": "Street food and market",
+      "reason": "drop_junk",
+      "lng": 117.92963,
+      "lat": 40.97723,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-13172285704",
+      "name": "Russia Folk Town",
+      "reason": "drop_junk",
+      "lng": 129.06401,
+      "lat": 44.8167,
+      "province": "吉林"
+    },
+    {
+      "id": "osm-node-5907265603",
+      "name": "Rocas curiosas",
+      "reason": "drop_foreign",
+      "lng": 74.53549,
+      "lat": 39.81516,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-6530828385",
+      "name": "Friday Market",
+      "reason": "drop_junk",
+      "lng": 99.84425,
+      "lat": 26.31472,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4839906724",
+      "name": "near Led chip factory",
+      "reason": "drop_junk",
+      "lng": 113.1261,
+      "lat": 22.64722,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-9291557850",
+      "name": "sat dish",
+      "reason": "drop_junk",
+      "lng": 104.69877,
+      "lat": 31.46605,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-11472663269",
+      "name": "tulou",
+      "reason": "drop_junk",
+      "lng": 117.36041,
+      "lat": 24.68129,
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-5839803833",
+      "name": "Stonehenge",
+      "reason": "drop_junk",
+      "lng": 116.66501,
+      "lat": 40.13374,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-13766262200",
+      "name": "Water Wheel",
+      "reason": "drop_junk",
+      "lng": 117.04623,
+      "lat": 24.61746,
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-8732329020",
+      "name": "L1",
+      "reason": "drop_junk",
+      "lng": 116.51492,
+      "lat": 40.0825,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-11612846369",
+      "name": "bamboo rafting ticket center",
+      "reason": "drop_junk",
+      "lng": 117.91975,
+      "lat": 27.64153,
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-12893853501",
+      "name": "Garden Camping",
+      "reason": "drop_junk",
+      "lng": 130.43255,
+      "lat": 42.91014,
+      "province": "吉林"
+    },
+    {
+      "id": "osm-node-10948664705",
+      "name": "Pagoda",
+      "reason": "drop_junk",
+      "lng": 118.34336,
+      "lat": 29.83046,
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-7005515785",
+      "name": "waterwheel",
+      "reason": "drop_junk",
+      "lng": 117.61351,
+      "lat": 29.56168,
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-4839927026",
+      "name": "Hotel near Pho's place",
+      "reason": "drop_foreign",
+      "lng": 113.09481,
+      "lat": 22.95128,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-5763878353",
+      "name": "To the 3 hidden lakes",
+      "reason": "drop_junk",
+      "lng": 99.87269,
+      "lat": 26.32009,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6413894888",
+      "name": "huge tea market",
+      "reason": "drop_junk",
+      "lng": 118.3168,
+      "lat": 29.7205,
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-11703605370",
+      "name": "amazing area",
+      "reason": "drop_junk",
+      "lng": 114.46398,
+      "lat": 22.79524,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-4772210521",
+      "name": "Food Street",
+      "reason": "drop_junk",
+      "lng": 110.69156,
+      "lat": 29.42922,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-4248289396",
+      "name": "Market",
+      "reason": "drop_junk",
+      "lng": 102.21806,
+      "lat": 31.90236,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-13664022923",
+      "name": "yurts",
+      "reason": "drop_junk",
+      "lng": 119.07845,
+      "lat": 43.14511,
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-12998229515",
+      "name": "1517 - 2024 (Start)",
+      "reason": "drop_junk",
+      "lng": 114.30219,
+      "lat": 25.69116,
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-10051133976",
+      "name": "Eiffel tower",
+      "reason": "drop_junk",
+      "lng": 117.69404,
+      "lat": 24.50744,
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-13663940583",
+      "name": "yurts",
+      "reason": "drop_junk",
+      "lng": 119.07251,
+      "lat": 43.13454,
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-8732326220",
+      "name": "L2",
+      "reason": "drop_junk",
+      "lng": 116.5143,
+      "lat": 40.08393,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-9107105517",
+      "name": "Night Market",
+      "reason": "drop_junk",
+      "lng": 100.80123,
+      "lat": 22.01524,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-11636806269",
+      "name": "bamboo rafting starting point",
+      "reason": "drop_junk",
+      "lng": 117.9206,
+      "lat": 27.64299,
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-11880477799",
+      "name": "JK02",
+      "reason": "drop_junk",
+      "lng": 111.39656,
+      "lat": 25.25712,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-4428862792",
+      "name": "MAHLYA silk work shop",
+      "reason": "drop_junk",
+      "lng": 79.97984,
+      "lat": 37.1339,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-11773114269",
+      "name": "Food street",
+      "reason": "drop_junk",
+      "lng": 106.11723,
+      "lat": 30.83666,
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-5001434419",
+      "name": "satellite dish",
+      "reason": "drop_junk",
+      "lng": 119.56529,
+      "lat": 25.77612,
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-7056203785",
+      "name": "nice park",
+      "reason": "drop_junk",
+      "lng": 104.9697,
+      "lat": 26.54641,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-9916370120",
+      "name": "Night Market Gift Shops",
+      "reason": "drop_junk",
+      "lng": 86.85906,
+      "lat": 47.69932,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-10050152051",
+      "name": "Pillbox 13",
+      "reason": "drop_junk",
+      "lng": 114.1685,
+      "lat": 22.25771,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-11779978509",
+      "name": "PODIUM",
+      "reason": "drop_junk",
+      "lng": 114.16847,
+      "lat": 22.24863,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-4523231006",
+      "name": "GWM Haval Xu Shui proving ground A3 entrance",
+      "reason": "drop_junk",
+      "lng": 115.47928,
+      "lat": 39.03069,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-4523231004",
+      "name": "GWM Haval Xu Shui proving ground A3 entrance",
+      "reason": "drop_junk",
+      "lng": 115.4869,
+      "lat": 39.03121,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-4523229895",
+      "name": "GWM Haval Xu Shui proving ground A4 entrance",
+      "reason": "drop_junk",
+      "lng": 115.46926,
+      "lat": 39.03084,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-4753180540",
+      "name": "GWM Haval Gate",
+      "reason": "drop_junk",
+      "lng": 115.47676,
+      "lat": 39.02913,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11593565335",
+      "name": "PB 314",
+      "reason": "drop_junk",
+      "lng": 114.15004,
+      "lat": 22.36048,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-6642045085",
+      "name": "Jurassic Park",
+      "reason": "drop_junk",
+      "lng": 109.67812,
+      "lat": 18.32183,
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-6700494270",
+      "name": "1954",
+      "reason": "drop_junk",
+      "lng": 94.36628,
+      "lat": 39.65611,
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-5158276421",
+      "name": "Air-Raid Shelter",
+      "reason": "drop_junk",
+      "lng": 106.61403,
+      "lat": 29.56836,
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-1417111351",
+      "name": "Pagoda",
+      "reason": "drop_junk",
+      "lng": 99.93213,
+      "lat": 26.45038,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-662762270",
+      "name": "Pagoda",
+      "reason": "drop_junk",
+      "lng": 100.32517,
+      "lat": 25.16743,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4798905424",
+      "name": "Film park",
+      "reason": "drop_junk",
+      "lng": 121.30582,
+      "lat": 31.01242,
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-4957698422",
+      "name": "Temple",
+      "reason": "drop_junk",
+      "lng": 118.74054,
+      "lat": 32.09645,
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-1440339372",
+      "name": "Statue of Florence Nightingale",
+      "reason": "drop_junk",
+      "lng": 121.19052,
+      "lat": 31.03385,
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-2335441324",
+      "name": "Movie City",
+      "reason": "drop_junk",
+      "lng": 94.5152,
+      "lat": 40.057,
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-12052382797",
+      "name": "MiG-17P exhibit",
+      "reason": "drop_junk",
+      "lng": 121.70409,
+      "lat": 31.19242,
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-10973656670",
+      "name": "Gallery 401",
+      "reason": "drop_junk",
+      "lng": 121.64668,
+      "lat": 29.88473,
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-320903773",
+      "name": "Buddha Statue",
+      "reason": "drop_junk",
+      "lng": 116.15423,
+      "lat": 39.97074,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-534628587",
+      "name": "Lookoff",
+      "reason": "drop_junk",
+      "lng": 116.77889,
+      "lat": 40.50232,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-5077017222",
+      "name": "leaky",
+      "reason": "drop_junk",
+      "lng": 116.21156,
+      "lat": 40.1955,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-5077020122",
+      "name": "RES",
+      "reason": "drop_junk",
+      "lng": 116.22459,
+      "lat": 40.21023,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-8583463117",
+      "name": "people park",
+      "reason": "drop_junk",
+      "lng": 116.69944,
+      "lat": 39.53123,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-4839699023",
+      "name": "Pedestrian x crossing",
+      "reason": "drop_junk",
+      "lng": 121.51375,
+      "lat": 31.22987,
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-6789815485",
+      "name": "Viewpoint from abandoned building tallest one",
+      "reason": "drop_junk",
+      "lng": 109.93727,
+      "lat": 28.74582,
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-14114549542",
+      "name": "Photospot drone show",
+      "reason": "drop_junk",
+      "lng": 106.58393,
+      "lat": 29.5686,
+      "province": "重庆"
+    },
+    {
+      "id": "osm-node-6243837685",
+      "name": "Summit",
+      "reason": "drop_junk",
+      "lng": 119.72466,
+      "lat": 40.04584,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-6771809285",
+      "name": "Panoramic view",
+      "reason": "drop_junk",
+      "lng": 117.93582,
+      "lat": 40.99991,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-6771829986",
+      "name": "Panoramic view",
+      "reason": "drop_junk",
+      "lng": 117.93497,
+      "lat": 40.99755,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-8043506585",
+      "name": "Tower",
+      "reason": "drop_junk",
+      "lng": 114.68343,
+      "lat": 39.25953,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-1859712492",
+      "name": "Ski Resort",
+      "reason": "drop_junk",
+      "lng": 123.70803,
+      "lat": 41.57858,
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-4332599847",
+      "name": "view point",
+      "reason": "drop_junk",
+      "lng": 121.78474,
+      "lat": 39.09717,
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-2449465792",
+      "name": "Stonecow",
+      "reason": "drop_junk",
+      "lng": 124.38431,
+      "lat": 41.67086,
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-2383178115",
+      "name": "Gace with Chimpanse",
+      "reason": "drop_junk",
+      "lng": 123.37865,
+      "lat": 41.74739,
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-6636162285",
+      "name": "Zoo",
+      "reason": "drop_junk",
+      "lng": 121.61517,
+      "lat": 38.88828,
+      "province": "辽宁"
+    },
+    {
+      "id": "osm-node-6744986385",
+      "name": "Viewing platform for the waterfall",
+      "reason": "drop_junk",
+      "lng": 128.05599,
+      "lat": 42.03893,
+      "province": "吉林"
+    },
+    {
+      "id": "osm-node-14076277601",
+      "name": "Yangyushi viewpoint of North Korea",
+      "reason": "drop_junk",
+      "lng": 126.28319,
+      "lat": 41.18782,
+      "province": "吉林"
+    },
+    {
+      "id": "osm-node-2870081091",
+      "name": "730",
+      "reason": "drop_junk",
+      "lng": 116.85688,
+      "lat": 31.12836,
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-4533908190",
+      "name": "Wetlands",
+      "reason": "drop_junk",
+      "lng": 120.00976,
+      "lat": 30.93315,
+      "province": "江苏"
+    },
+    {
+      "id": "osm-node-1256827520",
+      "name": "Light show (Dancing fountains)",
+      "reason": "drop_junk",
+      "lng": 120.15692,
+      "lat": 30.25309,
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-7745642785",
+      "name": "Viewpoint for the sunrise",
+      "reason": "drop_junk",
+      "lng": 122.82691,
+      "lat": 30.71512,
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-9847348317",
+      "name": "Kwan-jin Jump",
+      "reason": "drop_junk",
+      "lng": 122.38383,
+      "lat": 29.93564,
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-11636806369",
+      "name": "viewpoint for rafting boats",
+      "reason": "drop_junk",
+      "lng": 117.94272,
+      "lat": 27.64738,
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-5843355285",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 116.90157,
+      "lat": 24.55263,
+      "province": "福建"
+    },
+    {
+      "id": "osm-node-5341873921",
+      "name": "on the way to 5 old men",
+      "reason": "drop_junk",
+      "lng": 116.00817,
+      "lat": 29.54687,
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-13451697602",
+      "name": "Ferris",
+      "reason": "drop_junk",
+      "lng": 120.43817,
+      "lat": 36.0677,
+      "province": "山东"
+    },
+    {
+      "id": "osm-node-5712964022",
+      "name": "Viewpoint + snack stand",
+      "reason": "drop_junk",
+      "lng": 110.48249,
+      "lat": 29.37529,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-12802476502",
+      "name": "View to Moon hill",
+      "reason": "drop_junk",
+      "lng": 110.47436,
+      "lat": 24.72399,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-12802476701",
+      "name": "View to Moon hill",
+      "reason": "drop_junk",
+      "lng": 110.47403,
+      "lat": 24.72293,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6567777385",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 110.43093,
+      "lat": 29.33476,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6567777585",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 110.43069,
+      "lat": 29.33497,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6709289787",
+      "name": "Mother and Baby",
+      "reason": "drop_junk",
+      "lng": 110.4318,
+      "lat": 29.32435,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-13659004403",
+      "name": "Viewpoint over the River",
+      "reason": "drop_junk",
+      "lng": 110.49135,
+      "lat": 24.94391,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-6567777986",
+      "name": "Viewpoint two rocks",
+      "reason": "drop_junk",
+      "lng": 110.42618,
+      "lat": 29.32825,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-14148026101",
+      "name": "Herb Collecting Old Man",
+      "reason": "drop_junk",
+      "lng": 110.48004,
+      "lat": 29.36955,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-9870969673",
+      "name": "Nam Shan, Lantau",
+      "reason": "drop_foreign",
+      "lng": 113.98932,
+      "lat": 22.24968,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-4755979222",
+      "name": "Platform",
+      "reason": "drop_junk",
+      "lng": 113.53776,
+      "lat": 22.24782,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-5425892421",
+      "name": "Paragliding Launch Area",
+      "reason": "drop_junk",
+      "lng": 114.37381,
+      "lat": 22.37016,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-4845921821",
+      "name": "Marina maison",
+      "reason": "drop_junk",
+      "lng": 114.1486,
+      "lat": 22.2854,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-13099651945",
+      "name": "The Eye of AI",
+      "reason": "drop_junk",
+      "lng": 114.19266,
+      "lat": 22.66873,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-5271856622",
+      "name": "Chess table",
+      "reason": "drop_junk",
+      "lng": 109.5192,
+      "lat": 18.26867,
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-1083608461",
+      "name": "Viewpoint charged 10Y",
+      "reason": "drop_junk",
+      "lng": 100.10224,
+      "lat": 27.1892,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4754773223",
+      "name": "Start of track to first bend viewpoint",
+      "reason": "drop_junk",
+      "lng": 99.96219,
+      "lat": 26.86849,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5913521285",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 101.804,
+      "lat": 30.07838,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-4876910768",
+      "name": "Tower",
+      "reason": "drop_junk",
+      "lng": 104.99914,
+      "lat": 28.48862,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6748137585",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 108.16642,
+      "lat": 26.496,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5759810721",
+      "name": "Viewpoint on ShiZong Temple",
+      "reason": "drop_junk",
+      "lng": 99.83929,
+      "lat": 26.36186,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5913466485",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 101.88768,
+      "lat": 29.99654,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-5920175310",
+      "name": "Yilhun Latso Viewpoint",
+      "reason": "drop_junk",
+      "lng": 99.10948,
+      "lat": 31.86653,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6720640997",
+      "name": "Yilhun Latso Viewpoint",
+      "reason": "drop_junk",
+      "lng": 99.10978,
+      "lat": 31.86649,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5963221485",
+      "name": "Circus of Nego Valley 4960m",
+      "reason": "drop_junk",
+      "lng": 99.61321,
+      "lat": 29.90754,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6477044985",
+      "name": "Start of trail up",
+      "reason": "drop_junk",
+      "lng": 98.76724,
+      "lat": 28.08597,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6536607586",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 108.41765,
+      "lat": 27.05546,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6669201186",
+      "name": "small trail go up on the side of Valley",
+      "reason": "drop_junk",
+      "lng": 98.92262,
+      "lat": 31.67212,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6669214486",
+      "name": "good landscap view",
+      "reason": "drop_junk",
+      "lng": 98.93141,
+      "lat": 31.66925,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6720640995",
+      "name": "S456 111KM Road Marker",
+      "reason": "drop_junk",
+      "lng": 98.4366,
+      "lat": 32.49179,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6720644686",
+      "name": "S217 11KM Road Marker",
+      "reason": "drop_junk",
+      "lng": 97.59647,
+      "lat": 33.13702,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6720647985",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 97.49921,
+      "lat": 33.14118,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6722352787",
+      "name": "Viewpoint 4829M",
+      "reason": "drop_junk",
+      "lng": 97.65773,
+      "lat": 34.12673,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6722355891",
+      "name": "S307 11KM Road Maker",
+      "reason": "drop_junk",
+      "lng": 97.45301,
+      "lat": 33.11281,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6742277885",
+      "name": "Waterfall viewpoint",
+      "reason": "drop_junk",
+      "lng": 101.86917,
+      "lat": 30.16419,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-6792365986",
+      "name": "View point of langmu",
+      "reason": "drop_junk",
+      "lng": 102.64214,
+      "lat": 34.08994,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6985303891",
+      "name": "start of route to yubeng 4-5h",
+      "reason": "drop_junk",
+      "lng": 99.03681,
+      "lat": 28.35372,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-7655063985",
+      "name": "Col",
+      "reason": "drop_junk",
+      "lng": 100.43715,
+      "lat": 28.37926,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-7655064086",
+      "name": "Col",
+      "reason": "drop_junk",
+      "lng": 100.34115,
+      "lat": 28.32329,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-7655066085",
+      "name": "Col",
+      "reason": "drop_junk",
+      "lng": 100.34029,
+      "lat": 28.31535,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-7655066087",
+      "name": "Dolma La",
+      "reason": "drop_junk",
+      "lng": 100.32093,
+      "lat": 28.41868,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-7655088185",
+      "name": "Col",
+      "reason": "drop_junk",
+      "lng": 100.42529,
+      "lat": 28.42201,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-9102687017",
+      "name": "National Park",
+      "reason": "drop_junk",
+      "lng": 99.94769,
+      "lat": 27.9091,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-9911175217",
+      "name": "DANGER: Path ends, don’t continue",
+      "reason": "drop_junk",
+      "lng": 100.19169,
+      "lat": 27.03667,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-11813345509",
+      "name": "65km/35km",
+      "reason": "drop_junk",
+      "lng": 104.18667,
+      "lat": 30.73568,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-11890488069",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 101.87105,
+      "lat": 30.91548,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-12153180408",
+      "name": "Glass Bodem platform",
+      "reason": "drop_junk",
+      "lng": 102.96726,
+      "lat": 34.29456,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-4681721689",
+      "name": "Walk To The Edge",
+      "reason": "drop_foreign",
+      "lng": 104.90897,
+      "lat": 25.28839,
+      "province": "贵州"
+    },
+    {
+      "id": "osm-node-264318945",
+      "name": "The awesome instagram photo on the boat",
+      "reason": "drop_junk",
+      "lng": 105.41842,
+      "lat": 23.23732,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6114429389",
+      "name": "Ta Van",
+      "reason": "drop_foreign",
+      "lng": 103.89022,
+      "lat": 22.30386,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-1223070536",
+      "name": "Pagnueng",
+      "reason": "drop_junk",
+      "lng": 101.24304,
+      "lat": 21.12069,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-2027787358",
+      "name": "View Point, altitute 2143m",
+      "reason": "drop_junk",
+      "lng": 103.77977,
+      "lat": 22.33434,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-3107970172",
+      "name": "Dong Van Karst Plateau UNESCO global geopark - viewpoint",
+      "reason": "drop_foreign",
+      "lng": 105.41435,
+      "lat": 23.16205,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-3108058417",
+      "name": "nui Co Tien",
+      "reason": "drop_foreign",
+      "lng": 104.99736,
+      "lat": 23.059,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-3223469462",
+      "name": "Waterfall Quy Khach",
+      "reason": "drop_junk",
+      "lng": 103.90538,
+      "lat": 22.2941,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5333758621",
+      "name": "view of waterfall from the top",
+      "reason": "drop_junk",
+      "lng": 103.90551,
+      "lat": 22.29321,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-3282165789",
+      "name": "Duong Hanh Phuc Ma Pi Leng",
+      "reason": "drop_foreign",
+      "lng": 105.41208,
+      "lat": 23.24062,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4252023719",
+      "name": "Waterfall",
+      "reason": "drop_junk",
+      "lng": 103.7903,
+      "lat": 22.36085,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4346516197",
+      "name": "mushrooms village promontory",
+      "reason": "drop_junk",
+      "lng": 102.82191,
+      "lat": 23.09412,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4350488089",
+      "name": "Dong Van Plateau",
+      "reason": "drop_foreign",
+      "lng": 105.25743,
+      "lat": 23.26063,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4427130789",
+      "name": "Thach Son Than",
+      "reason": "drop_junk",
+      "lng": 104.97066,
+      "lat": 23.02565,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4508638690",
+      "name": "Waterfall",
+      "reason": "drop_junk",
+      "lng": 97.79175,
+      "lat": 25.35966,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4561184895",
+      "name": "Heaven Sapa",
+      "reason": "drop_foreign",
+      "lng": 103.83597,
+      "lat": 22.33031,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5918784285",
+      "name": "Muong hoa valley",
+      "reason": "drop_foreign",
+      "lng": 103.83956,
+      "lat": 22.33618,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4566037389",
+      "name": "Iang Khac?",
+      "reason": "drop_junk",
+      "lng": 105.22611,
+      "lat": 22.99007,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4948016990",
+      "name": "Mai Pi Leng Pass",
+      "reason": "drop_foreign",
+      "lng": 105.41785,
+      "lat": 23.2271,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5030007821",
+      "name": "Waterfalls",
+      "reason": "drop_junk",
+      "lng": 99.36929,
+      "lat": 25.83474,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5110445021",
+      "name": "Walkbridge",
+      "reason": "drop_junk",
+      "lng": 100.20627,
+      "lat": 25.69998,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5380071427",
+      "name": "Tinh Tuc Hanging Valley Viewpoint - 892m.",
+      "reason": "drop_foreign",
+      "lng": 105.90683,
+      "lat": 22.64233,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6950942686",
+      "name": "Bac Sun - Eco Pass",
+      "reason": "drop_foreign",
+      "lng": 104.93043,
+      "lat": 22.99198,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5466976221",
+      "name": "Nice view point",
+      "reason": "drop_junk",
+      "lng": 103.83843,
+      "lat": 22.38476,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5469199021",
+      "name": "Panorama",
+      "reason": "drop_junk",
+      "lng": 105.01456,
+      "lat": 23.06095,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5500410027",
+      "name": "Way to stupa",
+      "reason": "drop_junk",
+      "lng": 101.79913,
+      "lat": 22.09949,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5500449421",
+      "name": "To stupa take right way",
+      "reason": "drop_junk",
+      "lng": 101.78939,
+      "lat": 22.09539,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5522520324",
+      "name": "cave",
+      "reason": "drop_junk",
+      "lng": 105.19401,
+      "lat": 23.23263,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5526946021",
+      "name": "beautiful road",
+      "reason": "drop_junk",
+      "lng": 105.72083,
+      "lat": 22.94245,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5559489868",
+      "name": "Panorama",
+      "reason": "drop_junk",
+      "lng": 105.38028,
+      "lat": 23.26736,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5645342080",
+      "name": "Quan Ba",
+      "reason": "drop_foreign",
+      "lng": 104.99702,
+      "lat": 23.0895,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5711360922",
+      "name": "View point",
+      "reason": "drop_junk",
+      "lng": 105.08062,
+      "lat": 23.11615,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5724377221",
+      "name": "Cong Troi Quan Ba",
+      "reason": "drop_foreign",
+      "lng": 104.99302,
+      "lat": 23.04932,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5890159104",
+      "name": "Panorama view",
+      "reason": "drop_junk",
+      "lng": 105.1944,
+      "lat": 23.19608,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5908142290",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 101.95533,
+      "lat": 25.63829,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5918784286",
+      "name": "Terrace rice fields shin chai",
+      "reason": "drop_junk",
+      "lng": 103.83665,
+      "lat": 22.40243,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5995048485",
+      "name": "Lookout",
+      "reason": "drop_junk",
+      "lng": 98.47945,
+      "lat": 25.02721,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6053606399",
+      "name": "Chinese border",
+      "reason": "drop_junk",
+      "lng": 105.28516,
+      "lat": 23.34744,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6094057885",
+      "name": "Free Viewpoint",
+      "reason": "drop_junk",
+      "lng": 102.78185,
+      "lat": 23.08231,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6164987785",
+      "name": "Pagoda",
+      "reason": "drop_junk",
+      "lng": 102.78846,
+      "lat": 23.08711,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6114429388",
+      "name": "Ta Giang Phing",
+      "reason": "drop_foreign",
+      "lng": 103.76753,
+      "lat": 22.45789,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6327856585",
+      "name": "Beautiful viewpoint. Have a stop here :)",
+      "reason": "drop_junk",
+      "lng": 105.05508,
+      "lat": 23.02978,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-11056586805",
+      "name": "Cam Vut Rac",
+      "reason": "drop_foreign",
+      "lng": 105.37947,
+      "lat": 23.29075,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6427509585",
+      "name": "Joezeff Stallone saddle 1337m",
+      "reason": "drop_junk",
+      "lng": 102.04895,
+      "lat": 21.29872,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6427509685",
+      "name": "Sunset view",
+      "reason": "drop_junk",
+      "lng": 102.05007,
+      "lat": 21.30678,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6467259386",
+      "name": "Tia Sang cave (underground cave) viewpoint",
+      "reason": "drop_junk",
+      "lng": 105.30984,
+      "lat": 23.30106,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6481860285",
+      "name": "Walkway and free viewpoint",
+      "reason": "drop_junk",
+      "lng": 102.74018,
+      "lat": 23.10866,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6484971887",
+      "name": "View of Sapa town",
+      "reason": "drop_foreign",
+      "lng": 103.85684,
+      "lat": 22.33289,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6512533785",
+      "name": "stunning view",
+      "reason": "drop_junk",
+      "lng": 105.23751,
+      "lat": 23.25416,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6521247385",
+      "name": "View point over rice terraces and corn fields",
+      "reason": "drop_junk",
+      "lng": 103.82276,
+      "lat": 22.40724,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6696160185",
+      "name": "Amazing Viewpoint",
+      "reason": "drop_junk",
+      "lng": 100.12478,
+      "lat": 25.68898,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6721952489",
+      "name": "S218 111KM Road Markers",
+      "reason": "drop_junk",
+      "lng": 101.65199,
+      "lat": 24.3733,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6856783085",
+      "name": "View over the Rice Terraces",
+      "reason": "drop_junk",
+      "lng": 105.20365,
+      "lat": 23.03971,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6899543085",
+      "name": "Beautiful view",
+      "reason": "drop_junk",
+      "lng": 105.20523,
+      "lat": 23.04271,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-7041239590",
+      "name": "Tran Ton Pass",
+      "reason": "drop_foreign",
+      "lng": 103.82449,
+      "lat": 22.34558,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-7241491385",
+      "name": "Very bad piece of road (2-3 km) - good luck!",
+      "reason": "drop_junk",
+      "lng": 105.04359,
+      "lat": 23.06176,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-10314270710",
+      "name": "Beautiful View",
+      "reason": "drop_junk",
+      "lng": 105.24288,
+      "lat": 22.97843,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-10794161808",
+      "name": "beautiful Viewpoint",
+      "reason": "drop_junk",
+      "lng": 104.24202,
+      "lat": 22.78544,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-10794161905",
+      "name": "View of little cute village and fields",
+      "reason": "drop_junk",
+      "lng": 104.10004,
+      "lat": 22.642,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-10794729906",
+      "name": "Amazing Viewpoint",
+      "reason": "drop_junk",
+      "lng": 104.29742,
+      "lat": 22.62118,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-11176414838",
+      "name": "Nice view to river and China",
+      "reason": "drop_junk",
+      "lng": 105.40487,
+      "lat": 23.24552,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-11377884269",
+      "name": "Muong Hoa Valley",
+      "reason": "drop_foreign",
+      "lng": 103.87737,
+      "lat": 22.31449,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-11648852469",
+      "name": "View over terraces",
+      "reason": "drop_junk",
+      "lng": 105.19827,
+      "lat": 23.02722,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-12529300901",
+      "name": "+ belle vue d’Ha Giang",
+      "reason": "drop_foreign",
+      "lng": 105.2425,
+      "lat": 23.22092,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13074061573",
+      "name": "Dam",
+      "reason": "drop_junk",
+      "lng": 105.48666,
+      "lat": 23.00832,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13634036101",
+      "name": "Unnamed Viewpoint",
+      "reason": "drop_junk",
+      "lng": 105.03852,
+      "lat": 23.10433,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5796501953",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 110.08276,
+      "lat": 34.47905,
+      "province": "陕西"
+    },
+    {
+      "id": "osm-node-4342728193",
+      "name": "Pagoda",
+      "reason": "drop_junk",
+      "lng": 101.71545,
+      "lat": 36.08533,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-5781792954",
+      "name": "Yellow river and mountains",
+      "reason": "drop_junk",
+      "lng": 101.84961,
+      "lat": 36.12226,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6683498688",
+      "name": "Yuzhu Peak Viewpoint",
+      "reason": "drop_junk",
+      "lng": 93.87989,
+      "lat": 35.52519,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6698588194",
+      "name": "Western sea fleet",
+      "reason": "drop_junk",
+      "lng": 93.09691,
+      "lat": 40.54482,
+      "province": "甘肃"
+    },
+    {
+      "id": "osm-node-6721952612",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 94.05425,
+      "lat": 35.61581,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6722352786",
+      "name": "G214 Road Marker 555",
+      "reason": "drop_junk",
+      "lng": 97.92999,
+      "lat": 34.35692,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6722355890",
+      "name": "G214 777km Road Marker",
+      "reason": "drop_junk",
+      "lng": 97.26303,
+      "lat": 33.01481,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6857015086",
+      "name": "Viewing platform",
+      "reason": "drop_junk",
+      "lng": 100.41353,
+      "lat": 38.47824,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-6680846889",
+      "name": "viewpoint 5170m",
+      "reason": "drop_junk",
+      "lng": 91.85161,
+      "lat": 32.55809,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-2377864004",
+      "name": "Khamar davaa",
+      "reason": "drop_junk",
+      "lng": 118.58743,
+      "lat": 47.61987,
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-6858371887",
+      "name": "Orthodox grave yard",
+      "reason": "drop_junk",
+      "lng": 119.94121,
+      "lat": 50.81696,
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-8332711417",
+      "name": "mpemba effect",
+      "reason": "drop_junk",
+      "lng": 119.91044,
+      "lat": 49.7876,
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-8333311918",
+      "name": "Mpemba effect",
+      "reason": "drop_junk",
+      "lng": 119.79331,
+      "lat": 49.25339,
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-8333379117",
+      "name": "mpemba effect",
+      "reason": "drop_junk",
+      "lng": 119.67875,
+      "lat": 49.32541,
+      "province": "内蒙古"
+    },
+    {
+      "id": "osm-node-2088839401",
+      "name": "Bontela",
+      "reason": "drop_junk",
+      "lng": 89.36273,
+      "lat": 27.73457,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-2444311727",
+      "name": "Lamla La",
+      "reason": "drop_junk",
+      "lng": 86.71341,
+      "lat": 28.33065,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-2623683811",
+      "name": "Marsimik La viewpoint",
+      "reason": "drop_foreign",
+      "lng": 78.61807,
+      "lat": 34.09316,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-3719865192",
+      "name": "Nako viewpoint",
+      "reason": "drop_junk",
+      "lng": 78.62807,
+      "lat": 31.87795,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-3719865211",
+      "name": "Tibet viewpoint",
+      "reason": "drop_junk",
+      "lng": 78.65203,
+      "lat": 31.83153,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4803361724",
+      "name": "Taru kharka",
+      "reason": "drop_foreign",
+      "lng": 85.31214,
+      "lat": 28.23191,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-5042068521",
+      "name": "North Face Lookout of Mount Kailas",
+      "reason": "drop_junk",
+      "lng": 81.31779,
+      "lat": 31.08987,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-5187481622",
+      "name": "Yamdrok Lake Viewpoint",
+      "reason": "drop_junk",
+      "lng": 90.61721,
+      "lat": 29.18778,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-5593409026",
+      "name": "Tilman Pass",
+      "reason": "drop_foreign",
+      "lng": 85.70164,
+      "lat": 28.16303,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-5593409028",
+      "name": "Ganja La Pass",
+      "reason": "drop_foreign",
+      "lng": 85.56266,
+      "lat": 28.16372,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-5596062324",
+      "name": "first pass",
+      "reason": "drop_junk",
+      "lng": 87.96599,
+      "lat": 29.07347,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-5676878124",
+      "name": "Konchok Ling",
+      "reason": "drop_junk",
+      "lng": 84.00875,
+      "lat": 29.22016,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6006369990",
+      "name": "Tibetan Border",
+      "reason": "drop_junk",
+      "lng": 84.64886,
+      "lat": 28.70621,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6021110385",
+      "name": "Noesagang",
+      "reason": "drop_junk",
+      "lng": 85.38596,
+      "lat": 28.16211,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6105049685",
+      "name": "Temple",
+      "reason": "drop_junk",
+      "lng": 85.32403,
+      "lat": 28.16862,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6648373685",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 94.65494,
+      "lat": 29.61169,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6846906885",
+      "name": "Sinche La (5000m)",
+      "reason": "drop_foreign",
+      "lng": 89.55231,
+      "lat": 28.01527,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6846906886",
+      "name": "Jhari La (4750m)",
+      "reason": "drop_junk",
+      "lng": 89.51104,
+      "lat": 27.96138,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6911934885",
+      "name": "Larkya Pass Sign (5160 meters)",
+      "reason": "drop_foreign",
+      "lng": 84.52031,
+      "lat": 28.66396,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-7021067925",
+      "name": "Hill-top viewpoint towards Manaslu",
+      "reason": "drop_foreign",
+      "lng": 84.69477,
+      "lat": 28.57358,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-7886221985",
+      "name": "Kailash Mansarowar darshan viewpoint, Lapcha",
+      "reason": "drop_foreign",
+      "lng": 81.61104,
+      "lat": 30.40913,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-7886229885",
+      "name": "On the way to Hilsha from Til",
+      "reason": "drop_foreign",
+      "lng": 81.43655,
+      "lat": 30.19402,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-10154437097",
+      "name": "Mt. Manaslu View",
+      "reason": "drop_foreign",
+      "lng": 84.5987,
+      "lat": 28.65603,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-10154438466",
+      "name": "Larke Pass Viewpoint",
+      "reason": "drop_foreign",
+      "lng": 84.57986,
+      "lat": 28.66415,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-13870911402",
+      "name": "Kern (4967 m)",
+      "reason": "drop_junk",
+      "lng": 84.57789,
+      "lat": 28.6698,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-10266860609",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 85.61384,
+      "lat": 28.19609,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-11082697841",
+      "name": "Kailash Parvat Darshan Viewpoint",
+      "reason": "drop_junk",
+      "lng": 81.02501,
+      "lat": 30.24849,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-11837452569",
+      "name": "Viewpoint (5225m)",
+      "reason": "drop_junk",
+      "lng": 84.57621,
+      "lat": 28.67631,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-13870911202",
+      "name": "Kern (end of grass, start of stones, 5042 m)",
+      "reason": "drop_junk",
+      "lng": 84.57767,
+      "lat": 28.67291,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-11930460069",
+      "name": "Pangthompo",
+      "reason": "drop_junk",
+      "lng": 85.40433,
+      "lat": 28.17816,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-13870910702",
+      "name": "Viewpoint",
+      "reason": "drop_junk",
+      "lng": 84.84007,
+      "lat": 28.52185,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-13762572701",
+      "name": "Lapche La",
+      "reason": "drop_foreign",
+      "lng": 81.60766,
+      "lat": 30.41183,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-13762572702",
+      "name": "Kailash Mansarovar Viewpoint, Lapche La",
+      "reason": "drop_foreign",
+      "lng": 81.6137,
+      "lat": 30.41585,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-14001680501",
+      "name": "New view point",
+      "reason": "drop_junk",
+      "lng": 81.36601,
+      "lat": 30.72519,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-5938610186",
+      "name": "View of mosque from old streets and houses",
+      "reason": "drop_junk",
+      "lng": 89.20206,
+      "lat": 42.93293,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-5039161622",
+      "name": "View Point",
+      "reason": "drop_junk",
+      "lng": 75.0516,
+      "lat": 38.45611,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-5992818095",
+      "name": "K2 Viewpoint",
+      "reason": "drop_junk",
+      "lng": 76.94379,
+      "lat": 37.09378,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-6499125488",
+      "name": "New Lookout",
+      "reason": "drop_junk",
+      "lng": 89.06046,
+      "lat": 42.95012,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-6734345302",
+      "name": "Pass",
+      "reason": "drop_junk",
+      "lng": 75.24975,
+      "lat": 40.84512,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-9757451317",
+      "name": "View up the valley",
+      "reason": "drop_junk",
+      "lng": 75.1629,
+      "lat": 36.87632,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-11076824405",
+      "name": "Pass",
+      "reason": "drop_junk",
+      "lng": 75.26897,
+      "lat": 40.81737,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-13235639301",
+      "name": "1. Bay",
+      "reason": "drop_junk",
+      "lng": 87.03563,
+      "lat": 48.65743,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-5144413161",
+      "name": "Fupingbao",
+      "reason": "drop_foreign",
+      "lng": 110.17936,
+      "lat": 25.83538,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-992057105",
+      "name": "Reo Purgyil",
+      "reason": "drop_foreign",
+      "lng": 78.7413,
+      "lat": 31.88546,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-14140533280",
+      "name": "Kabang Ri",
+      "reason": "drop_foreign",
+      "lng": 85.36064,
+      "lat": 28.58981,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-6617277379",
+      "name": "Dongkya Ri",
+      "reason": "drop_foreign",
+      "lng": 88.78975,
+      "lat": 27.98416,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-3966626560",
+      "name": "Om Parvat",
+      "reason": "drop_foreign",
+      "lng": 81.03272,
+      "lat": 30.19694,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-5319900118",
+      "name": "Kataklik Kangri I",
+      "reason": "drop_foreign",
+      "lng": 78.18265,
+      "lat": 34.9411,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-3425977446",
+      "name": "Baden-Powell Scout Peak",
+      "reason": "drop_junk",
+      "lng": 85.53338,
+      "lat": 28.16759,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-3619184773",
+      "name": "Pangpoche I",
+      "reason": "drop_foreign",
+      "lng": 84.6823,
+      "lat": 28.62959,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-12155582958",
+      "name": "Sanglaphu",
+      "reason": "drop_junk",
+      "lng": 88.7157,
+      "lat": 27.97669,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-12155582957",
+      "name": "Gurudongmar",
+      "reason": "drop_junk",
+      "lng": 88.69959,
+      "lat": 27.98109,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4574906010",
+      "name": "Marble Peak",
+      "reason": "drop_junk",
+      "lng": 76.48556,
+      "lat": 35.77392,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-4574906012",
+      "name": "Summa Ri I",
+      "reason": "drop_foreign",
+      "lng": 76.44548,
+      "lat": 35.86636,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-4574820718",
+      "name": "Ghent Kangri",
+      "reason": "drop_foreign",
+      "lng": 76.80012,
+      "lat": 35.51783,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-4801959247",
+      "name": "Loi Pangnao",
+      "reason": "drop_foreign",
+      "lng": 100.33265,
+      "lat": 21.31551,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-11035256471",
+      "name": "Yanamax",
+      "reason": "drop_junk",
+      "lng": 81.04332,
+      "lat": 42.28501,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-2872204365",
+      "name": "Chogolisa",
+      "reason": "drop_foreign",
+      "lng": 76.57397,
+      "lat": 35.61297,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-4574906011",
+      "name": "Praqpa Kangri",
+      "reason": "drop_foreign",
+      "lng": 76.43417,
+      "lat": 35.82992,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-5142794065",
+      "name": "Kangju Kangri",
+      "reason": "drop_junk",
+      "lng": 78.52744,
+      "lat": 33.72526,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4574820719",
+      "name": "Sherpi Kangri",
+      "reason": "drop_foreign",
+      "lng": 76.78437,
+      "lat": 35.47222,
+      "province": "新疆"
+    },
+    {
+      "id": "osm-node-6617277382",
+      "name": "Chombu",
+      "reason": "drop_junk",
+      "lng": 88.64499,
+      "lat": 27.90046,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-11327870944",
+      "name": "Rebu Gang",
+      "reason": "drop_junk",
+      "lng": 101.474,
+      "lat": 32.43232,
+      "province": "青海"
+    },
+    {
+      "id": "osm-node-11962724481",
+      "name": "Water source",
+      "reason": "drop_junk",
+      "lng": 100.03195,
+      "lat": 28.23788,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-11962709315",
+      "name": "Hot Spring from nearby Hostel",
+      "reason": "drop_junk",
+      "lng": 99.98718,
+      "lat": 26.23522,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-7309307286",
+      "name": "Spring",
+      "reason": "drop_junk",
+      "lng": 103.62558,
+      "lat": 22.51439,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-7309324586",
+      "name": "Spring",
+      "reason": "drop_junk",
+      "lng": 103.61178,
+      "lat": 22.50495,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4293948089",
+      "name": "Ev Ralph",
+      "reason": "drop_junk",
+      "lng": 116.44274,
+      "lat": 39.90816,
+      "province": "北京"
+    },
+    {
+      "id": "osm-node-13741380701",
+      "name": "Yang Neo",
+      "reason": "drop_junk",
+      "lng": 121.40264,
+      "lat": 31.25967,
+      "province": "上海"
+    },
+    {
+      "id": "osm-node-8289428245",
+      "name": "a rap, bring bottle and fill",
+      "reason": "drop_junk",
+      "lng": 113.41032,
+      "lat": 22.53627,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-9049503209",
+      "name": "Saserga",
+      "reason": "drop_junk",
+      "lng": 78.85399,
+      "lat": 33.55869,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-14079735001",
+      "name": "Parking Entry Lift Gate",
+      "reason": "drop_junk",
+      "lng": 108.24086,
+      "lat": 22.86264,
+      "province": "广西"
+    },
+    {
+      "id": "osm-node-6089320985",
+      "name": "Cave",
+      "reason": "drop_junk",
+      "lng": 117.62103,
+      "lat": 29.48465,
+      "province": "江西"
+    },
+    {
+      "id": "osm-node-11361400693",
+      "name": "Closed project",
+      "reason": "drop_junk",
+      "lng": 110.98008,
+      "lat": 24.90718,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-12803418814",
+      "name": "Arch",
+      "reason": "drop_junk",
+      "lng": 110.4234,
+      "lat": 24.76188,
+      "province": "湖南"
+    },
+    {
+      "id": "osm-node-2140236930",
+      "name": "Japanese Tunnel",
+      "reason": "drop_junk",
+      "lng": 114.1277,
+      "lat": 22.19252,
+      "province": "广东"
+    },
+    {
+      "id": "osm-node-4665570749",
+      "name": "cave",
+      "reason": "drop_junk",
+      "lng": 102.99021,
+      "lat": 30.07522,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-11977471170",
+      "name": "Need to squeeze through the rocks",
+      "reason": "drop_junk",
+      "lng": 103.84813,
+      "lat": 22.33427,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4518601444",
+      "name": "Lung Khuy Cave",
+      "reason": "drop_foreign",
+      "lng": 105.01992,
+      "lat": 23.07877,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4566037589",
+      "name": "Pai Lung Cave",
+      "reason": "drop_foreign",
+      "lng": 105.38678,
+      "lat": 23.25477,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-5294733028",
+      "name": "Grotte Tien Phuong",
+      "reason": "drop_foreign",
+      "lng": 104.965,
+      "lat": 22.7882,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-990469833",
+      "name": "Lapthal",
+      "reason": "drop_junk",
+      "lng": 80.13333,
+      "lat": 30.73333,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-990473891",
+      "name": "Sonam",
+      "reason": "drop_junk",
+      "lng": 79.11667,
+      "lat": 31.23333,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-4449435615",
+      "name": "Jhong Cave",
+      "reason": "drop_junk",
+      "lng": 83.98275,
+      "lat": 29.23599,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-5676878123",
+      "name": "Kunchokling cave with old painting",
+      "reason": "drop_junk",
+      "lng": 84.01058,
+      "lat": 29.22112,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-12025785572",
+      "name": "Ritiling",
+      "reason": "drop_junk",
+      "lng": 83.99739,
+      "lat": 29.24154,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-11744787414",
+      "name": "Ritseling cave",
+      "reason": "drop_junk",
+      "lng": 84.0005,
+      "lat": 29.24716,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-11435248714",
+      "name": "G239",
+      "reason": "drop_junk",
+      "lng": 118.46773,
+      "lat": 39.98947,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11435248713",
+      "name": "G238",
+      "reason": "drop_junk",
+      "lng": 118.46983,
+      "lat": 39.98929,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368491858",
+      "name": "G049",
+      "reason": "drop_junk",
+      "lng": 118.48345,
+      "lat": 40.02942,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368491857",
+      "name": "G048",
+      "reason": "drop_junk",
+      "lng": 118.48318,
+      "lat": 40.02965,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135850",
+      "name": "68",
+      "reason": "drop_junk",
+      "lng": 118.20425,
+      "lat": 40.19979,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135849",
+      "name": "67",
+      "reason": "drop_junk",
+      "lng": 118.20232,
+      "lat": 40.20038,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135848",
+      "name": "66",
+      "reason": "drop_junk",
+      "lng": 118.20003,
+      "lat": 40.20066,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11435248711",
+      "name": "G236",
+      "reason": "drop_junk",
+      "lng": 118.47324,
+      "lat": 39.99054,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135851",
+      "name": "69",
+      "reason": "drop_junk",
+      "lng": 118.20618,
+      "lat": 40.19865,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294195",
+      "name": "G143",
+      "reason": "drop_junk",
+      "lng": 118.49013,
+      "lat": 40.01938,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135844",
+      "name": "62",
+      "reason": "drop_junk",
+      "lng": 118.19241,
+      "lat": 40.20157,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368412603",
+      "name": "G002",
+      "reason": "drop_junk",
+      "lng": 118.47664,
+      "lat": 40.02844,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294193",
+      "name": "G141",
+      "reason": "drop_junk",
+      "lng": 118.48453,
+      "lat": 40.01992,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294196",
+      "name": "G144",
+      "reason": "drop_junk",
+      "lng": 118.49087,
+      "lat": 40.01755,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368412604",
+      "name": "G003",
+      "reason": "drop_junk",
+      "lng": 118.47659,
+      "lat": 40.03017,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368511484",
+      "name": "G075",
+      "reason": "drop_junk",
+      "lng": 118.44961,
+      "lat": 39.99065,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368412605",
+      "name": "G004",
+      "reason": "drop_junk",
+      "lng": 118.47748,
+      "lat": 40.03158,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-4739676734",
+      "name": "Quarry",
+      "reason": "drop_junk",
+      "lng": 120.8225,
+      "lat": 30.37955,
+      "province": "浙江"
+    },
+    {
+      "id": "osm-node-11368412602",
+      "name": "G001",
+      "reason": "drop_junk",
+      "lng": 118.47499,
+      "lat": 40.02749,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135843",
+      "name": "61",
+      "reason": "drop_junk",
+      "lng": 118.19264,
+      "lat": 40.20003,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-13591678801",
+      "name": "Closed entrance (construction site) 2025.09",
+      "reason": "drop_junk",
+      "lng": 101.9663,
+      "lat": 30.04573,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-11368511485",
+      "name": "G076",
+      "reason": "drop_junk",
+      "lng": 118.44844,
+      "lat": 39.99089,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368511488",
+      "name": "G079",
+      "reason": "drop_junk",
+      "lng": 118.44578,
+      "lat": 39.98944,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294197",
+      "name": "G145",
+      "reason": "drop_junk",
+      "lng": 118.48605,
+      "lat": 40.01769,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11435248710",
+      "name": "G235",
+      "reason": "drop_junk",
+      "lng": 118.47847,
+      "lat": 39.99052,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368491863",
+      "name": "G054",
+      "reason": "drop_junk",
+      "lng": 118.466,
+      "lat": 39.99806,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377289336",
+      "name": "G088",
+      "reason": "drop_junk",
+      "lng": 118.44441,
+      "lat": 40.0022,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135842",
+      "name": "60",
+      "reason": "drop_junk",
+      "lng": 118.19131,
+      "lat": 40.19876,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135833",
+      "name": "51",
+      "reason": "drop_junk",
+      "lng": 118.18486,
+      "lat": 40.20006,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135834",
+      "name": "52",
+      "reason": "drop_junk",
+      "lng": 118.18601,
+      "lat": 40.20034,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368412609",
+      "name": "G008",
+      "reason": "drop_junk",
+      "lng": 118.4811,
+      "lat": 40.03713,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377289354",
+      "name": "G102,E35",
+      "reason": "drop_junk",
+      "lng": 118.45025,
+      "lat": 40.01809,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135841",
+      "name": "59",
+      "reason": "drop_junk",
+      "lng": 118.19058,
+      "lat": 40.19709,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294227",
+      "name": "G175",
+      "reason": "drop_junk",
+      "lng": 118.46336,
+      "lat": 39.99981,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368491864",
+      "name": "G055",
+      "reason": "drop_junk",
+      "lng": 118.45971,
+      "lat": 39.99832,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294228",
+      "name": "G176",
+      "reason": "drop_junk",
+      "lng": 118.48039,
+      "lat": 39.97641,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377289349",
+      "name": "G097,E30",
+      "reason": "drop_junk",
+      "lng": 118.44449,
+      "lat": 40.01215,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368412610",
+      "name": "G009",
+      "reason": "drop_junk",
+      "lng": 118.4803,
+      "lat": 40.03796,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294230",
+      "name": "G178",
+      "reason": "drop_junk",
+      "lng": 118.48019,
+      "lat": 39.97952,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294229",
+      "name": "G177",
+      "reason": "drop_junk",
+      "lng": 118.47977,
+      "lat": 39.97673,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368491865",
+      "name": "G056",
+      "reason": "drop_junk",
+      "lng": 118.45734,
+      "lat": 39.99778,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11383764599",
+      "name": "G184",
+      "reason": "drop_junk",
+      "lng": 118.48039,
+      "lat": 39.98282,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11383764598",
+      "name": "G183",
+      "reason": "drop_junk",
+      "lng": 118.48012,
+      "lat": 39.98254,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-12590443475",
+      "name": "A park",
+      "reason": "drop_junk",
+      "lng": 119.18772,
+      "lat": 36.72842,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368511470",
+      "name": "G061",
+      "reason": "drop_junk",
+      "lng": 118.44938,
+      "lat": 40.00174,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11383764595",
+      "name": "G180",
+      "reason": "drop_junk",
+      "lng": 118.47927,
+      "lat": 39.9808,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11383764594",
+      "name": "G179",
+      "reason": "drop_junk",
+      "lng": 118.47857,
+      "lat": 39.97856,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11383764596",
+      "name": "G181",
+      "reason": "drop_junk",
+      "lng": 118.479,
+      "lat": 39.98186,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368412613",
+      "name": "G012",
+      "reason": "drop_junk",
+      "lng": 118.47924,
+      "lat": 40.04158,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377289355",
+      "name": "G103",
+      "reason": "drop_junk",
+      "lng": 118.45423,
+      "lat": 40.01773,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294205",
+      "name": "G153",
+      "reason": "drop_junk",
+      "lng": 118.47985,
+      "lat": 40.01399,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368412615",
+      "name": "G014",
+      "reason": "drop_junk",
+      "lng": 118.48186,
+      "lat": 40.04405,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11368412614",
+      "name": "G013",
+      "reason": "drop_junk",
+      "lng": 118.48153,
+      "lat": 40.04335,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-10032528308",
+      "name": "ZBHD Spotting Point (By SINO3209)",
+      "reason": "drop_junk",
+      "lng": 114.43023,
+      "lat": 36.53187,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11383764653",
+      "name": "E64",
+      "reason": "drop_junk",
+      "lng": 118.46998,
+      "lat": 40.01938,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377289340",
+      "name": "G091",
+      "reason": "drop_junk",
+      "lng": 118.45101,
+      "lat": 40.00582,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377289341",
+      "name": "G092",
+      "reason": "drop_junk",
+      "lng": 118.45081,
+      "lat": 40.00677,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377289359",
+      "name": "G107,E46",
+      "reason": "drop_junk",
+      "lng": 118.46026,
+      "lat": 40.02376,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135828",
+      "name": "46",
+      "reason": "drop_junk",
+      "lng": 118.18273,
+      "lat": 40.1919,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294217",
+      "name": "G165",
+      "reason": "drop_junk",
+      "lng": 118.46824,
+      "lat": 40.0047,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294206",
+      "name": "G154",
+      "reason": "drop_junk",
+      "lng": 118.47698,
+      "lat": 40.01297,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377289360",
+      "name": "G108",
+      "reason": "drop_junk",
+      "lng": 118.46311,
+      "lat": 40.02456,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377294218",
+      "name": "G166",
+      "reason": "drop_junk",
+      "lng": 118.46802,
+      "lat": 40.00612,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11387135827",
+      "name": "45",
+      "reason": "drop_junk",
+      "lng": 118.1827,
+      "lat": 40.19003,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11377289358",
+      "name": "G106,E45",
+      "reason": "drop_junk",
+      "lng": 118.46015,
+      "lat": 40.01925,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11366115898",
+      "name": "E12",
+      "reason": "drop_junk",
+      "lng": 118.518,
+      "lat": 39.97762,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11366072322",
+      "name": "Y11",
+      "reason": "drop_junk",
+      "lng": 118.53003,
+      "lat": 39.9748,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11366072312",
+      "name": "Y01",
+      "reason": "drop_junk",
+      "lng": 118.52923,
+      "lat": 39.97529,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-11366115897",
+      "name": "E11",
+      "reason": "drop_junk",
+      "lng": 118.51804,
+      "lat": 39.97699,
+      "province": "河北"
+    },
+    {
+      "id": "osm-node-12393499633",
+      "name": "M1",
+      "reason": "drop_junk",
+      "lng": 108.22984,
+      "lat": 34.5617,
+      "province": "陕西"
+    },
+    {
+      "id": "osm-node-2868132732",
+      "name": "possible camp site",
+      "reason": "drop_junk",
+      "lng": 110.43025,
+      "lat": 18.71385,
+      "province": "海南"
+    },
+    {
+      "id": "osm-node-6917982085",
+      "name": "Waterfall (small)",
+      "reason": "drop_junk",
+      "lng": 100.14479,
+      "lat": 27.25064,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-14152970520",
+      "name": "Wasserfall",
+      "reason": "drop_junk",
+      "lng": 101.69638,
+      "lat": 30.41085,
+      "province": "四川"
+    },
+    {
+      "id": "osm-node-3359066831",
+      "name": "Pagnueng",
+      "reason": "drop_junk",
+      "lng": 101.24359,
+      "lat": 21.12593,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4378102398",
+      "name": "Water Fall",
+      "reason": "drop_junk",
+      "lng": 103.20031,
+      "lat": 22.41302,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4738030721",
+      "name": "Nam Keo Waterfall",
+      "reason": "drop_junk",
+      "lng": 101.17839,
+      "lat": 21.12003,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-4954139623",
+      "name": "Waterfall",
+      "reason": "drop_junk",
+      "lng": 105.50136,
+      "lat": 23.75524,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-12306226701",
+      "name": "You have a road for coming here. (Dirt road, maybe hard on scooter)",
+      "reason": "drop_junk",
+      "lng": 105.02521,
+      "lat": 23.03409,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-6313995085",
+      "name": "Nice waterfall",
+      "reason": "drop_junk",
+      "lng": 104.65995,
+      "lat": 22.67872,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-7265256785",
+      "name": "Trai Tim Waterfall (Thac Trai Tim)",
+      "reason": "drop_foreign",
+      "lng": 103.52366,
+      "lat": 22.49486,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-7273851085",
+      "name": "Trai Tim Waterfall (Thac Trai Tim)",
+      "reason": "drop_foreign",
+      "lng": 103.52417,
+      "lat": 22.47509,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-7273851185",
+      "name": "Trai Tim Waterfall",
+      "reason": "drop_foreign",
+      "lng": 103.52668,
+      "lat": 22.4807,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-9337064618",
+      "name": "Xiav Lagoon",
+      "reason": "drop_junk",
+      "lng": 105.00365,
+      "lat": 22.95239,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-11868866769",
+      "name": "Khau Lan Waterfall",
+      "reason": "drop_foreign",
+      "lng": 104.93808,
+      "lat": 23.02011,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13195214196",
+      "name": "Seo Ho",
+      "reason": "drop_junk",
+      "lng": 105.04222,
+      "lat": 22.94899,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-13195267511",
+      "name": "Seo Ho",
+      "reason": "drop_junk",
+      "lng": 105.04012,
+      "lat": 22.94914,
+      "province": "云南"
+    },
+    {
+      "id": "osm-node-3477345600",
+      "name": "Dhungsel Jharna",
+      "reason": "drop_foreign",
+      "lng": 85.13542,
+      "lat": 28.18013,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-9714464318",
+      "name": "Huge waterfall",
+      "reason": "drop_junk",
+      "lng": 84.76237,
+      "lat": 28.54885,
+      "province": "西藏"
+    },
+    {
+      "id": "osm-node-10080411080",
+      "name": "Aloh Cheekoh",
+      "reason": "drop_junk",
+      "lng": 96.60774,
+      "lat": 28.72535,
+      "province": "西藏"
+    }
+  ],
+  "unresolved": [],
+  "actions": {
+    "drop_junk": 365,
+    "dict": 484,
+    "drop_foreign": 62,
+    "osm_zh": 6,
+    "keep_en": 8,
+    "pattern": 2
+  }
+}

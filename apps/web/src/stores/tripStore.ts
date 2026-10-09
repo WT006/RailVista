@@ -175,18 +175,31 @@ export const useTripStore = defineStore('trip', () => {
     return epoch === preciseEpoch && activeJobId === jobId;
   }
 
+  /** 站名宽松相等：去「站」后缀后相等或互相 startsWith（对齐 sliceStopsByOd） */
+  function stationNamesMatch(a: string, b: string): boolean {
+    if (!a || !b) return false;
+    if (a === b) return true;
+    const na = a.replace(/站$/, '').trim();
+    const nb = b.replace(/站$/, '').trim();
+    if (!na || !nb) return false;
+    return na === nb || na.startsWith(nb) || nb.startsWith(na);
+  }
+
   /** 任务站序须与当前行程 OD 一致（服务端可能仍返回旧 job） */
   function jobMatchesCurrentTrip(job: RailGeometryJob): boolean {
     const seg = segment.value;
     if (!seg?.stops?.length) return false;
-    if (job.trainCode && job.trainCode !== seg.trainCode) return false;
+    const jobCode = (job.trainCode || '').trim().toUpperCase();
+    const segCode = (seg.trainCode || '').trim().toUpperCase();
+    if (jobCode && segCode && jobCode !== segCode) return false;
     if (!job.stops?.length) return true;
-    const segNames = seg.stops.map((s) => s.name);
-    const jobNames = job.stops.map((s) => s.name).filter(Boolean);
+    const jobNames = job.stops.map((s) => s.name).filter(Boolean) as string[];
     if (jobNames.length < 2) return false;
+    const segFrom = seg.fromName || seg.stops[0]?.name || '';
+    const segTo = seg.toName || seg.stops[seg.stops.length - 1]?.name || '';
     return (
-      jobNames[0] === segNames[0] &&
-      jobNames[jobNames.length - 1] === segNames[segNames.length - 1]
+      stationNamesMatch(jobNames[0], segFrom) &&
+      stationNamesMatch(jobNames[jobNames.length - 1], segTo)
     );
   }
 

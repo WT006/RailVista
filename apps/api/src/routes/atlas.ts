@@ -136,8 +136,11 @@ export type AtlasOverview = {
     corridorCount: number;
     spotCount: number;
     roadCorridorCount: number;
+    /** 图集落图数量（已滤测绘噪音） */
     roadSpotCount: number;
-    /** 公路景点库中被排除的铁路迁移条数量（说明为什么 roadSpots < 库总量） */
+    /** 公路原生景点库总量（未做落图过滤） */
+    roadSpotLibraryCount: number;
+    /** 公路景点库中被排除的铁路迁移条数量 */
     roadMigratedExcluded: number;
     generatedAt: string;
     buildMs: number;
@@ -311,7 +314,13 @@ const ROAD_TTL_MS = 600_000;
 type RoadLayerCache = {
   stamp: string;
   at: number;
-  data: { roadCorridors: AtlasRoadCorridor[]; roadSpots: AtlasSpot[]; excluded: number };
+  data: {
+    roadCorridors: AtlasRoadCorridor[];
+    roadSpots: AtlasSpot[];
+    excluded: number;
+    /** 公路原生景点库总量（未做图集落图过滤） */
+    libraryCount: number;
+  };
 };
 let roadCache: RoadLayerCache | null = null;
 let cacheStamp = '';
@@ -441,6 +450,7 @@ function buildOverview(): AtlasOverview {
   const roadCorridors = road.roadCorridors;
   const roadSpots = road.roadSpots;
   const roadMigratedExcluded = road.excluded;
+  const roadSpotLibraryCount = road.libraryCount;
 
   // 铁路景点补来源标记，前端合并成一个列表时可区分
   for (const s of spots) s.origin = 'rail';
@@ -454,7 +464,10 @@ function buildOverview(): AtlasOverview {
       corridorCount: out.length,
       spotCount: spots.length,
       roadCorridorCount: roadCorridors.length,
+      /** 图集实际落图（已滤测绘噪音） */
       roadSpotCount: roadSpots.length,
+      /** 公路原生库总量，供 UI「展示 N / 库内 M」 */
+      roadSpotLibraryCount,
       roadMigratedExcluded,
       generatedAt: new Date().toISOString(),
       buildMs: Date.now() - t0,
@@ -462,9 +475,10 @@ function buildOverview(): AtlasOverview {
   };
 }
 
-/** 公路图层指纹：几何目录与景点库任一变化即失效 */
+/** 公路图层指纹：几何目录与景点库任一变化即失效；含落图规则版本以免规则改了仍吃旧缓存 */
 function roadStamp(): string {
-  let out = '';
+  // 与 isAtlasRoadDisplaySpot 放宽同步 bump（v2 ≈ 千级落图）
+  let out = 'atlas-road-display:v2|';
   try {
     if (existsSync(SPOTS_PATH)) out += String(statSync(SPOTS_PATH).mtimeMs);
   } catch {
@@ -495,7 +509,12 @@ function getRoadLayer(): RoadLayerCache['data'] {
 }
 
 function buildRoadLayer(): RoadLayerCache['data'] {
-  const empty = { roadCorridors: [] as AtlasRoadCorridor[], roadSpots: [] as AtlasSpot[], excluded: 0 };
+  const empty = {
+    roadCorridors: [] as AtlasRoadCorridor[],
+    roadSpots: [] as AtlasSpot[],
+    excluded: 0,
+    libraryCount: 0,
+  };
   try {
     // 取 250 条上限：索引里 hasGeom 标了 15107 条，但实际几何文件只有 448 个
     // （既有数据不一致，本轮不修数据），按里程降序取前 250 条能覆盖到全部
@@ -506,6 +525,7 @@ function buildRoadLayer(): RoadLayerCache['data'] {
     // 它们的坐标贴铁路走廊，画在公路网上位置就是错的（需求方明确指出的严重问题）
     const native = all.filter((s) => !String(s.source ?? '').startsWith('migrated'));
     const excluded = all.length - native.length;
+    const libraryCount = native.length;
 
     const roadGrid = buildGeoIndex(roads.map((r) => ({ id: r.key, polyline: r.polyline })));
     const roadIdsByKey = new Map<string, string[]>();
@@ -572,7 +592,7 @@ function buildRoadLayer(): RoadLayerCache['data'] {
         spotIds: ids,
       };
     });
-    return { roadCorridors, roadSpots, excluded };
+    return { roadCorridors, roadSpots, excluded, libraryCount };
   } catch {
     // 公路侧不可用（无路网数据/服务未初始化）：铁路侧完整保留
     return empty;
@@ -624,6 +644,7 @@ atlasRoute.get('/road', (c) => {
         meta: {
           roadCorridorCount: meta.roadCorridorCount,
           roadSpotCount: meta.roadSpotCount,
+          roadSpotLibraryCount: meta.roadSpotLibraryCount,
           roadMigratedExcluded: meta.roadMigratedExcluded,
           generatedAt: meta.generatedAt,
         },

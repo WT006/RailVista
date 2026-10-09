@@ -5,7 +5,8 @@
  * 职责：
  *   1. 承载品牌标识（BrandLogo）与版本徽标，为页面提供统一的"顶部基线"；
  *   2. sticky 吸顶：随文档流滚动，滚动时保持可见（依赖 document 作为滚动容器）；
- *   3. 高度按断点走 --appbar-h 令牌（48 / 56 / 64），横屏短视口自动压缩。
+ *   3. 高度按断点走 --appbar-h 令牌（48 / 56 / 64），横屏短视口自动压缩；
+ *   4. padding-top 吃掉 --safe-top，避免 Logo 与系统时间/电量重叠（viewport-fit=cover）。
  *
  * 版本徽标：v0.5.x 曾在 ba6d8d6「走廊全屏地图页」中被整块删掉，导致
  * packages/shared/src/version.ts 全仓无人消费（改了版本界面上看不到）。此处恢复。
@@ -60,7 +61,10 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   position: sticky;
   top: 0;
   z-index: 60;
-  height: var(--appbar-h);
+  /* 总高含安全区；内层仍按 --appbar-h 排布，Logo 不会顶到状态栏 */
+  height: var(--appbar-offset);
+  padding-top: var(--safe-top);
+  box-sizing: border-box;
   /* 与主页面融为一体：去掉底部硬描边，背景几乎透明，仅保留极淡的玻璃模糊，
    * 让顶栏像"悬浮在页面之上"而非一块独立的条。滚过内容后才微微加深，给出层级暗示。
    * P5：背景随滚动状态的加深/变浅走平滑过渡（沉浸光感规范：从透明到模糊平滑过渡），
@@ -69,8 +73,9 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   border-bottom: none;
   background: linear-gradient(
     to bottom,
-    rgba(11, 14, 20, 0.5),
-    rgba(11, 14, 20, 0.24) 72%,
+    rgba(11, 14, 20, 0.72) 0%,
+    rgba(11, 14, 20, 0.5) var(--safe-top),
+    rgba(11, 14, 20, 0.24) calc(var(--safe-top) + 72%),
     rgba(11, 14, 20, 0)
   );
   backdrop-filter: blur(10px) saturate(var(--glass-saturate));
@@ -81,8 +86,9 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 .appbar.is-scrolled {
   background: linear-gradient(
     to bottom,
-    rgba(11, 14, 20, 0.66),
-    rgba(11, 14, 20, 0.38) 72%,
+    rgba(11, 14, 20, 0.82) 0%,
+    rgba(11, 14, 20, 0.66) var(--safe-top),
+    rgba(11, 14, 20, 0.38) calc(var(--safe-top) + 72%),
     rgba(11, 14, 20, 0)
   );
 }
@@ -92,7 +98,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  height: 100%;
+  height: var(--appbar-h);
 }
 
 .appbar__left {

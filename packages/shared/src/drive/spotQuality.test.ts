@@ -20,6 +20,15 @@ describe('isAtlasRoadDisplaySpot', () => {
       isAtlasRoadDisplaySpot({ name: '幻彩詠香江', score: 73, category: 'viewpoint.landmark' }),
       true,
     );
+    // 放宽后：海拔≥1000，或「≥700 且高分」的中文峰可落图
+    assert.equal(
+      isAtlasRoadDisplaySpot({ name: '念青唐古拉', score: 72, category: 'nature.mountain', ele: 7162 }),
+      true,
+    );
+    assert.equal(
+      isAtlasRoadDisplaySpot({ name: '云雾山', score: 80, category: 'nature.mountain', ele: 900 }),
+      true,
+    );
   });
 
   it('drops OSM survey noise', () => {
@@ -43,6 +52,10 @@ describe('isAtlasRoadDisplaySpot', () => {
     );
     assert.equal(
       isAtlasRoadDisplaySpot({ name: '迷魂台', score: 65, category: 'viewpoint.observation-deck' }),
+      false,
+    );
+    assert.equal(
+      isAtlasRoadDisplaySpot({ name: '迷魂台', score: 67, category: 'viewpoint.observation-deck' }),
       false,
     );
     assert.equal(

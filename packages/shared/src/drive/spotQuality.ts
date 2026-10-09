@@ -1,6 +1,7 @@
 /**
  * 公路景点是否值得作为「景点」展示（图集 / 沿程可共用）。
  * 不改库文件；OSM 测绘支峰、乐园设施、金门工事在这里挡掉。
+ * 落图约为库内原生点的一成（约一千），UI 应标明「展示 N / 库内 M」。
  */
 import { inKinmenMatsu } from './spotGrid.js';
 
@@ -35,6 +36,7 @@ export type AtlasRoadDisplaySpot = {
 
 function isNotableMountain(s: AtlasRoadDisplaySpot): boolean {
   const name = s.name ?? '';
+  const score = s.score ?? 0;
   if (String(s.source ?? '').startsWith('hand-curated')) return true;
   if (!CJK_RE.test(name) || SURVEY_PEAK.test(name) || FALSE_FAMOUS.test(name)) return false;
   const ele = s.ele;
@@ -45,6 +47,9 @@ function isNotableMountain(s: AtlasRoadDisplaySpot): boolean {
     if (Number.isFinite(ele) && (ele as number) < 800) return false;
     return true;
   }
+  // 略放宽：中高海拔中文峰（仍挡矮测绘峰 / 罗马数字峰；目标落图约一千）
+  if (Number.isFinite(ele) && (ele as number) >= 1000 && score >= 65) return true;
+  if (Number.isFinite(ele) && (ele as number) >= 700 && score >= 76) return true;
   return false;
 }
 
@@ -58,7 +63,7 @@ function isOsmLabelNoise(s: AtlasRoadDisplaySpot): boolean {
   if (cat === 'culture.ruin' && !RUIN_KEEP.test(name) && score < 80) return true;
   if (/燈塔|灯塔/.test(name) && score < 76) return true;
   if (/石刻$/.test(name) && cat !== 'culture.heritage' && score < 76) return true;
-  if (cat === 'viewpoint.observation-deck' && score < 70) return true;
+  if (cat === 'viewpoint.observation-deck' && score < 68) return true;
   if (GENERIC_VIEW.test(name) && (score < 73 || /台阶|臺階|牌坊/.test(name))) return true;
   if (name.length <= 2 && score < 73) return true;
   return false;

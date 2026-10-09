@@ -2,10 +2,7 @@
   --top-overlay: 72px;
   --bottom-overlay: 168px;
   --bottom-panel-clearance: 168px;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
+  /* --safe-* 定义在 tokens.css，供地图浮层与顶栏共用 */
   --panel-bg: var(--bg-raised);
 }
 
@@ -76,7 +73,8 @@ html:has(.drive-map-page) #app {
 
 .top-bar {
   position: fixed;
-  top: calc(8px + var(--safe-top));
+  /* safe-area：避开刘海 / 状态栏；无主顶栏时由此承担顶部留白 */
+  top: calc(12px + var(--safe-top));
   left: calc(10px + var(--safe-left));
   right: calc(10px + var(--safe-right));
   z-index: 100;
@@ -85,6 +83,23 @@ html:has(.drive-map-page) #app {
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
+}
+
+/* 手机：依赖系统/浏览器侧滑返回（Apple HIG standard/system gestures），隐藏显式返回键；
+ * 桌面仍保留 map-back-btn。仅含返回键的操作条一并收起，避免空行占位。 */
+@media (max-width: 599px) {
+  .map-back-btn {
+    display: none;
+  }
+
+  .map-nav-actions:not(:has(button:not(.map-back-btn))) {
+    display: none;
+  }
+
+  .top-bar {
+    top: calc(10px + var(--safe-top));
+    gap: 6px;
+  }
 }
 
 .map-back-btn {
@@ -1100,7 +1115,9 @@ html:has(.drive-map-page) #app {
   justify-content: center;
   border: 1px solid var(--success);
   border-radius: 999px;
-  background: var(--panel-bg);
+  background: color-mix(in srgb, var(--surface-0) 88%, #1a212b);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   color: var(--success);
   font-size: 13px;
   font-weight: 700;
@@ -1123,7 +1140,9 @@ html:has(.drive-map-page) #app {
   justify-content: center;
   border: 1px solid var(--border-default);
   border-radius: 999px;
-  background: var(--panel-bg);
+  background: color-mix(in srgb, var(--surface-0) 88%, #1a212b);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   color: var(--text-primary);
   font-size: 13px;
   font-weight: 600;
@@ -1152,7 +1171,10 @@ html:has(.drive-map-page) #app {
   justify-content: center;
   border: 1px solid var(--border-default);
   border-radius: 999px;
-  background: var(--panel-bg);
+  /* 浮在地图上：不可用半透明 surface-1，否则地名会透出叠在图例字上 */
+  background: color-mix(in srgb, var(--surface-0) 88%, #1a212b);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   color: var(--text-primary);
   font-size: 13px;
   font-weight: 600;
@@ -1167,8 +1189,11 @@ html:has(.drive-map-page) #app {
   bottom: calc(var(--bottom-overlay) + 154px);
   z-index: 101;
   display: none;
-  min-width: 88px;
-  background: var(--panel-bg);
+  min-width: 104px;
+  /* 同 legend-toggle：压住底图注记，避免「风景」等行出现重影 */
+  background: color-mix(in srgb, var(--surface-0) 88%, #1a212b);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   border: 1px solid var(--border-default);
   border-radius: 12px;
   padding: 8px 10px;

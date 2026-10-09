@@ -54,7 +54,10 @@ const loadError = ref('');
 const mapError = ref('');
 const heatSupported = ref(true);
 const heatOn = ref(false);
-const sidebarOpen = ref(true);
+/** 桌面默认展开侧栏；手机地图优先，面板收起（点「筛选」再开） */
+const sidebarOpen = ref(
+  typeof window === 'undefined' ? true : window.matchMedia('(min-width: 721px)').matches,
+);
 const query = ref('');
 const activeDims = ref<string[]>([]);
 /** 省份筛选（铁路用库字段；公路用 displayProvince，与地图省圈一致） */
@@ -103,6 +106,7 @@ async function loadRoad(): Promise<void> {
         ...stats.value,
         roadCorridorCount: d.meta.roadCorridorCount,
         roadSpotCount: d.meta.roadSpotCount,
+        roadSpotLibraryCount: d.meta.roadSpotLibraryCount,
         roadMigratedExcluded: d.meta.roadMigratedExcluded,
       };
     }
@@ -135,11 +139,21 @@ let roadPlainMarkers: any[] = [];
 /** corridorId → 折线，供点击/搜索后 fitView */
 const lineByCorridor = new Map<string, any>();
 
-// ── 公路图层：与铁路图层共存，独立开关 ────────────────────────────────────────
+// ── 公路图层：高速 / 国道分开关（琥珀 vs 蓝，不再绑在一起）────────────────
 // v0.5.5：数据直接取 /atlas/overview 的 roadCorridors，不再单独请求
 // /drive/network/overview —— 同一份折线在同页出现两次是纯浪费。
-const roadLayerOn = ref(false);
+const expresswayLayerOn = ref(false);
+const nationalLayerOn = ref(false);
+/** 任一公路线层开启（用于按需拉数据） */
+const roadLayerOn = computed(() => expresswayLayerOn.value || nationalLayerOn.value);
 let roadPolylines: any[] = [];
+
+function roadClassLayerOn(cls: string | undefined): boolean {
+  if (cls === 'expressway') return expresswayLayerOn.value;
+  if (cls === 'national') return nationalLayerOn.value;
+  // 省道及以下此前跟「公路」一起画；跟国道开关，避免拆开后静默消失
+  return nationalLayerOn.value;
+}
 
 function renderRoadLayer() {
   if (!map || !AMapRef) return;
@@ -154,6 +168,7 @@ function renderRoadLayer() {
   if (!roadLayerOn.value) return;
   for (const r of roadCorridors.value) {
     if (!r.polyline || r.polyline.length < 2) continue;
+    if (!roadClassLayerOn(r.class)) continue;
     const line = new AMapRef.Polyline({
       path: r.polyline,
       strokeColor: roadColor(r.class),
@@ -172,9 +187,15 @@ function renderRoadLayer() {
   }
 }
 
-async function toggleRoadLayer() {
-  roadLayerOn.value = !roadLayerOn.value;
-  if (roadLayerOn.value) await loadRoad();
+async function toggleExpresswayLayer() {
+  expresswayLayerOn.value = !expresswayLayerOn.value;
+  if (expresswayLayerOn.value) await loadRoad();
+  renderRoadLayer();
+}
+
+async function toggleNationalLayer() {
+  nationalLayerOn.value = !nationalLayerOn.value;
+  if (nationalLayerOn.value) await loadRoad();
   renderRoadLayer();
 }
 
@@ -443,6 +464,13 @@ function spotFilterProvince(s: AtlasSpotLite): string {
 /** 公路图集真正落图的点：提高 score 门槛并去掉测绘小山，不改库 */
 function atlasRoadDisplayList(list: AtlasSpotLite[]): AtlasSpotLite[] {
   return list.filter(isAtlasRoadDisplaySpot);
+}
+
+/** 库内总量展示：过万写「x.x 万」 */
+function formatRoadLibraryCount(n: number | undefined): string {
+  const v = Number(n) || 0;
+  if (v >= 10000) return `${(v / 10000).toFixed(1).replace(/\.0$/, '')} 万`;
+  return String(v);
 }
 
 function roadSpotLod(): 'province' | 'city' | 'spots' {
@@ -942,24 +970,32 @@ function getMapChromeInsets(): [number, number, number, number] {
   // setFitView avoid：[上, 右, 下, 左]，为单位像素
   const edge = 36;
   const dock = document.querySelector('.atlas-dock') as HTMLElement | null;
+  const layers = document.querySelector('.atlas-layers') as HTMLElement | null;
   const mapRect = mapEl.value?.getBoundingClientRect();
-  if (!dock || dock.classList.contains('is-collapsed') || !mapRect) {
-    return [edge, edge, edge, edge];
-  }
-  const rect = dock.getBoundingClientRect();
-  // 相对地图容器换算，避免窗口坐标与 map 像素坐标系错位
-  const dockRight = rect.right - mapRect.left;
-  const dockTop = rect.top - mapRect.top;
+  if (!mapRect) return [edge, edge, edge, edge];
+
   const vw = mapRect.width || window.innerWidth;
   const vh = mapRect.height || window.innerHeight;
-  if (vw <= 720) {
-    // 底栏：景点落在底栏上方可视区中心
-    const bottom = Math.max(edge, Math.ceil(vh - dockTop) + 10);
-    return [edge + 8, edge, bottom, edge];
+  let top = edge;
+  if (layers) {
+    top = Math.max(edge, Math.ceil(layers.getBoundingClientRect().bottom - mapRect.top) + 8);
   }
-  // 左侧栏：景点落在侧栏右侧可视区中心
+
+  if (!dock || dock.classList.contains('is-collapsed')) {
+    const bottomNav = vw <= 720 ? 76 : 0;
+    return [top, edge, edge + bottomNav, edge];
+  }
+
+  const rect = dock.getBoundingClientRect();
+  const dockRight = rect.right - mapRect.left;
+  const dockTop = rect.top - mapRect.top;
+  if (vw <= 720) {
+    // 底部伸缩面板：景点落在面板上方可视区
+    const bottom = Math.max(edge, Math.ceil(vh - dockTop) + 10);
+    return [top, edge, bottom, edge];
+  }
   const left = Math.max(edge, Math.ceil(dockRight) + 12);
-  return [edge, edge, edge, left];
+  return [top, edge, edge, left];
 }
 
 function mapPixelSize(): { w: number; h: number } {
@@ -1314,9 +1350,10 @@ async function reloadAll() {
 onMounted(async () => {
   await load();
   await initMap();
-  // /drive/atlas 模式：默认打开公路图层（铁路图层共存，可再手动切换）
+  // /drive/atlas 模式：默认打开高速+国道（铁路图层共存，可再手动切换）
   if (props.drive && map) {
-    roadLayerOn.value = true;
+    expresswayLayerOn.value = true;
+    nationalLayerOn.value = true;
     await loadRoad();
     renderRoadLayer();
   } else if (spotOrigin.value === 'all') {
@@ -1410,42 +1447,110 @@ watch(spotOrigin, (v) => {
   <div class="atlas-page">
     <div ref="mapEl" class="atlas-map"></div>
 
+    <!-- 图层开关独立浮层：桌面仅图层胶囊；手机收成一块分组面板 -->
+    <div class="atlas-layers" role="toolbar" aria-label="地图图层与筛选">
+      <div class="atlas-layers__group">
+        <span class="atlas-layers__k">图层</span>
+        <div class="atlas-layers__row">
+          <button
+            type="button"
+            class="atlas-layers__btn"
+            :class="{ 'is-on': expresswayLayerOn }"
+            style="--dot: #ffb84d"
+            :disabled="!!mapError"
+            :aria-pressed="expresswayLayerOn"
+            @click="toggleExpresswayLayer"
+          >
+            <i class="atlas-layers__dot" aria-hidden="true"></i>
+            高速
+          </button>
+          <button
+            type="button"
+            class="atlas-layers__btn"
+            :class="{ 'is-on': nationalLayerOn }"
+            style="--dot: #4d9fff"
+            :disabled="!!mapError"
+            :aria-pressed="nationalLayerOn"
+            @click="toggleNationalLayer"
+          >
+            <i class="atlas-layers__dot" aria-hidden="true"></i>
+            国道
+          </button>
+          <button
+            type="button"
+            class="atlas-layers__btn"
+            :class="{ 'is-on': heatOn }"
+            style="--dot: #ff6b8a"
+            :disabled="!heatSupported || !!mapError"
+            :aria-pressed="heatOn"
+            @click="heatOn = !heatOn"
+          >
+            <i class="atlas-layers__dot" aria-hidden="true"></i>
+            热力
+          </button>
+        </div>
+      </div>
+      <div class="atlas-layers__filters" aria-label="景点筛选">
+        <div class="atlas-layers__group">
+          <span class="atlas-layers__k">来源</span>
+          <div class="atlas-layers__row">
+            <button
+              v-for="o in ORIGIN_OPTIONS"
+              :key="o.key"
+              type="button"
+              class="atlas-layers__btn atlas-layers__btn--sm"
+              :class="{ 'is-on': spotOrigin === o.key }"
+              :style="{ '--dot': o.color }"
+              :aria-pressed="spotOrigin === o.key"
+              @click="spotOrigin = o.key"
+            >
+              <i class="atlas-layers__dot" aria-hidden="true"></i>
+              {{ o.label }}
+            </button>
+          </div>
+        </div>
+        <div class="atlas-layers__group">
+          <span class="atlas-layers__k">维度</span>
+          <div class="atlas-layers__row">
+            <button
+              v-for="d in dimOptions"
+              :key="d.key"
+              type="button"
+              class="atlas-layers__btn atlas-layers__btn--sm"
+              :class="{ 'is-on': activeDims.includes(d.key) }"
+              :style="{ '--dot': d.color }"
+              :aria-pressed="activeDims.includes(d.key)"
+              @click="toggleDim(d.key)"
+            >
+              <i class="atlas-layers__dot" aria-hidden="true"></i>
+              {{ d.short }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 外层必须是 .atlas-dock：样式 / fitView 避让都认这个类；勿改回 atlas-side（会沉到地图下面） -->
     <aside class="atlas-dock" :class="{ 'is-collapsed': !sidebarOpen }">
       <template v-if="sidebarOpen">
         <header class="atlas-dock__head">
-          <div class="atlas-dock__nav">
-            <button type="button" class="map-back-btn" @click="goBack">
+          <div class="atlas-dock__grab" aria-hidden="true"></div>
+          <div class="atlas-dock__title-row">
+            <button type="button" class="atlas-dock__back map-back-btn" @click="goBack">
               <span class="map-back-btn__icon" aria-hidden="true">‹</span>
               返回
             </button>
-            <button
-              type="button"
-              class="map-new-trip-btn"
-              :class="{ 'is-active': roadLayerOn }"
-              :disabled="!!mapError"
-              @click="toggleRoadLayer"
-            >
-              公路 {{ roadLayerOn ? '开' : '关' }}
-            </button>
-            <button
-              type="button"
-              class="map-new-trip-btn"
-              :class="{ 'is-active': heatOn }"
-              :disabled="!heatSupported || !!mapError"
-              @click="heatOn = !heatOn"
-            >
-              热力 {{ heatOn ? '开' : '关' }}
-            </button>
-            <button type="button" class="map-new-trip-btn" @click="sidebarOpen = false">
-              收起
-            </button>
-          </div>
-          <div class="atlas-dock__title">
             <div class="atlas-dock__identity">
-              <span class="train-badge">全国</span>
               <h1 class="atlas-dock__name">全国景点地图</h1>
             </div>
+            <button
+              type="button"
+              class="atlas-dock__collapse"
+              aria-label="收起面板"
+              @click="sidebarOpen = false"
+            >
+              收起
+            </button>
           </div>
         </header>
 
@@ -1472,7 +1577,7 @@ watch(spotOrigin, (v) => {
           <p v-else-if="query.trim()" class="atlas-none">没有匹配的线路或景点</p>
         </section>
 
-        <section class="atlas-block">
+        <section class="atlas-block atlas-block--origin">
           <h2 class="atlas-block__title">景点来源</h2>
           <div class="atlas-dims">
             <button
@@ -1496,17 +1601,17 @@ watch(spotOrigin, (v) => {
                 <button type="button" class="atlas-link" @click="loadRoad">重试</button>
               </template>
               <template v-else>
-                铁路 {{ spots.length }} · 公路 {{ roadLoaded ? roadSpots.length : (stats?.roadSpotCount ?? 0) }}
+                铁路 {{ spots.length }} · 公路展示
+                {{ roadLoaded ? roadSpots.length : (stats?.roadSpotCount ?? 0) }}
+                <template v-if="(stats?.roadSpotLibraryCount ?? 0) > (stats?.roadSpotCount ?? 0)">
+                  / 库内 {{ formatRoadLibraryCount(stats?.roadSpotLibraryCount) }}
+                </template>
               </template>
             </span>
             <button v-if="activeDims.length || activeProvinces.length || activeCity" type="button" class="atlas-link" @click="clearFilters">
               清空筛选
             </button>
           </div>
-          <p class="atlas-block__note">
-            公路景点：地图只画真正会去的点（名山/博物馆/地标；不含 OSM 测绘点、低分观景、残墓和金门工事）。
-            省/市圈与省份筛选按经纬度重算归属，不用采集时的 province 标签。
-          </p>
           <p v-if="activeCity" class="atlas-block__note">
             当前展开：{{ activeCity }}
             <button type="button" class="atlas-link" @click="activeCity = ''">返回全市聚合</button>
@@ -1539,7 +1644,7 @@ watch(spotOrigin, (v) => {
           </div>
         </section>
 
-        <section class="atlas-block">
+        <section class="atlas-block atlas-block--dims">
           <h2 class="atlas-block__title">景点维度<span class="atlas-block__hint">（可多选）</span></h2>
           <div class="atlas-dims">
             <button
@@ -1735,7 +1840,15 @@ watch(spotOrigin, (v) => {
         </p>
         </div>
       </template>
-      <button v-else type="button" class="atlas-dock__open" @click="sidebarOpen = true">›</button>
+      <button
+        v-else
+        type="button"
+        class="atlas-dock__open"
+        aria-label="展开筛选与榜单"
+        @click="sidebarOpen = true"
+      >
+        筛选 · 榜单
+      </button>
     </aside>
 
     <p v-if="loading" class="atlas-status">正在加载全国铁路与景点数据…</p>
@@ -1764,10 +1877,85 @@ watch(spotOrigin, (v) => {
   z-index: 0;
 }
 
-/* ── 左侧统一面板（导航 + 标题 + 筛选/榜单，避免顶栏与侧栏叠压） ── */
+/* ── 图层开关（独立浮层，左上角常显） ── */
+.atlas-layers {
+  position: fixed;
+  top: calc(10px + var(--safe-top));
+  left: calc(12px + var(--safe-left));
+  z-index: 270;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: min(100vw - 24px, 420px);
+  pointer-events: auto;
+}
+
+.atlas-layers__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.atlas-layers__k {
+  display: none;
+}
+
+.atlas-layers__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.atlas-layers__filters {
+  display: none;
+}
+
+.atlas-layers__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line-default);
+  background: color-mix(in srgb, var(--surface-0) 88%, transparent);
+  backdrop-filter: blur(12px) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(12px) saturate(var(--glass-saturate));
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--elev-2);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.atlas-layers__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.atlas-layers__btn.is-on {
+  border-color: color-mix(in srgb, var(--dot, var(--accent)) 55%, transparent);
+  color: var(--text-1);
+  background: color-mix(in srgb, var(--dot, var(--accent)) 18%, var(--surface-0));
+}
+
+.atlas-layers__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--dot, var(--accent));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--dot, var(--accent)) 55%, transparent);
+}
+
+/* ── 筛选/榜单伸缩面板（桌面左侧栏 · 手机底部 sheet） ── */
 .atlas-dock {
   position: fixed;
-  top: calc(8px + var(--safe-top));
+  /* 网页端侧栏让出左上角图层开关，避免挡住高速/国道/热力 */
+  top: calc(58px + var(--safe-top));
   left: calc(12px + var(--safe-left));
   bottom: calc(12px + var(--safe-bottom));
   z-index: 200;
@@ -1782,31 +1970,48 @@ watch(spotOrigin, (v) => {
   box-shadow: var(--elev-3);
   overflow: hidden;
   pointer-events: auto;
-  transition: width var(--dur-base) var(--ease-out);
+  transition:
+    width var(--dur-base) var(--ease-out),
+    max-height var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
 }
 
 .atlas-dock.is-collapsed {
-  width: 40px;
+  width: auto;
+  top: calc(10px + var(--safe-top));
+  right: auto;
+  bottom: auto;
+  /* 网页端收起后，展开钮跟在图层开关右侧 */
+  left: calc(12px + var(--safe-left) + 248px);
+  max-height: none;
 }
 
 .atlas-dock__head {
   flex-shrink: 0;
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-1);
   padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--line-hairline);
 }
 
-.atlas-dock__nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
+.atlas-dock__grab {
+  display: none;
+  width: 36px;
+  height: 4px;
+  margin: 2px auto 4px;
+  border-radius: 999px;
+  background: var(--line-strong);
 }
 
-.atlas-dock__title {
-  display: grid;
-  gap: var(--space-1);
+.atlas-dock__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.atlas-dock__back {
+  flex-shrink: 0;
 }
 
 .atlas-dock__identity {
@@ -1814,6 +2019,8 @@ watch(spotOrigin, (v) => {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+  min-width: 0;
+  flex: 1;
 }
 
 .atlas-dock__name {
@@ -1822,13 +2029,28 @@ watch(spotOrigin, (v) => {
   font-weight: 700;
   line-height: var(--lh-tight);
   color: var(--text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.atlas-dock__sub {
-  margin: 0;
-  font-size: var(--fs-micro);
-  line-height: var(--lh-snug);
-  color: var(--text-3);
+.atlas-dock__collapse {
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-default);
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.atlas-dock__collapse:hover {
+  border-color: var(--line-accent);
+  color: var(--text-1);
 }
 
 .atlas-dock__body {
@@ -1843,15 +2065,18 @@ watch(spotOrigin, (v) => {
 }
 
 .atlas-dock__open {
-  width: 100%;
-  height: 100%;
-  min-height: 40px;
+  min-height: 44px;
+  padding: 0 16px;
   border: none;
-  border-radius: var(--radius-sm);
-  background: var(--fill-subtle);
-  color: var(--text-2);
-  font-size: 18px;
+  border-radius: 999px;
+  background: var(--fill-accent);
+  color: var(--text-1);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
+  box-shadow: var(--elev-3);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .atlas-block {
@@ -2203,28 +2428,121 @@ watch(spotOrigin, (v) => {
 }
 
 @media (max-width: 720px) {
+  /* 手机：收成一块带分类的玻璃面板 */
+  .atlas-layers {
+    top: calc(10px + var(--safe-top));
+    left: calc(10px + var(--safe-left));
+    right: calc(10px + var(--safe-right));
+    gap: 8px;
+    max-width: none;
+    padding: 8px 10px;
+    border-radius: 16px;
+    border: 1px solid var(--line-default);
+    background: color-mix(in srgb, var(--surface-0) 88%, transparent);
+    backdrop-filter: blur(16px) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(16px) saturate(var(--glass-saturate));
+    box-shadow: var(--elev-3);
+  }
+
+  .atlas-layers__group {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    align-items: start;
+    gap: 4px 8px;
+    width: 100%;
+  }
+
+  .atlas-layers__k {
+    display: block;
+    padding-top: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-3);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .atlas-layers__row {
+    gap: 5px;
+  }
+
+  .atlas-layers__filters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    padding-top: 8px;
+    border-top: 1px solid var(--line-hairline);
+  }
+
+  .atlas-layers__btn {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: var(--fs-cap);
+    box-shadow: none;
+    background: var(--fill-subtle);
+  }
+
+  .atlas-layers__btn--sm {
+    min-height: 28px;
+    padding: 0 8px;
+  }
+
+  .atlas-layers__dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  /* 侧栏里的来源/维度/说明/统计在手机端去掉，改走顶部压缩条 */
+  .atlas-block--origin,
+  .atlas-block--dims {
+    display: none;
+  }
+
+  /* 底部伸缩 sheet：标题条 + 可滚内容，不挡图层开关 */
   .atlas-dock {
     top: auto;
     left: calc(10px + var(--safe-left));
     right: calc(10px + var(--safe-right));
-    bottom: calc(10px + var(--safe-bottom));
+    bottom: calc(var(--bottomnav-h) + 10px + var(--safe-bottom));
     width: auto;
-    /* 默认只占下半偏少，多留地图；内容在面板内滚动 */
-    max-height: min(38vh, calc(100dvh - 96px - var(--safe-bottom)));
+    max-height: min(34vh, calc(100dvh - var(--bottomnav-h) - 120px - var(--safe-top) - var(--safe-bottom)));
+    z-index: 260;
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-md) var(--radius-md);
   }
 
   .atlas-dock.is-collapsed {
-    width: 44px;
-    max-height: 44px;
+    top: auto;
+    left: calc(10px + var(--safe-left));
+    right: auto;
+    bottom: calc(var(--bottomnav-h) + 10px + var(--safe-bottom));
+    width: auto;
+    min-width: 112px;
+    max-height: none;
+    border-radius: 999px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .atlas-dock__grab {
+    display: none;
+  }
+
+  .atlas-dock__back {
+    display: none;
   }
 
   .atlas-dock__head {
-    gap: var(--space-1);
-    padding: var(--space-2) var(--space-2) var(--space-1);
+    gap: 0;
+    padding: 6px var(--space-2) var(--space-1);
   }
 
-  .atlas-dock__sub {
-    display: none;
+  .atlas-dock__name {
+    font-size: var(--fs-body);
   }
 
   .atlas-dock__body {
@@ -2236,14 +2554,14 @@ watch(spotOrigin, (v) => {
     padding: 7px 8px;
   }
 
-  .atlas-top-list {
-    max-height: 22vh;
+  .atlas-top-list,
+  .atlas-rank-list {
+    max-height: 12vh;
     overflow-y: auto;
   }
 
-  .atlas-rank-list {
-    max-height: 16vh;
-    overflow-y: auto;
+  .atlas-provinces {
+    max-height: 88px;
   }
 }
 
@@ -2629,8 +2947,7 @@ watch(spotOrigin, (v) => {
   overflow: hidden;
 }
 
-.atlas-side__open,
-.atlas-dock__open {
+.atlas-side__open {
   width: 100%;
   height: 40px;
   border: none;
@@ -2639,57 +2956,6 @@ watch(spotOrigin, (v) => {
   color: var(--text-secondary);
   font-size: 18px;
   cursor: pointer;
-}
-
-/* ── 侧栏内部结构（ba6d8d6 引入的 dock 结构） ── */
-.atlas-dock__head {
-  display: grid;
-  gap: 8px;
-}
-
-.atlas-dock__nav {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.atlas-dock__title {
-  display: grid;
-  gap: 2px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-hairline);
-}
-
-.atlas-dock__identity {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-
-.atlas-dock__name {
-  margin: 0;
-  font-size: var(--fs-h1);
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.atlas-dock__sub {
-  margin: 0;
-  font-size: 10.5px;
-  line-height: 1.5;
-  color: var(--text-muted);
-}
-
-.atlas-dock__body {
-  display: grid;
-  gap: 8px;
-  align-content: start;
 }
 
 /* 线路聚焦时地图上的定位点 */

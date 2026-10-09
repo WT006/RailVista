@@ -7,15 +7,10 @@ import AppTopBar from './components/AppTopBar.vue';
 
 const route = useRoute();
 /**
- * 全屏地图类页面自带顶部控件（返回 + 图层/来源切换），不渲染主顶栏。
- * 注意 /drive/atlas 须先于 /drive 判断。
+ * 全屏地图页（meta.fullscreenMap）：自带浮层控件，不渲染主顶栏，
+ * 避免品牌 Logo 与地图顶栏（返回/状态卡）重叠（HIG safe-area / fixed-element-offset）。
  */
-const showTopBar = computed(
-  () =>
-    !route.path.startsWith('/atlas') &&
-    !route.path.startsWith('/drive/atlas') &&
-    !route.path.startsWith('/route/'),
-);
+const showTopBar = computed(() => !route.meta.fullscreenMap);
 </script>
 
 <template>

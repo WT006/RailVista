@@ -678,15 +678,15 @@ watch([displayFrom, displayTo], async () => {
       <div class="legend" :class="{ 'is-open': legendOpen }">
         <div class="legend-item--toggle" aria-pressed="true">
           <i class="rail" aria-hidden="true" />
-          示意铁路
+          <span>示意铁路</span>
         </div>
         <div class="legend-item--toggle" aria-pressed="true">
           <i class="station" aria-hidden="true" />
-          经停站
+          <span>经停站</span>
         </div>
         <div class="legend-item--toggle" aria-pressed="true">
           <i class="spot" aria-hidden="true" />
-          风景
+          <span>风景</span>
         </div>
         <div v-if="legendOpen" class="legend-side">
           <span class="legend-side__title">景点维度</span>

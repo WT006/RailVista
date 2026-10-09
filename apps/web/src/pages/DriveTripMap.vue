@@ -21,7 +21,7 @@ import {
 import { api } from '../api/client';
 import { useGeolocation } from '../composables/useGeolocation';
 import { escHtml } from '../data/spotDimensions';
-import { ROAD_COLORS } from '../data/roadColors';
+import { ROAD_COLORS, ROAD_SHADOW_STROKE } from '../data/roadColors';
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 
 const route = useRoute();
@@ -677,7 +677,7 @@ async function drawMap() {
   const path = displayPath(coords);
   routeShadow = new AMapRef.Polyline({
     path,
-    strokeColor: '#0a1628',
+    strokeColor: ROAD_SHADOW_STROKE,
     strokeOpacity: satelliteOn.value ? 0.55 : 0.35,
     strokeWeight: compact.value ? 9 : 11,
     lineJoin: 'round',

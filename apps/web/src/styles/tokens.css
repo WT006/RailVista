@@ -156,6 +156,15 @@
   --elev-4: 0 32px 80px -16px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   --glow-accent: 0 0 0 1px var(--line-accent), 0 12px 36px -10px rgba(77, 159, 255, 0.2);
 
+  /* ══════════ 地图浮层与标注（自驾/地图模块专用档，2026-10 收敛）══════════ */
+  --elev-float: 0 4px 16px rgba(0, 0, 0, 0.24); /* 地图小控件（胶囊按钮等） */
+  --elev-float-strong: 0 8px 22px rgba(0, 0, 0, 0.35); /* 地图浮卡 / 浮层面板 */
+  --pin-shadow: 0 4px 10px rgba(0, 0, 0, 0.45); /* 地图 pin 投影（filter: drop-shadow） */
+  --pin-rim: #ffffff; /* 地图 pin / 车辆/定位标记的白色描边 */
+  --fs-annot: 10px; /* 地图标注字号（数据标注层，低于正文微字号） */
+  --fs-annot-sm: 8px; /* 地图标注·密集态（缩小 pin / 刻度条内） */
+  --dur-pulse: 1600ms; /* 氛围脉冲：无位移的呼吸/扩散类循环动画专用（不受 350ms 位移档约束） */
+
   /* ══════════ 动效 ══════════ */
   --dur-micro: 100ms; /* 颜色 / 描边 */
   --dur-fast: 200ms; /* 小构件状态切换 */

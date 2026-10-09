@@ -400,9 +400,7 @@ html {
 }
 
 .select-form label,
-.od-panel label,
-/* 自驾页 OD 搜索复用铁路版「站点输入」观感（station-field 结构一致） */
-.drive-od .station-field {
+.od-panel label {
   display: grid;
   gap: var(--space-2);
   font-size: var(--fs-meta);
@@ -410,8 +408,7 @@ html {
 }
 
 .select-form input,
-.od-panel select,
-.drive-od .station-field input {
+.od-panel select {
   width: 100%;
   padding: 0 var(--space-3);
   min-height: 46px;
@@ -432,20 +429,17 @@ html {
 }
 
 /* 输入框占位符：弱化但保持可辨识 */
-.select-form input::placeholder,
-.drive-od .station-field input::placeholder {
+.select-form input::placeholder {
   color: var(--text-3);
 }
 
 .select-form input:hover,
-.od-panel select:hover,
-.drive-od .station-field input:hover {
+.od-panel select:hover {
   border-color: var(--line-strong);
 }
 
 .select-form input:focus,
-.od-panel select:focus,
-.drive-od .station-field input:focus {
+.od-panel select:focus {
   outline: none;
   border-color: var(--accent);
   background: var(--surface-3);

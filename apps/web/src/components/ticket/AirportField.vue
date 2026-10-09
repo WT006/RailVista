@@ -69,38 +69,50 @@ function pick(a: Airport) {
 </template>
 
 <style scoped>
-.af__label { display: block; margin-bottom: 7px; font-size: 12.5px; letter-spacing: 0.04em; color: rgba(255,255,255,0.55); }
+.af__label { display: block; margin-bottom: 7px; font-size: var(--fs-cap); letter-spacing: 0.04em; color: var(--text-2); }
 .af__box {
   display: flex; align-items: center; gap: 9px;
   min-height: 48px; padding: 0 13px;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.055);
-  border: 1px solid rgba(255,255,255,0.08);
-  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line-default);
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-fast) var(--ease-standard);
 }
 .af__box:focus-within {
-  border-color: rgba(212,168,83,0.55);
-  background: rgba(255,255,255,0.08);
-  box-shadow: 0 0 0 3px rgba(212,168,83,0.12);
+  border-color: var(--accent);
+  background: var(--interactive-hover);
+  box-shadow: var(--focus-ring);
 }
-.af__icon { flex-shrink: 0; color: rgba(255,255,255,0.4); }
-.af__box input { flex: 1; min-width: 0; height: 46px; font-size: 14.5px; color: #fff; background: transparent; border: none; outline: none; }
-.af__box input::placeholder { color: rgba(255,255,255,0.3); }
-.af__code { flex-shrink: 0; font-size: 12px; font-weight: 700; color: #d4a853; }
+.af__icon { flex-shrink: 0; color: var(--text-3); }
+.af__box input { flex: 1; min-width: 0; height: 46px; font-size: var(--fs-body); color: var(--text-1); background: transparent; border: none; outline: none; }
+.af__box input::placeholder { color: var(--text-3); }
+.af__code { flex-shrink: 0; font-size: 12px; font-weight: 700; color: var(--ticket-gold); }
 .af__list {
   position: relative; z-index: 20;
   max-height: 260px; overflow-y: auto;
   margin: 6px 0 0; padding: 6px;
-  border-radius: 14px; list-style: none;
-  background: #232634; border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+  border-radius: var(--radius-md); list-style: none;
+  background: var(--surface-1); border: 1px solid var(--line-strong);
+  box-shadow: var(--elev-3);
 }
 .af__list li {
   display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px;
-  padding: 9px 11px; border-radius: 9px; cursor: pointer;
+  padding: 9px 11px; border-radius: var(--radius-sm); cursor: pointer;
 }
-.af__list li:hover { background: rgba(255,255,255,0.08); }
-.af__city { font-size: 13.5px; color: rgba(255,255,255,0.9); }
-.af__en { font-size: 10.5px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 8px; }
-.af__iata { font-size: 12px; font-weight: 700; color: #d4a853; }
+@media (hover: hover) and (pointer: fine) {
+  .af__list li:hover { background: var(--interactive-hover); }
+}
+.af__city { font-size: var(--fs-meta); color: var(--text-1); }
+.af__en { font-size: var(--fs-micro); color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 8px; }
+.af__iata { font-size: 12px; font-weight: 700; color: var(--ticket-gold); }
+
+@media (prefers-reduced-motion: reduce) {
+  .af__box,
+  .af__list li {
+    transition: none;
+  }
+}
 </style>

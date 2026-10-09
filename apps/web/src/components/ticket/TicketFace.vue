@@ -6,6 +6,9 @@
  * - 飞行：登机牌版式（大 IATA、机场英文名、条码），不含任何自驾元素
  * 主题色板来自 src/data/ticket.ts，经 CSS 变量注入。
  */
+/* 【作用域例外层】票面印刷层（票面渲染器）：渐变 / 微字号（印刷排印）/ 微圆角
+ * 按印刷品规范保留，不套用界面令牌体系；界面交互控件不在此例外内
+ * （2026-10-09 鸿蒙化收敛裁定，见 tokens.css 例外条款）。 */
 import { computed } from 'vue';
 import { mustDriveFromShields, type TicketConfig } from '@railvista/shared';
 import { AIRLINES, ALLIANCES, TICKET_KIND_META, ticketTheme } from '../../data/ticket';

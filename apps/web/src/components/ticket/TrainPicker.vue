@@ -184,27 +184,30 @@ function trainKind(code: string): 'hsr' | 'intercity' | 'conventional' | 'other'
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
-.tp__label { display: block; margin-bottom: 7px; font-size: 12.5px; letter-spacing: 0.04em; color: rgba(255,255,255,0.55); }
+.tp__label { display: block; margin-bottom: 7px; font-size: var(--fs-cap); letter-spacing: 0.04em; color: var(--text-2); }
 .tp__control, .tp__datebox {
   position: relative;
   display: flex; align-items: center;
   min-height: 48px; padding: 0 14px;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.055);
-  border: 1px solid rgba(255,255,255,0.08);
-  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line-default);
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-fast) var(--ease-standard);
 }
 .tp__control:focus-within, .tp__datebox:focus-within {
-  border-color: rgba(212,168,83,0.55);
-  background: rgba(255,255,255,0.08);
-  box-shadow: 0 0 0 3px rgba(212,168,83,0.12);
+  border-color: var(--accent);
+  background: var(--interactive-hover);
+  box-shadow: var(--focus-ring);
 }
 .tp__control input, .tp__datebox input {
   flex: 1; min-width: 0; height: 46px;
-  font-size: 15px; color: #fff;
+  font-size: 15px; color: var(--text-1);
   background: transparent; border: none; outline: none;
 }
-.tp__control input::placeholder { color: rgba(255,255,255,0.3); }
+.tp__control input::placeholder { color: var(--text-3); }
 .tp__datebox input::-webkit-date-and-time-value { text-align: left; }
 .tp__datebox { color-scheme: dark; }
 
@@ -212,35 +215,37 @@ function trainKind(code: string): 'hsr' | 'intercity' | 'conventional' | 'other'
   position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 20;
   max-height: 240px; overflow-y: auto;
   padding: 6px;
-  border-radius: 14px;
-  background: #232634;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--elev-3);
   list-style: none; margin: 0;
 }
 .tp__suggest li {
   padding: 9px 12px;
-  border-radius: 9px;
-  font-size: 14px; color: rgba(255,255,255,0.85);
+  border-radius: var(--radius-sm);
+  font-size: 14px; color: var(--text-1);
   cursor: pointer;
 }
-.tp__suggest li:hover { background: rgba(255,255,255,0.08); }
+@media (hover: hover) and (pointer: fine) {
+  .tp__suggest li:hover { background: var(--interactive-hover); }
+}
 
 .tp__submit {
   grid-column: 1 / -1;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   min-height: 50px;
-  border: none; border-radius: 25px;
-  font-size: 15px; font-weight: 600; color: #1c1810;
-  background: linear-gradient(180deg, #e8cd92, #cba85c);
+  border: none; border-radius: var(--radius-full);
+  font-size: 15px; font-weight: 600; color: var(--surface-0);
+  background: linear-gradient(180deg, var(--accent), var(--accent-press));
   cursor: pointer;
-  transition: transform 0.15s, filter 0.15s;
+  transition: transform var(--dur-micro) var(--ease-standard), filter var(--dur-micro) var(--ease-standard);
 }
 .tp__submit:hover { filter: brightness(1.06); }
 .tp__submit:active { transform: scale(0.985); }
 .tp__submit:disabled { opacity: 0.6; cursor: default; }
 
-.tp__error { color: #e06b6b; font-size: 13px; margin: 10px 0 0; }
+.tp__error { color: var(--danger); font-size: 13px; margin: 10px 0 0; }
 .tp__grid { display: grid; gap: 10px; margin-top: 16px; }
 .tp__train {
   display: grid;
@@ -250,22 +255,36 @@ function trainKind(code: string): 'hsr' | 'intercity' | 'conventional' | 'other'
   padding: 12px 16px;
   text-align: left;
   border-radius: 16px;
-  background: rgba(255,255,255,0.045);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--surface-2);
+  border: 1px solid var(--line-default);
   cursor: pointer;
-  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+  transition:
+    transform var(--dur-micro) var(--ease-standard),
+    border-color var(--dur-micro) var(--ease-standard),
+    background var(--dur-micro) var(--ease-standard);
   animation: tp-in 0.3s both; animation-delay: calc(var(--i) * 35ms);
 }
-.tp__train:hover { border-color: var(--train-color); background: rgba(255,255,255,0.07); transform: translateY(-1px); }
+@media (hover: hover) and (pointer: fine) {
+  .tp__train:hover { border-color: var(--train-color); background: var(--line-default); transform: translateY(-1px); }
+}
 .tp__code {
   grid-row: 1 / 3;
   font-size: 19px; font-weight: 800; color: var(--train-color);
   font-family: 'Arial', sans-serif; letter-spacing: 0.5px;
 }
-.tp__time { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: #fff; }
-.tp__arrow { color: rgba(255,255,255,0.4); font-size: 13px; }
-.tp__meta { font-size: 12px; color: rgba(255,255,255,0.45); }
-.tp__empty { margin-top: 16px; font-size: 13px; color: rgba(255,255,255,0.45); }
+.tp__time { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--text-1); }
+.tp__arrow { color: var(--text-3); font-size: 13px; }
+.tp__meta { font-size: 12px; color: var(--text-3); }
+.tp__empty { margin-top: 16px; font-size: 13px; color: var(--text-3); }
 
 @keyframes tp-in { from { opacity: 0; transform: translateY(8px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tp__control,
+  .tp__suggest,
+  .tp__submit,
+  .tp__train {
+    transition: none;
+  }
+}
 </style>

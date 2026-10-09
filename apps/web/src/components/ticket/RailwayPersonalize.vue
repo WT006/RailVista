@@ -123,16 +123,16 @@ watch(
   margin-top: 16px;
   padding: 16px;
   border-radius: 20px;
-  background: rgba(255,255,255,0.035);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: var(--surface-2);
+  border: 1px solid var(--line-default);
 }
 .rp-card__head {
   display: flex; align-items: center; gap: 8px;
-  font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9);
+  font-size: 14px; font-weight: 600; color: var(--text-1);
   margin-bottom: 14px;
 }
-.rp-card__dot { width: 8px; height: 8px; border-radius: 50%; background: #d4a853; box-shadow: 0 0 8px rgba(212,168,83,0.7); }
-.rp-card__tip { margin-left: auto; font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.35); }
+.rp-card__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ticket-gold); box-shadow: 0 0 8px color-mix(in srgb, var(--ticket-gold) 70%, transparent); }
+.rp-card__tip { margin-left: auto; font-size: 11px; font-weight: 400; color: var(--text-3); }
 .rp-card__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 12px; }
-.rp-card__switch { padding: 10px 0 14px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 14px; }
+.rp-card__switch { padding: 10px 0 14px; border-bottom: 1px solid var(--line-default); margin-bottom: 14px; }
 </style>

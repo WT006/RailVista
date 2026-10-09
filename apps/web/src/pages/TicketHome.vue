@@ -172,7 +172,7 @@ const showAdvanced = ref(false);
 }
 .ticket-page .rv-grid.is-preview .tk-face-wrap { max-width: 430px; }
 
-.builder-title { font-size: var(--fs-h4); margin: 0 0 var(--space-2); letter-spacing: 0.02em; }
+.builder-title { font-size: var(--fs-h3); margin: 0 0 var(--space-2); letter-spacing: 0.02em; }
 
 .adv-toggle {
   display: flex; align-items: center; justify-content: space-between;
@@ -181,7 +181,9 @@ const showAdvanced = ref(false);
   font-size: var(--fs-meta); color: var(--text-2); cursor: pointer;
   font-family: inherit;
 }
-.adv-toggle:hover { color: var(--text-1); }
+@media (hover: hover) and (pointer: fine) {
+  .adv-toggle:hover { color: var(--text-1); }
+}
 
 .saved-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-1); }
 .saved-list li {

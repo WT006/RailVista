@@ -172,6 +172,10 @@
   --map-amber-deep: #ffa028;
   --map-amber-ink: #1a1206;
   --map-heat: #ff6b8a; /* 热力图开关图例点 */
+  /* 纪念票主题金（仅装饰层可用：票面、徽标点、序列号；交互层禁用——焦点/按钮走系统令牌） */
+  --ticket-gold: #d4a853;
+  --ticket-gold-deep: #cba85c;
+  --ticket-gold-bright: #e8cd92;
 
   /* ══════════ 动效 ══════════ */
   --dur-micro: 100ms; /* 颜色 / 描边 */

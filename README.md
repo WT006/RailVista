@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="docs/assets/app-icon.png" alt="RailVista App Icon" width="128" height="128" />
+  <img src="docs/assets/app-icon.png" alt="RailVista App Icon" width="128" height="128" align="middle" />
+  &nbsp;&nbsp;
+  <img src="docs/assets/heyworld-logo.png" alt="Hey World" width="64" align="middle" />
 </p>
 
 <h1 align="center">RailVista · 万里路书</h1>

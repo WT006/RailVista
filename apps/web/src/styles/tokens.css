@@ -64,6 +64,7 @@
   --success: #6cc27f;
   --success-soft: rgba(108, 194, 127, 0.14);
   --info: #7fb4d8;
+  --info-soft: rgba(127, 180, 216, 0.16);
   --warning: #e0b155;
   --warning-soft: rgba(224, 177, 85, 0.16);
   --danger: #e0765c;
@@ -75,6 +76,7 @@
   --rail: #4d9fff;
   --station: #e5ca6a;
   --spot: #e0915a;
+  --spot-soft: rgba(224, 145, 90, 0.2);
   --train: #74bd89;
   --gps: #6aa9f0;
 

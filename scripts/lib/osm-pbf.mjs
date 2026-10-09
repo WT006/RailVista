@@ -235,7 +235,7 @@ function readGroup(buf, strtab, h) {
       }
       if (h.onWay) h.onWay({ id, keys, vals, refs: refs || [], strtab });
     } else if (f === 4 && w === 2) {
-      if (h.onRelation) h.onRelation(r.bytes());
+      if (h.onRelation) h.onRelation(parseRelation(r.bytes(), strtab));
       else r.skip(w);
     } else r.skip(w);
   }
@@ -258,6 +258,96 @@ function readBlockParams(buf) {
     else r.skip(w);
   }
   return { granularity, latOffset, lonOffset, limits };
+}
+
+// ── Relation 解析 ────────────────────────────────────────────────────────────
+/** 读取 packed 段内全部原始 varint（允许 10 字节负 int32） */
+function readPackedVarints(blob) {
+  const r = new Reader(blob);
+  const out = [];
+  while (!r.eof()) {
+    let x = 0;
+    let s = 0;
+    let b;
+    do {
+      b = r.b[r.p++];
+      x += (b & 0x7f) * 2 ** s;
+      s += 7;
+    } while (b & 0x80 && s <= 63);
+    out.push(x);
+  }
+  return out;
+}
+/** uint32 → int32（roles_sid 用 -1 表示空角色，会以 10 字节补码出现） */
+const asInt32 = (x) => (x >= 0x80000000 ? x - 0x100000000 : x);
+/** packed sint32 zigzag 解码（memids） */
+const zigzag32 = (v) => (v >>> 1) ^ -(v & 1);
+
+/**
+ * 解析单个 Relation。
+ * PBF 中 Relation：id(1) · keys(2,packed) · vals(3,packed) ·
+ *   roles_sid(8,packed,int32 delta，-1=空) · memids(9,packed,sint32 zigzag delta) · types(10,packed)
+ */
+function parseRelation(buf, strtab) {
+  const r = new Reader(buf);
+  let id = 0;
+  let keyBlob = null, valBlob = null, roleBlob = null, memBlob = null, typeBlob = null;
+  while (!r.eof()) {
+    const k = r.varint();
+    const f = k >> 3;
+    const w = k & 7;
+    if (f === 1 && w === 0) id = r.varint();
+    else if (f === 2 && w === 2) keyBlob = r.bytes();
+    else if (f === 3 && w === 2) valBlob = r.bytes();
+    else if (f === 8 && w === 2) roleBlob = r.bytes();
+    else if (f === 9 && w === 2) memBlob = r.bytes();
+    else if (f === 10 && w === 2) typeBlob = r.bytes();
+    else r.skip(w);
+  }
+  const keyIdx = keyBlob ? readPackedVarints(keyBlob) : [];
+  const valIdx = valBlob ? readPackedVarints(valBlob) : [];
+  const tags = {};
+  for (let i = 0; i < keyIdx.length; i += 1) tags[strtab[keyIdx[i]]] = strtab[valIdx[i]] ?? '';
+
+  const roleDeltas = roleBlob ? readPackedVarints(roleBlob).map(asInt32) : [];
+  const memDeltas = memBlob ? readPackedVarints(memBlob).map(zigzag32) : [];
+  const typeCodes = typeBlob ? readPackedVarints(typeBlob) : [];
+
+  const members = [];
+  const wayIds = [];
+  let memId = 0;
+  let roleSid = 0;
+  for (let i = 0; i < memDeltas.length; i += 1) {
+    memId += memDeltas[i];
+    roleSid += roleDeltas[i] || 0;
+    const t = typeCodes[i];
+    const role = roleSid < 0 ? '' : strtab[roleSid] ?? '';
+    const type = t === 0 ? 'node' : t === 1 ? 'way' : 'relation';
+    members.push({ type, id: memId, role });
+    if (type === 'way') wayIds.push(memId);
+  }
+  return { id, tags, members, wayIds };
+}
+
+/**
+ * 扫描 relations，onRelation 收到 { id, tags, members:[{type,id,role}], wayIds }。
+ * @param {string} file
+ * @param {(r: {id:number,tags:Record<string,string>,members:Array<{type:string,id:number,role:string}>,wayIds:number[]})=>void} onRelation
+ */
+export async function scanRelations(file, onRelation) {
+  let count = 0;
+  await forEachBlob(file, (_t, data) => {
+    const { strtab, groups } = readPrimitiveBlock(data);
+    if (!strtab) return;
+    const params = readBlockParams(data);
+    for (const g of groups) {
+      readGroup(g, strtab, {
+        ...params,
+        onRelation: (rel) => { count += 1; onRelation(rel); },
+      });
+    }
+  });
+  return count;
 }
 
 /**

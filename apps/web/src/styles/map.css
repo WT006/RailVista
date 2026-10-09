@@ -1183,10 +1183,39 @@ html:has(.drive-map-page) #app {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
 }
 
-.legend {
+.sky-btn {
   position: fixed;
   right: calc(10px + var(--safe-right));
   bottom: calc(var(--bottom-overlay) + 154px);
+  z-index: 101;
+  box-sizing: border-box;
+  width: 88px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: var(--panel-bg);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+}
+
+.sky-btn.is-active {
+  border-color: var(--accent-container);
+  background: var(--accent-container);
+  color: var(--accent-hover);
+}
+
+.legend {
+  position: fixed;
+  right: calc(10px + var(--safe-right));
+  bottom: calc(var(--bottom-overlay) + 202px);
   z-index: 101;
   display: none;
   min-width: 104px;
@@ -1328,6 +1357,70 @@ html:has(.drive-map-page) #app {
   font-size: 9px;
   padding: 1px 5px;
   border-width: 1.5px;
+}
+
+/* 天象标注：景点式——圆点贴在路线点上，文字胶囊悬在线上方
+   霞=暖橙 / 金=琥珀 / 蓝=冰蓝 / 日=朱红 / 月=靛紫（与 SkyJourneyPanel k-* 同语义） */
+.sky-marker {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.sky-marker__text {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(15, 19, 26, 0.85);
+  color: var(--text-primary);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.sky-marker__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--text-secondary);
+  border: 1.5px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+.sky-marker.is-glow .sky-marker__dot {
+  background: var(--spot);
+}
+
+.sky-marker.is-golden .sky-marker__dot {
+  background: var(--warning);
+}
+
+.sky-marker.is-blue .sky-marker__dot {
+  background: var(--info);
+}
+
+.sky-marker.is-sun .sky-marker__dot {
+  background: var(--danger);
+}
+
+.sky-marker.is-moon .sky-marker__dot {
+  background: var(--purple);
+}
+
+.sky-marker.is-star .sky-marker__dot {
+  background: var(--purple);
+}
+
+.sky-marker--compact .sky-marker__text {
+  display: none;
+}
+
+.sky-marker--compact .sky-marker__dot {
+  width: 6px;
+  height: 6px;
 }
 
 .train-marker {
@@ -1495,6 +1588,10 @@ html:has(.drive-map-page) #app {
 
   .satellite-btn {
     bottom: calc(var(--bottom-overlay) + 238px);
+  }
+
+  .sky-btn {
+    bottom: calc(var(--bottom-overlay) + 286px);
   }
 
   .bottom-panel .meta {

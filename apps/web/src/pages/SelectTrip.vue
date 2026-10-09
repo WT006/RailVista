@@ -1177,8 +1177,8 @@ function goBack() {
   .select-rankings-below-fold {
     display: grid;
     grid-template-rows: 1fr auto;
-    min-height: calc(100svh - var(--appbar-h) - var(--space-4));
-    scroll-margin-top: calc(var(--appbar-h) + var(--space-3));
+    min-height: calc(100svh - var(--appbar-offset) - var(--space-4));
+    scroll-margin-top: calc(var(--appbar-offset) + var(--space-3));
   }
 
   .select-rankings-spacer {

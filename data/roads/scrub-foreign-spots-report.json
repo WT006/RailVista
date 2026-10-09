@@ -1,0 +1,335 @@
+{
+  "updated": "2026-10-09",
+  "before": 12391,
+  "dropped": 137,
+  "after": 12254,
+  "byReason": {
+    "foreign_script_or_name": 70,
+    "kinmen_matsu": 50,
+    "outside_china_bbox": 17
+  },
+  "reassigned": 0,
+  "movedTop": [],
+  "samples": [
+    {
+      "id": "osm-node-9258838247",
+      "name": "Map of Garzê",
+      "province": "四川",
+      "lng": 101.4991258,
+      "lat": 30.5109776,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-3055203895",
+      "name": "翟山坑道",
+      "province": "福建",
+      "lng": 118.31926,
+      "lat": 24.3901,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-3495445018",
+      "name": "馬山觀測所",
+      "province": "福建",
+      "lng": 118.40872,
+      "lat": 24.52914,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-3291847985",
+      "name": "鐵堡",
+      "province": "福建",
+      "lng": 119.92092,
+      "lat": 26.14187,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-2357167467",
+      "name": "文臺寶塔",
+      "province": "福建",
+      "lng": 118.30605,
+      "lat": 24.39878,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-3701496921",
+      "name": "東碇燈塔",
+      "province": "福建",
+      "lng": 118.23365,
+      "lat": 24.16192,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-4720530110",
+      "name": "大漢據點",
+      "province": "福建",
+      "lng": 119.92887,
+      "lat": 26.14083,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-4826294445",
+      "name": "勇士堡",
+      "province": "福建",
+      "lng": 118.25198,
+      "lat": 24.4478,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-4826294813",
+      "name": "鐵漢堡",
+      "province": "福建",
+      "lng": 118.25511,
+      "lat": 24.44738,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-13162197540",
+      "name": "Núi Thủng",
+      "province": "广西",
+      "lng": 106.31129,
+      "lat": 22.77821,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-991996791",
+      "name": "Cát Cát",
+      "province": "云南",
+      "lng": 103.83468,
+      "lat": 22.32853,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-3497035870",
+      "name": "獅山砲陣地",
+      "province": "福建",
+      "lng": 118.43643,
+      "lat": 24.50447,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-2357167458",
+      "name": "得月樓",
+      "province": "福建",
+      "lng": 118.29847,
+      "lat": 24.40968,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-12887906701",
+      "name": "Хэппи Дэй",
+      "province": "黑龙江",
+      "lng": 135.06164,
+      "lat": 48.48895,
+      "reason": "outside_china_bbox"
+    },
+    {
+      "id": "osm-node-6142833816",
+      "name": "Набережная Синхай",
+      "province": "辽宁",
+      "lng": 121.57389,
+      "lat": 38.87498,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-4735606624",
+      "name": "Даосский храмовый комплекс Дун Тянь",
+      "province": "海南",
+      "lng": 109.18584,
+      "lat": 18.31266,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-4735613621",
+      "name": "Тропический парк",
+      "province": "海南",
+      "lng": 110.43414,
+      "lat": 18.84325,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-4735606627",
+      "name": "Даосский Парк \"Небесные Гроты\"",
+      "province": "海南",
+      "lng": 109.1538,
+      "lat": 18.30366,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-12367615317",
+      "name": "Дерево счастья",
+      "province": "黑龙江",
+      "lng": 127.49033,
+      "lat": 50.30996,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-4382158410",
+      "name": "九宮坑道",
+      "province": "福建",
+      "lng": 118.26246,
+      "lat": 24.42387,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-4662638991",
+      "name": "舊門廊",
+      "province": "福建",
+      "lng": 118.31661,
+      "lat": 24.43104,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-3205650190",
+      "name": "榕園",
+      "province": "福建",
+      "lng": 118.4323,
+      "lat": 24.44311,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-2451212562",
+      "name": "午沙北海坑道",
+      "province": "福建",
+      "lng": 119.97847,
+      "lat": 26.21615,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-8410707317",
+      "name": "戰車",
+      "province": "福建",
+      "lng": 118.33432,
+      "lat": 24.39567,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-1952647596",
+      "name": "秋桂亭",
+      "province": "福建",
+      "lng": 119.92539,
+      "lat": 26.16768,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-10583792605",
+      "name": "馬祖劍碑",
+      "province": "福建",
+      "lng": 119.91863,
+      "lat": 26.15883,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-10201933172",
+      "name": "勝利山莊",
+      "province": "福建",
+      "lng": 119.93518,
+      "lat": 26.1531,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-4943372821",
+      "name": "神秘小海灣",
+      "province": "福建",
+      "lng": 119.97763,
+      "lat": 25.95949,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-6687160785",
+      "name": "Lung Měn",
+      "province": "山西",
+      "lng": 112.46175,
+      "lat": 34.56043,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-14045623901",
+      "name": "Парк морской",
+      "province": "辽宁",
+      "lng": 121.67315,
+      "lat": 38.87235,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-13624559803",
+      "name": "Блошиный рынок",
+      "province": "广西",
+      "lng": 108.31862,
+      "lat": 22.83192,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-5121349822",
+      "name": "ศาลเจ้าไต่ฮงกง",
+      "province": "广东",
+      "lng": 116.4975,
+      "lat": 23.26796,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-10201933163",
+      "name": "藍眼淚生態館",
+      "province": "福建",
+      "lng": 119.91923,
+      "lat": 26.16788,
+      "reason": "kinmen_matsu"
+    },
+    {
+      "id": "osm-node-4448914256",
+      "name": "Ялалт хөшөө Yalalt statue",
+      "province": "内蒙古",
+      "lng": 118.59915,
+      "lat": 47.63483,
+      "reason": "foreign_script_or_name"
+    },
+    {
+      "id": "osm-node-2006160993",
+      "name": "遠東藝術博物館",
+      "province": "黑龙江",
+      "lng": 135.05267,
+      "lat": 48.47298,
+      "reason": "outside_china_bbox"
+    },
+    {
+      "id": "osm-node-3634989899",
+      "name": "能源博物館",
+      "province": "黑龙江",
+      "lng": 135.07614,
+      "lat": 48.47401,
+      "reason": "outside_china_bbox"
+    },
+    {
+      "id": "osm-node-9953705395",
+      "name": "Авторетро 100",
+      "province": "黑龙江",
+      "lng": 135.05622,
+      "lat": 48.47348,
+      "reason": "outside_china_bbox"
+    },
+    {
+      "id": "osm-node-2495828812",
+      "name": "Пожарно-техническая выставка",
+      "province": "黑龙江",
+      "lng": 135.09816,
+      "lat": 48.45887,
+      "reason": "outside_china_bbox"
+    },
+    {
+      "id": "osm-node-2007827186",
+      "name": "Музей истории города Хабаровска",
+      "province": "黑龙江",
+      "lng": 135.09272,
+      "lat": 48.48356,
+      "reason": "outside_china_bbox"
+    },
+    {
+      "id": "osm-node-12234279894",
+      "name": "胡璉將軍紀念館",
+      "province": "福建",
+      "lng": 118.31682,
+      "lat": 24.47671,
+      "reason": "kinmen_matsu"
+    }
+  ]
+}

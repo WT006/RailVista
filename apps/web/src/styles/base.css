@@ -129,7 +129,7 @@ html {
 @media (min-width: 840px) {
   .rv-col--main {
     position: sticky;
-    top: calc(var(--appbar-h) + var(--space-4));
+    top: calc(var(--appbar-offset) + var(--space-4));
   }
 }
 

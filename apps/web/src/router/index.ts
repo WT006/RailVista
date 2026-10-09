@@ -18,10 +18,15 @@ export const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', name: 'select', component: SelectTrip },
-    { path: '/trip', name: 'trip', component: TripMap },
+    { path: '/trip', name: 'trip', component: TripMap, meta: { fullscreenMap: true } },
     { path: '/route/:corridorId', name: 'route-detail', component: RouteDetail },
-    { path: '/route/:corridorId/map', name: 'corridor-map', component: CorridorMap },
-    { path: '/atlas', name: 'atlas', component: AtlasMap },
+    {
+      path: '/route/:corridorId/map',
+      name: 'corridor-map',
+      component: CorridorMap,
+      meta: { fullscreenMap: true },
+    },
+    { path: '/atlas', name: 'atlas', component: AtlasMap, meta: { fullscreenMap: true } },
     // ── 万里路书 · 旅行纪念票（顶部菜单第 4 入口） ──────────────────────────
     { path: '/ticket', name: 'ticket', component: TicketHome },
     // ── 旅行路书 · 省 → 市 → 路线（攻略层，含非自驾玩法） ───────────────────
@@ -34,7 +39,12 @@ export const router = createRouter({
     // ── 万里路书 · 全国公路旅游网（PRD §2.1 路由表） ─────────────────────────
     { path: '/drive', name: 'drive-home', component: DriveHome },
     { path: '/drive/trip', name: 'drive-trip', component: DriveTrip },
-    { path: '/drive/trip/map', name: 'drive-trip-map', component: DriveTripMap },
+    {
+      path: '/drive/trip/map',
+      name: 'drive-trip-map',
+      component: DriveTripMap,
+      meta: { fullscreenMap: true },
+    },
     // 公路详情统一走沿程页布局（原 DriveRoad 双栏改为 DriveTrip 三栏）
     {
       path: '/drive/road/:code',
@@ -50,6 +60,7 @@ export const router = createRouter({
       name: 'drive-atlas',
       component: AtlasMap,
       props: { drive: true },
+      meta: { fullscreenMap: true },
     },
     { path: '/drive/rankings', name: 'drive-rankings', component: DriveRankings },
     { path: '/drive/rankings/:boardId', name: 'drive-board', component: DriveBoard },

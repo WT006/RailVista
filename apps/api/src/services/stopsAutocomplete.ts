@@ -1,5 +1,6 @@
 import { trainSource } from './cr12306.js';
 import { enrichStopsCoords } from './geocode.js';
+import { sliceStopsByOdNames } from './stopOdSlice.js';
 
 const STOPS_AUTOCOMPLETE_MIN = Number(process.env.STOPS_AUTOCOMPLETE_MIN || 5);
 const AUTOCOMPLETE_TIMEOUT_MS = Number(process.env.AUTOCOMPLETE_TIMEOUT_MS || 20000);
@@ -62,12 +63,17 @@ export async function ensureFullStops(
       AUTOCOMPLETE_TIMEOUT_MS,
     );
 
-    if (fullStops.length < STOPS_AUTOCOMPLETE_MIN) {
+    // 12306 常回整趟；必须裁回请求 OD，否则 Z223 西宁→拉萨会变成重庆西→拉萨
+    const odStops = sliceStopsByOdNames(fullStops, from, to) || fullStops;
+    if (odStops.length < 2) {
+      return { stops, completed: false, reason: 'od_slice_fail' };
+    }
+    if (odStops.length < STOPS_AUTOCOMPLETE_MIN && odStops.length <= stops.length) {
       return { stops, completed: false, reason: 'too_few_stops' };
     }
 
     const enriched = await enrichStopsCoords(
-      fullStops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat })),
+      odStops.map((s) => ({ name: s.name, lng: s.lng, lat: s.lat })),
       { trainCode },
     );
 

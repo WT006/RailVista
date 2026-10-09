@@ -8,7 +8,7 @@
  * 结构：
  *   1. App 级背景与铁路选行程页一致（淡轮廓 + 冷蓝景点星点）
  *   2. 起终点 OD 搜索（suggest 四类索引 + geocode 兜底）+ ⇄ 交换
- *   3. 公路编号键盘（对标车次号前缀键盘：G/S/X/Y/C + 数字；S 需先选省）
+ *   3. 公路编号键盘（对标车次号前缀键盘：G/S/X/Y + 数字；S 需先选省）
  *   4. 路网统计 + 覆盖诚实说明（PRD §3.1）
  *   5. 第二屏：榜单入口卡（从属）
  */
@@ -142,16 +142,6 @@ function pickHit(field: 'from' | 'to', hit: PlaceHit) {
   }
 }
 
-function swapOd() {
-  const f = from.value;
-  from.value = to.value;
-  to.value = f;
-  // A5：结构化端点也要一起交换，否则 kind 会与文本错位
-  const fh = fromHit.value;
-  fromHit.value = toHit.value;
-  toHit.value = fh;
-}
-
 function goTrip() {
   if (!from.value.trim() || !to.value.trim()) {
     odError.value = '请先填写起点和终点（城市 / 区县级地名）';
@@ -181,7 +171,6 @@ const PREFIXES = [
   { key: 'S', zh: '省道', en: 'Provincial', color: ROAD_COLORS.provincial },
   { key: 'X', zh: '县道', en: 'County', color: ROAD_COLORS.county },
   { key: 'Y', zh: '乡道', en: 'Township', color: ROAD_COLORS.township },
-  { key: 'C', zh: '村道', en: 'Village', color: ROAD_COLORS.village },
 ];
 
 const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
@@ -189,11 +178,11 @@ const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 const activePrefix = computed(() => {
   const v = codeQuery.value.trim().toUpperCase();
   if (!v) return null;
-  return /^[GSXYC]/.test(v) ? v[0]! : null;
+  return /^[GSXY]/.test(v) ? v[0]! : null;
 });
 
 /** 省道等省内编号跨省重复：先选省（PRD §4.2） */
-const needsProvince = computed(() => ['S', 'X', 'Y', 'C'].includes(activePrefix.value ?? ''));
+const needsProvince = computed(() => ['S', 'X', 'Y'].includes(activePrefix.value ?? ''));
 
 const provinceOptions = computed(() => {
   const set = new Set<string>();
@@ -241,7 +230,7 @@ async function refreshRoadCandidates() {
 watch(codeQuery, () => void refreshRoadCandidates());
 
 function applyPrefix(p: { key: string }) {
-  const digits = codeQuery.value.replace(/^[GSXYC]/, '').trim();
+  const digits = codeQuery.value.replace(/^[GSXY]/, '').trim();
   codeQuery.value = p.key + digits; // 保留已选省与后续数字，只换等级前缀
 }
 
@@ -354,7 +343,6 @@ const levelLabel: Record<string, string> = {
                   </ul>
                 </div>
               </label>
-              <button type="button" class="drive-od__swap" aria-label="交换起终点" @click="swapOd">⇄</button>
               <label class="station-field">
                 <span>终点</span>
                 <div class="station-field__control">
@@ -387,7 +375,6 @@ const levelLabel: Record<string, string> = {
               <button type="submit" class="btn primary" :disabled="odBusy">
                 {{ odBusy ? '规划中…' : '出发' }}
               </button>
-              <span class="drive-od__hint">按起终点规划一条自定义路线（在线高德规划，本地干线 A* 兜底）</span>
             </div>
           </form>
 

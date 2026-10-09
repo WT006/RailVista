@@ -149,6 +149,13 @@
   --gutter: 16px;
   --shell-max: 100%;
   --appbar-h: 56px;
+  /* 刘海 / 状态栏 / Home 指示条：viewport-fit=cover 时必须自行避让（系统不自动挪内容） */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  /* 顶栏占位总高（内容区 + 顶部安全区），sticky 避让与 min-height 一律用此令牌 */
+  --appbar-offset: calc(var(--appbar-h) + var(--safe-top));
   --bottomnav-h: 0px; /* 桌面端无底栏 */
   --col-ratio-main: 7; /* 主栏占 12 栅格中的 7 列 */
   --col-ratio-side: 5; /* 侧栏占 12 栅格中的 5 列 */

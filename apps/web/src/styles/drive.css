@@ -735,24 +735,6 @@
   align-items: end;
 }
 
-.drive-od__swap {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--line-default);
-  background: var(--surface-2);
-  color: var(--text-2);
-  font-size: var(--fs-h3);
-  cursor: pointer;
-  justify-self: center;
-  transform: rotate(90deg);
-}
-
-.drive-od__swap:hover {
-  border-color: var(--line-accent);
-  color: var(--accent-hover);
-}
-
 .drive-od__error {
   margin: 0;
   font-size: var(--fs-cap);
@@ -841,7 +823,7 @@
 
 .road-kbd__prefixes {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-1);
 }
 
@@ -2055,14 +2037,76 @@
 
 /* —— 三档响应式（PRD §11.3：390 / 768 / 1440）—— */
 /* 旧: max-width 降序，新: min-width 升序（mobile-first，与 tokens.css 方向一致） */
-@media (min-width: 600px) {
-  .drive-od__row {
-    grid-template-columns: 1fr auto 1fr;
+/* 手机：压缩 OD + 编号键盘首屏高度（去掉乡道后四档一行） */
+@media (max-width: 599px) {
+  .drive-home-panel {
+    gap: var(--space-2);
   }
 
-  .drive-od__swap {
-    justify-self: auto;
-    transform: none;
+  .drive-home-panel > .drive-od.rv-card,
+  .drive-home-panel > .road-kbd.rv-card {
+    padding: var(--space-3);
+  }
+
+  .drive-od {
+    gap: var(--space-1);
+  }
+
+  .drive-od .station-field {
+    gap: 4px;
+    font-size: var(--fs-cap);
+  }
+
+  .drive-od .station-field input {
+    min-height: 40px;
+    padding: 0 var(--space-2);
+  }
+
+  .drive-od .drive-actions {
+    margin-top: var(--space-2);
+    gap: var(--space-1);
+  }
+
+  .drive-od__hint {
+    flex: 1 1 100%;
+    line-height: 1.4;
+  }
+
+  .road-kbd {
+    gap: var(--space-1);
+  }
+
+  .road-kbd__input {
+    padding: 8px var(--space-2);
+    font-size: var(--fs-body);
+  }
+
+  .road-kbd__prefix {
+    padding: 6px 2px;
+    gap: 0;
+  }
+
+  .road-kbd__letter {
+    font-size: var(--fs-body);
+  }
+
+  .road-kbd__name em {
+    display: none;
+  }
+
+  .road-kbd__digit {
+    padding: 8px 0;
+    font-size: var(--fs-cap);
+  }
+
+  .road-kbd .drive-actions {
+    margin-top: var(--space-2);
+  }
+}
+
+@media (min-width: 600px) {
+  .drive-od__row {
+    grid-template-columns: 1fr 1fr;
   }
 
   .road-kbd__digits {
@@ -2070,7 +2114,7 @@
   }
 
   .road-kbd__prefixes {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 
   .drive-trip-tab {
@@ -2086,7 +2130,7 @@
 
   .drive-netpanel {
     position: sticky;
-    top: calc(var(--appbar-h) + var(--space-3));
+    top: calc(var(--appbar-offset) + var(--space-3));
   }
 
   .drive-road-grid {
@@ -2113,7 +2157,7 @@
 
   .drive-trip-side {
     position: sticky;
-    top: calc(var(--appbar-h) + var(--space-3));
+    top: calc(var(--appbar-offset) + var(--space-3));
   }
 }
 /* ══════════ P3 卡片三件套：悬停光影/微缩放/渐显反馈/入场动画 ══════════ */
@@ -2870,8 +2914,8 @@
   /* 右栏独立滚动：与左侧地图解耦，滚信息不带动地图 */
   .drive-road-side {
     position: sticky;
-    top: calc(var(--appbar-h) + var(--space-3));
-    max-height: calc(100vh - var(--appbar-h) - var(--space-6));
+    top: calc(var(--appbar-offset) + var(--space-3));
+    max-height: calc(100vh - var(--appbar-offset) - var(--space-6));
     overflow-y: auto;
     overscroll-behavior: contain;
     padding-right: 2px;

@@ -373,7 +373,37 @@ function toSpot(row, provName) {
     intro: bits[0] ?? '',
     source: 'osm_batch',
     verified: false,
-    osmTags: Object.fromEntries(Object.entries(t).slice(0, 12)),
+    // 优先保留中文相关键，避免 Object.entries 前 12 个把 name:zh 挤掉
+    osmTags: (() => {
+      const prefer = [
+        'name:zh',
+        'name:zh-Hans',
+        'name:zh-Hant',
+        'name',
+        'name:en',
+        'wikipedia:zh',
+        'wikipedia',
+        'wikidata',
+        'tourism',
+        'natural',
+        'ele',
+        'addr:country',
+      ];
+      const out = [];
+      const seen = new Set();
+      for (const k of prefer) {
+        if (t[k] != null && t[k] !== '') {
+          out.push([k, t[k]]);
+          seen.add(k);
+        }
+      }
+      for (const [k, v] of Object.entries(t)) {
+        if (seen.has(k) || v == null || v === '') continue;
+        out.push([k, v]);
+        if (out.length >= 16) break;
+      }
+      return Object.fromEntries(out.slice(0, 16));
+    })(),
   };
 }
 

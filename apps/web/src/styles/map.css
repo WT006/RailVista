@@ -6,7 +6,8 @@
   --panel-bg: var(--bg-raised);
 }
 
-@media (max-width: 599px) {
+/* 底栏档（<840）：底部浮层控件整体上移，让出页签高度 */
+@media (max-width: 839px) {
   :root {
     --bottom-overlay: calc(168px + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
     --bottom-panel-clearance: calc(168px + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
@@ -73,9 +74,10 @@ html:has(.drive-map-page) #app {
 
 .top-bar {
   position: fixed;
-  /* safe-area：避开刘海 / 状态栏；无主顶栏时由此承担顶部留白 */
+  /* safe-area：避开刘海 / 状态栏；无主顶栏时由此承担顶部留白；
+     ≥840 另让出侧边 Tab（--sidenav-w） */
   top: calc(12px + var(--safe-top));
-  left: calc(10px + var(--safe-left));
+  left: calc(10px + var(--safe-left) + var(--sidenav-w));
   right: calc(10px + var(--safe-right));
   z-index: 100;
   pointer-events: none;
@@ -600,7 +602,7 @@ html:has(.drive-map-page) #app {
 
 .bottom-panel {
   position: fixed;
-  left: 0;
+  left: var(--sidenav-w); /* ≥840 让出侧边 Tab */
   right: 0;
   bottom: 0;
   z-index: 100;
@@ -1544,7 +1546,8 @@ html:has(.drive-map-page) #app {
   white-space: nowrap;
 }
 
-@media (min-width: 641px) {
+/* 桌面档（≥840，与侧边 Tab 同断点）：窄顶栏 + 图例常显 + 浮层再定位 */
+@media (min-width: 840px) {
   :root {
     --top-overlay: 88px;
     --bottom-overlay: 156px;
@@ -1553,7 +1556,7 @@ html:has(.drive-map-page) #app {
 
   .top-bar {
     top: calc(12px + var(--safe-top));
-    left: calc(12px + var(--safe-left));
+    left: calc(12px + var(--safe-left) + var(--sidenav-w));
     right: auto;
     max-width: 520px;
   }

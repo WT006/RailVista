@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import AppBackdrop from './components/AppBackdrop.vue';
 import AppBottomNav from './components/AppBottomNav.vue';
+import AppSideNav from './components/AppSideNav.vue';
 import AppTopBar from './components/AppTopBar.vue';
 
 const route = useRoute();
@@ -29,6 +30,8 @@ const showTopBar = computed(() => !route.meta.fullscreenMap);
     模糊保持稳定；滚动加深背景的过渡也按沉浸光感规范做成平滑渐变。
   -->
   <AppTopBar v-if="showTopBar" />
+  <!-- 侧边 Tab（≥840）：底部页签的挪移布局；与 AppBottomNav 的互斥由 CSS 断点控制 -->
+  <AppSideNav />
   <AppBottomNav />
 
   <RouterView v-slot="{ Component }">

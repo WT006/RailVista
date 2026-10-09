@@ -138,7 +138,7 @@ const countdownText = computed(() => {
 .approach-card {
   /* fixed：与 .bottom-panel 同一坐标系，避免 absolute 相对 .trip-page 时宽屏叠压错位 */
   position: fixed;
-  left: calc(12px + var(--safe-left, 0px));
+  left: calc(12px + var(--safe-left, 0px) + var(--sidenav-w));
   right: calc(12px + var(--safe-right, 0px));
   /* 叠在底栏上方；高度仅取底栏占位，避免与 --bottom-overlay 互相抬升 */
   bottom: calc(var(--bottom-panel-clearance, var(--bottom-overlay, 168px)) + 8px);

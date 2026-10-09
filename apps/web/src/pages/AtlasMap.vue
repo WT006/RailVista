@@ -56,7 +56,7 @@ const heatSupported = ref(true);
 const heatOn = ref(false);
 /** 桌面默认展开侧栏；手机地图优先，面板收起（点「筛选」再开） */
 const sidebarOpen = ref(
-  typeof window === 'undefined' ? true : window.matchMedia('(min-width: 721px)').matches,
+  typeof window === 'undefined' ? true : window.matchMedia('(min-width: 840px)').matches,
 );
 const query = ref('');
 const activeDims = ref<string[]>([]);
@@ -1881,7 +1881,7 @@ watch(spotOrigin, (v) => {
 .atlas-layers {
   position: fixed;
   top: calc(10px + var(--safe-top));
-  left: calc(12px + var(--safe-left));
+  left: calc(12px + var(--safe-left) + var(--sidenav-w));
   z-index: 270;
   display: flex;
   flex-direction: column;
@@ -1956,7 +1956,7 @@ watch(spotOrigin, (v) => {
   position: fixed;
   /* 网页端侧栏让出左上角图层开关，避免挡住高速/国道/热力 */
   top: calc(58px + var(--safe-top));
-  left: calc(12px + var(--safe-left));
+  left: calc(12px + var(--safe-left) + var(--sidenav-w));
   bottom: calc(12px + var(--safe-bottom));
   z-index: 200;
   width: min(320px, calc(100vw - 24px - var(--safe-left) - var(--safe-right)));
@@ -1981,8 +1981,8 @@ watch(spotOrigin, (v) => {
   top: calc(10px + var(--safe-top));
   right: auto;
   bottom: auto;
-  /* 网页端收起后，展开钮跟在图层开关右侧 */
-  left: calc(12px + var(--safe-left) + 248px);
+  /* 网页端收起后，展开钮跟在图层开关右侧（248px 为图层开关行宽度） */
+  left: calc(12px + var(--safe-left) + var(--sidenav-w) + 248px);
   max-height: none;
 }
 
@@ -2427,8 +2427,8 @@ watch(spotOrigin, (v) => {
   color: var(--warning);
 }
 
-@media (max-width: 720px) {
-  /* 手机：收成一块带分类的玻璃面板 */
+@media (max-width: 839px) {
+  /* 手机：收成一块带分类的玻璃面板（与底栏档 <840 对齐） */
   .atlas-layers {
     top: calc(10px + var(--safe-top));
     left: calc(10px + var(--safe-left));

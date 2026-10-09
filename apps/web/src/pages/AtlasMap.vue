@@ -34,7 +34,7 @@ import {
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 import { roadColor } from '../data/roadColors';
 import { roadDisplayPlace } from '../data/prefectureSeeds';
-import { ROAD_ATLAS_MIN_SCORE, isAtlasRoadDisplaySpot } from '../data/atlasRoadDisplay';
+import { dedupeAtlasRoadSpots, isAtlasRoadDisplaySpot } from '../data/atlasRoadDisplay';
 /** 低于此缩放只画省圈；达到后按市降密 */
 const ROAD_ZOOM_CITY = 6.2;
 /** 点开某市后，最多画几处单点（避免再塞几千个 Marker） */
@@ -216,12 +216,14 @@ const spotsByOrigin = computed(() => {
 });
 
 /**
- * 图集可见集：公路只计落图门槛内的点，与省/市聚合圆同一口径。
+ * 图集可见集：公路只计落图门槛 + 去重后的点，与省/市聚合圆同一口径。
  * 铁路仍用全量库字段。
  */
-const atlasVisibleByOrigin = computed(() =>
-  spotsByOrigin.value.filter((s) => s.origin !== 'road' || isAtlasRoadDisplaySpot(s)),
-);
+const atlasVisibleByOrigin = computed(() => {
+  const rail = spotsByOrigin.value.filter((s) => s.origin !== 'road');
+  const road = atlasRoadDisplayList(spotsByOrigin.value.filter((s) => s.origin === 'road'));
+  return rail.concat(road);
+});
 
 const selectedCorridor = computed(
   () => corridors.value.find((c) => c.id === selectedCorridorId.value) || null,
@@ -461,9 +463,12 @@ function spotFilterProvince(s: AtlasSpotLite): string {
   return s.origin === 'road' ? roadSpotProvince(s) : (s.province ?? '');
 }
 
-/** 公路图集真正落图的点：提高 score 门槛并去掉测绘小山，不改库 */
+/** 公路图集真正落图的点：质量门槛 + 近名/城区去重，不改库 */
 function atlasRoadDisplayList(list: AtlasSpotLite[]): AtlasSpotLite[] {
-  return list.filter(isAtlasRoadDisplaySpot);
+  const passed = list.filter(
+    (s) => Number.isFinite(s.lng) && Number.isFinite(s.lat) && isAtlasRoadDisplaySpot(s),
+  ) as Array<AtlasSpotLite & { lng: number; lat: number }>;
+  return dedupeAtlasRoadSpots(passed);
 }
 
 /** 库内总量展示：过万写「x.x 万」 */
@@ -905,7 +910,6 @@ function renderHeat() {
    */
   const points = filteredSpots.value
     .filter((s) => Number.isFinite(s.lng) && Number.isFinite(s.lat))
-    .filter((s) => s.origin !== 'road' || isAtlasRoadDisplaySpot(s))
     .map((s) => ({
       lng: s.lng,
       lat: s.lat,
@@ -1612,6 +1616,12 @@ watch(spotOrigin, (v) => {
               清空筛选
             </button>
           </div>
+          <p
+            v-if="!roadLoading && (stats?.roadSpotLibraryCount ?? 0) > (stats?.roadSpotCount ?? 0)"
+            class="atlas-block__note"
+          >
+            地图只画较值得去的点；近名重复与城区密集聚（如城门群、馆群）已合并，测绘峰/低分观景已隐藏。
+          </p>
           <p v-if="activeCity" class="atlas-block__note">
             当前展开：{{ activeCity }}
             <button type="button" class="atlas-link" @click="activeCity = ''">返回全市聚合</button>

@@ -29,7 +29,7 @@ import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 import { useRoadDraw } from '../composables/useRoadDraw';
 import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
-import { ROAD_COLORS } from '../data/roadColors';
+import { driveTierColor } from '../data/roadColors';
 import { loadAmap } from '../map/amap';
 
 usePointerSpotlight();
@@ -57,6 +57,9 @@ const loading = ref(true);
 const error = ref('');
 const roadRoute = ref<RoadRoute | null>(null);
 const spots = ref<AlongSpot[]>([]);
+/** 未贯通段景点（局部里程）；不并进主链进度 / 即将到达 */
+const orphanSpots = ref<AlongSpot[]>([]);
+const spotStats = ref<{ main: number; orphan: number } | null>(null);
 const chapters = ref<RoadChapter[]>([]);
 const spotLibrary = ref<{ count: number; updated: string; note?: string } | null>(null);
 const progress = ref(0);
@@ -85,6 +88,11 @@ async function load() {
     const data = await api.getDriveAlong(params);
     roadRoute.value = data.route;
     spots.value = data.spots;
+    orphanSpots.value = data.orphanSpots ?? [];
+    spotStats.value = data.spotStats ?? {
+      main: data.spots.length,
+      orphan: (data.orphanSpots ?? []).length,
+    };
     chapters.value = data.chapters ?? [];
     spotLibrary.value = data.spotLibrary ?? null;
 
@@ -146,11 +154,10 @@ const focusBbox = computed<[number, number, number, number]>(() => {
     if (y > maxY) maxY = y;
   };
   for (const [lng, lat] of coords) absorb(lng, lat);
-  // 未贯通段必须纳入取景，否则北京段景点会把中心拉飞、主链被 slice 裁没
+  // 未贯通段必须纳入取景；取景只跟路线几何，勿被离线景点主导 bbox（invariants §5）
   for (const seg of roadRoute.value?.segments ?? []) {
     for (const pt of seg) absorb(pt[0], pt[1]);
   }
-  for (const s of spots.value.slice(0, 80)) absorb(s.lng, s.lat);
 
   const contentW = Math.max(maxX - minX, 4);
   const contentH = Math.max(maxY - minY, 4);
@@ -253,10 +260,7 @@ const VIS_LABEL: Record<string, string> = {
 };
 
 function tierColor(tier: string): string {
-  // PRD §11.2：沿程标记只能从 ROAD_COLORS 取色（A 琥珀 / B 宇宙蓝 / C 青绿）
-  if (tier === 'A') return ROAD_COLORS.expressway;
-  if (tier === 'C') return ROAD_COLORS.provincial;
-  return ROAD_COLORS.national;
+  return driveTierColor(tier);
 }
 
 function detourText(s: AlongSpot): string {
@@ -483,7 +487,13 @@ watch(gps, (sample) => {
               <span class="drive-route-card__name" style="font-size: var(--fs-h3)">{{ roadRoute.name }}</span>
               <div class="drive-route-card__meta" style="flex-direction: column; align-items: flex-start; gap: 4px">
                 <span>全程 {{ roadRoute.lengthKm }} km<template v-if="roadRoute.durationMin"> · 约 {{ Math.round(roadRoute.durationMin / 60) }} 小时</template></span>
-                <span>沿程景点 {{ spots.length }} 处 · 章节 {{ chapters.length }} 段</span>
+                <span>
+                  沿程景点 {{ spotStats?.main ?? spots.length }} 处
+                  <template v-if="(spotStats?.orphan ?? orphanSpots.length) > 0">
+                    · 未贯通段另 {{ spotStats?.orphan ?? orphanSpots.length }} 处
+                  </template>
+                  · 章节 {{ chapters.length }} 段
+                </span>
                 <span v-if="roadRoute.roadKeys.length" class="drive-trip-roadkeys">
                   <span
                     v-for="k in roadRoute.roadKeys.slice(0, 6)"
@@ -637,6 +647,19 @@ watch(gps, (sample) => {
                 @click.stop="toggleSpot(s)"
               >
                 <title>{{ s.name }} · {{ kmText(s.progressKm) }}</title>
+              </circle>
+              <circle
+                v-for="s in orphanSpots"
+                :key="'orphan-' + s.id"
+                class="drive-trip-map__dot is-orphan"
+                :cx="spotPos(s)[0]"
+                :cy="spotPos(s)[1]"
+                r="0.7"
+                :fill="tierColor(s.tier)"
+                opacity="0.55"
+                @click.stop="toggleSpot(s)"
+              >
+                <title>{{ s.name }} · 未贯通段</title>
               </circle>
             </svg>
             <button type="button" class="drive-trip-map__enter" @click="openFullMap">

@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { loadScenicSpots } from '../services/scenicSpots.js';
 import { roadNetworkOverview } from '../services/roadNetwork.js';
 import { getRoadsideSpots } from '../services/roadsideSpots.js';
-import { isAtlasRoadDisplaySpot } from '@railvista/shared';
+import { dedupeAtlasRoadSpots, isAtlasRoadDisplaySpot } from '@railvista/shared';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const presetsDir = join(__dirname, '../../../../data/presets');
@@ -477,8 +477,8 @@ function buildOverview(): AtlasOverview {
 
 /** 公路图层指纹：几何目录与景点库任一变化即失效；含落图规则版本以免规则改了仍吃旧缓存 */
 function roadStamp(): string {
-  // 与 isAtlasRoadDisplaySpot 放宽同步 bump（v2 ≈ 千级落图）
-  let out = 'atlas-road-display:v2|';
+  // 与落图/去重规则同步 bump（v3 = 近名去重 + 城区限流）
+  let out = 'atlas-road-display:v3|';
   try {
     if (existsSync(SPOTS_PATH)) out += String(statSync(SPOTS_PATH).mtimeMs);
   } catch {
@@ -529,7 +529,7 @@ function buildRoadLayer(): RoadLayerCache['data'] {
 
     const roadGrid = buildGeoIndex(roads.map((r) => ({ id: r.key, polyline: r.polyline })));
     const roadIdsByKey = new Map<string, string[]>();
-    const roadSpots: AtlasSpot[] = [];
+    const candidates: AtlasSpot[] = [];
     for (const s of native) {
       const lng = Number(s.lng);
       const lat = Number(s.lat);
@@ -541,6 +541,7 @@ function buildRoadLayer(): RoadLayerCache['data'] {
       const score = Number.isFinite(Number(s.score)) ? Number(s.score) : undefined;
       const category = typeof s.category === 'string' ? s.category : undefined;
       const source = typeof s.source === 'string' && s.source ? s.source : undefined;
+      const hasWiki = Boolean(tags.wikipedia || tags['wikipedia:zh'] || tags.wikidata);
       if (
         !isAtlasRoadDisplaySpot({
           name,
@@ -554,14 +555,7 @@ function buildRoadLayer(): RoadLayerCache['data'] {
       ) {
         continue;
       }
-      const keys = [...geoMatch(roadGrid, lng, lat, 20).keys()];
-      for (const k of keys) {
-        const arr = roadIdsByKey.get(k);
-        if (arr) arr.push(id);
-        else roadIdsByKey.set(k, [id]);
-      }
-      const hasWiki = Boolean(tags.wikipedia || tags['wikipedia:zh'] || tags.wikidata);
-      roadSpots.push({
+      candidates.push({
         id,
         name,
         lng: round4(lng),
@@ -574,10 +568,22 @@ function buildRoadLayer(): RoadLayerCache['data'] {
         source,
         ele: Number.isFinite(ele) ? ele : undefined,
         hasWiki: hasWiki || undefined,
-        corridorIds: keys,
-        matchKind: keys.length ? 'geo' : null,
+        corridorIds: [],
+        matchKind: null,
         origin: 'road',
       });
+    }
+    // 近名合并 + 城区密集聚限流（城门群 / 馆群），再挂公路归属
+    const roadSpots = dedupeAtlasRoadSpots(candidates);
+    for (const spot of roadSpots) {
+      const keys = [...geoMatch(roadGrid, spot.lng, spot.lat, 20).keys()];
+      spot.corridorIds = keys;
+      spot.matchKind = keys.length ? 'geo' : null;
+      for (const k of keys) {
+        const arr = roadIdsByKey.get(k);
+        if (arr) arr.push(spot.id);
+        else roadIdsByKey.set(k, [spot.id]);
+      }
     }
     const roadCorridors: AtlasRoadCorridor[] = roads.map((r) => {
       const ids = roadIdsByKey.get(r.key) ?? [];

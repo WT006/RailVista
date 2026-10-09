@@ -15,6 +15,22 @@ export const ROAD_COLORS: Record<RoadClass, string> = {
   village: '#6b7280', // 村道 · 深灰
 };
 
+/**
+ * 沿程景点分级色（地图点 + 图例 + 列表徽标共用）。
+ * B 不用 national（路线蓝）也不用县道紫：与 A 琥珀 / C 青绿拉开，暗底可读。
+ */
+export const DRIVE_TIER_COLORS = {
+  A: ROAD_COLORS.expressway, // 讲解级 · 琥珀
+  B: '#ff9a76', // 沿途可看 · 珊瑚
+  C: ROAD_COLORS.provincial, // 小确幸 · 青绿
+} as const;
+
+export function driveTierColor(tier: string): string {
+  if (tier === 'A') return DRIVE_TIER_COLORS.A;
+  if (tier === 'C') return DRIVE_TIER_COLORS.C;
+  return DRIVE_TIER_COLORS.B;
+}
+
 export const ROAD_CLASS_LABELS: Record<RoadClass, string> = {
   expressway: '国家高速',
   national: '普通国道',

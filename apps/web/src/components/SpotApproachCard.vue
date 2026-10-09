@@ -148,10 +148,10 @@ const countdownText = computed(() => {
   overflow: auto;
   padding: 10px 12px 11px;
   border-radius: 14px;
-  background: linear-gradient(165deg, rgba(30, 41, 59, 0.96), var(--bg-base));
-  border: 1px solid var(--border-default);
+  background: linear-gradient(165deg, rgba(30, 41, 59, 0.96), var(--surface-0));
+  border: 1px solid var(--line-default);
   box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
-  color: var(--text-secondary);
+  color: var(--text-2);
   font-size: 12.5px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -189,7 +189,7 @@ const countdownText = computed(() => {
 }
 
 .approach-card__countdown {
-  color: var(--text-muted);
+  color: var(--text-3);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
@@ -205,7 +205,7 @@ const countdownText = computed(() => {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
 }
 
 .approach-card__meta {
@@ -222,13 +222,13 @@ const countdownText = computed(() => {
   border-radius: 999px;
   font-size: 11px;
   font-weight: 650;
-  color: var(--text-secondary);
+  color: var(--text-2);
   background: rgba(148, 163, 184, 0.12);
   border: 1px solid rgba(148, 163, 184, 0.18);
 }
 
 .approach-card__chip--muted {
-  color: var(--text-muted);
+  color: var(--text-3);
   font-weight: 500;
 }
 
@@ -244,7 +244,7 @@ const countdownText = computed(() => {
 
 .approach-card__intro {
   margin: 6px 0 0;
-  color: var(--text-muted);
+  color: var(--text-3);
   font-size: 12px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -265,13 +265,13 @@ const countdownText = computed(() => {
   padding: 2px 6px;
   border-radius: 6px;
   color: var(--accent-hover);
-  background: var(--accent-container);
+  background: var(--accent-soft);
 }
 
 .approach-card__honor--more {
-  color: var(--text-muted);
+  color: var(--text-3);
   background: transparent;
-  border: 1px dashed var(--border-default);
+  border: 1px dashed var(--line-default);
 }
 
 .approach-card__blocked {

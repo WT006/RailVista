@@ -260,32 +260,32 @@ function onCancelClick() {
           <span class="rv-loader__dash rv-loader__dash--1" />
           <span class="rv-loader__dash rv-loader__dash--2" />
           <svg class="rv-loader__cr" viewBox="0 0 62 24" aria-hidden="true">
-            <rect x="7" y="17.6" width="15" height="3.6" rx="1.4" fill="var(--text-muted)" />
-            <rect x="33" y="17.6" width="13" height="3.6" rx="1.4" fill="var(--text-muted)" />
+            <rect x="7" y="17.6" width="15" height="3.6" rx="1.4" fill="var(--text-3)" />
+            <rect x="33" y="17.6" width="13" height="3.6" rx="1.4" fill="var(--text-3)" />
             <g class="rv-loader__wheel" style="transform-origin: 12px 21.4px">
-              <circle cx="12" cy="21.4" r="2" fill="var(--text-muted)" />
-              <circle cx="12" cy="21.4" r="0.7" fill="var(--bg-base)" />
+              <circle cx="12" cy="21.4" r="2" fill="var(--text-3)" />
+              <circle cx="12" cy="21.4" r="0.7" fill="var(--surface-0)" />
             </g>
             <g class="rv-loader__wheel" style="transform-origin: 19px 21.4px">
-              <circle cx="19" cy="21.4" r="2" fill="var(--text-muted)" />
-              <circle cx="19" cy="21.4" r="0.7" fill="var(--bg-base)" />
+              <circle cx="19" cy="21.4" r="2" fill="var(--text-3)" />
+              <circle cx="19" cy="21.4" r="0.7" fill="var(--surface-0)" />
             </g>
             <g class="rv-loader__wheel" style="transform-origin: 37px 21.4px">
-              <circle cx="37" cy="21.4" r="2" fill="var(--text-muted)" />
-              <circle cx="37" cy="21.4" r="0.7" fill="var(--bg-base)" />
+              <circle cx="37" cy="21.4" r="2" fill="var(--text-3)" />
+              <circle cx="37" cy="21.4" r="0.7" fill="var(--surface-0)" />
             </g>
             <g class="rv-loader__wheel" style="transform-origin: 43px 21.4px">
-              <circle cx="43" cy="21.4" r="2" fill="var(--text-muted)" />
-              <circle cx="43" cy="21.4" r="0.7" fill="var(--bg-base)" />
+              <circle cx="43" cy="21.4" r="2" fill="var(--text-3)" />
+              <circle cx="43" cy="21.4" r="0.7" fill="var(--surface-0)" />
             </g>
             <path
               d="M2.6 5H33c11.5 0 19.5 3.3 25 7.7 1.8 1.4 1.8 2.8 0 4.2C52.5 18.1 45 18.6 36 18.6H5Q2.6 18.6 2.6 16V7.6Q2.6 5 2.6 5Z"
-              fill="var(--text-secondary)"
+              fill="var(--text-2)"
             />
-            <path d="M2.6 15.8H36c7 .2 13.5 .9 18.6 1.7H5Q2.6 17.5 2.6 15.8Z" fill="var(--text-muted)" />
+            <path d="M2.6 15.8H36c7 .2 13.5 .9 18.6 1.7H5Q2.6 17.5 2.6 15.8Z" fill="var(--text-3)" />
             <path
               d="M6.5 7.3H37c8 .2 14.5 2.4 18.6 5l-1.7 1.5c-3.9-2.6-9.4-4.4-16.9-4.6H6.5Z"
-              fill="var(--bg-elevated)"
+              fill="var(--surface-2)"
             />
             <rect x="4" y="13.6" width="45" height="1.3" rx="0.65" fill="var(--danger)" />
             <ellipse
@@ -325,10 +325,10 @@ function onCancelClick() {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: var(--bg-raised);
+  background: var(--surface-1);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  animation: rv-fade var(--dur-fast) var(--ease-out) both;
+  animation: rv-fade var(--dur-fast) var(--ease-standard) both;
 }
 
 .rv-loader__card {
@@ -336,8 +336,8 @@ function onCancelClick() {
   width: min(92vw, 340px);
   padding: 20px 22px 18px;
   border-radius: 16px;
-  background: linear-gradient(165deg, var(--bg-raised) 0%, var(--bg-base) 100%);
-  border: 1px solid var(--accent-container);
+  background: linear-gradient(165deg, var(--surface-1) 0%, var(--surface-0) 100%);
+  border: 1px solid var(--accent-soft);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
 }
 
@@ -350,7 +350,7 @@ function onCancelClick() {
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .rv-loader__track {
@@ -366,7 +366,7 @@ function onCancelClick() {
   top: 24px;
   height: 6px;
   border-radius: 999px;
-  background: var(--border-default);
+  background: var(--line-default);
   overflow: hidden;
 }
 
@@ -376,11 +376,11 @@ function onCancelClick() {
   transform-origin: 0 50%;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
-  transition: transform var(--dur-slow) var(--ease-out);
+  transition: transform var(--dur-slow) var(--ease-standard);
 }
 
 .rv-loader__fill.is-hold {
-  background: var(--text-muted);
+  background: var(--text-3);
 }
 
 .rv-loader__fill.is-done {
@@ -393,7 +393,7 @@ function onCancelClick() {
   width: 2px;
   height: 10px;
   border-radius: 1px;
-  background: var(--border-default);
+  background: var(--line-default);
   transform: translateX(-50%);
 }
 
@@ -404,8 +404,8 @@ function onCancelClick() {
   height: 8px;
   border-radius: 50%;
   transform: translateX(-50%);
-  background: var(--text-muted);
-  transition: background var(--dur-base) var(--ease-out);
+  background: var(--text-3);
+  transition: background var(--dur-base) var(--ease-standard);
 }
 
 .rv-loader__milestone.is-on {
@@ -422,7 +422,7 @@ function onCancelClick() {
   top: 6px;
   transform: translateX(-86%);
   margin-left: 4px;
-  transition: left var(--dur-slow) var(--ease-out);
+  transition: left var(--dur-slow) var(--ease-standard);
   display: flex;
   align-items: center;
 }
@@ -457,7 +457,7 @@ function onCancelClick() {
   left: 40px;
   width: 2px;
   height: 10px;
-  background: var(--text-muted);
+  background: var(--text-3);
 }
 
 .rv-loader__signal::before {
@@ -482,7 +482,7 @@ function onCancelClick() {
   margin: 0;
   font-size: 17px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
   letter-spacing: 0.02em;
 }
 
@@ -501,7 +501,7 @@ function onCancelClick() {
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.5;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .rv-loader__actions {
@@ -514,7 +514,7 @@ function onCancelClick() {
   flex: 1;
   appearance: none;
   border: 1px solid var(--accent-border);
-  background: var(--accent-container);
+  background: var(--accent-soft);
   color: var(--accent-hover);
   font-size: 13px;
   font-weight: 600;
@@ -524,13 +524,13 @@ function onCancelClick() {
 }
 
 .rv-loader__btn:hover {
-  background: var(--accent-container);
+  background: var(--accent-soft);
 }
 
 .rv-loader__btn--ghost {
-  border-color: var(--border-strong);
+  border-color: var(--line-strong);
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 @keyframes rv-fade {

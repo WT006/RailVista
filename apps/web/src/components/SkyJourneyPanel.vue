@@ -604,7 +604,7 @@ defineExpose({ compute });
 }
 
 .sky-chip.is-hot {
-  border-color: var(--accent-container);
+  border-color: var(--accent-soft);
   background: var(--accent-soft);
 }
 

@@ -434,8 +434,8 @@ watch(corridorId, async () => {
 .route-page {
   min-height: 100%;
   padding: 14px 14px 40px;
-  background: var(--bg-base);
-  color: var(--text-secondary);
+  background: var(--surface-0);
+  color: var(--text-2);
 }
 
 .route-top {
@@ -469,9 +469,9 @@ watch(corridorId, async () => {
   flex-shrink: 0;
   padding: 5px 10px;
   border-radius: 999px;
-  border: 1px solid var(--border-default);
-  background: var(--border-hairline);
-  color: var(--text-secondary);
+  border: 1px solid var(--line-default);
+  background: var(--line-hairline);
+  color: var(--text-2);
   font-size: 11.5px;
   cursor: pointer;
 }
@@ -486,15 +486,15 @@ watch(corridorId, async () => {
 .route-tip {
   margin: 0;
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .route-empty,
 .route-warn {
   padding: 14px;
   border-radius: 12px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-elevated);
+  border: 1px solid var(--line-default);
+  background: var(--surface-2);
 }
 
 .route-empty h2 {
@@ -505,7 +505,7 @@ watch(corridorId, async () => {
 .route-empty p {
   margin: 0 0 10px;
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .route-warn {
@@ -521,8 +521,8 @@ watch(corridorId, async () => {
   gap: 6px;
   padding: 12px 13px;
   border-radius: 14px;
-  border: 1px solid var(--border-default);
-  background: linear-gradient(180deg, var(--bg-elevated), var(--bg-raised));
+  border: 1px solid var(--line-default);
+  background: linear-gradient(180deg, var(--surface-2), var(--surface-1));
 }
 
 .route-head__od {
@@ -535,8 +535,8 @@ watch(corridorId, async () => {
 .route-od {
   padding: 2px 9px;
   border-radius: 999px;
-  border: 1px solid var(--accent-container);
-  background: var(--accent-container);
+  border: 1px solid var(--accent-soft);
+  background: var(--accent-soft);
   color: var(--accent-hover);
   font-size: 12px;
   font-weight: 600;
@@ -545,8 +545,8 @@ watch(corridorId, async () => {
 .route-chip {
   padding: 2px 8px;
   border-radius: 999px;
-  background: var(--border-hairline);
-  color: var(--text-muted);
+  background: var(--line-hairline);
+  color: var(--text-3);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
@@ -561,7 +561,7 @@ watch(corridorId, async () => {
 
 .route-head__ranks-label {
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .route-rank-badge {
@@ -576,7 +576,7 @@ watch(corridorId, async () => {
 .route-head__tagline {
   margin: 0;
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   line-height: 1.5;
 }
 
@@ -584,8 +584,8 @@ watch(corridorId, async () => {
 .route-map-card {
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid var(--border-default);
-  background: var(--bg-inset);
+  border: 1px solid var(--line-default);
+  background: var(--surface-sunken);
 }
 
 .route-map {
@@ -597,15 +597,15 @@ watch(corridorId, async () => {
   margin: 0;
   padding: 16px 13px;
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .route-map-stations {
   margin: 0;
   padding: 8px 12px;
-  border-top: 1px solid var(--border-hairline);
+  border-top: 1px solid var(--line-hairline);
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-3);
   line-height: 1.5;
 }
 
@@ -623,7 +623,7 @@ watch(corridorId, async () => {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform var(--dur-micro) var(--ease-out), filter var(--dur-micro) var(--ease-out);
+  transition: transform var(--dur-micro) var(--ease-standard), filter var(--dur-micro) var(--ease-standard);
 }
 
 .route-btn:hover {
@@ -632,13 +632,13 @@ watch(corridorId, async () => {
 
 .route-btn--primary {
   background: linear-gradient(180deg, var(--accent), var(--accent-press));
-  color: var(--bg-base);
+  color: var(--surface-0);
 }
 
 .route-btn--ghost {
-  border-color: var(--border-strong);
-  background: var(--border-hairline);
-  color: var(--text-secondary);
+  border-color: var(--line-strong);
+  background: var(--line-hairline);
+  color: var(--text-2);
 }
 
 /* ── 景点分组 ── */
@@ -659,14 +659,14 @@ watch(corridorId, async () => {
 .route-spots__count {
   font-size: 11px;
   font-weight: 400;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .route-group {
   padding: 10px 11px;
   border-radius: 12px;
-  border: 1px solid var(--border-hairline);
-  background: var(--bg-elevated);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-2);
 }
 
 .route-group__title {
@@ -676,20 +676,20 @@ watch(corridorId, async () => {
   gap: 6px;
   font-size: 12.5px;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 
 .route-dot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: var(--dot, var(--text-muted));
+  background: var(--dot, var(--text-3));
 }
 
 .route-group__count {
   font-size: 10.5px;
   font-weight: 400;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .route-group__list {
@@ -703,8 +703,8 @@ watch(corridorId, async () => {
 .route-spot {
   padding: 8px 9px;
   border-radius: 10px;
-  background: var(--bg-inset);
-  border: 1px solid var(--border-hairline);
+  background: var(--surface-sunken);
+  border: 1px solid var(--line-hairline);
 }
 
 .route-spot__head {
@@ -717,7 +717,7 @@ watch(corridorId, async () => {
 .route-spot__name {
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-1);
 }
 
 .route-spot__km {
@@ -730,7 +730,7 @@ watch(corridorId, async () => {
 .route-spot__intro {
   margin: 3px 0 0;
   font-size: 11.5px;
-  color: var(--text-muted);
+  color: var(--text-3);
   line-height: 1.55;
 }
 
@@ -740,7 +740,7 @@ watch(corridorId, async () => {
   flex-wrap: wrap;
   gap: 8px;
   font-size: 10.5px;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .route-spot__infer {
@@ -768,10 +768,10 @@ watch(corridorId, async () => {
   gap: 4px;
   padding: 2px 7px;
   border-radius: 999px;
-  background: var(--bg-base);
-  border: 1px solid var(--border-strong);
+  background: var(--surface-0);
+  border: 1px solid var(--line-strong);
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   white-space: nowrap;
 }
 
@@ -791,17 +791,17 @@ watch(corridorId, async () => {
   width: 9px;
   height: 9px;
   border-radius: 999px;
-  background: var(--dot, var(--text-muted));
-  box-shadow: 0 0 0 2px var(--bg-raised);
+  background: var(--dot, var(--text-3));
+  box-shadow: 0 0 0 2px var(--surface-1);
 }
 
 .route-iw {
   max-width: 230px;
   padding: 9px 11px;
   border-radius: 10px;
-  background: var(--bg-base);
-  border: 1px solid var(--border-default);
-  color: var(--text-secondary);
+  background: var(--surface-0);
+  border: 1px solid var(--line-default);
+  color: var(--text-2);
 }
 
 .route-iw__name {
@@ -825,8 +825,8 @@ watch(corridorId, async () => {
 .iw-dim {
   padding: 1px 6px;
   border-radius: 999px;
-  background: var(--dot, var(--text-muted));
-  color: var(--bg-base);
+  background: var(--dot, var(--text-3));
+  color: var(--surface-0);
   font-size: 10px;
   font-weight: 700;
 }
@@ -834,7 +834,7 @@ watch(corridorId, async () => {
 .route-iw__intro {
   margin: 5px 0 0;
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   line-height: 1.5;
 }
 </style>

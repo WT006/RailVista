@@ -43,7 +43,7 @@ const showTopBar = computed(() => !route.meta.fullscreenMap);
 
 <style>
 .page-enter-active {
-  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  transition: opacity var(--dur-base) var(--ease-standard), transform var(--dur-base) var(--ease-standard);
 }
 .page-leave-active {
   transition: opacity var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);

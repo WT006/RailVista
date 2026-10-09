@@ -7,6 +7,10 @@
  *   - 圆角：官方通用档位 4 / 8 / 16 / 20 / 32 vp，且「层级越高圆角越大」。
  *   - 间距：8vp 基线网格（取 8 的倍数）。
  *   - 动效：转场按屏幕尺寸分档 200 / 250 / 300ms；曲线优先弹性。
+ *   - 断点：系统档 599/600 / 840 / 1200；380 / 480 / 560 / 960 为「细调档」白名单，
+ *           除此之外禁止新增其它数值断点（2026-10-09 鸿蒙化收敛）。
+ *   - 例外：data/ 下数据语义色板（地图图例/图层、车次色、票面印刷色）为受控例外，
+ *           集中在各 data/*.ts 中声明；交互层（按钮/焦点/链接）禁止使用字面色。
  *
  * 约定：
  *   1. 业务样式只允许引用本文件令牌，禁止硬编码色值 / 圆角 / 间距 / 时长。
@@ -37,6 +41,16 @@
   --glow-radius: 460px;
   --glow-alpha: 0.13; /* 一级卡片光晕峰值透明度 */
   --glow-alpha-tile: 0.1; /* 二/三级条目光晕峰值透明度 */
+  /* 材质高光层（rv-card 指针光晕 / 顶部高光带；原散落在 base.css 的字面量归并至此） */
+  --glow-white-layer: rgba(255, 255, 255, var(--glow-alpha));
+  --glow-accent-layer: rgba(77, 159, 255, calc(var(--glow-alpha) * 0.9));
+  --glow-white-layer-tile: rgba(255, 255, 255, var(--glow-alpha-tile));
+  --sheen-band: rgba(255, 255, 255, 0.34);
+
+  /* chrome 层（顶栏 / 底栏）玻璃：与卡片玻璃分档，模糊更轻 */
+  --glass-blur-chrome: 14px;
+  /* 底部页签上方渐变蒙层高度（底部页签规范：高于内容最顶边 16vp，颜色与页面背景一致） */
+  --bottomnav-scrim-h: 16px;
 
   /* ══════════ 描边（整体降不透明度：框体更轻盈，突出内容本身）══════════ */
   --line-hairline: rgba(255, 255, 255, 0.04);
@@ -59,6 +73,13 @@
   --accent-press: #0a84ff;
   --accent-soft: rgba(77, 159, 255, 0.14);
   --accent-border: rgba(77, 159, 255, 0.42);
+
+  /* 通用交互态（HarmonyOS interactive_hover / interactive_pressed 深色档）：
+     hover 5% 白、pressed 10% 白，用于列表行、图标按钮等非填充型可交互元素 */
+  --interactive-hover: rgba(255, 255, 255, 0.05);
+  --interactive-pressed: rgba(255, 255, 255, 0.1);
+  /* 键盘焦点环（可达性统一）：柔和强调光晕，与输入框焦点观感一致 */
+  --focus-ring: 0 0 0 3px var(--accent-soft), 0 0 16px -4px rgba(77, 159, 255, 0.4);
 
   /* ══════════ 语义色（统一降饱和，符合 HarmonyOS 主色饱和度 30–60% 约束）══════════ */
   --success: #6cc27f;
@@ -124,6 +145,9 @@
   --radius-xl: 32px; /* 半模态、弹出框 */
   --radius-full: 999px;
 
+  /* 触控命中区下限（规范：触屏可点区域 ≥ 44×44；视觉尺寸可小于此，用 .rv-hit 扩展） */
+  --hit-min: 44px;
+
   /* ══════════ 阴影（四档 + 内高光，构成"材质"而非"黑影"）══════════ */
   --elev-0: none;
   --elev-1: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -158,7 +182,8 @@
   --safe-right: env(safe-area-inset-right, 0px);
   /* 顶栏占位总高（内容区 + 顶部安全区），sticky 避让与 min-height 一律用此令牌 */
   --appbar-offset: calc(var(--appbar-h) + var(--safe-top));
-  --bottomnav-h: 0px; /* 桌面端无底栏 */
+  --bottomnav-h: 0px; /* 底栏高度由断点赋值：<840 有底栏；≥840 侧边 Tab 无底栏 */
+  --sidenav-w: 0px; /* 侧边 Tab 宽度（≥840 赋 88px；《响应式应用架构》挪移布局） */
   --col-ratio-main: 7; /* 主栏占 12 栅格中的 7 列 */
   --col-ratio-side: 5; /* 侧栏占 12 栅格中的 5 列 */
 
@@ -175,33 +200,38 @@
 }
 
 /* ── 断点：sm ≥600 / md ≥840 / lg ≥1200 ────────────────────────────────────
- * 容器宽度策略：
+ * 容器宽度策略（margins 按《布局基础》栅格规范 16 / 24 / 32）：
  *   <600px 手机竖屏  → 全宽 - 2×16  gutter（单列）
- *   600–1199        → 全宽 - 2×gutter（双栏，尽量吃满屏幕，不做人为收窄）
+ *   600–839        → 全宽 - 2×24  gutter（双栏，尽量吃满屏幕，不做人为收窄）
+ *   ≥840           → 全宽 - 2×32  gutter；底部页签迁移为侧边 Tab（<840 为底部页签）
  *   ≥1200 桌面      → 收窄到 1120px，保证双栏阅读宽度与行宽舒适
  */
-@media (max-width: 599px) {
+
+/* 底部页签档（<840）：内容区高度取规范悬浮式 56vp 档（图标 24 + 文字双行结构），
+   安全区由组件用 env(safe-area-inset-bottom) 另行追加 */
+@media (max-width: 839px) {
   :root {
-    --bottomnav-h: 68px;
+    --bottomnav-h: 56px;
   }
 }
 
 @media (min-width: 600px) {
   :root {
-    --gutter: 20px;
+    --gutter: 24px;
     --shell-max: 100%;
     --appbar-h: 56px;
-    --bottomnav-h: 0px;
   }
 }
 
 @media (min-width: 840px) {
   :root {
-    --gutter: 24px;
+    --gutter: 32px;
     --shell-max: 100%;
     --appbar-h: 64px;
     --fs-display: 32px;
     --fs-h1: 22px;
+    --bottomnav-h: 0px;
+    --sidenav-w: 88px;
   }
 }
 

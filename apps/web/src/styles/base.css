@@ -17,8 +17,8 @@ body {
   background: var(--surface-0);
 }
 
-/* 移动端底栏：全屏地图页侧栏/面板让出导航高度 */
-@media (max-width: 599px) {
+/* 底栏档（<840）：全屏地图页侧栏/面板让出页签高度 */
+@media (max-width: 839px) {
   .atlas-dock {
     bottom: calc(var(--bottomnav-h) + 8px + env(safe-area-inset-bottom, 0px));
   }
@@ -92,6 +92,14 @@ html {
   z-index: 1;
   width: min(100% - 2 * var(--gutter), var(--shell-max));
   margin-inline: auto;
+}
+
+/* ≥840（--sidenav-w > 0）：文档流页面内容整体让出侧边 Tab；
+   全屏地图页保持满幅铺底，由各自浮层控件单独避让（见 map.css / 各页 scoped） */
+.rv-page,
+.route-page,
+.drive-page {
+  padding-left: var(--sidenav-w);
 }
 
 .rv-grid {
@@ -179,12 +187,12 @@ html {
   background:
     radial-gradient(
       var(--glow-radius) circle at var(--mx, 50%) var(--my, 0%),
-      rgba(255, 255, 255, var(--glow-alpha)),
+      var(--glow-white-layer),
       transparent 62%
     ),
     radial-gradient(
       calc(var(--glow-radius) * 0.7) circle at var(--mx, 50%) var(--my, 0%),
-      rgba(77, 159, 255, calc(var(--glow-alpha) * 0.9)),
+      var(--glow-accent-layer),
       transparent 65%
     );
   transition: opacity var(--dur-base) var(--ease-standard);
@@ -202,7 +210,7 @@ html {
   background-image: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.34) 50%,
+    var(--sheen-band) 50%,
     transparent 100%
   );
   background-size: 42% 100%;
@@ -247,7 +255,7 @@ html {
   opacity: 0;
   background: radial-gradient(
     calc(var(--glow-radius) * 0.55) circle at var(--mx, 50%) var(--my, 0%),
-    rgba(255, 255, 255, var(--glow-alpha-tile)),
+    var(--glow-white-layer-tile),
     transparent 65%
   );
   transition: opacity var(--dur-base) var(--ease-standard);
@@ -442,7 +450,7 @@ html {
   border-color: var(--accent);
   background: var(--surface-3);
   /* 焦点外发光：柔和的强调光晕，而非硬描边 */
-  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 16px -4px rgba(77, 159, 255, 0.4);
+  box-shadow: var(--focus-ring);
 }
 
 .station-field__control {
@@ -1627,4 +1635,41 @@ html {
     border: 1px solid var(--line-default);
     box-shadow: var(--elev-3);
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * 可达性与交互态工具（2026-10-09 鸿蒙化收敛新增）
+ *
+ * 1. 全局键盘焦点环：可交互元素在键盘聚焦（:focus-visible）时显示统一的柔和
+ *    强调环；已有自定义焦点观感的控件（输入框等）以自身样式为准（优先级更高）。
+ * 2. .rv-hit：触屏命中区扩展。视觉尺寸 < 44px 的小控件加此类后，命中区以
+ *    自身中心为锚扩到 --hit-min（44×44）；元素已占用 ::after 的请改 ::before。
+ * 3. .rv-pressable：统一按压态反馈（0.98 缩放，--dur-micro 内完成，快速响应档）。
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+:focus-visible {
+  outline: 2px solid var(--accent-border);
+  outline-offset: 2px;
+}
+
+.rv-hit {
+  position: relative;
+}
+
+.rv-hit::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--hit-min));
+  height: max(100%, var(--hit-min));
+  transform: translate(-50%, -50%);
+}
+
+.rv-pressable {
+  transition: transform var(--dur-micro) var(--ease-standard);
+}
+
+.rv-pressable:active {
+  transform: scale(0.98);
 }

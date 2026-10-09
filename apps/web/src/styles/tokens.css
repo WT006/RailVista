@@ -159,11 +159,19 @@
   /* ══════════ 地图浮层与标注（自驾/地图模块专用档，2026-10 收敛）══════════ */
   --elev-float: 0 4px 16px rgba(0, 0, 0, 0.24); /* 地图小控件（胶囊按钮等） */
   --elev-float-strong: 0 8px 22px rgba(0, 0, 0, 0.35); /* 地图浮卡 / 浮层面板 */
+  --elev-up: 0 -8px 24px rgba(0, 0, 0, 0.25); /* 底部浮层面板（向上投影） */
   --pin-shadow: 0 4px 10px rgba(0, 0, 0, 0.45); /* 地图 pin 投影（filter: drop-shadow） */
   --pin-rim: #ffffff; /* 地图 pin / 车辆/定位标记的白色描边 */
+  --surface-lift: #1a212b; /* 地图浮层“提亮基准”（与 surface-2 同色相，不透明，供 color-mix 使用） */
   --fs-annot: 10px; /* 地图标注字号（数据标注层，低于正文微字号） */
   --fs-annot-sm: 8px; /* 地图标注·密集态（缩小 pin / 刻度条内） */
   --dur-pulse: 1600ms; /* 氛围脉冲：无位移的呼吸/扩散类循环动画专用（不受 350ms 位移档约束） */
+  /* 地图标注强调（atlas 选中焦点 pin 专用色阶） */
+  --map-amber: #ffb84d;
+  --map-amber-bright: #ffd08a;
+  --map-amber-deep: #ffa028;
+  --map-amber-ink: #1a1206;
+  --map-heat: #ff6b8a; /* 热力图开关图例点 */
 
   /* ══════════ 动效 ══════════ */
   --dur-micro: 100ms; /* 颜色 / 描边 */

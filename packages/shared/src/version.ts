@@ -5,13 +5,13 @@
  * 并在需要时按 SemVer 递增这里的 APP_VERSION（小迭代递增修订号）。
  * 前端首页显示的版本号直接读取本文件，因此不会出现文档与界面不一致。
  */
-export const APP_VERSION = '0.7.0';
+export const APP_VERSION = '0.8.0';
 
 /** 版本对应的发布/变更摘要，便于 UI 展示（与 CHANGELOG.md 首条一致） */
 export const APP_VERSION_SUMMARY =
-  '旅行路书库上线并补全国内容：37 条路线 / 344 景点，五层分类不限自驾';
+  '路书库阶段 1 完成：61 条路线（本轮 +24 条），覆盖 21 省 99 市，三条 L1 国家级长线上线';
 
-export const APP_VERSION_DATE = '2026-10-06';
+export const APP_VERSION_DATE = '2026-10-08';
 
 export type AppVersionInfo = {
   version: string;

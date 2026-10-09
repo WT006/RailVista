@@ -135,4 +135,9 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
     display: none;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  .appbar {
+    transition: none;
+  }
+}
 </style>

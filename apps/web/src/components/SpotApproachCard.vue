@@ -147,12 +147,12 @@ const countdownText = computed(() => {
   max-height: min(42vh, 260px);
   overflow: auto;
   padding: 10px 12px 11px;
-  border-radius: 14px;
-  background: linear-gradient(165deg, rgba(30, 41, 59, 0.96), var(--surface-0));
+  border-radius: var(--radius-md);
+  background: linear-gradient(165deg, var(--surface-lift), var(--surface-0));
   border: 1px solid var(--line-default);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--elev-float-strong);
   color: var(--text-2);
-  font-size: 12.5px;
+  font-size: var(--fs-cap);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -219,12 +219,12 @@ const countdownText = computed(() => {
   display: inline-flex;
   align-items: center;
   padding: 2px 7px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 650;
   color: var(--text-2);
-  background: rgba(148, 163, 184, 0.12);
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: color-mix(in srgb, var(--text-2) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-2) 18%, transparent);
 }
 
 .approach-card__chip--muted {
@@ -234,8 +234,8 @@ const countdownText = computed(() => {
 
 .approach-card__chip--night {
   color: var(--warning);
-  background: rgba(223, 179, 87, 0.12);
-  border-color: rgba(223, 179, 87, 0.28);
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--warning) 28%, transparent);
 }
 
 .approach-card__wx {
@@ -261,9 +261,9 @@ const countdownText = computed(() => {
 }
 
 .approach-card__honor {
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
   padding: 2px 6px;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   color: var(--accent-hover);
   background: var(--accent-soft);
 }
@@ -285,7 +285,14 @@ const countdownText = computed(() => {
 
 .approach-enter-active,
 .approach-leave-active {
-  transition: opacity 0.22s ease, transform 0.22s ease;
+  transition: opacity var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .approach-enter-active,
+  .approach-leave-active {
+    transition: none;
+  }
 }
 .approach-enter-from,
 .approach-leave-to {

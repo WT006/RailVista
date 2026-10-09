@@ -56,4 +56,11 @@ const showTopBar = computed(() => !route.meta.fullscreenMap);
   opacity: 0;
   transform: translateY(-6px);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active,
+  .page-leave-active {
+    transition: none;
+  }
+}
 </style>

@@ -468,11 +468,11 @@ watch(corridorId, async () => {
 .route-top__ghost {
   flex-shrink: 0;
   padding: 5px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--line-default);
   background: var(--line-hairline);
   color: var(--text-2);
-  font-size: 11.5px;
+  font-size: var(--fs-micro);
   cursor: pointer;
 }
 
@@ -492,7 +492,7 @@ watch(corridorId, async () => {
 .route-empty,
 .route-warn {
   padding: 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--line-default);
   background: var(--surface-2);
 }
@@ -511,8 +511,8 @@ watch(corridorId, async () => {
 .route-warn {
   font-size: 12px;
   color: var(--warning);
-  border-color: rgba(223, 179, 87, 0.32);
-  background: rgba(223, 179, 87, 0.08);
+  border-color: color-mix(in srgb, var(--warning) 32%, transparent);
+  background: color-mix(in srgb, var(--warning) 8%, transparent);
 }
 
 /* ── 头部信息条 ── */
@@ -520,7 +520,7 @@ watch(corridorId, async () => {
   display: grid;
   gap: 6px;
   padding: 12px 13px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--line-default);
   background: linear-gradient(180deg, var(--surface-2), var(--surface-1));
 }
@@ -534,7 +534,7 @@ watch(corridorId, async () => {
 
 .route-od {
   padding: 2px 9px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--accent-soft);
   background: var(--accent-soft);
   color: var(--accent-hover);
@@ -544,7 +544,7 @@ watch(corridorId, async () => {
 
 .route-chip {
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--line-hairline);
   color: var(--text-3);
   font-size: 11px;
@@ -566,9 +566,9 @@ watch(corridorId, async () => {
 
 .route-rank-badge {
   padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid rgba(223, 179, 87, 0.32);
-  background: rgba(223, 179, 87, 0.1);
+  border-radius: var(--radius-full);
+  border: 1px solid color-mix(in srgb, var(--warning) 32%, transparent);
+  background: color-mix(in srgb, var(--warning) 10%, transparent);
   color: var(--warning);
   font-size: 11px;
 }
@@ -582,7 +582,7 @@ watch(corridorId, async () => {
 
 /* ── 小地图 ── */
 .route-map-card {
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--line-default);
   background: var(--surface-sunken);
@@ -618,7 +618,7 @@ watch(corridorId, async () => {
 
 .route-btn {
   padding: 9px 16px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   border: 1px solid transparent;
   font-size: 13px;
   font-weight: 600;
@@ -664,7 +664,7 @@ watch(corridorId, async () => {
 
 .route-group {
   padding: 10px 11px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--line-hairline);
   background: var(--surface-2);
 }
@@ -674,7 +674,7 @@ watch(corridorId, async () => {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12.5px;
+  font-size: var(--fs-cap);
   font-weight: 700;
   color: var(--text-2);
 }
@@ -682,12 +682,12 @@ watch(corridorId, async () => {
 .route-dot {
   width: 8px;
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--dot, var(--text-3));
 }
 
 .route-group__count {
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
   font-weight: 400;
   color: var(--text-3);
 }
@@ -702,7 +702,7 @@ watch(corridorId, async () => {
 
 .route-spot {
   padding: 8px 9px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: var(--surface-sunken);
   border: 1px solid var(--line-hairline);
 }
@@ -715,7 +715,7 @@ watch(corridorId, async () => {
 }
 
 .route-spot__name {
-  font-size: 12.5px;
+  font-size: var(--fs-cap);
   font-weight: 600;
   color: var(--text-1);
 }
@@ -729,7 +729,7 @@ watch(corridorId, async () => {
 
 .route-spot__intro {
   margin: 3px 0 0;
-  font-size: 11.5px;
+  font-size: var(--fs-micro);
   color: var(--text-3);
   line-height: 1.55;
 }
@@ -739,7 +739,7 @@ watch(corridorId, async () => {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
   color: var(--text-3);
 }
 
@@ -767,7 +767,7 @@ watch(corridorId, async () => {
   align-items: center;
   gap: 4px;
   padding: 2px 7px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--surface-0);
   border: 1px solid var(--line-strong);
   font-size: 11px;
@@ -778,7 +778,7 @@ watch(corridorId, async () => {
 .route-pin__dot {
   width: 7px;
   height: 7px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--accent);
 }
 
@@ -790,7 +790,7 @@ watch(corridorId, async () => {
   display: block;
   width: 9px;
   height: 9px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--dot, var(--text-3));
   box-shadow: 0 0 0 2px var(--surface-1);
 }
@@ -798,7 +798,7 @@ watch(corridorId, async () => {
 .route-iw {
   max-width: 230px;
   padding: 9px 11px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: var(--surface-0);
   border: 1px solid var(--line-default);
   color: var(--text-2);
@@ -806,13 +806,13 @@ watch(corridorId, async () => {
 
 .route-iw__name {
   margin: 0;
-  font-size: 12.5px;
+  font-size: var(--fs-cap);
   font-weight: 700;
 }
 
 .route-iw__meta {
   margin: 3px 0 0;
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
   color: var(--accent-hover);
 }
 
@@ -824,7 +824,7 @@ watch(corridorId, async () => {
 
 .iw-dim {
   padding: 1px 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--dot, var(--text-3));
   color: var(--surface-0);
   font-size: 10px;

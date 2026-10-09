@@ -15,6 +15,15 @@ export const ATLAS_ORIGIN_COLORS = {
 /** 铁路线路描边（与品牌 accent 同色，地图画布用） */
 export const ATLAS_RAIL_STROKE = '#4d9fff';
 
+/** 铁路线路悬停描边（accent-hover 的镜像值，画布取色回退用） */
+export const ATLAS_RAIL_HOVER_STROKE = '#74b2ff';
+
+/** 行程地图：车头光效描边 */
+export const TRIP_GLOW_STROKE = '#e0915a';
+
+/** 行程地图：线路高亮描边 */
+export const TRIP_HIGHLIGHT_STROKE = '#8f7ae8';
+
 /** 未选中线路网络描边（低饱和灰蓝） */
 export const ATLAS_NETWORK_STROKE = '#7a8494';
 

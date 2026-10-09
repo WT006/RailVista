@@ -957,4 +957,10 @@ defineExpose({ compute });
     overflow: hidden;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  .sky-panel,
+  .sky-panel * {
+    transition: none;
+  }
+}
 </style>

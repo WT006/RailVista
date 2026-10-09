@@ -40,7 +40,7 @@ const ASPECT = 1894 / 655;
   line-height: 1;
   user-select: none;
   /* 深色底上白色素材略微加投影，避免纯白在浅色背景上发虚 */
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(var(--elev-1));
 }
 
 .brand-lockup__img {

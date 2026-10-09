@@ -317,7 +317,7 @@ watch(
   gap: 10px;
   width: 100%;
   padding: 12px 14px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--line-default);
   background: var(--surface-1);
   color: var(--text-1);
@@ -328,10 +328,16 @@ watch(
   transition: border-color var(--dur-micro) var(--ease-standard), box-shadow var(--dur-micro) var(--ease-standard);
 }
 
-.dtf-trigger:hover,
 .dtf--open .dtf-trigger {
   border-color: var(--accent-border);
   box-shadow: 0 0 0 1px var(--accent-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dtf-trigger:hover {
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 1px var(--accent-soft);
+  }
 }
 
 .dtf-trigger__text.is-placeholder {
@@ -347,11 +353,11 @@ watch(
 .dtf-panel {
   z-index: 50;
   margin-top: 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--surface-0);
   border: 1px solid var(--line-default);
   box-shadow:
-    0 18px 48px rgba(0, 0, 0, 0.5),
+    var(--elev-3),
     0 0 0 1px var(--accent-soft) inset;
   overflow: hidden;
 }
@@ -451,7 +457,7 @@ watch(
 .dtf:not(.dtf--inline) .dtf-day {
   height: 26px;
   font-size: 11px;
-  border-radius: 5px;
+  border-radius: var(--radius-xs);
 }
 
 .dtf:not(.dtf--inline) .dtf-nav {
@@ -487,7 +493,7 @@ watch(
   width: 26px;
   height: 26px;
   border: 1px solid var(--line-default);
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   background: var(--surface-2);
   color: var(--text-2);
   font-size: 16px;
@@ -495,9 +501,11 @@ watch(
   cursor: pointer;
 }
 
-.dtf-nav:hover {
-  border-color: rgba(56, 189, 248, 0.4);
-  color: var(--accent-hover);
+@media (hover: hover) and (pointer: fine) {
+  .dtf-nav:hover {
+    border-color: var(--accent-border);
+    color: var(--accent-hover);
+  }
 }
 
 .dtf-week {
@@ -528,7 +536,7 @@ watch(
   font-size: 12px;
   font-family: inherit;
   height: 28px;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   cursor: pointer;
 }
 
@@ -615,7 +623,7 @@ watch(
   padding: 4px 0;
   margin: 0;
   border: 1px solid transparent;
-  border-radius: 5px;
+  border-radius: var(--radius-xs);
   background: transparent;
   color: var(--text-3);
   font-size: 12px;
@@ -651,6 +659,11 @@ watch(
 
   .dtf-time-scroll {
     max-height: 108px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dtf-trigger {
+    transition: none;
   }
 }
 </style>

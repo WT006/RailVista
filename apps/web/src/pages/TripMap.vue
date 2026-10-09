@@ -49,6 +49,12 @@ import {
   tripCacheKey,
 } from '../lib/tripCache';
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
+import {
+  ATLAS_RAIL_HOVER_STROKE,
+  ATLAS_RAIL_STROKE,
+  TRIP_GLOW_STROKE,
+  TRIP_HIGHLIGHT_STROKE,
+} from '../data/atlasColors';
 import { readSimulatedProgress, useGeolocation, useNow } from '../composables/useGeolocation';
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import PreciseRoutePanel from '../components/PreciseRoutePanel.vue';
@@ -626,10 +632,10 @@ function readToken(name: string, fallback: string): string {
 }
 
 function railStrokeOptions() {
-  const rail = readToken('--rail', '#4d9fff');
+  const rail = readToken('--rail', ATLAS_RAIL_STROKE);
   // 卫星底图偏亮，提高不透明度并略微提亮，保证线条仍可辨识
   return satelliteOn.value
-    ? { strokeColor: readToken('--accent-hover', '#74b2ff'), strokeOpacity: 0.95 }
+    ? { strokeColor: readToken('--accent-hover', ATLAS_RAIL_HOVER_STROKE), strokeOpacity: 0.95 }
     : { strokeColor: rail, strokeOpacity: 0.85 };
 }
 
@@ -939,7 +945,7 @@ function rebuildSkyOverlay(payload: SkyMapResult | null) {
       const line = new AMapRef.Polyline({
         path: coords,
         // JS 侧无法读 CSS 变量，取 tokens 同值：--spot #e0915a / --purple #8f7ae8
-        strokeColor: isGlow ? '#e0915a' : '#8f7ae8',
+        strokeColor: isGlow ? TRIP_GLOW_STROKE : TRIP_HIGHLIGHT_STROKE,
         strokeWeight: isGlow ? 7 : 6,
         strokeOpacity: 0.92,
         lineJoin: 'round',

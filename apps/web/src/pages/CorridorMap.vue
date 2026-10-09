@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 /**
  * 线路全屏地图 /route/:corridorId/map
  *
@@ -9,6 +9,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api, type AtlasCorridorDetail, type AtlasCorridorSpot } from '../api/client';
 import { findRankingsByCorridor } from '../data/beautifulRailings';
+import { ATLAS_RAIL_HOVER_STROKE, ATLAS_RAIL_STROKE } from '../data/atlasColors';
 import {
   SPOT_DIMENSIONS,
   UNCLASSIFIED_DIMENSION,
@@ -191,9 +192,9 @@ function readToken(name: string, fallback: string): string {
 }
 
 function railStrokeOptions() {
-  const rail = readToken('--rail', '#4d9fff');
+  const rail = readToken('--rail', ATLAS_RAIL_STROKE);
   return satelliteOn.value
-    ? { strokeColor: readToken('--accent-hover', '#74b2ff'), strokeOpacity: 0.95 }
+    ? { strokeColor: readToken('--accent-hover', ATLAS_RAIL_HOVER_STROKE), strokeOpacity: 0.95 }
     : { strokeColor: rail, strokeOpacity: 0.85 };
 }
 
@@ -734,12 +735,12 @@ watch([displayFrom, displayTo], async () => {
   max-height: min(52vh, calc(100vh - 160px));
   display: flex;
   flex-direction: column;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--line-default);
   background: color-mix(in srgb, var(--panel-bg, var(--surface-1)) 96%, transparent);
   backdrop-filter: blur(12px) saturate(1.2);
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--elev-float-strong);
   overflow: hidden;
   pointer-events: auto;
 }
@@ -810,7 +811,7 @@ watch([displayFrom, displayTo], async () => {
   margin: 0 0 2px;
   padding: 8px 8px;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: inherit;
   font: inherit;

@@ -338,11 +338,11 @@ function onCancelClick() {
   border-radius: 16px;
   background: linear-gradient(165deg, var(--surface-1) 0%, var(--surface-0) 100%);
   border: 1px solid var(--accent-soft);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--elev-3);
 }
 
 .rv-loader__card.is-hold {
-  border-color: rgba(223, 179, 87, 0.45);
+  border-color: color-mix(in srgb, var(--warning) 45%, transparent);
 }
 
 .rv-loader__eyebrow {
@@ -365,7 +365,7 @@ function onCancelClick() {
   right: 0;
   top: 24px;
   height: 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--line-default);
   overflow: hidden;
 }
@@ -374,7 +374,7 @@ function onCancelClick() {
   height: 100%;
   width: 100%;
   transform-origin: 0 50%;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 100%);
   transition: transform var(--dur-slow) var(--ease-standard);
 }

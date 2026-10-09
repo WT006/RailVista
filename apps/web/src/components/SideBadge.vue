@@ -128,11 +128,11 @@ const title = computed(() => {
   align-items: center;
   gap: 5px;
   padding: 3px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--side-color);
   background: var(--side-bg);
   color: var(--side-color);
-  font-size: 11.5px;
+  font-size: var(--fs-micro);
   font-weight: 650;
   line-height: 1.3;
   white-space: nowrap;
@@ -225,6 +225,13 @@ const title = computed(() => {
   transition:
     transform var(--dur-fast) var(--ease-overshoot),
     opacity var(--dur-fast) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-flip-enter-active,
+  .side-flip-leave-active {
+    transition: none;
+  }
 }
 
 .side-flip-enter-from {

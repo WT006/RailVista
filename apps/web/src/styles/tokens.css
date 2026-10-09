@@ -286,30 +286,6 @@
   }
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
- * 兼容别名：历史令牌名 → 新语义令牌
- * 供地图页（TripMap / AtlasMap）、线路详情页等未参与本轮重构的模块继续工作。
- * 新代码请勿引用本区块。
- * ══════════════════════════════════════════════════════════════════════════ */
-:root {
-  --bg-base: var(--surface-0);
-  --bg-raised: var(--surface-1);
-  --bg-elevated: var(--surface-2);
-  --bg-inset: var(--surface-sunken);
-  --bg-scrim: var(--surface-scrim);
-
-  --border-hairline: var(--line-hairline);
-  --border-default: var(--line-default);
-  --border-strong: var(--line-strong);
-
-  --text-primary: var(--text-1);
-  --text-secondary: var(--text-2);
-  --text-muted: var(--text-3);
-
-  --accent-container: var(--accent-soft);
-  --success-container: var(--success-soft);
-  --danger-container: var(--danger-soft);
-  --warning-container: var(--warning-soft);
-
-  --ease-out: var(--ease-standard);
-}
+/* （旧令牌兼容别名区已于 2026-10-09 鸿蒙化收敛完成时删除：全仓引用清零。
+   历史名 → 新语义名映射：--bg-*→--surface-*、--border-*→--line-*、
+   --text-primary/secondary/muted→--text-1/2/3、--*-container→--*-soft、--ease-out→--ease-standard） */

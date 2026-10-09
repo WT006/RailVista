@@ -4,6 +4,18 @@ import { enrichStopsCoords, loadStationsGeo } from './geocode.js';
 import { envInt, fetchWithTimeout, HttpTimeoutError, withDeadline } from './http.js';
 import { trainCache } from './trainCache.js';
 import { countMissingCoords, fillLocalCoords, geoVersion } from './stopsLocalGeo.js';
+import { sliceStopsByOdNames } from './stopOdSlice.js';
+
+/** 12306 常回整趟；按请求 OD 裁切并重标 seq/type */
+function clampStopsToOd(stops: Stop[], fromName: string, toName: string): Stop[] {
+  const sliced = sliceStopsByOdNames(stops, fromName, toName);
+  if (!sliced || sliced.length < 2) return stops;
+  return sliced.map((s, idx, arr) => ({
+    ...s,
+    seq: idx + 1,
+    type: idx === 0 ? 'depart' : idx === arr.length - 1 ? 'arrive' : 'stop',
+  }));
+}
 
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
@@ -303,6 +315,7 @@ export class Cr12306Source implements TrainDataSource {
     if (!fromSt || !toSt) throw Object.assign(new Error('车站无法识别'), { code: 'BAD_STATION' });
 
     const cacheKey = `stops:${query.trainNo}:${query.date}:${fromSt.telecode}:${toSt.telecode}`;
+    const toOd = (rows: Stop[]) => clampStopsToOd(rows, query.from, query.to);
 
     // ── 缓存命中且坐标齐全 → 直接返回，不再重跑 enrich（原实现每次都重跑） ──
     const cached = trainCache.getWithAge<Stop[]>(cacheKey);
@@ -311,10 +324,10 @@ export class Cr12306Source implements TrainDataSource {
       const versionChanged = stopsGeoVersion.get(cacheKey) !== geoVersion();
       if (missing === 0 && !versionChanged) {
         logMetric('stops.cacheHit', { key: cacheKey, ms: Date.now() - t0, missing });
-        return cached.value;
+        return toOd(cached.value);
       }
       // 坐标有缺口或坐标库已更新：带最后期限补齐，超时先用旧值
-      const p = enrichStopsCoords(cached.value, { trainCode: query.trainCode });
+      const p = enrichStopsCoords(cached.value, { trainCode: query.trainCode }).then(toOd);
       settleEnrich(p, cacheKey);
       const r = await withDeadline(p, stopsEnrichDeadlineMs());
       logMetric('stops.cacheHitEnrich', {
@@ -323,7 +336,7 @@ export class Cr12306Source implements TrainDataSource {
         missing,
         timedOut: r.timedOut,
       });
-      return r.value ?? cached.value;
+      return r.value ?? toOd(cached.value);
     }
 
     // ── 冷启动：先拿时刻表，坐标补全带最后期限 ──
@@ -340,12 +353,14 @@ export class Cr12306Source implements TrainDataSource {
       throw e;
     }
 
-    const p = enrichStopsCoords(raw, { trainCode: query.trainCode });
+    // 先按 OD 裁切再 enrich/回写，避免后台 settle 把整趟车写回 XNO→LSO 缓存
+    const rawOd = toOd(raw);
+    const p = enrichStopsCoords(rawOd, { trainCode: query.trainCode }).then(toOd);
     settleEnrich(p, cacheKey);
     const r = await withDeadline(p, stopsEnrichDeadlineMs());
 
     // 超时降级：先用本地坐标库能填的填上，远程补点继续在后台跑并回写缓存
-    const final = r.value ?? fillLocalCoords(raw).rows;
+    const final = r.value ?? toOd(fillLocalCoords(rawOd).rows);
     trainCache.set(cacheKey, final, stopsTtlSec(final));
     stopsGeoVersion.set(cacheKey, geoVersion());
     logMetric('stops.fetch', {
@@ -458,10 +473,12 @@ export class Cr12306Source implements TrainDataSource {
     if (!fromSt || !toSt) throw Object.assign(new Error('车站无法识别'), { code: 'BAD_STATION' });
 
     const cacheKey = `stops:${query.trainNo}:${query.date}:${fromSt.telecode}:${toSt.telecode}`;
+    const toOd = (rows: Stop[]) => clampStopsToOd(rows, query.from, query.to);
     const cached = trainCache.getWithAge<Stop[]>(cacheKey);
-    const base =
-      cached?.value ?? (await this.fetchStopsBase(query, fromSt.telecode, toSt.telecode));
-    const enriched = await enrichStopsCoords(base, { trainCode: query.trainCode });
+    const base = toOd(
+      cached?.value ?? (await this.fetchStopsBase(query, fromSt.telecode, toSt.telecode)),
+    );
+    const enriched = toOd(await enrichStopsCoords(base, { trainCode: query.trainCode }));
     trainCache.set(cacheKey, enriched, stopsTtlSec(enriched));
     stopsGeoVersion.set(cacheKey, geoVersion());
     logMetric('stops.enrichNow', {

@@ -229,10 +229,10 @@ watch(state, (next, prev) => {
     </p>
 
     <div v-if="!showProgress && (state !== 'done' || expanded)" class="precise-panel__body">
-      <p class="precise-panel__desc">
+      <!-- failed：错误已在标题，不再重复小字 -->
+      <p v-if="state !== 'failed'" class="precise-panel__desc">
         <template v-if="state === 'done'">{{ summary }}</template>
         <template v-else-if="state === 'partial'">{{ summary }} · 缺口为示意线</template>
-        <template v-else-if="state === 'failed'">{{ trip.preciseError || '可稍后重试' }}</template>
         <template v-else>{{ trip.polylineHint }}</template>
       </p>
 

@@ -125,7 +125,10 @@ export type AtlasOverviewData = {
     corridorCount: number;
     spotCount: number;
     roadCorridorCount: number;
+    /** 图集落图数量（已滤测绘噪音） */
     roadSpotCount: number;
+    /** 公路原生库总量 */
+    roadSpotLibraryCount?: number;
     roadMigratedExcluded: number;
     generatedAt: string;
     buildMs: number;
@@ -264,6 +267,7 @@ export const api = {
       meta: {
         roadCorridorCount: number;
         roadSpotCount: number;
+        roadSpotLibraryCount?: number;
         roadMigratedExcluded: number;
         generatedAt: string;
       };

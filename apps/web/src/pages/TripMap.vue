@@ -1384,11 +1384,11 @@ onUnmounted(() => {
           @click="prefs.setLayer(layer, !prefs.layers[layer])"
         >
           <i :class="layer" aria-hidden="true" />
-          {{
+          <span>{{
             { rail: '示意铁路', station: '经停站', spot: '风景', train: '列车估算', gps: '手机 GPS' }[
               layer
             ]
-          }}
+          }}</span>
         </button>
         <div v-if="legendOpen" class="legend-side">
           <span class="legend-side__title">车窗方位徽标（点开景点可见）</span>

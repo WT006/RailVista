@@ -13,7 +13,15 @@
  */
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { projectToRoute, type AlongSpot, type RoadChapter, type RoadRoute } from '@railvista/shared';
+import {
+  buildChapterVisualScale,
+  kmToVisualPct,
+  projectToRoute,
+  visualPctToKm,
+  type AlongSpot,
+  type RoadChapter,
+  type RoadRoute,
+} from '@railvista/shared';
 import { api } from '../api/client';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import { useGeolocation } from '../composables/useGeolocation';
@@ -303,10 +311,13 @@ const chaptersExpanded = ref(false);
 const gpsFollowing = ref(false);
 
 const progressKm = computed(() => progress.value * spanKm.value);
-const progressPct = computed(() => {
-  if (!spanKm.value) return 0;
-  return Math.min(100, (progressKm.value / spanKm.value) * 100);
-});
+
+/** 混合视觉刻度：短段保底可见，长段仍更宽；真实公里逻辑不变 */
+const chapterVisualScale = computed(() =>
+  buildChapterVisualScale(chapters.value, spanKm.value),
+);
+
+const progressPct = computed(() => kmToVisualPct(chapterVisualScale.value, progressKm.value));
 
 const activeChapterIndex = computed(() => {
   const km = progressKm.value;
@@ -380,15 +391,12 @@ function aheadText(s: AlongSpot): string {
   return `${d.toFixed(1)} 公里`;
 }
 
-function chapterLeftPct(ch: RoadChapter): number {
-  if (!spanKm.value) return 0;
-  return Math.max(0, Math.min(100, (ch.fromKm / spanKm.value) * 100));
+function chapterLeftPct(ch: RoadChapter, index: number): number {
+  return chapterVisualScale.value.slices[index]?.leftPct ?? 0;
 }
 
-function chapterWidthPct(ch: RoadChapter): number {
-  if (!spanKm.value) return 0;
-  const w = ((ch.toKm - ch.fromKm) / spanKm.value) * 100;
-  return Math.max(0.8, Math.min(100 - chapterLeftPct(ch), w));
+function chapterWidthPct(_ch: RoadChapter, index: number): number {
+  return chapterVisualScale.value.slices[index]?.widthPct ?? 0;
 }
 
 function spotsInChapter(ch: RoadChapter): number {
@@ -409,14 +417,26 @@ function jumpToChapter(index: number) {
 function jumpToProgress(event: MouseEvent) {
   const track = event.currentTarget as HTMLElement;
   const rect = track.getBoundingClientRect();
-  const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+  const visualRatio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
   gpsFollowing.value = false;
-  progress.value = ratio;
+  if (!spanKm.value) {
+    progress.value = visualRatio;
+    return;
+  }
+  const km = visualPctToKm(chapterVisualScale.value, visualRatio * 100);
+  progress.value = Math.max(0, Math.min(1, km / spanKm.value));
 }
 
-function nudgeProgress(delta: number) {
+/** 键盘微调：按视觉 1% 步进，短段上更好点到 */
+function nudgeProgress(visualDelta: number) {
   gpsFollowing.value = false;
-  progress.value = Math.max(0, Math.min(1, progress.value + delta));
+  if (!spanKm.value) {
+    progress.value = Math.max(0, Math.min(1, progress.value + visualDelta));
+    return;
+  }
+  const nextPct = Math.max(0, Math.min(100, progressPct.value + visualDelta * 100));
+  const km = visualPctToKm(chapterVisualScale.value, nextPct);
+  progress.value = Math.max(0, Math.min(1, km / spanKm.value));
 }
 
 // 有定位时静默推进进度（无独立「我在哪」面板）
@@ -511,7 +531,7 @@ watch(gps, (sample) => {
                       :key="'seg-' + i"
                       class="drive-chprog__segment"
                       :class="{ 'is-done': i < activeChapterIndex, 'is-current': i === activeChapterIndex }"
-                      :style="{ left: chapterLeftPct(ch) + '%', width: chapterWidthPct(ch) + '%' }"
+                      :style="{ left: chapterLeftPct(ch, i) + '%', width: chapterWidthPct(ch, i) + '%' }"
                     />
                   </div>
                   <div class="drive-chprog__fill" :style="{ width: progressPct + '%' }" />

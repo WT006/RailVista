@@ -355,7 +355,7 @@ onMounted(async () => {
 }
 
 .rd-state--error {
-  color: #ff8f8f;
+  color: var(--danger);
 }
 
 .rd-crumb {
@@ -523,11 +523,15 @@ onMounted(async () => {
   font-size: var(--fs-meta);
   white-space: nowrap;
   cursor: pointer;
-  transition: all var(--dur-fast) var(--ease-standard);
+  transition:
+    background var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard);
 }
 
-.rd-tab:hover {
-  color: var(--text-1);
+@media (hover: hover) and (pointer: fine) {
+  .rd-tab:hover {
+    color: var(--text-1);
+  }
 }
 
 .rd-tab.on {
@@ -580,13 +584,14 @@ onMounted(async () => {
   color: var(--text-2);
 }
 
-.rd-note {
-  margin-top: var(--space-2) !important;
-  color: var(--text-3) !important;
+/* 说明行：靠双类提升特异性，替代强制覆盖声明（与 .rd-info-card p 竞争） */
+.rd-info-card .rd-note {
+  margin-top: var(--space-2);
+  color: var(--text-3);
 }
 
-.rd-note--warn {
-  color: #ffb84d !important;
+.rd-info-card .rd-note--warn {
+  color: var(--warning);
 }
 
 .rd-mini-list {
@@ -689,8 +694,8 @@ onMounted(async () => {
 }
 
 .rd-class--pending {
-  border-color: rgba(255, 184, 77, 0.4);
-  color: #ffb84d;
+  border-color: color-mix(in srgb, var(--warning) 40%, transparent);
+  color: var(--warning);
 }
 
 .rd-seg-note {
@@ -702,7 +707,7 @@ onMounted(async () => {
 
 .rd-seg-note--warn {
   margin-top: var(--space-1);
-  color: #ffb84d;
+  color: var(--warning);
 }
 
 .rd-seg-pois {
@@ -832,8 +837,8 @@ onMounted(async () => {
 }
 
 .rd-level {
-  border-color: rgba(255, 184, 77, 0.4);
-  color: #ffb84d;
+  border-color: color-mix(in srgb, var(--warning) 40%, transparent);
+  color: var(--warning);
 }
 
 .rd-spot-tagline {
@@ -902,9 +907,9 @@ onMounted(async () => {
 .rd-sources {
   margin-top: var(--space-4);
   padding: var(--space-4);
-  border: 1px solid rgba(255, 184, 77, 0.3);
+  border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
   border-radius: var(--radius-md);
-  background: rgba(255, 184, 77, 0.06);
+  background: color-mix(in srgb, var(--warning) 6%, transparent);
 }
 
 .rd-sources {
@@ -959,7 +964,7 @@ onMounted(async () => {
   border-color: var(--line-strong);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599px) {
   .rd-prac-row {
     grid-template-columns: 1fr;
     gap: var(--space-1);
@@ -967,6 +972,30 @@ onMounted(async () => {
 
   .rd-metric {
     flex: 1 1 40%;
+  }
+}
+
+/* 同层级页签切换：内容轻量淡入（交叉淡入的轻量落法，快速响应档） */
+@media (prefers-reduced-motion: no-preference) {
+  .rd-section {
+    animation: rd-fade-in var(--dur-micro) var(--ease-standard);
+  }
+}
+
+@keyframes rd-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rd-tab {
+    transition: none;
   }
 }
 </style>

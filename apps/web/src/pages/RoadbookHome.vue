@@ -428,9 +428,11 @@ function seasonText(months: number[]): string {
 }
 
 .rb-chip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
+  min-height: 36px;
   padding: 6px var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-full);
@@ -445,13 +447,27 @@ function seasonText(months: number[]): string {
 }
 
 .rb-chip.sm {
+  min-height: 32px;
   padding: 4px var(--space-3);
   font-size: var(--fs-cap);
 }
 
-.rb-chip:hover {
-  color: var(--text-1);
-  border-color: var(--line-strong);
+/* 触控命中区扩展：≥44×44（视觉尺寸保持紧凑） */
+.rb-chip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--hit-min));
+  height: max(100%, var(--hit-min));
+  transform: translate(-50%, -50%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rb-chip:hover {
+    color: var(--text-1);
+    border-color: var(--line-strong);
+  }
 }
 
 .rb-chip.on {
@@ -485,7 +501,7 @@ function seasonText(months: number[]): string {
 
 .rb-input {
   flex: 1 1 260px;
-  min-height: 40px;
+  min-height: 46px;
   padding: 0 var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-sm);
@@ -500,7 +516,7 @@ function seasonText(months: number[]): string {
 
 .rb-select,
 .rb-reset {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-sm);
@@ -510,9 +526,11 @@ function seasonText(months: number[]): string {
   cursor: pointer;
 }
 
-.rb-reset:hover {
-  color: var(--text-1);
-  border-color: var(--line-strong);
+@media (hover: hover) and (pointer: fine) {
+  .rb-reset:hover {
+    color: var(--text-1);
+    border-color: var(--line-strong);
+  }
 }
 
 .rb-result-head {
@@ -541,7 +559,7 @@ function seasonText(months: number[]): string {
 }
 
 .rb-empty--error {
-  color: #ff8f8f;
+  color: var(--danger);
 }
 
 /* ── 路线卡片 ─────────────────────────────────────────────────────────── */
@@ -566,9 +584,11 @@ function seasonText(months: number[]): string {
     transform var(--dur-base) var(--ease-standard);
 }
 
-.rb-card:hover {
-  border-color: var(--accent-border);
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .rb-card:hover {
+    border-color: var(--accent-border);
+    transform: translateY(-2px);
+  }
 }
 
 .rb-card-title {
@@ -688,13 +708,21 @@ function seasonText(months: number[]): string {
   color: var(--accent);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599px) {
   .rb-grid {
     grid-template-columns: 1fr;
   }
 
   .rb-input {
     flex-basis: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-chip,
+  .rb-card,
+  .rb-reset {
+    transition: none;
   }
 }
 </style>

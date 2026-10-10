@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.8.0`**（2026-10-08）
+**当前版本：`0.9.0`**（2026-10-09）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -26,6 +26,71 @@
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
 
 ---
+
+## [0.9.0] — 2026-10-09
+
+**全站鸿蒙化设计规范收敛：导航体系重构（底部页签图标化 + 侧边 Tab）、设计令牌升级、四大模块与标杆页统一整改，机械扫描全仓清零。**
+
+动机：铁路线模块此前已按 HarmonyOS 设计规范完成改造，但后续补充的自驾 / 全国地图 /
+旅行纪念票 / 旅行路书四个模块未走同一套规范，出现多套并存的视觉与交互语言（旧令牌别名、
+非标圆角 / 字号 / 断点、金色交互层、触摸目标不足、缺降级守卫等）。本轮依据 HarmonyOS
+官方规范（色彩 / 文本排版 / 沉浸光感 / 圆角参数 / 布局基础 / 响应式应用架构 / 组件概览 /
+底部页签，及《引力动效体系》转场规范；经 HarmonyOS Developer Knowledge MCP 检索校验）做全站收敛。
+
+### 导航（《底部页签》+《响应式应用架构》）
+- 底部页签（<840px）：24vp 图标 + 文字、选中品牌高亮 + 弹跳动效（BounceSymbolEffect 等效）、
+  点击当前页签回滚页顶、56vp 高度 + 安全区、上缘分割线 + 16vp 渐变蒙层；中置运营项保持胶囊形态
+- 新增侧边 Tab（≥840px）：继承底部页签导航项；顶栏导航链接下线（AppNavLinks 删除）；
+  全屏地图页浮层与文档流页面统一让出 `--sidenav-w`
+
+### 设计令牌（tokens.css）
+- 新增：交互态（--interactive-hover / pressed，官方 5% / 10% 白）、焦点环 --focus-ring、
+  命中区 --hit-min、材质高光（--glow-* / --sheen-band）、chrome 玻璃、地图浮层阴影
+  （--elev-float* / --elev-up / --pin-shadow / --pin-rim / --surface-lift）、地图标注字号
+  （--fs-annot*）、氛围脉冲 --dur-pulse、地图标注强调（--map-amber* / --map-heat）、
+  纪念票主题金（--ticket-gold*）
+- 栅格 margins 对齐 16 / 24 / 32；底栏高度 68 → 56；断点收敛（系统档 600 / 840 / 1200，
+  细调档白名单 380 / 480 / 560 / 960），消除 640 / 641 / 720 / 721 / 839 等非标断点
+- **旧令牌兼容别名区删除**（全仓引用清零）；新语义名映射留注释备查
+- 数据语义色板集中到 data/（新增 trainColors.ts、atlasColors.ts）；票面印刷层、装饰艺术层、
+  领奖台金属色为显式声明的例外层（扫描器同步识别）
+
+### 模块整改
+- 自驾：drive.css 54 → 0（硬编码色 / 圆角 / 字号 / 时长全清），15 处悬停包裹 + 触控命中补齐，
+  DriveRoad.vue 死页与死规则删除（-1325 行）
+- 全国地图：AtlasMap 134 → 0、map.css 284 → 0；死代码（.atlas-top / .atlas-toggle /
+  .atlas-side / .route-dot）清理；玻璃分档与顶部偏移对齐；"筛选・榜单" 移动端入口与底栏关系理顺
+- 旅行纪念票：hm/* 五控件升级 v2 统一控件基座（令牌 + 三态 + role/aria/键盘 + 命中区 + 降级），
+  构建器金色交互层回退品牌令牌，触摸目标 34 / 38 / 42px → 44 / 46px，window.alert → 页内提示条
+- 旅行路书：令牌清零、页签转场淡入、触控命中、断点 640 → 599
+- 标杆补齐：RouteDetail / CorridorMap / SelectTrip / DarkDateTimeField / RailProgressLoader /
+  SideBadge / SpotApproachCard / BrandLogo 机械项清零
+
+### 可达性与动效
+- 全局 :focus-visible 焦点环；:hover 均包 (hover:hover) and (pointer:fine)
+- 无限 / 氛围动画统一 --dur-pulse（1600ms）并全部带 reduced-motion 就地守卫；
+  useScrollReveal / useRoadDraw 增加运行时降级
+
+### 验证
+- `pnpm --filter @railvista/web exec vue-tsc --noEmit`：0 错误
+- `pnpm build`：全仓通过；前端 gzip：CSS 39.54 KB / JS 575.01 KB（基线 39.63 / 573.73，持平）
+- `pnpm --filter @railvista/api test`：78 用例 69 过、9 失败；失败集与本次改造前基线完全一致
+  （corridors ×8 + scenicSpots ×1，属既有失败，与本次改动无关）
+- 机械扫描（tmp/harmonyos-audit-scan.mjs）：63 文件 **0 发现**（11 个声明例外层单列）
+- ui-probe（headless Edge）390 / 768 / 839 / 840 / 1440 多档实测首页、自驾、自驾行程、
+  全国地图、走廊地图、纪念票、旅行路书、线路详情：导航切换与浮层避让均正常
+
+### 涉及文件（主要）
+- 外壳与导航：App.vue、AppTopBar、AppBottomNav、AppSideNav（新）、navIcons.ts（新）
+- 令牌：tokens.css、base.css、AtlasEntryCard、SpotApproachCard、DarkDateTimeField 等
+- 模块：drive.css、map.css、AtlasMap、ticket/hm/*、RoadbookHome/Detail、RouteDetail 等
+- 数据色板：trainColors.ts（新）、atlasColors.ts（新）、roadColors.ts（+ROAD_SHADOW_STROKE）
+
+### 已知限制 / 回滚
+- 天空之旅（SkyJourneyPanel 等 WIP）不在本轮范围（仅同步令牌别名迁移与降级守卫）
+- 票面印刷层等例外层有意保留印刷 / 艺术观感，不套用界面令牌
+- 屏幕阅读器与真机触控本次未实测（无对应环境），建议后续真机复测
+- 回滚：逐笔 `git revert` 对应提交即可；令牌均为新增语义（无删除语义），无数据迁移
 
 ## [0.8.0] — 2026-10-08
 

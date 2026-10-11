@@ -9,7 +9,7 @@
  * 纪律（与 driveRoutes.ts 一致）：列表只读 _index.json，详情按 id 读单文件，
  * 禁止运行时目录遍历。
  */
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { RankingBoard, RankingBoardSummary, RankingItem } from '@railvista/shared';
@@ -30,9 +30,11 @@ function readBoardsIndex(): BoardsIndex {
   const path = join(BOARDS_DIR, '_index.json');
   if (!existsSync(path)) return { version: 1, updated: '', boards: [] };
   try {
-    if (indexCache) return indexCache.index;
+    // mtime 指纹缓存：数据文件更新自动重载（与 roadNetwork L0 纪律一致）
+    const mtime = statSync(path).mtimeMs;
+    if (indexCache && indexCache.mtime === mtime) return indexCache.index;
     const index = JSON.parse(readFileSync(path, 'utf8')) as BoardsIndex;
-    indexCache = { mtime: 0, index };
+    indexCache = { mtime, index };
     return index;
   } catch {
     return { version: 1, updated: '', boards: [] };

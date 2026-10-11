@@ -2,18 +2,23 @@
 /**
  * 万里路书 · 单个榜单页（PRD §7.3）。
  *
- * 榜单头（来源徽标 + 发布单位 + 年份）+ 条目列表（名次 · 名称 · 途经省 · 里程 · 标签）。
+ * 两种渲染：
+ *   - 通用平铺（其余榜单）：名次 · 名称 · 途经省 · 里程 · 标签。
+ *   - 分板块杂志式（board.groups 存在时，目前仅 CNG 最美公路触发）：
+ *     CNG 徽标横幅 + 地貌板块「第一名/第二名/第三名」领奖台 + 长线致敬 + 极致公路网格。
+ *
  * 「看沿程景点」→ /drive/trip（C2 整条公路入口；无几何时 C1 OD 兜底），
- * 复用主功能代码——榜单没有自己的渲染逻辑。
+ * 复用主功能代码——榜单没有自己的渲染逻辑（条目卡见 BoardItemCard）。
  */
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from '../api/client';
 import DriveSubNav from '../components/DriveSubNav.vue';
+import BoardItemCard from '../components/rankings/BoardItemCard.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 
 usePointerSpotlight();
-import type { RankingBoard, RankingItem } from '@railvista/shared';
+import type { RankingBoard, RankingBoardGroup } from '@railvista/shared';
 
 const route = useRoute();
 const boardId = String(route.params.boardId ?? '');
@@ -30,27 +35,68 @@ const LEVEL_LABEL: Record<string, string> = {
   international: '国际榜',
 };
 
-/**
- * B3：原兜底对「无 roadKeys / 无 routeId」的条目用 province 首尾兜底，
- * 22/33 个条目 roadKeys 为空且无 fromPlace/toPlace，同省条目会得到 from === to，
- * 规划出 lengthKm≈0 的空路线，点进去必然「加载失败」或空结果。
- * 现在校验 from !== to，相同则返回 null，由模板显示「暂无 OD 数据」并禁用跳转。
- */
-function alongHref(item: RankingItem, hasGeom: boolean): string | null {
-  if (hasGeom && item.roadKeys.length) {
-    return `/drive/trip?road=${encodeURIComponent(item.roadKeys[0]!)}`;
-  }
-  if (item.routeId) {
-    return `/drive/trip?route=${encodeURIComponent(item.routeId)}`;
-  }
-  const from = item.fromPlace ?? item.province[0] ?? '';
-  const to = item.toPlace ?? item.province[item.province.length - 1] ?? '';
-  if (!from || !to || from === to) return null;
-  return `/drive/trip?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+interface BoardRow {
+  item: RankingBoard['items'][number];
+  hasGeom: boolean;
 }
 
-function roadbookHref(item: RankingItem): string | null {
-  return item.routeId ? `/drive/roadbook/${encodeURIComponent(item.routeId)}` : null;
+interface BoardSection {
+  key: string;
+  index: string;
+  title: string;
+  description?: string;
+  kind: NonNullable<RankingBoardGroup['kind']> | 'flat';
+  rows: BoardRow[];
+}
+
+const rows = computed<BoardRow[]>(() =>
+  (board.value?.items ?? []).map((item, i) => ({ item, hasGeom: geomAvailable.value[i] ?? false })),
+);
+
+/**
+ * 分板块：items 平铺数据不动（alsoIn / geomAvailable 按下标配对），
+ * 只按 item.group 归拢进 board.groups 的展示顺序；无法归类的条目兜底进
+ * 「其他条目」，避免静默丢条目。
+ */
+const groupedSections = computed<BoardSection[]>(() => {
+  const b = board.value;
+  if (!b?.groups?.length) return [];
+  const byGroup = new Map<string, BoardRow[]>();
+  for (const row of rows.value) {
+    const key = row.item.group && b.groups.some((g) => g.key === row.item.group) ? row.item.group : '';
+    const list = byGroup.get(key) ?? [];
+    list.push(row);
+    byGroup.set(key, list);
+  }
+  const sections: BoardSection[] = b.groups.map((g, i) => ({
+    key: g.key,
+    index: String(i + 1).padStart(2, '0'),
+    title: g.title,
+    description: g.description,
+    kind: g.kind ?? 'terrain',
+    rows: byGroup.get(g.key) ?? [],
+  }));
+  const orphans = byGroup.get('');
+  if (orphans?.length) {
+    sections.push({ key: 'flat-rest', index: '', title: '其他条目', kind: 'flat', rows: orphans });
+  }
+  return sections;
+});
+
+const terrainGroups = computed(() => groupedSections.value.filter((s) => s.kind === 'terrain'));
+
+function shortTerrain(title: string): string {
+  return title.replace('区域最美公路', '');
+}
+
+const CN_RANK = ['第一名', '第二名', '第三名', '第四名', '第五名'];
+
+function cnRank(rank: number): string {
+  return CN_RANK[rank - 1] ?? `第${rank}名`;
+}
+
+function rankClass(rank: number): string | undefined {
+  return rank >= 1 && rank <= 3 ? `is-rank-${rank}` : undefined;
 }
 
 onMounted(async () => {
@@ -92,63 +138,77 @@ onMounted(async () => {
             <h1>{{ board.title }}</h1>
           </DriveSubNav>
           <p v-if="board.subtitle" class="sub">{{ board.subtitle }}</p>
+
+          <!-- CNG 杂志横幅：复刻《中国最美公路》增刊「G TOP 3」扉页版式 -->
+          <div v-if="groupedSections.length" class="cng-banner rv-card" data-spotlight>
+            <div class="cng-banner__brand">
+              <span class="cng-banner__mark" aria-hidden="true">C</span>
+              <span class="cng-banner__brandname">中国国家地理<i>CHINESE NATIONAL GEOGRAPHY</i></span>
+            </div>
+            <div class="cng-banner__title">
+              <span class="cng-banner__top">TOP 3</span>
+              <span class="cng-banner__en">THE MOST BEAUTIFUL HIGHWAYS IN CHINA</span>
+              <span class="cng-banner__cn">中国最美公路 · 榜单</span>
+            </div>
+            <ul class="cng-banner__terrains" aria-label="十大地貌区域">
+              <li v-for="g in terrainGroups" :key="g.key">{{ shortTerrain(g.title) }}</li>
+            </ul>
+          </div>
         </header>
 
-        <section class="drive-board-items">
-          <article v-for="(item, i) in board.items" :key="`${item.rank}-${item.name}`" class="drive-board-item rv-card" data-spotlight>
-            <div class="drive-board-item__head">
-              <span class="drive-board-item__rank">{{ item.rank }}</span>
-              <span class="drive-board-item__name">{{ item.name }}</span>
-              <span v-if="item.lengthKm" class="drive-board-item__km">约 {{ item.lengthKm }} km</span>
+        <!-- 分板块杂志式布局（CNG 最美公路：10 类地貌 × TOP3 + 致敬长线 + 极致公路） -->
+        <template v-if="groupedSections.length">
+          <section
+            v-for="sec in groupedSections"
+            :key="sec.key"
+            class="cng-section"
+            :class="`is-${sec.kind}`"
+          >
+            <header class="cng-section__head">
+              <span v-if="sec.index" class="cng-section__index" aria-hidden="true">{{ sec.index }}</span>
+              <div class="cng-section__titles">
+                <h2>{{ sec.title }}</h2>
+                <p v-if="sec.description">{{ sec.description }}</p>
+              </div>
+            </header>
+            <!-- 极致公路：无名次，双列卡片网格 -->
+            <div v-if="sec.kind === 'extreme'" class="cng-grid">
+              <BoardItemCard
+                v-for="row in sec.rows"
+                :key="`${row.item.rank}-${row.item.name}`"
+                class="cng-tile"
+                :item="row.item"
+                :has-geom="row.hasGeom"
+                :board-level="board.level"
+                :show-rank="false"
+              />
             </div>
-            <div class="drive-board-item__meta">
-              <span v-if="item.province.length">{{ item.province.join(' · ') }}</span>
-              <span v-if="item.highlight" class="drive-board-item__highlight">{{ item.highlight }}</span>
+            <!-- 地貌板块 / 长线致敬：领奖台行 -->
+            <div v-else class="cng-list">
+              <BoardItemCard
+                v-for="row in sec.rows"
+                :key="`${row.item.rank}-${row.item.name}`"
+                class="cng-row"
+                :class="sec.kind === 'terrain' ? rankClass(row.item.rank) : undefined"
+                :item="row.item"
+                :has-geom="row.hasGeom"
+                :board-level="board.level"
+                :show-rank="sec.kind === 'terrain'"
+                :rank-text="sec.kind === 'terrain' ? cnRank(row.item.rank) : undefined"
+              />
             </div>
-            <div v-if="item.tags?.length" class="drive-board-item__tags">
-              <span v-for="t in item.tags" :key="t" class="drive-tag">{{ t }}</span>
-            </div>
-            <div class="drive-board-item__actions">
-              <router-link
-                v-if="alongHref(item, geomAvailable[i] ?? false)"
-                class="btn primary btn-sm"
-                :to="alongHref(item, geomAvailable[i] ?? false)!"
-              >
-                看沿程景点 →
-              </router-link>
-              <!-- B3：无可用 OD（from===to 或全空）时禁用跳转并说明原因 -->
-              <span
-                v-else
-                class="btn ghost btn-sm is-disabled"
-                :title="board.level === 'international'
-                  ? '海外路线暂不支持查看沿程景点，本产品路网覆盖中国公路'
-                  : '该条目尚未关联公路编号，也没有起终点数据，暂时无法查看沿程景点'"
-              >
-                {{ board.level === 'international' ? '海外路线 · 仅供灵感' : '暂无 OD 数据' }}
-              </span>
-              <router-link
-                v-if="roadbookHref(item)"
-                class="btn ghost btn-sm"
-                :to="roadbookHref(item)!"
-              >
-                深度路书
-              </router-link>
-              <span
-                v-if="item.roadKeys.length && !geomAvailable[i]"
-                class="drive-board-item__hint"
-                :title="`${item.roadKeys.join(' / ')} 几何待抓取，按起终点规划示意`"
-              >
-                {{ item.roadKeys.join(' / ') }} 几何待补 · OD 示意
-              </span>
-              <span
-                v-if="item.alsoIn?.length"
-                class="drive-board-item__hint"
-                title="同一条路出现在多个榜单（交叉推荐）"
-              >
-                同路上榜：{{ item.alsoIn.length + 1 }} 个榜
-              </span>
-            </div>
-          </article>
+          </section>
+        </template>
+
+        <!-- 通用平铺布局（其余榜单，保持原有渲染） -->
+        <section v-else class="drive-board-items">
+          <BoardItemCard
+            v-for="row in rows"
+            :key="`${row.item.rank}-${row.item.name}`"
+            :item="row.item"
+            :has-geom="row.hasGeom"
+            :board-level="board.level"
+          />
         </section>
 
         <footer class="drive-footnote">

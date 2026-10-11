@@ -878,6 +878,23 @@ export interface RankingItem {
   tags?: string[];
   /** 归属榜单的交叉索引：这条路同时出现在哪些榜 */
   alsoIn?: string[];
+  /**
+   * 分板块展示：值对应 RankingBoard.groups[].key，items 顺序即板块内名次序。
+   * 无 groups 的榜单忽略此字段（平铺渲染，行为与旧版一致）。
+   */
+  group?: string;
+  /** 仅供灵感：库内确定无法沿程展示（如台湾路网），禁用「看沿程景点」跳转 */
+  inspirationOnly?: boolean;
+}
+
+/** 榜单分板块（如 CNG 最美公路的 10 类地貌 × TOP3 + 特别致敬/极致板块） */
+export interface RankingBoardGroup {
+  /** 稳定 key，RankingItem.group 指向它 */
+  key: string;
+  title: string;
+  description?: string;
+  /** terrain=地貌区域 TOP3 领奖台 / tribute=长线致敬 / extreme=极致公路网格 */
+  kind?: 'terrain' | 'tribute' | 'extreme';
 }
 
 /** 统一榜单模型（一个 schema 装下所有榜单，加新榜单 = 加一个 JSON，零代码） */
@@ -895,6 +912,11 @@ export interface RankingBoard {
   cover?: string;
   itemCount: number;
   items: RankingItem[];
+  /**
+   * 分板块元数据（可选；items 保持平铺、顺序 = 展示顺序）。
+   * 有值时 DriveBoard 渲染分板块杂志式布局；无值走通用平铺布局。
+   */
+  groups?: RankingBoardGroup[];
 }
 
 /** 榜单摘要（列表页用，不含 items） */

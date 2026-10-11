@@ -3904,3 +3904,209 @@
     animation: none;
   }
 }
+
+/* ══════════════ CNG「中国最美公路」分板块杂志版式（DriveBoard，board.groups 存在时触发）
+ * 版式参照《中国国家地理·中国最美公路》增刊扉页：C 标 + TOP 3 大字 + 十大地貌领奖台列表。
+ * 配色按 HarmonyOS NEXT 色彩规范（developer.huawei.com 色彩 token）走系统语义令牌：
+ * 品牌色宇宙蓝 --accent 做高亮，中性灰阶分层，琥珀 --warning 做第三名功能色。 */
+
+.cng-banner {
+  margin-top: var(--space-4);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  display: grid;
+  gap: var(--space-4);
+  border: 1px solid var(--line-strong);
+  background:
+    radial-gradient(120% 90% at 88% -10%, var(--accent-soft), transparent 55%),
+    var(--surface-1);
+}
+
+.cng-banner__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cng-banner__mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cng-banner__brandname {
+  display: grid;
+  gap: 2px;
+  font-size: var(--fs-cap);
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: var(--lh-tight);
+}
+
+.cng-banner__brandname i {
+  font-style: normal;
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--text-3);
+}
+
+.cng-banner__title {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.cng-banner__top {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--accent-hover);
+}
+
+.cng-banner__en {
+  font-family: var(--font-display);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--text-2);
+}
+
+.cng-banner__cn {
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.cng-banner__terrains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cng-banner__terrains li {
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-strong);
+  background: var(--fill-subtle);
+  font-size: var(--fs-micro);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.cng-section {
+  margin-top: var(--space-6);
+}
+
+.cng-section__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.cng-section__index {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-hover);
+}
+
+.cng-section__titles {
+  display: grid;
+  gap: 2px;
+}
+
+.cng-section__titles h2 {
+  margin: 0;
+  font-size: var(--fs-h1);
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.cng-section__titles p {
+  margin: 0;
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+}
+
+.cng-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* 领奖台行：第一名宇宙蓝高亮（HarmonyOS 高亮语义），二、三名中性/琥珀弱化 */
+.cng-row .drive-board-item__rank {
+  min-width: 4.2em;
+  font-size: var(--fs-h3);
+  letter-spacing: 0.04em;
+}
+
+.cng-row.is-rank-1 {
+  border-color: var(--line-accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.cng-row.is-rank-1 .drive-board-item__rank {
+  color: var(--accent-hover);
+}
+
+.cng-row.is-rank-2 .drive-board-item__rank {
+  color: var(--text-2);
+}
+
+.cng-row.is-rank-3 .drive-board-item__rank {
+  color: var(--warning);
+}
+
+/* 长线致敬：左侧细高亮针脚，弱化名次感 */
+.cng-section.is-tribute .cng-row {
+  box-shadow: inset 3px 0 0 var(--accent-soft);
+}
+
+/* 极致公路：无名次双列网格 */
+.cng-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-3);
+}
+
+.cng-tile .drive-board-item__head {
+  flex-wrap: wrap;
+}
+
+.cng-tile .drive-board-item__name {
+  white-space: normal;
+}
+
+@media (max-width: 599px) {
+  .cng-banner {
+    padding: var(--space-4);
+  }
+
+  .cng-banner__top {
+    font-size: 36px;
+  }
+
+  .cng-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cng-row .drive-board-item__rank {
+    min-width: 3.4em;
+  }
+}
+

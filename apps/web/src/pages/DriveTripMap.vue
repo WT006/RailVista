@@ -24,6 +24,7 @@ import { api } from '../api/client';
 import { useGeolocation } from '../composables/useGeolocation';
 import { escHtml } from '../data/spotDimensions';
 import { DRIVE_TIER_COLORS, ROAD_COLORS, ROAD_SHADOW_STROKE, driveTierColor } from '../data/roadColors';
+import { spotCategoryLabel } from '../data/roadSpotLabels';
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 
 const route = useRoute();
@@ -302,16 +303,7 @@ function kmText(km: number): string {
 }
 
 function categoryLabel(cat: string): string {
-  const [dim, sub] = cat.split('.');
-  const dimLabel: Record<string, string> = {
-    nature: '自然',
-    culture: '人文',
-    engineering: '工程',
-    viewpoint: '观景',
-    experience: '体验',
-    service: '服务',
-  };
-  return `${dimLabel[dim] ?? dim}${sub ? ' · ' + sub : ''}`;
+  return spotCategoryLabel(cat);
 }
 
 function detourText(s: AlongSpot): string {

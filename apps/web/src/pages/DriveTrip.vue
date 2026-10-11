@@ -32,6 +32,7 @@ import { useRoadDraw } from '../composables/useRoadDraw';
 import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
 import { driveTierColor } from '../data/roadColors';
+import { spotCategoryLabel } from '../data/roadSpotLabels';
 import { loadAmap } from '../map/amap';
 
 usePointerSpotlight();
@@ -298,12 +299,7 @@ function kmText(km: number): string {
 }
 
 function categoryLabel(cat: string): string {
-  const [dim, sub] = cat.split('.');
-  const dimLabel: Record<string, string> = {
-    nature: '自然', culture: '人文', engineering: '工程',
-    viewpoint: '观景', experience: '体验', service: '服务',
-  };
-  return `${dimLabel[dim] ?? dim}${sub ? ' · ' + sub : ''}`;
+  return spotCategoryLabel(cat);
 }
 
 // ── 沿程进度跨度 ─────────────────────────────────────────────────────────────

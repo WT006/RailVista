@@ -14,6 +14,7 @@
 import { computed } from 'vue';
 import type { AlongSpot } from '@railvista/shared';
 import { driveTierColor } from '../../data/roadColors';
+import { spotCategoryLabel } from '../../data/roadSpotLabels';
 import RoadSideBadge from './RoadSideBadge.vue';
 
 const props = withDefaults(
@@ -67,26 +68,7 @@ const stayText = computed(() => {
 
 const tierColor = computed(() => driveTierColor(s.value.tier));
 
-const DIM_LABEL: Record<string, string> = {
-  nature: '自然',
-  culture: '人文',
-  engineering: '工程',
-  viewpoint: '观景',
-  experience: '体验',
-  service: '服务',
-};
-
-const categoryLabel = computed(() => {
-  const [dim, sub] = s.value.category.split('.');
-  const SUB_LABEL: Record<string, string> = {
-    mountain: '山地', canyon: '峡谷', glacier: '冰川瀑布', lake: '湖泊河流',
-    wetland: '湿地', forest: '森林', grassland: '草原', desert: '沙漠',
-    'ancient-town': '古镇', village: '村寨', temple: '寺庙道观', heritage: '古迹',
-    red: '红色', ruin: '遗址', landmark: '地标', 'scenic-byway': '沿路风景',
-    'observation-deck': '观景台', 'hot-spring': '温泉',
-  };
-  return `${DIM_LABEL[dim] ?? dim}${sub ? ' · ' + (SUB_LABEL[sub] ?? sub) : ''}`;
-});
+const categoryLabel = computed(() => spotCategoryLabel(s.value.category));
 
 /** 展示标签：数据层已合并分类/资质/keytag，这里只做去重截断 */
 const tags = computed(() => (s.value.tags ?? []).filter(Boolean).slice(0, 4));

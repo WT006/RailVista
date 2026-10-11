@@ -888,6 +888,12 @@
   color: var(--accent-hover);
 }
 
+/* 「可达性」筛选与前面的「分类」筛选是两组不同维度 —— 用虚线边框区分，
+   避免被误读成第七个分类（自然/人文/…/顺路即停）。 */
+.road-kbd__chip.is-reach {
+  border-style: dashed;
+}
+
 .road-kbd__prefixes {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1729,6 +1735,11 @@
   display: grid;
   gap: 2px;
   min-width: 0;
+}
+
+.drive-upcoming__side {
+  margin-top: 3px;
+  justify-self: start;
 }
 
 .drive-upcoming__name {
@@ -3769,6 +3780,54 @@
 
 .drive-map-card__badge.is-vis {
   color: var(--text-3);
+}
+
+/* 方位徽标：不能只靠颜色区分左右，文案里已经带箭头（← / → / ⇅ / ·） */
+.drive-map-card__badge.is-side-left {
+  color: var(--info);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--info) 35%, transparent);
+}
+
+.drive-map-card__badge.is-side-right {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* 在路上（贴线）：确定结论，用正向色而非灰色 */
+.drive-map-card__badge.is-side-both {
+  color: var(--info);
+  background: var(--success-soft);
+  border-color: color-mix(in srgb, var(--info) 35%, transparent);
+}
+
+/* 判不出来：虚线边框，与「在路上」的实线区分 */
+.drive-map-card__badge.is-side-unknown {
+  color: var(--text-3);
+  border-style: dashed;
+}
+
+.drive-map-card__badge.is-rating {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.drive-map-card__fact {
+  margin: 4px 0 0;
+  font-size: var(--fs-meta);
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.drive-map-card__fact.is-spur {
+  margin-top: 6px;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--text-2);
 }
 
 .drive-map-card__detour {

@@ -237,11 +237,15 @@ driveRoute.get('/along', async (c) => {
   const matchCumKm = route.cumKm
     ? decimated.indices.map((i) => route.cumKm![i]!)
     : undefined;
+  // spur=0 可以关掉「专程绕行」景点（纯自驾沿程视角，只要路过就能看的）。
+  // 默认带上 —— 需求要求「值得专程绕行的景点单独标注理由」，关掉就看不见了。
+  const spurRaw = c.req.query('spur');
   const alongOpts = {
     categories: cat.length ? cat : undefined,
     minScore: Number.isFinite(min) ? min : undefined,
     maxCount: Number.isFinite(max) && max > 0 ? Math.min(max, 500) : 200,
     bufferKm: Number.isFinite(buffer) && buffer > 0 ? buffer : undefined,
+    includeSpur: spurRaw === undefined ? true : spurRaw !== '0' && spurRaw !== 'false',
   };
 
   // 主链景点 vs 未贯通段景点分离（禁止 orphan 里程偏移叠进主链 progressKm）。

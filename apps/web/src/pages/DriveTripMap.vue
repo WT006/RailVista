@@ -12,6 +12,8 @@ import {
   buildPath,
   kmToVisualPct,
   projectToRoute,
+  roadSideArrow,
+  roadSideShort,
   simplifyDP,
   visualPctToKm,
   type AlongSpot,
@@ -276,7 +278,14 @@ function showToast(msg: string) {
 }
 
 const TIER_LABEL: Record<string, string> = { A: '讲解级', B: '沿途可看', C: '小确幸' };
-const SIDE_LABEL: Record<string, string> = { left: '左侧', right: '右侧', unknown: '侧向待定' };
+/** 地图气泡是 HTML 字符串拼的，用不上组件，这里取 shared 的公路文案（不复用铁路「列车左/右侧」） */
+function sideBadgeHtml(s: AlongSpot): string {
+  const arrow = roadSideArrow(s.side);
+  const text = roadSideShort(s.side);
+  const cls = s.side === 'unknown' ? 'is-side-unknown' : `is-side-${s.side}`;
+  const title = s.side === 'unknown' ? '投影落在路线起终点之外，方位无法判定' : `按行进方向判定：${text}`;
+  return `<span class="drive-map-card__badge ${cls}" title="${escHtml(title)}">${arrow} ${text}</span>`;
+}
 const VIS_LABEL: Record<string, string> = {
   roadside: '就在路边',
   detour5: '5 分钟能绕到',
@@ -498,13 +507,27 @@ function openSpotCard(spot: AlongSpot) {
   if (!map || !AMapRef) return;
   if (!isTierVisible(spot.tier)) return;
   const color = tierColor(spot.tier);
+  const ratingHtml =
+    typeof spot.rating === 'number' && spot.rating > 0
+      ? `<span class="drive-map-card__badge is-rating">${spot.rating.toFixed(1)} 分</span>`
+      : '';
   const badges = [
     `<span class="drive-map-card__badge is-tier-${spot.tier.toLowerCase()}">${TIER_LABEL[spot.tier] ?? spot.tier}</span>`,
+    ratingHtml,
     `<span class="drive-map-card__badge">${escHtml(categoryLabel(spot.category))}</span>`,
-    `<span class="drive-map-card__badge">${SIDE_LABEL[spot.side] ?? spot.side}</span>`,
+    sideBadgeHtml(spot),
     spot.visibility
       ? `<span class="drive-map-card__badge is-vis">${VIS_LABEL[spot.visibility] ?? spot.visibility}</span>`
       : '',
+  ]
+    .filter(Boolean)
+    .join('');
+  // 自驾视角的三件事：怎么到、开放到几点、票务要不要预约
+  const facts = [
+    spot.accessNote ? `<p class="drive-map-card__fact">到达：${escHtml(spot.accessNote)}</p>` : '',
+    spot.visitHours ? `<p class="drive-map-card__fact">开放：${escHtml(spot.visitHours)}</p>` : '',
+    spot.ticketNote ? `<p class="drive-map-card__fact">票务：${escHtml(spot.ticketNote)}</p>` : '',
+    spot.spurReason ? `<p class="drive-map-card__fact is-spur">${escHtml(spot.spurReason)}</p>` : '',
   ]
     .filter(Boolean)
     .join('');
@@ -518,7 +541,9 @@ function openSpotCard(spot: AlongSpot) {
       <div class="drive-map-card__title">${escHtml(spot.name)}</div>
       <div class="drive-map-card__meta">${badges}</div>
       <p class="drive-map-card__detour">${escHtml(detourText(spot))} · 距路线 ${spot.distKm} km</p>
+      ${spot.tagline ? `<p class="drive-map-card__intro">${escHtml(spot.tagline)}</p>` : ''}
       ${spot.intro ? `<p class="drive-map-card__intro">${escHtml(spot.intro)}</p>` : ''}
+      ${facts}
       <div class="drive-map-card__arrow" aria-hidden="true"></div>
     </div>`,
     offset: new AMapRef.Pixel(0, -36),

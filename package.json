@@ -1,7 +1,7 @@
 {
   "name": "railvista",
   "private": true,
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "RailVista — 铁路旅客车上沿途风景与行程定位伴侣",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
@@ -20,6 +20,9 @@
     "roads:verify": "node scripts/verify-road-network.mjs",
     "roads:topo": "node --max-old-space-size=8192 scripts/build-road-topology.mjs",
     "roads:od-check": "pnpm --filter @railvista/api exec tsx ../../scripts/verify-road-routing.mts",
+    "roads:spots:harvest": "node scripts/harvest-amap-scenic.mjs",
+    "roads:spots:build": "node --max-old-space-size=8192 scripts/build-roadside-spots-v2.mjs",
+    "roads:spots:scan": "node scripts/scan-roadside-v2.mjs",
     "roads:raster": "node scripts/build-drive-network-raster.mjs",
     "rails:raster": "node scripts/build-rail-network-raster.mjs",
     "roads:backdrop": "node scripts/build-drive-backdrop.mjs",

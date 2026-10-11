@@ -9,7 +9,7 @@
  *   1. App 级背景与铁路选行程页一致（淡轮廓 + 冷蓝景点星点）
  *   2. 起终点 OD 搜索（suggest 四类索引 + geocode 兜底）+ ⇄ 交换
  *   3. 公路编号键盘（对标车次号前缀键盘：G/S/X/Y + 数字；S 需先选省）
- *   4. 路网统计 + 覆盖诚实说明（PRD §3.1）
+ *   4. 首屏侧栏：路网覆盖诚实说明（PRD §3.1；不与榜单抢「热门干线」）
  *   5. 第二屏：榜单入口卡（从属）
  */
 import { computed, onMounted, ref, watch } from 'vue';
@@ -26,51 +26,10 @@ import {
 } from '../lib/driveRecent';
 
 usePointerSpotlight();
-import { ROAD_COLORS, roadColor, roadClassLabel, classOfRef } from '../data/roadColors';
-import type { PlaceHit, RoadClass } from '@railvista/shared';
+import { ROAD_COLORS, roadColor, classOfRef } from '../data/roadColors';
+import type { PlaceHit } from '@railvista/shared';
 
 const router = useRouter();
-
-/** 路网索引：用于右侧「干线直达」快捷入口与等级图例（背景不再铺路网位图） */
-interface RoadBrief {
-  key: string;
-  ref: string;
-  name?: string;
-  class: RoadClass;
-  lengthKm: number;
-}
-
-const roadList = ref<RoadBrief[]>([]);
-const netError = ref('');
-
-async function loadNetwork() {
-  try {
-    const data = await api.getDriveNetworkOverview();
-    roadList.value = data.roads
-      .filter((r) => r.polyline.length >= 2)
-      .map((r) => ({
-        key: r.key,
-        ref: r.ref,
-        name: r.name,
-        class: r.class,
-        lengthKm: r.lengthKm,
-      }));
-  } catch (e) {
-    netError.value = e instanceof Error ? e.message : '路网图层加载失败';
-  }
-}
-
-/** 干线直达：按里程取前若干条作快捷入口（背景图上画的就是这些已挂几何的公路） */
-const hotRoads = computed(() =>
-  [...roadList.value].sort((a, b) => b.lengthKm - a.lengthKm).slice(0, 12),
-);
-
-/** 等级图例：与背景路网、编号徽标共用 ROAD_COLORS 单一色板，不硬编码颜色 */
-const LEGEND = (['national', 'expressway', 'provincial', 'county'] as RoadClass[]).map((cls) => ({
-  cls,
-  label: roadClassLabel(cls),
-  color: roadColor(cls),
-}));
 
 function openRoad(key: string, name?: string, sub?: string) {
   pushDriveRecentRoad(key, name || key, sub);
@@ -296,9 +255,14 @@ function openRoadHit(hit: PlaceHit) {
   }
 }
 
-/** A2：点选候选时记录选中项，「设为起点/终点」用它而不是列表第一项。 */
+/** A2：点选候选时记录选中项，「设为起点/终点」用它而不是列表第一项。
+ * 再点同一条 → 打开详情（触控/窄屏没有可靠 dblclick，第二次点若只做取消会「只闪不跳」）。 */
 function selectRoadHit(hit: PlaceHit) {
-  selectedRoadHit.value = selectedRoadHit.value?.id === hit.id ? null : hit;
+  if (selectedRoadHit.value?.id === hit.id) {
+    openRoadHit(hit);
+    return;
+  }
+  selectedRoadHit.value = hit;
 }
 
 function setRoadAsConstraint(field: 'from' | 'to') {
@@ -315,13 +279,16 @@ function setRoadAsConstraint(field: 'from' | 'to') {
   }
 }
 
-// ── 路网统计 + 榜单入口（第二屏） ────────────────────────────────────────────
+// ── 路网覆盖（首屏侧栏）+ 榜单入口（第二屏） ────────────────────────────────
 const stats = ref<Awaited<ReturnType<typeof api.getDriveNetworkStats>> | null>(null);
 const boards = ref<Awaited<ReturnType<typeof api.getDriveBoards>>['boards']>([]);
 
+const coverageRatioPct = computed(() =>
+  stats.value ? Math.round(stats.value.hasGeomRatio * 100) : null,
+);
+
 onMounted(async () => {
   refreshRecentUi();
-  void loadNetwork();
   try {
     stats.value = await api.getDriveNetworkStats();
   } catch {
@@ -345,10 +312,10 @@ const levelLabel: Record<string, string> = {
   <div class="drive-page">
 
     <main class="rv-shell">
-      <DriveSubNav />
-
       <header class="drive-hero">
-        <h1>万里路书 · 全国公路旅游网</h1>
+        <DriveSubNav>
+          <h1>万里路书 · 全国公路旅游网</h1>
+        </DriveSubNav>
         <p class="sub">
           和铁路版同构：全国公路网 + 路线搜索 + 任意起终点的沿程景点。
           无论走在哪条国道上，或者从哪个位置到哪个位置，走过就能把它的景点加载出来。
@@ -483,7 +450,6 @@ const levelLabel: Record<string, string> = {
                   :class="{ 'is-picked': selectedRoadHit?.id === hit.id }"
                   :aria-pressed="selectedRoadHit?.id === hit.id"
                   @click="selectRoadHit(hit)"
-                  @dblclick="openRoadHit(hit)"
                 >
                   <span class="road-kbd__badge" :style="{ '--prefix-color': roadColor(classOfRef(hit.name)) }">{{ hit.name }}</span>
                   <span class="road-kbd__candidate-sub">{{ hit.sub }}</span>
@@ -575,72 +541,51 @@ const levelLabel: Record<string, string> = {
           </section>
         </div>
 
-        <!-- 路网速览：图例 + 干线直达（背景图即全国公路网，此处不再重复画一张地图） -->
-        <aside class="drive-netpanel rv-card" data-spotlight>
-          <h2 class="drive-netpanel__title">全国公路网</h2>
-          <p class="drive-netpanel__sub">按等级区分已入库干线，可一键进入详情</p>
+        <!-- 路网覆盖诚实卡：说明「库里有什么、能画到哪」，不与榜单抢热门入口 -->
+        <aside class="drive-netpanel rv-card" data-spotlight aria-label="路网覆盖">
+          <h2 class="drive-netpanel__title">路网覆盖</h2>
+          <p class="drive-netpanel__sub">
+            名录分母取自《国家公路网规划》；走向为 OSM 众包估算，不作为导航依据。找路用搜索，种草看下方榜单。
+          </p>
 
-          <ul class="drive-legend">
-            <li v-for="l in LEGEND" :key="l.cls">
-              <i class="drive-legend__dot" :style="{ background: l.color }" aria-hidden="true"></i>
-              <span>{{ l.label }}</span>
-            </li>
-          </ul>
-
-          <div class="drive-hotroads">
-            <span class="drive-hotroads__label">干线直达 · 按已绘里程排序</span>
-            <div v-if="hotRoads.length" class="drive-hotroads__chips">
-              <button
-                v-for="r in hotRoads"
-                :key="r.key"
-                type="button"
-                class="drive-hotroads__chip"
-                :style="{ '--prefix-color': roadColor(r.class) }"
-                :title="`${r.ref} ${r.name ?? ''} · 已绘几何 ${Math.round(r.lengthKm)} km（估算，非官方里程）`"
-                @click="openRoad(r.key, r.ref, r.name)"
-              >
-                <b>{{ r.ref }}</b>
-                <em>{{ Math.round(r.lengthKm) }} km</em>
-              </button>
+          <div v-if="stats" class="drive-coverage">
+            <div class="drive-coverage__item">
+              <div class="drive-coverage__value">
+                {{ stats.national }}<span class="drive-coverage__den">/{{ stats.coverage.targetNational }}</span>
+              </div>
+              <div class="drive-coverage__label">普通国道在册</div>
             </div>
-            <p v-if="netError" class="drive-netpanel__note">{{ netError }}</p>
-            <p v-else-if="!hotRoads.length" class="drive-netpanel__note">
-              路网几何加载中…（暂无可直达的干线）
-            </p>
-            <p v-else class="drive-netpanel__note">
-              里程为已绘制几何长度（估算），非官方里程。
-            </p>
+            <div class="drive-coverage__item">
+              <div class="drive-coverage__value">
+                {{ stats.expressway }}<span class="drive-coverage__den">/{{ stats.coverage.targetExpressway }}</span>
+              </div>
+              <div class="drive-coverage__label">国家高速在册</div>
+            </div>
+            <div class="drive-coverage__item">
+              <div class="drive-coverage__value">
+                {{ stats.hasGeom }}
+                <span v-if="coverageRatioPct != null" class="drive-coverage__den">（{{ coverageRatioPct }}%）</span>
+              </div>
+              <div class="drive-coverage__label">已收录走向</div>
+            </div>
+            <div class="drive-coverage__item">
+              <div class="drive-coverage__value">{{ stats.spotCount }}</div>
+              <div class="drive-coverage__label">公路侧景点</div>
+            </div>
           </div>
+          <p v-else class="drive-netpanel__note">覆盖数据加载中…</p>
+
+          <p class="drive-netpanel__note">
+            有编号无走向的条目仍可搜索，地图会标明暂无几何；已贯通里程与官方里程分开展示。
+          </p>
         </aside>
       </section>
 
-      <!-- 路网统计（国道/高速分母取《国家公路网规划》权威名录） -->
-      <section v-if="stats" class="drive-stats" aria-label="路网统计">
-        <div class="drive-stat">
-          <div class="drive-stat__value">
-            {{ stats.national }}<span class="drive-stat__target">/{{ stats.coverage.targetNational }}</span>
-          </div>
-          <div class="drive-stat__label">普通国道在册</div>
-        </div>
-        <div class="drive-stat">
-          <div class="drive-stat__value">
-            {{ stats.expressway }}<span class="drive-stat__target">/{{ stats.coverage.targetExpressway }}</span>
-          </div>
-          <div class="drive-stat__label">国家高速在册</div>
-        </div>
-        <div class="drive-stat">
-          <div class="drive-stat__value">{{ stats.hasGeom }}</div>
-          <div class="drive-stat__label">已收录走向（{{ Math.round(stats.hasGeomRatio * 100) }}%）</div>
-        </div>
-        <div class="drive-stat">
-          <div class="drive-stat__value">{{ stats.spotCount }}</div>
-          <div class="drive-stat__label">公路侧景点</div>
-        </div>
-      </section>
-
-      <!-- 第二屏：榜单入口（从属，视觉权重低于搜索） -->
+      <!-- 第二屏：榜单入口（从属，视觉权重低于搜索；标题即全部榜单入口） -->
       <section class="drive-boards">
-        <h2 class="drive-boards__title">热门榜单<span>（入口，点击看完整榜单）</span></h2>
+        <h2 class="drive-boards__title">
+          <router-link class="drive-boards__entry" to="/drive/rankings">热门榜单</router-link>
+        </h2>
         <div class="drive-boards__grid">
           <router-link
             v-for="b in boards.slice(0, 3)"
@@ -654,7 +599,6 @@ const levelLabel: Record<string, string> = {
           </router-link>
           <p v-if="!boards.length" class="drive-empty">榜单数据待生成（data/roads/boards/）</p>
         </div>
-        <router-link class="drive-boards__more" to="/drive/rankings">查看全部榜单 →</router-link>
       </section>
 
       <footer class="drive-footnote">

@@ -70,15 +70,17 @@ onMounted(async () => {
   <div class="drive-page">
 
     <main class="rv-shell">
-      <DriveSubNav />
-
       <div v-if="loading" class="drive-skeleton">
+        <DriveSubNav />
         <div class="drive-skeleton__line drive-skeleton__line--wide" />
         <div class="drive-skeleton__line drive-skeleton__line--mid" />
         <div class="drive-skeleton__line drive-skeleton__line--narrow" />
         <div class="drive-skeleton__line drive-skeleton__line--wide" />
       </div>
-      <div v-else-if="error || !board" class="drive-empty drive-empty--error">{{ error || '榜单不存在' }}</div>
+      <div v-else-if="error || !board" class="drive-empty drive-empty--error">
+        <DriveSubNav />
+        {{ error || '榜单不存在' }}
+      </div>
 
       <template v-else>
         <header class="drive-hero">
@@ -86,7 +88,9 @@ onMounted(async () => {
             <span class="drive-board-card__level" :class="`is-${board.level}`">{{ LEVEL_LABEL[board.level] ?? board.level }}</span>
             {{ board.source.org }}<template v-if="board.source.publishedAt"> · {{ board.source.publishedAt }}</template>
           </p>
-          <h1>{{ board.title }}</h1>
+          <DriveSubNav>
+            <h1>{{ board.title }}</h1>
+          </DriveSubNav>
           <p v-if="board.subtitle" class="sub">{{ board.subtitle }}</p>
         </header>
 

@@ -52,14 +52,21 @@ function startNav() {
   <div class="drive-page">
 
     <main class="rv-shell">
-      <DriveSubNav />
-      <div v-if="loading" class="drive-empty">正在翻开路书…</div>
-      <div v-else-if="error || !data" class="drive-empty drive-empty--error">{{ error || '未找到该线路' }}</div>
+      <div v-if="loading" class="drive-empty">
+        <DriveSubNav />
+        正在翻开路书…
+      </div>
+      <div v-else-if="error || !data" class="drive-empty drive-empty--error">
+        <DriveSubNav />
+        {{ error || '未找到该线路' }}
+      </div>
 
       <template v-else>
         <header class="drive-hero">
           <p class="drive-stat__label">万里路书 · {{ data.route.tier === 'national' ? '国家级主干线' : '省级精品线' }}</p>
-          <h1>{{ data.route.name }}</h1>
+          <DriveSubNav>
+            <h1>{{ data.route.name }}</h1>
+          </DriveSubNav>
           <p class="sub">{{ data.route.summary }}</p>
           <div class="drive-route-card__meta" style="margin-top: 12px">
             <span>{{ data.route.provinces.join(' · ') }}</span>

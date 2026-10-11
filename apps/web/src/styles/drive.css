@@ -72,6 +72,11 @@
   letter-spacing: -0.01em;
 }
 
+/* 标题与导航同行时去掉 h1 底边距，间距交给 title-row */
+.drive-hero .drive-subnav__title h1 {
+  margin: 0;
+}
+
 .drive-hero .sub {
   margin: 0;
   max-width: 36em;
@@ -531,23 +536,45 @@
  * 全国公路旅游网 v0.4.0（PRD-万里路书-全国公路旅游网-20261001）
  * ══════════════════════════════════════════════════════════════════════════ */
 
-/* —— 次级导航（主/从分界，非顶栏） —— */
+/* —— 次级导航：标题行内 [返回?] 标题 [榜单?]；无标题时仅按钮条 —— */
 .drive-subnav {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  margin: var(--space-2) 0 var(--space-4);
+  gap: var(--space-2) var(--space-3);
   flex-wrap: wrap;
+}
+
+.drive-subnav.is-bar-only {
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+.drive-subnav.is-with-title {
+  margin: 0 0 var(--space-2);
+}
+
+.drive-subnav__title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.drive-subnav__title > :first-child {
+  margin: 0;
+}
+
+.drive-hero .drive-subnav + .sub {
+  margin-top: 0;
 }
 
 .drive-subnav__main,
 .drive-subnav__sub {
+  flex-shrink: 0;
   padding: 6px var(--space-3);
   border-radius: var(--radius-full);
   font-size: var(--fs-cap);
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
+  align-self: center;
 }
 
 .drive-subnav__main {
@@ -562,17 +589,17 @@
   color: var(--surface-0);
 }
 
+/* 榜单入口：暖色实底，在深蓝标题区更易发现 */
 .drive-subnav__sub {
-  border: 1px solid var(--line-default);
-  background: transparent;
-  color: var(--text-2);
+  border: 1px solid var(--warning);
+  background: var(--warning);
+  color: #1a1408;
   text-decoration: none;
   font-family: inherit;
 }
 
 .drive-subnav__sub.is-active {
-  border-color: var(--line-accent);
-  color: var(--accent-hover);
+  filter: brightness(1.08);
 }
 
 .drive-subnav__caret {
@@ -652,111 +679,60 @@
   align-content: start;
 }
 
-/* —— 路网速览（背景地图的图例与快捷入口，不重复画一张地图） —— */
+/* —— 路网覆盖诚实卡（首屏侧栏：说明覆盖，不提供热门干线入口） —— */
 .drive-netpanel {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
   align-content: start;
-  padding: var(--space-3);
+  padding: var(--space-4);
 }
 
 .drive-netpanel__title {
   margin: 0;
-  font-size: var(--fs-body);
-  font-weight: 600;
+  font-size: var(--fs-h2);
+  font-weight: 700;
   color: var(--text-1);
 }
 
 .drive-netpanel__sub,
 .drive-netpanel__note {
   margin: 0;
-  font-size: var(--fs-micro);
-  line-height: 1.6;
+  font-size: var(--fs-meta);
+  line-height: var(--lh-normal);
   color: var(--text-3);
 }
 
-.drive-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.drive-legend li {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--fs-cap);
-  color: var(--text-2);
-}
-
-.drive-legend__dot {
-  width: 10px;
-  height: 3px;
-  border-radius: var(--radius-full);
-  box-shadow: 0 0 8px currentColor;
-}
-
-.drive-hotroads {
+.drive-coverage {
   display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-2);
 }
 
-.drive-hotroads__label,
-.drive-hotroads__label + * {
-  font-size: var(--fs-micro);
+.drive-coverage__item {
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-2);
 }
 
-.drive-hotroads__label {
-  color: var(--text-3);
-  letter-spacing: 0.08em;
-}
-
-.drive-hotroads__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.drive-hotroads__chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 5px;
-  padding: 4px 10px;
-  border: 1px solid var(--line-default);
-  border-radius: var(--radius-full);
-  background: var(--fill-subtle);
-  color: var(--text-1);
-  font: inherit;
-  font-size: var(--fs-cap);
-  cursor: pointer;
-  transition:
-    border-color var(--dur-fast) var(--ease-standard),
-    background var(--dur-fast) var(--ease-standard),
-    transform var(--dur-fast) var(--ease-standard);
-}
-
-.drive-hotroads__chip b {
-  color: var(--prefix-color);
+.drive-coverage__value {
+  font-size: var(--fs-h1);
   font-weight: 700;
+  line-height: 1.2;
   font-variant-numeric: tabular-nums;
+  color: var(--text-1);
 }
 
-.drive-hotroads__chip em {
-  font-style: normal;
-  font-size: var(--fs-micro);
+.drive-coverage__den {
+  font-size: var(--fs-cap);
+  font-weight: 500;
   color: var(--text-3);
-  font-variant-numeric: tabular-nums;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .drive-hotroads__chip:hover {
-    border-color: var(--prefix-color);
-    background: var(--fill-accent);
-    transform: translateY(-1px);
-  }
+.drive-coverage__label {
+  margin-top: var(--space-1);
+  font-size: var(--fs-cap);
+  color: var(--text-3);
 }
 
 /* —— OD 搜索 —— */
@@ -994,6 +970,13 @@
   }
 }
 
+/* 触屏无 hover：右侧提示常显，避免点选时 opacity 0→1 像闪一下 */
+@media (hover: none), (pointer: coarse) {
+  .road-kbd__candidate-go {
+    opacity: 1;
+  }
+}
+
 .road-kbd__hint {
   margin: 0 auto 0 0;
   font-size: var(--fs-micro);
@@ -1052,24 +1035,46 @@
   font-weight: 700;
 }
 
-.drive-boards__title span {
-  font-weight: 400;
-  font-size: var(--fs-cap);
-  color: var(--text-3);
+.drive-boards__entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.3em 0.75em 0.3em 0.85em;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  color: inherit;
+  text-decoration: none;
+  font: inherit;
+  line-height: 1.2;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.drive-boards__entry::after {
+  content: '→';
+  font-weight: 500;
+  font-size: 0.85em;
+  color: var(--accent-hover);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .drive-boards__entry:hover {
+    border-color: var(--line-accent);
+    background: var(--surface-2);
+  }
+}
+
+.drive-boards__entry:focus-visible {
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 2px;
 }
 
 .drive-boards__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--space-3);
-}
-
-.drive-boards__more {
-  display: inline-block;
-  margin-top: var(--space-3);
-  font-size: var(--fs-cap);
-  color: var(--accent-hover);
-  text-decoration: none;
 }
 
 .drive-board-card {

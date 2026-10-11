@@ -58,10 +58,10 @@ const showAdvanced = ref(false);
 <template>
   <div class="ticket-page rv-page">
     <div class="rv-shell">
-      <header class="rv-head">
-        <p class="rv-head__eyebrow">HEY WORLD · COMMEMORATIVE PASS</p>
-        <h1 class="rv-head__title">旅行纪念票</h1>
-        <p class="rv-head__sub">
+      <header class="ticket-hero">
+        <p class="ticket-hero__eyebrow">HEY WORLD · COMMEMORATIVE PASS</p>
+        <h1>旅行纪念票</h1>
+        <p class="sub">
           选好关键项，票面大部分自动生成：铁路联动 12306 车次，自驾一键规划路牌，飞行自动匹配机场与航程。
         </p>
       </header>
@@ -148,6 +148,37 @@ const showAdvanced = ref(false);
 </template>
 
 <style scoped>
+/* 与 select-hero / drive-hero / rb-hero 同级：页标题用 --fs-display，说明用 --fs-meta */
+.ticket-hero {
+  margin: 0 0 var(--space-5);
+}
+
+.ticket-hero__eyebrow {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ticket-hero h1 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-display);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+
+.ticket-hero .sub {
+  margin: 0;
+  max-width: 36em;
+  font-size: var(--fs-meta);
+  line-height: var(--lh-normal);
+  color: var(--text-2);
+}
+
 .ticket-page .rv-grid { margin-top: var(--space-2); }
 
 .kind-switch { max-width: 420px; margin: var(--space-2) auto 0; }

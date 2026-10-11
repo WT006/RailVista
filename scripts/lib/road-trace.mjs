@@ -68,7 +68,7 @@ export function buildGraph(components) {
     l.push(i);
   }
   /** 最近图节点（搜索半径内） */
-  function nearest(lng, lat, { radiusCells = 12 } = {}) {
+  function nearest(lng, lat, { radiusCells = Number(process.env.NEAREST_CELLS || 4) } = {}) {
     const [cx, cy] = cellKey(lng, lat).split(',').map(Number);
     let best = null, bestD = Infinity;
     for (let dx = -radiusCells; dx <= radiusCells; dx += 1) for (let dy = -radiusCells; dy <= radiusCells; dy += 1) {

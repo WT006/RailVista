@@ -1,0 +1,7765 @@
+[
+ {
+  "f": "上海_S202.json",
+  "kind": "fragmented",
+  "total": 46,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "上海_X1.json",
+  "kind": "fragmented",
+  "total": 62,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "上海_X20.json",
+  "kind": "fragmented",
+  "total": 37,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "上海_X891.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "云南_S207.json",
+  "kind": "fragmented",
+  "total": 238,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "云南_S209.json",
+  "kind": "fragmented",
+  "total": 760,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "云南_S212.json",
+  "kind": "fragmented",
+  "total": 576,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "云南_S214.json",
+  "kind": "fragmented",
+  "total": 87,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "云南_S215.json",
+  "kind": "fragmented",
+  "total": 409,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "云南_S233.json",
+  "kind": "fragmented",
+  "total": 177,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "云南_S308.json",
+  "kind": "tooShort",
+  "total": 49,
+  "official": 180,
+  "comps": 1
+ },
+ {
+  "f": "云南_S311.json",
+  "kind": "fragmented",
+  "total": 176,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "云南_S312.json",
+  "kind": "fragmented",
+  "total": 370,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "云南_S334.json",
+  "kind": "fragmented",
+  "total": 119,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "内蒙古_S101.json",
+  "kind": "fragmented",
+  "total": 245,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "内蒙古_S102.json",
+  "kind": "fragmented",
+  "total": 193,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "内蒙古_S105.json",
+  "kind": "fragmented",
+  "total": 557,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "内蒙古_S204.json",
+  "kind": "fragmented",
+  "total": 420,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "内蒙古_S205.json",
+  "kind": "fragmented",
+  "total": 308,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "内蒙古_S208.json",
+  "kind": "fragmented",
+  "total": 372,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "内蒙古_S209.json",
+  "kind": "fragmented",
+  "total": 203,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "内蒙古_S211.json",
+  "kind": "fragmented",
+  "total": 155,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "内蒙古_S212.json",
+  "kind": "fragmented",
+  "total": 308,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "内蒙古_S215.json",
+  "kind": "fragmented",
+  "total": 709,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "内蒙古_S216.json",
+  "kind": "fragmented",
+  "total": 289,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "内蒙古_S304.json",
+  "kind": "fragmented",
+  "total": 377,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "内蒙古_S309.json",
+  "kind": "fragmented",
+  "total": 176,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "内蒙古_S312.json",
+  "kind": "fragmented",
+  "total": 473,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "内蒙古_S315.json",
+  "kind": "fragmented",
+  "total": 855,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "内蒙古_X164.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "内蒙古_X618.json",
+  "kind": "fragmented",
+  "total": 310,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "北京_S330.json",
+  "kind": "fragmented",
+  "total": 80,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "北京_X1.json",
+  "kind": "fragmented",
+  "total": 78,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "北京_X10.json",
+  "kind": "fragmented",
+  "total": 63,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "北京_X11.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "北京_X12.json",
+  "kind": "fragmented",
+  "total": 48,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "北京_X13.json",
+  "kind": "fragmented",
+  "total": 93,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "北京_X14.json",
+  "kind": "fragmented",
+  "total": 53,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "北京_X15.json",
+  "kind": "fragmented",
+  "total": 82,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "北京_X16.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "北京_X17.json",
+  "kind": "fragmented",
+  "total": 119,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "北京_X18.json",
+  "kind": "fragmented",
+  "total": 63,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "北京_X19.json",
+  "kind": "fragmented",
+  "total": 62,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "北京_X2.json",
+  "kind": "fragmented",
+  "total": 186,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "北京_X20.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "北京_X21.json",
+  "kind": "fragmented",
+  "total": 67,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "北京_X23.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "北京_X24.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "北京_X3.json",
+  "kind": "fragmented",
+  "total": 72,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "北京_X301.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "北京_X31.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "北京_X32.json",
+  "kind": "fragmented",
+  "total": 48,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "北京_X4.json",
+  "kind": "fragmented",
+  "total": 118,
+  "official": 0,
+  "comps": 18
+ },
+ {
+  "f": "北京_X40.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "北京_X5.json",
+  "kind": "fragmented",
+  "total": 83,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "北京_X6.json",
+  "kind": "fragmented",
+  "total": 47,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "北京_X7.json",
+  "kind": "fragmented",
+  "total": 100,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "北京_X8.json",
+  "kind": "fragmented",
+  "total": 90,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "北京_X9.json",
+  "kind": "fragmented",
+  "total": 87,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "吉林_S1.json",
+  "kind": "fragmented",
+  "total": 779,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "吉林_X164.json",
+  "kind": "fragmented",
+  "total": 279,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "吉林_X7.json",
+  "kind": "fragmented",
+  "total": 105,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "吉林_Y1.json",
+  "kind": "fragmented",
+  "total": 74,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_S101.json",
+  "kind": "fragmented",
+  "total": 778,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "四川_S105.json",
+  "kind": "fragmented",
+  "total": 183,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_S201.json",
+  "kind": "fragmented",
+  "total": 575,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "四川_S202.json",
+  "kind": "fragmented",
+  "total": 394,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_S203.json",
+  "kind": "fragmented",
+  "total": 487,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "四川_S205.json",
+  "kind": "fragmented",
+  "total": 636,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "四川_S206.json",
+  "kind": "fragmented",
+  "total": 506,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "四川_S207.json",
+  "kind": "fragmented",
+  "total": 336,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "四川_S208.json",
+  "kind": "fragmented",
+  "total": 632,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "四川_S209.json",
+  "kind": "fragmented",
+  "total": 527,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "四川_S210.json",
+  "kind": "fragmented",
+  "total": 558,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "四川_S211.json",
+  "kind": "overLong",
+  "total": 299,
+  "official": 60,
+  "comps": 8
+ },
+ {
+  "f": "四川_S212.json",
+  "kind": "fragmented",
+  "total": 318,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "四川_S216.json",
+  "kind": "fragmented",
+  "total": 376,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_S217.json",
+  "kind": "overLong",
+  "total": 1205,
+  "official": 300,
+  "comps": 4
+ },
+ {
+  "f": "四川_S218.json",
+  "kind": "fragmented",
+  "total": 515,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "四川_S301.json",
+  "kind": "fragmented",
+  "total": 1011,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "四川_S302.json",
+  "kind": "fragmented",
+  "total": 706,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "四川_S303.json",
+  "kind": "overLong",
+  "total": 528,
+  "official": 45,
+  "comps": 5
+ },
+ {
+  "f": "四川_S305.json",
+  "kind": "fragmented",
+  "total": 356,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "四川_S306.json",
+  "kind": "fragmented",
+  "total": 253,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_S307.json",
+  "kind": "fragmented",
+  "total": 375,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "四川_S308.json",
+  "kind": "fragmented",
+  "total": 492,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_S309.json",
+  "kind": "fragmented",
+  "total": 509,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "四川_S310.json",
+  "kind": "fragmented",
+  "total": 286,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_S311.json",
+  "kind": "fragmented",
+  "total": 399,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "四川_S401.json",
+  "kind": "fragmented",
+  "total": 775,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "四川_S416.json",
+  "kind": "fragmented",
+  "total": 218,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_S434.json",
+  "kind": "fragmented",
+  "total": 415,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "四川_X168.json",
+  "kind": "fragmented",
+  "total": 38,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "四川_X28.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_X49.json",
+  "kind": "fragmented",
+  "total": 52,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "四川_X57.json",
+  "kind": "fragmented",
+  "total": 80,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "四川_X58.json",
+  "kind": "fragmented",
+  "total": 48,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "四川_Y1.json",
+  "kind": "fragmented",
+  "total": 136,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "四川_Y11.json",
+  "kind": "fragmented",
+  "total": 62,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "四川_Y12.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_Y5.json",
+  "kind": "fragmented",
+  "total": 61,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "四川_Y9.json",
+  "kind": "fragmented",
+  "total": 37,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "宁夏_S101.json",
+  "kind": "fragmented",
+  "total": 68,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "宁夏_S103.json",
+  "kind": "fragmented",
+  "total": 189,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "安徽_S102.json",
+  "kind": "fragmented",
+  "total": 372,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_S103.json",
+  "kind": "fragmented",
+  "total": 432,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "安徽_S208.json",
+  "kind": "fragmented",
+  "total": 173,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_S230.json",
+  "kind": "fragmented",
+  "total": 197,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_S238.json",
+  "kind": "fragmented",
+  "total": 240,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "安徽_S245.json",
+  "kind": "fragmented",
+  "total": 303,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_S302.json",
+  "kind": "fragmented",
+  "total": 172,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_S303.json",
+  "kind": "fragmented",
+  "total": 142,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_S306.json",
+  "kind": "fragmented",
+  "total": 240,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_S307.json",
+  "kind": "fragmented",
+  "total": 121,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_S317.json",
+  "kind": "fragmented",
+  "total": 98,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_S320.json",
+  "kind": "fragmented",
+  "total": 181,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "安徽_S324.json",
+  "kind": "fragmented",
+  "total": 205,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_S330.json",
+  "kind": "fragmented",
+  "total": 355,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_S335.json",
+  "kind": "fragmented",
+  "total": 101,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_S340.json",
+  "kind": "fragmented",
+  "total": 85,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_X1.json",
+  "kind": "fragmented",
+  "total": 246,
+  "official": 0,
+  "comps": 19
+ },
+ {
+  "f": "安徽_X10.json",
+  "kind": "fragmented",
+  "total": 112,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "安徽_X11.json",
+  "kind": "fragmented",
+  "total": 164,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "安徽_X12.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "安徽_X13.json",
+  "kind": "fragmented",
+  "total": 215,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "安徽_X14.json",
+  "kind": "fragmented",
+  "total": 118,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "安徽_X16.json",
+  "kind": "fragmented",
+  "total": 85,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "安徽_X17.json",
+  "kind": "fragmented",
+  "total": 84,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "安徽_X18.json",
+  "kind": "fragmented",
+  "total": 68,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "安徽_X19.json",
+  "kind": "fragmented",
+  "total": 80,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_X2.json",
+  "kind": "fragmented",
+  "total": 174,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "安徽_X20.json",
+  "kind": "fragmented",
+  "total": 130,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "安徽_X202.json",
+  "kind": "fragmented",
+  "total": 72,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_X204.json",
+  "kind": "fragmented",
+  "total": 51,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_X205.json",
+  "kind": "fragmented",
+  "total": 68,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_X21.json",
+  "kind": "fragmented",
+  "total": 147,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "安徽_X213.json",
+  "kind": "fragmented",
+  "total": 142,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_X22.json",
+  "kind": "fragmented",
+  "total": 107,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "安徽_X23.json",
+  "kind": "fragmented",
+  "total": 174,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "安徽_X24.json",
+  "kind": "fragmented",
+  "total": 193,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "安徽_X26.json",
+  "kind": "fragmented",
+  "total": 87,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_X27.json",
+  "kind": "fragmented",
+  "total": 46,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_X28.json",
+  "kind": "fragmented",
+  "total": 59,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_X29.json",
+  "kind": "fragmented",
+  "total": 95,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "安徽_X3.json",
+  "kind": "fragmented",
+  "total": 138,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "安徽_X304.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_X306.json",
+  "kind": "fragmented",
+  "total": 69,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_X322.json",
+  "kind": "fragmented",
+  "total": 83,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_X35.json",
+  "kind": "fragmented",
+  "total": 171,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "安徽_X37.json",
+  "kind": "fragmented",
+  "total": 72,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_X38.json",
+  "kind": "fragmented",
+  "total": 96,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "安徽_X4.json",
+  "kind": "fragmented",
+  "total": 196,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "安徽_X43.json",
+  "kind": "fragmented",
+  "total": 85,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "安徽_X44.json",
+  "kind": "fragmented",
+  "total": 65,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "安徽_X45.json",
+  "kind": "fragmented",
+  "total": 77,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_X46.json",
+  "kind": "fragmented",
+  "total": 140,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_X49.json",
+  "kind": "fragmented",
+  "total": 133,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "安徽_X5.json",
+  "kind": "fragmented",
+  "total": 156,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "安徽_X50.json",
+  "kind": "fragmented",
+  "total": 104,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_X53.json",
+  "kind": "fragmented",
+  "total": 78,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_X55.json",
+  "kind": "fragmented",
+  "total": 46,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_X56.json",
+  "kind": "fragmented",
+  "total": 87,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_X57.json",
+  "kind": "fragmented",
+  "total": 67,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_X58.json",
+  "kind": "fragmented",
+  "total": 46,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_X59.json",
+  "kind": "fragmented",
+  "total": 100,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "安徽_X6.json",
+  "kind": "fragmented",
+  "total": 110,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "安徽_X60.json",
+  "kind": "fragmented",
+  "total": 87,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_X62.json",
+  "kind": "fragmented",
+  "total": 86,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "安徽_X64.json",
+  "kind": "fragmented",
+  "total": 56,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_X68.json",
+  "kind": "fragmented",
+  "total": 63,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_X7.json",
+  "kind": "fragmented",
+  "total": 79,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_X70.json",
+  "kind": "fragmented",
+  "total": 67,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_X73.json",
+  "kind": "fragmented",
+  "total": 72,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_X8.json",
+  "kind": "fragmented",
+  "total": 45,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "安徽_X9.json",
+  "kind": "fragmented",
+  "total": 97,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "安徽_X91.json",
+  "kind": "fragmented",
+  "total": 109,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_Y1.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_Y10.json",
+  "kind": "fragmented",
+  "total": 65,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "安徽_Y11.json",
+  "kind": "fragmented",
+  "total": 33,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_Y12.json",
+  "kind": "fragmented",
+  "total": 31,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_Y13.json",
+  "kind": "fragmented",
+  "total": 18,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_Y15.json",
+  "kind": "fragmented",
+  "total": 35,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_Y2.json",
+  "kind": "fragmented",
+  "total": 53,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "安徽_Y21.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "安徽_Y6.json",
+  "kind": "fragmented",
+  "total": 45,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "安徽_Y7.json",
+  "kind": "fragmented",
+  "total": 38,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_S101.json",
+  "kind": "fragmented",
+  "total": 156,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "山东_S102.json",
+  "kind": "fragmented",
+  "total": 433,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "山东_S103.json",
+  "kind": "fragmented",
+  "total": 281,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_S202.json",
+  "kind": "fragmented",
+  "total": 293,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "山东_S209.json",
+  "kind": "fragmented",
+  "total": 352,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "山东_S220.json",
+  "kind": "fragmented",
+  "total": 264,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_S221.json",
+  "kind": "fragmented",
+  "total": 160,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "山东_S222.json",
+  "kind": "fragmented",
+  "total": 304,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "山东_S227.json",
+  "kind": "fragmented",
+  "total": 179,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_S228.json",
+  "kind": "fragmented",
+  "total": 252,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "山东_S235.json",
+  "kind": "fragmented",
+  "total": 75,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "山东_S241.json",
+  "kind": "fragmented",
+  "total": 394,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_S242.json",
+  "kind": "fragmented",
+  "total": 420,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "山东_S246.json",
+  "kind": "fragmented",
+  "total": 265,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "山东_S309.json",
+  "kind": "fragmented",
+  "total": 374,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "山东_S313.json",
+  "kind": "fragmented",
+  "total": 381,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "山东_S318.json",
+  "kind": "fragmented",
+  "total": 357,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "山东_S319.json",
+  "kind": "fragmented",
+  "total": 276,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "山东_S321.json",
+  "kind": "fragmented",
+  "total": 227,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "山东_S324.json",
+  "kind": "fragmented",
+  "total": 124,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "山东_X1.json",
+  "kind": "fragmented",
+  "total": 49,
+  "official": 0,
+  "comps": 17
+ },
+ {
+  "f": "山东_X17.json",
+  "kind": "fragmented",
+  "total": 87,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "山东_X2.json",
+  "kind": "fragmented",
+  "total": 56,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "山东_X20.json",
+  "kind": "fragmented",
+  "total": 62,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "山东_X23.json",
+  "kind": "fragmented",
+  "total": 127,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "山东_X25.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_X302.json",
+  "kind": "fragmented",
+  "total": 63,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_X37.json",
+  "kind": "fragmented",
+  "total": 85,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "山东_X38.json",
+  "kind": "fragmented",
+  "total": 48,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_X39.json",
+  "kind": "fragmented",
+  "total": 64,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_X4.json",
+  "kind": "fragmented",
+  "total": 61,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "山东_X48.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_X5.json",
+  "kind": "fragmented",
+  "total": 76,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "山东_X51.json",
+  "kind": "fragmented",
+  "total": 119,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "山东_X6.json",
+  "kind": "fragmented",
+  "total": 64,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "山东_X7.json",
+  "kind": "fragmented",
+  "total": 62,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山东_X9.json",
+  "kind": "fragmented",
+  "total": 188,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "山西_S103.json",
+  "kind": "fragmented",
+  "total": 117,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山西_S201.json",
+  "kind": "fragmented",
+  "total": 289,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "山西_S205.json",
+  "kind": "fragmented",
+  "total": 246,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山西_S248.json",
+  "kind": "fragmented",
+  "total": 150,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山西_S320.json",
+  "kind": "fragmented",
+  "total": 62,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山西_S321.json",
+  "kind": "fragmented",
+  "total": 61,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山西_Y1.json",
+  "kind": "fragmented",
+  "total": 131,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "山西_Y10.json",
+  "kind": "fragmented",
+  "total": 84,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "山西_Y11.json",
+  "kind": "fragmented",
+  "total": 68,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "山西_Y12.json",
+  "kind": "fragmented",
+  "total": 57,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "山西_Y13.json",
+  "kind": "fragmented",
+  "total": 55,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "山西_Y14.json",
+  "kind": "fragmented",
+  "total": 48,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "山西_Y15.json",
+  "kind": "fragmented",
+  "total": 36,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "山西_Y16.json",
+  "kind": "fragmented",
+  "total": 62,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "山西_Y17.json",
+  "kind": "fragmented",
+  "total": 47,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "山西_Y19.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山西_Y2.json",
+  "kind": "fragmented",
+  "total": 170,
+  "official": 0,
+  "comps": 24
+ },
+ {
+  "f": "山西_Y20.json",
+  "kind": "fragmented",
+  "total": 55,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山西_Y22.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "山西_Y3.json",
+  "kind": "fragmented",
+  "total": 136,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "山西_Y4.json",
+  "kind": "fragmented",
+  "total": 76,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "山西_Y5.json",
+  "kind": "fragmented",
+  "total": 102,
+  "official": 0,
+  "comps": 16
+ },
+ {
+  "f": "山西_Y6.json",
+  "kind": "fragmented",
+  "total": 127,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "山西_Y7.json",
+  "kind": "fragmented",
+  "total": 112,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "山西_Y8.json",
+  "kind": "fragmented",
+  "total": 90,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "山西_Y9.json",
+  "kind": "fragmented",
+  "total": 107,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "广东_S113.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_S118.json",
+  "kind": "fragmented",
+  "total": 267,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "广东_S120.json",
+  "kind": "fragmented",
+  "total": 378,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "广东_S223.json",
+  "kind": "fragmented",
+  "total": 286,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_S226.json",
+  "kind": "fragmented",
+  "total": 188,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_S254.json",
+  "kind": "fragmented",
+  "total": 257,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_S263.json",
+  "kind": "fragmented",
+  "total": 157,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_S268.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_S270.json",
+  "kind": "fragmented",
+  "total": 194,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_S272.json",
+  "kind": "fragmented",
+  "total": 246,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_S282.json",
+  "kind": "fragmented",
+  "total": 168,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_S283.json",
+  "kind": "fragmented",
+  "total": 194,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_S297.json",
+  "kind": "fragmented",
+  "total": 207,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_S366.json",
+  "kind": "fragmented",
+  "total": 81,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_S386.json",
+  "kind": "fragmented",
+  "total": 316,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "广东_S387.json",
+  "kind": "fragmented",
+  "total": 191,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_S388.json",
+  "kind": "fragmented",
+  "total": 257,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_S530.json",
+  "kind": "fragmented",
+  "total": 78,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_S539.json",
+  "kind": "fragmented",
+  "total": 73,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_X195.json",
+  "kind": "fragmented",
+  "total": 61,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_X207.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_X251.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_X264.json",
+  "kind": "fragmented",
+  "total": 26,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_X284.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_X297.json",
+  "kind": "fragmented",
+  "total": 17,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_X405.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_X427.json",
+  "kind": "fragmented",
+  "total": 32,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_X503.json",
+  "kind": "fragmented",
+  "total": 35,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_X512.json",
+  "kind": "fragmented",
+  "total": 56,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_X514.json",
+  "kind": "fragmented",
+  "total": 12,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_X561.json",
+  "kind": "fragmented",
+  "total": 33,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_X582.json",
+  "kind": "fragmented",
+  "total": 45,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_X880.json",
+  "kind": "fragmented",
+  "total": 33,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y1.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y101.json",
+  "kind": "fragmented",
+  "total": 52,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y102.json",
+  "kind": "fragmented",
+  "total": 63,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y103.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "广东_Y104.json",
+  "kind": "fragmented",
+  "total": 17,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y105.json",
+  "kind": "fragmented",
+  "total": 59,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "广东_Y106.json",
+  "kind": "fragmented",
+  "total": 20,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "广东_Y107.json",
+  "kind": "fragmented",
+  "total": 41,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y108.json",
+  "kind": "fragmented",
+  "total": 49,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "广东_Y109.json",
+  "kind": "fragmented",
+  "total": 57,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "广东_Y11.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y110.json",
+  "kind": "fragmented",
+  "total": 34,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "广东_Y111.json",
+  "kind": "fragmented",
+  "total": 31,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y112.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y113.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y114.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y115.json",
+  "kind": "fragmented",
+  "total": 52,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "广东_Y116.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y117.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y118.json",
+  "kind": "fragmented",
+  "total": 31,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y119.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y12.json",
+  "kind": "fragmented",
+  "total": 13,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y120.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "广东_Y121.json",
+  "kind": "fragmented",
+  "total": 57,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y122.json",
+  "kind": "fragmented",
+  "total": 43,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y123.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "广东_Y124.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y125.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "广东_Y126.json",
+  "kind": "fragmented",
+  "total": 46,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "广东_Y127.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y128.json",
+  "kind": "fragmented",
+  "total": 51,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y129.json",
+  "kind": "fragmented",
+  "total": 37,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y13.json",
+  "kind": "fragmented",
+  "total": 26,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y130.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y131.json",
+  "kind": "fragmented",
+  "total": 18,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y132.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "广东_Y133.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y134.json",
+  "kind": "fragmented",
+  "total": 57,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "广东_Y135.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y136.json",
+  "kind": "fragmented",
+  "total": 45,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y137.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y138.json",
+  "kind": "fragmented",
+  "total": 33,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y139.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y140.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "广东_Y141.json",
+  "kind": "fragmented",
+  "total": 17,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y142.json",
+  "kind": "fragmented",
+  "total": 43,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y143.json",
+  "kind": "fragmented",
+  "total": 37,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "广东_Y145.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y146.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y147.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "广东_Y148.json",
+  "kind": "fragmented",
+  "total": 32,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y149.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y15.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y151.json",
+  "kind": "fragmented",
+  "total": 56,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "广东_Y152.json",
+  "kind": "fragmented",
+  "total": 32,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y153.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y154.json",
+  "kind": "fragmented",
+  "total": 12,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y155.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y156.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "广东_Y157.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y158.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y159.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y161.json",
+  "kind": "fragmented",
+  "total": 41,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "广东_Y162.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y163.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y164.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y165.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y166.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "广东_Y167.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y168.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y169.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y170.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y171.json",
+  "kind": "fragmented",
+  "total": 41,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y172.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y173.json",
+  "kind": "fragmented",
+  "total": 32,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y174.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y175.json",
+  "kind": "fragmented",
+  "total": 18,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y176.json",
+  "kind": "fragmented",
+  "total": 44,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y177.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y178.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y179.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y180.json",
+  "kind": "fragmented",
+  "total": 45,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y181.json",
+  "kind": "fragmented",
+  "total": 17,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y182.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y183.json",
+  "kind": "fragmented",
+  "total": 43,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y184.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y185.json",
+  "kind": "fragmented",
+  "total": 32,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y186.json",
+  "kind": "fragmented",
+  "total": 32,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y187.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y188.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y192.json",
+  "kind": "fragmented",
+  "total": 12,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y193.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y194.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y195.json",
+  "kind": "fragmented",
+  "total": 40,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y199.json",
+  "kind": "fragmented",
+  "total": 51,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y2.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y200.json",
+  "kind": "fragmented",
+  "total": 38,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y201.json",
+  "kind": "fragmented",
+  "total": 45,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y202.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y203.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y204.json",
+  "kind": "fragmented",
+  "total": 10,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y205.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y206.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y207.json",
+  "kind": "fragmented",
+  "total": 33,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y208.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y209.json",
+  "kind": "fragmented",
+  "total": 32,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y210.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y211.json",
+  "kind": "fragmented",
+  "total": 53,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "广东_Y212.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y213.json",
+  "kind": "fragmented",
+  "total": 36,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y214.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y215.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y218.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y219.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y220.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y222.json",
+  "kind": "fragmented",
+  "total": 12,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y223.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y224.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y227.json",
+  "kind": "fragmented",
+  "total": 20,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y228.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y231.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y233.json",
+  "kind": "fragmented",
+  "total": 26,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y234.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y235.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y236.json",
+  "kind": "fragmented",
+  "total": 17,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y238.json",
+  "kind": "fragmented",
+  "total": 13,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y240.json",
+  "kind": "fragmented",
+  "total": 20,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y241.json",
+  "kind": "fragmented",
+  "total": 33,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y242.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y243.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y244.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y245.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y246.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y247.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y248.json",
+  "kind": "fragmented",
+  "total": 20,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y249.json",
+  "kind": "fragmented",
+  "total": 31,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y250.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y251.json",
+  "kind": "fragmented",
+  "total": 62,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "广东_Y252.json",
+  "kind": "fragmented",
+  "total": 35,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y253.json",
+  "kind": "fragmented",
+  "total": 35,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y254.json",
+  "kind": "fragmented",
+  "total": 31,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y255.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y256.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y257.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y259.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y260.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y261.json",
+  "kind": "fragmented",
+  "total": 14,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y262.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y263.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y264.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y266.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y267.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y268.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y269.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y270.json",
+  "kind": "fragmented",
+  "total": 18,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "广东_Y272.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y273.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "广东_Y274.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y275.json",
+  "kind": "fragmented",
+  "total": 20,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y276.json",
+  "kind": "fragmented",
+  "total": 13,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y277.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y281.json",
+  "kind": "fragmented",
+  "total": 31,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y282.json",
+  "kind": "fragmented",
+  "total": 12,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y283.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y284.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y285.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y286.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y287.json",
+  "kind": "fragmented",
+  "total": 5,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y288.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y289.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y290.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y292.json",
+  "kind": "fragmented",
+  "total": 20,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y295.json",
+  "kind": "fragmented",
+  "total": 14,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y297.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y298.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y299.json",
+  "kind": "fragmented",
+  "total": 7,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y3.json",
+  "kind": "fragmented",
+  "total": 31,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y300.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y301.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y302.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y303.json",
+  "kind": "fragmented",
+  "total": 17,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y304.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y305.json",
+  "kind": "fragmented",
+  "total": 11,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y306.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y307.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y308.json",
+  "kind": "fragmented",
+  "total": 49,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y309.json",
+  "kind": "fragmented",
+  "total": 18,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y310.json",
+  "kind": "fragmented",
+  "total": 17,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y312.json",
+  "kind": "fragmented",
+  "total": 20,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y314.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y315.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y316.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y318.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y320.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y321.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y322.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y323.json",
+  "kind": "fragmented",
+  "total": 14,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y324.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y328.json",
+  "kind": "fragmented",
+  "total": 37,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y329.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y334.json",
+  "kind": "fragmented",
+  "total": 10,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y339.json",
+  "kind": "fragmented",
+  "total": 41,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广东_Y342.json",
+  "kind": "fragmented",
+  "total": 17,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y344.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y347.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y348.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y349.json",
+  "kind": "fragmented",
+  "total": 43,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y351.json",
+  "kind": "fragmented",
+  "total": 35,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y358.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y360.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y361.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y366.json",
+  "kind": "fragmented",
+  "total": 14,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y367.json",
+  "kind": "fragmented",
+  "total": 14,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y381.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y383.json",
+  "kind": "fragmented",
+  "total": 34,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y386.json",
+  "kind": "fragmented",
+  "total": 18,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y410.json",
+  "kind": "fragmented",
+  "total": 9,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y421.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y427.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y459.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y468.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y475.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y487.json",
+  "kind": "fragmented",
+  "total": 20,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y494.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y5.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y502.json",
+  "kind": "fragmented",
+  "total": 32,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y503.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y504.json",
+  "kind": "fragmented",
+  "total": 38,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y505.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y507.json",
+  "kind": "fragmented",
+  "total": 36,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y510.json",
+  "kind": "fragmented",
+  "total": 41,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y512.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y513.json",
+  "kind": "fragmented",
+  "total": 36,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y517.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y518.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y519.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y524.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y525.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y526.json",
+  "kind": "fragmented",
+  "total": 37,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y532.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y533.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y536.json",
+  "kind": "fragmented",
+  "total": 46,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y539.json",
+  "kind": "fragmented",
+  "total": 37,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y542.json",
+  "kind": "fragmented",
+  "total": 20,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y543.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y549.json",
+  "kind": "fragmented",
+  "total": 33,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y588.json",
+  "kind": "fragmented",
+  "total": 20,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y616.json",
+  "kind": "fragmented",
+  "total": 18,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y617.json",
+  "kind": "fragmented",
+  "total": 36,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y626.json",
+  "kind": "fragmented",
+  "total": 56,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y629.json",
+  "kind": "fragmented",
+  "total": 11,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y632.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y643.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y658.json",
+  "kind": "fragmented",
+  "total": 50,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y699.json",
+  "kind": "fragmented",
+  "total": 34,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y7.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广东_Y706.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "广东_Y712.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y728.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y761.json",
+  "kind": "fragmented",
+  "total": 17,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y764.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y8.json",
+  "kind": "fragmented",
+  "total": 18,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y805.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y818.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y835.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y844.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y846.json",
+  "kind": "fragmented",
+  "total": 13,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y861.json",
+  "kind": "fragmented",
+  "total": 26,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y871.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y891.json",
+  "kind": "fragmented",
+  "total": 18,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y903.json",
+  "kind": "fragmented",
+  "total": 18,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y919.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y923.json",
+  "kind": "fragmented",
+  "total": 43,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y934.json",
+  "kind": "fragmented",
+  "total": 26,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y938.json",
+  "kind": "fragmented",
+  "total": 46,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广东_Y939.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y942.json",
+  "kind": "fragmented",
+  "total": 24,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广东_Y950.json",
+  "kind": "fragmented",
+  "total": 26,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广西_S201.json",
+  "kind": "fragmented",
+  "total": 112,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广西_S302.json",
+  "kind": "fragmented",
+  "total": 382,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "广西_S309.json",
+  "kind": "fragmented",
+  "total": 362,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广西_S313.json",
+  "kind": "fragmented",
+  "total": 369,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广西_S323.json",
+  "kind": "fragmented",
+  "total": 66,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广西_S57.json",
+  "kind": "fragmented",
+  "total": 139,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "广西_X147.json",
+  "kind": "fragmented",
+  "total": 48,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广西_X203.json",
+  "kind": "fragmented",
+  "total": 45,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广西_X702.json",
+  "kind": "fragmented",
+  "total": 38,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广西_X885.json",
+  "kind": "fragmented",
+  "total": 49,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "广西_Y16.json",
+  "kind": "fragmented",
+  "total": 47,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广西_Y2.json",
+  "kind": "fragmented",
+  "total": 67,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "广西_Y5.json",
+  "kind": "fragmented",
+  "total": 36,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "新疆_S205.json",
+  "kind": "fragmented",
+  "total": 104,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "新疆_S236.json",
+  "kind": "fragmented",
+  "total": 451,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "新疆_S303.json",
+  "kind": "fragmented",
+  "total": 340,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "新疆_S306.json",
+  "kind": "fragmented",
+  "total": 292,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "新疆_S318.json",
+  "kind": "fragmented",
+  "total": 426,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "新疆_S326.json",
+  "kind": "fragmented",
+  "total": 344,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江苏_S122.json",
+  "kind": "fragmented",
+  "total": 214,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江苏_S229.json",
+  "kind": "fragmented",
+  "total": 271,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江苏_S230.json",
+  "kind": "fragmented",
+  "total": 210,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "江苏_S232.json",
+  "kind": "fragmented",
+  "total": 256,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "江苏_S237.json",
+  "kind": "fragmented",
+  "total": 50,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江苏_S247.json",
+  "kind": "fragmented",
+  "total": 162,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江苏_S250.json",
+  "kind": "fragmented",
+  "total": 185,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江苏_S324.json",
+  "kind": "fragmented",
+  "total": 336,
+  "official": 0,
+  "comps": 17
+ },
+ {
+  "f": "江苏_S325.json",
+  "kind": "fragmented",
+  "total": 114,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江苏_S329.json",
+  "kind": "fragmented",
+  "total": 141,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "江苏_S331.json",
+  "kind": "fragmented",
+  "total": 343,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "江苏_S340.json",
+  "kind": "fragmented",
+  "total": 244,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "江苏_S341.json",
+  "kind": "fragmented",
+  "total": 160,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "江苏_S348.json",
+  "kind": "fragmented",
+  "total": 184,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "江苏_S353.json",
+  "kind": "fragmented",
+  "total": 173,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江苏_S356.json",
+  "kind": "fragmented",
+  "total": 362,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江苏_X1.json",
+  "kind": "fragmented",
+  "total": 128,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "江苏_X101.json",
+  "kind": "fragmented",
+  "total": 335,
+  "official": 0,
+  "comps": 42
+ },
+ {
+  "f": "江苏_X102.json",
+  "kind": "fragmented",
+  "total": 197,
+  "official": 0,
+  "comps": 23
+ },
+ {
+  "f": "江苏_X103.json",
+  "kind": "fragmented",
+  "total": 231,
+  "official": 0,
+  "comps": 26
+ },
+ {
+  "f": "江苏_X104.json",
+  "kind": "fragmented",
+  "total": 106,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "江苏_X105.json",
+  "kind": "fragmented",
+  "total": 140,
+  "official": 0,
+  "comps": 19
+ },
+ {
+  "f": "江苏_X106.json",
+  "kind": "fragmented",
+  "total": 41,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江苏_X151.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "江苏_X2.json",
+  "kind": "fragmented",
+  "total": 153,
+  "official": 0,
+  "comps": 21
+ },
+ {
+  "f": "江苏_X201.json",
+  "kind": "fragmented",
+  "total": 773,
+  "official": 0,
+  "comps": 75
+ },
+ {
+  "f": "江苏_X202.json",
+  "kind": "fragmented",
+  "total": 705,
+  "official": 0,
+  "comps": 65
+ },
+ {
+  "f": "江苏_X203.json",
+  "kind": "fragmented",
+  "total": 564,
+  "official": 0,
+  "comps": 66
+ },
+ {
+  "f": "江苏_X204.json",
+  "kind": "fragmented",
+  "total": 675,
+  "official": 0,
+  "comps": 65
+ },
+ {
+  "f": "江苏_X205.json",
+  "kind": "fragmented",
+  "total": 610,
+  "official": 0,
+  "comps": 65
+ },
+ {
+  "f": "江苏_X206.json",
+  "kind": "fragmented",
+  "total": 501,
+  "official": 0,
+  "comps": 55
+ },
+ {
+  "f": "江苏_X207.json",
+  "kind": "fragmented",
+  "total": 314,
+  "official": 0,
+  "comps": 21
+ },
+ {
+  "f": "江苏_X208.json",
+  "kind": "fragmented",
+  "total": 350,
+  "official": 0,
+  "comps": 43
+ },
+ {
+  "f": "江苏_X209.json",
+  "kind": "fragmented",
+  "total": 153,
+  "official": 0,
+  "comps": 22
+ },
+ {
+  "f": "江苏_X210.json",
+  "kind": "fragmented",
+  "total": 133,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "江苏_X211.json",
+  "kind": "fragmented",
+  "total": 103,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "江苏_X212.json",
+  "kind": "fragmented",
+  "total": 92,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "江苏_X213.json",
+  "kind": "fragmented",
+  "total": 77,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "江苏_X214.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "江苏_X251.json",
+  "kind": "fragmented",
+  "total": 276,
+  "official": 0,
+  "comps": 31
+ },
+ {
+  "f": "江苏_X252.json",
+  "kind": "fragmented",
+  "total": 231,
+  "official": 0,
+  "comps": 31
+ },
+ {
+  "f": "江苏_X253.json",
+  "kind": "fragmented",
+  "total": 229,
+  "official": 0,
+  "comps": 23
+ },
+ {
+  "f": "江苏_X254.json",
+  "kind": "fragmented",
+  "total": 72,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "江苏_X256.json",
+  "kind": "fragmented",
+  "total": 34,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江苏_X257.json",
+  "kind": "fragmented",
+  "total": 53,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江苏_X258.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江苏_X259.json",
+  "kind": "fragmented",
+  "total": 29,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江苏_X261.json",
+  "kind": "fragmented",
+  "total": 34,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江苏_X301.json",
+  "kind": "fragmented",
+  "total": 696,
+  "official": 0,
+  "comps": 59
+ },
+ {
+  "f": "江苏_X302.json",
+  "kind": "fragmented",
+  "total": 609,
+  "official": 0,
+  "comps": 68
+ },
+ {
+  "f": "江苏_X303.json",
+  "kind": "fragmented",
+  "total": 508,
+  "official": 0,
+  "comps": 60
+ },
+ {
+  "f": "江苏_X304.json",
+  "kind": "fragmented",
+  "total": 675,
+  "official": 0,
+  "comps": 56
+ },
+ {
+  "f": "江苏_X305.json",
+  "kind": "fragmented",
+  "total": 568,
+  "official": 0,
+  "comps": 53
+ },
+ {
+  "f": "江苏_X306.json",
+  "kind": "fragmented",
+  "total": 403,
+  "official": 0,
+  "comps": 50
+ },
+ {
+  "f": "江苏_X307.json",
+  "kind": "fragmented",
+  "total": 309,
+  "official": 0,
+  "comps": 32
+ },
+ {
+  "f": "江苏_X308.json",
+  "kind": "fragmented",
+  "total": 242,
+  "official": 0,
+  "comps": 32
+ },
+ {
+  "f": "江苏_X309.json",
+  "kind": "fragmented",
+  "total": 263,
+  "official": 0,
+  "comps": 18
+ },
+ {
+  "f": "江苏_X310.json",
+  "kind": "fragmented",
+  "total": 105,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "江苏_X311.json",
+  "kind": "fragmented",
+  "total": 120,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "江苏_X312.json",
+  "kind": "fragmented",
+  "total": 82,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "江苏_X314.json",
+  "kind": "fragmented",
+  "total": 83,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "江苏_X315.json",
+  "kind": "fragmented",
+  "total": 25,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江苏_X316.json",
+  "kind": "fragmented",
+  "total": 54,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "江苏_X351.json",
+  "kind": "fragmented",
+  "total": 283,
+  "official": 0,
+  "comps": 37
+ },
+ {
+  "f": "江苏_X352.json",
+  "kind": "fragmented",
+  "total": 289,
+  "official": 0,
+  "comps": 29
+ },
+ {
+  "f": "江苏_X353.json",
+  "kind": "fragmented",
+  "total": 155,
+  "official": 0,
+  "comps": 21
+ },
+ {
+  "f": "江苏_X354.json",
+  "kind": "fragmented",
+  "total": 109,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "江苏_X355.json",
+  "kind": "fragmented",
+  "total": 72,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "江苏_X356.json",
+  "kind": "fragmented",
+  "total": 73,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "江苏_X357.json",
+  "kind": "fragmented",
+  "total": 48,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "江苏_Y1.json",
+  "kind": "fragmented",
+  "total": 76,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江苏_Y101.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江苏_Y15.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江苏_Y19.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "江苏_Y307.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江苏_Y5.json",
+  "kind": "fragmented",
+  "total": 41,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江苏_Y9.json",
+  "kind": "fragmented",
+  "total": 26,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江西_S207.json",
+  "kind": "fragmented",
+  "total": 325,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江西_S212.json",
+  "kind": "fragmented",
+  "total": 325,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江西_S214.json",
+  "kind": "fragmented",
+  "total": 174,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江西_S218.json",
+  "kind": "fragmented",
+  "total": 317,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_S219.json",
+  "kind": "fragmented",
+  "total": 446,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江西_S221.json",
+  "kind": "fragmented",
+  "total": 514,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "江西_S222.json",
+  "kind": "fragmented",
+  "total": 271,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "江西_S223.json",
+  "kind": "fragmented",
+  "total": 170,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "江西_S225.json",
+  "kind": "fragmented",
+  "total": 130,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_S226.json",
+  "kind": "fragmented",
+  "total": 293,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江西_S304.json",
+  "kind": "fragmented",
+  "total": 447,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江西_S307.json",
+  "kind": "fragmented",
+  "total": 254,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江西_S309.json",
+  "kind": "fragmented",
+  "total": 359,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_S314.json",
+  "kind": "fragmented",
+  "total": 258,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江西_S320.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_X1.json",
+  "kind": "fragmented",
+  "total": 43,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江西_X10.json",
+  "kind": "fragmented",
+  "total": 53,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_X108.json",
+  "kind": "fragmented",
+  "total": 91,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "江西_X111.json",
+  "kind": "fragmented",
+  "total": 56,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江西_X22.json",
+  "kind": "fragmented",
+  "total": 53,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江西_X33.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江西_X41.json",
+  "kind": "fragmented",
+  "total": 54,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "江西_X463.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_X503.json",
+  "kind": "fragmented",
+  "total": 59,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_X801.json",
+  "kind": "fragmented",
+  "total": 66,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_X802.json",
+  "kind": "fragmented",
+  "total": 71,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_X803.json",
+  "kind": "fragmented",
+  "total": 55,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_X805.json",
+  "kind": "fragmented",
+  "total": 120,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "江西_X806.json",
+  "kind": "fragmented",
+  "total": 87,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "江西_X811.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_S10.json",
+  "kind": "fragmented",
+  "total": 265,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河北_S201.json",
+  "kind": "fragmented",
+  "total": 257,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_S202.json",
+  "kind": "fragmented",
+  "total": 228,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "河北_S203.json",
+  "kind": "fragmented",
+  "total": 241,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "河北_S205.json",
+  "kind": "fragmented",
+  "total": 152,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_S207.json",
+  "kind": "fragmented",
+  "total": 117,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_S208.json",
+  "kind": "fragmented",
+  "total": 66,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河北_S210.json",
+  "kind": "fragmented",
+  "total": 58,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_S212.json",
+  "kind": "fragmented",
+  "total": 158,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_S213.json",
+  "kind": "fragmented",
+  "total": 121,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_S220.json",
+  "kind": "fragmented",
+  "total": 111,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_S221.json",
+  "kind": "fragmented",
+  "total": 76,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_S222.json",
+  "kind": "fragmented",
+  "total": 123,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_S231.json",
+  "kind": "fragmented",
+  "total": 231,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_S233.json",
+  "kind": "fragmented",
+  "total": 117,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河北_S234.json",
+  "kind": "fragmented",
+  "total": 79,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_S241.json",
+  "kind": "fragmented",
+  "total": 479,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_S242.json",
+  "kind": "fragmented",
+  "total": 186,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_S245.json",
+  "kind": "fragmented",
+  "total": 110,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_S272.json",
+  "kind": "overLong",
+  "total": 160,
+  "official": 90,
+  "comps": 2
+ },
+ {
+  "f": "河北_S282.json",
+  "kind": "fragmented",
+  "total": 163,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_S302.json",
+  "kind": "fragmented",
+  "total": 75,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_S306.json",
+  "kind": "fragmented",
+  "total": 54,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_S308.json",
+  "kind": "fragmented",
+  "total": 123,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_S315.json",
+  "kind": "fragmented",
+  "total": 191,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_S316.json",
+  "kind": "fragmented",
+  "total": 174,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_S317.json",
+  "kind": "fragmented",
+  "total": 55,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_S323.json",
+  "kind": "fragmented",
+  "total": 153,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "河北_S324.json",
+  "kind": "fragmented",
+  "total": 232,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_S326.json",
+  "kind": "fragmented",
+  "total": 140,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_S329.json",
+  "kind": "fragmented",
+  "total": 119,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_S330.json",
+  "kind": "fragmented",
+  "total": 80,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_S331.json",
+  "kind": "fragmented",
+  "total": 167,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_S356.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_S382.json",
+  "kind": "fragmented",
+  "total": 158,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_S64.json",
+  "kind": "fragmented",
+  "total": 81,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_X1.json",
+  "kind": "fragmented",
+  "total": 247,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "河北_X10.json",
+  "kind": "fragmented",
+  "total": 63,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "河北_X11.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河北_X12.json",
+  "kind": "fragmented",
+  "total": 72,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "河北_X13.json",
+  "kind": "fragmented",
+  "total": 93,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_X14.json",
+  "kind": "fragmented",
+  "total": 110,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "河北_X15.json",
+  "kind": "fragmented",
+  "total": 111,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_X16.json",
+  "kind": "fragmented",
+  "total": 64,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "河北_X17.json",
+  "kind": "fragmented",
+  "total": 135,
+  "official": 0,
+  "comps": 16
+ },
+ {
+  "f": "河北_X18.json",
+  "kind": "fragmented",
+  "total": 67,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河北_X19.json",
+  "kind": "fragmented",
+  "total": 62,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "河北_X2.json",
+  "kind": "fragmented",
+  "total": 194,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "河北_X20.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "河北_X204.json",
+  "kind": "fragmented",
+  "total": 82,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_X21.json",
+  "kind": "fragmented",
+  "total": 69,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_X23.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_X24.json",
+  "kind": "fragmented",
+  "total": 21,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_X3.json",
+  "kind": "fragmented",
+  "total": 93,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "河北_X301.json",
+  "kind": "fragmented",
+  "total": 16,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_X31.json",
+  "kind": "fragmented",
+  "total": 19,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_X32.json",
+  "kind": "fragmented",
+  "total": 48,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_X4.json",
+  "kind": "fragmented",
+  "total": 166,
+  "official": 0,
+  "comps": 24
+ },
+ {
+  "f": "河北_X40.json",
+  "kind": "fragmented",
+  "total": 22,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_X5.json",
+  "kind": "fragmented",
+  "total": 102,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "河北_X506.json",
+  "kind": "fragmented",
+  "total": 156,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_X6.json",
+  "kind": "fragmented",
+  "total": 87,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "河北_X602.json",
+  "kind": "fragmented",
+  "total": 95,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_X616.json",
+  "kind": "fragmented",
+  "total": 77,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河北_X658.json",
+  "kind": "fragmented",
+  "total": 48,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_X66.json",
+  "kind": "fragmented",
+  "total": 49,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河北_X7.json",
+  "kind": "fragmented",
+  "total": 126,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "河北_X706.json",
+  "kind": "fragmented",
+  "total": 111,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河北_X8.json",
+  "kind": "fragmented",
+  "total": 122,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "河北_X9.json",
+  "kind": "fragmented",
+  "total": 136,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "河北_Y12.json",
+  "kind": "fragmented",
+  "total": 15,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S102.json",
+  "kind": "fragmented",
+  "total": 190,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S103.json",
+  "kind": "fragmented",
+  "total": 328,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S206.json",
+  "kind": "fragmented",
+  "total": 177,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_S213.json",
+  "kind": "fragmented",
+  "total": 295,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_S215.json",
+  "kind": "fragmented",
+  "total": 110,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_S219.json",
+  "kind": "fragmented",
+  "total": 206,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "河南_S220.json",
+  "kind": "fragmented",
+  "total": 208,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S223.json",
+  "kind": "fragmented",
+  "total": 183,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河南_S224.json",
+  "kind": "fragmented",
+  "total": 143,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_S231.json",
+  "kind": "fragmented",
+  "total": 61,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河南_S234.json",
+  "kind": "fragmented",
+  "total": 245,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河南_S237.json",
+  "kind": "fragmented",
+  "total": 261,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "河南_S238.json",
+  "kind": "fragmented",
+  "total": 154,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "河南_S240.json",
+  "kind": "fragmented",
+  "total": 160,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S241.json",
+  "kind": "fragmented",
+  "total": 230,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S242.json",
+  "kind": "fragmented",
+  "total": 201,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河南_S243.json",
+  "kind": "fragmented",
+  "total": 120,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_S248.json",
+  "kind": "fragmented",
+  "total": 210,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_S303.json",
+  "kind": "fragmented",
+  "total": 106,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S307.json",
+  "kind": "fragmented",
+  "total": 237,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_S308.json",
+  "kind": "fragmented",
+  "total": 93,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_S309.json",
+  "kind": "fragmented",
+  "total": 173,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河南_S312.json",
+  "kind": "fragmented",
+  "total": 333,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_S314.json",
+  "kind": "fragmented",
+  "total": 191,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_S316.json",
+  "kind": "fragmented",
+  "total": 130,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_S318.json",
+  "kind": "fragmented",
+  "total": 208,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S319.json",
+  "kind": "fragmented",
+  "total": 119,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S320.json",
+  "kind": "fragmented",
+  "total": 198,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河南_S322.json",
+  "kind": "fragmented",
+  "total": 206,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S323.json",
+  "kind": "fragmented",
+  "total": 451,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "河南_S324.json",
+  "kind": "fragmented",
+  "total": 224,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_S325.json",
+  "kind": "fragmented",
+  "total": 254,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_S327.json",
+  "kind": "fragmented",
+  "total": 202,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_S328.json",
+  "kind": "fragmented",
+  "total": 339,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "河南_S330.json",
+  "kind": "fragmented",
+  "total": 280,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S333.json",
+  "kind": "fragmented",
+  "total": 163,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_S334.json",
+  "kind": "fragmented",
+  "total": 135,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_S337.json",
+  "kind": "fragmented",
+  "total": 213,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_X1.json",
+  "kind": "fragmented",
+  "total": 330,
+  "official": 0,
+  "comps": 25
+ },
+ {
+  "f": "河南_X10.json",
+  "kind": "fragmented",
+  "total": 247,
+  "official": 0,
+  "comps": 19
+ },
+ {
+  "f": "河南_X11.json",
+  "kind": "fragmented",
+  "total": 228,
+  "official": 0,
+  "comps": 21
+ },
+ {
+  "f": "河南_X12.json",
+  "kind": "fragmented",
+  "total": 259,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "河南_X13.json",
+  "kind": "fragmented",
+  "total": 188,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "河南_X14.json",
+  "kind": "fragmented",
+  "total": 185,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "河南_X15.json",
+  "kind": "fragmented",
+  "total": 28,
+  "official": 0,
+  "comps": 16
+ },
+ {
+  "f": "河南_X16.json",
+  "kind": "fragmented",
+  "total": 65,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "河南_X17.json",
+  "kind": "fragmented",
+  "total": 200,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "河南_X18.json",
+  "kind": "fragmented",
+  "total": 87,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "河南_X19.json",
+  "kind": "fragmented",
+  "total": 133,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "河南_X2.json",
+  "kind": "fragmented",
+  "total": 213,
+  "official": 0,
+  "comps": 22
+ },
+ {
+  "f": "河南_X20.json",
+  "kind": "fragmented",
+  "total": 145,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "河南_X21.json",
+  "kind": "fragmented",
+  "total": 169,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "河南_X22.json",
+  "kind": "fragmented",
+  "total": 177,
+  "official": 0,
+  "comps": 16
+ },
+ {
+  "f": "河南_X23.json",
+  "kind": "fragmented",
+  "total": 60,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_X28.json",
+  "kind": "fragmented",
+  "total": 90,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_X3.json",
+  "kind": "fragmented",
+  "total": 214,
+  "official": 0,
+  "comps": 19
+ },
+ {
+  "f": "河南_X30.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_X32.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河南_X38.json",
+  "kind": "fragmented",
+  "total": 49,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_X39.json",
+  "kind": "fragmented",
+  "total": 104,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_X4.json",
+  "kind": "fragmented",
+  "total": 229,
+  "official": 0,
+  "comps": 23
+ },
+ {
+  "f": "河南_X5.json",
+  "kind": "fragmented",
+  "total": 140,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "河南_X58.json",
+  "kind": "fragmented",
+  "total": 38,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河南_X6.json",
+  "kind": "fragmented",
+  "total": 221,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "河南_X7.json",
+  "kind": "fragmented",
+  "total": 162,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "河南_X8.json",
+  "kind": "fragmented",
+  "total": 399,
+  "official": 0,
+  "comps": 23
+ },
+ {
+  "f": "河南_X9.json",
+  "kind": "fragmented",
+  "total": 225,
+  "official": 0,
+  "comps": 27
+ },
+ {
+  "f": "河南_Y1.json",
+  "kind": "fragmented",
+  "total": 168,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "河南_Y10.json",
+  "kind": "fragmented",
+  "total": 215,
+  "official": 0,
+  "comps": 25
+ },
+ {
+  "f": "河南_Y11.json",
+  "kind": "fragmented",
+  "total": 40,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_Y12.json",
+  "kind": "fragmented",
+  "total": 85,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "河南_Y13.json",
+  "kind": "fragmented",
+  "total": 47,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_Y14.json",
+  "kind": "fragmented",
+  "total": 91,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "河南_Y16.json",
+  "kind": "fragmented",
+  "total": 75,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "河南_Y17.json",
+  "kind": "fragmented",
+  "total": 83,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_Y18.json",
+  "kind": "fragmented",
+  "total": 90,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_Y2.json",
+  "kind": "fragmented",
+  "total": 101,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "河南_Y20.json",
+  "kind": "fragmented",
+  "total": 35,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "河南_Y22.json",
+  "kind": "fragmented",
+  "total": 57,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "河南_Y24.json",
+  "kind": "fragmented",
+  "total": 78,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "河南_Y26.json",
+  "kind": "fragmented",
+  "total": 83,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "河南_Y28.json",
+  "kind": "fragmented",
+  "total": 60,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_Y3.json",
+  "kind": "fragmented",
+  "total": 120,
+  "official": 0,
+  "comps": 16
+ },
+ {
+  "f": "河南_Y30.json",
+  "kind": "fragmented",
+  "total": 39,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_Y32.json",
+  "kind": "fragmented",
+  "total": 65,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_Y34.json",
+  "kind": "fragmented",
+  "total": 36,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_Y38.json",
+  "kind": "fragmented",
+  "total": 67,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_Y4.json",
+  "kind": "fragmented",
+  "total": 201,
+  "official": 0,
+  "comps": 23
+ },
+ {
+  "f": "河南_Y40.json",
+  "kind": "fragmented",
+  "total": 53,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_Y42.json",
+  "kind": "fragmented",
+  "total": 30,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "河南_Y44.json",
+  "kind": "fragmented",
+  "total": 23,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "河南_Y5.json",
+  "kind": "fragmented",
+  "total": 145,
+  "official": 0,
+  "comps": 19
+ },
+ {
+  "f": "河南_Y6.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "河南_Y7.json",
+  "kind": "fragmented",
+  "total": 126,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "河南_Y8.json",
+  "kind": "fragmented",
+  "total": 85,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "河南_Y9.json",
+  "kind": "fragmented",
+  "total": 55,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "浙江_S201.json",
+  "kind": "fragmented",
+  "total": 132,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "浙江_S202.json",
+  "kind": "fragmented",
+  "total": 228,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "浙江_S204.json",
+  "kind": "fragmented",
+  "total": 167,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "浙江_S206.json",
+  "kind": "fragmented",
+  "total": 160,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "浙江_S207.json",
+  "kind": "fragmented",
+  "total": 321,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "浙江_S211.json",
+  "kind": "fragmented",
+  "total": 111,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "浙江_S214.json",
+  "kind": "fragmented",
+  "total": 292,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "浙江_S215.json",
+  "kind": "fragmented",
+  "total": 221,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "浙江_S218.json",
+  "kind": "fragmented",
+  "total": 248,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "浙江_S219.json",
+  "kind": "fragmented",
+  "total": 160,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "浙江_S304.json",
+  "kind": "fragmented",
+  "total": 114,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_S308.json",
+  "kind": "fragmented",
+  "total": 55,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_S309.json",
+  "kind": "fragmented",
+  "total": 409,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "浙江_S310.json",
+  "kind": "fragmented",
+  "total": 306,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "浙江_S315.json",
+  "kind": "fragmented",
+  "total": 159,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_S50.json",
+  "kind": "fragmented",
+  "total": 76,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_X304.json",
+  "kind": "fragmented",
+  "total": 136,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "浙江_X306.json",
+  "kind": "fragmented",
+  "total": 51,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_X307.json",
+  "kind": "fragmented",
+  "total": 47,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_X401.json",
+  "kind": "fragmented",
+  "total": 68,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_X408.json",
+  "kind": "fragmented",
+  "total": 45,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_X409.json",
+  "kind": "fragmented",
+  "total": 49,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "浙江_X412.json",
+  "kind": "fragmented",
+  "total": 49,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "浙江_X421.json",
+  "kind": "fragmented",
+  "total": 62,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "浙江_X5.json",
+  "kind": "fragmented",
+  "total": 76,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "浙江_X501.json",
+  "kind": "fragmented",
+  "total": 59,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_X502.json",
+  "kind": "fragmented",
+  "total": 79,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "浙江_X507.json",
+  "kind": "fragmented",
+  "total": 70,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "浙江_X510.json",
+  "kind": "fragmented",
+  "total": 77,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "浙江_X523.json",
+  "kind": "fragmented",
+  "total": 75,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_X603.json",
+  "kind": "fragmented",
+  "total": 83,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "浙江_X604.json",
+  "kind": "fragmented",
+  "total": 108,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "浙江_X605.json",
+  "kind": "fragmented",
+  "total": 70,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_X802.json",
+  "kind": "fragmented",
+  "total": 127,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "浙江_X803.json",
+  "kind": "fragmented",
+  "total": 88,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "湖北_S103.json",
+  "kind": "fragmented",
+  "total": 169,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "湖北_S109.json",
+  "kind": "fragmented",
+  "total": 90,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖北_S112.json",
+  "kind": "fragmented",
+  "total": 160,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖北_S201.json",
+  "kind": "fragmented",
+  "total": 212,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "湖北_S203.json",
+  "kind": "fragmented",
+  "total": 191,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖北_S208.json",
+  "kind": "fragmented",
+  "total": 164,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖北_S214.json",
+  "kind": "fragmented",
+  "total": 156,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖北_S304.json",
+  "kind": "fragmented",
+  "total": 122,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "湖北_S334.json",
+  "kind": "fragmented",
+  "total": 90,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖北_S63.json",
+  "kind": "fragmented",
+  "total": 70,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖北_X1.json",
+  "kind": "fragmented",
+  "total": 213,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "湖北_X11.json",
+  "kind": "fragmented",
+  "total": 49,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖北_X14.json",
+  "kind": "fragmented",
+  "total": 59,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖北_X2.json",
+  "kind": "fragmented",
+  "total": 114,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "湖北_X3.json",
+  "kind": "fragmented",
+  "total": 61,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖北_X4.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖北_X7.json",
+  "kind": "fragmented",
+  "total": 68,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖北_X9.json",
+  "kind": "fragmented",
+  "total": 103,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "湖南_S201.json",
+  "kind": "fragmented",
+  "total": 164,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_S207.json",
+  "kind": "fragmented",
+  "total": 105,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_S209.json",
+  "kind": "fragmented",
+  "total": 137,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_S212.json",
+  "kind": "fragmented",
+  "total": 161,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_S214.json",
+  "kind": "fragmented",
+  "total": 241,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖南_S217.json",
+  "kind": "fragmented",
+  "total": 355,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_S219.json",
+  "kind": "fragmented",
+  "total": 323,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_S222.json",
+  "kind": "fragmented",
+  "total": 323,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_S227.json",
+  "kind": "fragmented",
+  "total": 213,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_S228.json",
+  "kind": "tooShort",
+  "total": 15,
+  "official": 40,
+  "comps": 4
+ },
+ {
+  "f": "湖南_S306.json",
+  "kind": "fragmented",
+  "total": 370,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_S308.json",
+  "kind": "fragmented",
+  "total": 377,
+  "official": 0,
+  "comps": 19
+ },
+ {
+  "f": "湖南_S313.json",
+  "kind": "fragmented",
+  "total": 223,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_S315.json",
+  "kind": "fragmented",
+  "total": 512,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "湖南_S317.json",
+  "kind": "fragmented",
+  "total": 370,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "湖南_S319.json",
+  "kind": "fragmented",
+  "total": 244,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_X1.json",
+  "kind": "fragmented",
+  "total": 279,
+  "official": 0,
+  "comps": 20
+ },
+ {
+  "f": "湖南_X10.json",
+  "kind": "fragmented",
+  "total": 69,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖南_X11.json",
+  "kind": "fragmented",
+  "total": 150,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "湖南_X13.json",
+  "kind": "fragmented",
+  "total": 83,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_X14.json",
+  "kind": "fragmented",
+  "total": 147,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "湖南_X15.json",
+  "kind": "fragmented",
+  "total": 162,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "湖南_X16.json",
+  "kind": "fragmented",
+  "total": 209,
+  "official": 0,
+  "comps": 17
+ },
+ {
+  "f": "湖南_X17.json",
+  "kind": "fragmented",
+  "total": 83,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖南_X18.json",
+  "kind": "fragmented",
+  "total": 171,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X19.json",
+  "kind": "fragmented",
+  "total": 269,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "湖南_X2.json",
+  "kind": "fragmented",
+  "total": 258,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "湖南_X20.json",
+  "kind": "fragmented",
+  "total": 197,
+  "official": 0,
+  "comps": 16
+ },
+ {
+  "f": "湖南_X21.json",
+  "kind": "fragmented",
+  "total": 197,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "湖南_X22.json",
+  "kind": "fragmented",
+  "total": 187,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "湖南_X23.json",
+  "kind": "fragmented",
+  "total": 186,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "湖南_X24.json",
+  "kind": "fragmented",
+  "total": 250,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X25.json",
+  "kind": "fragmented",
+  "total": 126,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X26.json",
+  "kind": "fragmented",
+  "total": 207,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "湖南_X27.json",
+  "kind": "fragmented",
+  "total": 142,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_X28.json",
+  "kind": "fragmented",
+  "total": 155,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖南_X29.json",
+  "kind": "fragmented",
+  "total": 105,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "湖南_X3.json",
+  "kind": "fragmented",
+  "total": 146,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X30.json",
+  "kind": "fragmented",
+  "total": 176,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "湖南_X31.json",
+  "kind": "fragmented",
+  "total": 143,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X32.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_X33.json",
+  "kind": "fragmented",
+  "total": 173,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X34.json",
+  "kind": "fragmented",
+  "total": 271,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "湖南_X35.json",
+  "kind": "fragmented",
+  "total": 149,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "湖南_X36.json",
+  "kind": "fragmented",
+  "total": 219,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "湖南_X37.json",
+  "kind": "fragmented",
+  "total": 180,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X38.json",
+  "kind": "fragmented",
+  "total": 126,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖南_X39.json",
+  "kind": "fragmented",
+  "total": 218,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "湖南_X4.json",
+  "kind": "fragmented",
+  "total": 134,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X40.json",
+  "kind": "fragmented",
+  "total": 152,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "湖南_X41.json",
+  "kind": "fragmented",
+  "total": 171,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "湖南_X43.json",
+  "kind": "fragmented",
+  "total": 185,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "湖南_X44.json",
+  "kind": "fragmented",
+  "total": 182,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X45.json",
+  "kind": "fragmented",
+  "total": 179,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X46.json",
+  "kind": "fragmented",
+  "total": 86,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "湖南_X47.json",
+  "kind": "fragmented",
+  "total": 185,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "湖南_X48.json",
+  "kind": "fragmented",
+  "total": 103,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_X49.json",
+  "kind": "fragmented",
+  "total": 169,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "湖南_X5.json",
+  "kind": "fragmented",
+  "total": 194,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "湖南_X50.json",
+  "kind": "fragmented",
+  "total": 156,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "湖南_X51.json",
+  "kind": "fragmented",
+  "total": 181,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X52.json",
+  "kind": "fragmented",
+  "total": 218,
+  "official": 0,
+  "comps": 16
+ },
+ {
+  "f": "湖南_X53.json",
+  "kind": "fragmented",
+  "total": 226,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "湖南_X54.json",
+  "kind": "fragmented",
+  "total": 149,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X55.json",
+  "kind": "fragmented",
+  "total": 244,
+  "official": 0,
+  "comps": 18
+ },
+ {
+  "f": "湖南_X56.json",
+  "kind": "fragmented",
+  "total": 188,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "湖南_X58.json",
+  "kind": "fragmented",
+  "total": 122,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_X59.json",
+  "kind": "fragmented",
+  "total": 75,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_X6.json",
+  "kind": "fragmented",
+  "total": 170,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "湖南_X60.json",
+  "kind": "fragmented",
+  "total": 177,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X61.json",
+  "kind": "fragmented",
+  "total": 93,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_X62.json",
+  "kind": "fragmented",
+  "total": 229,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖南_X63.json",
+  "kind": "fragmented",
+  "total": 148,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖南_X64.json",
+  "kind": "fragmented",
+  "total": 249,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "湖南_X68.json",
+  "kind": "fragmented",
+  "total": 183,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_X69.json",
+  "kind": "fragmented",
+  "total": 107,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_X7.json",
+  "kind": "fragmented",
+  "total": 178,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "湖南_X70.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "湖南_X71.json",
+  "kind": "fragmented",
+  "total": 187,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "湖南_X72.json",
+  "kind": "fragmented",
+  "total": 138,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "湖南_X73.json",
+  "kind": "fragmented",
+  "total": 94,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_X74.json",
+  "kind": "fragmented",
+  "total": 153,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "湖南_X75.json",
+  "kind": "fragmented",
+  "total": 111,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "湖南_X78.json",
+  "kind": "fragmented",
+  "total": 73,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_X8.json",
+  "kind": "fragmented",
+  "total": 231,
+  "official": 0,
+  "comps": 15
+ },
+ {
+  "f": "湖南_X80.json",
+  "kind": "fragmented",
+  "total": 120,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "湖南_X83.json",
+  "kind": "fragmented",
+  "total": 191,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "湖南_X84.json",
+  "kind": "fragmented",
+  "total": 141,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖南_X85.json",
+  "kind": "fragmented",
+  "total": 110,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "湖南_X9.json",
+  "kind": "fragmented",
+  "total": 173,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "甘肃_S207.json",
+  "kind": "fragmented",
+  "total": 293,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "甘肃_S301.json",
+  "kind": "overLong",
+  "total": 403,
+  "official": 80,
+  "comps": 7
+ },
+ {
+  "f": "甘肃_S306.json",
+  "kind": "fragmented",
+  "total": 141,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "福建_C17.json",
+  "kind": "fragmented",
+  "total": 13,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "福建_S201.json",
+  "kind": "fragmented",
+  "total": 355,
+  "official": 0,
+  "comps": 18
+ },
+ {
+  "f": "福建_S203.json",
+  "kind": "fragmented",
+  "total": 314,
+  "official": 0,
+  "comps": 17
+ },
+ {
+  "f": "福建_S204.json",
+  "kind": "fragmented",
+  "total": 147,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "福建_S205.json",
+  "kind": "fragmented",
+  "total": 498,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "福建_S206.json",
+  "kind": "fragmented",
+  "total": 331,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "福建_S207.json",
+  "kind": "fragmented",
+  "total": 176,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "福建_S303.json",
+  "kind": "fragmented",
+  "total": 42,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "福建_S304.json",
+  "kind": "fragmented",
+  "total": 180,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "福建_S306.json",
+  "kind": "fragmented",
+  "total": 353,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "福建_S307.json",
+  "kind": "fragmented",
+  "total": 146,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "福建_S308.json",
+  "kind": "fragmented",
+  "total": 295,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "福建_X901.json",
+  "kind": "fragmented",
+  "total": 123,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "福建_X944.json",
+  "kind": "fragmented",
+  "total": 86,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "福建_X977.json",
+  "kind": "fragmented",
+  "total": 44,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "西藏_S201.json",
+  "kind": "fragmented",
+  "total": 593,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "西藏_S202.json",
+  "kind": "fragmented",
+  "total": 447,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "西藏_S203.json",
+  "kind": "fragmented",
+  "total": 561,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "西藏_S301.json",
+  "kind": "overLong",
+  "total": 1897,
+  "official": 80,
+  "comps": 8
+ },
+ {
+  "f": "西藏_S302.json",
+  "kind": "fragmented",
+  "total": 1834,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "西藏_S303.json",
+  "kind": "fragmented",
+  "total": 2100,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "贵州_S102.json",
+  "kind": "fragmented",
+  "total": 238,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "贵州_S104.json",
+  "kind": "fragmented",
+  "total": 89,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "贵州_S205.json",
+  "kind": "fragmented",
+  "total": 323,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "贵州_S207.json",
+  "kind": "fragmented",
+  "total": 120,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "贵州_S208.json",
+  "kind": "fragmented",
+  "total": 206,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "贵州_S212.json",
+  "kind": "fragmented",
+  "total": 497,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "贵州_S303.json",
+  "kind": "fragmented",
+  "total": 549,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "贵州_S304.json",
+  "kind": "fragmented",
+  "total": 408,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "贵州_S307.json",
+  "kind": "fragmented",
+  "total": 280,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "贵州_S308.json",
+  "kind": "fragmented",
+  "total": 255,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "贵州_S309.json",
+  "kind": "fragmented",
+  "total": 556,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "贵州_S312.json",
+  "kind": "fragmented",
+  "total": 420,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "贵州_X10.json",
+  "kind": "fragmented",
+  "total": 60,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "贵州_X320.json",
+  "kind": "fragmented",
+  "total": 104,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "贵州_X350.json",
+  "kind": "fragmented",
+  "total": 91,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "贵州_X540.json",
+  "kind": "fragmented",
+  "total": 85,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "贵州_X7.json",
+  "kind": "fragmented",
+  "total": 60,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "贵州_X740.json",
+  "kind": "fragmented",
+  "total": 173,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "贵州_X922.json",
+  "kind": "fragmented",
+  "total": 52,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "贵州_Y1.json",
+  "kind": "fragmented",
+  "total": 112,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "贵州_Y12.json",
+  "kind": "fragmented",
+  "total": 107,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "贵州_Y3.json",
+  "kind": "fragmented",
+  "total": 74,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "贵州_Y6.json",
+  "kind": "fragmented",
+  "total": 87,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "贵州_Y9.json",
+  "kind": "fragmented",
+  "total": 82,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "辽宁_S202.json",
+  "kind": "fragmented",
+  "total": 510,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "辽宁_S206.json",
+  "kind": "fragmented",
+  "total": 256,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "辽宁_S303.json",
+  "kind": "fragmented",
+  "total": 187,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "辽宁_S309.json",
+  "kind": "fragmented",
+  "total": 92,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "重庆_S102.json",
+  "kind": "fragmented",
+  "total": 875,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "重庆_S103.json",
+  "kind": "fragmented",
+  "total": 153,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "重庆_S107.json",
+  "kind": "fragmented",
+  "total": 199,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "重庆_S205.json",
+  "kind": "fragmented",
+  "total": 135,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "重庆_S207.json",
+  "kind": "fragmented",
+  "total": 232,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "重庆_X62.json",
+  "kind": "fragmented",
+  "total": 58,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_S101.json",
+  "kind": "fragmented",
+  "total": 215,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "陕西_S106.json",
+  "kind": "fragmented",
+  "total": 259,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "陕西_S107.json",
+  "kind": "fragmented",
+  "total": 459,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "陕西_S201.json",
+  "kind": "fragmented",
+  "total": 232,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "陕西_S202.json",
+  "kind": "fragmented",
+  "total": 233,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "陕西_S204.json",
+  "kind": "fragmented",
+  "total": 453,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "陕西_S205.json",
+  "kind": "fragmented",
+  "total": 428,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "陕西_S208.json",
+  "kind": "fragmented",
+  "total": 123,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_S209.json",
+  "kind": "fragmented",
+  "total": 251,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "陕西_S212.json",
+  "kind": "fragmented",
+  "total": 101,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "陕西_S301.json",
+  "kind": "fragmented",
+  "total": 107,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_S306.json",
+  "kind": "fragmented",
+  "total": 177,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_S312.json",
+  "kind": "fragmented",
+  "total": 162,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "陕西_X101.json",
+  "kind": "fragmented",
+  "total": 140,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "陕西_X105.json",
+  "kind": "fragmented",
+  "total": 26,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_X201.json",
+  "kind": "fragmented",
+  "total": 148,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_X203.json",
+  "kind": "fragmented",
+  "total": 103,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_X204.json",
+  "kind": "fragmented",
+  "total": 113,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "陕西_X205.json",
+  "kind": "fragmented",
+  "total": 92,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "陕西_X208.json",
+  "kind": "fragmented",
+  "total": 141,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "陕西_X213.json",
+  "kind": "fragmented",
+  "total": 48,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_X214.json",
+  "kind": "fragmented",
+  "total": 134,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "陕西_X216.json",
+  "kind": "fragmented",
+  "total": 164,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "陕西_X221.json",
+  "kind": "fragmented",
+  "total": 102,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "陕西_X222.json",
+  "kind": "fragmented",
+  "total": 140,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_X226.json",
+  "kind": "fragmented",
+  "total": 201,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_X301.json",
+  "kind": "fragmented",
+  "total": 141,
+  "official": 0,
+  "comps": 14
+ },
+ {
+  "f": "陕西_X303.json",
+  "kind": "fragmented",
+  "total": 85,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "陕西_X305.json",
+  "kind": "fragmented",
+  "total": 96,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "陕西_X306.json",
+  "kind": "fragmented",
+  "total": 124,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_X307.json",
+  "kind": "fragmented",
+  "total": 119,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "陕西_X308.json",
+  "kind": "fragmented",
+  "total": 203,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "陕西_X309.json",
+  "kind": "fragmented",
+  "total": 153,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "陕西_X310.json",
+  "kind": "fragmented",
+  "total": 71,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "陕西_X312.json",
+  "kind": "fragmented",
+  "total": 37,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "陕西_X313.json",
+  "kind": "fragmented",
+  "total": 102,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_X314.json",
+  "kind": "fragmented",
+  "total": 156,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "陕西_X318.json",
+  "kind": "fragmented",
+  "total": 85,
+  "official": 0,
+  "comps": 12
+ },
+ {
+  "f": "青海_S101.json",
+  "kind": "tooShort",
+  "total": 69,
+  "official": 400,
+  "comps": 9
+ },
+ {
+  "f": "青海_S102.json",
+  "kind": "overLong",
+  "total": 85,
+  "official": 40,
+  "comps": 3
+ },
+ {
+  "f": "青海_S20.json",
+  "kind": "fragmented",
+  "total": 405,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "青海_S202.json",
+  "kind": "overLong",
+  "total": 157,
+  "official": 100,
+  "comps": 2
+ },
+ {
+  "f": "青海_S203.json",
+  "kind": "fragmented",
+  "total": 133,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "青海_S301.json",
+  "kind": "fragmented",
+  "total": 274,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "青海_X308.json",
+  "kind": "fragmented",
+  "total": 240,
+  "official": 0,
+  "comps": 6
+ },
+ {
+  "f": "黑龙江_S101.json",
+  "kind": "fragmented",
+  "total": 355,
+  "official": 0,
+  "comps": 13
+ },
+ {
+  "f": "黑龙江_S202.json",
+  "kind": "fragmented",
+  "total": 284,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "黑龙江_S203.json",
+  "kind": "fragmented",
+  "total": 806,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "黑龙江_S207.json",
+  "kind": "fragmented",
+  "total": 412,
+  "official": 0,
+  "comps": 10
+ },
+ {
+  "f": "黑龙江_S209.json",
+  "kind": "fragmented",
+  "total": 246,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "黑龙江_S210.json",
+  "kind": "fragmented",
+  "total": 183,
+  "official": 0,
+  "comps": 8
+ },
+ {
+  "f": "黑龙江_S309.json",
+  "kind": "fragmented",
+  "total": 601,
+  "official": 0,
+  "comps": 11
+ },
+ {
+  "f": "黑龙江_S311.json",
+  "kind": "fragmented",
+  "total": 418,
+  "official": 0,
+  "comps": 9
+ },
+ {
+  "f": "黑龙江_X132.json",
+  "kind": "fragmented",
+  "total": 27,
+  "official": 0,
+  "comps": 7
+ },
+ {
+  "f": "黑龙江_Y3.json",
+  "kind": "fragmented",
+  "total": 71,
+  "official": 0,
+  "comps": 6
+ }
+]

@@ -210,7 +210,8 @@
           "lat": 29.91,
           "tagline": "大渡河上的铁索桥，近现代史地标。",
           "intro": "清康熙年间建成的悬索桥，由十三条铁链承重，桥下是湍急的大渡河。走在桥面上能直观感受「大渡桥横铁索寒」的场景，桥头设有纪念馆。",
-          "visitHours": 1
+          "visitHours": 1,
+          "ticketNote": "桥体为文物古迹，参观与纪念馆开放范围以文保单位公告为准"
         },
         {
           "id": "cts-p-zheduo",
@@ -223,7 +224,8 @@
           "tagline": "川藏线第一座大山，康巴第一关。",
           "intro": "海拔约 4298 米，是川藏线上第一个真正的高海拔山口，也是汉藏文化与地理的过渡线之一。山口经幡密集，设有「康定情歌」石碑，雪季常需防滑链。",
           "mustSee": true,
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "山口为公路公共路段，无售票，停车与管制以交管公告为准"
         },
         {
           "id": "cts-p-xinduqiao",
@@ -237,6 +239,7 @@
           "intro": "海拔约 3300 米，河谷两侧青杨、白桦与藏式民居加上远处山脊，构成层次丰富的画面。真正的看点在 G318 两侧的无名地段而不是镇中心，清晨与日落光线最好。",
           "mustSee": true,
           "visitHours": 2,
+          "ticketNote": "光影走廊无统一门票，个别观景台与消费项目以现场公示为准",
           "bestTime": "日出后 1 小时、日落前 1 小时。"
         },
         {
@@ -250,7 +253,8 @@
           "tagline": "海拔 4500 米以上的石头海与大小海子。",
           "intro": "青藏高原最大的古冰体遗迹之一，上千个大大小小的花岗岩漂砾散布在高原面上，中间夹着数百个冰蚀湖（海子）。姊妹湖观景台就在路边，是拍摄高原湖群最方便的机位。",
           "mustSee": true,
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "路边观景点免费开放，核心区禁止驶离公路，以公告为准"
         },
         {
           "id": "cts-p-dongda",
@@ -262,7 +266,8 @@
           "lat": 29.7,
           "tagline": "川藏南线最高点，海拔 5130 米。",
           "intro": "川藏南线的最高山口，垭口开阔、经幡密布，山体呈现典型的高寒草甸与裸岩。短暂拍照即可，切勿久留或奔跑。",
-          "visitHours": 0.3
+          "visitHours": 0.3,
+          "ticketNote": "垭口为国道沿线免费停留点，停留时限与管制以交管公告为准"
         },
         {
           "id": "cts-p-72turns",
@@ -275,7 +280,8 @@
           "tagline": "从 4600 米直落到 2700 米的连续回头弯。",
           "intro": "业拉山下到怒江峡谷之间的盘山公路，短时间下降近 2000 米，是世界级的公路景观之一。观景台可以看到整条路如同褶皱带挂在山坡上；下山请使用低挡位控制车速。",
           "mustSee": true,
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "观景台免费，停车位有限，是否限流以交管部门公告为准"
         },
         {
           "id": "cts-p-ranwu",
@@ -289,6 +295,7 @@
           "intro": "海拔约 3850 米的堰塞湖，湖水源自周边雪山冰川，晴天时雪山倒影与湖水构成川藏线上最出名的画面之一。最佳观景位在瓦村与湖尾观景台；融雪季水色会变浑。",
           "mustSee": true,
           "visitHours": 1,
+          "ticketNote": "湖岸多数免费，个别管理区需购票，以景区官方公告为准",
           "bestTime": "清晨无风时倒影最好。"
         },
         {
@@ -316,20 +323,88 @@
           "tagline": "雪山森林环抱的高山草甸，最适合住一晚。",
           "intro": "海拔约 3300 米的宽阔牧场，云杉、冷杉与蕨类植物围合着一川草地，木栅栏与藏式木屋散布其间。这里是川藏线上海拔最低、最好睡的一站，也是石锅鸡的故乡。",
           "mustSee": true,
-          "visitHours": 3
+          "visitHours": 3,
+          "ticketNote": "牧场住宿与餐饮按当地经营点收取，开放与营业以现场公示为准"
+        },
+        {
+          "id": "cts-p-namcha",
+          "name": "南迦巴瓦峰",
+          "province": "西藏",
+          "city": "林芝",
+          "category": "mountain",
+          "lng": 95.0561,
+          "lat": 29.6284,
+          "tagline": "林芝的「羞女峰」，中国最美雪山之一。",
+          "intro": "喜马拉雅东端的最高峰，海拔 7782 米，常年云遮雾绕、难得露面，得名「羞女峰」。位于林芝米林，与雅鲁藏布大峡谷相邻，是观山与峡谷同框的核心。最佳观赏期在秋冬晴朗少云的清晨与傍晚。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "ticketNote": "观景点分布在峡谷与色季拉山口一带，开放以景区公告为准"
+        },
+        {
+          "id": "cts-p-yarlung",
+          "name": "雅鲁藏布大峡谷",
+          "province": "西藏",
+          "city": "林芝",
+          "category": "landform",
+          "lng": 94.9375,
+          "lat": 29.6128,
+          "tagline": "世界最深的峡谷，围绕南迦巴瓦的马蹄形大拐弯。",
+          "intro": "雅鲁藏布江在林芝米林—派镇一带切出世界最深的峡谷，围绕南迦巴瓦峰形成巨大的马蹄形拐弯。景区可乘船或徒步进入，沿途瀑布、桃林与雪山同框，是大拐弯与垂直植被带景观的集中展示区。",
+          "mustSee": true,
+          "visitHours": 3,
+          "ticketNote": "景区需购票并按规定线路游览，以公告为准"
+        },
+        {
+          "id": "cts-p-basum",
+          "name": "巴松措",
+          "province": "西藏",
+          "city": "林芝",
+          "category": "water",
+          "lng": 93.9679,
+          "lat": 30.0079,
+          "tagline": "林芝深处的国家 5A 湖泊，湖心孤岛寺庙。",
+          "intro": "位于工布江达县的高山堰塞湖，湖水清澈呈墨绿，湖心岛上有错宗工巴寺，是藏东南少有的「湖中寺」景观。周边森林环抱，四季皆景，春天湖边桃林与雪山相映。",
+          "visitHours": 2,
+          "ticketNote": "景区为 5A 管理，门票与游船以公告为准"
+        },
+        {
+          "id": "cts-p-hailuogou",
+          "name": "海螺沟",
+          "province": "四川",
+          "city": "甘孜藏族自治州",
+          "category": "mountain",
+          "lng": 102.0055,
+          "lat": 29.579,
+          "tagline": "贡嘎东坡的低海拔现代冰川，可近距离走到冰舌。",
+          "intro": "位于甘孜州泸定县磨西镇，是贡嘎山东坡的现代海洋性冰川，因海拔较低（冰舌下探至约 2900 米）而能近距离观赏巨大冰瀑布与冰川弧拱。沟内原始森林与温泉并存，是川藏线康定—泸定段的经典冰川景点。",
+          "visitHours": 3,
+          "ticketNote": "景区需购票并换乘观光车，以公告为准"
+        },
+        {
+          "id": "cts-p-bangda",
+          "name": "邦达草原",
+          "province": "西藏",
+          "city": "昌都",
+          "category": "grassland",
+          "lng": 97.2925,
+          "lat": 30.2085,
+          "tagline": "昌都高原上的辽阔草甸，318 与 214 交汇的牧区。",
+          "intro": "位于八宿县邦达镇一带的高原草甸，海拔约 4200 米，是 318 国道与 214 国道交汇附近的典型牧区。地势平阔、夏季水草丰美，周边有邦达机场与连绵的山丘，是川藏线上感受高原牧场风光的一站。",
+          "visitHours": 0.5,
+          "ticketNote": "草原为开放牧区，停留与通行以当地管理为准"
         }
       ],
       "plan": [
-        { "day": 1, "title": "成都 → 泸定", "fromNode": "成都", "toNode": "泸定", "distanceKm": 320, "driveHours": 5.5, "roadRefs": ["G318"], "stayCity": "泸定", "poiIds": ["cts-p-luding"], "summary": "出盆地，开始进山。" },
-        { "day": 2, "title": "泸定 → 康定 → 新都桥", "fromNode": "泸定", "toNode": "康定", "distanceKm": 110, "driveHours": 2.5, "roadRefs": ["G318"], "stayCity": "康定", "poiIds": ["cts-p-zheduo", "cts-p-xinduqiao"], "summary": "翻折多山，正式上高原。" },
-        { "day": 3, "title": "康定 → 理塘", "fromNode": "康定", "toNode": "理塘", "distanceKm": 290, "driveHours": 6, "roadRefs": ["G318"], "stayCity": "理塘", "poiIds": [], "summary": "连翻三山，住世界高城。", "tips": ["理塘 4000 米，首夜注意保暖与少动"] },
-        { "day": 4, "title": "理塘 → 芒康", "fromNode": "理塘", "toNode": "芒康", "distanceKm": 300, "driveHours": 6.5, "roadRefs": ["G318"], "stayCity": "芒康", "poiIds": ["cts-p-haizi"], "summary": "海子山之后跨金沙江入藏。" },
-        { "day": 5, "title": "芒康 → 左贡", "fromNode": "芒康", "toNode": "左贡", "distanceKm": 160, "driveHours": 4.5, "roadRefs": ["G318"], "stayCity": "左贡", "poiIds": ["cts-p-dongda"], "summary": "翻 5130 米东达山。" },
-        { "day": 6, "title": "左贡 → 八宿", "fromNode": "左贡", "toNode": "八宿", "distanceKm": 200, "driveHours": 5, "roadRefs": ["G318"], "stayCity": "八宿", "poiIds": ["cts-p-72turns"], "summary": "怒江七十二拐。" },
-        { "day": 7, "title": "八宿 → 然乌 → 波密", "fromNode": "八宿", "toNode": "波密", "distanceKm": 220, "driveHours": 4.5, "roadRefs": ["G318"], "stayCity": "波密", "poiIds": ["cts-p-ranwu", "cts-p-midui"], "summary": "冰川与森林的一天。" },
-        { "day": 8, "title": "波密 → 林芝", "fromNode": "波密", "toNode": "林芝八一", "distanceKm": 230, "driveHours": 5, "roadRefs": ["G318"], "stayCity": "林芝八一", "poiIds": ["cts-p-lulang"], "summary": "通麦隧道群 + 鲁朗。" },
-        { "day": 9, "title": "林芝 → 拉萨", "fromNode": "林芝八一", "toNode": "拉萨", "distanceKm": 310, "driveHours": 5, "roadRefs": ["G318", "G4218"], "stayCity": "拉萨", "poiIds": [], "summary": "抵达圣城。" },
-        { "day": 10, "title": "拉萨休整", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "roadRefs": ["城市道路"], "stayCity": "拉萨", "poiIds": [], "summary": "机动与适应。" }
+        { "day": 1, "title": "成都 → 泸定", "fromNode": "成都", "toNode": "泸定", "distanceKm": 320, "driveHours": 5.5, "roadRefs": ["G318"], "stayCity": "泸定", "poiIds": ["cts-p-luding"], "summary": "上午从成都出发，沿成雅高速到雅安后转 G318，翻二郎山隧道到泸定。傍晚在泸定城边看大渡河与泸定桥，这一天海拔一路升到 1300 米左右，是进山的第一课，节奏可以慢一点。", "tips": ["出城前补满油电，山区夜间服务点较少", "二郎山隧道内禁止停车拍照", "今天海拔较低，可正常作息"] },
+        { "day": 2, "title": "泸定 → 康定 → 新都桥", "fromNode": "泸定", "toNode": "康定", "distanceKm": 110, "driveHours": 2.5, "roadRefs": ["G318"], "stayCity": "康定", "poiIds": ["cts-p-zheduo", "cts-p-xinduqiao"], "summary": "上午看泸定桥与大渡河峡谷，午后翻折多山口到康定。这座 4298 米的垭口是川藏线第一道真正的门槛，拍照别久留；到康定后先休息，今天不安排太多景点。", "tips": ["折多山雪季结冰，需备防滑链", "垭口停留时间控制在半小时以内", "到康定后避免跑跳与过热水澡"] },
+        { "day": 3, "title": "康定 → 理塘", "fromNode": "康定", "toNode": "理塘", "distanceKm": 290, "driveHours": 6, "roadRefs": ["G318"], "stayCity": "理塘", "poiIds": [], "summary": "从康定出发，经雅江、新都桥连翻高尔寺、剪子弯与卡子拉三座大山，傍晚抵达理塘。新都桥的光影走廊值得停车一次；理塘海拔 4014 米，今晚少走动、早休息。", "tips": ["理塘 4000 米，首夜注意保暖与少动", "新都桥最佳光线在清晨与日落", "连续三座大山，车程长注意休息"] },
+        { "day": 4, "title": "理塘 → 芒康", "fromNode": "理塘", "toNode": "芒康", "distanceKm": 300, "driveHours": 6.5, "roadRefs": ["G318"], "stayCity": "芒康", "poiIds": ["cts-p-haizi"], "summary": "上午穿过海子山高原古冰体遗迹，数百个冰蚀湖散落在漂砾之间；午后下到巴塘，跨金沙江大桥进入西藏，一路海拔降到 2500 米。傍晚抵达芒康住宿，在县城采购后面几天所需物资。", "tips": ["海子山无补给，中午前完成拍摄", "过桥后有检查站，随身带好证件", "芒康县城提前补齐氧气与食品"] },
+        { "day": 5, "title": "芒康 → 左贡", "fromNode": "芒康", "toNode": "左贡", "distanceKm": 160, "driveHours": 4.5, "roadRefs": ["G318"], "stayCity": "左贡", "poiIds": ["cts-p-dongda"], "summary": "沿 G318 北上，先后翻拉乌山、觉巴山与东达山，其中东达山约 5130 米是川藏线最高点，垭口拍照要快、要少动作。全天都在反复爬升与下降，午后到左贡后以休息为主。", "tips": ["觉巴山为连续回头弯，注意会车", "东达山停留控制在十几分钟内", "车厢内备好氧气与温水"] },
+        { "day": 6, "title": "左贡 → 八宿", "fromNode": "左贡", "toNode": "八宿", "distanceKm": 200, "driveHours": 5, "roadRefs": ["G318"], "stayCity": "八宿", "poiIds": ["cts-p-72turns"], "summary": "上午翻业拉山，随后是三十多公里连续下坡直落到 2700 米的怒江峡谷，全程低挡位控速。怒江七十二拐的观景台能看到整条路挂在山坡上，下到八宿后是进藏以来最舒服的一晚。", "tips": ["长下坡禁空挡滑行，刹车过热是首忌", "观景台停车靠外侧，避免占用弯道", "下到峡谷后气温升高，注意补水"] },
+        { "day": 7, "title": "八宿 → 然乌 → 波密", "fromNode": "八宿", "toNode": "波密", "distanceKm": 220, "driveHours": 4.5, "roadRefs": ["G318"], "stayCity": "波密", "poiIds": ["cts-p-ranwu", "cts-p-midui"], "summary": "从八宿下到然乌湖，晴天可见来古冰川方向的雪峰倒影；再沿湖行到波密，进入森林与冰川交界的段落。海拔从 3850 米降到 2750 米，一路湿润多雨，米堆冰川安排在下午。", "tips": ["然乌清晨无风时倒影最好，早到为佳", "米堆冰川栈道约 2 公里，备防滑鞋", "此段多雨，车内备干衣与雨具"] },
+        { "day": 8, "title": "波密 → 林芝", "fromNode": "波密", "toNode": "林芝八一", "distanceKm": 230, "driveHours": 5, "roadRefs": ["G318"], "stayCity": "林芝八一", "poiIds": ["cts-p-lulang"], "summary": "经通麦隧道桥群与排龙峡谷北上，昔日天险已成坦途，午后进鲁朗牧场住一晚。海拔从 2000 米升到 3300 米再翻色季拉山口，是全程景观最连贯的一段；傍晚光线适合拍摄。", "tips": ["通麦段仍要留意落石提示", "鲁朗海拔低、气候温润，适合好好休息", "石锅鸡旺季排队长，晚餐提前订位"] },
+        { "day": 9, "title": "林芝 → 拉萨", "fromNode": "林芝八一", "toNode": "拉萨", "distanceKm": 310, "driveHours": 5, "roadRefs": ["G318", "G4218"], "stayCity": "拉萨", "poiIds": [], "summary": "上午从林芝出发翻米拉山口，海拔最高约 5013 米，气温也随之下降；可选择走林拉高速避开垭口、缩短约 1.5 小时。午后一路降到拉萨，抵达后先安排休息与补给。", "tips": ["米拉山口风大，停留不宜过久", "高速与国道车程差异大，出行前确认路况", "今天不再安排景点，抵达即休息"] },
+        { "day": 10, "title": "拉萨休整", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "driveHours": 0, "roadRefs": ["城市道路"], "stayCity": "拉萨", "poiIds": [], "summary": "最后一天留在拉萨，用来补上因天气或塌方落下的行程，也用于处理高原反应。上午可去布达拉宫与大昭寺，清晨转经人流最盛；午后整理装备、补给氧气并确认返程交通。", "tips": ["布达拉宫需按批次提前预约", "返程前确认火车或航班时刻", "今天避免剧烈运动与饮酒"] }
       ],
       "practical": {
         "permit": "常规进藏不需边防证；若增加墨脱、察隅、珠峰等支线需另行办理。",
@@ -520,7 +595,8 @@
           "tagline": "云南规模最大的藏传佛教寺院，被称为「小布达拉宫」。",
           "intro": "17 世纪由五世达赖喇嘛敕建的格鲁派寺院，依山而建的白墙金顶与拉姆央措湖构成经典的对称构图。清晨常有僧人辩经，湖边栈道是最佳拍摄位置。",
           "mustSee": true,
-          "visitHours": 2
+          "visitHours": 2,
+          "ticketNote": "需实名预约，旺季限流，开放范围以寺院官方公告为准"
         },
         {
           "id": "ytl-p-baima",
@@ -533,6 +609,7 @@
           "tagline": "海拔约 4292 米的滇藏第一垭口，五月杜鹃花海。",
           "intro": "白马雪山国家级自然保护区内有完整的高山针叶林与滇金丝猴栖息地，公路最高处在 4292 米左右。5-6 月杜鹃沿路盛放，是国内最容易亲近的高山杜鹃观赏公路之一。",
           "visitHours": 0.5,
+          "ticketNote": "垭口属公路沿线观景点，核心区禁入，以保护区公告为准",
           "bestTime": "5-6 月花期。"
         },
         {
@@ -547,6 +624,7 @@
           "intro": "主峰卡瓦格博海拔 6740 米，是云南最高峰，也是至今未被登顶的神山之一。飞来寺观景台正对十三峰，秋冬季节（11 月至次年 2 月）晴天率高，清晨第一缕阳光打到峰顶的「日照金山」是滇藏线最著名的画面。",
           "mustSee": true,
           "visitHours": 2,
+          "ticketNote": "观景台分多个点位，旺季需实名预约，是否限流以景区公告为准",
           "bestTime": "日出前半小时候位。"
         },
         {
@@ -560,7 +638,8 @@
           "tagline": "澜沧江边的千年手工盐田。",
           "intro": "芒康县纳西乡的盐井保留着极其原始的手工晒盐方式：卤水从江边盐井打出后在层层木架上自然风干，因土质不同而产出红盐与白盐。这里同时有藏传佛教与天主教并存的特殊人文景观。",
           "mustSee": true,
-          "visitHours": 1.5
+          "visitHours": 1.5,
+          "ticketNote": "盐井为村寨管理范围，参观需尊重当地习俗，以现场说明为准"
         },
         {
           "id": "ytl-p-72turns",
@@ -572,7 +651,8 @@
           "lat": 29.85,
           "tagline": "业拉山下到怒江峡谷的回头弯道群。",
           "intro": "连续回头弯从海拔 4600 米直落到 2700 米，观景台在垭口下方。下山请全程低挡位控制车速，切忌长时间踩刹车。",
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "观景台免费，停车位有限，是否限流以交管部门公告为准"
         },
         {
           "id": "ytl-p-ranwu",
@@ -585,7 +665,8 @@
           "tagline": "湖面倒影雪山的经典机位。",
           "intro": "高山堰塞湖，湖岸两侧是来古冰川方向的雪峰与原始森林，晴天时倒影极好。融雪季之后水色会变浑，最佳季节在 4 月与 10-11 月。",
           "mustSee": true,
-          "visitHours": 1
+          "visitHours": 1,
+          "ticketNote": "湖岸多为免费岸线，管理范围需购票，以景区公告为准"
         },
         {
           "id": "ytl-p-midui",
@@ -611,21 +692,76 @@
           "lat": 29.76,
           "tagline": "川藏与滇藏在此合流，石锅鸡的故乡。",
           "intro": "海拔 3300 米的高山草甸被云杉林环绕，是进藏路上海拔最低、最好睡的一站，也是滇藏线与川藏南线汇合后的共同休息点。",
-          "visitHours": 3
+          "visitHours": 3,
+          "ticketNote": "牧场住宿与餐饮按当地经营点收取，开放与营业以现场公示为准"
+        },
+        {
+          "id": "ytl-p-namcha",
+          "name": "南迦巴瓦峰",
+          "province": "西藏",
+          "city": "林芝",
+          "category": "mountain",
+          "lng": 95.0561,
+          "lat": 29.6284,
+          "tagline": "林芝的「羞女峰」，中国最美雪山之一。",
+          "intro": "喜马拉雅东端的最高峰，海拔 7782 米，常年云遮雾绕、难得露面，得名「羞女峰」。位于林芝米林，与雅鲁藏布大峡谷相邻，是观山与峡谷同框的核心。最佳观赏期在秋冬晴朗少云的清晨与傍晚。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "ticketNote": "观景点分布在峡谷与色季拉山口一带，开放以景区公告为准"
+        },
+        {
+          "id": "ytl-p-yarlung",
+          "name": "雅鲁藏布大峡谷",
+          "province": "西藏",
+          "city": "林芝",
+          "category": "landform",
+          "lng": 94.9375,
+          "lat": 29.6128,
+          "tagline": "世界最深的峡谷，围绕南迦巴瓦的马蹄形大拐弯。",
+          "intro": "雅鲁藏布江在林芝米林—派镇一带切出世界最深的峡谷，围绕南迦巴瓦峰形成巨大的马蹄形拐弯。景区可乘船或徒步进入，沿途瀑布、桃林与雪山同框，是大拐弯与垂直植被带景观的集中展示区。",
+          "mustSee": true,
+          "visitHours": 3,
+          "ticketNote": "景区需购票并按规定线路游览，以公告为准"
+        },
+        {
+          "id": "ytl-p-basum",
+          "name": "巴松措",
+          "province": "西藏",
+          "city": "林芝",
+          "category": "water",
+          "lng": 93.9679,
+          "lat": 30.0079,
+          "tagline": "林芝深处的国家 5A 湖泊，湖心孤岛寺庙。",
+          "intro": "位于工布江达县的高山堰塞湖，湖水清澈呈墨绿，湖心岛上有错宗工巴寺，是藏东南少有的「湖中寺」景观。周边森林环抱，四季皆景，春天湖边桃林与雪山相映。",
+          "visitHours": 2,
+          "ticketNote": "景区为 5A 管理，门票与游船以公告为准"
+        },
+        {
+          "id": "ytl-p-galing",
+          "name": "嘎朗湖",
+          "province": "西藏",
+          "city": "林芝",
+          "category": "water",
+          "lng": 95.6049,
+          "lat": 29.9039,
+          "tagline": "波密冰川脚下的湿地湖泊，桃花季最出片。",
+          "intro": "位于波密县嘎朗村一带的高原湿地湖泊，背靠念青唐古拉东段冰川群，湖水静谧、倒映雪山森林。每年三月下旬至四月，湖畔桃花与远处冰川同框，是波密桃花沟区域最具代表性的取景点之一。",
+          "visitHours": 1,
+          "ticketNote": "湖畔为乡村与湿地开放区域，停留以当地管理为准"
         }
       ],
       "plan": [
-        { "day": 1, "title": "丽江古城适应", "fromNode": "丽江", "toNode": "丽江", "distanceKm": 0, "roadRefs": ["城市道路"], "stayCity": "丽江", "poiIds": [], "summary": "适应 2400 米海拔。" },
-        { "day": 2, "title": "丽江 → 香格里拉", "fromNode": "丽江", "toNode": "香格里拉", "distanceKm": 190, "driveHours": 3.5, "roadRefs": ["G214"], "stayCity": "香格里拉", "poiIds": ["ytl-p-tiger", "ytl-p-songzanlin"], "summary": "虎跳峡 + 松赞林寺。" },
-        { "day": 3, "title": "香格里拉 → 德钦", "fromNode": "香格里拉", "toNode": "德钦", "distanceKm": 180, "driveHours": 4, "roadRefs": ["G214"], "stayCity": "德钦", "poiIds": ["ytl-p-baima", "ytl-p-meili"], "summary": "翻白马雪山看杜鹃。" },
-        { "day": 4, "title": "飞来寺日出 → 盐井 → 芒康", "fromNode": "德钦", "toNode": "芒康", "distanceKm": 220, "driveHours": 6, "roadRefs": ["G214"], "stayCity": "芒康", "poiIds": ["ytl-p-meili", "ytl-p-yanjing"], "summary": "清晨看日照金山后跨境。" },
-        { "day": 5, "title": "芒康 → 左贡", "fromNode": "芒康", "toNode": "左贡", "distanceKm": 160, "driveHours": 4.5, "roadRefs": ["G318"], "stayCity": "左贡", "poiIds": [], "summary": "并入 G318。" },
-        { "day": 6, "title": "左贡 → 八宿", "fromNode": "左贡", "toNode": "八宿", "distanceKm": 200, "driveHours": 5, "roadRefs": ["G318"], "stayCity": "八宿", "poiIds": ["ytl-p-72turns"], "summary": "怒江七十二拐。" },
-        { "day": 7, "title": "八宿 → 然乌 → 波密", "fromNode": "八宿", "toNode": "波密", "distanceKm": 220, "driveHours": 4.5, "roadRefs": ["G318"], "stayCity": "波密", "poiIds": ["ytl-p-ranwu", "ytl-p-midui"], "summary": "然乌湖 + 米堆冰川。" },
-        { "day": 8, "title": "波密 → 林芝", "fromNode": "波密", "toNode": "林芝八一", "distanceKm": 230, "driveHours": 5, "roadRefs": ["G318"], "stayCity": "林芝八一", "poiIds": ["ytl-p-lulang"], "summary": "通麦隧道群。" },
-        { "day": 9, "title": "林芝自由活动", "fromNode": "林芝八一", "toNode": "林芝八一", "distanceKm": 0, "roadRefs": [], "stayCity": "林芝八一", "poiIds": [], "summary": "可安排雅鲁藏布大峡谷。" },
-        { "day": 10, "title": "林芝 → 拉萨", "fromNode": "林芝八一", "toNode": "拉萨", "distanceKm": 310, "driveHours": 5, "roadRefs": ["G318", "G4218"], "stayCity": "拉萨", "poiIds": [], "summary": "抵达拉萨。" },
-        { "day": 11, "title": "拉萨机动日", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "roadRefs": [], "stayCity": "拉萨", "poiIds": [], "summary": "留一天缓冲。" }
+        { "day": 1, "title": "丽江古城适应", "fromNode": "丽江", "toNode": "丽江", "distanceKm": 0, "driveHours": 0, "roadRefs": ["城市道路"], "stayCity": "丽江", "poiIds": [], "summary": "全天留在丽江适应 2400 米的海拔与气候，先在古城周边慢走一圈熟悉补给点。第一天不安排远行，把证件、边境通行证与高原物资清单过一遍，采购后续几天的高原食品与药品。", "tips": ["海拔 2400 米，头一天避免剧烈活动", "确认边境通行证办理地点与所需材料", "采购耐放的高原干粮与常用药"] },
+        { "day": 2, "title": "丽江 → 香格里拉", "fromNode": "丽江", "toNode": "香格里拉", "distanceKm": 190, "driveHours": 3.5, "roadRefs": ["G214"], "stayCity": "香格里拉", "poiIds": ["ytl-p-tiger", "ytl-p-songzanlin"], "summary": "上午先走虎跳峡，上虎跳的木栈道可以走到江边近距离看金沙江收窄的谷口；午后北上到香格里拉，傍晚进松赞林寺看白墙金顶与拉姆央措湖的对称构图。这天路况轻松，海拔只升到 3280 米。", "tips": ["虎跳峡谷窄风大，栈道注意落石", "松赞林寺需提前实名预约", "午后进香格里拉，海拔仍需适应"] },
+        { "day": 3, "title": "香格里拉 → 德钦", "fromNode": "香格里拉", "toNode": "德钦", "distanceKm": 180, "driveHours": 4, "roadRefs": ["G214"], "stayCity": "德钦", "poiIds": ["ytl-p-baima", "ytl-p-meili"], "summary": "经奔子栏翻白马雪山垭口，海拔最高约 4292 米，公路两侧是完整的高山针叶林；午后下到飞来寺，正对梅里十三峰。行李运抵后抓紧时间，日出前后是观察日照金山最合适的时段。", "tips": ["垭口雪季结冰，备好防滑链", "5-6 月沿路高山杜鹃盛开", "飞来寺观景台日出前到位占位"] },
+        { "day": 4, "title": "飞来寺日出 → 盐井 → 芒康", "fromNode": "德钦", "toNode": "芒康", "distanceKm": 220, "driveHours": 6, "roadRefs": ["G214"], "stayCity": "芒康", "poiIds": ["ytl-p-meili", "ytl-p-yanjing"], "summary": "清晨在飞来寺看日照金山，看完立刻收车上路，沿澜沧江峡谷北上。经盐井时看千年古盐田，红盐与白盐分层挂在木架上；傍晚抵达芒康，正式进入西藏。红拉山一段路面较窄。", "tips": ["日出后尽快出发，避免峡谷段夜间行车", "盐井一段路窄，会车提前减速", "抵达芒康后先确认次日路况"] },
+        { "day": 5, "title": "芒康 → 左贡", "fromNode": "芒康", "toNode": "左贡", "distanceKm": 160, "driveHours": 4.5, "roadRefs": ["G318"], "stayCity": "左贡", "poiIds": [], "summary": "并入 G318 之后连续翻拉乌山、觉巴山与东达山，垭口最高处约 5130 米。行程本身景观并不少，但注意力要放在身体上：反复爬升容易诱发头痛，抵达左贡后安排整晚休息。", "tips": ["东达山停留控制在十几分钟", "随车氧气当天就要能用起来", "县城补给比芒康少，提前备足"] },
+        { "day": 6, "title": "左贡 → 八宿", "fromNode": "左贡", "toNode": "八宿", "distanceKm": 200, "driveHours": 5, "roadRefs": ["G318"], "stayCity": "八宿", "poiIds": ["ytl-p-72turns"], "summary": "翻业拉山后进入怒江七十二拐，三十多公里连续回头弯从 4600 米直落到 2700 米，全程低挡位控速。观景台之后沿峡谷前行，天黑前到八宿住宿；海拔下降后身体会舒服很多。", "tips": ["下坡禁止空挡滑行，弯前提前减速", "峡谷段多货车，注意车距", "天黑前抵达，不摸黑行车"] },
+        { "day": 7, "title": "八宿 → 然乌 → 波密", "fromNode": "八宿", "toNode": "波密", "distanceKm": 220, "driveHours": 4.5, "roadRefs": ["G318"], "stayCity": "波密", "poiIds": ["ytl-p-ranwu", "ytl-p-midui"], "summary": "下到然乌湖，晴天时雪山倒影是滇藏线上最出名的画面；沿湖到波密，海拔降到 2750 米，进入森林与冰川交织的湿润段落。米堆冰川安排在午后，栈道走到观景平台约两公里。", "tips": ["然乌上午无风时倒影最好", "米堆冰川雨后栈道湿滑，注意防滑", "此段多雨，随车带干衣"] },
+        { "day": 8, "title": "波密 → 林芝", "fromNode": "波密", "toNode": "林芝八一", "distanceKm": 230, "driveHours": 5, "roadRefs": ["G318"], "stayCity": "林芝八一", "poiIds": ["ytl-p-lulang"], "summary": "经通麦隧道桥群与排龙峡谷向东南，沿途是全线最密集的森林路段；午后翻色季拉山口到鲁朗牧场住下。川藏与滇藏在这一段合流，下午光线变斜时在牧场木屋与栅栏之间拍摄最合适。", "tips": ["通麦段留意落石提示", "鲁朗是全线海拔最低、最好睡的一站", "晚餐尝石锅鸡，旺季提前订位"] },
+        { "day": 9, "title": "林芝自由活动", "fromNode": "林芝八一", "toNode": "林芝八一", "distanceKm": 0, "driveHours": 0, "roadRefs": [], "stayCity": "林芝八一", "poiIds": [], "summary": "机动的一天。体力与天气都合适，可去雅鲁藏布大峡谷，在派镇附近看大拐弯全景；也可留在八一城区休整，或补走前几段因天气跳过的湖岸。备选方案要提前定好。", "tips": ["大峡谷以观光车为主，晕车者提前准备", "天气不佳时不要硬进峡谷支线", "今天不安排长途，为最后两天留体力"] },
+        { "day": 10, "title": "林芝 → 拉萨", "fromNode": "林芝八一", "toNode": "拉萨", "distanceKm": 310, "driveHours": 5, "roadRefs": ["G318", "G4218"], "stayCity": "拉萨", "poiIds": [], "summary": "上午翻米拉山口，海拔最高约 5013 米，可选择走林拉高速避开垭口以缩短车程。午后沿雅砻河谷下行到拉萨，抵达后安排热水澡与补给，把返程行李整理好。", "tips": ["米拉山口风大，勿久留", "高速与国道车程差异大，先查路况", "抵达后即休息，减少活动量"] },
+        { "day": 11, "title": "拉萨机动日", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "driveHours": 0, "roadRefs": [], "stayCity": "拉萨", "poiIds": [], "summary": "留给天气、身体与返程安排的缓冲日。上午可去布达拉宫或大昭寺补看此前落下的内容，午后整理装备、寄送行李并确认返程班次。如果前几日顺利，这半天还能慢慢收尾。", "tips": ["布达拉宫需按批次提前预约", "返程前确认车次或航班时刻", "高原上慢慢起身，避免动作过猛"] }
       ],
       "practical": {
         "permit": "常规不需边防证；若延伸到墨脱、察隅需办理。",

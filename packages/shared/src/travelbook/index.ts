@@ -16,6 +16,7 @@ import type {
   TravelTier,
 } from './types.js';
 import {
+  LAYER_DAYS_RANGE,
   LAYER_RANK_RANGE,
   RECOMMEND_LAYER_ROTATION,
   RECOMMEND_ROTATION_STEP,
@@ -40,6 +41,7 @@ export {
   TRAVEL_DIFFICULTY_LABEL,
   TRAVEL_LAYER_LABEL,
   LAYER_RANK_RANGE,
+  LAYER_DAYS_RANGE,
   RECOMMEND_LAYER_ROTATION,
   RECOMMEND_ROTATION_STEP,
 };
@@ -182,6 +184,15 @@ export function validateTravelRoute(r: TravelRouteDetail): ValidationIssue[] {
     actualPoiIds.add(p.id);
     if (!p.province || !p.city) push('warn', `景点 ${p.name} 缺少省市信息`, 'pois');
     if (!p.intro) push('warn', `景点 ${p.name} 缺少介绍`, 'pois');
+    if (!Number.isFinite(p.lng) || !Number.isFinite(p.lat)) {
+      push('error', `景点 ${p.name} 坐标非法或缺失`, 'pois');
+    }
+    if (p.lng !== undefined && (p.lng < 73 || p.lng > 136)) {
+      push('error', `景点 ${p.name} 经度 ${p.lng} 超出中国陆地范围（73~136）`, 'pois');
+    }
+    if (p.lat !== undefined && (p.lat < 3 || p.lat > 54)) {
+      push('error', `景点 ${p.name} 纬度 ${p.lat} 超出中国陆地范围（3~54）`, 'pois');
+    }
     if (p.city && r.cities.length && !r.cities.includes(p.city)) {
       push('warn', `景点 ${p.name} 的城市 ${p.city} 不在 cities 中`, 'pois');
     }
@@ -280,6 +291,14 @@ export function validateTravelRoute(r: TravelRouteDetail): ValidationIssue[] {
   // V17 anchorCity 应落在 cities 内（applyRouteCoverage 会 union，不算硬错，但通常是笔误）
   if (r.anchorCity && Array.isArray(r.cities) && r.cities.length && !r.cities.includes(r.anchorCity)) {
     push('warn', `anchorCity「${r.anchorCity}」不在 cities 中（通常是笔误）`, 'anchorCity');
+  }
+
+  // V19 分层天数上限（区间常量在 types.ts，勿在两处各写一份）
+  const daysRange = LAYER_DAYS_RANGE[resolveLayer(r)];
+  if (daysRange && typeof r.days === 'number' && (r.days < daysRange[0] || r.days > daysRange[1])) {
+    // 本轮先 warn：resolveLayer 的推断路径尚未完全收口（V15 仍在报「未显式写 layer」），
+    // 在推断结果上判 error 会误报。分层模型稳定后升 error。
+    push('warn', `${resolveLayer(r)} 路线天数应在 ${daysRange[0]}~${daysRange[1]} 天（当前 ${r.days} 天）`, 'days');
   }
 
   return issues;

@@ -405,6 +405,161 @@ describe('V17 anchorCity 应包含在 cities 内', () => {
   });
 });
 
+describe('V19 分层天数上限（warn 级）', () => {
+  const cases: { layer: TravelLayer; days: number; ok: boolean }[] = [
+    { layer: 'L1', days: 15, ok: true }, // L1 只卡上限：阿里 15 天是合理形态
+    { layer: 'L1', days: 16, ok: false },
+    { layer: 'L2', days: 3, ok: true },
+    { layer: 'L2', days: 7, ok: true },
+    { layer: 'L2', days: 2, ok: false },
+    { layer: 'L3', days: 2, ok: true },
+    { layer: 'L3', days: 5, ok: true },
+    { layer: 'L3', days: 6, ok: false }, // keketuohai-kanas-6d 曾踩的就是这条
+    { layer: 'L4', days: 3, ok: true },
+    { layer: 'L4', days: 4, ok: false },
+    { layer: 'L5', days: 2, ok: true },
+    { layer: 'L5', days: 6, ok: false },
+  ];
+
+  for (const c of cases) {
+    it(`${c.layer} ${c.days} 天 → ${c.ok ? '放行' : 'warn'}`, () => {
+      const r = validRoute({
+        layer: c.layer,
+        tier: c.layer === 'L1' ? 'national' : c.layer === 'L2' ? 'regional' : 'city',
+        days: c.days,
+        intro: { ...validRoute().intro, days: c.days },
+        plan: Array.from({ length: c.days }, (_, i) => planDay(i + 1)),
+      });
+      assert.equal(hasField(warnsOf(validateTravelRoute(r)), 'days'), !c.ok);
+    });
+  }
+
+  it('判据是 warn 级，不阻断（error 中不应出现 days 天数上限问题）', () => {
+    const r = validRoute({
+      layer: 'L3',
+      tier: 'city',
+      days: 6,
+      intro: { ...validRoute().intro, days: 6 },
+      plan: Array.from({ length: 6 }, (_, i) => planDay(i + 1)),
+    });
+    const issues = validateTravelRoute(r);
+    assert.equal(hasField(warnsOf(issues), 'days'), true);
+    assert.equal(
+      hasField(errorsOf(issues), 'days'),
+      false,
+      `V19 不得判 error：${JSON.stringify(errorsOf(issues).filter((i) => i.field === 'days'))}`,
+    );
+  });
+
+  it('layer 缺省时按 resolveLayer 推断结果判定', () => {
+    // tier=national → 推断 L1，上限 15；16 天超出
+    const r = validRoute({
+      layer: undefined,
+      tier: 'national',
+      days: 16,
+      intro: { ...validRoute().intro, days: 16 },
+      plan: Array.from({ length: 16 }, (_, i) => planDay(i + 1)),
+    });
+    assert.equal(hasField(warnsOf(validateTravelRoute(r)), 'days'), true);
+  });
+});
+
+/**
+ * V20：景点坐标校验。
+ *
+ * 背景：判据长期只校验 `nodes[]` 的坐标，从不校验 `pois[]`，
+ * 导致 22 个缺坐标的景点长期静默通过闸门，直到人工 review 才发现。
+ * 这组用例锁住「缺坐标」与「坐标越界」两类问题，防止漏洞复发。
+ */
+describe('V20景点坐标校验', () => {
+  /**
+   * 替换第0 个 POI 的坐标字段。
+   * 注意：必须显式写 `lng: undefined` 而不是靠对象展开去「删」——
+   * `{...p, ...{}}` 会保留 p 原有的 lng，属性根本没被删掉，测试会假绿。
+   */
+  function withPoiCoord(over: Partial<TravelPoi>, extra: Partial<TravelRouteDetail> = {}): TravelRouteDetail {
+    const base = validRoute();
+    const pois = base.pois.map((p, i) => (i === 0 ? { ...p, ...over } : p)) as TravelPoi[];
+    return { ...base, pois, ...extra };
+  }
+
+  function errorsOfPoi(issues: ValidationIssue[]) {
+    return issues.filter((i) => i.level === 'error' && i.field === 'pois');
+  }
+
+  it('基线路线（全部 POI 带坐标）不报错', () => {
+    assert.equal(errorsOfPoi(validateTravelRoute(validRoute())).length, 0);
+  });
+
+  it('缺 lng → error', () => {
+    const r = withPoiCoord({ lng: undefined });
+    const errs = errorsOfPoi(validateTravelRoute(r));
+    assert.equal(errs.length, 1, `应为 error，实际：${JSON.stringify(errs)}`);
+    assert.match(errs[0].message, /坐标非法或缺失/);
+  });
+
+  it('缺 lat → error', () => {
+    const r = withPoiCoord({ lat: undefined });
+    assert.equal(errorsOfPoi(validateTravelRoute(r)).length, 1);
+  });
+
+  it('lng 为 NaN → error（Number.isFinite 会拦住）', () => {
+    const r = withPoiCoord({ lng: Number.NaN });
+    assert.equal(errorsOfPoi(validateTravelRoute(r)).length, 1);
+  });
+
+  it('两个坐标都缺 → 只报一次，不重复刷屏', () => {
+    const r = withPoiCoord({ lng: undefined, lat: undefined });
+    assert.equal(errorsOfPoi(validateTravelRoute(r)).length, 1);
+  });
+
+  it('经度 0（明显是漏填而非真实坐标）→ error', () => {
+    // 0 是合法 number，能通过 Number.isFinite；靠范围判据兜住
+    const r = withPoiCoord({ lng: 0, lat: 0 });
+    assert.ok(errorsOfPoi(validateTravelRoute(r)).length >= 1);
+  });
+
+  const OUT_OF_RANGE: Array<[string, number, number]> = [
+    ['经度偏西', 60, 30],
+    ['经度偏东', 150, 30],
+    ['纬度偏南', 120, 0],
+    ['纬度偏北', 120, 60],
+  ];
+  for (const [label, lng, lat] of OUT_OF_RANGE) {
+    it(`${label} ${lng},${lat} → error`, () => {
+      const r = withPoiCoord({ lng, lat });
+      const errs = errorsOfPoi(validateTravelRoute(r));
+      assert.ok(errs.length >= 1, `${label} 应报范围越界`);
+    });
+  }
+
+  it('边界值 73 / 136 / 3 / 54 不判越界（中国陆地范围内）', () => {
+    for (const [lng, lat] of [
+      [73, 3],
+      [136, 54],
+      [120, 30],
+    ]) {
+      const r = withPoiCoord({ lng, lat });
+      assert.equal(
+        errorsOfPoi(validateTravelRoute(r)).length,
+        0,
+        `${lng},${lat} 在范围内不应报错`,
+      );
+    }
+  });
+
+  it('漠河北红村与乌苏里卡伦浅滩的真实坐标放行（回归保护）', () => {
+    // 这两个是本轮实际补齐的存量数据，坐标来自公开地理资料
+    for (const [lng, lat] of [
+      [123.28, 53.55],
+      [123.26, 53.56],
+    ]) {
+      const r = withPoiCoord({ lng, lat });
+      assert.equal(errorsOfPoi(validateTravelRoute(r)).length, 0);
+    }
+  });
+});
+
 describe('layerText', () => {
   it('返回受影响层的中文标签', () => {
     for (const l of Object.keys(TRAVEL_LAYER_LABEL) as TravelLayer[]) {

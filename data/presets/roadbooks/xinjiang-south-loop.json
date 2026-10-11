@@ -223,6 +223,7 @@
           "tagline": "中国最大的内陆淡水吞吐湖。",
           "intro": "水域面积约 1600 平方公里，湖边的芦苇荡与沙滩是最有代表性的画面。金沙滩景区设施完善，适合在长里程第一天安排半日放松。",
           "visitHours": 2,
+          "ticketNote": "湖区部分栈道与游船分项开放，是否限流以景区官方公告为准",
           "detourKm": 40
         },
         {
@@ -236,7 +237,8 @@
           "tagline": "古龟兹都城，赤色山体中的山城。",
           "intro": "库车是丝路上龟兹国的中心，老城的库车大寺、热斯坦街与传统民居保持着浓郁的生活气息；城北的天山神秘大峡谷（库车大峡谷）是红色砂岩被洪水切割出的窄谷，是公路旅行的绝佳搭配。",
           "mustSee": true,
-          "visitHours": 4
+          "visitHours": 4,
+          "ticketNote": "大峡谷旺季需实名预约并分时段限流，预约渠道以官方公告为准"
         },
         {
           "id": "sxjl-p-kizil",
@@ -264,7 +266,8 @@
           "tagline": "「不到喀什不算到新疆」的那座城。",
           "intro": "生土建筑组成的迷宫巷弄、手工作坊与每天早晨的开城仪式，让这里成为新疆最有生活质感的城市。艾提尕尔清真寺是国内规模最大的清真寺之一，周边的大巴扎与百年老茶馆值得留在最后一天慢慢逛。",
           "mustSee": true,
-          "visitHours": 5
+          "visitHours": 5,
+          "ticketNote": "清真寺非礼拜时段开放，参观需注意着装，限流以官方公告为准"
         },
         {
           "id": "sxjl-p-karakul",
@@ -277,7 +280,8 @@
           "tagline": "慕士塔格脚下的高原湖，中巴公路的招牌。",
           "intro": "海拔约 3600 米的高原湖，晴天时湖面倒映出慕士塔格峰的巨大白色山体。湖畔有柯尔克孜牧民的毡房，可以骑马到湖边；海拔较高，走路要慢。",
           "mustSee": true,
-          "visitHours": 1
+          "visitHours": 1,
+          "ticketNote": "帕米尔高原各点位实行总量限流，是否需预约以景区公告为准"
         },
         {
           "id": "sxjl-p-muztagh",
@@ -304,7 +308,8 @@
           "tagline": "塔吉克人的高原县城，海拔 3100 米。",
           "intro": "塔什库尔干是塔吉克自治县县城，城边的石头城遗址与下方的金草滩湿地在日出日落时成为帕米尔最经典的画面。这里也是中国唯一与塔吉克、阿富汗、巴基斯坦三国接壤的县城。",
           "mustSee": true,
-          "visitHours": 2.5
+          "visitHours": 2.5,
+          "ticketNote": "石头城遗址属文保单位，金草滩旺季限流，开放时段以公告为准"
         },
         {
           "id": "sxjl-p-pamir",
@@ -317,6 +322,7 @@
           "tagline": "海拔 4700 米以上的国门公路。",
           "intro": "G314 一直延伸到中巴边境的红其拉甫口岸，沿途为典型的高寒荒漠与雪山。口岸不定期对游客开放，出行前需确认政策；即使不到口岸，这段的高原风光也值得走一半再折返。",
           "visitHours": 2,
+          "ticketNote": "口岸不常规对外开放，能否通行须查边检部门与口岸官方公告",
           "detourKm": 130
         },
         {
@@ -329,7 +335,8 @@
           "lat": 37.88,
           "tagline": "G219 的起点地标。",
           "intro": "新藏公路（G219）零公里石碑所在地，也是所有进藏玩家的朝圣地。县城本身不大，可作为昆仑山前的一处补给与短停。",
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "零公里石碑为公路起点标志，往新藏方向须提前办证并查路况公告"
         },
         {
           "id": "sxjl-p-hotan",
@@ -342,7 +349,8 @@
           "tagline": "和田玉的故乡，夜市烟火气最重的一站。",
           "intro": "和田玉与艾德莱斯绸的产地，玉石巴扎与每周的乡村集市是观察当地交易最好的窗口。夜市汇集了烤包子、烤蛋、酸奶粽子等南疆小吃，建议住城内以便晚上走动。",
           "mustSee": true,
-          "visitHours": 3
+          "visitHours": 3,
+          "ticketNote": "巴扎与乡村集市随交易习惯变动开放，周末人流集中，以当地公告为准"
         },
         {
           "id": "sxjl-p-desertroad",
@@ -356,6 +364,7 @@
           "intro": "南北纵穿塔克拉玛干的公路，两侧是网格状的草方格固沙带与红柳、梭梭，每隔数公里有一口水井房。塔中油城是唯一的中途补给点。全程几百公里没有弯道，注意疲劳驾驶。",
           "mustSee": true,
           "visitHours": 1,
+          "ticketNote": "公路全线通行，塔中油城为唯一补给点，固沙区禁止驶离主道",
           "bestTime": "日落前后沙丘阴影最美。"
         },
         {
@@ -375,19 +384,19 @@
         }
       ],
       "plan": [
-        { "day": 1, "title": "抵达乌鲁木齐", "fromNode": "乌鲁木齐", "toNode": "乌鲁木齐", "distanceKm": 0, "roadRefs": ["城市道路"], "stayCity": "乌鲁木齐", "poiIds": [], "summary": "提车、采购、办边防证（帕米尔方向需要）。" },
-        { "day": 2, "title": "乌鲁木齐 → 库尔勒", "fromNode": "乌鲁木齐", "toNode": "库尔勒", "distanceKm": 470, "driveHours": 6, "roadRefs": ["G3012"], "stayCity": "库尔勒", "poiIds": ["sxjl-p-bosten"], "summary": "出发南疆，博斯腾湖半日。" },
-        { "day": 3, "title": "库尔勒 → 库车", "fromNode": "库尔勒", "toNode": "库车", "distanceKm": 290, "driveHours": 3.5, "roadRefs": ["G3012"], "stayCity": "库车", "poiIds": ["sxjl-p-kucha"], "summary": "龟兹古国，老城与大峡谷。" },
-        { "day": 4, "title": "库车 → 阿克苏", "fromNode": "库车", "toNode": "阿克苏", "distanceKm": 260, "driveHours": 3, "roadRefs": ["G3012"], "stayCity": "阿克苏", "poiIds": ["sxjl-p-kizil"], "summary": "千佛洞。" },
-        { "day": 5, "title": "阿克苏 → 喀什", "fromNode": "阿克苏", "toNode": "喀什", "distanceKm": 470, "driveHours": 5.5, "roadRefs": ["G3012"], "stayCity": "喀什", "poiIds": [], "summary": "抵达南疆第一城。" },
-        { "day": 6, "title": "喀什老城一整天", "fromNode": "喀什", "toNode": "喀什", "distanceKm": 0, "roadRefs": ["城市道路"], "stayCity": "喀什", "poiIds": ["sxjl-p-kashgar"], "summary": "老城、清真寺、大巴扎。" },
-        { "day": 7, "title": "喀什 → 塔什库尔干", "fromNode": "喀什", "toNode": "塔什库尔干", "distanceKm": 290, "driveHours": 5.5, "roadRefs": ["G314"], "stayCity": "塔什库尔干", "poiIds": ["sxjl-p-karakul", "sxjl-p-muztagh", "sxjl-p-pamir"], "summary": "帕米尔高原。" },
-        { "day": 8, "title": "塔县 → 喀什", "fromNode": "塔什库尔干", "toNode": "喀什", "distanceKm": 290, "driveHours": 5, "roadRefs": ["G314"], "stayCity": "喀什", "poiIds": ["sxjl-p-tashkurgan"], "summary": "石头城日出后返程。" },
-        { "day": 9, "title": "喀什 → 和田", "fromNode": "喀什", "toNode": "和田", "distanceKm": 500, "driveHours": 6.5, "roadRefs": ["G3012", "G315"], "stayCity": "和田", "poiIds": ["sxjl-p-yecheng"], "summary": "沿昆仑山前南下。" },
-        { "day": 10, "title": "和田一日", "fromNode": "和田", "toNode": "和田", "distanceKm": 0, "roadRefs": ["城市道路"], "stayCity": "和田", "poiIds": ["sxjl-p-hotan"], "summary": "玉石巴扎、夜市。" },
-        { "day": 11, "title": "和田 → 民丰", "fromNode": "和田", "toNode": "民丰", "distanceKm": 300, "driveHours": 4, "roadRefs": ["G315"], "stayCity": "民丰", "poiIds": [], "summary": "沙漠公路前的最后补给。" },
-        { "day": 12, "title": "民丰 → 轮台（穿塔克拉玛干）", "fromNode": "民丰", "toNode": "轮台", "distanceKm": 580, "driveHours": 8, "roadRefs": ["塔克拉玛干沙漠公路"], "stayCity": "轮台", "poiIds": ["sxjl-p-desertroad"], "summary": "全天穿沙。" },
-        { "day": 13, "title": "轮台 → 乌鲁木齐", "fromNode": "轮台", "toNode": "乌鲁木齐", "distanceKm": 480, "driveHours": 6, "roadRefs": ["G3012"], "stayCity": "乌鲁木齐", "poiIds": ["sxjl-p-poplar"], "summary": "胡杨林后返程。" }
+        { "day": 1, "title": "抵达乌鲁木齐", "fromNode": "乌鲁木齐", "toNode": "乌鲁木齐", "distanceKm": 0, "driveHours": 0, "roadRefs": ["城市道路"], "stayCity": "乌鲁木齐", "poiIds": [], "summary": "第一天不赶路：在乌鲁木齐提车、采购补给，并前往办证点办理帕米尔方向所需的边防证件。检查车况与胎压，把防寒和防晒装备一并置齐，为接下来连续十几天的高海拔长途做好准备。", "tips": ["边防证需带身份证原件，当日办理较快", "提车时加满油，检查备胎与随车工具", "南疆昼夜温差大，冲锋衣与薄羽绒都带上"] },
+        { "day": 2, "title": "乌鲁木齐 → 库尔勒", "fromNode": "乌鲁木齐", "toNode": "库尔勒", "distanceKm": 470, "driveHours": 6, "roadRefs": ["G3012"], "stayCity": "库尔勒", "poiIds": ["sxjl-p-bosten"], "summary": "沿 G3012 吐和高速一路南下，出城后景观从戈壁快速过渡到绿洲。中午前后抵达巴音郭楞，在博斯腾湖安排半日：走一段湖边栈道，看芦苇荡与金沙滩，傍晚在库尔勒住宿，为次日进库车减负。", "tips": ["出城前把油加满，高速服务区间距较长", "湖边正午紫外线极强，防晒与遮阳帽必备", "傍晚湖边风大降温，随身带件外套"] },
+        { "day": 3, "title": "库尔勒 → 库车", "fromNode": "库尔勒", "toNode": "库车", "distanceKm": 290, "driveHours": 3.5, "roadRefs": ["G3012"], "stayCity": "库车", "poiIds": ["sxjl-p-kucha"], "summary": "继续沿 G3012 南下进入阿克苏地区，午后到库车。上午与下午各留一段：先逛库车老城的大寺、热斯坦街与传统民居，再北上钻进天山神秘大峡谷的红色窄谷，体力允许可走完整段栈道，傍晚留在库车。", "tips": ["峡谷内气温明显低于县城，带件外套", "大峡谷下午光线最硬，拍照靠上午", "老城停车位紧张，建议停外围再步行"] },
+        { "day": 4, "title": "库车 → 阿克苏", "fromNode": "库车", "toNode": "阿克苏", "distanceKm": 260, "driveHours": 3, "roadRefs": ["G3012"], "stayCity": "阿克苏", "poiIds": ["sxjl-p-kizil"], "summary": "上午前往克孜尔千佛洞，跟随讲解员看菱格故事画与天相图，洞窟内禁止拍照，注意保护壁画。参观控制在两小时左右，午后继续沿 G3012 向西推进。这一段路途平顺、风景变化不大，适合作为缓冲日。", "tips": ["石窟内严禁拍照，须跟队随讲解参观", "洞窟内阴凉，出洞后温差大需增减衣物"] },
+        { "day": 5, "title": "阿克苏 → 喀什", "fromNode": "阿克苏", "toNode": "喀什", "distanceKm": 470, "driveHours": 5.5, "roadRefs": ["G3012"], "stayCity": "喀什", "poiIds": [], "summary": "全程较长的一天，沿 G314 乌红线穿越塔里木盆地南缘，景观从荒漠戈壁逐渐转为绿洲与核桃林。傍晚抵达喀什，先去老城外围踩点熟悉环境，晚上逛夜市尝烤包子与酸奶粽子，把节奏调慢下来。", "tips": ["这一天里程长，务必早起并按时出发", "沿途加油站稀疏，经过就补满油箱", "进喀什前确认沿途边防检查站位置"] },
+        { "day": 6, "title": "喀什老城一整天", "fromNode": "喀什", "toNode": "喀什", "distanceKm": 0, "driveHours": 0, "roadRefs": ["城市道路"], "stayCity": "喀什", "poiIds": ["sxjl-p-kashgar"], "summary": "整天留给喀什老城。清晨看开城仪式，人少、光线斜；上午在巷弄迷宫里步行，穿插艾提尕尔清真寺与百年老茶馆；午后去大巴扎看手工作坊与交易；傍晚回到老城，用一整天感受这座城的生活质感。", "tips": ["老城巷子窄且会迷路，多步行少开车", "清真寺参观注意着装，避开礼拜时段", "午后大巴扎人流密集，贵重物品随身"] },
+        { "day": 7, "title": "喀什 → 塔什库尔干", "fromNode": "喀什", "toNode": "塔什库尔干", "distanceKm": 290, "driveHours": 5.5, "roadRefs": ["G314"], "stayCity": "塔什库尔干", "poiIds": ["sxjl-p-karakul", "sxjl-p-muztagh", "sxjl-p-pamir"], "summary": "沿 G314 翻越帕米尔高原，进入中国唯一与三国接壤的县城方向。全天海拔一路抬升，经卡拉库里湖看慕士塔格倒影，进冰川公园走一段栈道；体力与时间允许可再向红其拉甫方向延伸一段，晚上住塔县。", "tips": ["全程海拔高，行动放慢，避免跑跳", "高原紫外线极强，防晒与墨镜都要备齐", "若往红其拉甫方向延伸，须带齐证件"] },
+        { "day": 8, "title": "塔县 → 喀什", "fromNode": "塔什库尔干", "toNode": "喀什", "distanceKm": 290, "driveHours": 5, "roadRefs": ["G314"], "stayCity": "喀什", "poiIds": ["sxjl-p-tashkurgan"], "summary": "清晨在石头城遗址与金草滩看日出，湿地反光是这一带最好的画面。上午在塔县县城补给了些许特产，随后原路翻回帕米尔返回喀什。下午留给休整与机动，为次日长距离南下和田养足体力。", "tips": ["日出前抵达石头城高处，视野最好", "帕米尔段弯道多，不在弯道停留拍照", "回到喀什先加满油，明日仍是长途"] },
+        { "day": 9, "title": "喀什 → 和田", "fromNode": "喀什", "toNode": "和田", "distanceKm": 500, "driveHours": 6.5, "roadRefs": ["G3012", "G315"], "stayCity": "和田", "poiIds": ["sxjl-p-yecheng"], "summary": "沿昆仑山前的东西向走廊长距离南下，戈壁与雪山交替出现，中途在叶城的零公里石碑短停，这里是许多进藏车流的起点。傍晚抵达和田，把车停在住处附近，晚上在夜市里尝烤蛋、酸奶粽子与艾德莱斯绸。", "tips": ["昆仑山前横风强劲，注意握稳方向", "叶城是重要补给点，补油并补充干粮"] },
+        { "day": 10, "title": "和田一日", "fromNode": "和田", "toNode": "和田", "distanceKm": 0, "driveHours": 0, "roadRefs": ["城市道路"], "stayCity": "和田", "poiIds": ["sxjl-p-hotan"], "summary": "留在和田走人文线。上午先看玉石巴扎的现场交易与手工作坊，午后往约特干故城遗址方向；傍晚回城吃夜市。这座城市适合慢下来感受，不建议为了赶路压缩成半天，玉石与地毯都是需要细看的东西。", "tips": ["玉石市场谨防高价推销，理性消费", "夜市摊位集中在傍晚，早去好位置"] },
+        { "day": 11, "title": "和田 → 民丰", "fromNode": "和田", "toNode": "民丰", "distanceKm": 300, "driveHours": 4, "roadRefs": ["G315"], "stayCity": "民丰", "poiIds": [], "summary": "从和田向东南沿昆仑山前推进，绿洲逐渐变窄、荒漠变宽。这一段是进沙漠公路前最后的补给窗口，在民丰把油箱加满、检查备胎与胎压，并备足饮水与食物。补给点稀少，前一晚的准备决定第二天的从容程度。", "tips": ["这是进沙漠公路前最后的补给机会", "出发前检查备胎与胎压，带足饮水"] },
+        { "day": 12, "title": "民丰 → 轮台（穿塔克拉玛干）", "fromNode": "民丰", "toNode": "轮台", "distanceKm": 580, "driveHours": 8, "roadRefs": ["塔克拉玛干沙漠公路"], "stayCity": "轮台", "poiIds": ["sxjl-p-desertroad"], "summary": "全天纵穿塔克拉玛干沙漠公路，两侧是网格状草方格固沙带与红柳、梭梭，几百公里几乎没有弯道。塔中油城是唯一的中途补给点，可在井房区短暂停留。傍晚出沙漠到轮台，注意疲劳驾驶与车内补水。", "tips": ["长距离无弯道，两人轮换避免疲劳", "全程唯一补给点是塔中油城，别错过", "车内备足饮水，沙漠白天气温极高"] },
+        { "day": 13, "title": "轮台 → 乌鲁木齐", "fromNode": "轮台", "toNode": "乌鲁木齐", "distanceKm": 480, "driveHours": 6, "roadRefs": ["G3012"], "stayCity": "乌鲁木齐", "poiIds": ["sxjl-p-poplar"], "summary": "上午在轮台胡杨林安排两到三小时，叶片转金的季节在十月中下旬，此时河岸倒影最出片；小火车可以省不少脚力。午后取车返乌鲁木齐，一路上由胡杨林渐渐退回戈壁，傍晚进市区收尾，全程环线闭合。", "tips": ["秋季胡杨林叶色最好，务必错峰进园", "返程长途，提前把油加满再上高速"] }
       ],
       "practical": {
         "permit": "前往塔什库尔干、红其拉甫必须办理《边境管理区通行证》，可在喀什办理；身份证随身，检查站频繁。",

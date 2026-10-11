@@ -42,7 +42,7 @@ const EXP_RUN_MAX_M = 20000;
  * 评估一条高德驾车 leg 是否为「真实地面直达线」。
  * @returns {{accept:boolean, expPct:number, maxRunM:number, longRunStart:number, detour:number, maxLat:number}}
  */
-export function evaluateLeg(leg, from, to) {
+export function evaluateLeg(leg, from, to, { allowExpressway = false, coLineway = false } = {}) {
   const chord = haversineM(from[0], from[1], to[0], to[1]);
   const steps = leg.steps;
   let expM = 0, runM = 0, maxRunM = 0, runStart = -1, longRunStart = -1;
@@ -58,8 +58,9 @@ export function evaluateLeg(leg, from, to) {
   let maxLat = 0;
   for (const s of steps) for (const p of s.points) { const l = proj.project(p).lat; if (l > maxLat) maxLat = l; }
   const detour = chord > 0 ? leg.distanceM / chord : Infinity;
-  const accept = detour <= ratioFor(chord) && maxLat <= lateralCapFor(chord)
-    && expPct <= EXP_PCT_MAX && maxRunM <= EXP_RUN_MAX_M;
+  const expGate = allowExpressway || (coLineway && expPct <= 0.6 && maxRunM <= 30000)
+    || (expPct <= EXP_PCT_MAX && maxRunM <= EXP_RUN_MAX_M);
+  const accept = detour <= ratioFor(chord) && maxLat <= lateralCapFor(chord) && expGate;
   return { accept, expPct, maxRunM, longRunStart, detour, maxLat };
 }
 
@@ -68,7 +69,7 @@ export function evaluateLeg(leg, from, to) {
  * @param {{from:number[],to:number[]}} gap
  * @param {{ref:string}} 道路编号（用于日志/路名参考）
  */
-export async function fillGap(gap, { ref = '' } = {}) {
+export async function fillGap(gap, { ref = '', allowExpressway = false, coLineway = false } = {}) {
   const from = gap.from, to = gap.to;
   const straight = haversineM(from[0], from[1], to[0], to[1]);
   if (straight < 1) return { points: [], unresolved: [], legs: 0, runs: [] };
@@ -109,14 +110,14 @@ export async function fillGap(gap, { ref = '' } = {}) {
     const leg = await tryLeg(cursor, to);
     legs += 1;
     if (leg.unroutable) { addGap(cursor, to); cursor = to; break; }  // 无法规划：整段诚实保留
-    const ev = evaluateLeg(leg, cursor, to);
+    const ev = evaluateLeg(leg, cursor, to, { allowExpressway, coLineway });
     if (ev.accept) {
       addPts(leg.steps.flatMap((s) => s.points));   // 真实地面（含短桥/短共线）：接受
       cursor = to;
       break;
     }
     // 长连续高速是主要问题：在该高速段前切分，接受地面前缀后继续
-    if (ev.maxRunM > EXP_RUN_MAX_M && ev.longRunStart > 0) {
+    if (!allowExpressway && !coLineway && ev.maxRunM > EXP_RUN_MAX_M && ev.longRunStart > 0) {
       const pre = leg.steps.slice(0, ev.longRunStart).flatMap((s) => s.points);
       addPts(pre);
       cursor = pre[pre.length - 1];

@@ -30,6 +30,17 @@ const mode = ref('');
 const layer = ref<TravelLayer | ''>('');
 const keyword = ref('');
 const sort = ref('recommend');
+/** 天数上限。'' = 全部（默认不筛，避免隐藏存量长线）。语义是「N 天以内」，见 §4.3。 */
+const maxDays = ref<number | ''>('');
+
+const DAY_FILTERS: { key: number | ''; label: string }[] = [
+  { key: '', label: '全部' },
+  { key: 3, label: '3 天以内' },
+  { key: 5, label: '5 天以内' },
+  { key: 6, label: '6 天以内' },
+  { key: 7, label: '7 天以内' },
+];
+const daysLabel = (k: number | '') => DAY_FILTERS.find((d) => d.key === k)?.label ?? '';
 
 const MODES: { key: string; label: string }[] = [
   { key: 'selfdrive', label: '自驾' },
@@ -105,6 +116,7 @@ async function loadRoutes() {
       city: city.value || undefined,
       mode: mode.value || undefined,
       layer: layer.value || undefined,
+      maxDays: maxDays.value === '' ? undefined : maxDays.value,
       q: keyword.value.trim() || undefined,
       sort: sort.value,
       limit: 100,
@@ -129,10 +141,13 @@ onMounted(async () => {
 });
 
 // 省份切换时清空城市；其余条件变化时重新拉列表
-watch([() => province.value, () => mode.value, () => layer.value, () => sort.value], () => {
-  city.value = '';
-  loadRoutes();
-});
+watch(
+  [() => province.value, () => mode.value, () => layer.value, () => sort.value, () => maxDays.value],
+  () => {
+    city.value = '';
+    loadRoutes();
+  },
+);
 
 let keywordTimer: ReturnType<typeof setTimeout> | undefined;
 watch(keyword, () => {
@@ -154,11 +169,17 @@ function pickLayer(key: TravelLayer | '') {
   layer.value = layer.value === key ? '' : key;
 }
 
+/** 与省份/玩法/分层是「与」关系；再点一次取消（回到「全部」） */
+function pickDays(key: number | '') {
+  maxDays.value = maxDays.value === key ? '' : key;
+}
+
 function reset() {
   province.value = '';
   city.value = '';
   mode.value = '';
   layer.value = '';
+  maxDays.value = '';
   keyword.value = '';
   sort.value = 'recommend';
   loadRoutes();
@@ -258,6 +279,26 @@ function seasonText(months: number[]): string {
         </div>
       </section>
 
+      <!-- 天数上限（与省份 / 分层 / 玩法是「与」关系；语义是「N 天以内」） -->
+      <section class="rb-filter-block">
+        <div class="rb-filter-head">
+          天数
+          <span class="rb-filter-hint">（按天数上限筛选，2 天以内的周末短线也会出现）</span>
+        </div>
+        <div class="rb-chips">
+          <button class="rb-chip" :class="{ on: maxDays === '' }" @click="pickDays('')">全部</button>
+          <button
+            v-for="d in DAY_FILTERS.slice(1)"
+            :key="d.key"
+            class="rb-chip"
+            :class="{ on: maxDays === d.key }"
+            @click="pickDays(d.key)"
+          >
+            {{ d.label }}
+          </button>
+        </div>
+      </section>
+
       <!-- 玩法 + 关键词 + 排序 -->
       <section class="rb-filter-block">
         <div class="rb-filter-head">玩法</div>
@@ -290,12 +331,13 @@ function seasonText(months: number[]): string {
 
       <div class="rb-result-head">
         共 <b>{{ total }}</b> 条
-        <span v-if="province || city || mode || layer || keyword" class="rb-active">
+        <span v-if="province || city || mode || layer || maxDays !== '' || keyword" class="rb-active">
           ·
           <span v-if="province">{{ province }}</span>
           <span v-if="city"> / {{ city }}</span>
           <span v-if="mode"> / {{ modeLabel(mode) }}</span>
           <span v-if="layer"> / {{ layerLabel(layer) }}</span>
+          <span v-if="maxDays !== ''"> / {{ daysLabel(maxDays) }}</span>
           <span v-if="keyword.trim()"> / “{{ keyword.trim() }}”</span>
         </span>
       </div>

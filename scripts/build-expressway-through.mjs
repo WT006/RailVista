@@ -20,6 +20,7 @@ import {
 } from './lib/road-build.mjs';
 import { buildGraph, buildTraceStream } from './lib/road-trace.mjs';
 import { haversineM, simplifyDP, polylineM } from './lib/road-assemble.mjs';
+import { dedupBacktrack } from './lib/road-build.mjs';
 import { fillGap, evaluateLeg } from './lib/road-fill.mjs';
 import { drivingLeg } from './lib/amap.mjs';
 
@@ -93,7 +94,7 @@ export async function buildOne(ref) {
     for (const el of stream) {
       if (el.nodes) atoms.push({ pts: el.nodes.map((n) => graph.coords[n]) });
       else if (el.gap) {
-        const r = await fillGap(el.gap, { ref });
+        const r = await fillGap(el.gap, { ref, allowExpressway: true });
         for (const rn of r.runs) atoms.push(rn);
       }
     }
@@ -147,7 +148,7 @@ export async function buildOne(ref) {
       const b = comps[i + 1][0];
       const leg = await cleanLeg(a, b);
       if (!leg) continue;
-      if (!evaluateLeg(leg, a, b).accept) continue;
+      if (!evaluateLeg(leg, a, b, { allowExpressway: true }).accept) continue;
       const mid = leg.steps.flatMap((s) => s.points);
       comps[i] = comps[i].concat(mid, comps[i + 1]);
       comps.splice(i + 1, 1);
@@ -169,7 +170,7 @@ export async function buildOne(ref) {
     });
   }
 
-  const simplified = comps.map((c) => simplifyDP(c, DP_TOL));
+  const simplified = comps.map((c) => simplifyDP(dedupBacktrack(c, Number(process.env.LOOP_TRIM_KM || 15)), DP_TOL));
   if (!simplified.length) throw new Error('无几何：' + ref);
   const lengths = simplified.map((c) => polylineM(c));
   let mainIdx = 0;

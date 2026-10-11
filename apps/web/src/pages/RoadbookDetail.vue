@@ -78,6 +78,8 @@ const mustSeeSpots = computed(() => detail.value?.pois.filter((p) => p.mustSee) 
 const practicalRows = computed(() => {
   const p = detail.value?.practical;
   if (!p) return [];
+  // 字段顺序 = 「需提前安排」的语义块：装备 → 住宿 → 餐饮 → 预订；warnings 单独渲染成告警卡片。
+  // 末尾 filter 保证存量数据（不填新字段）时页面行数与高度零变化。
   const rows: { label: string; value: string }[] = [
     { label: '证件与预约', value: p.permit ?? '' },
     { label: '海拔提示', value: p.altitudeNote ?? '' },
@@ -85,6 +87,8 @@ const practicalRows = computed(() => {
     { label: '加油充电', value: p.fuelNote ?? '' },
     { label: '信号通讯', value: p.signalNote ?? '' },
     { label: '装备', value: p.gearNote ?? '' },
+    { label: '住宿区域', value: p.lodgingNote ?? '' },
+    { label: '餐饮', value: p.foodNote ?? '' },
     { label: '预订提示', value: p.bookingNote ?? '' },
   ];
   return rows.filter((r) => r.value);

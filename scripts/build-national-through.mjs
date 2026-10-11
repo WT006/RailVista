@@ -19,6 +19,7 @@ import {
 } from './lib/road-build.mjs';
 import { buildGraph, buildTraceStream } from './lib/road-trace.mjs';
 import { haversineM, simplifyDP, polylineM } from './lib/road-assemble.mjs';
+import { dedupBacktrack } from './lib/road-build.mjs';
 import { fillGap, evaluateLeg } from './lib/road-fill.mjs';
 import { drivingLeg } from './lib/amap.mjs';
 
@@ -104,7 +105,7 @@ export async function buildOne(ref) {
       if (el.nodes) atoms.push({ pts: el.nodes.map((n) => graph.coords[n]) });
       else if (el.gap) {
         // 残余缺口：高德只补「非高速」真实地面线；高速大绕行/确实未建 → 诚实保留
-        const r = await fillGap(el.gap, { ref });
+        const r = await fillGap(el.gap, { ref, coLineway: true });
         for (const rn of r.runs) atoms.push(rn);
       }
     }
@@ -160,7 +161,7 @@ export async function buildOne(ref) {
       const b = comps[i + 1][0];
       const leg = await cleanLeg(a, b);
       if (!leg) continue;
-      if (!evaluateLeg(leg, a, b).accept) continue;
+      if (!evaluateLeg(leg, a, b, { coLineway: true }).accept) continue;
       const mid = leg.steps.flatMap((s) => s.points);
       comps[i] = comps[i].concat(mid, comps[i + 1]);
       comps.splice(i + 1, 1);
@@ -184,7 +185,7 @@ export async function buildOne(ref) {
   }
 
   // 简化（comps 为走线顺序）
-  const simplified = comps.map((c) => simplifyDP(c, DP_TOL));
+  const simplified = comps.map((c) => simplifyDP(dedupBacktrack(c, Number(process.env.LOOP_TRIM_KM || 15)), DP_TOL));
   if (!simplified.length) throw new Error('无几何：' + ref);
   // 与 build-road-geom 一致：最长组件为主链 points（assembleComponents 按长度降序），其余进 segments
   const lengths = simplified.map((c) => polylineM(c));

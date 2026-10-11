@@ -329,8 +329,17 @@ export const api = {
       coveragePct?: number | null;
     }>(`/drive/road/${encodeURIComponent(key)}`);
   },
-  /** 双引擎 OD 规划 */
-  planDriveRoute(params: { from: string; to: string; via?: string[]; engine?: 'auto' | 'local' }) {
+  /**
+   * 双引擎 OD 规划。
+   * engine：auto（默认，本地公路网 A* 优先）/ local（只用本地拓扑）/ amap（只用高德驾车规划）。
+   * 缺省不再走高德 —— 本地拓扑已是全国网，跨省 OD 可离线复算。
+   */
+  planDriveRoute(params: {
+    from: string;
+    to: string;
+    via?: string[];
+    engine?: 'auto' | 'local' | 'amap';
+  }) {
     const qs = new URLSearchParams({ from: params.from, to: params.to });
     if (params.via?.length) qs.set('via', params.via.join(';'));
     if (params.engine) qs.set('engine', params.engine);
@@ -345,7 +354,7 @@ export const api = {
     cat?: string[];
     min?: number;
     max?: number;
-    engine?: 'auto' | 'local';
+    engine?: 'auto' | 'local' | 'amap';
   }) {
     const qs = new URLSearchParams();
     if (params.from) qs.set('from', params.from);

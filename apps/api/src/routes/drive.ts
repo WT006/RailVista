@@ -134,7 +134,10 @@ driveRoute.get('/route', async (c) => {
   const from = c.req.query('from');
   const to = c.req.query('to');
   const via = (c.req.query('via') ?? '').split(';').map((s) => s.trim()).filter(Boolean);
-  const engine = c.req.query('engine') === 'local' ? 'local' : 'auto';
+  // auto（默认，本地网优先）/ local（只用本地拓扑）/ amap（只用高德驾车规划）
+  const engineQuery = c.req.query('engine');
+  const engine: 'auto' | 'local' | 'amap' =
+    engineQuery === 'local' ? 'local' : engineQuery === 'amap' ? 'amap' : 'auto';
   if (!from || !to) return badRequest(c, '缺少 from / to 参数');
   try {
     const route = await planDriveRoute({ from, to, via, engine });
@@ -203,7 +206,13 @@ driveRoute.get('/along', async (c) => {
   } else if (from && to) {
     // C1 点对点
     try {
-      route = await planDriveRoute({ from, to, engine: c.req.query('engine') === 'local' ? 'local' : 'auto' });
+      // 与 /route 同口径：engine=local|amap 显式指定，缺省 auto
+      const eq = c.req.query('engine');
+      route = await planDriveRoute({
+        from,
+        to,
+        engine: eq === 'local' ? 'local' : eq === 'amap' ? 'amap' : 'auto',
+      });
     } catch (e) {
       if (e instanceof PlaceNotFoundError) {
         return c.json({ ok: false, error: { code: e.code, message: e.message, field: e.field } }, 404);

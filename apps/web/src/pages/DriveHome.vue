@@ -289,6 +289,34 @@ const coverageRatioPct = computed(() =>
   stats.value ? Math.round(stats.value.hasGeomRatio * 100) : null,
 );
 
+/**
+ * 跨省寻路就绪度。
+ *
+ * 「有几何」不等于「能连线」——点对点规划走的是 L2 拓扑（china-road-topo.bin），
+ * 它是构建产物、不入库。2026-10-11 之前的拓扑只装了 34 条国道（18.2 万节点，主分量
+ * 缩在青藏东部），跨省 OD 全部无解、静默退化成两点直线，而页面上看不出任何异常。
+ * 这张卡片的职责就是把这件事说出来，别让用户把直线当成路线。
+ */
+const TOPO_MIN_NODES = 200_000;
+const topoState = computed<'missing' | 'stale' | 'ready'>(() => {
+  const t = stats.value?.topology;
+  if (!t?.loaded || t.nodeCount <= 0) return 'missing';
+  return t.nodeCount < TOPO_MIN_NODES ? 'stale' : 'ready';
+});
+const topoNote = computed(() => {
+  const t = stats.value?.topology;
+  const wan = (n: number) => (n / 10000).toFixed(1);
+  if (topoState.value === 'missing') {
+    return '跨省寻路未启用：公路网拓扑尚未构建，起终点会被连成直线。请在有省份路网数据的机器上运行 roads:topo 后重启服务。';
+  }
+  if (topoState.value === 'stale') {
+    return `跨省寻路数据过旧（拓扑仅 ${wan(t?.nodeCount ?? 0)} 万节点，多为单条干线）。请重跑 roads:topo，否则跨省起终点只会连成直线。`;
+  }
+  return `跨省寻路已就绪：公路网拓扑 ${wan(t?.nodeCount ?? 0)} 万节点 / ${wan(
+    t?.edgeCount ?? 0,
+  )} 万边，起终点会沿国道 / 省道自动连线。`;
+});
+
 onMounted(async () => {
   refreshRecentUi();
   try {
@@ -576,6 +604,11 @@ const levelLabel: Record<string, string> = {
             </div>
           </div>
           <p v-else class="drive-netpanel__note">覆盖数据加载中…</p>
+
+          <p v-if="stats" class="drive-netpanel__topo" :class="`is-${topoState}`">
+            <span class="drive-netpanel__topo-dot" aria-hidden="true" />
+            <span>{{ topoNote }}</span>
+          </p>
 
           <p class="drive-netpanel__note">
             有编号无走向的条目仍可搜索，地图会标明暂无几何；已贯通里程与官方里程分开展示。

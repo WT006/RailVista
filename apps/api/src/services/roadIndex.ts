@@ -19,6 +19,13 @@ import { getRoadsideSpots } from './roadsideSpots.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PLACES_PATH = join(__dirname, '../../../../data/roads/places-geo.json');
+/**
+ * 全国行政区划地名索引（省 / 地级市 / 区县，含坐标）。
+ * 由 scripts/build-place-index.mjs 从高德行政区划一次性落盘，运行时只读——
+ * 与 places-geo.json 分开，因为后者会被运行时 geocode 回写，混进去会把
+ * 3500+ 条离线地名写进那个"缓存"文件。
+ */
+const ADMIN_PLACES_PATH = join(__dirname, '../../../../data/roads/places-admin.json');
 const FACILITIES_PATH = join(__dirname, '../../../../data/roads/facilities.json');
 
 // ── 地名锚点 ─────────────────────────────────────────────────────────────────
@@ -27,6 +34,8 @@ export interface PlaceAnchor {
   lng: number;
   lat: number;
   province?: string;
+  /** 所属地级市（仅区县级有；直辖市的区县回落到省名，如 嘉定区 → 上海） */
+  city?: string;
   level?: 'province' | 'city' | 'county';
 }
 
@@ -50,6 +59,59 @@ function loadPlaces(): PlaceAnchor[] {
     return placesCache.places;
   } catch {
     return [];
+  }
+}
+
+/**
+ * 行政区划地名（省 / 地级市 / 区县），只读，按 mtime 热重载。
+ * 与运行时回写的 places-geo.json 分开加载，搜索时才合并。
+ */
+let adminCache: { mtime: number; places: PlaceAnchor[] } | null = null;
+
+function loadAdminPlaces(): PlaceAnchor[] {
+  if (!existsSync(ADMIN_PLACES_PATH)) return [];
+  try {
+    const mtime = statSync(ADMIN_PLACES_PATH).mtimeMs;
+    if (adminCache && adminCache.mtime === mtime) return adminCache.places;
+    const file = JSON.parse(readFileSync(ADMIN_PLACES_PATH, 'utf8')) as PlacesFile;
+    adminCache = { mtime, places: Array.isArray(file.places) ? file.places : [] };
+    return adminCache.places;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * 合并后的候选：**行政区划库优先**，places-geo 只补它缺的名字。
+ *
+ * 顺序不能反：places-geo.json 是早年手工攒的，实测把「拉萨」「西安」都标成了
+ * `level: 'province'`（它那 34 条"省级"里混着地级市），直接拿它当首选会让
+ * 联想副标题显示成「西藏 · 省级」。行政区划库是按 adcode 层级落的，级别可靠。
+ * places-geo 里独有的手工锚点（景区、口岸等）仍然照常补进来，不丢数据。
+ */
+let mergedCache: { key: string; places: PlaceAnchor[] } | null = null;
+
+function mergedPlaces(): PlaceAnchor[] {
+  const admin = loadAdminPlaces();
+  const base = loadPlaces();
+  const key = `${base.length}:${admin.length}:${statSafe(PLACES_PATH)}:${statSafe(ADMIN_PLACES_PATH)}`;
+  if (mergedCache && mergedCache.key === key) return mergedCache.places;
+  const seen = new Set(admin.map((p) => p.name));
+  const out = admin.slice();
+  for (const p of base) {
+    if (seen.has(p.name)) continue;
+    seen.add(p.name);
+    out.push(p);
+  }
+  mergedCache = { key, places: out };
+  return out;
+}
+
+function statSafe(path: string): number {
+  try {
+    return statSync(path).mtimeMs;
+  } catch {
+    return 0;
   }
 }
 
@@ -112,22 +174,61 @@ function scoreText(q: string, text: string): number {
   return 0;
 }
 
+const LEVEL_LABEL: Record<string, string> = {
+  province: '省级',
+  city: '地级市',
+  county: '区县',
+};
+
+/** 省级行政区里其实是直辖市的那四个（高德把它们落在 province 层） */
+const MUNICIPALITY = new Set(['北京', '上海', '天津', '重庆']);
+
+/** 同名排序权重：地级市最常用，其次省级（直辖市），区县最后 */
+function levelRank(level?: string): number {
+  return level === 'city' ? 3 : level === 'province' ? 2 : 1;
+}
+
+/** 联想副标题：省 · 市 · 级别（同名区县靠它区分，如「朝阳区」北京 vs 长春） */
+function placeSub(p: PlaceAnchor): string {
+  // 直辖市的省级条目（北京/上海/天津/重庆）标「省级」不够准确
+  const lv =
+    p.level === 'province' && MUNICIPALITY.has(p.name) ? '直辖市' : LEVEL_LABEL[p.level ?? ''] ?? '地名';
+  const parts = [p.province, p.city, lv].filter(Boolean);
+  // 直辖市的 province 与 city 同名（上海/上海），去重一次免得显示「上海 · 上海 · 区县」
+  return [...new Set(parts)].join(' · ');
+}
+
 function suggestPlacesOfKind(q: string, kind: PlaceKind, limit: number, province?: string): PlaceHit[] {
   const hits: PlaceHit[] = [];
   if (kind === 'place') {
-    for (const p of loadPlaces()) {
+    const scored: Array<{ hit: PlaceHit; rank: number }> = [];
+    for (const p of mergedPlaces()) {
       const score = scoreText(q, p.name);
       if (!score) continue;
-      hits.push({
-        kind: 'place',
-        id: p.name,
-        name: p.name,
-        sub: [p.province, p.level === 'province' ? '省级' : p.level === 'city' ? '地级市' : '县级'].filter(Boolean).join(' · ') || '地名',
-        lng: p.lng,
-        lat: p.lat,
-        score,
+      scored.push({
+        hit: {
+          kind: 'place',
+          id: p.name,
+          name: p.name,
+          sub: placeSub(p),
+          lng: p.lng,
+          lat: p.lat,
+          score,
+        },
+        rank: levelRank(p.level),
       });
     }
+    // 同分时「地级市 > 省级 > 县级」：OD 端点里地级市最常用，
+    // 且要把「长沙（市）」排在「长沙县」前面、「朝阳市」排在「朝阳区」前面。
+    // 再按名字长度升序——短名更像用户想输入的那个规范名。
+    scored.sort(
+      (a, b) =>
+        b.hit.score - a.hit.score ||
+        b.rank - a.rank ||
+        a.hit.name.length - b.hit.name.length ||
+        a.hit.name.localeCompare(b.hit.name, 'zh'),
+    );
+    return scored.slice(0, limit).map((s) => s.hit);
   } else if (kind === 'road') {
     // 2026-10-11：S/X/Y 编号跨省重复且候选远超 limit —— 选省过滤必须在打分截断之前，
     // 否则一省的碎片条目挤掉其他省编号，前端"选省"永远筛不到。
@@ -203,6 +304,42 @@ export function suggestPlaces(q: string, kind?: PlaceKind, limit = 20, province?
   return all.slice(0, limit);
 }
 
+/**
+ * 沿程地名反查：给定坐标找最近的行政地名（用于给 OD 折线的里程分段起名）。
+ *
+ * 只查行政区划库（3564 条，线性扫描足够快：32 个分段 × 3564 ≈ 11 万次，
+ * 实测 <5ms）。先找地级市、找不到再找区县 —— 段名要的是「这条路上过了哪个地方」，
+ * 地级市比同名区县更能代表一个路段。
+ *
+ * @param maxKm 半径上限。超出就返回 null（宁可这一段不起名，也不拿远处地名糊弄）
+ */
+export function nearestPlaceName(
+  lng: number,
+  lat: number,
+  maxKm = 60,
+): { name: string; level: string; km: number } | null {
+  const cosLat = Math.cos((lat * Math.PI) / 180);
+  const places = loadAdminPlaces();
+  if (!places.length) return null;
+  let city: { name: string; level: string; km: number } | null = null;
+  let county: { name: string; level: string; km: number } | null = null;
+  for (const p of places) {
+    const dLng = (p.lng - lng) * cosLat;
+    const dLat = p.lat - lat;
+    const km = Math.sqrt(dLng * dLng + dLat * dLat) * 111;
+    if (km > maxKm) continue;
+    if (p.level === 'province') continue; // 省级范围太大，不适合当段名
+    if (p.level === 'city') {
+      if (!city || km < city.km) city = { name: p.name, level: p.level, km };
+    } else if (!county || km < county.km) {
+      county = { name: p.name, level: p.level ?? 'county', km };
+    }
+  }
+  // 区县明显更近（近一半以上）才用区县，否则一律用地级市名
+  if (city && county && county.km * 2 < city.km) return county;
+  return city ?? county;
+}
+
 /** OD 端点解析：地名优先，公路编号次之（取其起点） */
 export function resolvePlace(text: string): PlaceHit | undefined {
   const query = (text || '').trim();
@@ -222,8 +359,20 @@ function isPlausibleCnPoint(lng: number, lat: number): boolean {
   return lng > 73 && lng < 136 && lat > 17 && lat < 55;
 }
 
+/**
+ * 高德 key 取用顺序：AMAP_SERVER_KEY → AMAP_KEY。
+ *
+ * 必须区分的原因（2026-10-11 实测）：apps/api/.env 里长期配的是前端 Web 端 key
+ * （带 AMAP_SECURITY_CODE 的 JS API key），调 Web 服务接口恒返回
+ * `USERKEY_PLAT_NOMATCH`，等于「配了 key 但在线 geocode / 驾车规划从来没成功过」。
+ * 服务端调用必须用 Web 服务类型的 key，新增 AMAP_SERVER_KEY 承载它。
+ */
+export function amapKey(): string {
+  return process.env.AMAP_SERVER_KEY || process.env.AMAP_KEY || '';
+}
+
 async function amapGeocode(name: string): Promise<PlaceAnchor | null> {
-  const key = process.env.AMAP_KEY;
+  const key = amapKey();
   if (!key) return null;
   const qs = new URLSearchParams({ key, address: name });
   try {

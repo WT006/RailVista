@@ -3,12 +3,12 @@
  * 万里路书 · 路书库首页。
  *
  * 三层结构对应需求 5：省份 → 城市 → 路线。
- *   - 省份横向 chips（覆盖率一眼可见：已开 vs 待补）
- *   - 选中省后展示该省地级城市，点击即按城市筛选（coverage=todo 的不可选）
- *   - 玩法 chips 明确「不限于自驾」：自驾 / 包车 / 公共交通 / 骑行 / 徒步 / 混合
+ * 信息架构（对标旅行类 App 渐进披露）：
+ *   - 首屏只留搜索 + 省份横滑 + 已选摘要，路线列表尽早出现
+ *   - 分层 / 天数 / 玩法收入「筛选」面板，默认收起
  * 筛选全部走 GET /api/travel/routes，与 shared 层共用同一套 matchTravelRoute。
  */
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '../api/client';
 import { RECOMMEND_LAYER_ROTATION, TRAVEL_LAYER_LABEL } from '@railvista/shared';
@@ -67,18 +67,40 @@ const EMPTY_LAYER_COUNTS: Record<TravelLayer, number> = { L1: 0, L2: 0, L3: 0, L
 /** 分层路线数（取服务端 counts.byLayer，全库口径，不随筛选变化） */
 const layerCounts = ref<Record<TravelLayer, number>>({ ...EMPTY_LAYER_COUNTS });
 
-const SORTS: { key: string; label: string }[] = [
-  { key: 'recommend', label: '推荐序' },
-  { key: 'layer', label: '按层级' },
-  { key: 'days-asc', label: '天数少→多' },
-  { key: 'km-desc', label: '里程长→短' },
-  { key: 'km-asc', label: '里程短→长' },
+const SORTS: { key: string; label: string; hint: string }[] = [
+  { key: 'recommend', label: '推荐序', hint: '按内容分层轮转推荐' },
+  { key: 'layer', label: '按层级', hint: '同层路线排在一起' },
+  { key: 'days-asc', label: '天数少→多', hint: '优先短途行程' },
+  { key: 'km-desc', label: '里程长→短', hint: '优先长线穿越' },
+  { key: 'km-asc', label: '里程短→长', hint: '优先短里程' },
 ];
 
 const DIFFICULTY: Record<number, string> = { 1: '轻松', 2: '休闲', 3: '中等', 4: '较难', 5: '挑战' };
 const SHAPE: Record<string, string> = { loop: '环线', point: '单程', outback: '往返', corridor: '走廊' };
 const modeLabel = (k: string) => MODES.find((m) => m.key === k)?.label ?? k;
 const layerLabel = (k: string) => LAYERS.find((l) => l.key === k)?.label ?? k;
+const sortLabel = computed(() => SORTS.find((s) => s.key === sort.value)?.label ?? '排序');
+
+/** 更多筛选（分层 / 天数 / 玩法）默认收起，避免首屏被 chip 墙占满 */
+const filtersOpen = ref(false);
+/** 省份默认只露两行，避免窄屏横滑裁切又不易发现 */
+const provinceExpanded = ref(false);
+/** 自定义排序菜单（替代原生 select，避免系统菜单裁切与风格割裂） */
+const sortOpen = ref(false);
+
+const moreFilterCount = computed(() => {
+  let n = 0;
+  if (mode.value) n += 1;
+  if (layer.value) n += 1;
+  if (maxDays.value !== '') n += 1;
+  return n;
+});
+
+const hasActiveFilters = computed(
+  () =>
+    Boolean(province.value || city.value || mode.value || layer.value || keyword.value.trim()) ||
+    maxDays.value !== '',
+);
 
 /** 当前选中省的城市列表（含覆盖标记），用于二级联动 */
 const citiesOfProvince = computed(() => {
@@ -131,13 +153,30 @@ async function loadRoutes() {
   }
 }
 
+function pickSort(key: string) {
+  sort.value = key;
+  sortOpen.value = false;
+}
+
+function onDocPointerDown(e: PointerEvent) {
+  if (!sortOpen.value) return;
+  const t = e.target;
+  if (t instanceof Element && t.closest('.rb-sort')) return;
+  sortOpen.value = false;
+}
+
 onMounted(async () => {
+  document.addEventListener('pointerdown', onDocPointerDown, true);
   try {
     await loadOverview();
   } catch (e) {
     error.value = e instanceof Error ? e.message : '区划数据加载失败';
   }
   await loadRoutes();
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', onDocPointerDown, true);
 });
 
 // 省份切换时清空城市；其余条件变化时重新拉列表
@@ -157,6 +196,7 @@ watch(keyword, () => {
 
 function pickProvince(name: string) {
   province.value = province.value === name ? '' : name;
+  if (name) provinceExpanded.value = true;
 }
 
 function pickCity(name: string) {
@@ -182,7 +222,36 @@ function reset() {
   maxDays.value = '';
   keyword.value = '';
   sort.value = 'recommend';
+  filtersOpen.value = false;
+  provinceExpanded.value = false;
+  sortOpen.value = false;
   loadRoutes();
+}
+
+function clearProvince() {
+  province.value = '';
+  city.value = '';
+}
+
+function clearCity() {
+  city.value = '';
+  loadRoutes();
+}
+
+function clearMode() {
+  mode.value = '';
+}
+
+function clearLayer() {
+  layer.value = '';
+}
+
+function clearDays() {
+  maxDays.value = '';
+}
+
+function clearKeyword() {
+  keyword.value = '';
 }
 
 function openDetail(id: string) {
@@ -215,27 +284,108 @@ function seasonText(months: number[]): string {
   <div class="rv-page">
     <main class="rv-shell">
       <header class="rb-hero">
-        <p class="rb-eyebrow">ROUTE BOOK</p>
-        <h1>路书库</h1>
-        <p class="rb-sub">
-          按省份与城市挑选路线。自驾、包车、公共交通、骑行、徒步均可；点进卡片看完整行程。
-        </p>
-        <p class="rb-stat">
-          <b>{{ overview.totalRoutes }}</b> 条路线 ·
-          <b>{{ overview.totalPois }}</b> 处景点 ·
-          <b>{{ provinces.length }}</b> 省区
-          <span v-if="overview.latestUpdated"> · {{ overview.latestUpdated }}</span>
-        </p>
+        <div class="rb-hero__row">
+          <div>
+            <p class="rb-eyebrow">ROUTE BOOK</p>
+            <h1>路书库</h1>
+          </div>
+          <p class="rb-stat">
+            <b>{{ overview.totalRoutes }}</b> 条 ·
+            <b>{{ provinces.length }}</b> 省
+          </p>
+        </div>
+        <p class="rb-sub">按省份挑路线，点卡片看完整行程。</p>
       </header>
 
-      <!-- 省 → 市 两级联动 -->
-      <section class="rb-filter-block">
-        <div class="rb-filter-head">省份</div>
-        <div class="rb-chips">
-          <button class="rb-chip" :class="{ on: !province }" @click="pickProvince('')">全部</button>
+      <!-- 搜索 + 筛选入口 + 排序：始终占一行工具条 -->
+      <section class="rb-toolbar" aria-label="搜索与筛选">
+        <input
+          v-model="keyword"
+          class="rb-input"
+          type="search"
+          placeholder="搜路线 / 城市 / G318"
+          enterkeyhint="search"
+        />
+        <div class="rb-toolbar__actions">
+          <button
+            type="button"
+            class="rb-filter-toggle"
+            :class="{ on: filtersOpen || moreFilterCount > 0 }"
+            :aria-expanded="filtersOpen"
+            aria-controls="rb-more-filters"
+            @click="filtersOpen = !filtersOpen"
+          >
+            筛选
+            <i v-if="moreFilterCount" class="rb-chip-n">{{ moreFilterCount }}</i>
+          </button>
+          <button
+            v-if="hasActiveFilters"
+            type="button"
+            class="rb-reset"
+            @click="reset"
+          >
+            重置
+          </button>
+        </div>
+      </section>
+
+      <!-- 已选条件：可点掉，避免展开面板才能改 -->
+      <div v-if="hasActiveFilters" class="rb-active-bar" aria-label="已选条件">
+        <button v-if="province" type="button" class="rb-active-chip" @click="clearProvince">
+          {{ province }} ×
+        </button>
+        <button v-if="city" type="button" class="rb-active-chip" @click="clearCity">
+          {{ city }} ×
+        </button>
+        <button v-if="layer" type="button" class="rb-active-chip" @click="clearLayer">
+          {{ layerLabel(layer) }} ×
+        </button>
+        <button v-if="maxDays !== ''" type="button" class="rb-active-chip" @click="clearDays">
+          {{ daysLabel(maxDays) }} ×
+        </button>
+        <button v-if="mode" type="button" class="rb-active-chip" @click="clearMode">
+          {{ modeLabel(mode) }} ×
+        </button>
+        <button
+          v-if="keyword.trim()"
+          type="button"
+          class="rb-active-chip"
+          @click="clearKeyword"
+        >
+          “{{ keyword.trim() }}” ×
+        </button>
+      </div>
+
+      <!-- 省份：换行展示，默认收成两行，避免窄屏横滑裁切 -->
+      <section class="rb-filter-block rb-filter-block--slim">
+        <div class="rb-filter-head rb-filter-head--row">
+          <span>省份</span>
+          <button
+            type="button"
+            class="rb-expand"
+            @click="provinceExpanded = !provinceExpanded"
+          >
+            {{ provinceExpanded ? '收起' : '展开全部' }}
+          </button>
+        </div>
+        <div
+          class="rb-chips"
+          :class="{ 'is-clamped': !provinceExpanded }"
+          role="listbox"
+          aria-label="选择省份"
+        >
+          <button
+            type="button"
+            class="rb-chip"
+            :class="{ on: !province }"
+            @click="pickProvince('')"
+          >
+            全部
+          </button>
           <button
             v-for="p in provinces"
             :key="p.shortName"
+            type="button"
             class="rb-chip"
             :class="{ on: province === p.shortName }"
             @click="pickProvince(p.shortName)"
@@ -250,10 +400,18 @@ function seasonText(months: number[]): string {
         <template v-if="citiesOfProvince.length">
           <div class="rb-filter-head">{{ province }} · 城市</div>
           <div class="rb-chips">
-            <button class="rb-chip sm" :class="{ on: !city }" @click="pickCity('')">全部</button>
+            <button
+              type="button"
+              class="rb-chip sm"
+              :class="{ on: !city }"
+              @click="pickCity('')"
+            >
+              全部
+            </button>
             <button
               v-for="c in selectableCities"
               :key="c.name"
+              type="button"
               class="rb-chip sm"
               :class="{ on: city === c.name }"
               @click="pickCity(c.name)"
@@ -265,91 +423,133 @@ function seasonText(months: number[]): string {
         </template>
       </section>
 
-      <!-- 内容分层 L1~L5（颗粒度维度，与省份 / 玩法是「与」关系） -->
-      <section class="rb-filter-block">
-        <div class="rb-filter-head">
-          内容分层
-          <span class="rb-filter-hint">
-            （顺序与推荐列表的出现先后一致：景区几日游 → 周末周边 → 区域环线 → 国家级大环线 → 小众目的地）
-          </span>
-        </div>
-        <div class="rb-chips">
-          <button class="rb-chip" :class="{ on: !layer }" @click="pickLayer('')">全部</button>
-          <button
-            v-for="l in LAYERS"
-            :key="l.key"
-            class="rb-chip"
-            :class="[{ on: layer === l.key }, `tone-${l.key}`]"
-            :title="l.label"
-            @click="pickLayer(l.key)"
+      <!-- 更多筛选：分层 / 天数 / 玩法 -->
+      <section
+        v-show="filtersOpen"
+        id="rb-more-filters"
+        class="rb-filter-block rb-filter-block--more"
+      >
+        <div class="rb-filter-group">
+          <div
+            class="rb-filter-head"
+            title="顺序与推荐列表一致：景区几日游 → 周末周边 → 区域环线 → 国家级大环线 → 小众目的地"
           >
-            {{ l.label }}
-            <i class="rb-chip-n">{{ layerCounts[l.key] ?? 0 }}</i>
-          </button>
-        </div>
-      </section>
-
-      <!-- 天数上限（与省份 / 分层 / 玩法是「与」关系；语义是「N 天以内」） -->
-      <section class="rb-filter-block">
-        <div class="rb-filter-head">
-          天数
-          <span class="rb-filter-hint">（按天数上限筛选，2 天以内的周末短线也会出现）</span>
-        </div>
-        <div class="rb-chips">
-          <button class="rb-chip" :class="{ on: maxDays === '' }" @click="pickDays('')">全部</button>
-          <button
-            v-for="d in DAY_FILTERS.slice(1)"
-            :key="d.key"
-            class="rb-chip"
-            :class="{ on: maxDays === d.key }"
-            @click="pickDays(d.key)"
-          >
-            {{ d.label }}
-          </button>
-        </div>
-      </section>
-
-      <!-- 玩法 + 关键词 + 排序 -->
-      <section class="rb-filter-block">
-        <div class="rb-filter-head">玩法</div>
-        <div class="rb-chips">
-          <button class="rb-chip" :class="{ on: !mode }" @click="mode = ''">不限</button>
-          <button
-            v-for="m in MODES"
-            :key="m.key"
-            class="rb-chip"
-            :class="{ on: mode === m.key }"
-            @click="mode = m.key"
-          >
-            {{ m.label }}
-          </button>
+            内容分层
+          </div>
+          <div class="rb-chips">
+            <button
+              type="button"
+              class="rb-chip"
+              :class="{ on: !layer }"
+              @click="pickLayer('')"
+            >
+              全部
+            </button>
+            <button
+              v-for="l in LAYERS"
+              :key="l.key"
+              type="button"
+              class="rb-chip"
+              :class="[{ on: layer === l.key }, `tone-${l.key}`]"
+              :title="l.label"
+              @click="pickLayer(l.key)"
+            >
+              {{ l.label }}
+              <i class="rb-chip-n">{{ layerCounts[l.key] ?? 0 }}</i>
+            </button>
+          </div>
         </div>
 
-        <div class="rb-row">
-          <input
-            v-model="keyword"
-            class="rb-input"
-            type="search"
-            placeholder="搜路线名 / 城市 / 公路编号（如 G318）"
-          />
-          <select v-model="sort" class="rb-select">
-            <option v-for="s in SORTS" :key="s.key" :value="s.key">{{ s.label }}</option>
-          </select>
-          <button class="rb-reset" @click="reset">重置</button>
+        <div class="rb-filter-group">
+          <div class="rb-filter-head" title="按天数上限筛选，更短的周末线也会出现">天数</div>
+          <div class="rb-chips">
+            <button
+              type="button"
+              class="rb-chip"
+              :class="{ on: maxDays === '' }"
+              @click="pickDays('')"
+            >
+              全部
+            </button>
+            <button
+              v-for="d in DAY_FILTERS.slice(1)"
+              :key="d.key"
+              type="button"
+              class="rb-chip"
+              :class="{ on: maxDays === d.key }"
+              @click="pickDays(d.key)"
+            >
+              {{ d.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="rb-filter-group">
+          <div class="rb-filter-head">玩法</div>
+          <div class="rb-chips">
+            <button
+              type="button"
+              class="rb-chip"
+              :class="{ on: !mode }"
+              @click="mode = ''"
+            >
+              不限
+            </button>
+            <button
+              v-for="m in MODES"
+              :key="m.key"
+              type="button"
+              class="rb-chip"
+              :class="{ on: mode === m.key }"
+              @click="mode = m.key"
+            >
+              {{ m.label }}
+            </button>
+          </div>
         </div>
       </section>
 
       <div class="rb-result-head">
-        共 <b>{{ total }}</b> 条
-        <span v-if="province || city || mode || layer || maxDays !== '' || keyword" class="rb-active">
-          ·
-          <span v-if="province">{{ province }}</span>
-          <span v-if="city"> / {{ city }}</span>
-          <span v-if="mode"> / {{ modeLabel(mode) }}</span>
-          <span v-if="layer"> / {{ layerLabel(layer) }}</span>
-          <span v-if="maxDays !== ''"> / {{ daysLabel(maxDays) }}</span>
-          <span v-if="keyword.trim()"> / “{{ keyword.trim() }}”</span>
-        </span>
+        <span class="rb-result-head__count">共 <b>{{ total }}</b> 条</span>
+        <div class="rb-sort">
+          <button
+            type="button"
+            class="rb-sort__trigger"
+            :aria-expanded="sortOpen"
+            aria-haspopup="listbox"
+            @click="sortOpen = !sortOpen"
+          >
+            <span class="rb-sort__label">{{ sortLabel }}</span>
+            <svg class="rb-sort__chev" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 9l6 6 6-6"
+              />
+            </svg>
+          </button>
+          <ul
+            v-show="sortOpen"
+            class="rb-sort__menu"
+            role="listbox"
+            aria-label="排序方式"
+          >
+            <li v-for="s in SORTS" :key="s.key" role="option" :aria-selected="sort === s.key">
+              <button
+                type="button"
+                class="rb-sort__item"
+                :class="{ on: sort === s.key }"
+                @click="pickSort(s.key)"
+              >
+                <span class="rb-sort__item-label">{{ s.label }}</span>
+                <span class="rb-sort__item-hint">{{ s.hint }}</span>
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div v-if="loading" class="rb-empty">正在加载路书…</div>
@@ -398,37 +598,52 @@ function seasonText(months: number[]): string {
 </template>
 
 <style scoped>
+/* 与 select-hero / drive-hero / ticket-hero 同级字号 */
 .rb-hero {
-  padding: var(--space-5) 0 var(--space-4);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+}
+
+.rb-hero__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
 }
 
 .rb-eyebrow {
   margin: 0 0 var(--space-2);
   font-size: var(--fs-eyebrow);
+  font-weight: 700;
   letter-spacing: 0.18em;
-  color: var(--text-3);
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
 .rb-hero h1 {
-  margin: 0 0 var(--space-2);
+  margin: 0;
   font-size: var(--fs-display);
-  font-weight: 600;
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
   color: var(--text-1);
 }
 
-.rb-sub,
-.rb-stat {
-  margin: 0;
-  max-width: 52ch;
-  font-size: var(--fs-body);
-  line-height: 1.65;
+.rb-sub {
+  margin: var(--space-2) 0 0;
+  max-width: 36em;
+  font-size: var(--fs-meta);
+  line-height: var(--lh-normal);
   color: var(--text-2);
 }
 
 .rb-stat {
-  margin-top: var(--space-2);
+  margin: 0;
+  flex-shrink: 0;
   font-size: var(--fs-meta);
   color: var(--text-3);
+  text-align: right;
+  line-height: 1.4;
 }
 
 .rb-stat b {
@@ -436,17 +651,90 @@ function seasonText(months: number[]): string {
   font-weight: 600;
 }
 
+/* 搜索 + 筛选入口 */
+.rb-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.rb-toolbar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.rb-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rb-filter-toggle.on {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--text-1);
+}
+
+/* 已选摘要：横滑可点掉 */
+.rb-active-bar {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.rb-active-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.rb-active-chip {
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 4px var(--space-3);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--text-1);
+  font-size: var(--fs-cap);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 .rb-filter-block {
   margin-bottom: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-md);
   background: var(--surface-1);
   backdrop-filter: blur(var(--glass-blur-tile));
 }
 
-.rb-filter-block--tools {
-  padding-bottom: var(--space-4);
+.rb-filter-block--slim {
+  padding-block: var(--space-2) var(--space-3);
+}
+
+.rb-filter-block--more {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.rb-filter-group + .rb-filter-group {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line-hairline);
 }
 
 .rb-filter-head {
@@ -456,10 +744,23 @@ function seasonText(months: number[]): string {
   color: var(--text-2);
 }
 
-.rb-tools {
+.rb-filter-head--row {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.rb-expand {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  min-height: 32px;
+  padding: 0 var(--space-1);
 }
 
 .rb-chips {
@@ -468,8 +769,10 @@ function seasonText(months: number[]): string {
   gap: var(--space-2);
 }
 
-.rb-chips--inline {
-  margin: 0;
+/* 省份默认两行，点「展开全部」看齐 */
+.rb-chips.is-clamped {
+  max-height: calc(36px * 2 + var(--space-2));
+  overflow: hidden;
 }
 
 .rb-chip {
@@ -558,15 +861,8 @@ function seasonText(months: number[]): string {
   opacity: 0.85;
 }
 
-.rb-row {
-  display: flex;
-  gap: var(--space-2);
-  align-items: center;
-  flex-wrap: wrap;
-}
-
 .rb-input {
-  flex: 1 1 260px;
+  width: 100%;
   min-height: 46px;
   padding: 0 var(--space-3);
   border: 1px solid var(--line-default);
@@ -580,7 +876,6 @@ function seasonText(months: number[]): string {
   color: var(--text-3);
 }
 
-.rb-select,
 .rb-reset {
   min-height: 44px;
   padding: 0 var(--space-3);
@@ -590,6 +885,7 @@ function seasonText(months: number[]): string {
   color: var(--text-2);
   font-size: var(--fs-cap);
   cursor: pointer;
+  font-family: inherit;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -600,17 +896,113 @@ function seasonText(months: number[]): string {
 }
 
 .rb-result-head {
-  margin: var(--space-3) 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
   font-size: var(--fs-meta);
   color: var(--text-3);
 }
 
-.rb-result-head b {
+.rb-result-head__count b {
   color: var(--text-1);
 }
 
-.rb-active span {
-  margin-left: 2px;
+/* 自定义排序菜单：对齐暗色玻璃风格，选项完整可见 */
+.rb-sort {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.rb-sort__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  color: var(--text-1);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.rb-sort__trigger[aria-expanded='true'] {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+.rb-sort__chev {
+  color: var(--text-3);
+  transition: transform var(--dur-fast) var(--ease-standard);
+}
+
+.rb-sort__trigger[aria-expanded='true'] .rb-sort__chev {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+
+.rb-sort__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  min-width: min(240px, 78vw);
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  border: 1px solid var(--line-hairline);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--elev-3);
+}
+
+.rb-sort__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-1);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rb-sort__item-label {
+  font-size: var(--fs-meta);
+  font-weight: 600;
+}
+
+.rb-sort__item-hint {
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+.rb-sort__item.on {
+  background: var(--accent-soft);
+  color: var(--text-1);
+}
+
+.rb-sort__item.on .rb-sort__item-hint {
+  color: color-mix(in srgb, var(--accent) 70%, var(--text-3));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rb-sort__item:hover {
+    background: var(--fill-accent);
+  }
 }
 
 .rb-empty {
@@ -802,13 +1194,34 @@ function seasonText(months: number[]): string {
   content: ' →';
 }
 
-@media (max-width: 599px) {
-  .rb-grid {
-    grid-template-columns: 1fr;
+@media (min-width: 720px) {
+  .rb-toolbar {
+    flex-direction: row;
+    align-items: center;
   }
 
   .rb-input {
-    flex-basis: 100%;
+    flex: 1 1 auto;
+  }
+
+  .rb-toolbar__actions {
+    flex-shrink: 0;
+  }
+
+  /* 宽屏省份直接铺开，不必再点展开 */
+  .rb-chips.is-clamped {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .rb-expand {
+    display: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .rb-grid {
+    grid-template-columns: 1fr;
   }
 
   .rb-metrics {

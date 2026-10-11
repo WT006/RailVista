@@ -63,8 +63,14 @@ export function usePointerSpotlight(): void {
 
   /** 按压点光源：触点坐标写入 + 点亮按压态 */
   function onPointerDown(event: PointerEvent): void {
+    if (!(event.target instanceof Element)) return;
     const el = resolveTarget(event.target);
     if (!el) return;
+    // 点在卡片内部的普通控件上时，不要给祖先整卡加按压态（公路候选单击会整卡闪一下）
+    const control = event.target.closest<HTMLElement>(
+      'button, a, input, select, textarea, summary, [role="button"]',
+    );
+    if (control && control !== el) return;
     pressed = el;
     const rect = el.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;

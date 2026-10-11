@@ -216,11 +216,16 @@ function localResult(flightIata: string, date: string): FlightLookup {
     flightNumber: flightIata.toUpperCase(),
     airlineIata: airline?.iata,
     date,
-    note: '未配置航班数据服务（AIRLABS_API_KEY），无法自动获取起降机场与时刻，请在下方补选；机场英文名、里程、巡航高度将自动匹配。',
+    note: '在线航班数据源暂不可用，请选择出发和到达机场，系统将自动通过飞猪源搜索该航班。',
   };
 }
 
-export async function lookupFlight(flightNo: string, date: string): Promise<FlightLookup> {
+export async function lookupFlight(
+  flightNo: string,
+  date: string,
+  from?: string,
+  to?: string,
+): Promise<FlightLookup> {
   const flightIata = flightNo.trim().toUpperCase();
   if (!parseFlightIata(flightIata)) {
     return {
@@ -230,13 +235,40 @@ export async function lookupFlight(flightNo: string, date: string): Promise<Flig
       note: '航班号格式不正确，示例：CZ3467、CA4401、3U8633。',
     };
   }
-  // 查询链：FR24（免费无需key）→ AirLabs（需key）→ 本地兜底
+  // 查询链：FR24（免费无需key）→ AirLabs（需key）→ 飞猪按航线+航班号过滤 → 本地兜底
   const fr24 = await queryFr24(flightIata, date);
   if (fr24) return fr24;
   const online = await queryAirlabs(flightIata, date);
-  return online ?? localResult(flightIata, date);
+  if (online) return online;
+
+  // 在线源均不可用时，若用户提供了起降机场，用飞猪按航线搜索并过滤航班号
+  if (from && to) {
+    const routeResults = await searchFlightsByRoute(from, to, date);
+    const match = routeResults.find(
+      (r) => r.flightNumber.toUpperCase() === flightIata,
+    );
+    if (match) {
+      const ap = getAirport(match.depIata);
+      const bp = getAirport(match.arrIata);
+      const distanceKm = ap && bp ? Math.round(haversineKm(ap, bp)) : undefined;
+      const durationMin = match.durationMin ?? (distanceKm ? flightDurationMinEst(distanceKm) : undefined);
+      return {
+        source: 'fr24',
+        flightNumber: match.flightNumber,
+        airlineIata: match.airlineIata,
+        date,
+        dep: { iata: match.depIata, scheduled: match.scheduledDeparture },
+        arr: { iata: match.arrIata, scheduled: match.scheduledArrival },
+        durationMin,
+        distanceKm,
+        cruiseAltitudeM: distanceKm ? cruiseAltitudeM(distanceKm) : undefined,
+      };
+    }
+  }
+
+  return localResult(flightIata, date);
 }
-// ── FlyClaw 子进程航线搜索 ──────────────────────────────────────────────────
+// ── FlyClaw 子进程 ──────────────────────────────────────────────────────────
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FLYCLAW_DIR = join(__dirname, '../../../../tools/flyclaw');
 const FLYCLAW_SCRIPT = join(FLYCLAW_DIR, 'flyclaw.py');
@@ -270,6 +302,13 @@ interface FlyClawRecord {
   stops?: number;
   cabin_class?: string;
   source?: string;
+}
+
+/** 从 ISO 时间字符串提取 HH:MM（兼容 YYYY-MM-DDTHH:MM / YYYY-MM-DD HH:MM / 纯 HH:MM） */
+function extractHHMM(s: string | undefined): string | undefined {
+  if (!s) return undefined;
+  const m = /(\d{2}):(\d{2})/.exec(s);
+  return m ? `${m[1]}:${m[2]}` : undefined;
 }
 
 /**
@@ -310,23 +349,30 @@ export async function searchFlightsByRoute(
           resolve([]);
           return;
         }
-        const results: FlightSearchResult[] = raw.map((r) => ({
-          flightNumber: r.flight_number ?? '',
-          airlineName: r.airline,
-          airlineIata: r.flight_number ? r.flight_number.replace(/\d.*$/, '').toUpperCase() : undefined,
-          depIata: r.origin_iata ?? '',
-          arrIata: r.destination_iata ?? '',
-          depCity: r.origin_city,
-          arrCity: r.destination_city,
-          scheduledDeparture: r.scheduled_departure?.slice(11, 16),
-          scheduledArrival: r.scheduled_arrival?.slice(11, 16),
-          durationMin: r.duration_minutes,
-          price: r.price,
-          currency: r.currency,
-          stops: r.stops,
-          cabinClass: r.cabin_class,
-          source: r.source ?? 'flyclaw',
-        })).filter((r) => r.flightNumber && r.depIata && r.arrIata);
+        const results: FlightSearchResult[] = raw.map((r) => {
+          // 数字开头航班号（3U/9C/8L…）不能用 /\d.*$/ 截前缀（会把 3U8633 截成空串），
+          // 用 parseFlightIata 统一解析航司二字码
+          const parsed = r.flight_number ? parseFlightIata(r.flight_number) : null;
+          const airlineIata = parsed?.airlineIata;
+          const airlineInfo = airlineIata ? getAirline(airlineIata) : undefined;
+          return {
+            flightNumber: r.flight_number ?? '',
+            airlineName: airlineInfo?.name ?? r.airline,
+            airlineIata,
+            depIata: r.origin_iata ?? '',
+            arrIata: r.destination_iata ?? '',
+            depCity: r.origin_city,
+            arrCity: r.destination_city,
+            scheduledDeparture: extractHHMM(r.scheduled_departure),
+            scheduledArrival: extractHHMM(r.scheduled_arrival),
+            durationMin: r.duration_minutes,
+            price: r.price,
+            currency: r.currency,
+            stops: r.stops,
+            cabinClass: r.cabin_class,
+            source: r.source ?? 'flyclaw',
+          };
+        }).filter((r) => r.flightNumber && r.depIata && r.arrIata);
         resolve(results);
       } catch {
         resolve([]);

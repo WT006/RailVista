@@ -78,3 +78,159 @@ export function isAtlasRoadDisplaySpot(s: AtlasRoadDisplaySpot): boolean {
   if (PEAK_CATS.has(cat)) return isNotableMountain(s);
   return true;
 }
+
+// ── 近重复 / 城区密集聚去重（不改库）────────────────────────────────────────
+
+const NAME_STRIP_RE =
+  /(国家考古遗址公园|考古遗址公园|国家地质公园|地质公园|森林公园|国家公园|风景名胜区|风景区|景区|博物院|博物馆|纪念馆|美术馆|展览馆|陈列馆|观光厅|观景台|觀景台|瞭望台|瞭望點|主峰|峰)$/g;
+
+/** 城区非山岳：约 1km 内最多保留几处（按评分） */
+export const ROAD_ATLAS_URBAN_TOP_K = 2;
+/** 城区密度半径（km） */
+export const ROAD_ATLAS_URBAN_RADIUS_KM = 1.0;
+
+function haversineKm(
+  a: { lng: number; lat: number },
+  b: { lng: number; lat: number },
+): number {
+  const to = (x: number) => (x * Math.PI) / 180;
+  const dLat = to(b.lat - a.lat);
+  const dLng = to(b.lng - a.lng);
+  const x =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(to(a.lat)) * Math.cos(to(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.sqrt(x));
+}
+
+function coreName(name: string): string {
+  return name.normalize('NFKC').replace(/\s+/g, '').replace(NAME_STRIP_RE, '');
+}
+
+function isPeakCat(cat: string | undefined): boolean {
+  return PEAK_CATS.has(cat ?? '');
+}
+
+function spotRank(s: AtlasRoadDisplaySpot & { hasWiki?: boolean }): number {
+  let r = s.score ?? 0;
+  if (String(s.source ?? '').startsWith('hand-curated')) r += 20;
+  if (s.hasWiki) r += 5;
+  // 更短主名略优先（冈仁波齐 > 冈仁波齐峰）
+  r += Math.max(0, 12 - (s.name?.length ?? 12)) * 0.15;
+  return r;
+}
+
+/** 同名 / 近名 / 峰群卫星是否应合并 */
+function isNearDuplicate(
+  a: AtlasRoadDisplaySpot & { lng: number; lat: number },
+  b: AtlasRoadDisplaySpot & { lng: number; lat: number },
+): boolean {
+  const d = haversineKm(a, b);
+  const na = (a.name ?? '').replace(/\s+/g, '');
+  const nb = (b.name ?? '').replace(/\s+/g, '');
+  if (na && na === nb && d <= 2) return true;
+
+  const ca = coreName(a.name ?? '');
+  const cb = coreName(b.name ?? '');
+  if (ca.length >= 2 && ca === cb && d <= 1.5) return true;
+
+  // 峰群：洛子峰 / 洛子中一峰 / 洛子东峰
+  if (isPeakCat(a.category) && isPeakCat(b.category) && d <= 2.5) {
+    if (
+      ca.length >= 2 &&
+      cb.length >= 2 &&
+      (ca.startsWith(cb) || cb.startsWith(ca) || ca.includes(cb) || cb.includes(ca))
+    ) {
+      return true;
+    }
+  }
+
+  // 一名称包含另一（≥3 字核心），1km 内
+  if (ca.length >= 3 && cb.length >= 3 && d <= 1.0) {
+    if (ca.includes(cb) || cb.includes(ca) || na.includes(nb) || nb.includes(na)) return true;
+  }
+  return false;
+}
+
+export type AtlasRoadDedupeSpot = AtlasRoadDisplaySpot & {
+  id?: string;
+  lng: number;
+  lat: number;
+  hasWiki?: boolean;
+};
+
+/**
+ * 图集公路景点去重：近名合并 + 城区密集聚限流。
+ * 保留高分 / 手选 / 有百科；不改景点库。
+ */
+export function dedupeAtlasRoadSpots<T extends AtlasRoadDedupeSpot>(spots: T[]): T[] {
+  type Row = { s: T; key: string };
+  const rows: Row[] = [];
+  const seenKey = new Set<string>();
+  spots.forEach((s, i) => {
+    if (!Number.isFinite(s.lng) || !Number.isFinite(s.lat) || !(s.name ?? '')) return;
+    const key = s.id || `${s.name}@${s.lng.toFixed(5)},${s.lat.toFixed(5)}#${i}`;
+    if (seenKey.has(key)) return;
+    seenKey.add(key);
+    rows.push({ s, key });
+  });
+  if (rows.length < 2) return rows.map((r) => r.s);
+
+  const cell = 0.012;
+  const grid = new Map<string, Row[]>();
+  for (const row of rows) {
+    const k = `${Math.floor(row.s.lng / cell)},${Math.floor(row.s.lat / cell)}`;
+    const arr = grid.get(k);
+    if (arr) arr.push(row);
+    else grid.set(k, [row]);
+  }
+
+  const neighbors = (row: Row): Row[] => {
+    const ix = Math.floor(row.s.lng / cell);
+    const iy = Math.floor(row.s.lat / cell);
+    const out: Row[] = [];
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        const arr = grid.get(`${ix + dx},${iy + dy}`);
+        if (arr) out.push(...arr);
+      }
+    }
+    return out;
+  };
+
+  const assigned = new Set<string>();
+  const afterName: T[] = [];
+  for (const row of rows) {
+    if (assigned.has(row.key)) continue;
+    const group: T[] = [row.s];
+    assigned.add(row.key);
+    const q = [row];
+    while (q.length) {
+      const cur = q.pop()!;
+      for (const o of neighbors(cur)) {
+        if (assigned.has(o.key)) continue;
+        if (!isNearDuplicate(cur.s, o.s)) continue;
+        assigned.add(o.key);
+        group.push(o.s);
+        q.push(o);
+      }
+    }
+    group.sort((a, b) => spotRank(b) - spotRank(a));
+    afterName.push(group[0]!);
+  }
+
+  // 城区限流：非山岳，1km 内最多 ROAD_ATLAS_URBAN_TOP_K 处
+  const sorted = afterName.slice().sort((a, b) => spotRank(b) - spotRank(a));
+  const kept: T[] = [];
+  for (const s of sorted) {
+    if (isPeakCat(s.category)) {
+      kept.push(s);
+      continue;
+    }
+    const nearby = kept.filter(
+      (o) => !isPeakCat(o.category) && haversineKm(s, o) <= ROAD_ATLAS_URBAN_RADIUS_KM,
+    );
+    if (nearby.length >= ROAD_ATLAS_URBAN_TOP_K) continue;
+    kept.push(s);
+  }
+  return kept;
+}

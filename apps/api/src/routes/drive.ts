@@ -30,11 +30,15 @@ import {
   roadNetworkOverview,
 } from '../services/roadNetwork.js';
 import { geocodeFallback, suggestPlaces } from '../services/roadIndex.js';
-import { buildChapters, matchSpotsAlong, roadsideSpotsMeta } from '../services/roadsideSpots.js';
+import {
+  buildChapters,
+  matchSpotsAlong,
+  matchSpotsMainAndOrphans,
+  roadsideSpotsMeta,
+} from '../services/roadsideSpots.js';
 import { PlaceNotFoundError, planDriveRoute, planRoadRoute } from '../services/roadRouting.js';
 import { boardsAlsoIn, getBoard, itemHasGeometry, listBoards } from '../services/driveBoards.js';
 import { loadRoadTopology, roadTopologyInfo } from '../services/roadTopology.js';
-import { computeCumKm } from '@railvista/shared';
 import type { AlongSpot, PlaceKind, RankingBoard, RankingItem, RoadRoute } from '@railvista/shared';
 
 export const driveRoute = new Hono();
@@ -230,34 +234,17 @@ driveRoute.get('/along', async (c) => {
     bufferKm: Number.isFinite(buffer) && buffer > 0 ? buffer : undefined,
   };
 
-  // v0.6.0：整条公路在 OSM 中常由多个连通分量组成（城区 ref 断档）。
-  // 沿程景点必须覆盖**全部分量**，否则「G318 沿线景点」只找得到最长那一段。
-  // 做法：逐分量匹配 + 里程偏移累加；跨分量重复命中的点位按"离路更近"去重。
+  // 主链景点 vs 未贯通段景点分离（禁止 orphan 里程偏移叠进主链 progressKm）。
+  // 旧逻辑 offsetKm 累加会把远端断段 POI 标成 K900+，总览起终点扎堆、中间空。
+  const extraChains = (route.segments ?? [])
+    .filter((c) => Array.isArray(c) && c.length >= 2)
+    .map((c) => decimatePoints(c as [number, number, number?][], 400));
   let spots: AlongSpot[];
-  const extraChains = (route.segments ?? []).filter((c) => Array.isArray(c) && c.length >= 2);
+  let orphanSpots: AlongSpot[] = [];
   if (route.engine === 'road-geometry' && extraChains.length) {
-    const chains: [number, number, number?][][] = [matchCoords, ...extraChains.map((c) => c as [number, number, number?][])];
-    const merged: AlongSpot[] = [];
-    const bestById = new Map<string, number>();
-    let offsetKm = 0;
-    for (const chain of chains) {
-      const part = matchSpotsAlong(decimatePoints(chain, 400), alongOpts);
-      for (const sp of part) {
-        const shifted = { ...sp, progressKm: Math.round((sp.progressKm + offsetKm) * 10) / 10 };
-        const prev = bestById.get(sp.id);
-        if (prev === undefined) {
-          bestById.set(sp.id, merged.length);
-          merged.push(shifted);
-        } else if (shifted.distKm < merged[prev]!.distKm) {
-          merged[prev] = shifted;
-        }
-      }
-      const cum = computeCumKm(chain as [number, number][]);
-      offsetKm += cum[cum.length - 1] ?? 0;
-    }
-    merged.sort((a, b) => a.progressKm - b.progressKm);
-    const cap = alongOpts.maxCount ?? 200;
-    spots = merged.slice(0, cap);
+    const matched = matchSpotsMainAndOrphans(matchCoords, extraChains, alongOpts);
+    spots = matched.spots;
+    orphanSpots = matched.orphanSpots;
   } else {
     spots = matchSpotsAlong(matchCoords, alongOpts);
   }
@@ -272,6 +259,11 @@ driveRoute.get('/along', async (c) => {
         ...(matchCumKm ? { cumKm: matchCumKm } : {}),
       },
       spots,
+      orphanSpots,
+      spotStats: {
+        main: spots.length,
+        orphan: orphanSpots.length,
+      },
       chapters: route.chapters ?? buildChapters(matchCoords, route.lengthKm),
       highlights: legacyHighlights,
       legacyChapters,

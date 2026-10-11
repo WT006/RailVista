@@ -357,7 +357,11 @@ export const api = {
     if (params.engine) qs.set('engine', params.engine);
     return request<{
       route: import('@railvista/shared').RoadRoute;
+      /** 主链沿程景点（progressKm 在主链里程内） */
       spots: import('@railvista/shared').AlongSpot[];
+      /** 未贯通段景点（局部里程 + orphanChainIndex），不并进主链进度 */
+      orphanSpots?: import('@railvista/shared').AlongSpot[];
+      spotStats?: { main: number; orphan: number };
       chapters: import('@railvista/shared').RoadChapter[];
       highlights?: import('@railvista/shared').DriveHighlight[];
       legacyChapters?: unknown;

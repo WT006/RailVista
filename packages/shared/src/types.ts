@@ -852,6 +852,11 @@ export interface AlongSpot {
   bestView?: SpotBestView;
   canPark?: boolean;
   province?: string;
+  /**
+   * 未贯通 orphan 段下标（相对 route.segments）。
+   * 有值时 progressKm 是该断段内的局部里程，不得并进主链进度条 / 章节统计。
+   */
+  orphanChainIndex?: number;
 }
 
 /** 榜单条目：指向路网里的实际路线（引用 + 精选，非独立数据） */

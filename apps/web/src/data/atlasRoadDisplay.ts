@@ -4,5 +4,6 @@
 export {
   ROAD_ATLAS_MIN_SCORE,
   isAtlasRoadDisplaySpot,
+  dedupeAtlasRoadSpots,
   type AtlasRoadDisplaySpot,
 } from '@railvista/shared';

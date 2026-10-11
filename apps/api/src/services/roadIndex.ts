@@ -112,7 +112,7 @@ function scoreText(q: string, text: string): number {
   return 0;
 }
 
-function suggestPlacesOfKind(q: string, kind: PlaceKind, limit: number): PlaceHit[] {
+function suggestPlacesOfKind(q: string, kind: PlaceKind, limit: number, province?: string): PlaceHit[] {
   const hits: PlaceHit[] = [];
   if (kind === 'place') {
     for (const p of loadPlaces()) {
@@ -129,7 +129,11 @@ function suggestPlacesOfKind(q: string, kind: PlaceKind, limit: number): PlaceHi
       });
     }
   } else if (kind === 'road') {
+    // 2026-10-11：S/X/Y 编号跨省重复且候选远超 limit —— 选省过滤必须在打分截断之前，
+    // 否则一省的碎片条目挤掉其他省编号，前端"选省"永远筛不到。
+    const prov = province?.trim();
     for (const r of loadRoadIndex().entries as RoadIndexEntry[]) {
+      if (prov && !r.key.startsWith(`${prov}:`)) continue;
       const refScore = r.ref === q ? 100 : r.ref.startsWith(q) ? 85 : 0;
       const nameScore = r.name ? scoreText(q, r.name) * 0.6 : 0; // 中文名（沪聂线）60%
       const odScore = `${r.fromPlace}${r.toPlace}`.includes(q) ? 40 : 0;
@@ -139,12 +143,21 @@ function suggestPlacesOfKind(q: string, kind: PlaceKind, limit: number): PlaceHi
         kind: 'road',
         id: r.key,
         name: r.ref,
-        sub: `${r.name ? r.name + ' · ' : ''}${r.fromPlace} → ${r.toPlace}`,
+        sub: `${prov || r.key.split(':')[0]} · ${r.name ? r.name + ' · ' : ''}${r.fromPlace} → ${r.toPlace}`,
         lng: r.bbox[0] || 104,
         lat: r.bbox[1] || 35,
         score,
       });
     }
+    hits.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      // 同分（前缀命中）：短编号优先（S2 < S20 < S201），避免截断淹没各省主编号
+      const da = Number(a.name.replace(/\D/g, '')) || 0;
+      const db = Number(b.name.replace(/\D/g, '')) || 0;
+      if (a.name.length !== b.name.length) return a.name.length - b.name.length;
+      return da - db || a.id.localeCompare(b.id, 'zh');
+    });
+    return hits.slice(0, limit);
   } else if (kind === 'spot') {
     for (const s of getRoadsideSpots()) {
       const score = scoreText(q, s.name);
@@ -179,10 +192,10 @@ function suggestPlacesOfKind(q: string, kind: PlaceKind, limit: number): PlaceHi
 }
 
 /** 统一入口：不传 kind 时四类混合，按分数取 top */
-export function suggestPlaces(q: string, kind?: PlaceKind, limit = 20): PlaceHit[] {
+export function suggestPlaces(q: string, kind?: PlaceKind, limit = 20, province?: string): PlaceHit[] {
   const query = (q || '').trim();
   if (!query) return [];
-  if (kind) return suggestPlacesOfKind(query, kind, limit);
+  if (kind) return suggestPlacesOfKind(query, kind, limit, province);
   const all = (['place', 'road', 'spot', 'facility'] as PlaceKind[]).flatMap((k) =>
     suggestPlacesOfKind(query, k, limit),
   );

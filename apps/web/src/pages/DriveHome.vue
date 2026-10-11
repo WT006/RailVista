@@ -209,7 +209,7 @@ async function refreshRoadCandidates() {
   }
   roadBusy.value = true;
   try {
-    const data = await api.suggestDrivePlaces(q, 'road', 80);
+    const data = await api.suggestDrivePlaces(q, 'road', 80, selectedProvince.value || undefined);
     let hits = data.hits;
     if (needsProvince.value && selectedProvince.value) {
       hits = hits.filter((h) => h.id.startsWith(`${selectedProvince.value}:`));
@@ -235,6 +235,8 @@ async function refreshRoadCandidates() {
 }
 
 watch(codeQuery, () => void refreshRoadCandidates());
+// 2026-10-11：选省后重新请求（服务端在截断前按省过滤），本地已截断的 80 条会漏掉其他省编号
+watch(selectedProvince, () => void refreshRoadCandidates());
 
 function applyPrefix(p: { key: string }) {
   const digits = codeQuery.value.replace(/^[GSXY]/, '').trim();

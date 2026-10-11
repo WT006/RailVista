@@ -52,6 +52,48 @@ function classifyProvincial(ref) {
   return null;
 }
 
+// ── 名字审查与多数原则选择（2026-10-11）─────────────────────────────────────
+// C1 垃圾名：OSM 抓取噪声（地图页脚/审图号等文本被误存为 way name）
+const NAME_GARBAGE_RE = /经度：|纬度：|审图号|地图纠错|高清版|NavInfo|自然资源部|切换至传统版/;
+const NAME_SYNONYM_RE = /省道|Provincial|Hwy|Highway|国道/i;
+const digitsOfName = (s) => (String(s).match(/\d+/g) ?? []).join('').replace(/^0+/, '');
+/** 纯编号名（"X015"/"S466"）：展示层已有 ref，name 再是编号即冗余或错标 */
+function isBareRefLikeName(name, ref) {
+  const a = String(name).replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  const b = String(ref).replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  if (!a) return false;
+  if (a === b) return true;
+  return /^[A-Z]\d+$/.test(a) && digitsOfName(a) === digitsOfName(b);
+}
+/** 同义反复（"202 省道 - 202 Provincial Highway"）：数字与 ref 相同且含等级词 */
+function isSynonymName(name, ref) {
+  return Boolean(digitsOfName(name)) && digitsOfName(name) === digitsOfName(ref) && NAME_SYNONYM_RE.test(name);
+}
+/** 可信路名：剔除 C1 垃圾名 / C2 同义反复 / 纯编号名 */
+function plausibleRoadName(name, ref) {
+  if (!name) return false;
+  if (NAME_GARBAGE_RE.test(name)) return false;
+  if (isSynonymName(name, ref)) return false;
+  if (isBareRefLikeName(name, ref)) return false;
+  return true;
+}
+/** 频次多数原则：同名出现最多的胜出；平票时含中文的优先、更短的优先（短名多为核心路名） */
+function pickBestName(counts) {
+  let best = '';
+  let bestN = 0;
+  const zhRe = /[\u4e00-\u9fff]/;
+  for (const [name, n] of counts) {
+    if (n > bestN) { best = name; bestN = n; continue; }
+    if (n === bestN && best) {
+      const zhA = zhRe.test(name);
+      const zhB = zhRe.test(best);
+      if (zhA !== zhB) { if (zhA) best = name; }
+      else if (name.length < best.length) best = name;
+    }
+  }
+  return best;
+}
+
 /**
  * 从 RVWN 要素库派生"事实名录"：省道/县道/乡道/村道的编号不是从某份文件抄来的，
  * 而是从全省每一段真实道路的 ref 标签里聚合出来的 —— 这是"县乡村道一条都没有"的解法。
@@ -89,17 +131,24 @@ function deriveFromNet() {
         const key = province + ':' + ref;
         let e = map.get(key);
         if (!e) {
-          e = { key, ref, class: cls, provinces: [province], fromPlace: '', toPlace: '', lengthKm: 0, bbox: [0, 0, 0, 0], spotCount: 0, hasGeom: false, source: 'osm_only', status: 'unverified', wayCount: 0, name: '' };
+          e = { key, ref, class: cls, provinces: [province], fromPlace: '', toPlace: '', lengthKm: 0, bbox: [0, 0, 0, 0], spotCount: 0, hasGeom: false, source: 'osm_only', status: 'unverified', wayCount: 0, name: '', _nameCounts: new Map() };
           map.set(key, e);
         }
         e.lengthKm += w.lenM / 1000;
         e.wayCount += 1;
-        if (w.name && w.name.length > e.name.length) e.name = w.name;
+        if (plausibleRoadName(w.name, ref)) {
+          e._nameCounts.set(w.name, (e._nameCounts.get(w.name) || 0) + 1);
+        }
       }
     }
     r.close();
   }
-  const rows = [...map.values()].map((e) => ({ ...e, lengthKm: Math.round(e.lengthKm * 10) / 10 }));
+  const rows = [...map.values()].map((e) => {
+    const { _nameCounts, ...rest } = e;
+    const best = pickBestName(_nameCounts);
+    const prov = rest.key.split(':')[0];
+    return { ...rest, name: best ? `${best}（${prov}）` : undefined, lengthKm: Math.round(e.lengthKm * 10) / 10 };
+  });
   rows.sort((a, b) => (a.class === b.class ? a.key.localeCompare(b.key) : a.class.localeCompare(b.class)));
   const extraRows = [...extraRoads.values()].map((e) => ({ ...e, lengthKm: Math.round(e.lengthKm * 10) / 10 }));
   return { provincial: rows, extraRoads: extraRows, osmRefs, provinces: shards.length };
@@ -279,7 +328,7 @@ const derived = fromNet ? deriveFromNet() : { provincial: [], extraRoads: [], pr
 const provincial = (derived.provincial.length ? derived.provincial : PROVINCIAL_SEED.map(([province, ref, name, fromPlace, toPlace, lengthKm]) => ({
   key: `${province}:${ref}`,
   ref,
-  name: name || undefined,
+  name: name ? `${name}（${province}）` : undefined,
   class: 'provincial',
   provinces: [province],
   fromPlace,

@@ -301,10 +301,11 @@ export const api = {
     }>('/drive/stats');
   },
   // ── 万里路书 · 全国公路旅游网（v0.4.0，PRD §5.5） ──────────────────────────
-  /** 公路搜索：地名 / 编号 / 景点 / 服务区四类索引 + geocode 兜底 */
-  suggestDrivePlaces(q: string, kind?: string, limit = 20) {
+  /** 公路搜索：地名 / 编号 / 景点 / 服务区四类索引 + geocode 兜底；province 为省内编号（S/X/Y）选省过滤 */
+  suggestDrivePlaces(q: string, kind?: string, limit = 20, province?: string) {
     const qs = new URLSearchParams({ q, limit: String(limit) });
     if (kind) qs.set('kind', kind);
+    if (province) qs.set('province', province);
     return request<{ q: string; kind: string | null; hits: import('@railvista/shared').PlaceHit[] }>(
       `/drive/suggest?${qs}`,
     );

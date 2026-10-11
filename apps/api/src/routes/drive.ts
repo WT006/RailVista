@@ -52,10 +52,11 @@ driveRoute.get('/suggest', async (c) => {
   const q = c.req.query('q') ?? '';
   const kindRaw = c.req.query('kind');
   const limit = Math.min(80, Math.max(1, Number(c.req.query('limit')) || 20));
+  const province = c.req.query('province') || undefined;
   const kind = ['place', 'road', 'spot', 'facility'].includes(kindRaw ?? '')
     ? (kindRaw as PlaceKind)
     : undefined;
-  let hits = suggestPlaces(q, kind, limit);
+  let hits = suggestPlaces(q, kind, limit, province);
   // 降级链：本地未命中 → 高德 → Nominatim（PRD §4.3；place 语义才兜底）
   if (!hits.length && q.trim().length >= 2 && (!kind || kind === 'place')) {
     const remote = await geocodeFallback(q.trim());

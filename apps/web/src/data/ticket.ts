@@ -9,7 +9,7 @@
  * （2026-10-09 鸿蒙化收敛裁定，见 tokens.css 例外条款）。 */
 import type { TicketKind } from '@railvista/shared';
 
-// 航司官方素材（透明底）：ca/cz 2026-10 接入透明底新素材，mu 为正方形版
+// 航司官方素材（透明底）：ca/cz 2026-10 接入透明底新素材，mu/9c/3u/hu 为官方 1:1 正方形版（2026-10-12）
 import logoCa from '../assets/ticket/ca.png';
 import logoCz from '../assets/ticket/cz.png';
 import logoMu from '../assets/ticket/mu.png';
@@ -18,22 +18,22 @@ import logoMf from '../assets/ticket/mf.jpg';
 import logo3u from '../assets/ticket/3u.png';
 import logoZh from '../assets/ticket/zh.png';
 import logoSc from '../assets/ticket/sc-crop.png';
-import logo9c from '../assets/ticket/9c.jpg';
+import logo9c from '../assets/ticket/9c.png';
 import logoHo from '../assets/ticket/ho.png';
-// 补充 16 家航司官方 logo（2026-10-05 接入，均经 1:1 正方形归一，见 scripts/normalize-new-airline-logos.mjs）
+// 补充航司官方 logo（均经 1:1 正方形归一，见 scripts/normalize-new-airline-logos.mjs）
 import logoGs from '../assets/ticket/gs.png';
 import logoJd from '../assets/ticket/jd.png';
 import logoKn from '../assets/ticket/kn.png';
 import logoG5 from '../assets/ticket/g5.png';
 import logoEu from '../assets/ticket/eu.png';
-import logoWz from '../assets/ticket/wz.png';
+import logoPn from '../assets/ticket/pn.png';
 import logoNs from '../assets/ticket/ns.png';
 import logoFu from '../assets/ticket/fu.png';
 import logoUq from '../assets/ticket/uq.png';
-import logoAq from '../assets/ticket/aq.png';
+import logo8l from '../assets/ticket/8l.png';
 import logoGj from '../assets/ticket/gj.png';
 import logoQw from '../assets/ticket/qw.png';
-import logoGt from '../assets/ticket/gt.png';
+import logoKy from '../assets/ticket/ky.png';
 import logoA6 from '../assets/ticket/a6.png';
 import logoGx from '../assets/ticket/gx.png';
 import logoRy from '../assets/ticket/ry.png';
@@ -173,25 +173,53 @@ export const AIRLINES: Record<string, AirlineMeta> = {
   '9c': { code: '9c', name: '春秋航空', en: 'SPRING AIRLINES', prefix: '9C', logo: logo9c, alliance: null },
   ho: { code: 'ho', name: '吉祥航空', en: 'JUNEYAO AIR', prefix: 'HO', logo: logoHo, alliance: null },
 
-  // ── 补充航司（2026-10-03 建表 / 2026-10-05 接入官方 logo）──
-  // 官方 VI 已逐一目视核验；gt 桂林为蓝底 app 图标制式（无白底版官方素材）。
+  // ── 补充航司（2026-10-03 建表 / 2026-10-05 接入官方 logo / 2026-10-12 修正 IATA 代码）──
+  // IATA 代码以 aviation.ts AIRLINE_LIST 为准；logo 文件名 = IATA 小写。
   // 联盟归属按公开资料：三大集团成员均已核对；地方/低成本航司多数无联盟。
   gs: { code: 'gs', name: '天津航空', en: 'TIANJIN AIRLINES', prefix: 'GS', logo: logoGs, alliance: null },
   jd: { code: 'jd', name: '首都航空', en: 'BEIJING CAPITAL AIRLINES', prefix: 'JD', logo: logoJd, alliance: null },
   kn: { code: 'kn', name: '中国联合航空', en: 'CHINA UNITED AIRLINES', prefix: 'KN', logo: logoKn, alliance: null },
   g5: { code: 'g5', name: '华夏航空', en: 'CHINA EXPRESS AIRLINES', prefix: 'G5', logo: logoG5, alliance: null },
   eu: { code: 'eu', name: '成都航空', en: 'CHENGDU AIRLINES', prefix: 'EU', logo: logoEu, alliance: null },
-  wz: { code: 'wz', name: '西部航空', en: 'WESTERN AIRLINES', prefix: 'WZ', logo: logoWz, alliance: null },
+  pn: { code: 'pn', name: '西部航空', en: 'WEST AIR', prefix: 'PN', logo: logoPn, alliance: null },
   ns: { code: 'ns', name: '河北航空', en: 'HEBEI AIRLINES', prefix: 'NS', logo: logoNs, alliance: null },
   fu: { code: 'fu', name: '福州航空', en: 'FUZHOU AIRLINES', prefix: 'FU', logo: logoFu, alliance: null },
   uq: { code: 'uq', name: '乌鲁木齐航空', en: 'URUMQI AIRLINES', prefix: 'UQ', logo: logoUq, alliance: null },
-  aq: { code: 'aq', name: '九元航空', en: '9 AIRLINES', prefix: 'AQ', logo: logoAq, alliance: null },
+  '8l': { code: '8l', name: '祥鹏航空', en: 'LUCKY AIR', prefix: '8L', logo: logo8l, alliance: null },
   gj: { code: 'gj', name: '长龙航空', en: 'LOONG AIR', prefix: 'GJ', logo: logoGj, alliance: null },
   qw: { code: 'qw', name: '青岛航空', en: 'QINGDAO AIRLINES', prefix: 'QW', logo: logoQw, alliance: null },
-  gt: { code: 'gt', name: '桂林航空', en: 'AIR GUILIN', prefix: 'GT', logo: logoGt, alliance: null },
+  ky: { code: 'ky', name: '昆明航空', en: 'KUNMING AIRLINES', prefix: 'KY', logo: logoKy, alliance: null },
   a6: { code: 'a6', name: '湖南航空', en: 'HUNAN AIRLINES', prefix: 'A6', logo: logoA6, alliance: null },
   gx: { code: 'gx', name: '北部湾航空', en: 'BEGUI BAY AIRLINES', prefix: 'GX', logo: logoGx, alliance: null },
   ry: { code: 'ry', name: '江西航空', en: 'JIANGXI AIRLINES', prefix: 'RY', logo: logoRy, alliance: null },
+
+  // ── 补充航司（2026-10-12 新增，覆盖 aviation.ts 全部大陆航司）──
+  fm: { code: 'fm', name: '上海航空', en: 'SHANGHAI AIRLINES', prefix: 'FM', logo: '', alliance: 'skyteam' },
+  y8: { code: 'y8', name: '金鹏航空', en: 'SUPARNA AIRLINES', prefix: 'Y8', logo: '', alliance: null },
+  jr: { code: 'jr', name: '幸福航空', en: 'JOY AIR', prefix: 'JR', logo: '', alliance: null },
+  dr: { code: 'dr', name: '瑞丽航空', en: 'RUILI AIRLINES', prefix: 'DR', logo: '', alliance: null },
+  '9h': { code: '9h', name: '长安航空', en: 'AIR CHANGAN', prefix: '9H', logo: '', alliance: null },
+  oq: { code: 'oq', name: '重庆航空', en: 'CHONGQING AIRLINES', prefix: 'OQ', logo: '', alliance: null },
+  // 港澳台
+  cx: { code: 'cx', name: '国泰航空', en: 'CATHAY PACIFIC', prefix: 'CX', logo: '', alliance: 'oneworld' },
+  br: { code: 'br', name: '长荣航空', en: 'EVA AIR', prefix: 'BR', logo: '', alliance: 'staralliance' },
+  ci: { code: 'ci', name: '中华航空', en: 'CHINA AIRLINES', prefix: 'CI', logo: '', alliance: 'skyteam' },
+  nx: { code: 'nx', name: '澳门航空', en: 'AIR MACAU', prefix: 'NX', logo: '', alliance: null },
+  // 国际常用
+  aa: { code: 'aa', name: '美国航空', en: 'AMERICAN AIRLINES', prefix: 'AA', logo: '', alliance: 'oneworld' },
+  ua: { code: 'ua', name: '美国联合航空', en: 'UNITED AIRLINES', prefix: 'UA', logo: '', alliance: 'staralliance' },
+  dl: { code: 'dl', name: '达美航空', en: 'DELTA AIR LINES', prefix: 'DL', logo: '', alliance: 'skyteam' },
+  ba: { code: 'ba', name: '英国航空', en: 'BRITISH AIRWAYS', prefix: 'BA', logo: '', alliance: 'oneworld' },
+  af: { code: 'af', name: '法国航空', en: 'AIR FRANCE', prefix: 'AF', logo: '', alliance: 'skyteam' },
+  lh: { code: 'lh', name: '汉莎航空', en: 'LUFTHANSA', prefix: 'LH', logo: '', alliance: 'staralliance' },
+  ek: { code: 'ek', name: '阿联酋航空', en: 'EMIRATES', prefix: 'EK', logo: '', alliance: null },
+  sq: { code: 'sq', name: '新加坡航空', en: 'SINGAPORE AIRLINES', prefix: 'SQ', logo: '', alliance: 'staralliance' },
+  jl: { code: 'jl', name: '日本航空', en: 'JAPAN AIRLINES', prefix: 'JL', logo: '', alliance: 'oneworld' },
+  nh: { code: 'nh', name: '全日空', en: 'ALL NIPPON AIRWAYS', prefix: 'NH', logo: '', alliance: 'staralliance' },
+  ke: { code: 'ke', name: '大韩航空', en: 'KOREAN AIR', prefix: 'KE', logo: '', alliance: 'skyteam' },
+  oz: { code: 'oz', name: '韩亚航空', en: 'ASIANA AIRLINES', prefix: 'OZ', logo: '', alliance: 'staralliance' },
+  qr: { code: 'qr', name: '卡塔尔航空', en: 'QATAR AIRWAYS', prefix: 'QR', logo: '', alliance: 'oneworld' },
+  tk: { code: 'tk', name: '土耳其航空', en: 'TURKISH AIRLINES', prefix: 'TK', logo: '', alliance: 'staralliance' },
 };
 
 export const ALLIANCES: Record<string, { name: string; logo: string }> = {

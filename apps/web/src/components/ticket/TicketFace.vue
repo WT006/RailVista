@@ -249,6 +249,7 @@ const statsView = computed(() =>
         <header class="fl-head">
           <div class="fl-head__air">
             <img v-if="airline?.logo" :src="airline.logo" class="fl-head__logo" :alt="airline.name" />
+            <span v-else-if="airline" class="fl-head__logo-fallback">{{ airline.en?.charAt(0) || airline.name?.charAt(0) || '✈' }}</span>
             <div class="fl-head__txt">
               <strong>{{ airline?.name || config.airline?.name || '航班' }}</strong>
               <span>{{ airline?.en || config.airline?.en || 'AIRLINE' }}</span>
@@ -512,6 +513,15 @@ const statsView = computed(() =>
   width: calc(38 * var(--s)); height: calc(38 * var(--s));
   object-fit: contain; background: #fff; border-radius: calc(8 * var(--s));
   padding: calc(4 * var(--s)); flex-shrink: 0;
+  box-shadow: 0 1px calc(4 * var(--s)) rgba(0,0,0,0.3);
+}
+.fl-head__logo-fallback {
+  width: calc(38 * var(--s)); height: calc(38 * var(--s));
+  display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--tk-acc), var(--tk-acc-hi));
+  border-radius: calc(8 * var(--s)); flex-shrink: 0;
+  font-size: calc(18 * var(--s)); font-weight: 800; color: #fff;
+  font-family: Arial, sans-serif; letter-spacing: 0;
   box-shadow: 0 1px calc(4 * var(--s)) rgba(0,0,0,0.3);
 }
 .fl-head__txt { display: flex; flex-direction: column; gap: calc(2 * var(--s)); min-width: 0; }

@@ -4,6 +4,9 @@
  * 纪律同 `roadColors.ts`：票面一切颜色与品牌资产只准从这里取，
  * 组件内禁止硬编码色值。主题通过 CSS 变量注入 TicketFace。
  */
+/* 【作用域例外层】票面印刷色板（纪念票票面 / 主题，经 CSS 变量注入 TicketFace 等）：
+ * 属数据语义色，集中在本文件声明，界面交互控件不得从这里取色
+ * （2026-10-09 鸿蒙化收敛裁定，见 tokens.css 例外条款）。 */
 import type { TicketKind } from '@railvista/shared';
 
 // 航司官方素材（透明底）：ca/cz 2026-10 接入透明底新素材，mu 为正方形版

@@ -159,10 +159,16 @@ const showAdvanced = ref(false);
 .tk-toolbar__hint { font-size: var(--fs-cap); color: var(--text-3); letter-spacing: 0.04em; }
 .tk-toolbar__acts { display: flex; gap: var(--space-1); }
 
-/* 票面固定 3:4.5 竖向比例 */
+/* 票面竖向比例：桌面 3:4.2；手机竖屏（≤480px）票面更窄，同比缩版后内容仍偏高，
+   加高到 3:4.45 保证铁路 / 自驾票面页脚（二维码/票号）完整不被裁切 */
 .tk-face-wrap {
   width: 100%; max-width: 380px; margin: 0 auto;
   aspect-ratio: 3 / 4.2;
+}
+@media (max-width: 480px) {
+  .tk-face-wrap {
+    aspect-ratio: 3 / 4.45;
+  }
 }
 
 .tk-notice { margin: var(--space-2) 0 0; text-align: center; font-size: var(--fs-meta); color: var(--success); }
@@ -172,16 +178,21 @@ const showAdvanced = ref(false);
 }
 .ticket-page .rv-grid.is-preview .tk-face-wrap { max-width: 430px; }
 
-.builder-title { font-size: var(--fs-h4); margin: 0 0 var(--space-2); letter-spacing: 0.02em; }
+.builder-title { font-size: var(--fs-h3); margin: 0 0 var(--space-2); letter-spacing: 0.02em; }
 
 .adv-toggle {
   display: flex; align-items: center; justify-content: space-between;
-  width: 100%; padding: 4px 2px;
+  width: 100%;
+  /* 命中区 ≥44vp（鸿蒙触控规范；原 25px 高在手机上难以点按） */
+  min-height: 44px;
+  padding: 10px 2px;
   border: none; background: transparent;
   font-size: var(--fs-meta); color: var(--text-2); cursor: pointer;
   font-family: inherit;
 }
-.adv-toggle:hover { color: var(--text-1); }
+@media (hover: hover) and (pointer: fine) {
+  .adv-toggle:hover { color: var(--text-1); }
+}
 
 .saved-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-1); }
 .saved-list li {
@@ -192,6 +203,13 @@ const showAdvanced = ref(false);
 .saved-list__meta strong { font-size: var(--fs-meta); color: var(--text-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .saved-list__meta span { font-size: var(--fs-cap); color: var(--text-3); }
 .saved-list__acts { display: flex; gap: 4px; flex-shrink: 0; }
+/* 触屏：载入/删除按钮命中区补齐 ≥44vp（桌面保留紧凑小按钮） */
+@media (pointer: coarse) {
+  .saved-list__acts .btn {
+    min-width: 44px;
+    min-height: 40px;
+  }
+}
 
 .footnote { margin: var(--space-3) 0 0; color: var(--text-3); font-size: var(--fs-cap); text-align: center; }
 </style>

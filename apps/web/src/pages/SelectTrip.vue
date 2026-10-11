@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 import type { Stop, TrainSummary } from '@railvista/shared';
 import { api } from '../api/client';
+import { TRAIN_COLORS } from '../data/trainColors';
 import { hydrateFromSnapshot } from '../lib/persistTrip';
 import {
   clearAutoResume,
@@ -106,20 +107,7 @@ onBeforeUnmount(() => {
   queryFlipRo = null;
 });
 
-/** 车次类型前缀 → 专属颜色（前缀键盘 + 车次列表共用同一色板，保证"对得上"）。
- * 每类一个可区分色，落在深色玻璃底上均 ≥ 3:1 对比；纯数字普速用中性灰。 */
-const TRAIN_COLORS: Record<string, string> = {
-  G: '#4d9fff', // 高铁 · 蓝
-  D: '#35c2a5', // 动车 · 青绿
-  C: '#7fb4d8', // 城际 · 青蓝
-  Z: '#9d8cf0', // 直达 · 紫
-  T: '#e0915a', // 特快 · 橙
-  K: '#74bd89', // 快速 · 黄绿
-  L: '#8a97a8', // 临客 · 灰蓝
-  S: '#6aa9f0', // 市郊 · 天蓝
-  Y: '#e5769f', // 旅游 · 品红
-  '': '#a3aebd', // 普速(纯数字) · 灰
-};
+/** 车次类型前缀色板：单一来源已提取到 data/trainColors.ts（前缀键盘 + 车次列表共用，保证"对得上"）。 */
 
 /** 车次号前缀键盘：字母 / 中文名 / 英文名 / 色别。
  * 覆盖国铁常见车次类型；「纯数字」对应无字母开头的普通旅客列车。 */
@@ -1194,6 +1182,12 @@ function goBack() {
 
 .select-page .footnote {
   margin-inline: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .select-page,
+  .select-page * {
+    transition: none;
+  }
 }
 </style>
 

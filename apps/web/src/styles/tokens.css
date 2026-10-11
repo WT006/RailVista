@@ -7,6 +7,10 @@
  *   - 圆角：官方通用档位 4 / 8 / 16 / 20 / 32 vp，且「层级越高圆角越大」。
  *   - 间距：8vp 基线网格（取 8 的倍数）。
  *   - 动效：转场按屏幕尺寸分档 200 / 250 / 300ms；曲线优先弹性。
+ *   - 断点：系统档 599/600 / 840 / 1200；380 / 480 / 560 / 960 为「细调档」白名单，
+ *           除此之外禁止新增其它数值断点（2026-10-09 鸿蒙化收敛）。
+ *   - 例外：data/ 下数据语义色板（地图图例/图层、车次色、票面印刷色）为受控例外，
+ *           集中在各 data/*.ts 中声明；交互层（按钮/焦点/链接）禁止使用字面色。
  *
  * 约定：
  *   1. 业务样式只允许引用本文件令牌，禁止硬编码色值 / 圆角 / 间距 / 时长。
@@ -37,6 +41,23 @@
   --glow-radius: 460px;
   --glow-alpha: 0.13; /* 一级卡片光晕峰值透明度 */
   --glow-alpha-tile: 0.1; /* 二/三级条目光晕峰值透明度 */
+  /* 材质高光层（rv-card 指针光晕 / 顶部高光带；原散落在 base.css 的字面量归并至此） */
+  --glow-white-layer: rgba(255, 255, 255, var(--glow-alpha));
+  --glow-accent-layer: rgba(77, 159, 255, calc(var(--glow-alpha) * 0.9));
+  --glow-white-layer-tile: rgba(255, 255, 255, var(--glow-alpha-tile));
+  --sheen-band: rgba(255, 255, 255, 0.34);
+
+  /* chrome 层（顶栏 / 底栏）玻璃：与卡片玻璃分档，模糊更轻 */
+  --glass-blur-chrome: 14px;
+  /* 底部页签上方渐变蒙层高度（HarmonyOS《底部页签》：高于内容最顶边 16vp，颜色与页面背景一致） */
+  --bottomnav-scrim-h: 16px;
+  /* 悬浮式底栏：胶囊距屏幕两侧/底边的留白（barFloatingStyle.barBottomMargin 等效，8vp） */
+  --nav-float-inset: 12px;
+  --nav-float-gap: 8px;
+  /* 点按点光源（沉浸光感·按压点光源）：触屏按压时触点光晕的峰值透明度与半径 */
+  --press-glow-alpha: 0.16;
+  --press-glow-alpha-tile: 0.12;
+  --press-glow-radius: 220px;
 
   /* ══════════ 描边（整体降不透明度：框体更轻盈，突出内容本身）══════════ */
   --line-hairline: rgba(255, 255, 255, 0.04);
@@ -60,10 +81,18 @@
   --accent-soft: rgba(77, 159, 255, 0.14);
   --accent-border: rgba(77, 159, 255, 0.42);
 
+  /* 通用交互态（HarmonyOS interactive_hover / interactive_pressed 深色档）：
+     hover 5% 白、pressed 10% 白，用于列表行、图标按钮等非填充型可交互元素 */
+  --interactive-hover: rgba(255, 255, 255, 0.05);
+  --interactive-pressed: rgba(255, 255, 255, 0.1);
+  /* 键盘焦点环（可达性统一）：柔和强调光晕，与输入框焦点观感一致 */
+  --focus-ring: 0 0 0 3px var(--accent-soft), 0 0 16px -4px rgba(77, 159, 255, 0.4);
+
   /* ══════════ 语义色（统一降饱和，符合 HarmonyOS 主色饱和度 30–60% 约束）══════════ */
   --success: #6cc27f;
   --success-soft: rgba(108, 194, 127, 0.14);
   --info: #7fb4d8;
+  --info-soft: rgba(127, 180, 216, 0.16);
   --warning: #e0b155;
   --warning-soft: rgba(224, 177, 85, 0.16);
   --danger: #e0765c;
@@ -75,6 +104,7 @@
   --rail: #4d9fff;
   --station: #e5ca6a;
   --spot: #e0915a;
+  --spot-soft: rgba(224, 145, 90, 0.2);
   --train: #74bd89;
   --gps: #6aa9f0;
 
@@ -122,6 +152,9 @@
   --radius-xl: 32px; /* 半模态、弹出框 */
   --radius-full: 999px;
 
+  /* 触控命中区下限（规范：触屏可点区域 ≥ 44×44；视觉尺寸可小于此，用 .rv-hit 扩展） */
+  --hit-min: 44px;
+
   /* ══════════ 阴影（四档 + 内高光，构成"材质"而非"黑影"）══════════ */
   --elev-0: none;
   --elev-1: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -129,6 +162,27 @@
   --elev-3: 0 20px 48px -12px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --elev-4: 0 32px 80px -16px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   --glow-accent: 0 0 0 1px var(--line-accent), 0 12px 36px -10px rgba(77, 159, 255, 0.2);
+
+  /* ══════════ 地图浮层与标注（自驾/地图模块专用档，2026-10 收敛）══════════ */
+  --elev-float: 0 4px 16px rgba(0, 0, 0, 0.24); /* 地图小控件（胶囊按钮等） */
+  --elev-float-strong: 0 8px 22px rgba(0, 0, 0, 0.35); /* 地图浮卡 / 浮层面板 */
+  --elev-up: 0 -8px 24px rgba(0, 0, 0, 0.25); /* 底部浮层面板（向上投影） */
+  --pin-shadow: 0 4px 10px rgba(0, 0, 0, 0.45); /* 地图 pin 投影（filter: drop-shadow） */
+  --pin-rim: #ffffff; /* 地图 pin / 车辆/定位标记的白色描边 */
+  --surface-lift: #1a212b; /* 地图浮层“提亮基准”（与 surface-2 同色相，不透明，供 color-mix 使用） */
+  --fs-annot: 10px; /* 地图标注字号（数据标注层，低于正文微字号） */
+  --fs-annot-sm: 8px; /* 地图标注·密集态（缩小 pin / 刻度条内） */
+  --dur-pulse: 1600ms; /* 氛围脉冲：无位移的呼吸/扩散类循环动画专用（不受 350ms 位移档约束） */
+  /* 地图标注强调（atlas 选中焦点 pin 专用色阶） */
+  --map-amber: #ffb84d;
+  --map-amber-bright: #ffd08a;
+  --map-amber-deep: #ffa028;
+  --map-amber-ink: #1a1206;
+  --map-heat: #ff6b8a; /* 热力图开关图例点 */
+  /* 纪念票主题金（仅装饰层可用：票面、徽标点、序列号；交互层禁用——焦点/按钮走系统令牌） */
+  --ticket-gold: #d4a853;
+  --ticket-gold-deep: #cba85c;
+  --ticket-gold-bright: #e8cd92;
 
   /* ══════════ 动效 ══════════ */
   --dur-micro: 100ms; /* 颜色 / 描边 */
@@ -156,7 +210,8 @@
   --safe-right: env(safe-area-inset-right, 0px);
   /* 顶栏占位总高（内容区 + 顶部安全区），sticky 避让与 min-height 一律用此令牌 */
   --appbar-offset: calc(var(--appbar-h) + var(--safe-top));
-  --bottomnav-h: 0px; /* 桌面端无底栏 */
+  --bottomnav-h: 0px; /* 底栏高度由断点赋值：<840 有底栏；≥840 侧边 Tab 无底栏 */
+  --sidenav-w: 0px; /* 侧边 Tab 宽度（≥840 赋 88px；《响应式应用架构》挪移布局） */
   --col-ratio-main: 7; /* 主栏占 12 栅格中的 7 列 */
   --col-ratio-side: 5; /* 侧栏占 12 栅格中的 5 列 */
 
@@ -173,33 +228,38 @@
 }
 
 /* ── 断点：sm ≥600 / md ≥840 / lg ≥1200 ────────────────────────────────────
- * 容器宽度策略：
+ * 容器宽度策略（margins 按《布局基础》栅格规范 16 / 24 / 32）：
  *   <600px 手机竖屏  → 全宽 - 2×16  gutter（单列）
- *   600–1199        → 全宽 - 2×gutter（双栏，尽量吃满屏幕，不做人为收窄）
+ *   600–839        → 全宽 - 2×24  gutter（双栏，尽量吃满屏幕，不做人为收窄）
+ *   ≥840           → 全宽 - 2×32  gutter；底部页签迁移为侧边 Tab（<840 为底部页签）
  *   ≥1200 桌面      → 收窄到 1120px，保证双栏阅读宽度与行宽舒适
  */
-@media (max-width: 599px) {
+
+/* 底部页签档（<840）：悬浮胶囊本体 56vp + 底边悬浮留白 8vp（--nav-float-gap），
+   内容避让总高取 64vp；安全区由消费处用 env(safe-area-inset-bottom) 另行追加 */
+@media (max-width: 839px) {
   :root {
-    --bottomnav-h: 68px;
+    --bottomnav-h: 64px;
   }
 }
 
 @media (min-width: 600px) {
   :root {
-    --gutter: 20px;
+    --gutter: 24px;
     --shell-max: 100%;
     --appbar-h: 56px;
-    --bottomnav-h: 0px;
   }
 }
 
 @media (min-width: 840px) {
   :root {
-    --gutter: 24px;
+    --gutter: 32px;
     --shell-max: 100%;
     --appbar-h: 64px;
     --fs-display: 32px;
     --fs-h1: 22px;
+    --bottomnav-h: 0px;
+    --sidenav-w: 88px;
   }
 }
 
@@ -233,30 +293,6 @@
   }
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
- * 兼容别名：历史令牌名 → 新语义令牌
- * 供地图页（TripMap / AtlasMap）、线路详情页等未参与本轮重构的模块继续工作。
- * 新代码请勿引用本区块。
- * ══════════════════════════════════════════════════════════════════════════ */
-:root {
-  --bg-base: var(--surface-0);
-  --bg-raised: var(--surface-1);
-  --bg-elevated: var(--surface-2);
-  --bg-inset: var(--surface-sunken);
-  --bg-scrim: var(--surface-scrim);
-
-  --border-hairline: var(--line-hairline);
-  --border-default: var(--line-default);
-  --border-strong: var(--line-strong);
-
-  --text-primary: var(--text-1);
-  --text-secondary: var(--text-2);
-  --text-muted: var(--text-3);
-
-  --accent-container: var(--accent-soft);
-  --success-container: var(--success-soft);
-  --danger-container: var(--danger-soft);
-  --warning-container: var(--warning-soft);
-
-  --ease-out: var(--ease-standard);
-}
+/* （旧令牌兼容别名区已于 2026-10-09 鸿蒙化收敛完成时删除：全仓引用清零。
+   历史名 → 新语义名映射：--bg-*→--surface-*、--border-*→--line-*、
+   --text-primary/secondary/muted→--text-1/2/3、--*-container→--*-soft、--ease-out→--ease-standard） */

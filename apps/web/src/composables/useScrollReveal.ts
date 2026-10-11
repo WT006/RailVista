@@ -21,6 +21,14 @@ export function useScrollReveal(
 ): { rescan: () => void } {
   const { threshold = 0.1, staggerMs = 40, once = true } = options;
 
+  /** 无障碍：系统开启「减少动态效果」时不做级联延迟（直接揭示） */
+  function prefersReduce(): boolean {
+    return (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
+  }
+
   let observer: IntersectionObserver | null = null;
   let mutationObserver: MutationObserver | null = null;
   let revealedCount = 0;
@@ -33,7 +41,7 @@ export function useScrollReveal(
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
           const el = entry.target as HTMLElement;
-          el.style.transitionDelay = `${revealedCount * staggerMs}ms`;
+          if (!prefersReduce()) el.style.transitionDelay = `${revealedCount * staggerMs}ms`;
           el.classList.add('is-revealed');
           revealedCount += 1;
           if (once) observer?.unobserve(el);
@@ -59,7 +67,7 @@ export function useScrollReveal(
       // 已经进入视口（或已在视口内滚动过）时立即揭示，避免错过后不再触发
       const rect = el.getBoundingClientRect();
       if (rect.top < (typeof window !== 'undefined' ? window.innerHeight : 0)) {
-        el.style.transitionDelay = `${revealedCount * staggerMs}ms`;
+        if (!prefersReduce()) el.style.transitionDelay = `${revealedCount * staggerMs}ms`;
         el.classList.add('is-revealed');
         revealedCount += 1;
         if (!once) io.observe(el);

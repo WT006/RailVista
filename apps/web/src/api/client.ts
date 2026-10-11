@@ -427,6 +427,19 @@ export const api = {
       body: JSON.stringify({ spots }),
     });
   },
+  /** 天象观景 · 事件时刻逐时气象采样（云量分层/湿度/风/零度层，Open-Meteo） */
+  getSkyMet(
+    points: Array<{ pointId: string; lng: number; lat: number; atIso: string }>,
+  ) {
+    return request<{
+      items: Array<{ pointId: string; met?: import('@railvista/shared').SkyMetSample }>;
+      source: string;
+    }>('/sky/met', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ points }),
+    });
+  },
   // ── 万里路书 · 路书库（省 → 市 → 路线，玩法不限于自驾） ───────────────────
   /** 列表页一次拿齐：区划底座 + 统计 + 源文件清单 */
   getTravelOverview() {

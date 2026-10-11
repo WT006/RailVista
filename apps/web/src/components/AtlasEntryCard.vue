@@ -33,9 +33,9 @@ function goAtlas() {
   border: 1px solid var(--line-accent);
   background: linear-gradient(
     135deg,
-    rgba(77, 159, 255, 0.22),
-    rgba(77, 159, 255, 0.07) 52%,
-    rgba(157, 140, 240, 0.14)
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    color-mix(in srgb, var(--accent) 7%, transparent) 52%,
+    var(--purple-soft)
   );
   color: var(--accent-hover);
   font-family: inherit;
@@ -54,10 +54,10 @@ function goAtlas() {
   width: 104px;
   height: 104px;
   border-radius: var(--radius-full);
-  border: 1px solid rgba(77, 159, 255, 0.28);
+  border: 1px solid var(--line-accent);
   box-shadow:
-    0 0 0 18px rgba(77, 159, 255, 0.07),
-    0 0 0 36px rgba(77, 159, 255, 0.04);
+    0 0 0 18px color-mix(in srgb, var(--accent) 7%, transparent),
+    0 0 0 36px color-mix(in srgb, var(--accent) 4%, transparent);
   pointer-events: none;
 }
 
@@ -71,7 +71,7 @@ function goAtlas() {
   opacity: 0;
   background: radial-gradient(
     calc(var(--glow-radius) * 0.55) circle at var(--mx, 50%) var(--my, 0%),
-    rgba(255, 255, 255, var(--glow-alpha-tile)),
+    var(--glow-white-layer-tile),
     transparent 65%
   );
   transition: opacity var(--dur-base) var(--ease-standard);
@@ -81,7 +81,7 @@ function goAtlas() {
   .atlas-entry:hover {
     transform: translateY(-2px);
     border-color: var(--accent);
-    box-shadow: 0 12px 32px -12px rgba(77, 159, 255, 0.35);
+    box-shadow: 0 12px 32px -12px color-mix(in srgb, var(--accent) 35%, transparent);
   }
 
   .atlas-entry:hover::after {
@@ -115,7 +115,7 @@ function goAtlas() {
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
   border: 1px solid var(--line-accent);
-  background: rgba(77, 159, 255, 0.16);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
   font-size: var(--fs-cap);
   font-weight: 600;
   color: var(--accent-hover);

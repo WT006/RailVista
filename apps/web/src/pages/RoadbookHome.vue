@@ -30,6 +30,17 @@ const mode = ref('');
 const layer = ref<TravelLayer | ''>('');
 const keyword = ref('');
 const sort = ref('recommend');
+/** 天数上限。'' = 全部（默认不筛，避免隐藏存量长线）。语义是「N 天以内」，见 §4.3。 */
+const maxDays = ref<number | ''>('');
+
+const DAY_FILTERS: { key: number | ''; label: string }[] = [
+  { key: '', label: '全部' },
+  { key: 3, label: '3 天以内' },
+  { key: 5, label: '5 天以内' },
+  { key: 6, label: '6 天以内' },
+  { key: 7, label: '7 天以内' },
+];
+const daysLabel = (k: number | '') => DAY_FILTERS.find((d) => d.key === k)?.label ?? '';
 
 const MODES: { key: string; label: string }[] = [
   { key: 'selfdrive', label: '自驾' },
@@ -105,6 +116,7 @@ async function loadRoutes() {
       city: city.value || undefined,
       mode: mode.value || undefined,
       layer: layer.value || undefined,
+      maxDays: maxDays.value === '' ? undefined : maxDays.value,
       q: keyword.value.trim() || undefined,
       sort: sort.value,
       limit: 100,
@@ -129,10 +141,13 @@ onMounted(async () => {
 });
 
 // 省份切换时清空城市；其余条件变化时重新拉列表
-watch([() => province.value, () => mode.value, () => layer.value, () => sort.value], () => {
-  city.value = '';
-  loadRoutes();
-});
+watch(
+  [() => province.value, () => mode.value, () => layer.value, () => sort.value, () => maxDays.value],
+  () => {
+    city.value = '';
+    loadRoutes();
+  },
+);
 
 let keywordTimer: ReturnType<typeof setTimeout> | undefined;
 watch(keyword, () => {
@@ -154,11 +169,17 @@ function pickLayer(key: TravelLayer | '') {
   layer.value = layer.value === key ? '' : key;
 }
 
+/** 与省份/玩法/分层是「与」关系；再点一次取消（回到「全部」） */
+function pickDays(key: number | '') {
+  maxDays.value = maxDays.value === key ? '' : key;
+}
+
 function reset() {
   province.value = '';
   city.value = '';
   mode.value = '';
   layer.value = '';
+  maxDays.value = '';
   keyword.value = '';
   sort.value = 'recommend';
   loadRoutes();
@@ -244,57 +265,89 @@ function seasonText(months: number[]): string {
         </template>
       </section>
 
-      <section class="rb-filter-block rb-filter-block--tools">
-        <div class="rb-tools">
-          <div class="rb-chips rb-chips--inline">
-            <button class="rb-chip" :class="{ on: !layer }" @click="pickLayer('')">全部层</button>
-            <button
-              v-for="l in LAYERS"
-              :key="l.key"
-              class="rb-chip"
-              :class="[{ on: layer === l.key }, `tone-${l.key}`]"
-              :title="l.label"
-              @click="pickLayer(l.key)"
-            >
-              {{ l.label }}
-              <i class="rb-chip-n">{{ layerCounts[l.key] ?? 0 }}</i>
-            </button>
-          </div>
-          <div class="rb-chips rb-chips--inline">
-            <button class="rb-chip" :class="{ on: !mode }" @click="mode = ''">玩法不限</button>
-            <button
-              v-for="m in MODES"
-              :key="m.key"
-              class="rb-chip"
-              :class="{ on: mode === m.key }"
-              @click="mode = m.key"
-            >
-              {{ m.label }}
-            </button>
-          </div>
-          <div class="rb-row">
-            <input
-              v-model="keyword"
-              class="rb-input"
-              type="search"
-              placeholder="搜路线 / 城市 / G318"
-            />
-            <select v-model="sort" class="rb-select">
-              <option v-for="s in SORTS" :key="s.key" :value="s.key">{{ s.label }}</option>
-            </select>
-            <button class="rb-reset" @click="reset">重置</button>
-          </div>
+      <!-- 内容分层 L1~L5（颗粒度维度，与省份 / 玩法是「与」关系） -->
+      <section class="rb-filter-block">
+        <div class="rb-filter-head">
+          内容分层
+          <span class="rb-filter-hint">
+            （顺序与推荐列表的出现先后一致：景区几日游 → 周末周边 → 区域环线 → 国家级大环线 → 小众目的地）
+          </span>
+        </div>
+        <div class="rb-chips">
+          <button class="rb-chip" :class="{ on: !layer }" @click="pickLayer('')">全部</button>
+          <button
+            v-for="l in LAYERS"
+            :key="l.key"
+            class="rb-chip"
+            :class="[{ on: layer === l.key }, `tone-${l.key}`]"
+            :title="l.label"
+            @click="pickLayer(l.key)"
+          >
+            {{ l.label }}
+            <i class="rb-chip-n">{{ layerCounts[l.key] ?? 0 }}</i>
+          </button>
+        </div>
+      </section>
+
+      <!-- 天数上限（与省份 / 分层 / 玩法是「与」关系；语义是「N 天以内」） -->
+      <section class="rb-filter-block">
+        <div class="rb-filter-head">
+          天数
+          <span class="rb-filter-hint">（按天数上限筛选，2 天以内的周末短线也会出现）</span>
+        </div>
+        <div class="rb-chips">
+          <button class="rb-chip" :class="{ on: maxDays === '' }" @click="pickDays('')">全部</button>
+          <button
+            v-for="d in DAY_FILTERS.slice(1)"
+            :key="d.key"
+            class="rb-chip"
+            :class="{ on: maxDays === d.key }"
+            @click="pickDays(d.key)"
+          >
+            {{ d.label }}
+          </button>
+        </div>
+      </section>
+
+      <!-- 玩法 + 关键词 + 排序 -->
+      <section class="rb-filter-block">
+        <div class="rb-filter-head">玩法</div>
+        <div class="rb-chips">
+          <button class="rb-chip" :class="{ on: !mode }" @click="mode = ''">不限</button>
+          <button
+            v-for="m in MODES"
+            :key="m.key"
+            class="rb-chip"
+            :class="{ on: mode === m.key }"
+            @click="mode = m.key"
+          >
+            {{ m.label }}
+          </button>
+        </div>
+
+        <div class="rb-row">
+          <input
+            v-model="keyword"
+            class="rb-input"
+            type="search"
+            placeholder="搜路线名 / 城市 / 公路编号（如 G318）"
+          />
+          <select v-model="sort" class="rb-select">
+            <option v-for="s in SORTS" :key="s.key" :value="s.key">{{ s.label }}</option>
+          </select>
+          <button class="rb-reset" @click="reset">重置</button>
         </div>
       </section>
 
       <div class="rb-result-head">
         共 <b>{{ total }}</b> 条
-        <span v-if="province || city || mode || layer || keyword" class="rb-active">
+        <span v-if="province || city || mode || layer || maxDays !== '' || keyword" class="rb-active">
           ·
           <span v-if="province">{{ province }}</span>
           <span v-if="city"> / {{ city }}</span>
           <span v-if="mode"> / {{ modeLabel(mode) }}</span>
           <span v-if="layer"> / {{ layerLabel(layer) }}</span>
+          <span v-if="maxDays !== ''"> / {{ daysLabel(maxDays) }}</span>
           <span v-if="keyword.trim()"> / “{{ keyword.trim() }}”</span>
         </span>
       </div>
@@ -420,10 +473,12 @@ function seasonText(months: number[]): string {
 }
 
 .rb-chip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 5px var(--space-3);
+  min-height: 36px;
+  padding: 6px var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-full);
   background: var(--surface-2);
@@ -437,12 +492,27 @@ function seasonText(months: number[]): string {
 }
 
 .rb-chip.sm {
-  padding: 3px var(--space-2);
+  min-height: 32px;
+  padding: 4px var(--space-3);
+  font-size: var(--fs-cap);
 }
 
-.rb-chip:hover {
-  color: var(--text-1);
-  border-color: var(--line-strong);
+/* 触控命中区扩展：≥44×44（视觉尺寸保持紧凑） */
+.rb-chip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--hit-min));
+  height: max(100%, var(--hit-min));
+  transform: translate(-50%, -50%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rb-chip:hover {
+    color: var(--text-1);
+    border-color: var(--line-strong);
+  }
 }
 
 .rb-chip.on {
@@ -496,8 +566,8 @@ function seasonText(months: number[]): string {
 }
 
 .rb-input {
-  flex: 1 1 220px;
-  min-height: 36px;
+  flex: 1 1 260px;
+  min-height: 46px;
   padding: 0 var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-sm);
@@ -512,7 +582,7 @@ function seasonText(months: number[]): string {
 
 .rb-select,
 .rb-reset {
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-sm);
@@ -522,9 +592,11 @@ function seasonText(months: number[]): string {
   cursor: pointer;
 }
 
-.rb-reset:hover {
-  color: var(--text-1);
-  border-color: var(--line-strong);
+@media (hover: hover) and (pointer: fine) {
+  .rb-reset:hover {
+    color: var(--text-1);
+    border-color: var(--line-strong);
+  }
 }
 
 .rb-result-head {
@@ -594,12 +666,19 @@ function seasonText(months: number[]): string {
   opacity: 0.75;
 }
 
-.rb-card:hover,
 .rb-card:focus-visible {
   border-color: var(--accent-border);
   transform: translateY(-2px);
   outline: none;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rb-card:hover {
+    border-color: var(--accent-border);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  }
 }
 
 .rb-card:hover .rb-more,
@@ -723,7 +802,7 @@ function seasonText(months: number[]): string {
   content: ' →';
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599px) {
   .rb-grid {
     grid-template-columns: 1fr;
   }
@@ -734,6 +813,14 @@ function seasonText(months: number[]): string {
 
   .rb-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-chip,
+  .rb-card,
+  .rb-reset {
+    transition: none;
   }
 }
 </style>

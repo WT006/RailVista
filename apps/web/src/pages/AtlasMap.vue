@@ -33,6 +33,12 @@ import {
 } from '../data/spotDimensions';
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 import { roadColor } from '../data/roadColors';
+import {
+  ATLAS_HEAT_GRADIENT,
+  ATLAS_NETWORK_STROKE,
+  ATLAS_ORIGIN_COLORS,
+  ATLAS_RAIL_STROKE,
+} from '../data/atlasColors';
 import { roadDisplayPlace } from '../data/prefectureSeeds';
 import { dedupeAtlasRoadSpots, isAtlasRoadDisplaySpot } from '../data/atlasRoadDisplay';
 /** 低于此缩放只画省圈；达到后按市降密 */
@@ -56,7 +62,7 @@ const heatSupported = ref(true);
 const heatOn = ref(false);
 /** 桌面默认展开侧栏；手机地图优先，面板收起（点「筛选」再开） */
 const sidebarOpen = ref(
-  typeof window === 'undefined' ? true : window.matchMedia('(min-width: 721px)').matches,
+  typeof window === 'undefined' ? true : window.matchMedia('(min-width: 840px)').matches,
 );
 const query = ref('');
 const activeDims = ref<string[]>([]);
@@ -327,9 +333,9 @@ const dimOptions = [...SPOT_DIMENSIONS, UNCLASSIFIED_DIMENSION];
 
 /** 景点来源筛选选项：冷蓝=铁路（与铁路侧星点同色），琥珀=公路（与公路侧星点同色） */
 const ORIGIN_OPTIONS = [
-  { key: 'all' as const, label: '全部', color: '#9aa7b8' },
-  { key: 'rail' as const, label: '铁路', color: '#4d9fff' },
-  { key: 'road' as const, label: '公路', color: '#ffb84d' },
+  { key: 'all' as const, label: '全部', color: ATLAS_ORIGIN_COLORS.all },
+  { key: 'rail' as const, label: '铁路', color: ATLAS_ORIGIN_COLORS.rail },
+  { key: 'road' as const, label: '公路', color: ATLAS_ORIGIN_COLORS.road },
 ];
 
 /** 铁路：沿线景点最多的线路 Top10（按客户端统计的 spotCount） */
@@ -922,13 +928,7 @@ function renderHeat() {
     heat = new HeatMapCtor(map, {
       radius: 16,
       opacity: [0, 0.72],
-      gradient: {
-        0.25: '#38bdf8',
-        0.45: '#34d399',
-        0.65: '#fbbf24',
-        0.85: '#fb923c',
-        1: '#f87171',
-      },
+      gradient: ATLAS_HEAT_GRADIENT,
       zooms: [3, 20],
       zIndex: 120,
     });
@@ -952,7 +952,7 @@ function renderNetwork() {
     if (c.polyline.length < 2) continue;
     const line = new AMapRef.Polyline({
       path: c.polyline,
-      strokeColor: '#7a8494',
+      strokeColor: ATLAS_NETWORK_STROKE,
       strokeWeight: 1.5,
       strokeOpacity: 0.42,
       strokeStyle: 'solid',
@@ -1119,7 +1119,7 @@ function focusCorridor(id: string) {
   }
   highlightLine = new AMapRef.Polyline({
     path: target.polyline,
-    strokeColor: '#4d9fff',
+    strokeColor: ATLAS_RAIL_STROKE,
     strokeWeight: 5,
     strokeOpacity: 0.95,
     lineJoin: 'round',
@@ -1460,7 +1460,7 @@ watch(spotOrigin, (v) => {
             type="button"
             class="atlas-layers__btn"
             :class="{ 'is-on': expresswayLayerOn }"
-            style="--dot: #ffb84d"
+            style="--dot: var(--map-amber)"
             :disabled="!!mapError"
             :aria-pressed="expresswayLayerOn"
             @click="toggleExpresswayLayer"
@@ -1472,7 +1472,7 @@ watch(spotOrigin, (v) => {
             type="button"
             class="atlas-layers__btn"
             :class="{ 'is-on': nationalLayerOn }"
-            style="--dot: #4d9fff"
+            style="--dot: var(--accent)"
             :disabled="!!mapError"
             :aria-pressed="nationalLayerOn"
             @click="toggleNationalLayer"
@@ -1484,7 +1484,7 @@ watch(spotOrigin, (v) => {
             type="button"
             class="atlas-layers__btn"
             :class="{ 'is-on': heatOn }"
-            style="--dot: #ff6b8a"
+            style="--dot: var(--map-heat)"
             :disabled="!heatSupported || !!mapError"
             :aria-pressed="heatOn"
             @click="heatOn = !heatOn"
@@ -1877,8 +1877,8 @@ watch(spotOrigin, (v) => {
   position: fixed;
   inset: 0;
   overflow: hidden;
-  background: var(--bg-base);
-  color: var(--text-secondary);
+  background: var(--surface-0);
+  color: var(--text-2);
 }
 
 .atlas-map {
@@ -1890,8 +1890,8 @@ watch(spotOrigin, (v) => {
 /* ── 图层开关（独立浮层，左上角常显） ── */
 .atlas-layers {
   position: fixed;
-  top: calc(10px + var(--safe-top));
-  left: calc(12px + var(--safe-left));
+  top: calc(12px + var(--safe-top));
+  left: calc(12px + var(--safe-left) + var(--sidenav-w));
   z-index: 270;
   display: flex;
   flex-direction: column;
@@ -1923,16 +1923,17 @@ watch(spotOrigin, (v) => {
 }
 
 .atlas-layers__btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 42px;
+  min-height: 44px;
   padding: 0 16px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--line-default);
   background: color-mix(in srgb, var(--surface-0) 88%, transparent);
-  backdrop-filter: blur(12px) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(12px) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur-chrome)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-chrome)) saturate(var(--glass-saturate));
   color: var(--text-2);
   font: inherit;
   font-size: var(--fs-meta);
@@ -1940,6 +1941,35 @@ watch(spotOrigin, (v) => {
   cursor: pointer;
   box-shadow: var(--elev-2);
   -webkit-tap-highlight-color: transparent;
+}
+
+/* 触控命中区扩展（视觉尺寸可小，命中不低于 44×44）：图层按钮 / 收起按钮 / 关闭按钮 */
+.atlas-layers__btn::after,
+.atlas-dock__collapse::after,
+.atlas-iw__close::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--hit-min));
+  height: max(100%, var(--hit-min));
+  transform: translate(-50%, -50%);
+}
+
+.atlas-dock__collapse,
+.atlas-iw__close {
+  position: relative;
+}
+
+/* 统一按压态（快速响应档） */
+.atlas-layers__btn:active,
+.atlas-dock__collapse:active,
+.atlas-iw__close:active,
+.atlas-result:active,
+.atlas-top-row:active,
+.atlas-rank-row:active,
+.atlas-province:active {
+  transform: scale(0.97);
 }
 
 .atlas-layers__btn:disabled {
@@ -1956,7 +1986,7 @@ watch(spotOrigin, (v) => {
 .atlas-layers__dot {
   width: 9px;
   height: 9px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--dot, var(--accent));
   box-shadow: 0 0 8px color-mix(in srgb, var(--dot, var(--accent)) 55%, transparent);
 }
@@ -1966,7 +1996,7 @@ watch(spotOrigin, (v) => {
   position: fixed;
   /* 网页端侧栏让出左上角图层开关，避免挡住高速/国道/热力 */
   top: calc(58px + var(--safe-top));
-  left: calc(12px + var(--safe-left));
+  left: calc(12px + var(--safe-left) + var(--sidenav-w));
   bottom: calc(12px + var(--safe-bottom));
   z-index: 200;
   width: min(320px, calc(100vw - 24px - var(--safe-left) - var(--safe-right)));
@@ -1975,15 +2005,16 @@ watch(spotOrigin, (v) => {
   border-radius: var(--radius-md);
   border: 1px solid var(--line-default);
   background: color-mix(in srgb, var(--surface-0) 94%, transparent);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  /* 常驻侧栏取「卡内条目」玻璃档（沉浸光感分档：避免最重材质常驻） */
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   box-shadow: var(--elev-3);
   overflow: hidden;
   pointer-events: auto;
   transition:
-    width var(--dur-base) var(--ease-out),
-    max-height var(--dur-base) var(--ease-out),
-    transform var(--dur-base) var(--ease-out);
+    width var(--dur-base) var(--ease-standard),
+    max-height var(--dur-base) var(--ease-standard),
+    transform var(--dur-base) var(--ease-standard);
 }
 
 .atlas-dock.is-collapsed {
@@ -1991,8 +2022,8 @@ watch(spotOrigin, (v) => {
   top: calc(10px + var(--safe-top));
   right: auto;
   bottom: auto;
-  /* 网页端收起后，展开钮跟在图层开关右侧 */
-  left: calc(12px + var(--safe-left) + 248px);
+  /* 网页端收起后，展开钮跟在图层开关右侧（248px 为图层开关行宽度） */
+  left: calc(12px + var(--safe-left) + var(--sidenav-w) + 248px);
   max-height: none;
 }
 
@@ -2009,7 +2040,7 @@ watch(spotOrigin, (v) => {
   width: 36px;
   height: 4px;
   margin: 2px auto 4px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--line-strong);
 }
 
@@ -2048,7 +2079,7 @@ watch(spotOrigin, (v) => {
   flex-shrink: 0;
   min-height: 32px;
   padding: 0 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--line-default);
   background: transparent;
   color: var(--text-2);
@@ -2058,9 +2089,11 @@ watch(spotOrigin, (v) => {
   cursor: pointer;
 }
 
-.atlas-dock__collapse:hover {
-  border-color: var(--line-accent);
-  color: var(--text-1);
+@media (hover: hover) and (pointer: fine) {
+  .atlas-dock__collapse:hover {
+    border-color: var(--line-accent);
+    color: var(--text-1);
+  }
 }
 
 .atlas-dock__body {
@@ -2078,7 +2111,7 @@ watch(spotOrigin, (v) => {
   min-height: 44px;
   padding: 0 16px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--fill-accent);
   color: var(--text-1);
   font-size: var(--fs-cap);
@@ -2093,28 +2126,28 @@ watch(spotOrigin, (v) => {
   display: grid;
   gap: 6px;
   padding: 9px 10px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--line-hairline);
   background: var(--surface-sunken);
 }
 
 .atlas-block--sel {
   border-color: var(--accent-border);
-  background: var(--accent-container);
+  background: var(--accent-soft);
 }
 
 .atlas-block__title {
   margin: 0;
   font-size: 12px;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 
 .atlas-block__hint {
   margin-left: 4px;
   font-weight: 400;
-  font-size: 10.5px;
-  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
 }
 
 /* ── 搜索 ── */
@@ -2123,13 +2156,13 @@ watch(spotOrigin, (v) => {
   align-items: center;
   gap: 6px;
   padding: 6px 9px;
-  border-radius: 9px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-raised);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-default);
+  background: var(--surface-1);
 }
 
 .atlas-search__icon {
-  color: var(--text-muted);
+  color: var(--text-3);
   font-size: 14px;
 }
 
@@ -2139,7 +2172,7 @@ watch(spotOrigin, (v) => {
   border: none;
   outline: none;
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-2);
   font-size: 12px;
 }
 
@@ -2162,20 +2195,22 @@ watch(spotOrigin, (v) => {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-2);
   text-align: left;
   cursor: pointer;
 }
 
-.atlas-result:hover {
-  background: var(--accent-container);
+@media (hover: hover) and (pointer: fine) {
+  .atlas-result:hover {
+    background: var(--accent-soft);
+  }
 }
 
 .atlas-result__kind {
   padding: 1px 5px;
-  border-radius: 999px;
-  background: var(--border-hairline);
-  color: var(--text-muted);
+  border-radius: var(--radius-full);
+  background: var(--line-hairline);
+  color: var(--text-3);
   font-size: 10px;
   align-self: center;
 }
@@ -2183,13 +2218,13 @@ watch(spotOrigin, (v) => {
 .atlas-result__name {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-1);
 }
 
 .atlas-result__desc {
   grid-column: 2;
-  font-size: 10.5px;
-  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2198,7 +2233,7 @@ watch(spotOrigin, (v) => {
 .atlas-none {
   margin: 0;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 /* ── 维度筛选 ── */
@@ -2213,12 +2248,12 @@ watch(spotOrigin, (v) => {
   align-items: center;
   gap: 5px;
   padding: 5px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--border-default);
-  background: var(--border-hairline);
-  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-default);
+  background: var(--line-hairline);
+  color: var(--text-2);
   font-family: inherit;
-  font-size: 11.5px;
+  font-size: var(--fs-cap);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
@@ -2230,8 +2265,8 @@ watch(spotOrigin, (v) => {
 .atlas-dim__dot {
   width: 8px;
   height: 8px;
-  border-radius: 999px;
-  background: var(--dot, var(--text-muted));
+  border-radius: var(--radius-full);
+  background: var(--dot, var(--text-3));
   flex-shrink: 0;
 }
 
@@ -2250,8 +2285,8 @@ watch(spotOrigin, (v) => {
 }
 
 .atlas-count {
-  font-size: 10.5px;
-  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
 
@@ -2284,24 +2319,29 @@ watch(spotOrigin, (v) => {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-2);
   text-align: left;
   cursor: pointer;
 }
 
-.atlas-top-row:hover,
 .atlas-top-row.is-active {
-  background: var(--accent-container);
+  background: var(--accent-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .atlas-top-row:hover {
+    background: var(--accent-soft);
+  }
 }
 
 .atlas-top-row__no {
-  font-size: 10.5px;
-  color: var(--text-muted);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
   font-variant-numeric: tabular-nums;
 }
 
 .atlas-top-row__name {
-  font-size: 11.5px;
+  font-size: var(--fs-cap);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2309,8 +2349,8 @@ watch(spotOrigin, (v) => {
 
 .atlas-top-row__bar {
   height: 5px;
-  border-radius: 999px;
-  background: var(--border-hairline);
+  border-radius: var(--radius-full);
+  background: var(--line-hairline);
   overflow: hidden;
 }
 
@@ -2319,13 +2359,13 @@ watch(spotOrigin, (v) => {
   height: 100%;
   width: 100%;
   transform-origin: 0 50%;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: linear-gradient(90deg, var(--accent), var(--info));
-  transition: transform var(--dur-slow) var(--ease-out);
+  transition: transform var(--dur-slow) var(--ease-standard);
 }
 
 .atlas-top-row__num {
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
   color: var(--accent-hover);
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -2347,18 +2387,23 @@ watch(spotOrigin, (v) => {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-2);
   text-align: left;
   cursor: pointer;
 }
 
-.atlas-rank-row:hover,
 .atlas-rank-row.is-active {
-  background: var(--accent-container);
+  background: var(--accent-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .atlas-rank-row:hover {
+    background: var(--accent-soft);
+  }
 }
 
 .atlas-rank-row__name {
-  font-size: 11.5px;
+  font-size: var(--fs-cap);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2367,14 +2412,14 @@ watch(spotOrigin, (v) => {
 .atlas-rank-row__src {
   flex-shrink: 0;
   font-size: 10px;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 /* ── 选中卡片 ── */
 .atlas-sel-meta {
   margin: 0;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .atlas-sel-actions {
@@ -2386,10 +2431,10 @@ watch(spotOrigin, (v) => {
 
 .atlas-btn {
   padding: 6px 12px;
-  border-radius: 9px;
+  border-radius: var(--radius-sm);
   border: none;
   background: linear-gradient(180deg, var(--accent), var(--accent-press));
-  color: var(--bg-base);
+  color: var(--surface-0);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -2398,7 +2443,7 @@ watch(spotOrigin, (v) => {
 .atlas-foot {
   margin: 0;
   font-size: 10px;
-  color: var(--text-muted);
+  color: var(--text-3);
   line-height: 1.5;
 }
 
@@ -2411,11 +2456,11 @@ watch(spotOrigin, (v) => {
   z-index: 6;
   margin: 0;
   padding: 7px 14px;
-  border-radius: 999px;
-  background: var(--bg-base);
-  border: 1px solid var(--border-default);
-  font-size: 11.5px;
-  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  background: var(--surface-0);
+  border: 1px solid var(--line-default);
+  font-size: var(--fs-cap);
+  color: var(--text-2);
 }
 
 .atlas-status--err {
@@ -2433,24 +2478,24 @@ watch(spotOrigin, (v) => {
 }
 
 .atlas-status--warn {
-  border-color: rgba(223, 179, 87, 0.36);
+  border-color: color-mix(in srgb, var(--warning) 36%, transparent);
   color: var(--warning);
 }
 
-@media (max-width: 720px) {
-  /* 手机：收成一块带分类的玻璃面板 */
+@media (max-width: 839px) {
+  /* 手机：收成一块带分类的玻璃面板（与底栏档 <840 对齐） */
   .atlas-layers {
-    top: calc(10px + var(--safe-top));
-    left: calc(10px + var(--safe-left));
-    right: calc(10px + var(--safe-right));
+    top: calc(12px + var(--safe-top));
+    left: calc(12px + var(--safe-left));
+    right: calc(12px + var(--safe-right));
     gap: 8px;
     max-width: none;
     padding: 8px 10px;
     border-radius: 16px;
     border: 1px solid var(--line-default);
     background: color-mix(in srgb, var(--surface-0) 88%, transparent);
-    backdrop-filter: blur(16px) saturate(var(--glass-saturate));
-    -webkit-backdrop-filter: blur(16px) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
     box-shadow: var(--elev-3);
   }
 
@@ -2530,7 +2575,7 @@ watch(spotOrigin, (v) => {
     width: auto;
     min-width: 112px;
     max-height: none;
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     background: transparent;
     border: none;
     box-shadow: none;
@@ -2617,7 +2662,7 @@ watch(spotOrigin, (v) => {
   gap: 2px;
   height: 4px;
   margin-top: 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   overflow: hidden;
   background: var(--fill-subtle);
 }
@@ -2627,7 +2672,7 @@ watch(spotOrigin, (v) => {
 }
 
 .atlas-split__road {
-  background: #ffb84d;
+  background: var(--map-amber);
 }
 
 /* 省份筛选：可点选胶囊 + 计数 */
@@ -2646,7 +2691,7 @@ watch(spotOrigin, (v) => {
   gap: 4px;
   padding: 4px 10px;
   border: 1px solid var(--line-hairline);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--surface-1);
   color: var(--text-2);
   font-size: var(--fs-cap);
@@ -2663,8 +2708,10 @@ watch(spotOrigin, (v) => {
   font-variant-numeric: tabular-nums;
 }
 
-.atlas-province:hover {
-  border-color: var(--line-default);
+@media (hover: hover) and (pointer: fine) {
+  .atlas-province:hover {
+    border-color: var(--line-default);
+  }
 }
 
 .atlas-province.is-on {
@@ -2722,24 +2769,24 @@ watch(spotOrigin, (v) => {
   display: block;
   width: 7px;
   height: 7px;
-  border-radius: 999px;
-  background: var(--dot, #94a3b8);
+  border-radius: var(--radius-full);
+  background: var(--dot, var(--text-2));
   box-shadow:
-    0 0 0 2px rgba(11, 14, 20, 0.85),
-    0 2px 8px rgba(0, 0, 0, 0.35);
+    0 0 0 2px color-mix(in srgb, var(--surface-0) 85%, transparent),
+    var(--elev-float);
 }
 
 .atlas-cluster {
   display: grid;
   place-items: center;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--cluster, #4d9fff) 32%, rgba(11, 14, 20, 0.82));
-  border: 1.5px solid var(--cluster, #4d9fff);
-  color: #f0f4fa;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--cluster, var(--accent)) 32%, color-mix(in srgb, var(--surface-0) 82%, transparent));
+  border: 1.5px solid var(--cluster, var(--accent));
+  color: var(--text-1);
   font-size: 11px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--elev-float);
 }
 
 /* 搜索定位高亮：脉动环，保证聚合层下也看得见 */
@@ -2755,21 +2802,21 @@ watch(spotOrigin, (v) => {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 999px;
-  border: 2px solid var(--dot, #4d9fff);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--dot, var(--accent));
   opacity: 0.55;
-  animation: atlas-focus-pulse 1.4s var(--ease-standard, ease) infinite;
+  animation: atlas-focus-pulse var(--dur-pulse) var(--ease-standard) infinite;
 }
 
 .atlas-focus i {
   display: block;
   width: 14px;
   height: 14px;
-  border-radius: 999px;
-  background: var(--dot, #4d9fff);
+  border-radius: var(--radius-full);
+  background: var(--dot, var(--accent));
   box-shadow:
-    0 0 0 3px rgba(11, 14, 20, 0.9),
-    0 4px 12px rgba(0, 0, 0, 0.45);
+    0 0 0 3px color-mix(in srgb, var(--surface-0) 90%, transparent),
+    var(--pin-shadow);
 }
 
 @keyframes atlas-focus-pulse {
@@ -2783,15 +2830,22 @@ watch(spotOrigin, (v) => {
   }
 }
 
+/* 无障碍降级：定位脉冲停止（与全局兜底双保险） */
+@media (prefers-reduced-motion: reduce) {
+  .atlas-focus::before {
+    animation: none;
+  }
+}
+
 .atlas-iw {
   position: relative;
   max-width: 240px;
   padding: 9px 32px 11px 11px;
-  border-radius: 10px;
-  background: var(--bg-base);
-  border: 1px solid var(--border-default);
-  color: var(--text-secondary);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-sm);
+  background: var(--surface-0);
+  border: 1px solid var(--line-default);
+  color: var(--text-2);
+  box-shadow: var(--elev-float-strong);
 }
 
 .atlas-iw__close {
@@ -2802,8 +2856,8 @@ watch(spotOrigin, (v) => {
   height: 26px;
   border: none;
   border-radius: 8px;
-  background: var(--border-hairline);
-  color: var(--text-secondary);
+  background: var(--line-hairline);
+  color: var(--text-2);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -2811,21 +2865,23 @@ watch(spotOrigin, (v) => {
   place-items: center;
 }
 
-.atlas-iw__close:hover {
-  background: var(--border-default);
-  color: var(--text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .atlas-iw__close:hover {
+    background: var(--line-default);
+    color: var(--text-1);
+  }
 }
 
 .atlas-iw__name {
   margin: 0;
   padding-right: 4px;
-  font-size: 12.5px;
+  font-size: var(--fs-meta);
   font-weight: 700;
 }
 
 .atlas-iw__line {
   margin: 3px 0 0;
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
   color: var(--accent-hover);
 }
 
@@ -2838,9 +2894,9 @@ watch(spotOrigin, (v) => {
 
 .atlas-iw-dim {
   padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--dot, var(--text-muted));
-  color: var(--bg-base);
+  border-radius: var(--radius-full);
+  background: var(--dot, var(--text-3));
+  color: var(--surface-0);
   font-size: 10px;
   font-weight: 700;
 }
@@ -2848,145 +2904,22 @@ watch(spotOrigin, (v) => {
 .atlas-iw__intro {
   margin: 5px 0 0;
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   line-height: 1.5;
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   v0.6.4 布局修复
-   下面这组样式在 ba6d8d6「走廊全屏地图页」那次提交里连同旧侧栏结构
-   一起被删除，但模板仍在引用它们，后果是：
-     · .atlas-side 退化成无样式的裸块流 —— 侧栏横跨整个屏幕压住地图；
-     · 顶部条与「公路图层 / 热力图 / 收起侧栏」按钮失去玻璃质感、挤在左上角。
-   按 c00bc19 原样恢复，并补齐同批引入的 .atlas-dock* 内部结构样式
-   （那批只改了模板结构、没写样式）。
+/* （旧版 .atlas-top/.atlas-toggle/.atlas-side 结构样式已删除：模板零引用、仅历史遗留；
+   2026-10-09 鸿蒙化收敛。注：.atlas-top-list/.atlas-top-row* 为在用的 Top10 榜单样式，保留。）
    ══════════════════════════════════════════════════════════════════ */
 
-/* ── 顶部条 ── */
-.atlas-top {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  right: 12px;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 12px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-raised);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.atlas-top__title {
-  flex: 1;
-  min-width: 0;
-}
-
-.atlas-top__eyebrow {
-  margin: 0;
-  font-size: 9.5px;
-  letter-spacing: 0.22em;
-  color: var(--accent);
-  font-weight: 700;
-}
-
-.atlas-top__title h1 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ── 图层 / 热力图 / 收起侧栏 开关 ── */
-.atlas-toggle {
-  flex: none;
-  padding: 5px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border-default);
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 11px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color var(--dur-fast) var(--ease-standard),
-    color var(--dur-fast) var(--ease-standard);
-}
-
-.atlas-toggle.is-on {
-  background: color-mix(in srgb, var(--accent) 22%, transparent);
-  border-color: color-mix(in srgb, var(--accent) 52%, transparent);
-  color: var(--text-primary);
-}
-
-.atlas-toggle:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* ── 侧栏：地图之上的窄栏（≤720vp 落到底部） ── */
-.atlas-side {
-  position: absolute;
-  top: 66px;
-  left: 12px;
-  bottom: 12px;
-  z-index: 4;
-  width: 302px;
-  padding: 10px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  border-radius: 12px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-raised);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  display: grid;
-  gap: 10px;
-  align-content: start;
-  transition: width var(--dur-base) var(--ease-out), padding var(--dur-base) var(--ease-out);
-}
-
-.atlas-side.is-collapsed {
-  width: 34px;
-  padding: 6px;
-  overflow: hidden;
-}
-
-.atlas-side__open {
-  width: 100%;
-  height: 40px;
-  border: none;
-  border-radius: 8px;
-  background: var(--border-hairline);
-  color: var(--text-secondary);
-  font-size: 18px;
-  cursor: pointer;
-}
-
-/* 线路聚焦时地图上的定位点 */
-.route-dot {
-  display: grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--dot, var(--accent));
-  color: var(--bg-base);
-  font-size: 10px;
-  font-weight: 700;
-}
+/* （死规则 .route-dot 已删：模板零引用） */
 
 /* 公路景点：琥珀色小点（与铁路侧的六维着色区分） */
 .atlas-dot--road {
-  --dot: #ffb84d;
+  --dot: var(--map-amber);
   width: 7px;
   height: 7px;
-  box-shadow: 0 0 6px rgba(255, 184, 77, 0.55);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--map-amber) 55%, transparent);
 }
 
 /*
@@ -2998,12 +2931,12 @@ watch(spotOrigin, (v) => {
   place-content: center;
   gap: 0;
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 184, 77, 0.75);
-  background: radial-gradient(circle at 35% 30%, rgba(255, 208, 138, 0.95), rgba(255, 160, 40, 0.85));
-  color: #1a1206;
+  border: 1.5px solid color-mix(in srgb, var(--map-amber) 75%, transparent);
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--map-amber-bright) 95%, transparent), color-mix(in srgb, var(--map-amber-deep) 85%, transparent));
+  color: var(--map-amber-ink);
   font-weight: 700;
   text-align: center;
-  box-shadow: 0 0 14px rgba(255, 168, 60, 0.45);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--map-amber-deep) 45%, transparent);
   cursor: pointer;
   /* 数字为主、省名为辅：省名太长会挤爆小圆，截断即可 */
   white-space: nowrap;
@@ -3011,7 +2944,7 @@ watch(spotOrigin, (v) => {
 }
 
 .atlas-prov-cluster__name {
-  font-size: 8px;
+  font-size: var(--fs-annot-sm);
   line-height: 1.1;
   opacity: 0.85;
   max-width: 100%;
@@ -3026,19 +2959,5 @@ watch(spotOrigin, (v) => {
   font-variant-numeric: tabular-nums;
 }
 
-/* ── 响应式：窄屏侧栏改为底部抽屉 ── */
-@media (max-width: 720px) {
-  .atlas-side {
-    top: auto;
-    bottom: 12px;
-    left: 12px;
-    right: 12px;
-    width: auto;
-    max-height: 46vh;
-  }
-
-  .atlas-top {
-    right: 12px;
-  }
-}
+/* （旧版响应式侧栏媒体块已删：仅作用 .atlas-side/.atlas-top 死选择器） */
 </style>

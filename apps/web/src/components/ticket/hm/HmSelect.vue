@@ -1,9 +1,11 @@
 <script setup lang="ts">
 /**
- * 鸿蒙风格选择字段（参考 ArkUI Select）：
- * 外观与输入字段一致，点击弹出滚轮选择器；右侧为箭头。
+ * 鸿蒙风格选择字段（参考 ArkUI Select）v2（2026-10-09 鸿蒙化收敛）：
+ * 外观与输入字段一致（--radius-md / --surface-2 / --line-default），点击弹出滚轮选择器；右侧箭头。
+ *
+ * v2 变更：全量设计令牌；标签与控件关联（for/id）；动效走 --dur-* 并带 reduced-motion 降级。
  */
-import { computed, ref } from 'vue';
+import { computed, ref, useId } from 'vue';
 import HmWheel, { type WheelOption } from './HmWheel.vue';
 
 const props = withDefaults(
@@ -21,6 +23,7 @@ const emit = defineEmits<{
   confirm: [string | number, WheelOption];
 }>();
 
+const uid = `hms-${useId()}`;
 const open = ref(false);
 const selected = computed(() => props.options.find((o) => o.value === props.modelValue));
 
@@ -32,8 +35,8 @@ function onConfirm(value: string | number, opt: WheelOption) {
 
 <template>
   <div class="hm-select">
-    <label v-if="label" class="hm-select__label">{{ label }}</label>
-    <button type="button" class="hm-select__box" @click="open = true">
+    <label v-if="label" class="hm-select__label" :for="uid">{{ label }}</label>
+    <button :id="uid" type="button" class="hm-select__box" @click="open = true">
       <span class="hm-select__value" :class="{ 'is-placeholder': !selected }">
         {{ selected ? selected.label : placeholder ?? '请选择' }}
       </span>
@@ -56,19 +59,28 @@ function onConfirm(value: string | number, opt: WheelOption) {
 .hm-select { min-width: 0; }
 .hm-select__label {
   display: block; margin-bottom: 7px;
-  font-size: 12.5px; letter-spacing: 0.04em; color: rgba(255,255,255,0.55);
+  font-size: var(--fs-cap); letter-spacing: 0.04em; color: var(--text-2);
 }
 .hm-select__box {
   display: flex; align-items: center; gap: 8px;
   width: 100%; min-height: 48px; padding: 0 14px;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.055);
-  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line-default);
   cursor: pointer;
-  transition: border-color 0.18s, background 0.18s;
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background var(--dur-fast) var(--ease-standard);
 }
-.hm-select__box:hover { border-color: rgba(255,255,255,0.18); }
-.hm-select__value { flex: 1; text-align: left; font-size: 15px; color: #fff; }
-.hm-select__value.is-placeholder { color: rgba(255,255,255,0.3); }
-.hm-select__chevron { flex-shrink: 0; color: rgba(255,255,255,0.45); }
+.hm-select__box:hover { border-color: var(--line-strong); }
+.hm-select__box:focus-visible { box-shadow: var(--focus-ring); }
+.hm-select__value { flex: 1; text-align: left; font-size: var(--fs-body); color: var(--text-1); }
+.hm-select__value.is-placeholder { color: var(--text-3); }
+.hm-select__chevron { flex-shrink: 0; color: var(--text-3); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-select__box {
+    transition: none;
+  }
+}
 </style>

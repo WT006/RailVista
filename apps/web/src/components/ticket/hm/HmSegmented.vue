@@ -1,5 +1,11 @@
 <script setup lang="ts">
-/** 鸿蒙风格分段选择（参考 ArkUI 分段按钮）：滑块指示器在分段间平滑移动。 */
+/**
+ * 鸿蒙风格分段选择（参考 ArkUI 分段按钮）v2（2026-10-09 鸿蒙化收敛）：
+ * 滑块指示器在分段间平滑移动。
+ *
+ * v2 变更：全量设计令牌；指示器由品牌色驱动（原金色交互层回退系统令牌）；
+ * 分段高度 38 → 44（触控下限）；动效走 --dur-* / --ease-* 并带 reduced-motion 降级。
+ */
 import { computed } from 'vue';
 
 export interface SegOption {
@@ -31,6 +37,7 @@ function select(i: number) {
       type="button"
       class="hm-seg__item"
       :class="{ 'is-active': i === activeIndex }"
+      :aria-pressed="i === activeIndex"
       @click="select(i)"
     >
       <span v-if="o.icon" class="hm-seg__icon" v-html="o.icon" />
@@ -44,29 +51,36 @@ function select(i: number) {
   position: relative;
   display: flex;
   padding: 4px;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line-default);
 }
 .hm-seg__indicator {
   position: absolute; top: 4px; bottom: 4px; left: 4px;
   width: 33%;
-  border-radius: 11px;
-  background: linear-gradient(180deg, rgba(212,168,83,0.28), rgba(212,168,83,0.16));
-  border: 1px solid rgba(212,168,83,0.35);
-  transition: transform 0.24s cubic-bezier(0.3, 0.9, 0.3, 1);
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  transition: transform var(--dur-base) var(--ease-standard);
 }
 .hm-seg__item {
   position: relative; z-index: 1;
   flex: 1;
   display: flex; align-items: center; justify-content: center; gap: 6px;
-  height: 38px;
+  height: 44px;
   border: none; background: transparent;
-  font-size: 13.5px; color: rgba(255,255,255,0.55);
+  font-size: var(--fs-meta); color: var(--text-2);
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color var(--dur-fast) var(--ease-standard);
 }
-.hm-seg__item.is-active { color: #f0d9a8; font-weight: 600; }
+.hm-seg__item.is-active { color: var(--accent); font-weight: 600; }
 .hm-seg__icon { display: inline-flex; width: 16px; height: 16px; }
 .hm-seg__icon :deep(svg) { width: 100%; height: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-seg__indicator,
+  .hm-seg__item {
+    transition: none;
+  }
+}
 </style>

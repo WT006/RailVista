@@ -3,10 +3,11 @@
   --bottom-overlay: 168px;
   --bottom-panel-clearance: 168px;
   /* --safe-* 定义在 tokens.css，供地图浮层与顶栏共用 */
-  --panel-bg: var(--bg-raised);
+  --panel-bg: var(--surface-1);
 }
 
-@media (max-width: 599px) {
+/* 底栏档（<840）：底部浮层控件整体上移，让出页签高度 */
+@media (max-width: 839px) {
   :root {
     --bottom-overlay: calc(168px + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
     --bottom-panel-clearance: calc(168px + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
@@ -73,9 +74,10 @@ html:has(.drive-map-page) #app {
 
 .top-bar {
   position: fixed;
-  /* safe-area：避开刘海 / 状态栏；无主顶栏时由此承担顶部留白 */
+  /* safe-area：避开刘海 / 状态栏；无主顶栏时由此承担顶部留白；
+     ≥840 另让出侧边 Tab（--sidenav-w） */
   top: calc(12px + var(--safe-top));
-  left: calc(10px + var(--safe-left));
+  left: calc(10px + var(--safe-left) + var(--sidenav-w));
   right: calc(10px + var(--safe-right));
   z-index: 100;
   pointer-events: none;
@@ -109,17 +111,17 @@ html:has(.drive-map-page) #app {
   gap: 2px;
   min-height: 36px;
   padding: 0 12px 0 8px;
-  border: 1px solid var(--border-strong);
-  border-radius: 999px;
-  background: var(--bg-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-full);
+  background: var(--surface-1);
   
-  color: var(--text-primary);
+  color: var(--text-1);
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--elev-float);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -135,59 +137,59 @@ html:has(.drive-map-page) #app {
   appearance: none;
   min-height: 32px;
   padding: 0 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border-strong);
-  background: var(--bg-raised);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-strong);
+  background: var(--surface-1);
   
-  color: var(--text-secondary);
+  color: var(--text-2);
   font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--elev-float);
 }
 
 .map-new-trip-btn:hover {
-  border-color: var(--accent-container);
-  color: var(--text-primary);
+  border-color: var(--accent-soft);
+  color: var(--text-1);
 }
 
 .map-pin-trip-btn {
   appearance: none;
   min-height: 32px;
   padding: 0 12px;
-  border-radius: 999px;
-  border: 1px solid var(--accent-container);
-  background: var(--accent-container);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--accent-soft);
+  background: var(--accent-soft);
   
   color: var(--accent-hover);
   font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--elev-float);
 }
 
 .map-pin-trip-btn:hover:not(:disabled) {
-  background: var(--accent-container);
-  color: var(--text-primary);
+  background: var(--accent-soft);
+  color: var(--text-1);
 }
 
 .map-pin-trip-btn.is-active {
-  border-color: var(--border-strong);
-  background: var(--bg-elevated);
-  color: var(--text-primary);
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+  color: var(--text-1);
 }
 
 .map-pin-trip-btn.is-active:hover {
   border-color: var(--danger);
   color: var(--danger);
-  background: var(--danger-container);
+  background: var(--danger-soft);
 }
 
 .map-back-btn:hover {
-  border-color: var(--accent-container);
-  color: var(--text-primary);
+  border-color: var(--accent-soft);
+  color: var(--text-1);
 }
 
 .map-back-btn__icon {
@@ -205,11 +207,11 @@ html:has(.drive-map-page) #app {
 .status-card {
   pointer-events: auto;
   background: var(--panel-bg);
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--line-default);
   
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 10px 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--elev-float-strong);
   display: grid;
   gap: 8px;
 }
@@ -225,7 +227,7 @@ html:has(.drive-map-page) #app {
 }
 
 .status-expand-enter-active {
-  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  transition: opacity var(--dur-base) var(--ease-standard), transform var(--dur-base) var(--ease-standard);
 }
 .status-expand-leave-active {
   transition: opacity var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
@@ -243,10 +245,10 @@ html:has(.drive-map-page) #app {
   flex-shrink: 0;
   margin: 0;
   padding: 4px 9px;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--line-default);
   border-radius: 8px;
-  background: var(--bg-inset);
-  color: var(--text-secondary);
+  background: var(--surface-sunken);
+  color: var(--text-2);
   font: inherit;
   font-size: 11px;
   font-weight: 650;
@@ -256,9 +258,9 @@ html:has(.drive-map-page) #app {
 }
 
 .status-collapse-btn:hover {
-  border-color: var(--accent-container);
-  color: var(--text-primary);
-  background: var(--accent-container);
+  border-color: var(--accent-soft);
+  color: var(--text-1);
+  background: var(--accent-soft);
 }
 
 .status-head {
@@ -281,8 +283,8 @@ html:has(.drive-map-page) #app {
   font-family: var(--font-display);
   flex-shrink: 0;
   padding: 3px 9px;
-  border-radius: 999px;
-  background: var(--accent-container);
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
   color: var(--accent);
   font-weight: 700;
   font-size: 12px;
@@ -295,7 +297,7 @@ html:has(.drive-map-page) #app {
   text-overflow: ellipsis;
   font-weight: 650;
   font-size: 13px;
-  color: var(--text-primary);
+  color: var(--text-1);
 }
 
 .status-progress {
@@ -307,8 +309,8 @@ html:has(.drive-map-page) #app {
 .status-progress__track {
   flex: 1;
   height: 5px;
-  border-radius: 999px;
-  background: var(--border-hairline);
+  border-radius: var(--radius-full);
+  background: var(--line-hairline);
   overflow: hidden;
 }
 
@@ -318,7 +320,7 @@ html:has(.drive-map-page) #app {
   background: linear-gradient(90deg, var(--accent-press), var(--accent));
   min-width: 0;
   transform-origin: 0 50%;
-  transition: transform var(--dur-slow) var(--ease-out);
+  transition: transform var(--dur-slow) var(--ease-standard);
 }
 
 .status-progress__pct {
@@ -351,8 +353,8 @@ html:has(.drive-map-page) #app {
   min-width: 0;
   padding: 6px 8px;
   border-radius: 8px;
-  border: 1px solid var(--border-hairline);
-  background: var(--bg-inset);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-sunken);
 }
 
 .status-meta__item--mode .status-meta__v {
@@ -382,8 +384,8 @@ html:has(.drive-map-page) #app {
 }
 
 .status-meta__item--btn:hover {
-  border-color: var(--accent-container);
-  background: var(--accent-container);
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
 }
 
 .status-meta__k {
@@ -391,13 +393,13 @@ html:has(.drive-map-page) #app {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .status-meta__v {
   font-size: 12px;
   font-weight: 650;
-  color: var(--text-primary);
+  color: var(--text-1);
   font-variant-numeric: tabular-nums;
 }
 
@@ -405,7 +407,7 @@ html:has(.drive-map-page) #app {
   flex-shrink: 0;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
-  color: var(--text-secondary);
+  color: var(--text-2);
   letter-spacing: 0.01em;
   white-space: nowrap;
 }
@@ -421,10 +423,10 @@ html:has(.drive-map-page) #app {
   flex-shrink: 0;
   padding: 6px 10px;
   margin: 0;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--line-default);
   border-radius: 8px;
-  background: var(--bg-scrim);
-  color: var(--text-secondary);
+  background: var(--surface-scrim);
+  color: var(--text-2);
   font-size: 12px;
   font-family: inherit;
   font-weight: 600;
@@ -440,7 +442,7 @@ html:has(.drive-map-page) #app {
 
 .calibrate-btn.is-active {
   border-color: var(--success);
-  background: var(--success-container);
+  background: var(--success-soft);
   color: var(--success);
 }
 
@@ -460,7 +462,7 @@ html:has(.drive-map-page) #app {
 .rail-unresolved-hint {
   margin: 0;
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   line-height: 1.35;
 }
 
@@ -468,8 +470,8 @@ html:has(.drive-map-page) #app {
 .station-marker--unresolved .station-dot--unresolved {
   width: 12px;
   height: 12px;
-  background: var(--border-default);
-  border: 2px dashed var(--text-secondary);
+  background: var(--line-default);
+  border: 2px dashed var(--text-2);
   border-radius: 50%;
   box-shadow: none;
 }
@@ -480,9 +482,9 @@ html:has(.drive-map-page) #app {
 }
 
 .station-marker--unresolved .station-label {
-  color: var(--text-secondary);
-  background: var(--bg-raised);
-  border-color: var(--border-strong);
+  color: var(--text-2);
+  background: var(--surface-1);
+  border-color: var(--line-strong);
 }
 
 .station-label__pending {
@@ -490,9 +492,9 @@ html:has(.drive-map-page) #app {
   padding: 0 3px;
   font-size: 9px;
   font-style: normal;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-strong);
-  border-radius: 3px;
+  color: var(--text-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
 }
 
 .schedule-dialog {
@@ -512,17 +514,17 @@ html:has(.drive-map-page) #app {
 .schedule-dialog__backdrop {
   position: absolute;
   inset: 0;
-  background: var(--bg-raised);
+  background: var(--surface-1);
 }
 
 .schedule-dialog__card {
   position: relative;
   width: min(360px, 100%);
   padding: 18px 16px 14px;
-  border-radius: 12px;
-  background: var(--bg-base);
-  border: 1px solid var(--border-default);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  border-radius: var(--radius-md);
+  background: var(--surface-0);
+  border: 1px solid var(--line-default);
+  box-shadow: var(--elev-3);
 }
 
 .schedule-dialog__card--wide {
@@ -534,14 +536,14 @@ html:has(.drive-map-page) #app {
   margin: 0 0 6px;
   font-size: 17px;
   font-weight: 650;
-  color: var(--text-primary);
+  color: var(--text-1);
 }
 
 .schedule-dialog__hint {
   margin: 0 0 14px;
   font-size: 12px;
   line-height: 1.5;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 
 .schedule-dialog__field {
@@ -550,19 +552,19 @@ html:has(.drive-map-page) #app {
   gap: 8px;
   margin-bottom: 14px;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 
 .schedule-dialog__field > span {
-  color: var(--text-secondary);
+  color: var(--text-2);
   font-size: 12px;
   letter-spacing: 0.04em;
 }
 
 .schedule-dialog__field .dtf-panel {
-  border-radius: 12px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-scrim);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-default);
+  background: var(--surface-scrim);
 }
 
 .schedule-dialog__actions {
@@ -575,16 +577,16 @@ html:has(.drive-map-page) #app {
 .schedule-dialog__actions button {
   padding: 8px 14px;
   border-radius: 8px;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--line-default);
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-2);
   font-size: 13px;
   cursor: pointer;
 }
 
 .schedule-dialog__actions button.primary {
-  border-color: var(--accent-container);
-  background: var(--accent-container);
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
   color: var(--accent-hover);
   font-weight: 600;
 }
@@ -600,14 +602,14 @@ html:has(.drive-map-page) #app {
 
 .bottom-panel {
   position: fixed;
-  left: 0;
+  left: var(--sidenav-w); /* ≥840 让出侧边 Tab */
   right: 0;
   bottom: 0;
   z-index: 100;
-  background: linear-gradient(180deg, var(--bg-raised), var(--bg-base));
-  border-top: 1px solid var(--border-default);
+  background: linear-gradient(180deg, var(--surface-1), var(--surface-0));
+  border-top: 1px solid var(--line-default);
   padding: 10px calc(14px + var(--safe-right)) calc(10px + var(--safe-bottom)) calc(14px + var(--safe-left));
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--elev-up);
 }
 
 .location-card {
@@ -627,30 +629,30 @@ html:has(.drive-map-page) #app {
 .bottom-panel h2 {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--text-3);
   letter-spacing: 0.02em;
 }
 
 .location-mode {
   font-size: 11px;
   color: var(--success);
-  background: var(--success-container);
-  border: 1px solid var(--success-container);
-  border-radius: 999px;
+  background: var(--success-soft);
+  border: 1px solid var(--success-soft);
+  border-radius: var(--radius-full);
   padding: 2px 8px;
   white-space: nowrap;
 }
 
 .location-mode.is-schedule {
   color: var(--warning);
-  background: rgba(223, 179, 87, 0.12);
-  border-color: rgba(223, 179, 87, 0.28);
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--warning) 28%, transparent);
 }
 
 .location-segment {
   font-size: clamp(16px, 4.6vw, 18px);
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
   line-height: 1.3;
   word-break: break-word;
 }
@@ -658,20 +660,20 @@ html:has(.drive-map-page) #app {
 .location-meta {
   margin-top: 2px;
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   line-height: 1.45;
 }
 
 .panel-divider {
   height: 1px;
-  background: var(--border-hairline);
+  background: var(--line-hairline);
   margin: 8px 0;
 }
 
 .upcoming-card .next-name {
   font-size: clamp(17px, 4.8vw, 21px);
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
   line-height: 1.25;
   margin-bottom: 4px;
   word-break: break-word;
@@ -679,7 +681,7 @@ html:has(.drive-map-page) #app {
 
 .upcoming-card .next-meta {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   line-height: 1.4;
   margin-bottom: 2px;
 }
@@ -692,9 +694,9 @@ html:has(.drive-map-page) #app {
   gap: 10px;
   margin: 8px 0 2px;
   padding: 7px 10px;
-  border-radius: 10px;
-  background: rgba(148, 163, 184, 0.08);
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--text-2) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-2) 16%, transparent);
   min-width: 0;
 }
 
@@ -715,24 +717,24 @@ html:has(.drive-map-page) #app {
 .wx-strip__cond {
   font-size: 13px;
   font-weight: 650;
-  color: var(--text-primary);
+  color: var(--text-1);
   white-space: nowrap;
 }
 
 .wx-strip__temp {
   font-size: 13px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
   font-variant-numeric: tabular-nums;
   margin-left: 2px;
   padding-left: 8px;
-  border-left: 1px solid var(--border-default);
+  border-left: 1px solid var(--line-default);
 }
 
 .wx-strip__vis {
   flex-shrink: 0;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-3);
   white-space: nowrap;
 }
 
@@ -741,32 +743,32 @@ html:has(.drive-map-page) #app {
   display: inline-flex;
   align-items: center;
   padding: 3px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
-  color: var(--text-secondary);
-  background: rgba(148, 163, 184, 0.14);
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: var(--text-2);
+  background: color-mix(in srgb, var(--text-2) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-2) 22%, transparent);
 }
 
 .wx-strip__hint.is-good {
   color: var(--success);
-  background: var(--success-container);
+  background: var(--success-soft);
   border-color: transparent;
 }
 
 .wx-strip__hint.is-fair {
   color: var(--warning);
-  background: rgba(223, 179, 87, 0.14);
-  border-color: rgba(223, 179, 87, 0.28);
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
+  border-color: color-mix(in srgb, var(--warning) 28%, transparent);
 }
 
 .wx-strip__hint.is-poor {
-  color: #e07171;
-  background: rgba(224, 113, 113, 0.14);
-  border-color: rgba(224, 113, 113, 0.28);
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 28%, transparent);
 }
 
 .map-info-card__wx {
@@ -776,8 +778,8 @@ html:has(.drive-map-page) #app {
 .progress-track {
   margin-top: 10px;
   height: 4px;
-  background: var(--border-default);
-  border-radius: 999px;
+  background: var(--line-default);
+  border-radius: var(--radius-full);
   overflow: hidden;
 }
 
@@ -787,7 +789,7 @@ html:has(.drive-map-page) #app {
   width: 100%;
   transform-origin: left center;
   background: linear-gradient(90deg, var(--accent-press), var(--info));
-  transition: transform var(--dur-slow) var(--ease-out);
+  transition: transform var(--dur-slow) var(--ease-standard);
   will-change: transform;
 }
 
@@ -798,7 +800,7 @@ html:has(.drive-map-page) #app {
   gap: 8px;
   margin-top: 6px;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-3);
   letter-spacing: 0.02em;
 }
 
@@ -810,7 +812,7 @@ html:has(.drive-map-page) #app {
 
 .bottom-panel .meta {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   line-height: 1.45;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -821,8 +823,8 @@ html:has(.drive-map-page) #app {
 .bottom-panel .progress {
   margin-top: 10px;
   height: 5px;
-  background: var(--border-default);
-  border-radius: 999px;
+  background: var(--line-default);
+  border-radius: var(--radius-full);
   overflow: hidden;
 }
 
@@ -831,7 +833,7 @@ html:has(.drive-map-page) #app {
   height: 100%;
   width: 0;
   background: linear-gradient(90deg, var(--accent-press), var(--info));
-  transition: transform var(--dur-slow) var(--ease-out);
+  transition: transform var(--dur-slow) var(--ease-standard);
 }
 
 .bottom-panel__progress-text {
@@ -849,10 +851,10 @@ html:has(.drive-map-page) #app {
   z-index: 102;
   padding: 10px 12px;
   background: var(--panel-bg);
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--line-default);
   
-  border-radius: 12px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+  border-radius: var(--radius-md);
+  box-shadow: var(--elev-float-strong);
 }
 
 .calibrate-popover[hidden] {
@@ -874,7 +876,7 @@ html:has(.drive-map-page) #app {
 
 .calibrate-card__status {
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-3);
   font-weight: 600;
   text-align: right;
 }
@@ -882,7 +884,7 @@ html:has(.drive-map-page) #app {
 .calibrate-panel__hint {
   font-size: 11px;
   line-height: 1.45;
-  color: var(--text-muted);
+  color: var(--text-3);
   margin-bottom: 8px;
 }
 
@@ -895,10 +897,10 @@ html:has(.drive-map-page) #app {
 .calibrate-station-btn,
 .calibrate-clear,
 .info-calibrate-btn {
-  border: 1px solid var(--border-default);
-  border-radius: 999px;
-  background: var(--bg-scrim);
-  color: var(--text-primary);
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: var(--surface-scrim);
+  color: var(--text-1);
   font-size: 11px;
   font-weight: 600;
   font-family: inherit;
@@ -917,13 +919,13 @@ html:has(.drive-map-page) #app {
   width: max-content;
   max-width: min(300px, 78vw);
   padding: 12px 14px 14px;
-  border-radius: 14px;
-  background: linear-gradient(165deg, var(--bg-elevated), var(--bg-base));
-  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: linear-gradient(165deg, var(--surface-2), var(--surface-0));
+  border: 1px solid var(--line-default);
   box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.45),
-    0 0 0 1px var(--accent-container) inset;
-  color: var(--text-primary);
+    var(--elev-3),
+    0 0 0 1px var(--accent-soft) inset;
+  color: var(--text-1);
   font-family: inherit;
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
@@ -937,8 +939,8 @@ html:has(.drive-map-page) #app {
   height: 28px;
   border: none;
   border-radius: 8px;
-  background: var(--border-hairline);
-  color: var(--text-secondary);
+  background: var(--line-hairline);
+  color: var(--text-2);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -947,15 +949,15 @@ html:has(.drive-map-page) #app {
 }
 
 .map-info-card__close:hover {
-  background: var(--border-default);
-  color: var(--text-primary);
+  background: var(--line-default);
+  color: var(--text-1);
 }
 
 .map-info-card__title {
   margin: 0 28px 6px 0;
   font-size: 15px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
   letter-spacing: 0.01em;
 }
 
@@ -970,7 +972,7 @@ html:has(.drive-map-page) #app {
   display: inline-flex;
   align-items: center;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.02em;
@@ -978,32 +980,32 @@ html:has(.drive-map-page) #app {
 
 .map-info-card__badge--distant {
   color: var(--accent-hover);
-  background: var(--accent-container);
-  border: 1px solid var(--accent-container);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
 }
 
 .map-info-card__badge--on_track {
   color: var(--success);
-  background: var(--success-container);
-  border: 1px solid var(--success-container);
+  background: var(--success-soft);
+  border: 1px solid var(--success-soft);
 }
 
 .map-info-card__badge--window {
   color: var(--accent);
-  background: var(--accent-container);
+  background: var(--accent-soft);
   border: 1px solid var(--accent-border);
 }
 
 .map-info-card__badge--night {
   color: var(--warning);
-  background: rgba(223, 179, 87, 0.14);
-  border: 1px solid rgba(223, 179, 87, 0.28);
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning) 28%, transparent);
 }
 
 .map-info-card__badge--time {
-  color: var(--text-secondary);
-  background: var(--border-hairline);
-  border: 1px solid var(--border-default);
+  color: var(--text-2);
+  background: var(--line-hairline);
+  border: 1px solid var(--line-default);
 }
 
 .map-info-card__schedule {
@@ -1015,8 +1017,8 @@ html:has(.drive-map-page) #app {
 
 .map-info-card__intro {
   margin: 0;
-  font-size: 12.5px;
-  color: var(--text-secondary);
+  font-size: var(--fs-meta);
+  color: var(--text-2);
   line-height: 1.55;
 }
 
@@ -1025,12 +1027,12 @@ html:has(.drive-map-page) #app {
   padding: 7px 14px;
   font-size: 12px;
   border-color: var(--success);
-  background: var(--success-container);
+  background: var(--success-soft);
   color: var(--success);
 }
 
 .map-info-card .info-calibrate-btn:hover {
-  background: var(--success-container);
+  background: var(--success-soft);
   color: var(--success);
 }
 
@@ -1041,22 +1043,22 @@ html:has(.drive-map-page) #app {
   width: 12px;
   height: 12px;
   margin-left: -6px;
-  background: var(--bg-base);
-  border-right: 1px solid var(--border-default);
-  border-bottom: 1px solid var(--border-default);
+  background: var(--surface-0);
+  border-right: 1px solid var(--line-default);
+  border-bottom: 1px solid var(--line-default);
   transform: rotate(45deg);
   pointer-events: none;
 }
 
 .calibrate-station-btn.is-active {
   border-color: var(--success);
-  background: var(--success-container);
+  background: var(--success-soft);
   color: var(--success);
 }
 
 .calibrate-station-btn.is-near {
-  border-color: var(--accent-container);
-  box-shadow: 0 0 0 1px var(--accent-container);
+  border-color: var(--accent-soft);
+  box-shadow: 0 0 0 1px var(--accent-soft);
 }
 
 .calibrate-clear {
@@ -1074,7 +1076,7 @@ html:has(.drive-map-page) #app {
   display: inline-block;
   margin-top: 8px;
   border-color: var(--success);
-  background: var(--success-container);
+  background: var(--success-soft);
   color: var(--success);
 }
 
@@ -1086,14 +1088,14 @@ html:has(.drive-map-page) #app {
   z-index: 220;
   max-width: min(92vw, 360px);
   padding: 10px 14px;
-  border-radius: 12px;
-  background: var(--bg-base);
-  border: 1px solid var(--accent-container);
-  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  background: var(--surface-0);
+  border: 1px solid var(--accent-soft);
+  color: var(--text-1);
   font-size: 13px;
   line-height: 1.45;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--elev-float-strong);
   pointer-events: none;
 }
 
@@ -1114,8 +1116,8 @@ html:has(.drive-map-page) #app {
   align-items: center;
   justify-content: center;
   border: 1px solid var(--success);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--surface-0) 88%, #1a212b);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--surface-0) 88%, var(--surface-lift));
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   color: var(--success);
@@ -1123,7 +1125,7 @@ html:has(.drive-map-page) #app {
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--elev-float);
 }
 
 .satellite-btn {
@@ -1138,22 +1140,22 @@ html:has(.drive-map-page) #app {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border-default);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--surface-0) 88%, #1a212b);
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--surface-0) 88%, var(--surface-lift));
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
-  color: var(--text-primary);
+  color: var(--text-1);
   font-size: 13px;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--elev-float);
 }
 
 .satellite-btn.is-active {
-  border-color: var(--accent-container);
-  background: var(--accent-container);
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
   color: var(--accent-hover);
 }
 
@@ -1169,38 +1171,67 @@ html:has(.drive-map-page) #app {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border-default);
-  border-radius: 999px;
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
   /* 浮在地图上：不可用半透明 surface-1，否则地名会透出叠在图例字上 */
-  background: color-mix(in srgb, var(--surface-0) 88%, #1a212b);
+  background: color-mix(in srgb, var(--surface-0) 88%, var(--surface-lift));
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
-  color: var(--text-primary);
+  color: var(--text-1);
   font-size: 13px;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--elev-float);
+}
+
+.sky-btn {
+  position: fixed;
+  right: calc(10px + var(--safe-right));
+  bottom: calc(var(--bottom-overlay) + 154px);
+  z-index: 101;
+  box-sizing: border-box;
+  width: 88px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: var(--panel-bg);
+  color: var(--text-1);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--elev-float);
+}
+
+.sky-btn.is-active {
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
 }
 
 .legend {
   position: fixed;
   right: calc(10px + var(--safe-right));
-  bottom: calc(var(--bottom-overlay) + 154px);
+  bottom: calc(var(--bottom-overlay) + 202px);
   z-index: 101;
   display: none;
   min-width: 104px;
   /* 同 legend-toggle：压住底图注记，避免「风景」等行出现重影 */
-  background: color-mix(in srgb, var(--surface-0) 88%, #1a212b);
+  background: color-mix(in srgb, var(--surface-0) 88%, var(--surface-lift));
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
-  border: 1px solid var(--border-default);
-  border-radius: 12px;
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-md);
   padding: 8px 10px;
   font-size: 12px;
   line-height: 1.4;
-  color: var(--text-secondary);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  color: var(--text-2);
+  box-shadow: var(--elev-float-strong);
 }
 
 .legend.is-open {
@@ -1232,12 +1263,12 @@ html:has(.drive-map-page) #app {
   line-height: 1.35;
   text-align: left;
   cursor: pointer;
-  border-radius: 6px;
-  transition: opacity var(--dur-micro) var(--ease-out), background var(--dur-micro) var(--ease-out);
+  border-radius: var(--radius-xs);
+  transition: opacity var(--dur-micro) var(--ease-standard), background var(--dur-micro) var(--ease-standard);
 }
 
 .legend-item--toggle:hover {
-  background: var(--border-hairline);
+  background: var(--line-hairline);
 }
 
 .legend-item--toggle[aria-pressed="false"] {
@@ -1247,21 +1278,21 @@ html:has(.drive-map-page) #app {
 .legend-item--toggle[aria-pressed="false"] .train,
 .legend-item--toggle[aria-pressed="false"] .spot,
 .legend-item--toggle[aria-pressed="false"] .gps {
-  background: var(--text-muted);
+  background: var(--text-3);
 }
 
 .legend-item--toggle[aria-pressed="false"] .rail {
-  background: var(--text-muted);
+  background: var(--text-3);
 }
 
 .legend-item--toggle[aria-pressed="false"] .station {
-  background: var(--text-muted);
-  border-color: var(--text-muted);
+  background: var(--text-3);
+  border-color: var(--text-3);
 }
 
 .legend .rail {
   background: var(--accent);
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   height: 3px;
   width: 14px;
 }
@@ -1272,7 +1303,7 @@ html:has(.drive-map-page) #app {
 
 .legend .station {
   background: var(--station);
-  border: 1px solid var(--text-primary);
+  border: 1px solid var(--text-1);
 }
 
 .legend .train {
@@ -1281,7 +1312,7 @@ html:has(.drive-map-page) #app {
 
 .legend .gps {
   background: var(--info);
-  border: 1px solid var(--text-primary);
+  border: 1px solid var(--text-1);
 }
 
 .station-marker {
@@ -1298,7 +1329,7 @@ html:has(.drive-map-page) #app {
   width: 12px;
   height: 12px;
   background: var(--station);
-  border: 2px solid var(--text-primary);
+  border: 2px solid var(--text-1);
   border-radius: 50%;
   box-shadow: 0 0 0 3px var(--warning);
 }
@@ -1310,14 +1341,14 @@ html:has(.drive-map-page) #app {
 
 .spot-marker {
   background: linear-gradient(160deg, var(--spot), var(--spot));
-  color: var(--text-primary);
+  color: var(--text-1);
   font-size: 11px;
   font-weight: 700;
   min-width: 22px;
   height: 22px;
   padding: 0 6px;
-  border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--pin-rim);
   white-space: nowrap;
   line-height: 18px;
   text-align: center;
@@ -1330,14 +1361,78 @@ html:has(.drive-map-page) #app {
   border-width: 1.5px;
 }
 
+/* 天象标注：景点式——圆点贴在路线点上，文字胶囊悬在线上方
+   霞=暖橙 / 金=琥珀 / 蓝=冰蓝 / 日=朱红 / 月=靛紫（与 SkyJourneyPanel k-* 同语义） */
+.sky-marker {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.sky-marker__text {
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--surface-0) 85%, transparent);
+  color: var(--text-1);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  white-space: nowrap;
+  box-shadow: var(--elev-float);
+}
+
+.sky-marker__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--text-2);
+  border: 1.5px solid var(--pin-rim);
+  box-shadow: var(--pin-shadow);
+}
+
+.sky-marker.is-glow .sky-marker__dot {
+  background: var(--spot);
+}
+
+.sky-marker.is-golden .sky-marker__dot {
+  background: var(--warning);
+}
+
+.sky-marker.is-blue .sky-marker__dot {
+  background: var(--info);
+}
+
+.sky-marker.is-sun .sky-marker__dot {
+  background: var(--danger);
+}
+
+.sky-marker.is-moon .sky-marker__dot {
+  background: var(--purple);
+}
+
+.sky-marker.is-star .sky-marker__dot {
+  background: var(--purple);
+}
+
+.sky-marker--compact .sky-marker__text {
+  display: none;
+}
+
+.sky-marker--compact .sky-marker__dot {
+  width: 6px;
+  height: 6px;
+}
+
 .train-marker {
   position: relative;
   width: 16px;
   height: 16px;
   background: var(--success);
-  border: 3px solid var(--text-primary);
+  border: 3px solid var(--text-1);
   border-radius: 50%;
-  box-shadow: 0 0 0 6px var(--success-container);
+  box-shadow: 0 0 0 6px var(--success-soft);
   animation: train-pulse 3s var(--ease-in-out) infinite;
 }
 
@@ -1347,7 +1442,7 @@ html:has(.drive-map-page) #app {
   inset: -8px;
   border: 2px solid var(--success);
   border-radius: 50%;
-  animation: train-ring 2.5s var(--ease-out) 1;
+  animation: train-ring var(--dur-pulse) var(--ease-standard) 1;
 }
 
 .train-marker-wrap {
@@ -1362,7 +1457,7 @@ html:has(.drive-map-page) #app {
   font-size: 10px;
   font-weight: 700;
   color: var(--success);
-  background: var(--bg-raised);
+  background: var(--surface-1);
   border: 1px solid var(--success);
   border-radius: 4px;
   white-space: nowrap;
@@ -1376,9 +1471,9 @@ html:has(.drive-map-page) #app {
   width: 14px;
   height: 14px;
   background: var(--info);
-  border: 2px solid var(--text-primary);
+  border: 2px solid var(--text-1);
   border-radius: 50%;
-  box-shadow: 0 0 0 4px var(--accent-container);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
 @keyframes train-pulse {
@@ -1395,7 +1490,7 @@ html:has(.drive-map-page) #app {
   width: 14px;
   height: 14px;
   border-width: 2px;
-  box-shadow: 0 0 0 4px var(--success-container);
+  box-shadow: 0 0 0 4px var(--success-soft);
 }
 
 .error-overlay {
@@ -1406,7 +1501,7 @@ html:has(.drive-map-page) #app {
   align-items: center;
   justify-content: center;
   padding: calc(20px + var(--safe-top)) calc(20px + var(--safe-right)) calc(20px + var(--safe-bottom)) calc(20px + var(--safe-left));
-  background: var(--bg-raised);
+  background: var(--surface-1);
 }
 
 .error-overlay.show {
@@ -1415,8 +1510,8 @@ html:has(.drive-map-page) #app {
 
 .error-card {
   width: min(420px, 100%);
-  background: var(--bg-raised);
-  border: 1px solid var(--border-default);
+  background: var(--surface-1);
+  border: 1px solid var(--line-default);
   border-radius: 16px;
   padding: 20px;
 }
@@ -1429,11 +1524,11 @@ html:has(.drive-map-page) #app {
 .error-card p {
   font-size: 14px;
   line-height: 1.6;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 
 .error-card code {
-  background: var(--bg-base);
+  background: var(--surface-0);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 12px;
@@ -1445,13 +1540,14 @@ html:has(.drive-map-page) #app {
   font-size: 10px;
   line-height: 1.3;
   color: var(--warning);
-  background: var(--bg-raised);
+  background: var(--surface-1);
   border: 1px solid var(--warning);
   border-radius: 4px;
   white-space: nowrap;
 }
 
-@media (min-width: 641px) {
+/* 桌面档（≥840，与侧边 Tab 同断点）：窄顶栏 + 图例常显 + 浮层再定位 */
+@media (min-width: 840px) {
   :root {
     --top-overlay: 88px;
     --bottom-overlay: 156px;
@@ -1460,7 +1556,7 @@ html:has(.drive-map-page) #app {
 
   .top-bar {
     top: calc(12px + var(--safe-top));
-    left: calc(12px + var(--safe-left));
+    left: calc(12px + var(--safe-left) + var(--sidenav-w));
     right: auto;
     max-width: 520px;
   }
@@ -1497,6 +1593,10 @@ html:has(.drive-map-page) #app {
     bottom: calc(var(--bottom-overlay) + 238px);
   }
 
+  .sky-btn {
+    bottom: calc(var(--bottom-overlay) + 286px);
+  }
+
   .bottom-panel .meta {
     -webkit-line-clamp: 3;
   }
@@ -1529,9 +1629,9 @@ html:has(.drive-map-page) #app {
  * 唯一例外是「方位待确认」——它表达的是数据待复核，不是方位本身。
  */
 .spot-marker--unknown {
-  background: var(--bg-raised);
+  background: var(--surface-1);
   border-style: dashed;
-  color: var(--text-secondary);
+  color: var(--text-2);
   box-shadow: none;
 }
 
@@ -1541,30 +1641,30 @@ html:has(.drive-map-page) #app {
 
 .map-info-card__badge--side-left {
   color: var(--info);
-  background: var(--accent-container);
+  background: var(--accent-soft);
 }
 
 .map-info-card__badge--side-right {
   color: var(--accent);
-  background: var(--accent-container);
+  background: var(--accent-soft);
 }
 
 /* 两侧均可：正向色（青绿），与左/右同等可信，不用灰色 */
 .map-info-card__badge--side-both {
   color: var(--info);
-  background: var(--success-container);
+  background: var(--success-soft);
 }
 
 .map-info-card__badge--side-unknown {
-  color: var(--text-muted);
-  background: var(--border-hairline);
+  color: var(--text-3);
+  background: var(--line-hairline);
   border-style: dashed;
 }
 
 .map-info-card__badge--lowSide {
-  color: var(--text-secondary);
-  background: var(--border-hairline);
-  border: 1px dashed var(--border-strong);
+  color: var(--text-2);
+  background: var(--line-hairline);
+  border: 1px dashed var(--line-strong);
   font-weight: 500;
 }
 
@@ -1577,18 +1677,18 @@ html:has(.drive-map-page) #app {
 
 .map-info-card__honor {
   padding: 1px 6px;
-  border-radius: 6px;
-  background: var(--accent-container);
-  border: 1px solid var(--accent-container);
+  border-radius: var(--radius-xs);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
   color: var(--accent-hover);
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
   font-weight: 600;
 }
 
 .map-info-card__honor--more {
-  background: var(--border-hairline);
-  border-color: var(--border-default);
-  color: var(--text-secondary);
+  background: var(--line-hairline);
+  border-color: var(--line-default);
+  color: var(--text-2);
 }
 
 .legend-side {
@@ -1598,12 +1698,12 @@ html:has(.drive-map-page) #app {
   gap: 5px;
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid var(--border-hairline);
+  border-top: 1px solid var(--line-hairline);
 }
 
 .legend-side__title {
   width: 100%;
-  color: var(--text-secondary);
+  color: var(--text-2);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -1611,22 +1711,22 @@ html:has(.drive-map-page) #app {
 
 .legend-side__note {
   width: 100%;
-  color: var(--text-muted);
-  font-size: 10.5px;
+  color: var(--text-3);
+  font-size: var(--fs-micro);
 }
 
 /* ── U1 精度状态面板（PreciseRoutePanel）─────────────────────────────────
    与 .status-card 同一语言：12–14 圆角、1px 描边、低饱和底色；
-   主色 var(--accent) / 成功 var(--info) / 警示 var(--warning) / 失败 var(--danger) / 离线 var(--text-secondary)。 */
+   主色 var(--accent) / 成功 var(--info) / 警示 var(--warning) / 失败 var(--danger) / 离线 var(--text-2)。 */
 .precise-panel {
   display: grid;
   gap: 6px;
   margin-top: 8px;
   padding: 8px 10px 9px;
-  border-radius: 12px;
-  border: 1px solid var(--border-default);
-  background: linear-gradient(180deg, var(--bg-elevated), var(--bg-scrim));
-  transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-default);
+  background: linear-gradient(180deg, var(--surface-2), var(--surface-scrim));
+  transition: border-color var(--dur-fast) var(--ease-standard), background var(--dur-fast) var(--ease-standard);
 }
 
 .precise-panel--compact {
@@ -1644,36 +1744,36 @@ html:has(.drive-map-page) #app {
 .precise-dot {
   width: 8px;
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   flex-shrink: 0;
   background: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-container);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .precise-panel--done .precise-dot {
   background: var(--info);
-  box-shadow: 0 0 0 3px var(--success-container);
+  box-shadow: 0 0 0 3px var(--success-soft);
 }
 .precise-panel--partial .precise-dot,
 .precise-panel--bridging .precise-dot {
   background: var(--warning);
-  box-shadow: 0 0 0 3px rgba(223, 179, 87, 0.16);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--warning) 16%, transparent);
 }
 .precise-panel--failed .precise-dot {
   background: var(--danger);
-  box-shadow: 0 0 0 3px var(--danger-container);
+  box-shadow: 0 0 0 3px var(--danger-soft);
 }
 .precise-panel--offline .precise-dot {
-  background: var(--text-secondary);
-  box-shadow: 0 0 0 3px var(--border-hairline);
+  background: var(--text-2);
+  box-shadow: 0 0 0 3px var(--line-hairline);
 }
 
 .precise-panel__title {
   flex: 1;
   min-width: 0;
-  font-size: 12.5px;
+  font-size: var(--fs-meta);
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
   line-height: 1.35;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1685,28 +1785,28 @@ html:has(.drive-map-page) #app {
   flex-shrink: 0;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
-  color: var(--text-secondary);
+  color: var(--text-2);
   padding: 1px 6px;
-  border-radius: 999px;
-  background: var(--border-hairline);
+  border-radius: var(--radius-full);
+  background: var(--line-hairline);
 }
 
 .precise-tier {
   color: var(--accent-hover);
-  background: var(--accent-container);
+  background: var(--accent-soft);
 }
 
 .precise-panel--done .precise-tier {
   color: var(--info);
-  background: var(--success-container);
+  background: var(--success-soft);
 }
 
 .precise-panel__toggle,
 .precise-panel__cancel {
   flex-shrink: 0;
-  border: 1px solid var(--border-default);
-  background: var(--border-hairline);
-  color: var(--text-secondary);
+  border: 1px solid var(--line-default);
+  background: var(--line-hairline);
+  color: var(--text-2);
   border-radius: 8px;
   height: 22px;
   min-width: 22px;
@@ -1719,7 +1819,7 @@ html:has(.drive-map-page) #app {
 .precise-panel__cancel:hover {
   color: var(--danger);
   border-color: var(--danger);
-  background: var(--danger-container);
+  background: var(--danger-soft);
 }
 
 .precise-progress {
@@ -1731,8 +1831,8 @@ html:has(.drive-map-page) #app {
 .precise-progress__track {
   flex: 1;
   height: 4px;
-  border-radius: 999px;
-  background: var(--border-hairline);
+  border-radius: var(--radius-full);
+  background: var(--line-hairline);
   overflow: hidden;
 }
 
@@ -1740,9 +1840,9 @@ html:has(.drive-map-page) #app {
   height: 100%;
   width: 100%;
   transform-origin: 0 50%;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: linear-gradient(90deg, var(--accent-press), var(--accent));
-  transition: transform var(--dur-base) var(--ease-out);
+  transition: transform var(--dur-base) var(--ease-standard);
 }
 
 .precise-panel--bridging .precise-progress__bar {
@@ -1752,7 +1852,7 @@ html:has(.drive-map-page) #app {
 .precise-progress__pct {
   font-size: 11px;
   font-variant-numeric: tabular-nums;
-  color: var(--text-secondary);
+  color: var(--text-2);
   min-width: 30px;
   text-align: right;
 }
@@ -1762,7 +1862,7 @@ html:has(.drive-map-page) #app {
 .precise-panel__stale {
   margin: 0;
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   line-height: 1.4;
 }
 
@@ -1783,13 +1883,13 @@ html:has(.drive-map-page) #app {
   font-size: 12px;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: background var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+  transition: background var(--dur-micro) var(--ease-standard), border-color var(--dur-micro) var(--ease-standard);
 }
 
 .precise-btn--primary {
   background: linear-gradient(180deg, var(--accent-press), var(--accent-press));
-  border-color: var(--accent-container);
-  color: var(--text-primary);
+  border-color: var(--accent-soft);
+  color: var(--text-1);
   font-weight: 600;
 }
 
@@ -1799,13 +1899,13 @@ html:has(.drive-map-page) #app {
 }
 
 .precise-btn--ghost {
-  background: var(--border-hairline);
-  border-color: var(--border-default);
-  color: var(--text-secondary);
+  background: var(--line-hairline);
+  border-color: var(--line-default);
+  color: var(--text-2);
 }
 
 .precise-panel--done .precise-btn--primary {
-  background: linear-gradient(180deg, var(--success-container), var(--success-container));
+  background: linear-gradient(180deg, var(--success-soft), var(--success-soft));
   border-color: var(--info);
   color: var(--info);
 }

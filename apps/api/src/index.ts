@@ -11,6 +11,7 @@ import { driveRoute } from './routes/drive.js';
 import { flightsRoute } from './routes/flights.js';
 import { travelRoute } from './routes/travel.js';
 import { weatherRoute } from './routes/weather.js';
+import { skyRoute } from './routes/sky.js';
 import { loadStationIndex } from './services/stationIndex.js';
 import { trustedClientIp } from './lib/clientIdentity.js';
 import { buildVersionFingerprint, type VersionFingerprint } from './services/versionFingerprint.js';
@@ -105,6 +106,7 @@ app.route('/drive', driveRoute);
 app.route('/flights', flightsRoute);
 app.route('/travel', travelRoute);
 app.route('/weather', weatherRoute);
+app.route('/sky', skyRoute);
 
 const port = Number(process.env.PORT || 3000);
 

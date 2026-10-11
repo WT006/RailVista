@@ -113,6 +113,15 @@ export const LAYER_RANK_RANGE: Record<TravelLayer, [number, number]> = {
   L5: [400, 500],
 };
 
+/**
+ * 分层天数上限。判据 V19 保证「新写路线的天数与分层定位一致」。
+ * 区间为闭区间 [min, max]。L1 只卡上限、不卡下限：长线本就该长（阿里 15 天是合理形态），
+ * 设下限反而会逼出「为了合规而拉天数」的假数据。
+ */
+export const LAYER_DAYS_RANGE: Record<TravelLayer, [number, number]> = {
+  L1: [1, 15], L2: [3, 7], L3: [2, 5], L4: [1, 3], L5: [2, 5],
+};
+
 /** 分层轮转的层序（PRD §3.5）：先给「说走就走」的短内容，再给大线。 */
 export const RECOMMEND_LAYER_ROTATION: TravelLayer[] = ['L3', 'L4', 'L2', 'L1', 'L5'];
 
@@ -374,6 +383,10 @@ export interface TravelPractical {
   gearNote?: string;
   /** 预订与旺季提示 */
   bookingNote?: string;
+  /** 住宿区域：住哪一片、为什么这么住（写区域与选择理由，不写具体酒店名）。与逐日 plan[].stayCity 互补：那条回答「今天住哪个城市」，这条回答「为什么住这一带」。 */
+  lodgingNote?: string;
+  /** 餐饮：当地特色菜、大致用餐时段、高原餐饮注意。与 pois[].category='food' 互补：那是打卡点，这是日常吃饭建议。 */
+  foodNote?: string;
   /** 风险提示 */
   warnings?: string[];
 }

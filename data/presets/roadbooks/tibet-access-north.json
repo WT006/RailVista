@@ -146,7 +146,8 @@
           "lat": 36.42,
           "tagline": "农耕文明与游牧文明的分界线。",
           "intro": "海拔约 3520 米，自古被视为中原与吐蕃的分界。站在山口回望，东侧是湟水谷地的农田，西侧已是高原草场，是青藏线上海拔与景观的第一课。",
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "山口为公路沿线免费停留点，停车与管制以交管公告为准"
         },
         {
           "id": "qtl-p-qinghaihu",
@@ -188,7 +189,8 @@
           "tagline": "盐壳上的公路，路面本身就是盐。",
           "intro": "中国最大的可溶性钾镁盐矿床，G109 有几十公里直接修在盐壳之上，被称为「万丈盐桥」。路边卤水池呈现出不可思议的苹果绿，是中国最不像地球的公路景色之一。",
           "mustSee": true,
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "盐桥路段免费通行，卤水池与厂区限制进入，以景区公告为准"
         },
         {
           "id": "qtl-p-kunlun",
@@ -201,7 +203,8 @@
           "tagline": "海拔约 4767 米，进藏路上的第一道高墙。",
           "intro": "青藏公路上海拔落差感最强烈的山口，垭口两侧是典型的高寒荒漠。此处有索南达杰纪念碑，讲述可可西里反盗猎的历史。风极大，下车请穿冲锋衣并缩短停留时间。",
           "mustSee": true,
-          "visitHours": 0.3
+          "visitHours": 0.3,
+          "ticketNote": "山口为公路公共路段，无售票，停留时长以现场管理为准"
         },
         {
           "id": "qtl-p-hohxil",
@@ -215,6 +218,7 @@
           "intro": "中国最大的无人区之一，也是藏羚羊最重要的繁殖地。在 G109 沿线长时间等待通常就能看到远处活动的野生动物群。这里是国家级自然保护区核心区，严禁离开公路行驶。",
           "mustSee": true,
           "visitHours": 1.5,
+          "ticketNote": "保护区核心区禁止驶离公路，观鸟以管护公告为准",
           "bestTime": "清晨与黄昏动物最活跃。",
           "level": "世界自然遗产"
         },
@@ -229,7 +233,8 @@
           "tagline": "青藏公路最高点，海拔 5231 米。",
           "intro": "青藏线上的最高点，也是青海与西藏的分界。垭口开阔、常年积雪，碑石与经幡是最好的留念点。此处含氧量约为平原的一半，请勿下车奔跑。",
           "mustSee": true,
-          "visitHours": 0.3
+          "visitHours": 0.3,
+          "ticketNote": "山口为公路公共路段，停留时间不宜过长，以交管公告为准"
         },
         {
           "id": "qtl-p-namtso",
@@ -242,18 +247,19 @@
           "tagline": "海拔 4718 米的圣湖，从当雄方向绕入。",
           "intro": "从当雄沿景区公路向西北约 60 公里到纳根拉山口（5190 米），下坡后即到扎西半岛。湖区海拔高、夜间极冷，但星空与日出无可替代，是青藏线进藏后最值得加的一段。",
           "visitHours": 4,
+          "ticketNote": "景区需实名预约并分批进入，旺季住宿紧张，以景区公告为准",
           "detourKm": 130
         }
       ],
       "plan": [
-        { "day": 1, "title": "西宁 → 青海湖", "fromNode": "西宁", "toNode": "青海湖二郎剑", "distanceKm": 220, "driveHours": 3.5, "roadRefs": ["G109"], "stayCity": "青海湖二郎剑", "poiIds": ["qtl-p-riyue", "qtl-p-qinghaihu"], "summary": "适应 3000 米以上海拔。" },
-        { "day": 2, "title": "青海湖 → 茶卡 → 德令哈", "fromNode": "青海湖二郎剑", "toNode": "德令哈", "distanceKm": 320, "driveHours": 5, "roadRefs": ["G109"], "stayCity": "德令哈", "poiIds": ["qtl-p-chaka"], "summary": "天空之镜。" },
-        { "day": 3, "title": "德令哈 → 格尔木", "fromNode": "德令哈", "toNode": "格尔木", "distanceKm": 280, "driveHours": 4, "roadRefs": ["G109", "G3011"], "stayCity": "格尔木", "poiIds": ["qtl-p-chaerhan"], "summary": "进柴达木，最后一座大城市。" },
-        { "day": 4, "title": "格尔木 → 沱沱河", "fromNode": "格尔木", "toNode": "沱沱河", "distanceKm": 420, "driveHours": 7, "roadRefs": ["G109"], "stayCity": "沱沱河", "poiIds": ["qtl-p-kunlun", "qtl-p-hohxil"], "summary": "可可西里日。" },
-        { "day": 5, "title": "沱沱河 → 安多", "fromNode": "沱沱河", "toNode": "安多", "distanceKm": 300, "driveHours": 6, "roadRefs": ["G109"], "stayCity": "安多", "poiIds": ["qtl-p-tanggula"], "summary": "翻 5231 米唐古拉山口。" },
-        { "day": 6, "title": "安多 → 那曲 → 当雄", "fromNode": "安多", "toNode": "当雄", "distanceKm": 250, "driveHours": 5, "roadRefs": ["G109"], "stayCity": "当雄", "poiIds": [], "summary": "羌塘草原，天气好的一天。" },
-        { "day": 7, "title": "当雄 → 纳木错 → 拉萨", "fromNode": "当雄", "toNode": "拉萨", "distanceKm": 300, "driveHours": 7, "roadRefs": ["G109", "纳木错景区公路"], "stayCity": "拉萨", "poiIds": ["qtl-p-namtso"], "summary": "绕纳木错后到拉萨。" },
-        { "day": 8, "title": "拉萨机动日", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "roadRefs": ["城市道路"], "stayCity": "拉萨", "poiIds": [], "summary": "适应与休整。" }
+        { "day": 1, "title": "西宁 → 青海湖", "fromNode": "西宁", "toNode": "青海湖二郎剑", "distanceKm": 220, "driveHours": 3.5, "roadRefs": ["G109"], "stayCity": "青海湖二郎剑", "poiIds": ["qtl-p-riyue", "qtl-p-qinghaihu"], "summary": "从西宁出发，经湟源翻日月山到青海湖，海拔从 2260 米升到 3200 米。日月山是农耕与游牧的分界，翻过垭口就能看见两侧景观的切换；午后进景区半岛，时间富余可沿 G109 找免费湖畔观景点。", "tips": ["翻日月山后出现的反应要留意", "景区外免费观景台适合停靠与拍摄", "今天只升到 3200 米，不要跑跳"] },
+        { "day": 2, "title": "青海湖 → 茶卡 → 德令哈", "fromNode": "青海湖二郎剑", "toNode": "德令哈", "distanceKm": 320, "driveHours": 5, "roadRefs": ["G109"], "stayCity": "德令哈", "poiIds": ["qtl-p-chaka"], "summary": "沿 G109 向西穿过橡皮山到茶卡，再折向德令哈，全天是开阔的戈壁与盐湖公路，横风大、油耗高。上午进茶卡盐湖，固液并存的卤水湖在低角度光下最像镜子；傍晚到德令哈住宿。", "tips": ["盐湖上午或傍晚光线最好", "雨后水位上升，镜面效果会打折", "柴达木段加油站间距大，途中加满"] },
+        { "day": 3, "title": "德令哈 → 格尔木", "fromNode": "德令哈", "toNode": "格尔木", "distanceKm": 280, "driveHours": 4, "roadRefs": ["G109", "G3011"], "stayCity": "格尔木", "poiIds": ["qtl-p-chaerhan"], "summary": "沿 G3011 东行穿过柴达木盆地，路段笔直、景观单调，但正好用来调整节奏。下午经过察尔汗盐湖，G109 有几十公里直接修在盐壳之上，路边卤水池是苹果绿色。傍晚抵格尔木补给。", "tips": ["盐壳路段注意车速与方向控制", "格尔木是最后的大补给站", "检查车辆制动与胎压，为可可西里做准备"] },
+        { "day": 4, "title": "格尔木 → 沱沱河", "fromNode": "格尔木", "toNode": "沱沱河", "distanceKm": 420, "driveHours": 7, "roadRefs": ["G109"], "stayCity": "沱沱河", "poiIds": ["qtl-p-kunlun", "qtl-p-hohxil"], "summary": "经南山口、纳赤台翻昆仑山口进入可可西里，再穿过不冻泉与五道梁到沱沱河。这天最严格的纪律是留在公路上：藏羚羊与藏野驴常见，严禁下车追拍或驶离路基，动物在路面时降速让行。", "tips": ["保护区核心区严禁驶离公路", "野生动物上路时减速让行", "此段信号盲区长，提前报备行程"] },
+        { "day": 5, "title": "沱沱河 → 安多", "fromNode": "沱沱河", "toNode": "安多", "distanceKm": 300, "driveHours": 6, "roadRefs": ["G109"], "stayCity": "安多", "poiIds": ["qtl-p-tanggula"], "summary": "全天沿 G109 向南翻唐古拉山口，垭口海拔约 5231 米，是这条线的最高点，也是青海与西藏的分界。天气变化快、可能突降大雪，垭口风极大；午后下到安多住宿，今晚不要洗澡不要饮酒。", "tips": ["垭口停留控制在几分钟，勿奔跑", "雪天不要强行通过，可原路返回", "抵达安多后不洗澡、不饮酒"] },
+        { "day": 6, "title": "安多 → 那曲 → 当雄", "fromNode": "安多", "toNode": "当雄", "distanceKm": 250, "driveHours": 5, "roadRefs": ["G109"], "stayCity": "当雄", "poiIds": [], "summary": "沿 G109 南下经那曲到当雄，海拔从 4700 米缓慢降到 4280 米，一路是开阔的羌塘草原与河谷，天气好时能见连绵的雪山。行程以赶路为主，两处县城都只做短暂停留，傍晚在当雄住宿。", "tips": ["草原路段横风大，注意握稳方向", "那曲海拔仍高，停留时间不宜过长", "今晚确认纳木错路况与是否限行"] },
+        { "day": 7, "title": "当雄 → 纳木错 → 拉萨", "fromNode": "当雄", "toNode": "拉萨", "distanceKm": 300, "driveHours": 7, "roadRefs": ["G109", "纳木错景区公路"], "stayCity": "拉萨", "poiIds": ["qtl-p-namtso"], "summary": "从当雄向西北绕进纳木错，景区公路经纳根拉山口后下坡到扎西半岛。湖区海拔约 4718 米、夜里极冷，日出与星空无可替代；看日出后原路返回当雄，傍晚抵拉萨。", "tips": ["绕行纳木错需多跑约一百三十公里", "湖边夜间极冷，热水与被子先确认", "返程日不安排景点，到拉萨即休整"] },
+        { "day": 8, "title": "拉萨机动日", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "driveHours": 0, "roadRefs": ["城市道路"], "stayCity": "拉萨", "poiIds": [], "summary": "留在拉萨做缓冲与收尾。上午按预约批次看布达拉宫，午后去大昭寺与八廓街，清晨转经人流最盛；随后整理装备、补充氧气、处理退租与返程手续。高原上慢慢起身，避免动作过猛。", "tips": ["布达拉宫需提前实名预约并分批进入", "八廓街清晨转经人流最盛", "返程前确认交通时刻并预留缓冲"] }
       ],
       "practical": {
         "permit": "常规进藏不需边防证；若延伸至双湖、普若岗日等需另行办理。",
@@ -444,7 +450,8 @@
           "tagline": "新藏线的起点，中国最像中亚的老城。",
           "intro": "土黄色的生土建筑群与迷宫般的巷弄，加上艾提尕尔清真寺与百年老茶馆，让这里成为整趟行程最有人间烟火的一站。出发前在这里采购馕、干果与水果，并办理边境通行证。",
           "mustSee": true,
-          "visitHours": 3
+          "visitHours": 3,
+          "ticketNote": "老城街区免费开放，个别宗教场所限流，以官方公告为准"
         },
         {
           "id": "xtl-p-maza",
@@ -456,7 +463,8 @@
           "lat": 36.57,
           "tagline": "海拔约 4969 米，两天内遇到的第二道大山。",
           "intro": "新藏线前段最具压迫感的达坂之一，山体荒裸、碎石遍布，公路在巨大的扇形坡面上反复盘绕。这里距叶城只有三百多公里，是身体最难适应的一段。",
-          "visitHours": 0.3
+          "visitHours": 0.3,
+          "ticketNote": "达坂为公路公共路段，停车与管制以交管部门公告为准"
         },
         {
           "id": "xtl-p-kangxiwa",
@@ -469,7 +477,8 @@
           "tagline": "海拔约 4280 米的边防烈士陵园。",
           "intro": "为 1962 年中印边境自卫反击战中牺牲的战士所建，是 G219 上最有分量的纪念地。陵园面向雪山，过往车辆多会鸣笛致意，建议下车简短致敬。",
           "mustSee": true,
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "陵园为纪念性场所，开放安排以管理单位公告为准"
         },
         {
           "id": "xtl-p-jieshan",
@@ -482,7 +491,8 @@
           "tagline": "全线最高点，新藏两省区界碑所在。",
           "intro": "海拔约 5347 米的达坂，山体巨大而荒凉，是新藏线与阿里高原的地理分界。石碑处风极大，请控制在几分钟之内，不要跑到山体斜坡上。",
           "mustSee": true,
-          "visitHours": 0.3
+          "visitHours": 0.3,
+          "ticketNote": "界碑处为公路沿线停留点，无售票，管制以交管公告为准"
         },
         {
           "id": "xtl-p-bangong",
@@ -495,7 +505,8 @@
           "tagline": "高原上的狭长裂谷湖，鸟岛数以万计的斑头雁。",
           "intro": "海拔约 4242 米的窄长湖泊，中国境内为淡水、外侧逐渐变咸。湖中数个小岛是斑头雁、棕头鸥的大型繁殖地，岸边餐饮点可以尝到高原冷水鱼。日落时湖面会呈现出分层的蓝。",
           "mustSee": true,
-          "visitHours": 1.5
+          "visitHours": 1.5,
+          "ticketNote": "湖岸可停车观鸟，禁入区与禁飞范围以保护区公告为准"
         },
         {
           "id": "xtl-p-zanda",
@@ -508,7 +519,8 @@
           "tagline": "流水切割出的土质峰林，日落时最立体。",
           "intro": "象泉河谷两侧绵延数十公里的土质峰林，由远古大湖沉积被切割而成。县城附近的高地观景台可以俯瞰整片土林，日出日落光影最立体。",
           "mustSee": true,
-          "visitHours": 2
+          "visitHours": 2,
+          "ticketNote": "县城观景台免费开放，景区内步道与范围以景区公告为准"
         },
         {
           "id": "xtl-p-guge",
@@ -549,22 +561,77 @@
           "tagline": "冈仁波齐脚下的圣湖。",
           "intro": "海拔约 4588 米的淡水湖，与拉昂措一路之隔、颜色却完全不同。离开神山继续东行前，这里是给整趟荒原行程做收尾的最佳场景。",
           "mustSee": true,
-          "visitHours": 2
+          "visitHours": 2,
+          "ticketNote": "圣湖景区按预约分批放行，沿岸部分岸线属管理范围，以公告为准"
+        },
+        {
+          "id": "xtl-p-muztagh",
+          "name": "慕士塔格峰",
+          "province": "新疆",
+          "city": "喀什地区",
+          "category": "mountain",
+          "lng": 74.9507,
+          "lat": 38.2855,
+          "tagline": "海拔约 7509 米的「冰山之父」，帕米尔的标志性雪峰。",
+          "intro": "位于喀什通往塔什库尔干的 G314 沿线，山体浑圆、冰川发育完整，被称作「冰山之父」。它与脚下的喀拉库勒湖共同构成帕米尔最经典的画面，晴天时雪峰倒映湖中。接近与攀登通常从喀拉库勒湖一侧的大本营出发，普通游客多在湖边观景台远眺。",
+          "mustSee": true,
+          "visitHours": 1,
+          "ticketNote": "观景随喀拉库勒湖景区，进入与游览以景区管理公告为准"
+        },
+        {
+          "id": "xtl-p-karakul",
+          "name": "喀拉库勒湖",
+          "province": "新疆",
+          "city": "喀什地区",
+          "category": "water",
+          "lng": 75.0635,
+          "lat": 38.4417,
+          "tagline": "慕士塔格峰脚下的高山湖，雪峰倒影的天然镜面。",
+          "intro": "紧邻慕士塔格峰的高山湖泊，湖水随光线在蓝与绿之间转换，晴朗时雪峰完整倒映湖面。湖畔是柯尔克孜牧民的夏季牧场，可近距离感受帕米尔牧区生活，也是从喀什前往塔什库尔干途中最值得停留的观景组合。",
+          "mustSee": true,
+          "visitHours": 1,
+          "ticketNote": "湖区属喀拉库勒湖景区，开放与门票以景区公告为准"
+        },
+        {
+          "id": "xtl-p-tashkurgan",
+          "name": "塔什库尔干石头城",
+          "province": "新疆",
+          "city": "喀什地区",
+          "category": "ruin",
+          "lng": 75.238,
+          "lat": 37.7828,
+          "tagline": "帕米尔高原上的汉代西域戍堡，俯瞰金草滩。",
+          "intro": "位于塔什库尔干县城边的石头城遗址，兴于汉代、延续至唐代，曾是葱岭古道上重要的军事与商旅枢纽。遗址建在台地之上，与脚下的阿拉尔金草滩、远处连绵雪峰同框，是帕米尔人文与自然交织的代表性场景。",
+          "visitHours": 1,
+          "ticketNote": "遗址与金草滩联票管理，开放时间以景区公告为准"
+        },
+        {
+          "id": "xtl-p-khunjerab",
+          "name": "红其拉甫口岸",
+          "province": "新疆",
+          "city": "喀什地区",
+          "category": "culture",
+          "lng": 75.2312,
+          "lat": 37.7645,
+          "tagline": "中巴边境口岸，海拔约 4700 米的天路终点。",
+          "intro": "地处帕米尔高原中巴边境的公路口岸，是中国与巴基斯坦喀喇昆仑公路的对接点，海拔约 4700 米。口岸联检建筑与界碑是典型打卡点，周边为高寒荒原；前往需提前确认开放与通行政策，且高原反应风险显著。",
+          "visitHours": 0.5,
+          "ticketNote": "口岸通行与开放受双边政策与季节影响，出行前务必确认"
         }
       ],
       "plan": [
-        { "day": 1, "title": "喀什：补给与办证", "fromNode": "喀什", "toNode": "喀什", "distanceKm": 0, "roadRefs": ["城市道路"], "stayCity": "喀什", "poiIds": ["xtl-p-kashgar"], "summary": "办边防证、采购物资、检修车辆。" },
-        { "day": 2, "title": "喀什 → 叶城", "fromNode": "喀什", "toNode": "叶城", "distanceKm": 250, "driveHours": 3.5, "roadRefs": ["G315"], "stayCity": "叶城", "poiIds": [], "summary": "最后补给点。" },
-        { "day": 3, "title": "叶城 → 三十里营房", "fromNode": "叶城", "toNode": "三十里营房", "distanceKm": 360, "driveHours": 8, "roadRefs": ["G219"], "stayCity": "三十里营房", "poiIds": ["xtl-p-maza"], "summary": "爬升 3500 米，最艰难的一天。" },
-        { "day": 4, "title": "三十里营房 → 大红柳滩", "fromNode": "三十里营房", "toNode": "大红柳滩", "distanceKm": 130, "driveHours": 3.5, "roadRefs": ["G219"], "stayCity": "大红柳滩", "poiIds": ["xtl-p-kangxiwa"], "summary": "短里程但连翻达坂。" },
-        { "day": 5, "title": "大红柳滩 → 多玛", "fromNode": "大红柳滩", "toNode": "多玛", "distanceKm": 340, "driveHours": 7, "roadRefs": ["G219"], "stayCity": "多玛", "poiIds": ["xtl-p-jieshan"], "summary": "翻 5347 米界山达坂入藏。" },
-        { "day": 6, "title": "多玛 → 狮泉河", "fromNode": "多玛", "toNode": "狮泉河", "distanceKm": 225, "driveHours": 4, "roadRefs": ["G219"], "stayCity": "狮泉河", "poiIds": ["xtl-p-bangong"], "summary": "班公湖。" },
-        { "day": 7, "title": "狮泉河 → 扎达", "fromNode": "狮泉河", "toNode": "扎达", "distanceKm": 200, "driveHours": 4, "roadRefs": ["G219", "G565"], "stayCity": "扎达", "poiIds": ["xtl-p-zanda"], "summary": "下到 3700 米，好好睡一觉。" },
-        { "day": 8, "title": "扎达 → 塔尔钦", "fromNode": "扎达", "toNode": "塔尔钦", "distanceKm": 200, "driveHours": 4.5, "roadRefs": ["G565", "G219"], "stayCity": "塔尔钦", "poiIds": ["xtl-p-guge", "xtl-p-kailash"], "summary": "古格遗址与神山。" },
-        { "day": 9, "title": "塔尔钦：转山或休整", "fromNode": "塔尔钦", "toNode": "塔尔钦", "distanceKm": 0, "roadRefs": [], "stayCity": "塔尔钦", "poiIds": ["xtl-p-kailash", "xtl-p-mapam"], "summary": "可选两天转山。" },
-        { "day": 10, "title": "塔尔钦 → 萨嘎", "fromNode": "塔尔钦", "toNode": "萨嘎", "distanceKm": 640, "driveHours": 11, "roadRefs": ["G219"], "stayCity": "萨嘎", "poiIds": [], "summary": "长距离转移日。" },
-        { "day": 11, "title": "萨嘎 → 拉萨", "fromNode": "萨嘎", "toNode": "拉萨", "distanceKm": 650, "driveHours": 11, "roadRefs": ["G219", "G318"], "stayCity": "拉萨", "poiIds": [], "summary": "经拉孜转 G318 抵达。" },
-        { "day": 12, "title": "拉萨机动日", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "roadRefs": ["城市道路"], "stayCity": "拉萨", "poiIds": [], "summary": "缓冲与休整。" }
+        { "day": 1, "title": "喀什：补给与办证", "fromNode": "喀什", "toNode": "喀什", "distanceKm": 0, "driveHours": 0, "roadRefs": ["城市道路"], "stayCity": "喀什", "poiIds": ["xtl-p-kashgar"], "summary": "第一天全留在喀什。上午在老城采购馕、干果与高原食品，顺便检查车辆；下午去办《边境管理区通行证》，这是新藏线的硬性证件。今天把水、食物、氧气与备胎一次备齐，明天上高原就没有完整补给了。", "tips": ["边境通行证是硬性证件，今天必须办好", "采购耐放干粮，三天量为起步", "出发前确认卫星电话可正常通话"] },
+        { "day": 2, "title": "喀什 → 叶城", "fromNode": "喀什", "toNode": "叶城", "distanceKm": 250, "driveHours": 3.5, "roadRefs": ["G315"], "stayCity": "叶城", "poiIds": [], "summary": "上午沿 G315 经疏勒、英吉沙到叶城，路况平缓、海拔仍在 1300 米左右，是全程最轻松的一天。叶城是新藏线最后一个能完整补给与修车的县城，加满油、买足物资、检查备胎后再出发。", "tips": ["叶城是最后补给点，加满油并买足物资", "检查备胎与工具，确认边防证随身", "海拔仍低，今晚正常休息"] },
+        { "day": 3, "title": "叶城 → 三十里营房", "fromNode": "叶城", "toNode": "三十里营房", "distanceKm": 360, "driveHours": 8, "roadRefs": ["G219"], "stayCity": "三十里营房", "poiIds": ["xtl-p-maza"], "summary": "从叶城出发翻库地达坂、麻扎达坂到三十里营房，一天之内爬升超过 3500 米，是全线高反风险最高的一段。盘山路与隧道交替，下午抵达海拔约 3700 米后不要洗澡、不要饮酒，尽早躺下休息。", "tips": ["今日爬升超过 3500 米，动作放慢", "出现持续头痛立即吸氧并停止上升", "抵达后不洗澡、不饮酒，尽早休息"] },
+        { "day": 4, "title": "三十里营房 → 大红柳滩", "fromNode": "三十里营房", "toNode": "大红柳滩", "distanceKm": 130, "driveHours": 3.5, "roadRefs": ["G219"], "stayCity": "大红柳滩", "poiIds": ["xtl-p-kangxiwa"], "summary": "里程只有一百多公里，却要连翻数个达坂，垭口之间几乎没有平地，节奏由高度决定而不是距离。途经康西瓦烈士陵园可短停致敬，风大且停留不宜久；傍晚到大红柳滩住宿，这段海拔 4200 米。", "tips": ["里程短但达坂密集，别低估车程", "陵园着装整洁，简短致敬即可", "大红柳滩住宿简陋，确认供暖与热水"] },
+        { "day": 5, "title": "大红柳滩 → 多玛", "fromNode": "大红柳滩", "toNode": "多玛", "distanceKm": 340, "driveHours": 7, "roadRefs": ["G219"], "stayCity": "多玛", "poiIds": ["xtl-p-jieshan"], "summary": "上午从大红柳滩出发，经泉水沟翻界山达坂进入西藏，界山达坂约 5347 米，是全线最高点。碎石路面多、爆胎风险高，风极大；下午下到多玛住宿，入藏后第一天以恢复为主，晚餐后早睡。", "tips": ["碎石路段多，注意爆胎并控速", "达坂停留时间控制在几分钟之内", "进藏检查站配合查验，证件随身"] },
+        { "day": 6, "title": "多玛 → 狮泉河", "fromNode": "多玛", "toNode": "狮泉河", "distanceKm": 225, "driveHours": 4, "roadRefs": ["G219"], "stayCity": "狮泉河", "poiIds": ["xtl-p-bangong"], "summary": "经日土到班公湖，海拔约 4242 米，中国境内为淡水、外侧逐渐变咸，湖中小岛是斑头雁的繁殖地。岸边停留看鸟与日落分层蓝，注意不能下水或接近鸟群；午后继续北上狮泉河。", "tips": ["鸟类繁殖期保持距离，禁止下水", "日落时分层蓝最佳，注意保暖", "狮泉河是北线前最后的大补给点"] },
+        { "day": 7, "title": "狮泉河 → 扎达", "fromNode": "狮泉河", "toNode": "扎达", "distanceKm": 200, "driveHours": 4, "roadRefs": ["G219", "G565"], "stayCity": "扎达", "poiIds": ["xtl-p-zanda"], "summary": "沿 G219、G565 经那不如南下到扎达，沿途是连绵的土林沟壑，景观密度高、行车不累。扎达海拔只有 3700 米，是整趟新藏线睡得最踏实的一晚；晚上可以洗热水澡、好好吃一顿。", "tips": ["那不如一段弯多，注意会车", "扎达海拔 3700 米，今晚可洗热水澡", "县城条件仍简陋，物资提前采购"] },
+        { "day": 8, "title": "扎达 → 塔尔钦", "fromNode": "扎达", "toNode": "塔尔钦", "distanceKm": 200, "driveHours": 4.5, "roadRefs": ["G565", "G219"], "stayCity": "塔尔钦", "poiIds": ["xtl-p-guge", "xtl-p-kailash"], "summary": "上午补看古格王朝遗址，红殿壁画是核心看点，需爬约 300 级台阶；午后北上到塔尔钦，海拔回到 4660 米。傍晚在神山脚下远观冈仁波齐，天气好时清晨与日落最容易见峰顶。", "tips": ["古格遗址台阶多，量力安排登顶", "塔尔钦住宿紧张，抵达先安顿", "冈仁波齐清晨与日落最易见峰"] },
+        { "day": 9, "title": "塔尔钦：转山或休整", "fromNode": "塔尔钦", "toNode": "塔尔钦", "distanceKm": 0, "driveHours": 0, "roadRefs": [], "stayCity": "塔尔钦", "poiIds": ["xtl-p-kailash", "xtl-p-mapam"], "summary": "今天留给神山。体力足可启动冈仁波齐外圈转山的前半程，沿途以经幡与玛尼堆为主，走到卓玛拉山口一带；不转山者可在塔尔钦周边远拍峰顶，或去玛旁雍措湖岸。无论哪种都不要赶进度。", "tips": ["转山需两天，今天只走前半程", "垭口风大，勿奔跑、勿久留", "体力不足就在塔尔钦休整"] },
+        { "day": 10, "title": "塔尔钦 → 萨嘎", "fromNode": "塔尔钦", "toNode": "萨嘎", "distanceKm": 640, "driveHours": 11, "roadRefs": ["G219"], "stayCity": "萨嘎", "poiIds": [], "summary": "沿 G219 东行 640 公里穿越仲巴盆地，是典型的长距离转移日：里程大、景点少，海拔在 4500 米上下起伏。全天需早出发并控制节奏，途中补给点有限，车上水、食物与氧气都要充足。", "tips": ["出发前加满油，备足水与干粮", "里程极大，不要试图赶路", "信号断续，提前告知行程"] },
+        { "day": 11, "title": "萨嘎 → 拉萨", "fromNode": "萨嘎", "toNode": "拉萨", "distanceKm": 650, "driveHours": 11, "roadRefs": ["G219", "G318"], "stayCity": "拉萨", "poiIds": [], "summary": "继续东行约 650 公里，经拉孜后由 G219 转入 G318，海拔逐步下降到 3650 米，抵达拉萨是全程的终点。到城后先安排休息与补给，再把这条高海拔长线一路回看，机动日用来补漏。", "tips": ["拉孜是 G219 终点，注意换道", "今日里程大，不要安排中途游览", "抵达拉萨先把车辆加满油"] },
+        { "day": 12, "title": "拉萨机动日", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "driveHours": 0, "roadRefs": ["城市道路"], "stayCity": "拉萨", "poiIds": [], "summary": "留给天气、车辆与身体状况的缓冲日。上午可按预约批次看布达拉宫，午后去大昭寺与八廓街；剩余时间处理装备、寄送行李与确认返程班次。多留一天几乎总会用得上。", "tips": ["布达拉宫需提前预约并分批进入", "返程前确认车次或航班时刻", "高原上慢慢起身，避免动作过猛"] }
       ],
       "practical": {
         "permit": "新藏线全程需《边境管理区通行证》（含叶城、塔什库尔干、阿里地区、扎达等），建议在喀什或叶城办妥。",

@@ -1,0 +1,95 @@
+{
+  "viewport": [
+    390,
+    844
+  ],
+  "layout": {
+    "url": "http://localhost:5174/drive/trip?road=G318",
+    "viewport": [
+      390,
+      844
+    ],
+    "scrollingElement": "html",
+    "html": {
+      "tag": "HTML",
+      "clientH": 844,
+      "scrollH": 19159,
+      "clientW": 390,
+      "scrollW": 390,
+      "overflowY": "visible",
+      "overflowX": "visible",
+      "height": "19159.1px",
+      "minHeight": "0px",
+      "position": "static",
+      "canScroll": true
+    },
+    "body": {
+      "tag": "BODY",
+      "clientH": 19159,
+      "scrollH": 19159,
+      "clientW": 390,
+      "scrollW": 390,
+      "overflowY": "visible",
+      "overflowX": "visible",
+      "height": "19159.1px",
+      "minHeight": "844px",
+      "position": "static",
+      "canScroll": false
+    },
+    "app": {
+      "tag": "DIV#app",
+      "clientH": 19159,
+      "scrollH": 19159,
+      "clientW": 390,
+      "scrollW": 390,
+      "overflowY": "visible",
+      "overflowX": "visible",
+      "height": "19159.1px",
+      "minHeight": "0px",
+      "position": "static",
+      "canScroll": false
+    },
+    "selectPage": null,
+    "docScrollTop": 0,
+    "bodyScrollTop": 0,
+    "pageScrollTop": null,
+    "hasLenisClass": false,
+    "htmlClass": "",
+    "bodyClass": "",
+    "lenisVersion": false,
+    "sections": []
+  },
+  "fixLayout": null,
+  "wheel": {
+    "before": {
+      "html": 0,
+      "body": 0,
+      "page": null
+    },
+    "afterKey": {
+      "html": 1476,
+      "body": 0,
+      "page": null
+    },
+    "beforeWheel": {
+      "html": 0,
+      "body": 0,
+      "page": null
+    },
+    "afterWheel": {
+      "html": 900,
+      "body": 0,
+      "page": null
+    },
+    "deltaKey": {
+      "html": 1476,
+      "body": 0,
+      "page": 0
+    },
+    "deltaWheel": {
+      "html": 900,
+      "body": 0,
+      "page": 0
+    }
+  }
+}

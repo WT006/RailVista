@@ -17,8 +17,8 @@ body {
   background: var(--surface-0);
 }
 
-/* 移动端底栏：全屏地图页侧栏/面板让出导航高度 */
-@media (max-width: 599px) {
+/* 底栏档（<840）：全屏地图页侧栏/面板让出页签高度 */
+@media (max-width: 839px) {
   .atlas-dock {
     bottom: calc(var(--bottomnav-h) + 8px + env(safe-area-inset-bottom, 0px));
   }
@@ -92,6 +92,14 @@ html {
   z-index: 1;
   width: min(100% - 2 * var(--gutter), var(--shell-max));
   margin-inline: auto;
+}
+
+/* ≥840（--sidenav-w > 0）：文档流页面内容整体让出侧边 Tab；
+   全屏地图页保持满幅铺底，由各自浮层控件单独避让（见 map.css / 各页 scoped） */
+.rv-page,
+.route-page,
+.drive-page {
+  padding-left: var(--sidenav-w);
 }
 
 .rv-grid {
@@ -179,12 +187,12 @@ html {
   background:
     radial-gradient(
       var(--glow-radius) circle at var(--mx, 50%) var(--my, 0%),
-      rgba(255, 255, 255, var(--glow-alpha)),
+      var(--glow-white-layer),
       transparent 62%
     ),
     radial-gradient(
       calc(var(--glow-radius) * 0.7) circle at var(--mx, 50%) var(--my, 0%),
-      rgba(77, 159, 255, calc(var(--glow-alpha) * 0.9)),
+      var(--glow-accent-layer),
       transparent 65%
     );
   transition: opacity var(--dur-base) var(--ease-standard);
@@ -202,7 +210,7 @@ html {
   background-image: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.34) 50%,
+    var(--sheen-band) 50%,
     transparent 100%
   );
   background-size: 42% 100%;
@@ -247,7 +255,7 @@ html {
   opacity: 0;
   background: radial-gradient(
     calc(var(--glow-radius) * 0.55) circle at var(--mx, 50%) var(--my, 0%),
-    rgba(255, 255, 255, var(--glow-alpha-tile)),
+    var(--glow-white-layer-tile),
     transparent 65%
   );
   transition: opacity var(--dur-base) var(--ease-standard);
@@ -262,7 +270,10 @@ html {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .rv-card:hover {
+  /* #app 提权 + animation:none：入场动画 rv-card-in 的 fill:both 会持续级联
+     transform 终态，否则 hover 抬升声明被压制（按压态同理，见下方触屏规则） */
+  #app .rv-card:hover {
+    animation: none;
     transform: translateY(-2px) scale(1.006);
     border-color: var(--line-accent);
     box-shadow: var(--elev-3), var(--glow-accent);
@@ -287,6 +298,59 @@ html {
   .rank-row:hover::after {
     opacity: 1;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * 触屏按压反馈（HarmonyOS 沉浸光感·按压点光源 + 交互形变）
+ * 触屏没有 hover，.is-press-active 由 usePointerSpotlight 在 pointerdown 时
+ * 点亮、pointerup 时移除；光晕圆心即触点（--mx/--my）。
+ * prefers-reduced-motion 下组合式函数不注册，类名永不出现。
+ * ══════════════════════════════════════════════════════════════════════════ */
+/* #app 提权：① 压过入场动画 fill:both 级联的 transform 终态（animation:none）；
+   ② 压过翻面卡 .query-flip__card.is-measured .query-flip__face--front（0,3,0）的位移声明 */
+#app .rv-card.is-press-active {
+  animation: none;
+  transform: scale(0.997);
+  border-color: var(--line-accent);
+}
+
+#app .rv-card.is-press-active::after {
+  opacity: 1;
+  background:
+    radial-gradient(
+      var(--press-glow-radius) circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, var(--press-glow-alpha)),
+      var(--glow-accent-layer) 42%,
+      transparent 68%
+    );
+}
+
+.rv-card.is-press-active::before {
+  opacity: 0.7;
+}
+
+#app .rv-tile.is-press-active,
+#app .recent-card.is-press-active,
+#app .train-card.is-press-active,
+#app .rank-card.is-press-active,
+#app .rank-row.is-press-active {
+  animation: none;
+  transform: scale(0.992);
+  border-color: var(--line-strong);
+  background: var(--surface-3);
+}
+
+.rv-tile.is-press-active::after,
+.recent-card.is-press-active::after,
+.train-card.is-press-active::after,
+.rank-card.is-press-active::after,
+.rank-row.is-press-active::after {
+  opacity: 1;
+  background: radial-gradient(
+    calc(var(--press-glow-radius) * 0.8) circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, var(--press-glow-alpha-tile)),
+    transparent 64%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -392,9 +456,7 @@ html {
 }
 
 .select-form label,
-.od-panel label,
-/* 自驾页 OD 搜索复用铁路版「站点输入」观感（station-field 结构一致） */
-.drive-od .station-field {
+.od-panel label {
   display: grid;
   gap: var(--space-2);
   font-size: var(--fs-meta);
@@ -402,8 +464,7 @@ html {
 }
 
 .select-form input,
-.od-panel select,
-.drive-od .station-field input {
+.od-panel select {
   width: 100%;
   padding: 0 var(--space-3);
   min-height: 46px;
@@ -424,25 +485,22 @@ html {
 }
 
 /* 输入框占位符：弱化但保持可辨识 */
-.select-form input::placeholder,
-.drive-od .station-field input::placeholder {
+.select-form input::placeholder {
   color: var(--text-3);
 }
 
 .select-form input:hover,
-.od-panel select:hover,
-.drive-od .station-field input:hover {
+.od-panel select:hover {
   border-color: var(--line-strong);
 }
 
 .select-form input:focus,
-.od-panel select:focus,
-.drive-od .station-field input:focus {
+.od-panel select:focus {
   outline: none;
   border-color: var(--accent);
   background: var(--surface-3);
   /* 焦点外发光：柔和的强调光晕，而非硬描边 */
-  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 16px -4px rgba(77, 159, 255, 0.4);
+  box-shadow: var(--focus-ring);
 }
 
 .station-field__control {
@@ -1627,4 +1685,41 @@ html {
     border: 1px solid var(--line-default);
     box-shadow: var(--elev-3);
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * 可达性与交互态工具（2026-10-09 鸿蒙化收敛新增）
+ *
+ * 1. 全局键盘焦点环：可交互元素在键盘聚焦（:focus-visible）时显示统一的柔和
+ *    强调环；已有自定义焦点观感的控件（输入框等）以自身样式为准（优先级更高）。
+ * 2. .rv-hit：触屏命中区扩展。视觉尺寸 < 44px 的小控件加此类后，命中区以
+ *    自身中心为锚扩到 --hit-min（44×44）；元素已占用 ::after 的请改 ::before。
+ * 3. .rv-pressable：统一按压态反馈（0.98 缩放，--dur-micro 内完成，快速响应档）。
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+:focus-visible {
+  outline: 2px solid var(--accent-border);
+  outline-offset: 2px;
+}
+
+.rv-hit {
+  position: relative;
+}
+
+.rv-hit::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--hit-min));
+  height: max(100%, var(--hit-min));
+  transform: translate(-50%, -50%);
+}
+
+.rv-pressable {
+  transition: transform var(--dur-micro) var(--ease-standard);
+}
+
+.rv-pressable:active {
+  transform: scale(0.98);
 }

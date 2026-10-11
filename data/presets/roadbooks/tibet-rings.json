@@ -8,32 +8,91 @@
       "id": "xizang-grand-loop",
       "name": "西藏大环线",
       "subtitle": "一次走完藏东南林海、藏南河谷与后藏圣湖",
-      "alias": ["西藏全景环线", "前藏后藏环线"],
-      "provinces": ["西藏"],
-      "cities": ["拉萨", "山南", "林芝", "日喀则"],
+      "alias": [
+        "西藏全景环线",
+        "前藏后藏环线"
+      ],
+      "provinces": [
+        "西藏"
+      ],
+      "cities": [
+        "拉萨",
+        "山南",
+        "林芝",
+        "日喀则"
+      ],
       "anchorCity": "拉萨",
-      "modes": ["selfdrive", "charter", "mixed"],
+      "modes": [
+        "selfdrive",
+        "charter",
+        "mixed"
+      ],
       "primaryMode": "charter",
       "shape": "loop",
       "tier": "national",
-      "tags": ["雪山", "圣湖", "峡谷", "藏传佛教"],
+      "tags": [
+        "雪山",
+        "圣湖",
+        "峡谷",
+        "藏传佛教"
+      ],
       "summary": "从拉萨出发，顺时针把藏东南的原始森林、雅鲁藏布江深切河谷、羊卓雍措与后藏古镇串成一圈，最后北上纳木错收尾。适合首次进藏、想把「西藏该看的都看一遍」的人。",
       "totalKm": 2188,
-      "mileageNote": "13 天逐日累加 = 2188km；分段里程按县城中心起算估算，与实测会有 ±10% 偏差。",
+      "mileageNote": "13 天逐日累加 = 2188km；分段里程按县城中心起算估算，与实测会有 ±10% 偏差。驾驶时长口径：逐日驾驶时长按对应分段里程与该分段实测均速折算，仅 D2 拉萨城区内 10km（布宫—八廓街，无对应长途分段）按城区有效车速 20km/h 估算为 0.5h。",
       "days": 12,
-      "bestSeason": [5, 6, 7, 8, 9, 10],
+      "bestSeason": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
       "difficulty": 3,
-      "roadRefs": ["G318", "G109", "G560", "S5"],
+      "roadRefs": [
+        "G318",
+        "G109",
+        "G560",
+        "S5"
+      ],
       "startNode": "拉萨",
       "endNode": "拉萨",
       "intro": {
         "overview": "这条环线把西藏最不单调的几块拼在一起：林芝的雪山峡谷和原始森林、山南吐蕃王朝发源的雅砻河谷、后藏格鲁派重镇日喀则，以及藏北的纳木错。它采用「先适应海拔、再往高处走」的经典顺序——先在海拔 3000 米以下的林芝住两晚，再上 3600 米以上的拉萨与 4700 米的纳木错，身体会舒服很多。全程以铺装路面为主，轿车可通行，包车或自驾都很成熟，是第一次进藏最稳妥的一条大线。",
         "bestSeason": "5-10 月，其中 6-9 月为雨季，云多雨多但植被最绿、含氧量最高；10 月中下旬秋色最好、能见度最高。",
         "seasonNotes": [
-          { "months": [5, 6], "note": "林芝桃花季之后、雨季之前，山南与后藏通透度高，人流适中。" },
-          { "months": [7, 8], "note": "雨季，然乌—鲁朗方向易遇塌方管制，南迦巴瓦常被云雾遮住，需留机动日。" },
-          { "months": [9, 10], "note": "秋高气爽，看雪山概率最高；10 月下旬纳木错夜间可低至 -15℃。" },
-          { "months": [11, 12, 1, 2, 3, 4], "note": "冬季部分景区与高海拔路段限行，务必先确认路况。" }
+          {
+            "months": [
+              5,
+              6
+            ],
+            "note": "林芝桃花季之后、雨季之前，山南与后藏通透度高，人流适中。"
+          },
+          {
+            "months": [
+              7,
+              8
+            ],
+            "note": "雨季，然乌—鲁朗方向易遇塌方管制，南迦巴瓦常被云雾遮住，需留机动日。"
+          },
+          {
+            "months": [
+              9,
+              10
+            ],
+            "note": "秋高气爽，看雪山概率最高；10 月下旬纳木错夜间可低至 -15℃。"
+          },
+          {
+            "months": [
+              11,
+              12,
+              1,
+              2,
+              3,
+              4
+            ],
+            "note": "冬季部分景区与高海拔路段限行，务必先确认路况。"
+          }
         ],
         "days": 12,
         "daysNote": "压缩到 9 天需要砍掉纳木错；拉长到 15 天可再加山南洛扎、措美方向的边境线（须办边防证）。",
@@ -44,17 +103,90 @@
           "有 10 天以上假期、能接受每天 4-6 小时车程的人",
           "想用包车/拼车省心的中老年游客与亲子家庭"
         ],
-        "avoid": ["近期有心脑血管疾病或严重高血压者（请遵医嘱）", "假期只有 5 天以内的人（建议改走林芝短线）"]
+        "avoid": [
+          "近期有心脑血管疾病或严重高血压者（请遵医嘱）",
+          "假期只有 5 天以内的人（建议改走林芝短线）"
+        ]
       },
       "nodes": [
-        { "name": "拉萨", "province": "西藏", "city": "拉萨", "lng": 91.14, "lat": 29.65, "role": "hub", "elevM": 3650, "note": "所有进藏线路的交汇点，建议抵达后先休整一天。" },
-        { "name": "泽当", "province": "西藏", "city": "山南", "lng": 91.77, "lat": 29.24, "role": "stay", "elevM": 3560, "note": "山南市府所在地，吐蕃王朝发源地。" },
-        { "name": "米林", "province": "西藏", "city": "林芝", "lng": 94.21, "lat": 29.23, "role": "pass", "elevM": 2950 },
-        { "name": "林芝八一", "province": "西藏", "city": "林芝", "lng": 94.36, "lat": 29.65, "role": "stay", "elevM": 3000, "note": "林芝市政府驻地，环线东端。" },
-        { "name": "鲁朗", "province": "西藏", "city": "林芝", "lng": 94.72, "lat": 29.76, "role": "stay", "elevM": 3300, "note": "高山草甸与原始云杉林，被称为「东方瑞士」。" },
-        { "name": "江孜", "province": "西藏", "city": "日喀则", "lng": 89.6, "lat": 28.92, "role": "stay", "elevM": 4000 },
-        { "name": "日喀则", "province": "西藏", "city": "日喀则", "lng": 88.88, "lat": 29.27, "role": "stay", "elevM": 3850, "note": "后藏中心，班禅驻锡地。" },
-        { "name": "纳木错扎西半岛", "province": "西藏", "city": "拉萨", "lng": 90.62, "lat": 30.72, "role": "stay", "elevM": 4720, "note": "纳木错景区住宿点，夜间极冷。" }
+        {
+          "name": "拉萨",
+          "province": "西藏",
+          "city": "拉萨",
+          "lng": 91.14,
+          "lat": 29.65,
+          "role": "hub",
+          "elevM": 3650,
+          "note": "所有进藏线路的交汇点，建议抵达后先休整一天。"
+        },
+        {
+          "name": "泽当",
+          "province": "西藏",
+          "city": "山南",
+          "lng": 91.77,
+          "lat": 29.24,
+          "role": "stay",
+          "elevM": 3560,
+          "note": "山南市府所在地，吐蕃王朝发源地。"
+        },
+        {
+          "name": "米林",
+          "province": "西藏",
+          "city": "林芝",
+          "lng": 94.21,
+          "lat": 29.23,
+          "role": "pass",
+          "elevM": 2950
+        },
+        {
+          "name": "林芝八一",
+          "province": "西藏",
+          "city": "林芝",
+          "lng": 94.36,
+          "lat": 29.65,
+          "role": "stay",
+          "elevM": 3000,
+          "note": "林芝市政府驻地，环线东端。"
+        },
+        {
+          "name": "鲁朗",
+          "province": "西藏",
+          "city": "林芝",
+          "lng": 94.72,
+          "lat": 29.76,
+          "role": "stay",
+          "elevM": 3300,
+          "note": "高山草甸与原始云杉林，被称为「东方瑞士」。"
+        },
+        {
+          "name": "江孜",
+          "province": "西藏",
+          "city": "日喀则",
+          "lng": 89.6,
+          "lat": 28.92,
+          "role": "stay",
+          "elevM": 4000
+        },
+        {
+          "name": "日喀则",
+          "province": "西藏",
+          "city": "日喀则",
+          "lng": 88.88,
+          "lat": 29.27,
+          "role": "stay",
+          "elevM": 3850,
+          "note": "后藏中心，班禅驻锡地。"
+        },
+        {
+          "name": "纳木错扎西半岛",
+          "province": "西藏",
+          "city": "拉萨",
+          "lng": 90.62,
+          "lat": 30.72,
+          "role": "stay",
+          "elevM": 4720,
+          "note": "纳木错景区住宿点，夜间极冷。"
+        }
       ],
       "segments": [
         {
@@ -63,16 +195,27 @@
           "name": "拉萨 → 泽当（沿雅砻河谷）",
           "fromNode": "拉萨",
           "toNode": "泽当",
-          "via": ["贡嘎", "扎囊"],
-          "roadRefs": ["S5", "G349"],
+          "via": [
+            "贡嘎",
+            "扎囊"
+          ],
+          "roadRefs": [
+            "S5",
+            "G349"
+          ],
           "refPending": true,
           "roadClass": "省道",
           "distanceKm": 155,
           "driveHours": 2.5,
-          "altRange": [3560, 3650],
+          "altRange": [
+            3560,
+            3650
+          ],
           "condition": "全程铺装路面，沿雅鲁藏布江南岸走，限速摄像头较多。",
           "note": "经贡嘎机场方向的快速通道，与 G318 有共线段；编号近年有调整，以现场路牌为准。",
-          "poiIds": ["xzgl-p-sangye"]
+          "poiIds": [
+            "xzgl-p-sangye"
+          ]
         },
         {
           "id": "xzgl-2",
@@ -80,15 +223,28 @@
           "name": "泽当 → 米林（雅鲁藏布江沿江公路）",
           "fromNode": "泽当",
           "toNode": "米林",
-          "via": ["加查", "朗县", "里龙"],
-          "roadRefs": ["G560", "沿雅江公路"],
+          "via": [
+            "加查",
+            "朗县",
+            "里龙"
+          ],
+          "roadRefs": [
+            "G560",
+            "沿雅江公路"
+          ],
           "refPending": true,
           "roadClass": "国道",
           "distanceKm": 350,
           "driveHours": 7,
-          "altRange": [2900, 3560],
+          "altRange": [
+            2900,
+            3560
+          ],
           "condition": "沿江深切峡谷公路，路面良好但弯多、会车需慢行；雨季注意落石。",
-          "poiIds": ["xzgl-p-yumbulagang", "xzgl-p-lamulacuo"]
+          "poiIds": [
+            "xzgl-p-yumbulagang",
+            "xzgl-p-lamulacuo"
+          ]
         },
         {
           "id": "xzgl-3",
@@ -96,15 +252,24 @@
           "name": "米林 → 林芝八一",
           "fromNode": "米林",
           "toNode": "林芝八一",
-          "via": ["米林机场路口"],
-          "roadRefs": ["G560"],
+          "via": [
+            "米林机场路口"
+          ],
+          "roadRefs": [
+            "G560"
+          ],
           "refPending": true,
           "roadClass": "国道",
           "distanceKm": 80,
           "driveHours": 1.5,
-          "altRange": [2900, 3000],
+          "altRange": [
+            2900,
+            3000
+          ],
           "condition": "短途河谷公路，路况很好。",
-          "poiIds": ["xzgl-p-yalu-canyon"]
+          "poiIds": [
+            "xzgl-p-yalu-canyon"
+          ]
         },
         {
           "id": "xzgl-4",
@@ -112,15 +277,25 @@
           "name": "林芝八一 → 鲁朗（翻色季拉山）",
           "fromNode": "林芝八一",
           "toNode": "鲁朗",
-          "via": ["色季拉山口"],
-          "roadRefs": ["G318"],
+          "via": [
+            "色季拉山口"
+          ],
+          "roadRefs": [
+            "G318"
+          ],
           "roadClass": "国道",
           "distanceKm": 78,
           "driveHours": 2,
-          "altRange": [3000, 4720],
+          "altRange": [
+            3000,
+            4720
+          ],
           "condition": "国道盘山路，路面平整；冬季结冰需防滑链。",
           "note": "色季拉山口是远眺南迦巴瓦的经典位置，云雾一般上午较少。",
-          "poiIds": ["xzgl-p-namcha", "xzgl-p-lulang"]
+          "poiIds": [
+            "xzgl-p-namcha",
+            "xzgl-p-lulang"
+          ]
         },
         {
           "id": "xzgl-5",
@@ -128,12 +303,22 @@
           "name": "鲁朗 → 拉萨（G318 翻米拉山）",
           "fromNode": "鲁朗",
           "toNode": "拉萨",
-          "via": ["东久", "工布江达", "米拉山口", "墨竹工卡"],
-          "roadRefs": ["G318"],
+          "via": [
+            "东久",
+            "工布江达",
+            "米拉山口",
+            "墨竹工卡"
+          ],
+          "roadRefs": [
+            "G318"
+          ],
           "roadClass": "国道",
           "distanceKm": 400,
           "driveHours": 8,
-          "altRange": [3300, 5013],
+          "altRange": [
+            3300,
+            5013
+          ],
           "condition": "全程国道，隧道已较多，但仍有长距离盘山路；全程区间测速。",
           "note": "也可走 G4218 雅叶高速（林拉高速）缩短约 1.5 小时。",
           "poiIds": []
@@ -144,15 +329,28 @@
           "name": "拉萨 → 曲水 → 羊卓雍措 → 江孜",
           "fromNode": "拉萨",
           "toNode": "江孜",
-          "via": ["曲水", "岗巴拉山口", "浪卡子"],
-          "roadRefs": ["G318", "羊卓雍措环湖公路"],
+          "via": [
+            "曲水",
+            "岗巴拉山口",
+            "浪卡子"
+          ],
+          "roadRefs": [
+            "G318",
+            "羊卓雍措环湖公路"
+          ],
           "refPending": true,
           "roadClass": "国道",
           "distanceKm": 270,
           "driveHours": 6,
-          "altRange": [3600, 5030],
+          "altRange": [
+            3600,
+            5030
+          ],
           "condition": "曲水以前出国道；翻岗巴拉山后为沿湖公路，弯多、临崖、常有牛羊占道。",
-          "poiIds": ["xzgl-p-yamdrok", "xzgl-p-karuola"]
+          "poiIds": [
+            "xzgl-p-yamdrok",
+            "xzgl-p-karuola"
+          ]
         },
         {
           "id": "xzgl-7",
@@ -160,14 +358,21 @@
           "name": "江孜 → 日喀则",
           "fromNode": "江孜",
           "toNode": "日喀则",
-          "roadRefs": ["日喀则—江孜公路"],
+          "roadRefs": [
+            "日喀则—江孜公路"
+          ],
           "refPending": true,
           "roadClass": "省道",
           "distanceKm": 95,
           "driveHours": 1.8,
-          "altRange": [3850, 4000],
+          "altRange": [
+            3850,
+            4000
+          ],
           "condition": "平坦河谷公路，路况良好。",
-          "poiIds": ["xzgl-p-palkhor"]
+          "poiIds": [
+            "xzgl-p-palkhor"
+          ]
         },
         {
           "id": "xzgl-8",
@@ -175,14 +380,25 @@
           "name": "日喀则 → 拉萨（沿雅鲁藏布江西行）",
           "fromNode": "日喀则",
           "toNode": "拉萨",
-          "via": ["仁布", "尼木", "曲水"],
-          "roadRefs": ["G318"],
+          "via": [
+            "仁布",
+            "尼木",
+            "曲水"
+          ],
+          "roadRefs": [
+            "G318"
+          ],
           "roadClass": "国道",
           "distanceKm": 280,
           "driveHours": 5,
-          "altRange": [3620, 3850],
+          "altRange": [
+            3620,
+            3850
+          ],
           "condition": "国道主干道，全程铺装，补给方便。",
-          "poiIds": ["xzgl-p-tashilhunpo"]
+          "poiIds": [
+            "xzgl-p-tashilhunpo"
+          ]
         },
         {
           "id": "xzgl-9",
@@ -190,15 +406,28 @@
           "name": "拉萨 → 当雄 → 纳木错扎西半岛 → 拉萨",
           "fromNode": "拉萨",
           "toNode": "拉萨",
-          "via": ["羊八井", "当雄", "纳根拉山口"],
-          "roadRefs": ["G109", "纳木错景区公路"],
+          "via": [
+            "羊八井",
+            "当雄",
+            "纳根拉山口"
+          ],
+          "roadRefs": [
+            "G109",
+            "纳木错景区公路"
+          ],
           "refPending": true,
           "roadClass": "国道",
           "distanceKm": 470,
           "driveHours": 9,
-          "altRange": [4200, 5190],
+          "altRange": [
+            4200,
+            5190
+          ],
           "condition": "青藏国道 + 景区专用公路，路面良好；纳根拉山口风大、冬季易积雪。",
-          "poiIds": ["xzgl-p-namtso", "xzgl-p-yangbajing"]
+          "poiIds": [
+            "xzgl-p-namtso",
+            "xzgl-p-yangbajing"
+          ]
         }
       ],
       "pois": [
@@ -230,6 +459,7 @@
           "intro": "供奉释迦牟尼十二岁等身像的千年寺院，寺外的八廓街是拉萨最完整的转经道，清晨磕长头与傍晚煨桑的人群让这里成为观察西藏日常最好的窗口。金顶平台可俯瞰广场。",
           "mustSee": true,
           "visitHours": 2,
+          "ticketNote": "需实名预约，旺季限流，开放时段与预约渠道以寺院官方公告为准",
           "bestTime": "清晨 7-9 点转经人流最盛。"
         },
         {
@@ -242,7 +472,8 @@
           "lat": 29.2,
           "tagline": "西藏史上最早的宫殿之一，雅砻河谷的地标。",
           "intro": "坐落在扎西次日山脊上的宫堡遗址，与山南作为藏文明发源地的地位互为印证。登顶台阶较陡，约需 20 分钟，山风很大，注意防风。",
-          "visitHours": 1.5
+          "visitHours": 1.5,
+          "ticketNote": "需在山脚登记后步行登顶，旺季限流，开放范围以文物管理单位公告为准"
         },
         {
           "id": "xzgl-p-sangye",
@@ -255,6 +486,7 @@
           "tagline": "西藏第一座佛法僧俱全的寺院，按坛城布局。",
           "intro": "8 世纪由莲花生大师主持修建，主殿三层分别呈现藏、汉、印度三种风格，整体按佛教宇宙观的曼陀罗布局，四色佛塔环绕。从泽当出发约 1 小时，可与雅砻河谷一线并游。",
           "visitHours": 2,
+          "ticketNote": "需实名预约，寺内部分殿宇限流，开放范围以寺院官方公告为准",
           "detourKm": 60
         },
         {
@@ -268,6 +500,7 @@
           "tagline": "藏地最有名的神湖之一，需爬到约 5000 米观景台。",
           "intro": "高山小型湖泊，藏传佛教认为在此可以看到前世来生。湖面不大，观景台需步行爬升约 200 米，风大且气温低，必须带冲锋衣；高反敏感者慎行。",
           "visitHours": 3,
+          "ticketNote": "需实名预约，观景台每日限流人数，是否开放以景区官方公告为准",
           "detourKm": 80
         },
         {
@@ -294,8 +527,9 @@
           "lng": 94.7,
           "lat": 29.6,
           "tagline": "「十人九不遇」的 7782 米雪峰打卡点。",
-          "intro": "色季拉山口是 G318 上最容易接近南迦巴瓦的位置之一，山口海拔约 4720 米。看峰Tony的规律是旱季（10 月至次年 4 月）云量少，清晨出现概率最高。",
-          "visitHours": 0.5
+          "intro": "色季拉山口是 G318 上最容易接近南迦巴瓦的位置之一，山口海拔约 4720 米。看峰景的规律是旱季（10 月至次年 4 月）云量少，清晨出现概率最高。",
+          "visitHours": 0.5,
+          "ticketNote": "公路边观景点无需门票，停车位与通行管制以交管部门公告为准"
         },
         {
           "id": "xzgl-p-lulang",
@@ -308,7 +542,8 @@
           "tagline": "雪岭云杉环绕的高山草甸，川藏线上最适合住一晚的地方。",
           "intro": "海拔 3300 米的宽阔牧场被云杉、冷杉与灌木围合，夏季野花遍地，木篱笆与散布的藏式木屋构成经典画面。这里也是适应海拔的理想中转地，当地石锅鸡很有名。",
           "mustSee": true,
-          "visitHours": 3
+          "visitHours": 3,
+          "ticketNote": "沿线牧场与观景栈道免费开放，骑马等项目现场议价，以景区公告为准"
         },
         {
           "id": "xzgl-p-yamdrok",
@@ -317,11 +552,12 @@
           "city": "山南",
           "category": "water",
           "lng": 90.6,
-          "lat": 29.0,
+          "lat": 29,
           "tagline": "藏南群山中的珊瑚状蓝湖，西藏三大圣湖之一。",
           "intro": "湖面海拔 4441 米，湖岸线极不规则，在阳光下呈现层次分明的蓝绿色。岗巴拉山口下方的观景台是最经典机位，沿湖公路还可到更安静的角度。绕湖一圈约 250 公里，一般游客只看主景区。",
           "mustSee": true,
           "visitHours": 1.5,
+          "ticketNote": "主景区需实名购票并限流，沿湖公路部分路段管制，以官方公告为准",
           "bestTime": "正午到下午湖水颜色最艳。"
         },
         {
@@ -335,6 +571,7 @@
           "tagline": "离公路最近的冰川，走几步就到冰舌之下。",
           "intro": "冰川从乃钦康桑雪山南坡垂下，冰舌几乎贴着公路，是拍照条件最好的冰川之一。停车区海拔约 5020 米，风大且冷；经幡区域请勿拉扯，付费拍摄先谈好价格。",
           "visitHours": 0.5,
+          "ticketNote": "需购景区门票，旺季限流，冰舌区封闭范围以景区公告为准",
           "detourKm": 4
         },
         {
@@ -348,7 +585,8 @@
           "tagline": "十万佛塔与抗英遗址，江孜的双地标。",
           "intro": "白居寺以「十万佛塔」（菩提塔）闻名，塔内满布壁画与塑像，藏传佛教三大教派共处一寺；旁边的宗山半山古堡是 1904 年江孜保卫战的遗址。两处相邻，半天可游完。",
           "mustSee": true,
-          "visitHours": 2.5
+          "visitHours": 2.5,
+          "ticketNote": "白居寺内需实名预约并限流，宗山古堡开放范围以文保公告为准"
         },
         {
           "id": "xzgl-p-tashilhunpo",
@@ -361,7 +599,8 @@
           "tagline": "历代班禅驻锡地，后藏最大的格鲁派寺院。",
           "intro": "建于 1447 年的庞大寺城，措钦大殿、强巴佛殿（供奉世界最大的室内铜质弥勒像）与历代班禅灵塔是核心看点。清晨随转经人流沿寺墙走一圈，可以看见后藏最真实的宗教生活。",
           "mustSee": true,
-          "visitHours": 2.5
+          "visitHours": 2.5,
+          "ticketNote": "需实名预约，旺季限流，开放殿宇与时段以寺院官方公告为准"
         },
         {
           "id": "xzgl-p-namtso",
@@ -375,6 +614,7 @@
           "intro": "湖面海拔 4718 米、面积约 1900 多平方公里，湖蓝色随天光变化。扎西半岛伸入湖中，一侧是念青唐古拉雪山，落日与星空是这里的两张名片。夜里气温常降到冰点以下，热水与被子都要提前确认。",
           "mustSee": true,
           "visitHours": 5,
+          "ticketNote": "需实名预约并分批进入，旺季住宿紧张，是否限流以景区公告为准",
           "bestTime": "日落前 1 小时上到半岛小山；夜里 22 点后星空最好。",
           "detourKm": 130
         },
@@ -388,22 +628,260 @@
           "lat": 30.09,
           "tagline": "海拔最高的地热田，公路旁蒸腾的白色汽柱。",
           "intro": "青藏公路边的地热发电与温泉区，地表处处冒着白色蒸汽，与背后雪山同框，极具高原特色。此处海拔 4300 米以上，泡温泉容易加重高反，建议只作短时观景。",
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "路边观景带免费开放，发电与温泉区限制进入，以景区公告为准"
         }
       ],
       "plan": [
-        { "day": 1, "title": "抵达拉萨适应海拔", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "roadRefs": ["城市道路"], "stayCity": "拉萨", "poiIds": [], "summary": "拉萨休整，不要剧烈运动。", "tips": ["步行放慢、多喝水", "不要喝大酒、不要洗过热澡"] },
-        { "day": 2, "title": "拉萨城：布宫与八廓街", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 10, "roadRefs": ["城市道路"], "stayCity": "拉萨", "poiIds": ["xzgl-p-potala", "xzgl-p-jokhang"], "summary": "布达拉宫 + 大昭寺，城市内短距离。", "tips": ["布宫门票按批次预约"] },
-        { "day": 3, "title": "拉萨 → 泽当，雅砻河谷", "fromNode": "拉萨", "toNode": "泽当", "distanceKm": 155, "driveHours": 2.5, "roadRefs": ["S5", "G349"], "stayCity": "泽当", "poiIds": ["xzgl-p-sangye"], "summary": "沿河谷看吐蕃文明的起点。" },
-        { "day": 4, "title": "泽当 → 米林：沿江峡谷", "fromNode": "泽当", "toNode": "米林", "distanceKm": 350, "driveHours": 7, "roadRefs": ["G560"], "stayCity": "米林", "poiIds": ["xzgl-p-yumbulagang", "xzgl-p-lamulacuo"], "summary": "全天沿雅鲁藏布江东行，海拔缓降。", "tips": ["拉姆拉错为可选支线，需额外绕行约 80 公里"] },
-        { "day": 5, "title": "米林 → 林芝八一：大峡谷", "fromNode": "米林", "toNode": "林芝八一", "distanceKm": 80, "driveHours": 1.5, "roadRefs": ["G560"], "stayCity": "林芝八一", "poiIds": ["xzgl-p-yalu-canyon"], "summary": "游览雅鲁藏布大峡谷景区。", "tips": ["景区观光车约 3-4 小时"] },
-        { "day": 6, "title": "翻色季拉山到鲁朗", "fromNode": "林芝八一", "toNode": "鲁朗", "distanceKm": 78, "driveHours": 2, "roadRefs": ["G318"], "stayCity": "鲁朗", "poiIds": ["xzgl-p-namcha", "xzgl-p-lulang"], "summary": "看南迦巴瓦 + 住鲁朗牧场。", "tips": ["鲁朗石锅鸡是当地招牌"] },
-        { "day": 7, "title": "鲁朗 → 拉萨：翻米拉山", "fromNode": "鲁朗", "toNode": "拉萨", "distanceKm": 400, "driveHours": 8, "roadRefs": ["G318"], "stayCity": "拉萨", "poiIds": [], "summary": "全天车程最长的一天，也可改走高速。" },
-        { "day": 8, "title": "拉萨 → 羊卓雍措 → 江孜", "fromNode": "拉萨", "toNode": "江孜", "distanceKm": 270, "driveHours": 6, "roadRefs": ["G318", "羊卓雍措环湖公路"], "stayCity": "江孜", "poiIds": ["xzgl-p-yamdrok", "xzgl-p-karuola"], "summary": "圣湖与冰川，今日最高点约 5030 米。" },
-        { "day": 9, "title": "江孜 → 日喀则", "fromNode": "江孜", "toNode": "日喀则", "distanceKm": 95, "driveHours": 1.8, "roadRefs": ["日喀则—江孜公路"], "stayCity": "日喀则", "poiIds": ["xzgl-p-palkhor", "xzgl-p-tashilhunpo"], "summary": "白居寺 + 扎什伦布寺，后藏核心。" },
-        { "day": 10, "title": "日喀则 → 拉萨", "fromNode": "日喀则", "toNode": "拉萨", "distanceKm": 280, "driveHours": 5, "roadRefs": ["G318"], "stayCity": "拉萨", "poiIds": [], "summary": "返回拉萨，补齐纳木错行程的补给。" },
-        { "day": 11, "title": "拉萨 → 纳木错扎西半岛", "fromNode": "拉萨", "toNode": "纳木错扎西半岛", "distanceKm": 235, "driveHours": 4.5, "roadRefs": ["G109", "纳木错景区公路"], "stayCity": "纳木错扎西半岛", "poiIds": ["xzgl-p-namtso"], "summary": "傍晚到扎西半岛看落日与星空。", "tips": ["住宿条件简陋，建议带睡袋内胆", "夜间不要单独远离住处"] },
-        { "day": 12, "title": "纳木错 → 拉萨，行程结束", "fromNode": "纳木错扎西半岛", "toNode": "拉萨", "distanceKm": 235, "driveHours": 4.5, "roadRefs": ["G109"], "stayCity": "拉萨", "poiIds": ["xzgl-p-yangbajing"], "summary": "清晨看湖面反光后返程。" }
+        {
+          "day": 1,
+          "title": "抵达拉萨适应海拔",
+          "fromNode": "拉萨",
+          "toNode": "拉萨",
+          "distanceKm": 0, "driveHours": 0,
+          "roadRefs": [
+            "城市道路"
+          ],
+          "stayCity": "拉萨",
+          "poiIds": [],
+          "summary": "抵达当天不安排景点，先在酒店休整、补水补氧。下午可步行到八廓街外围活动筋骨，海拔 3650 米的第一天以让身体适应为主，晚餐清淡、早睡，为后面上高海拔留出余量。",
+          "tips": [
+            "步行放慢、多喝水",
+            "不要喝大酒、不要洗过热澡"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "拉萨城：布宫与八廓街",
+          "fromNode": "拉萨",
+          "toNode": "拉萨",
+          "distanceKm": 10, "driveHours": 0.5,
+          "roadRefs": [
+            "城市道路"
+          ],
+          "stayCity": "拉萨",
+          "poiIds": [
+            "xzgl-p-potala",
+            "xzgl-p-jokhang"
+          ],
+          "summary": "上午按预约批次进入布达拉宫，台阶陡、人流集中，两小时左右为宜；午后转到大昭寺与八廓街，先绕转经道再进殿。全天以步行为主、车程很短，正好把抵达日没看完的城内内容一次补齐。",
+          "tips": [
+            "布宫门票按批次预约"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "拉萨 → 泽当，雅砻河谷",
+          "fromNode": "拉萨",
+          "toNode": "泽当",
+          "distanceKm": 155,
+          "driveHours": 2.5,
+          "roadRefs": [
+            "S5",
+            "G349"
+          ],
+          "stayCity": "泽当",
+          "poiIds": [
+            "xzgl-p-sangye"
+          ],
+          "summary": "上午从拉萨沿雅砻河谷东行，途中在扎囊补给，午后抵泽当后先去桑耶寺看坛城式布局与四色佛塔，再就近看雍布拉康。里程不长但海拔基本持平，适合作为进藏后第一个正式游览日。",
+          "tips": [
+            "桑耶寺距泽当市区约一小时车程，需早出发",
+            "雍布拉康登顶台阶陡，山风大注意保暖",
+            "今日海拔平稳，可正常洗漱但避免过热水"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "泽当 → 米林：沿江峡谷",
+          "fromNode": "泽当",
+          "toNode": "米林",
+          "distanceKm": 350,
+          "driveHours": 7,
+          "roadRefs": [
+            "G560"
+          ],
+          "stayCity": "米林",
+          "poiIds": [
+            "xzgl-p-yumbulagang",
+            "xzgl-p-lamulacuo"
+          ],
+          "summary": "全天沿雅鲁藏布江深切峡谷东行，从泽当经加查、朗县到米林，弯道密集、常有牛羊占道。体力与天气允许可绕行拉姆拉错看高山神湖，海拔一路缓降，是全程身体最舒服的一天。",
+          "tips": [
+            "拉姆拉错为可选支线，需额外绕行约 80 公里",
+            "沿江公路会车需慢行，注意保持安全车距",
+            "今日车程长，每两小时停一次活动下车"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "米林 → 林芝八一：大峡谷",
+          "fromNode": "米林",
+          "toNode": "林芝八一",
+          "distanceKm": 80,
+          "driveHours": 1.5,
+          "roadRefs": [
+            "G560"
+          ],
+          "stayCity": "林芝八一",
+          "poiIds": [
+            "xzgl-p-yalu-canyon"
+          ],
+          "summary": "上午进雅鲁藏布大峡谷景区，以观光车沿江行驶为主，在多个观江平台停靠，晴天可见南迦巴瓦峰。下午返回米林住下，这一段海拔降到 2900 米左右、气候温润，是进藏以来第一次真正放松。",
+          "tips": [
+            "景区观光车约 3-4 小时",
+            "观江平台风大，拍照注意站稳",
+            "下午返程车程短，可在米林补给"
+          ]
+        },
+        {
+          "day": 6,
+          "title": "翻色季拉山到鲁朗",
+          "fromNode": "林芝八一",
+          "toNode": "鲁朗",
+          "distanceKm": 78,
+          "driveHours": 2,
+          "roadRefs": [
+            "G318"
+          ],
+          "stayCity": "鲁朗",
+          "poiIds": [
+            "xzgl-p-namcha",
+            "xzgl-p-lulang"
+          ],
+          "summary": "上午翻色季拉山口到观景台，晴天可远眺南迦巴瓦；午后下到鲁朗住进高山牧场，散步看云杉林与草甸。这天海拔先升后降、天气变化快，出发前先确认山口是否通行。",
+          "tips": [
+            "鲁朗石锅鸡是当地招牌",
+            "山口云雾多，上午看峰概率更高",
+            "牧场夜间偏冷，住宿需确认供暖"
+          ]
+        },
+        {
+          "day": 7,
+          "title": "鲁朗 → 拉萨：翻米拉山",
+          "fromNode": "鲁朗",
+          "toNode": "拉萨",
+          "distanceKm": 400,
+          "driveHours": 8,
+          "roadRefs": [
+            "G318"
+          ],
+          "stayCity": "拉萨",
+          "poiIds": [],
+          "summary": "从鲁朗出发沿 G318 东行翻米拉山口返回拉萨，隧道群已大幅缩短车程，但仍有长距离盘山路。可选改走林拉高速省去垭口、缩短约一个半小时；抵达后不再安排景点，早点休息。",
+          "tips": [
+            "米拉山口海拔 5013 米，上垭口勿快跑",
+            "林拉高速可避开米拉山口，按体感选择",
+            "全程区间测速，控制车速避免误拍"
+          ]
+        },
+        {
+          "day": 8,
+          "title": "拉萨 → 羊卓雍措 → 江孜",
+          "fromNode": "拉萨",
+          "toNode": "江孜",
+          "distanceKm": 270,
+          "driveHours": 6,
+          "roadRefs": [
+            "G318",
+            "羊卓雍措环湖公路"
+          ],
+          "stayCity": "江孜",
+          "poiIds": [
+            "xzgl-p-yamdrok",
+            "xzgl-p-karuola"
+          ],
+          "summary": "上午经曲水翻岗巴拉山口俯瞰羊卓雍措，正午到下午是湖水颜色最艳的时段；下午沿湖下行看卡若拉冰川，冰舌几乎贴着公路。今天是全程海拔最高的一天，山口动作放慢。",
+          "tips": [
+            "岗巴拉山口约 5030 米，观景台风大",
+            "沿湖公路常有牛羊占道，减速慢行",
+            "卡若拉冰川停车区海拔高，不宜久留"
+          ]
+        },
+        {
+          "day": 9,
+          "title": "江孜 → 日喀则",
+          "fromNode": "江孜",
+          "toNode": "日喀则",
+          "distanceKm": 95,
+          "driveHours": 1.8,
+          "roadRefs": [
+            "日喀则—江孜公路"
+          ],
+          "stayCity": "日喀则",
+          "poiIds": [
+            "xzgl-p-palkhor",
+            "xzgl-p-tashilhunpo"
+          ],
+          "summary": "上午在江孜看白居寺十万佛塔与宗山古堡，两处相邻、半天可游完；午后沿平坦河谷公路到日喀则，傍晚进扎什伦布寺看强巴佛殿。寺院需预约，务必提前确认批次。",
+          "tips": [
+            "白居寺与宗山古堡相距不远，可步行串联",
+            "扎什伦布寺需提前预约，旺季限流",
+            "今日里程较短，节奏可以放慢"
+          ]
+        },
+        {
+          "day": 10,
+          "title": "日喀则 → 拉萨",
+          "fromNode": "日喀则",
+          "toNode": "拉萨",
+          "distanceKm": 280,
+          "driveHours": 5,
+          "roadRefs": [
+            "G318"
+          ],
+          "stayCity": "拉萨",
+          "poiIds": [],
+          "summary": "沿雅鲁藏布江西行经仁布、尼木返回拉萨，国道铺装、补给方便。下午把氧气、食物与保暖衣物备齐，纳木错住宿条件简陋，这一晚的采购决定后面两晚的舒适度。",
+          "tips": [
+            "今日为回程补给日，务必加满油",
+            "纳木错夜间极冷，睡袋内胆与保暖层备齐",
+            "沿途加油站见到就加，不必赌下一站"
+          ]
+        },
+        {
+          "day": 11,
+          "title": "拉萨 → 纳木错扎西半岛",
+          "fromNode": "拉萨",
+          "toNode": "纳木错扎西半岛",
+          "distanceKm": 235,
+          "driveHours": 4.5,
+          "roadRefs": [
+            "G109",
+            "纳木错景区公路"
+          ],
+          "stayCity": "纳木错扎西半岛",
+          "poiIds": [
+            "xzgl-p-namtso"
+          ],
+          "summary": "上午从拉萨出发，途经羊八井地热田与当雄，翻纳根拉山口进入湖区，傍晚抵达扎西半岛。落日前上到半岛小山，夜里看星空；湖区海拔 4718 米，热水与厚被都要提前确认。",
+          "tips": [
+            "住宿条件简陋，建议带睡袋内胆",
+            "夜间不要单独远离住处",
+            "纳根拉山口风大，垭口不要久留"
+          ]
+        },
+        {
+          "day": 12,
+          "title": "纳木错 → 拉萨，行程结束",
+          "fromNode": "纳木错扎西半岛",
+          "toNode": "拉萨",
+          "distanceKm": 235,
+          "driveHours": 4.5,
+          "roadRefs": [
+            "G109"
+          ],
+          "stayCity": "拉萨",
+          "poiIds": [
+            "xzgl-p-yangbajing"
+          ],
+          "summary": "清晨在扎西半岛看湖面反光与晨光，收拾后沿景区公路返回当雄、羊八井，下午回到拉萨。这天一路下降海拔，回城后先洗热水澡休整，把状态调整回来。",
+          "tips": [
+            "返程上午出发，避开午后的大风",
+            "羊八井泡温泉会加重高反，只作观景",
+            "回到拉萨先休息，别急着连逛景点"
+          ]
+        }
       ],
       "practical": {
         "permit": "本线（不含支线）基本在常规开放区域，不需边防证；若增加洛扎、措美、珠峰等方向需提前办《边境管理区通行证》。",
@@ -420,8 +898,14 @@
         ]
       },
       "sources": [
-        { "title": "西藏自治区旅游发展厅 · 官方线路口径", "usedFor": "景点与季节" },
-        { "title": "项目公路索引 data/roads/index/national.json", "usedFor": "G318/G109/G560 端点与里程" }
+        {
+          "title": "西藏自治区旅游发展厅 · 官方线路口径",
+          "usedFor": "景点与季节"
+        },
+        {
+          "title": "项目公路索引 data/roads/index/national.json",
+          "usedFor": "G318/G109/G560 端点与里程"
+        }
       ],
       "editorRank": 6,
       "layer": "L1",
@@ -432,31 +916,84 @@
       "id": "ali-grand-loop",
       "name": "阿里大环线",
       "subtitle": "「一错再错」的羌塘荒野与神山圣湖",
-      "alias": ["阿里南北大环线", "西藏以西"],
-      "provinces": ["西藏"],
-      "cities": ["拉萨", "日喀则", "阿里地区", "那曲"],
+      "alias": [
+        "阿里南北大环线",
+        "西藏以西"
+      ],
+      "provinces": [
+        "西藏"
+      ],
+      "cities": [
+        "拉萨",
+        "日喀则",
+        "阿里地区",
+        "那曲",
+        "山南"
+      ],
       "anchorCity": "拉萨",
-      "modes": ["selfdrive", "charter", "mixed"],
+      "modes": [
+        "selfdrive",
+        "charter",
+        "mixed"
+      ],
       "primaryMode": "charter",
       "shape": "loop",
       "tier": "national",
-      "tags": ["神山", "圣湖", "土林", "无人区", "星空"],
+      "tags": [
+        "神山",
+        "圣湖",
+        "土林",
+        "无人区",
+        "星空"
+      ],
       "summary": "从拉萨沿 G318 到拉孜转 G219 南下，走冈仁波齐、扎达土林，再从狮泉河穿羌塘草原经改则、尼玛、班戈回到纳木错。是国内公路旅行里最硬的一条长环线。",
       "totalKm": 3750,
-      "mileageNote": "按 15 天逐日累加 = 3750km；日喀则市文旅局公开口径约 4136km，差额主要来自圣象天门、文布南村等支线的取舍与环形绕行。",
+      "mileageNote": "按 15 天逐日累加 = 3750km；日喀则市文旅局公开口径约 4136km，差额主要来自圣象天门、文布南村等支线的取舍与环形绕行。驾驶时长口径：逐日驾驶时长按对应分段里程与该分段实测均速折算，仅 D7 扎达—古格—托林寺 40km 县内支线往返（无对应长途分段）按含景区接驳与观景停留的山路有效车速 27km/h 估算为 1.5h。",
       "days": 15,
-      "bestSeason": [5, 6, 7, 8, 9, 10],
+      "bestSeason": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
       "difficulty": 5,
-      "roadRefs": ["G318", "G219", "G317", "G109", "G562", "G565"],
+      "roadRefs": [
+        "G318",
+        "G219",
+        "G317",
+        "G109",
+        "G562",
+        "G565"
+      ],
       "startNode": "拉萨",
       "endNode": "拉萨",
       "intro": {
         "overview": "阿里指的是西藏以西那片平均海拔 4500 米以上的高寒荒野。大环线南进北出，除了神山冈仁波齐、圣湖玛旁雍措、扎达土林与古格王朝遗址，还塞进了一整条羌塘无人区的湖泊盛宴：公珠措、扎日南木措、当惹雍措、色林措、纳木错一个接一个。它的难度不在路况——主干道已基本铺装——而在于距离、海拔、补给密度，以及那种「可能一整天看不到第二辆车」的孤独。",
         "bestSeason": "5-10 月；6-9 月最安全，10 月中下旬天气稳定但夜间已到 -15℃，11 月之后冰雪封路风险大幅上升。",
         "seasonNotes": [
-          { "months": [5, 6], "note": "野生动物活动频繁、湖面开始解冻，早晚仍有雪。" },
-          { "months": [7, 8], "note": "雨季，北侧搓板路遇雨可能陷车；同时人最多。" },
-          { "months": [9, 10], "note": "天气最稳定、能见度最高，是最推荐的窗口。" }
+          {
+            "months": [
+              5,
+              6
+            ],
+            "note": "野生动物活动频繁、湖面开始解冻，早晚仍有雪。"
+          },
+          {
+            "months": [
+              7,
+              8
+            ],
+            "note": "雨季，北侧搓板路遇雨可能陷车；同时人最多。"
+          },
+          {
+            "months": [
+              9,
+              10
+            ],
+            "note": "天气最稳定、能见度最高，是最推荐的窗口。"
+          }
         ],
         "days": 15,
         "daysNote": "标准版 15 天（含 2 天机动）；压缩到 12 天需砍掉当惹雍措支线；不存在低于 10 天的走法。",
@@ -467,20 +1004,116 @@
           "愿意包车、对土路和长时间坐车有心理准备的摄影爱好者",
           "至少有过一次西藏或青海高原旅行经历的人"
         ],
-        "avoid": ["首次进藏者（请先看别的线）", "孕妇与心脑血管疾病患者", "假期不足 7 天的人"]
+        "avoid": [
+          "首次进藏者（请先看别的线）",
+          "孕妇与心脑血管疾病患者",
+          "假期不足 7 天的人"
+        ]
       },
       "nodes": [
-        { "name": "拉萨", "province": "西藏", "city": "拉萨", "lng": 91.14, "lat": 29.65, "role": "hub", "elevM": 3650 },
-        { "name": "日喀则", "province": "西藏", "city": "日喀则", "lng": 88.88, "lat": 29.27, "role": "stay", "elevM": 3850 },
-        { "name": "拉孜", "province": "西藏", "city": "日喀则", "lng": 87.62, "lat": 29.08, "role": "pass", "elevM": 4050, "note": "G318 与 G219 的十字路口。" },
-        { "name": "萨嘎", "province": "西藏", "city": "日喀则", "lng": 85.23, "lat": 29.33, "role": "stay", "elevM": 4502 },
-        { "name": "塔尔钦", "province": "西藏", "city": "阿里地区", "lng": 81.28, "lat": 30.98, "role": "stay", "elevM": 4660, "note": "冈仁波齐脚下的村庄，转山起点。" },
-        { "name": "扎达", "province": "西藏", "city": "阿里地区", "lng": 79.8, "lat": 31.48, "role": "stay", "elevM": 3700, "note": "全线最好睡的一站。" },
-        { "name": "狮泉河", "province": "西藏", "city": "阿里地区", "lng": 80.11, "lat": 32.5, "role": "stay", "elevM": 4279, "note": "阿里地区行署所在地，北线前的补给基地。" },
-        { "name": "改则", "province": "西藏", "city": "阿里地区", "lng": 84.62, "lat": 32.3, "role": "stay", "elevM": 4350 },
-        { "name": "尼玛", "province": "西藏", "city": "那曲", "lng": 87.23, "lat": 31.78, "role": "stay", "elevM": 4700 },
-        { "name": "班戈", "province": "西藏", "city": "那曲", "lng": 90.26, "lat": 31.37, "role": "stay", "elevM": 4750 },
-        { "name": "纳木错", "province": "西藏", "city": "拉萨", "lng": 90.62, "lat": 30.72, "role": "stay", "elevM": 4718 }
+        {
+          "name": "拉萨",
+          "province": "西藏",
+          "city": "拉萨",
+          "lng": 91.14,
+          "lat": 29.65,
+          "role": "hub",
+          "elevM": 3650
+        },
+        {
+          "name": "日喀则",
+          "province": "西藏",
+          "city": "日喀则",
+          "lng": 88.88,
+          "lat": 29.27,
+          "role": "stay",
+          "elevM": 3850
+        },
+        {
+          "name": "拉孜",
+          "province": "西藏",
+          "city": "日喀则",
+          "lng": 87.62,
+          "lat": 29.08,
+          "role": "pass",
+          "elevM": 4050,
+          "note": "G318 与 G219 的十字路口。"
+        },
+        {
+          "name": "萨嘎",
+          "province": "西藏",
+          "city": "日喀则",
+          "lng": 85.23,
+          "lat": 29.33,
+          "role": "stay",
+          "elevM": 4502
+        },
+        {
+          "name": "塔尔钦",
+          "province": "西藏",
+          "city": "阿里地区",
+          "lng": 81.28,
+          "lat": 30.98,
+          "role": "stay",
+          "elevM": 4660,
+          "note": "冈仁波齐脚下的村庄，转山起点。"
+        },
+        {
+          "name": "扎达",
+          "province": "西藏",
+          "city": "阿里地区",
+          "lng": 79.8,
+          "lat": 31.48,
+          "role": "stay",
+          "elevM": 3700,
+          "note": "全线最好睡的一站。"
+        },
+        {
+          "name": "狮泉河",
+          "province": "西藏",
+          "city": "阿里地区",
+          "lng": 80.11,
+          "lat": 32.5,
+          "role": "stay",
+          "elevM": 4279,
+          "note": "阿里地区行署所在地，北线前的补给基地。"
+        },
+        {
+          "name": "改则",
+          "province": "西藏",
+          "city": "阿里地区",
+          "lng": 84.62,
+          "lat": 32.3,
+          "role": "stay",
+          "elevM": 4350
+        },
+        {
+          "name": "尼玛",
+          "province": "西藏",
+          "city": "那曲",
+          "lng": 87.23,
+          "lat": 31.78,
+          "role": "stay",
+          "elevM": 4700
+        },
+        {
+          "name": "班戈",
+          "province": "西藏",
+          "city": "那曲",
+          "lng": 90.26,
+          "lat": 31.37,
+          "role": "stay",
+          "elevM": 4750
+        },
+        {
+          "name": "纳木错",
+          "province": "西藏",
+          "city": "拉萨",
+          "lng": 90.62,
+          "lat": 30.72,
+          "role": "stay",
+          "elevM": 4718
+        }
       ],
       "segments": [
         {
@@ -489,14 +1122,25 @@
           "name": "拉萨 → 日喀则",
           "fromNode": "拉萨",
           "toNode": "日喀则",
-          "via": ["曲水", "尼木", "仁布"],
-          "roadRefs": ["G318"],
+          "via": [
+            "曲水",
+            "尼木",
+            "仁布"
+          ],
+          "roadRefs": [
+            "G318"
+          ],
           "roadClass": "国道",
           "distanceKm": 280,
           "driveHours": 5,
-          "altRange": [3620, 3850],
+          "altRange": [
+            3620,
+            3850
+          ],
           "condition": "国道主干道，全程铺装。",
-          "poiIds": ["agli-p-tashilhunpo"]
+          "poiIds": [
+            "agli-p-tashilhunpo"
+          ]
         },
         {
           "id": "agli-2",
@@ -504,15 +1148,26 @@
           "name": "日喀则 → 拉孜 → 萨嘎",
           "fromNode": "日喀则",
           "toNode": "萨嘎",
-          "via": ["拉孜", "昂仁", "22 道班"],
-          "roadRefs": ["G318"],
+          "via": [
+            "拉孜",
+            "昂仁",
+            "22 道班"
+          ],
+          "roadRefs": [
+            "G318"
+          ],
           "roadClass": "国道",
           "distanceKm": 480,
           "driveHours": 8.5,
-          "altRange": [4050, 4502],
+          "altRange": [
+            4050,
+            4502
+          ],
           "condition": "柏油路为主，翻越数处 4700 米以上山口；22 道班之后有较长无人区。",
           "note": "拉孜是 G318 与 G219 的十字路口，务必在此加满油。",
-          "poiIds": ["agli-p-peiku"]
+          "poiIds": [
+            "agli-p-peiku"
+          ]
         },
         {
           "id": "agli-3",
@@ -520,15 +1175,28 @@
           "name": "萨嘎 → 玛旁雍措 → 塔尔钦",
           "fromNode": "萨嘎",
           "toNode": "塔尔钦",
-          "via": ["公珠措", "拉昂措", "巴嘎"],
-          "roadRefs": ["G219"],
+          "via": [
+            "公珠措",
+            "拉昂措",
+            "巴嘎"
+          ],
+          "roadRefs": [
+            "G219"
+          ],
           "roadClass": "国道",
           "distanceKm": 500,
           "driveHours": 8,
-          "altRange": [4590, 4700],
+          "altRange": [
+            4590,
+            4700
+          ],
           "condition": "G219 阿里段，以新建铺装路面为主，偶有波浪路需控速。",
           "note": "沿途无加油站，务必在萨嘎加满并检查备胎。",
-          "poiIds": ["agli-p-mapam", "agli-p-laang", "agli-p-kailash"]
+          "poiIds": [
+            "agli-p-mapam",
+            "agli-p-laang",
+            "agli-p-kailash"
+          ]
         },
         {
           "id": "agli-4",
@@ -536,14 +1204,25 @@
           "name": "塔尔钦 → 扎达",
           "fromNode": "塔尔钦",
           "toNode": "扎达",
-          "via": ["门士", "巴尔兵站"],
-          "roadRefs": ["G219", "G565"],
+          "via": [
+            "门士",
+            "巴尔兵站"
+          ],
+          "roadRefs": [
+            "G219",
+            "G565"
+          ],
           "roadClass": "国道",
           "distanceKm": 320,
           "driveHours": 6.5,
-          "altRange": [3700, 4700],
+          "altRange": [
+            3700,
+            4700
+          ],
           "condition": "柏油盘山路，下到扎达县海拔骤降至 3700 米，是全程最好睡的一晚。",
-          "poiIds": ["agli-p-zanda"]
+          "poiIds": [
+            "agli-p-zanda"
+          ]
         },
         {
           "id": "agli-5",
@@ -551,14 +1230,26 @@
           "name": "扎达 → 狮泉河",
           "fromNode": "扎达",
           "toNode": "狮泉河",
-          "via": ["托林寺", "那不如"],
-          "roadRefs": ["G219", "G565"],
+          "via": [
+            "托林寺",
+            "那不如"
+          ],
+          "roadRefs": [
+            "G219",
+            "G565"
+          ],
           "roadClass": "国道",
           "distanceKm": 200,
           "driveHours": 4,
-          "altRange": [3700, 4279],
+          "altRange": [
+            3700,
+            4279
+          ],
           "condition": "路况良好，沿途为典型的土林沟壑地貌。",
-          "poiIds": ["agli-p-guge", "agli-p-tuolin"]
+          "poiIds": [
+            "agli-p-guge",
+            "agli-p-tuolin"
+          ]
         },
         {
           "id": "agli-6",
@@ -566,15 +1257,25 @@
           "name": "狮泉河 → 革吉 → 改则（阿里北线开启）",
           "fromNode": "狮泉河",
           "toNode": "改则",
-          "via": ["革吉", "盐湖乡"],
-          "roadRefs": ["G317"],
+          "via": [
+            "革吉",
+            "盐湖乡"
+          ],
+          "roadRefs": [
+            "G317"
+          ],
           "roadClass": "国道",
           "distanceKm": 470,
           "driveHours": 8,
-          "altRange": [4300, 4500],
+          "altRange": [
+            4300,
+            4500
+          ],
           "condition": "北线主道已铺装，但支线多为砂石搓板路；路上基本没有手机信号。",
           "note": "今日进入羌塘，务必提前一晚在狮泉河检查装备、加满油。",
-          "poiIds": ["agli-p-zharinanmu"]
+          "poiIds": [
+            "agli-p-zharinanmu"
+          ]
         },
         {
           "id": "agli-7",
@@ -582,16 +1283,26 @@
           "name": "改则 → 尼玛（当惹雍措支线）",
           "fromNode": "改则",
           "toNode": "尼玛",
-          "via": ["文布南村路口"],
-          "roadRefs": ["G317", "文布乡道"],
+          "via": [
+            "文布南村路口"
+          ],
+          "roadRefs": [
+            "G317",
+            "文布乡道"
+          ],
           "refPending": true,
           "roadClass": "国道",
           "distanceKm": 400,
           "driveHours": 7.5,
-          "altRange": [4500, 4700],
+          "altRange": [
+            4500,
+            4700
+          ],
           "condition": "主线柏油 + 通往当惹雍措的土石支线，支线需四驱车。",
           "note": "当惹雍措来回约 140 公里支线，只在天气好时进入。",
-          "poiIds": ["agli-p-dangra"]
+          "poiIds": [
+            "agli-p-dangra"
+          ]
         },
         {
           "id": "agli-8",
@@ -599,14 +1310,24 @@
           "name": "尼玛 → 班戈（色林措群湖段）",
           "fromNode": "尼玛",
           "toNode": "班戈",
-          "via": ["色林措", "错鄂"],
-          "roadRefs": ["G317"],
+          "via": [
+            "色林措",
+            "错鄂"
+          ],
+          "roadRefs": [
+            "G317"
+          ],
           "roadClass": "国道",
           "distanceKm": 405,
           "driveHours": 7.5,
-          "altRange": [4530, 4750],
+          "altRange": [
+            4530,
+            4750
+          ],
           "condition": "北线中风景最密、也最有搓板路的一段，务必控速保护轮胎。",
-          "poiIds": ["agli-p-selinco"]
+          "poiIds": [
+            "agli-p-selinco"
+          ]
         },
         {
           "id": "agli-9",
@@ -614,15 +1335,25 @@
           "name": "班戈 → 纳木错",
           "fromNode": "班戈",
           "toNode": "纳木错",
-          "via": ["纳根拉山口"],
-          "roadRefs": ["G562", "纳木错景区公路"],
+          "via": [
+            "纳根拉山口"
+          ],
+          "roadRefs": [
+            "G562",
+            "纳木错景区公路"
+          ],
           "refPending": true,
           "roadClass": "国道",
           "distanceKm": 420,
           "driveHours": 8,
-          "altRange": [4700, 5190],
+          "altRange": [
+            4700,
+            5190
+          ],
           "condition": "先走 G562 转向纳木错方向，再经景区公路到达扎西半岛。",
-          "poiIds": ["agli-p-namtso-n"]
+          "poiIds": [
+            "agli-p-namtso-n"
+          ]
         },
         {
           "id": "agli-10",
@@ -630,12 +1361,20 @@
           "name": "纳木错 → 拉萨（G109 收尾）",
           "fromNode": "纳木错",
           "toNode": "拉萨",
-          "via": ["当雄", "羊八井"],
-          "roadRefs": ["G109"],
+          "via": [
+            "当雄",
+            "羊八井"
+          ],
+          "roadRefs": [
+            "G109"
+          ],
           "roadClass": "国道",
           "distanceKm": 235,
           "driveHours": 4.5,
-          "altRange": [3650, 5190],
+          "altRange": [
+            3650,
+            5190
+          ],
           "condition": "青藏公路，路况好；两周以来第一次下降到 3700 米以下。",
           "poiIds": []
         }
@@ -651,7 +1390,8 @@
           "lat": 29.27,
           "tagline": "后藏最大的格鲁派寺院，班禅驻锡地。",
           "intro": "始建于 1447 年的巨大寺城，强巴佛殿内供奉世界上最大的室内铜质弥勒像。作为出发前的最后一站，它既是文化看点，也让你顺便在日喀则补齐物资。",
-          "visitHours": 2
+          "visitHours": 2,
+          "ticketNote": "需实名预约，旺季限流，开放殿宇与时段以寺院官方公告为准"
         },
         {
           "id": "agli-p-peiku",
@@ -664,7 +1404,8 @@
           "tagline": "希夏邦马峰脚下的大湖，公路贴湖而行。",
           "intro": "湖面海拔约 4590 米，湖的背后就是海拔 8012 米的希夏邦马峰——唯一完全位于中国境内的 8000 米级山峰。G318 沿湖岸走，是抵达阿里之前第一个「荒原感」场景。",
           "visitHours": 0.5,
-          "bestTime": "晴天无风时水面如镜。"
+          "bestTime": "晴天无风时水面如镜。",
+          "ticketNote": "湖岸多为公路沿线免费观景点，若进入管理范围需登记，以景区公告为准"
         },
         {
           "id": "agli-p-mapam",
@@ -690,7 +1431,8 @@
           "lat": 30.75,
           "tagline": "与圣湖一路之隔的咸水湖，颜色更深。",
           "intro": "紧挨玛旁雍措的咸水湖，因为没有鱼类、四周荒凉而得名。这里风极大，站在两湖之间的公路上可以一眼看到两种完全不同的蓝。",
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "部分岸段属管理范围需登记，其余为免费荒野岸线，以官方公告为准"
         },
         {
           "id": "agli-p-kailash",
@@ -719,7 +1461,8 @@
           "intro": "象泉河谷两侧绵延数十公里的土质峰林，由远古大湖沉积被流水切割而成。县城附近的观景台可以俯瞰整片土林，日出与日落时分光影最立体，很多人认为它是整个阿里最不像地球的地方。",
           "mustSee": true,
           "visitHours": 2,
-          "bestTime": "日出后 1 小时、日落前 1 小时。"
+          "bestTime": "日出后 1 小时、日落前 1 小时。",
+          "ticketNote": "县城观景台免费开放，景区内步道与范围以景区公告为准"
         },
         {
           "id": "agli-p-guge",
@@ -745,7 +1488,8 @@
           "lat": 31.48,
           "tagline": "阿里最古老的佛寺，藏传佛教后弘期的起点。",
           "intro": "11 世纪初由古格王室兴建，是阿底峡大师驻锡与译经的地方，对整个藏传佛教后弘期影响深远。寺院规模不大，但壁画与佛塔价值极高，参观需随管理人员开门进入。",
-          "visitHours": 1
+          "visitHours": 1,
+          "ticketNote": "殿堂开放范围随管理安排变动，是否限流以寺院公告为准"
         },
         {
           "id": "agli-p-zharinanmu",
@@ -754,10 +1498,11 @@
           "city": "阿里地区",
           "category": "water",
           "lng": 85.6,
-          "lat": 31.0,
+          "lat": 31,
           "tagline": "北线第一大湖，藏野驴成群。",
           "intro": "面积约 1000 平方公里的高原湖，是进入北线后的第一组强景观。湖岸是平坦的羌塘草甸，藏野驴、藏原羚、黑颈鹤常见，适合停车长时间观察。注意草甸松软，切勿把车开下路基。",
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "湖岸可停车观鸟，核心区禁入，开放范围以保护区公告为准"
         },
         {
           "id": "agli-p-dangra",
@@ -766,10 +1511,11 @@
           "city": "那曲",
           "category": "water",
           "lng": 86.6,
-          "lat": 31.0,
+          "lat": 31,
           "tagline": "苯教圣湖，湖畔是古老的文布南村。",
           "intro": "狭长的高原深水湖，被认为是西藏最古老的苯教圣湖之一，湖畔的文布南村保留着夯土房与青稞田的完整聚落。支线为土石路，来回约 140 公里，需四驱车并在天黑前离开。",
           "visitHours": 3,
+          "ticketNote": "苯教圣湖按寺院与村规管理，是否可进入以官方公告为准",
           "detourKm": 140
         },
         {
@@ -783,7 +1529,8 @@
           "tagline": "西藏第一大湖，黑颈鹤国家级自然保护区核心。",
           "intro": "面积约 2300 平方公里的大湖，与周边的错鄂、班戈措构成庞大的湖泊群，是黑颈鹤、藏羚羊的重要栖息地。G317 沿湖而过，是北线连续长距离中最不单调的一段。",
           "mustSee": true,
-          "visitHours": 0.5
+          "visitHours": 0.5,
+          "ticketNote": "沿岸为公路视角为主，禁入区与禁飞范围以保护区公告为准"
         },
         {
           "id": "agli-p-namtso-n",
@@ -795,25 +1542,377 @@
           "lat": 30.85,
           "tagline": "比南岸安静得多的一段湖岸公路。",
           "intro": "从班戈方向绕进纳木错，走的是游客罕至的北岸与东岸。湖面开阔、对岸雪山连绵，没有扎西半岛住区的光污染，星空质量更好。路边偶有牧民帐篷，不要随意进入草场。",
-          "visitHours": 1
+          "visitHours": 1,
+          "ticketNote": "北岸为景区外公路段，通行与住宿开放以官方公告为准"
+        },
+        {
+          "id": "agli-p-yamdrok",
+          "name": "羊卓雍措",
+          "province": "西藏",
+          "city": "山南",
+          "category": "water",
+          "lng": 90.6193,
+          "lat": 29.1905,
+          "tagline": "西藏三大圣湖之一，蜿蜒在冈底斯山脉间的蓝丝带。",
+          "intro": "简称羊湖，与纳木错、玛旁雍措并称西藏三大圣湖。湖水在群山间蜿蜒出极不规则的岸线，从岗巴拉山口俯瞰是一片深邃的蓝。湖区有观景台供停留，也可沿湖岸多个角度欣赏湖光与远山。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "ticketNote": "湖岸观景台分段管理，开放与收费以景区公告为准"
+        },
+        {
+          "id": "agli-p-karola",
+          "name": "卡若拉冰川",
+          "province": "西藏",
+          "city": "日喀则",
+          "category": "mountain",
+          "lng": 90.1665,
+          "lat": 28.8833,
+          "tagline": "从公路边就能望见的海洋性冰川，离 G349 极近。",
+          "intro": "位于浪卡子县与江孜之间的卡若拉山口附近，是西藏离公路最近的冰川之一，冰舌从乃钦康桑峰垂下、几乎触到 G349 路面。受气候变暖影响冰舌持续退缩，是直观感受冰川变化的地点。",
+          "visitHours": 0.5,
+          "ticketNote": "冰川观景区域管理，进入与门票以景区公告为准"
+        },
+        {
+          "id": "agli-p-everest",
+          "name": "珠穆朗玛峰大本营",
+          "province": "西藏",
+          "city": "日喀则",
+          "category": "mountain",
+          "lng": 86.8434,
+          "lat": 28.1648,
+          "tagline": "世界之巅脚下的观景营地，遥望珠峰旗云。",
+          "intro": "位于定日县扎西宗乡，是普通游客能抵达的珠峰最近观景点（环保车换乘后到达）。营地面向珠峰，天气好时可清晰看到峰顶与旗云，夜晚银河与日照金山是主要看点。海拔约 5200 米，需防范高原反应。",
+          "mustSee": true,
+          "visitHours": 2,
+          "ticketNote": "入山景区需预约并换乘环保车，开放与限流以景区公告为准"
+        },
+        {
+          "id": "agli-p-shishapangma",
+          "name": "希夏邦马峰",
+          "province": "西藏",
+          "city": "日喀则",
+          "category": "mountain",
+          "lng": 85.7817,
+          "lat": 28.3485,
+          "tagline": "唯一完全在中国境内的 8000 米级山峰。",
+          "intro": "海拔 8027 米，是全球 14 座 8000 米级山峰中唯一一座整体位于中国境内的，地处聂拉木县。从 318 国道接近可在佩枯措北岸远眺其完整山体，是阿里—日喀则走廊上少有的超高峰观景点。",
+          "visitHours": 0.5,
+          "ticketNote": "为沿途远眺点，靠近与停留以交管与景区公告为准"
+        },
+        {
+          "id": "agli-p-bamco",
+          "name": "巴木措",
+          "province": "西藏",
+          "city": "那曲",
+          "category": "water",
+          "lng": 90.5798,
+          "lat": 31.2334,
+          "tagline": "纳木错东北侧的高原湖，人少而水色浓烈。",
+          "intro": "位于班戈县，地处纳木错东北、念青唐古拉山以北的高原面上。相比纳木错景区更安静，湖水呈现出浓烈的蓝绿，周边为开阔牧场，是阿里大北线（班戈—当雄段）上值得停留的小众湖泊。",
+          "visitHours": 1,
+          "ticketNote": "湖岸为开放牧场区域，停留与通行以当地管理为准"
         }
       ],
       "plan": [
-        { "day": 1, "title": "拉萨适应 + 采购", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "roadRefs": ["城市道路"], "stayCity": "拉萨", "poiIds": [], "summary": "装备最后检查：备胎、氧气、燃油。" },
-        { "day": 2, "title": "拉萨 → 日喀则", "fromNode": "拉萨", "toNode": "日喀则", "distanceKm": 280, "driveHours": 5, "roadRefs": ["G318"], "stayCity": "日喀则", "poiIds": ["agli-p-tashilhunpo"], "summary": "常规适应过渡。" },
-        { "day": 3, "title": "日喀则 → 萨嘎", "fromNode": "日喀则", "toNode": "萨嘎", "distanceKm": 480, "driveHours": 8.5, "roadRefs": ["G318"], "stayCity": "萨嘎", "poiIds": ["agli-p-peiku"], "summary": "进入 4500 米以上的世界。", "tips": ["拉孜加满油"] },
-        { "day": 4, "title": "萨嘎 → 塔尔钦", "fromNode": "萨嘎", "toNode": "塔尔钦", "distanceKm": 500, "driveHours": 8, "roadRefs": ["G219"], "stayCity": "塔尔钦", "poiIds": ["agli-p-mapam", "agli-p-laang", "agli-p-kailash"], "summary": "圣湖群抵达，夜里看冈仁波齐。" },
-        { "day": 5, "title": "塔尔钦：转山或休整", "fromNode": "塔尔钦", "toNode": "塔尔钦", "distanceKm": 0, "roadRefs": [], "stayCity": "塔尔钦", "poiIds": ["agli-p-kailash"], "summary": "转山需 2 天（可选），不转山者在周边远拍。" },
-        { "day": 6, "title": "塔尔钦 → 扎达", "fromNode": "塔尔钦", "toNode": "扎达", "distanceKm": 320, "driveHours": 6.5, "roadRefs": ["G219", "G565"], "stayCity": "扎达", "poiIds": ["agli-p-zanda"], "summary": "下到 3700 米，住扎达。" },
-        { "day": 7, "title": "扎达：古格与托林寺", "fromNode": "扎达", "toNode": "扎达", "distanceKm": 40, "roadRefs": ["G565"], "stayCity": "扎达", "poiIds": ["agli-p-guge", "agli-p-tuolin"], "summary": "一天看完阿里的人文核心。" },
-        { "day": 8, "title": "扎达 → 狮泉河", "fromNode": "扎达", "toNode": "狮泉河", "distanceKm": 200, "driveHours": 4, "roadRefs": ["G219"], "stayCity": "狮泉河", "poiIds": [], "summary": "北线前的最后补给点。", "tips": ["检修车辆、加满油、装满水与食物"] },
-        { "day": 9, "title": "狮泉河 → 改则", "fromNode": "狮泉河", "toNode": "改则", "distanceKm": 470, "driveHours": 8, "roadRefs": ["G317"], "stayCity": "改则", "poiIds": ["agli-p-zharinanmu"], "summary": "进羌塘，全天接近无信号。" },
-        { "day": 10, "title": "改则 → 尼玛（当惹雍措支线）", "fromNode": "改则", "toNode": "尼玛", "distanceKm": 400, "driveHours": 7.5, "roadRefs": ["G317"], "stayCity": "尼玛", "poiIds": ["agli-p-dangra"], "summary": "土路最多的一天，务必早出发。" },
-        { "day": 11, "title": "尼玛 → 班戈", "fromNode": "尼玛", "toNode": "班戈", "distanceKm": 405, "driveHours": 7.5, "roadRefs": ["G317"], "stayCity": "班戈", "poiIds": ["agli-p-selinco"], "summary": "色林措群湖的一天。" },
-        { "day": 12, "title": "班戈 → 纳木错", "fromNode": "班戈", "toNode": "纳木错", "distanceKm": 420, "driveHours": 8, "roadRefs": ["G562", "纳木错景区公路"], "stayCity": "纳木错", "poiIds": ["agli-p-namtso-n"], "summary": "绕到游客最少的北岸。" },
-        { "day": 13, "title": "纳木错 → 拉萨", "fromNode": "纳木错", "toNode": "拉萨", "distanceKm": 235, "driveHours": 4.5, "roadRefs": ["G109"], "stayCity": "拉萨", "poiIds": [], "summary": "行程结束，回拉萨洗热水澡。" },
-        { "day": 14, "title": "机动日", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "roadRefs": [], "stayCity": "拉萨", "poiIds": [], "summary": "留给车辆故障、天气与身体不适。" },
-        { "day": 15, "title": "机动日 / 拉萨自由活动", "fromNode": "拉萨", "toNode": "拉萨", "distanceKm": 0, "roadRefs": [], "stayCity": "拉萨", "poiIds": [], "summary": "第二个机动日。" }
+        {
+          "day": 1,
+          "title": "拉萨适应 + 采购",
+          "fromNode": "拉萨",
+          "toNode": "拉萨",
+          "distanceKm": 0, "driveHours": 0,
+          "roadRefs": [
+            "城市道路"
+          ],
+          "stayCity": "拉萨",
+          "poiIds": [],
+          "summary": "全天留在拉萨做出发前最后准备：检查备胎与随车工具、补齐氧气和三天口粮、确认边防通行证与车辆保险。下午在市区采购后续几天的高原干粮，今天不安排景点，把体力留给明天。",
+          "tips": [
+            "证件、氧气、拖车绳三样当天必须复核",
+            "备胎与补胎工具实车试用一次",
+            "今天不要安排景点，把体力留给明天"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "拉萨 → 日喀则",
+          "fromNode": "拉萨",
+          "toNode": "日喀则",
+          "distanceKm": 280,
+          "driveHours": 5,
+          "roadRefs": [
+            "G318"
+          ],
+          "stayCity": "日喀则",
+          "poiIds": [
+            "agli-p-tashilhunpo"
+          ],
+          "summary": "沿 G318 从拉萨经曲水、仁布到日喀则，五小时车程基本全程铺装。海拔从 3650 米小幅抬升到 3850 米，抵达后先看扎什伦布寺的强巴佛殿，傍晚在城区补给，为次日长距离转入阿里做准备。",
+          "tips": [
+            "今日仍属适应期，不要赶夜路",
+            "日喀则是大补给点，氧气与食品一次买足",
+            "扎什伦布寺需预约，参观按批次入场"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "日喀则 → 萨嘎",
+          "fromNode": "日喀则",
+          "toNode": "萨嘎",
+          "distanceKm": 480,
+          "driveHours": 8.5,
+          "roadRefs": [
+            "G318"
+          ],
+          "stayCity": "萨嘎",
+          "poiIds": [
+            "agli-p-peiku"
+          ],
+          "summary": "从日喀则经拉孜、昂仁翻越数处 4700 米以上山口到萨嘎，这是全程最完整的一次从高原过渡到极高海拔的过程。佩枯措公路贴湖而过，晴天可见希夏邦马峰；到萨嘎后不要洗澡、不要饮酒，尽早入睡。",
+          "tips": [
+            "拉孜加满油",
+            "佩枯措路边停车带有限，注意避让大车",
+            "今日海拔跨越大，头痛明显就吸氧"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "萨嘎 → 塔尔钦",
+          "fromNode": "萨嘎",
+          "toNode": "塔尔钦",
+          "distanceKm": 500,
+          "driveHours": 8,
+          "roadRefs": [
+            "G219"
+          ],
+          "stayCity": "塔尔钦",
+          "poiIds": [
+            "agli-p-mapam",
+            "agli-p-laang",
+            "agli-p-kailash"
+          ],
+          "summary": "全天沿 G219 南下，经公珠措、玛旁雍措抵达神山脚下的塔尔钦。景观从荒原草原换成湖群与雪山，午后抵达后先在村里放慢走动，海拔 4660 米的第一晚不要安排活动。",
+          "tips": [
+            "沿途无加油站，务必在萨嘎加满油",
+            "玛旁雍措岸边风大，下车快速取景",
+            "塔尔钦住宿旺季紧张，按时抵达办理入住"
+          ]
+        },
+        {
+          "day": 5,
+          "title": "塔尔钦：转山或休整",
+          "fromNode": "塔尔钦",
+          "toNode": "塔尔钦",
+          "distanceKm": 0, "driveHours": 0,
+          "roadRefs": [],
+          "stayCity": "塔尔钦",
+          "poiIds": [
+            "agli-p-kailash"
+          ],
+          "summary": "今天是一天的弹性安排：体力足、体感好就启动冈仁波齐外圈转山的前半程，沿途以经幡、玛尼堆和雪山作伴；不转山者可在塔尔钦周边看神山晨昏，或在玛旁雍措湖岸坐一会儿。晚上早点收工。",
+          "tips": [
+            "外圈转山需两天，今天只走前半程",
+            "垭口风大，不要奔跑、不要久留",
+            "不转山者可在塔尔钦周边远拍神山"
+          ]
+        },
+        {
+          "day": 6,
+          "title": "塔尔钦 → 扎达",
+          "fromNode": "塔尔钦",
+          "toNode": "扎达",
+          "distanceKm": 320,
+          "driveHours": 6.5,
+          "roadRefs": [
+            "G219",
+            "G565"
+          ],
+          "stayCity": "扎达",
+          "poiIds": [
+            "agli-p-zanda"
+          ],
+          "summary": "沿 G219 折向东南，下到扎达县城时海拔骤降到 3700 米，是全程睡得最踏实的一晚。路上以土林沟壑景观为主，中途不下道穿行；到扎达后安排一顿热饭，把前几天的疲劳一次清掉。",
+          "tips": [
+            "下坡路段长，注意控制车速",
+            "扎达海拔骤降，明显比塔尔钦好睡",
+            "县城补给有限，需提前一天在狮泉河买足"
+          ]
+        },
+        {
+          "day": 7,
+          "title": "扎达：古格与托林寺",
+          "fromNode": "扎达",
+          "toNode": "扎达",
+          "distanceKm": 40, "driveHours": 1.5,
+          "roadRefs": [
+            "G565"
+          ],
+          "stayCity": "扎达",
+          "poiIds": [
+            "agli-p-guge",
+            "agli-p-tuolin"
+          ],
+          "summary": "上午上土山顶的古格王朝遗址，红殿壁画是看点所在，需爬约 300 级台阶；午后到县城边的托林寺看后弘期壁画与佛塔。两天加起来才是完整的人文线，体力紧张时可把托林寺挪到次日早上。",
+          "tips": [
+            "古格遗址台阶较多，量力安排登顶",
+            "殿内禁止闪光灯，拍摄注意规范",
+            "县城周边午后风大，注意保暖"
+          ]
+        },
+        {
+          "day": 8,
+          "title": "扎达 → 狮泉河",
+          "fromNode": "扎达",
+          "toNode": "狮泉河",
+          "distanceKm": 200,
+          "driveHours": 4,
+          "roadRefs": [
+            "G219"
+          ],
+          "stayCity": "狮泉河",
+          "poiIds": [],
+          "summary": "上午从扎达经托林寺、那不如北上狮泉河，沿途是连绵的土林沟壑，是全线最好开的一段路。狮泉河是北线前最后一个完整补给站，务必检修车辆、加满油、装满水与食物，并确认卫星电话。",
+          "tips": [
+            "检修车辆、加满油、装满水与食物",
+            "确认卫星电话与当日天气",
+            "不要单车离开狮泉河"
+          ]
+        },
+        {
+          "day": 9,
+          "title": "狮泉河 → 改则",
+          "fromNode": "狮泉河",
+          "toNode": "改则",
+          "distanceKm": 470,
+          "driveHours": 8,
+          "roadRefs": [
+            "G317"
+          ],
+          "stayCity": "改则",
+          "poiIds": [
+            "agli-p-zharinanmu"
+          ],
+          "summary": "北上进入羌塘，这一天大半时间看不到第二辆车，也基本没有手机信号。经过扎日南木措时在湖岸停留看藏野驴与水鸟，草甸松软不要把车开下路基。抵达改则后以休息为主。",
+          "tips": [
+            "羌塘段信号盲区多，先报备行程",
+            "草甸松软，严禁驶离公路",
+            "日落前抵达改则，天黑后不再行车"
+          ]
+        },
+        {
+          "day": 10,
+          "title": "改则 → 尼玛（当惹雍措支线）",
+          "fromNode": "改则",
+          "toNode": "尼玛",
+          "distanceKm": 400,
+          "driveHours": 7.5,
+          "roadRefs": [
+            "G317"
+          ],
+          "stayCity": "尼玛",
+          "poiIds": [
+            "agli-p-dangra"
+          ],
+          "summary": "主线沿 G317 北行，支线通往当惹雍措与文布南村，来回约 140 公里土石路，需四驱车且只在天气好时进入。当天里程不算大，但路最慢，务必早出发，并在天黑前回到主路。",
+          "tips": [
+            "支线为土石路，非四驱车不要进入",
+            "带足油与水，支线无补给",
+            "午后起风转冷，注意车厢保温"
+          ]
+        },
+        {
+          "day": 11,
+          "title": "尼玛 → 班戈",
+          "fromNode": "尼玛",
+          "toNode": "班戈",
+          "distanceKm": 405,
+          "driveHours": 7.5,
+          "roadRefs": [
+            "G317"
+          ],
+          "stayCity": "班戈",
+          "poiIds": [
+            "agli-p-selinco"
+          ],
+          "summary": "沿 G317 沿色林措群湖北上，路段风景最密也最颠搓板，控速保护轮胎。湖面与错鄂、班戈措层层铺开，大片湿地是黑颈鹤的重要栖息地。到班戈后早点停车休息，海拔 4750 米不宜久留。",
+          "tips": [
+            "搓板路段减速通过，避免急打方向",
+            "不在湿地边缘停靠驱赶动物",
+            "今日海拔高，抵达后不要饮酒"
+          ]
+        },
+        {
+          "day": 12,
+          "title": "班戈 → 纳木错",
+          "fromNode": "班戈",
+          "toNode": "纳木错",
+          "distanceKm": 420,
+          "driveHours": 8,
+          "roadRefs": [
+            "G562",
+            "纳木错景区公路"
+          ],
+          "stayCity": "纳木错",
+          "poiIds": [
+            "agli-p-namtso-n"
+          ],
+          "summary": "先走 G562 转向纳木错方向，再经景区公路从北岸进入，走的是游客最少的一段湖岸。没有扎西半岛住区的光污染，星空更干净；草原上的牧民帐篷不要随意进入。当晚住纳木错，注意夜间保暖。",
+          "tips": [
+            "北岸为景区外路段，是否限行以公告为准",
+            "住宿与供暖条件简陋，带睡袋内胆",
+            "夜间不要单独远离住处"
+          ]
+        },
+        {
+          "day": 13,
+          "title": "纳木错 → 拉萨",
+          "fromNode": "纳木错",
+          "toNode": "拉萨",
+          "distanceKm": 235,
+          "driveHours": 4.5,
+          "roadRefs": [
+            "G109"
+          ],
+          "stayCity": "拉萨",
+          "poiIds": [],
+          "summary": "清晨在湖边看第一缕光，之后沿景区公路返回当雄、翻羊八井到拉萨。这一天海拔从 4718 米一路下降到 3650 米，是全程第二次明显下降，回城后安排热水澡与充分休息，补给氧气与食品。",
+          "tips": [
+            "退房前检查是否有遗留物品",
+            "羊八井一带常有拥堵，留出缓冲",
+            "回拉萨当天不再安排景点"
+          ]
+        },
+        {
+          "day": 14,
+          "title": "机动日",
+          "fromNode": "拉萨",
+          "toNode": "拉萨",
+          "distanceKm": 0, "driveHours": 0,
+          "roadRefs": [],
+          "stayCity": "拉萨",
+          "poiIds": [],
+          "summary": "预留给车辆故障、天气或身体不适的一天。西藏段的塌方管制与临时封路常见，压缩后面的天数会非常被动；如果前几天顺利，这一天可以用来补看拉萨城内的寺院，或把未走完的支线补上。",
+          "tips": [
+            "提前与司机确认次日路况与管制",
+            "机动日不要提前锁定行程",
+            "需要就医时优先下到低海拔县城"
+          ]
+        },
+        {
+          "day": 15,
+          "title": "机动日 / 拉萨自由活动",
+          "fromNode": "拉萨",
+          "toNode": "拉萨",
+          "distanceKm": 0, "driveHours": 0,
+          "roadRefs": [],
+          "stayCity": "拉萨",
+          "poiIds": [],
+          "summary": "最后一个缓冲日。适合安排返程前的采购与整理：补充剩余氧气、修整装备、寄快递与办理退租。若前几天因天气损失了景点，可用这半天补大昭寺或八廓街，之后按航班或火车时间返程。",
+          "tips": [
+            "返程前确认机票或火车时刻",
+            "预留从市区到机场或车站的时间",
+            "高原上慢慢起身，避免动作过猛"
+          ]
+        }
       ],
       "practical": {
         "permit": "阿里全线需办理《边境管理区通行证》（含阿里地区、扎达、普兰等），建议在户籍地或拉萨提前办妥。",
@@ -831,8 +1930,14 @@
         ]
       },
       "sources": [
-        { "title": "日喀则市文化和旅游局 · 西藏公里数（路况大全）", "usedFor": "阿里南线 / 大北线分段里程" },
-        { "title": "阿里地区文旅 · 自驾阿里 3 条经典路线", "usedFor": "里程与天数口径" }
+        {
+          "title": "日喀则市文化和旅游局 · 西藏公里数（路况大全）",
+          "usedFor": "阿里南线 / 大北线分段里程"
+        },
+        {
+          "title": "阿里地区文旅 · 自驾阿里 3 条经典路线",
+          "usedFor": "里程与天数口径"
+        }
       ],
       "editorRank": 10,
       "layer": "L1",

@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 /**
  * 线路全屏地图 /route/:corridorId/map
  *
@@ -9,6 +9,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api, type AtlasCorridorDetail, type AtlasCorridorSpot } from '../api/client';
 import { findRankingsByCorridor } from '../data/beautifulRailings';
+import { ATLAS_RAIL_HOVER_STROKE, ATLAS_RAIL_STROKE } from '../data/atlasColors';
 import {
   SPOT_DIMENSIONS,
   UNCLASSIFIED_DIMENSION,
@@ -191,9 +192,9 @@ function readToken(name: string, fallback: string): string {
 }
 
 function railStrokeOptions() {
-  const rail = readToken('--rail', '#4d9fff');
+  const rail = readToken('--rail', ATLAS_RAIL_STROKE);
   return satelliteOn.value
-    ? { strokeColor: readToken('--accent-hover', '#74b2ff'), strokeOpacity: 0.95 }
+    ? { strokeColor: readToken('--accent-hover', ATLAS_RAIL_HOVER_STROKE), strokeOpacity: 0.95 }
     : { strokeColor: rail, strokeOpacity: 0.85 };
 }
 
@@ -709,7 +710,7 @@ watch([displayFrom, displayTo], async () => {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
   line-height: 1.3;
 }
 
@@ -717,7 +718,7 @@ watch([displayFrom, displayTo], async () => {
   margin: 0;
   font-size: 12px;
   line-height: 1.45;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 
 .cormap-meta {
@@ -725,8 +726,8 @@ watch([displayFrom, displayTo], async () => {
 }
 
 .status-meta__item--btn.is-active {
-  border-color: var(--accent-container);
-  background: var(--accent-container);
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
 }
 
 .cormap-side {
@@ -734,12 +735,12 @@ watch([displayFrom, displayTo], async () => {
   max-height: min(52vh, calc(100vh - 160px));
   display: flex;
   flex-direction: column;
-  border-radius: 14px;
-  border: 1px solid var(--border-default);
-  background: color-mix(in srgb, var(--panel-bg, var(--bg-raised)) 96%, transparent);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-default);
+  background: color-mix(in srgb, var(--panel-bg, var(--surface-1)) 96%, transparent);
   backdrop-filter: blur(12px) saturate(1.2);
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--elev-float-strong);
   overflow: hidden;
   pointer-events: auto;
 }
@@ -750,7 +751,7 @@ watch([displayFrom, displayTo], async () => {
   align-items: center;
   gap: 8px;
   padding: 10px 10px 8px 12px;
-  border-bottom: 1px solid var(--border-hairline);
+  border-bottom: 1px solid var(--line-hairline);
 }
 
 .cormap-side__title {
@@ -759,7 +760,7 @@ watch([displayFrom, displayTo], async () => {
   margin: 0;
   font-size: 13px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
   display: flex;
   align-items: baseline;
   gap: 6px;
@@ -769,7 +770,7 @@ watch([displayFrom, displayTo], async () => {
   font-size: 11px;
   font-weight: 650;
   font-variant-numeric: tabular-nums;
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .cormap-side__close {
@@ -778,18 +779,18 @@ watch([displayFrom, displayTo], async () => {
   height: 28px;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--line-hairline);
   border-radius: 8px;
-  background: var(--bg-inset);
-  color: var(--text-secondary);
+  background: var(--surface-sunken);
+  color: var(--text-2);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
 }
 
 .cormap-side__close:hover {
-  border-color: var(--accent-container);
-  color: var(--text-primary);
+  border-color: var(--accent-soft);
+  color: var(--text-1);
 }
 
 .cormap-side__list {
@@ -810,7 +811,7 @@ watch([displayFrom, displayTo], async () => {
   margin: 0 0 2px;
   padding: 8px 8px;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -819,13 +820,13 @@ watch([displayFrom, displayTo], async () => {
 }
 
 .cormap-side__row:hover {
-  background: var(--bg-inset);
-  border-color: var(--border-hairline);
+  background: var(--surface-sunken);
+  border-color: var(--line-hairline);
 }
 
 .cormap-side__row.is-active {
-  background: var(--accent-container);
-  border-color: var(--accent-container);
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
 }
 
 .cormap-side__idx {
@@ -835,7 +836,7 @@ watch([displayFrom, displayTo], async () => {
   font-size: 11px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--text-muted);
+  color: var(--text-3);
   text-align: right;
 }
 
@@ -849,20 +850,20 @@ watch([displayFrom, displayTo], async () => {
 .cormap-side__name {
   font-size: 13px;
   font-weight: 650;
-  color: var(--text-primary);
+  color: var(--text-1);
   line-height: 1.3;
 }
 
 .cormap-side__meta {
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   line-height: 1.35;
 }
 
 .cormap-side__empty {
   padding: 16px 10px;
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text-3);
   text-align: center;
 }
 
@@ -873,7 +874,7 @@ watch([displayFrom, displayTo], async () => {
   margin-right: 8px;
   margin-top: 4px;
   font-size: 11px;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 
 .cormap-legend-dim__dot {

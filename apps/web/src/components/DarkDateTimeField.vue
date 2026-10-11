@@ -317,25 +317,31 @@ watch(
   gap: 10px;
   width: 100%;
   padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border-default);
-  background: var(--bg-raised);
-  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-default);
+  background: var(--surface-1);
+  color: var(--text-1);
   font-size: 16px;
   font-family: inherit;
   cursor: pointer;
   text-align: left;
-  transition: border-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+  transition: border-color var(--dur-micro) var(--ease-standard), box-shadow var(--dur-micro) var(--ease-standard);
 }
 
-.dtf-trigger:hover,
 .dtf--open .dtf-trigger {
   border-color: var(--accent-border);
-  box-shadow: 0 0 0 1px var(--accent-container);
+  box-shadow: 0 0 0 1px var(--accent-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dtf-trigger:hover {
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 1px var(--accent-soft);
+  }
 }
 
 .dtf-trigger__text.is-placeholder {
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .dtf-trigger__icon {
@@ -347,12 +353,12 @@ watch(
 .dtf-panel {
   z-index: 50;
   margin-top: 8px;
-  border-radius: 12px;
-  background: var(--bg-base);
-  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-0);
+  border: 1px solid var(--line-default);
   box-shadow:
-    0 18px 48px rgba(0, 0, 0, 0.5),
-    0 0 0 1px var(--accent-container) inset;
+    var(--elev-3),
+    0 0 0 1px var(--accent-soft) inset;
   overflow: hidden;
 }
 
@@ -367,8 +373,8 @@ watch(
 .dtf--inline .dtf-panel {
   margin-top: 0;
   box-shadow: none;
-  background: var(--bg-scrim);
-  border: 1px solid var(--border-default);
+  background: var(--surface-scrim);
+  border: 1px solid var(--line-default);
 }
 
 /* 短视口横屏：面板高度 ~280px，向下弹必然超出视口下缘（390px 高的横屏
@@ -410,13 +416,13 @@ watch(
   justify-content: space-between;
   gap: 10px;
   padding: 8px 10px;
-  border-bottom: 1px solid var(--border-hairline);
-  background: var(--accent-container);
+  border-bottom: 1px solid var(--line-hairline);
+  background: var(--accent-soft);
 }
 
 .dtf-selected__label {
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-3);
   letter-spacing: 0.04em;
   flex-shrink: 0;
 }
@@ -451,7 +457,7 @@ watch(
 .dtf:not(.dtf--inline) .dtf-day {
   height: 26px;
   font-size: 11px;
-  border-radius: 5px;
+  border-radius: var(--radius-xs);
 }
 
 .dtf:not(.dtf--inline) .dtf-nav {
@@ -479,25 +485,27 @@ watch(
 .dtf-cal__label {
   font-size: 12px;
   font-weight: 650;
-  color: var(--text-secondary);
+  color: var(--text-2);
   letter-spacing: 0.02em;
 }
 
 .dtf-nav {
   width: 26px;
   height: 26px;
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+  color: var(--text-2);
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
 }
 
-.dtf-nav:hover {
-  border-color: rgba(56, 189, 248, 0.4);
-  color: var(--accent-hover);
+@media (hover: hover) and (pointer: fine) {
+  .dtf-nav:hover {
+    border-color: var(--accent-border);
+    color: var(--accent-hover);
+  }
 }
 
 .dtf-week {
@@ -510,7 +518,7 @@ watch(
 .dtf-week span {
   text-align: center;
   font-size: 10px;
-  color: var(--text-muted);
+  color: var(--text-3);
   padding: 2px 0;
 }
 
@@ -524,20 +532,20 @@ watch(
   appearance: none;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-2);
   font-size: 12px;
   font-family: inherit;
   height: 28px;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   cursor: pointer;
 }
 
 .dtf-day:hover {
-  background: var(--accent-container);
+  background: var(--accent-soft);
 }
 
 .dtf-day.is-muted {
-  color: var(--text-muted);
+  color: var(--text-3);
 }
 
 .dtf-day.is-today:not(.is-selected) {
@@ -546,7 +554,7 @@ watch(
 }
 
 .dtf-day.is-selected {
-  background: var(--accent-container);
+  background: var(--accent-soft);
   border-color: var(--accent-border);
   color: var(--accent-hover);
   font-weight: 650;
@@ -577,8 +585,8 @@ watch(
   display: flex;
   flex: 0 0 96px;
   width: 96px;
-  border-left: 1px solid var(--border-hairline);
-  background: var(--bg-scrim);
+  border-left: 1px solid var(--line-hairline);
+  background: var(--surface-scrim);
 }
 
 .dtf-time-col {
@@ -595,7 +603,7 @@ watch(
   font-weight: 700;
   color: var(--accent-hover);
   padding: 6px 0 4px;
-  border-bottom: 1px solid var(--border-hairline);
+  border-bottom: 1px solid var(--line-hairline);
   letter-spacing: 0.06em;
 }
 
@@ -606,7 +614,7 @@ watch(
   overscroll-behavior: contain;
   padding: 4px 3px;
   scrollbar-width: thin;
-  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-color: var(--text-3) transparent;
 }
 
 .dtf-time-item {
@@ -615,9 +623,9 @@ watch(
   padding: 4px 0;
   margin: 0;
   border: 1px solid transparent;
-  border-radius: 5px;
+  border-radius: var(--radius-xs);
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-3);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   font-family: inherit;
@@ -626,12 +634,12 @@ watch(
 }
 
 .dtf-time-item:hover {
-  background: var(--accent-container);
-  color: var(--text-secondary);
+  background: var(--accent-soft);
+  color: var(--text-2);
 }
 
 .dtf-time-item.is-active {
-  background: var(--accent-container);
+  background: var(--accent-soft);
   border-color: var(--accent-border);
   color: var(--accent-hover);
   font-weight: 650;
@@ -646,11 +654,16 @@ watch(
     width: 100%;
     flex-basis: auto;
     border-left: none;
-    border-top: 1px solid var(--border-hairline);
+    border-top: 1px solid var(--line-hairline);
   }
 
   .dtf-time-scroll {
     max-height: 108px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dtf-trigger {
+    transition: none;
   }
 }
 </style>

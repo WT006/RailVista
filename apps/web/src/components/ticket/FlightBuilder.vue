@@ -157,37 +157,39 @@ watch(
 <style scoped>
 .fb__top { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
 .fb__no { grid-column: 1 / -1; }
-.fb__label { display: block; margin-bottom: 7px; font-size: 12.5px; letter-spacing: 0.04em; color: rgba(255,255,255,0.55); }
+.fb__label { display: block; margin-bottom: 7px; font-size: var(--fs-cap); letter-spacing: 0.04em; color: var(--text-2); }
 .fb__datebox {
   display: flex; align-items: center;
   min-height: 48px; padding: 0 14px;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.055);
-  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line-default);
 }
-.fb__datebox:focus-within { border-color: rgba(212,168,83,0.55); box-shadow: 0 0 0 3px rgba(212,168,83,0.12); }
-.fb__datebox input { flex: 1; height: 46px; font-size: 15px; color: #fff; background: transparent; border: none; outline: none; color-scheme: dark; }
+.fb__datebox:focus-within { border-color: var(--accent); box-shadow: var(--focus-ring); }
+.fb__datebox input { flex: 1; height: 46px; font-size: 15px; color: var(--text-1); background: transparent; border: none; outline: none; color-scheme: dark; }
 .fb__submit {
   grid-column: 1 / -1;
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 50px; border: none; border-radius: 25px;
-  font-size: 15px; font-weight: 600; color: #1c1810;
-  background: linear-gradient(180deg, #e8cd92, #cba85c);
-  cursor: pointer; transition: transform 0.15s, filter 0.15s;
+  min-height: 50px; border: none; border-radius: var(--radius-full);
+  font-size: 15px; font-weight: 600; color: var(--surface-0);
+  background: linear-gradient(180deg, var(--accent), var(--accent-press));
+  cursor: pointer; transition: transform var(--dur-micro) var(--ease-standard), filter var(--dur-micro) var(--ease-standard);
 }
-.fb__submit:hover { filter: brightness(1.06); }
+@media (hover: hover) and (pointer: fine) {
+  .fb__submit:hover { filter: brightness(1.06); }
+}
 .fb__submit:active { transform: scale(0.985); }
 .fb__submit:disabled { opacity: 0.6; }
-.fb__error { color: #e06b6b; font-size: 13px; margin: 10px 0 0; }
+.fb__error { color: var(--danger); font-size: 13px; margin: 10px 0 0; }
 
-.fb__local { margin-top: 16px; padding: 14px; border-radius: 18px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); }
-.fb__notice { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: rgba(255,255,255,0.6); }
+.fb__local { margin-top: 16px; padding: 14px; border-radius: var(--radius-md); background: var(--surface-2); border: 1px solid var(--line-default); }
+.fb__notice { margin: 0 0 12px; font-size: var(--fs-cap); line-height: 1.6; color: var(--text-2); }
 .fb__airports { display: grid; gap: 12px; }
 .fb__times-toggle {
   display: flex; align-items: center; justify-content: space-between;
   width: 100%; margin-top: 12px; padding: 10px 4px;
   border: none; background: transparent;
-  font-size: 13px; color: rgba(212,168,83,0.85); cursor: pointer;
+  font-size: 13px; color: var(--accent); cursor: pointer;
 }
 .fb__times { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-top: 8px; }
 .fb__times .fb__time:last-of-type + * { grid-column: 1 / -1; }
@@ -195,8 +197,14 @@ watch(
 
 .fb__online {
   display: flex; align-items: center; gap: 8px;
-  margin: 14px 0 0; font-size: 12.5px; color: rgba(120,200,150,0.9);
+  margin: 14px 0 0; font-size: var(--fs-cap); color: var(--success);
 }
-.fb__personal { margin-top: 16px; padding: 14px; border-radius: 18px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); }
+.fb__personal { margin-top: 16px; padding: 14px; border-radius: var(--radius-md); background: var(--surface-2); border: 1px solid var(--line-default); }
 .fb__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fb__submit {
+    transition: none;
+  }
+}
 </style>

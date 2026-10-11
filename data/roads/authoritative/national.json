@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-10-05",
+ "updated": "2026-10-08",
  "roads": [
   {
    "ref": "G101",
@@ -386,13 +386,13 @@
   },
   {
    "ref": "G217",
-   "name": "阿库线",
+   "name": "阿塔线",
    "fromPlace": "阿勒泰",
    "toPlace": "塔什库尔干",
    "provinces": [
     "新疆"
    ],
-   "officialLengthKm": 1079
+   "officialLengthKm": 1753
   },
   {
    "ref": "G218",

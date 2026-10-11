@@ -3,7 +3,7 @@
  * 票面配置编辑器：TicketConfig 所有展示项均可编辑，禁止硬编码文案。
  * 直接读写 ticketStore.config（草稿自动落盘），保存动作入 saved 列表。
  */
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type {
   TicketRouteConfig,
   TicketSealEmblem,
@@ -40,10 +40,10 @@ const shieldsText = computed({
 /** 实时回显每个编号被识别成的国标制式，方便确认自动识别是否正确 */
 const shieldSpecs = computed(() => (config.value.route.shields ?? []).map((r) => classifyRoadSign(r)));
 
-function appendShield(token: string) {
+function appendShield(code: string) {
   const cur = config.value.route.shields ?? [];
-  if (cur.includes(token)) return;
-  patchRoute({ shields: [...cur, token] });
+  if (cur.includes(code)) return;
+  patchRoute({ shields: [...cur, code] });
 }
 const elevText = computed({
   get: () => (config.value.route.elevPoints ?? []).join(', '),
@@ -92,12 +92,23 @@ function onAirlineCode(code: string) {
   });
 }
 
+/** 背景图校验提示（替代 window.alert：与页面提示条模式一致，自动消退） */
+const bgNotice = ref('');
+let bgNoticeTimer: number | undefined;
+function showBgNotice(msg: string) {
+  bgNotice.value = msg;
+  window.clearTimeout(bgNoticeTimer);
+  bgNoticeTimer = window.setTimeout(() => {
+    bgNotice.value = '';
+  }, 4000);
+}
+
 function onBgFile(ev: Event) {
   const input = ev.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;
   if (file.size > 1.5 * 1024 * 1024) {
-    window.alert('背景图建议小于 1.5MB（需存入本地配置）');
+    showBgNotice('背景图建议小于 1.5MB（需存入本地配置）');
     return;
   }
   const reader = new FileReader();
@@ -147,6 +158,7 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
         <span>选文件</span>
         <input class="ed__input" type="file" accept="image/*" @change="onBgFile" />
       </label>
+      <p v-if="bgNotice" class="ed__hint ed__hint--warn" role="status">{{ bgNotice }}</p>
       <label class="ed__row">
         <span>背景图透明度 {{ config.background.opacity.toFixed(2) }}</span>
         <input
@@ -288,7 +300,7 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
 .ed__row > span { font-size: var(--fs-meta); color: var(--text-3); }
 .ed__input,
 .ed__select {
-  width: 100%; min-height: 34px;
+  width: 100%; min-height: 46px;
   background: var(--surface-2); color: var(--text-1);
   border: 1px solid var(--surface-3); border-radius: var(--radius-sm);
   padding: 4px var(--space-1); font-size: var(--fs-meta); font-family: inherit;
@@ -310,7 +322,43 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
   border-radius: var(--radius-full); padding: 3px 10px; cursor: pointer;
   transition: border-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
 }
-.ed__chip:hover { border-color: var(--accent); color: var(--accent); }
+@media (hover: hover) and (pointer: fine) {
+  .ed__chip:hover { border-color: var(--accent); color: var(--accent); }
+}
 .ed__hint { font-size: var(--fs-cap); color: var(--text-3); margin: 0; line-height: 1.6; }
+.ed__hint--warn { color: var(--warning); }
 .ed__actions { display: flex; gap: var(--space-1); justify-content: flex-end; }
+
+/* 触屏设备（手机竖屏）：鸿蒙触控规范命中区 ≥44vp。
+   桌面（精确指针）保留紧凑密度，不放大。 */
+@media (pointer: coarse) {
+  .ed__chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 8px 14px;
+  }
+  .ed__check {
+    min-height: 40px;
+  }
+  .ed__check input {
+    width: 20px;
+    height: 20px;
+  }
+  /* 原生 range 轨道仅 16px 高，触屏上几乎无法拖：撑到 32px 命中带 */
+  .ed__range {
+    height: 32px;
+  }
+  .ed__listrow .btn {
+    min-width: 44px;
+    min-height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed__input,
+  .ed__chip {
+    transition: none;
+  }
+}
 </style>

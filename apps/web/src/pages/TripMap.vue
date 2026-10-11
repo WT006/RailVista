@@ -16,6 +16,7 @@ import {
   getCalibratableStations,
   getStationAnchorTime,
   getUpcoming,
+  highlightEpisodes,
   isNearScheduledArrival,
   isNightAt,
   pointAtProgress,
@@ -34,6 +35,7 @@ import {
   type SpotEta,
   type SpotSide,
   type SpotWeather,
+  type SkyMapResult,
   type SpotWeatherParts,
   type Stop,
 } from '@railvista/shared';
@@ -47,10 +49,17 @@ import {
   tripCacheKey,
 } from '../lib/tripCache';
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
+import {
+  ATLAS_RAIL_HOVER_STROKE,
+  ATLAS_RAIL_STROKE,
+  TRIP_GLOW_STROKE,
+  TRIP_HIGHLIGHT_STROKE,
+} from '../data/atlasColors';
 import { readSimulatedProgress, useGeolocation, useNow } from '../composables/useGeolocation';
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import PreciseRoutePanel from '../components/PreciseRoutePanel.vue';
 import SideBadge from '../components/SideBadge.vue';
+import SkyJourneyPanel from '../components/SkyJourneyPanel.vue';
 import SpotApproachCard from '../components/SpotApproachCard.vue';
 import { usePrefsStore } from '../stores/prefsStore';
 import { useTripStore } from '../stores/tripStore';
@@ -76,6 +85,8 @@ let weatherFetchTimer: number | undefined;
 let weatherFetchSeq = 0;
 const legendOpen = ref(false);
 const calibrateOpen = ref(false);
+/** 天象观景面板开关（打开后按发车时间重算全线天象时间轴并在地图上标注） */
+const skyOpen = ref(false);
 const STATUS_COLLAPSE_KEY = 'railvista:map:statusCollapsed';
 const statusCollapsed = ref(
   typeof localStorage !== 'undefined' && localStorage.getItem(STATUS_COLLAPSE_KEY) === '1',
@@ -621,10 +632,10 @@ function readToken(name: string, fallback: string): string {
 }
 
 function railStrokeOptions() {
-  const rail = readToken('--rail', '#4d9fff');
+  const rail = readToken('--rail', ATLAS_RAIL_STROKE);
   // 卫星底图偏亮，提高不透明度并略微提亮，保证线条仍可辨识
   return satelliteOn.value
-    ? { strokeColor: readToken('--accent-hover', '#74b2ff'), strokeOpacity: 0.95 }
+    ? { strokeColor: readToken('--accent-hover', ATLAS_RAIL_HOVER_STROKE), strokeOpacity: 0.95 }
     : { strokeColor: rail, strokeOpacity: 0.85 };
 }
 
@@ -860,6 +871,176 @@ function rebuildSpotMarkers() {
     if (!prefs.layers.spot) marker.hide();
     spotMarkers.push(marker);
   });
+}
+
+// ── 天象观景：时间轴结果 → 地图标注 ─────────────────────────────────────────
+let skyOverlays: any[] = [];
+
+function clearSkyOverlay() {
+  if (!map) return;
+  for (const m of skyOverlays) {
+    try {
+      map.remove(m);
+    } catch {
+      /* ignore */
+    }
+  }
+  skyOverlays = [];
+}
+
+/** 天象标注配色：霞=暖橙 / 金=琥珀 / 蓝=冰蓝 / 日=朱红 / 月=靛紫（与面板 k-* 语义一致） */
+const SKY_EPISODE_CLS: Record<string, string> = {
+  dawnGlow: 'is-glow',
+  duskGlow: 'is-glow',
+  goldenMorning: 'is-golden',
+  goldenEvening: 'is-golden',
+  blueMorning: 'is-blue',
+  blueEvening: 'is-blue',
+  sunrise: 'is-sun',
+  sunset: 'is-sun',
+};
+
+/** 里程区间 → 路线折线切片（画路段高亮用） */
+function pathSliceKm(startKm: number, endKm: number): [number, number][] {
+  const path = pathMetrics.path;
+  const total = pathMetrics.lengthKm;
+  if (!path || path.length < 2 || total <= 0) return [];
+  const out: [number, number][] = [];
+  const a = pointAtProgress(path, total, startKm / total);
+  out.push([a.lng, a.lat]);
+  for (const p of path) {
+    if (p.distFromStart > startKm && p.distFromStart < endKm) out.push([p.lng, p.lat]);
+  }
+  const b = pointAtProgress(path, total, endKm / total);
+  out.push([b.lng, b.lat]);
+  return out;
+}
+
+/** 车窗左右侧短后缀：· 右 / · 左 */
+function sideShort(side: string): string {
+  return side === 'right' ? '· 右' : side === 'left' ? '· 左' : '';
+}
+
+/**
+ * 天象时间轴 → 地图：
+ *   1) 路线上的彩色路段：霞光段（暖橙）/ 观星段（靛紫，观星指数≥55 的夜段，如青藏高原）；
+ *   2) 时刻标注（日出/日落/月出/月落）与看点标注，均带车窗左右侧。
+ */
+function rebuildSkyOverlay(payload: SkyMapResult | null) {
+  if (!map || !AMapRef) return;
+  clearSkyOverlay();
+  if (!payload) return;
+  const { result, scores } = payload;
+
+  const items: Array<{ lng: number; lat: number; text: string; title: string; cls: string }> = [];
+
+  // 1) 彩色路段 + 路段中点标注
+  for (const e of result.episodes) {
+    const isGlow = e.kind === 'dawnGlow' || e.kind === 'duskGlow';
+    const score = scores[e.id];
+    const isStar = e.kind === 'night' && (score?.score ?? 0) >= 55;
+    if (!isGlow && !isStar) continue;
+    const coords = pathSliceKm(e.startKm, e.endKm);
+    if (coords.length >= 2) {
+      const line = new AMapRef.Polyline({
+        path: coords,
+        // JS 侧无法读 CSS 变量，取 tokens 同值：--spot #e0915a / --purple #8f7ae8
+        strokeColor: isGlow ? TRIP_GLOW_STROKE : TRIP_HIGHLIGHT_STROKE,
+        strokeWeight: isGlow ? 7 : 6,
+        strokeOpacity: 0.92,
+        lineJoin: 'round',
+        lineCap: 'round',
+        zIndex: 150,
+        bubble: true,
+      });
+      map.add(line);
+      skyOverlays.push(line);
+    }
+    const midKm = (e.startKm + e.endKm) / 2;
+    const mid = pointAtProgress(
+      pathMetrics.path,
+      pathMetrics.lengthKm,
+      midKm / (pathMetrics.lengthKm || 1),
+    );
+    const t = formatTime(new Date((e.startMs + e.endMs) / 2));
+    if (isGlow) {
+      items.push({
+        lng: mid.lng,
+        lat: mid.lat,
+        text: `${t} ${e.title} ${sideShort(e.sunSide.side)}`,
+        title: `${e.title} ${t} · ${e.nearName || '沿途'} · ${e.sunSide.label} · 指数 ${score?.score ?? '—'}`,
+        cls: 'is-glow',
+      });
+    } else {
+      const milky = (score?.note ?? '').includes('银河可见') ? ' · 银河' : '';
+      items.push({
+        lng: mid.lng,
+        lat: mid.lat,
+        text: `观星 ${score?.score ?? ''}${milky}`,
+        title: `观星段 · ${e.nearName || '沿途'} · 指数 ${score?.score ?? '—'} · ${score?.note ?? ''}`,
+        cls: 'is-star',
+      });
+    }
+  }
+
+  // 2) 日月时刻标注（带左右侧）
+  for (const m of result.moments) {
+    const isMoon = m.kind === 'moonrise' || m.kind === 'moonset';
+    const t = formatTime(new Date(m.atMs));
+    items.push({
+      lng: m.lng,
+      lat: m.lat,
+      text: `${t} ${m.title} ${sideShort(m.sideInfo.side)}`,
+      title: `${m.title} ${t} · ${m.nearName || '沿途'} · ${m.sideInfo.label}`,
+      cls: isMoon ? 'is-moon' : 'is-sun',
+    });
+  }
+
+  // 3) 金/蓝时刻看点标注（日出日落、霞光已单独标注，避免重复）
+  for (const e of highlightEpisodes(result.episodes)) {
+    const cls = SKY_EPISODE_CLS[e.kind];
+    if (!cls || e.kind === 'sunrise' || e.kind === 'sunset') continue;
+    if (e.kind === 'dawnGlow' || e.kind === 'duskGlow') continue;
+    const t = formatTime(new Date((e.startMs + e.endMs) / 2));
+    items.push({
+      lng: e.lng,
+      lat: e.lat,
+      text: `${t} ${e.title} ${sideShort(e.sunSide.side)}`,
+      title: `${e.title} · ${e.nearName || '沿途'} · ${e.sunSide.label}`,
+      cls,
+    });
+    if (items.length >= 28) break;
+  }
+
+  for (const it of items) {
+    const marker = new AMapRef.Marker({
+      position: [it.lng, it.lat],
+      title: it.title,
+      content: `<div class="sky-marker ${it.cls}${compact.value ? ' sky-marker--compact' : ''}"><span class="sky-marker__text">${escHtml(it.text)}</span><span class="sky-marker__dot"></span></div>`,
+      // 圆点落在路线点上，文字悬在线路上方（景点式标注）
+      anchor: 'bottom-center',
+      zIndex: 160,
+    });
+    map.add(marker);
+    skyOverlays.push(marker);
+  }
+}
+
+function toggleSky() {
+  skyOpen.value = !skyOpen.value;
+  if (!skyOpen.value) clearSkyOverlay();
+}
+
+/** 面板里点某个时刻/片段 → 地图定位到该点 */
+function onSkyFocus(p: { lng: number; lat: number }) {
+  if (!map) return;
+  map.setZoomAndCenter(Math.max(map.getZoom?.() ?? 6, 8), [p.lng, p.lat], false, 300);
+}
+
+/** 面板里改发车时间 → 落 prefs 并刷新全程时刻估算 */
+function onSkyDepartChange(iso: string) {
+  prefs.setDeparture(iso);
+  tick();
 }
 
 async function initMap() {
@@ -1374,6 +1555,15 @@ onUnmounted(() => {
         {{ satelliteOn ? '标准地图' : '卫星地图' }}
       </button>
       <button type="button" class="legend-toggle" @click="legendOpen = !legendOpen">图例</button>
+      <button
+        type="button"
+        class="sky-btn"
+        :class="{ 'is-active': skyOpen }"
+        :aria-pressed="skyOpen"
+        @click="toggleSky"
+      >
+        天象
+      </button>
       <div class="legend" :class="{ 'is-open': legendOpen }">
         <button
           v-for="layer in (['rail', 'station', 'spot', 'train', 'gps'] as const)"
@@ -1399,6 +1589,25 @@ onUnmounted(() => {
           </span>
         </div>
       </div>
+
+      <SkyJourneyPanel
+        :open="skyOpen"
+        :train-code="segment.trainCode"
+        :from-name="segment.fromName"
+        :to-name="segment.toName"
+        :path="pathMetrics.path"
+        :length-km="railLengthKm"
+        :stops="segment.stops"
+        :spots="trip.scenicSpots"
+        :departure-ms="schedule.departure.getTime()"
+        :arrival-ms="schedule.arrival.getTime()"
+        :offset-ms="schedule.offsetMs"
+        :compact="compact"
+        @close="toggleSky"
+        @focus="onSkyFocus"
+        @result="rebuildSkyOverlay"
+        @depart-change="onSkyDepartChange"
+      />
 
       <SpotApproachCard
         v-if="approachingSpot"

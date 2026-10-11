@@ -1,0 +1,31 @@
+{
+ "generatedAt": "2026-10-09T19:25:58.822Z",
+ "date": "2026-10-09",
+ "keyCount": 1,
+ "byClass": {
+  "expressway": {
+   "keys": 1,
+   "km": 173.8,
+   "A": 0,
+   "B": 0,
+   "C": 1,
+   "X": 0,
+   "segments": 2,
+   "multiComponent": 1,
+   "dup": 1
+  }
+ },
+ "items": [
+  {
+   "key": "G9911",
+   "cls": "expressway",
+   "totalKm": 173.8,
+   "officialKm": null,
+   "deviationPct": null,
+   "precision": "C",
+   "componentCount": 2,
+   "wayCount": 656,
+   "points": 201
+  }
+ ]
+}

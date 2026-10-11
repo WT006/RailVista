@@ -170,49 +170,59 @@ function removeShield(i: number) {
 .db__submit {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; min-height: 50px;
-  border: none; border-radius: 25px;
-  font-size: 15px; font-weight: 600; color: #1c1810;
-  background: linear-gradient(180deg, #e8cd92, #cba85c);
-  cursor: pointer; transition: transform 0.15s, filter 0.15s;
+  border: none; border-radius: var(--radius-full);
+  font-size: 15px; font-weight: 600; color: var(--surface-0);
+  background: linear-gradient(180deg, var(--accent), var(--accent-press));
+  cursor: pointer; transition: transform var(--dur-micro) var(--ease-standard), filter var(--dur-micro) var(--ease-standard);
 }
-.db__submit:hover { filter: brightness(1.06); }
+@media (hover: hover) and (pointer: fine) {
+  .db__submit:hover { filter: brightness(1.06); }
+}
 .db__submit:active { transform: scale(0.985); }
 .db__submit:disabled { opacity: 0.6; }
-.db__error { color: #e06b6b; font-size: 13px; margin: 10px 0 0; }
+.db__error { color: var(--danger); font-size: 13px; margin: 10px 0 0; }
 
-.db__personal { margin-top: 16px; padding: 14px; border-radius: 18px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); }
-.db__section { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); }
-.db__section-label { display: block; font-size: 12.5px; letter-spacing: 0.04em; color: rgba(255,255,255,0.55); margin-bottom: 9px; }
+.db__personal { margin-top: 16px; padding: 14px; border-radius: var(--radius-md); background: var(--surface-2); border: 1px solid var(--line-default); }
+.db__section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-default); }
+.db__section-label { display: block; font-size: var(--fs-cap); letter-spacing: 0.04em; color: var(--text-2); margin-bottom: 9px; }
 .db__chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
 .db__chip {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 5px 8px 5px 11px;
-  border-radius: 999px;
-  font-size: 12.5px; color: rgba(255,255,255,0.85);
-  background: rgba(255,255,255,0.08);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-cap); color: var(--text-1);
+  background: var(--interactive-hover);
 }
-.db__chip--road { font-weight: 700; color: #d4a853; }
+.db__chip--road { font-weight: 700; color: var(--ticket-gold); }
 .db__chip button {
   display: flex; align-items: center; justify-content: center;
   width: 16px; height: 16px; padding: 0;
   border: none; border-radius: 50%;
-  font-size: 13px; line-height: 1; color: rgba(255,255,255,0.7);
-  background: rgba(255,255,255,0.12); cursor: pointer;
+  font-size: 13px; line-height: 1; color: var(--text-2);
+  background: var(--interactive-pressed); cursor: pointer;
 }
-.db__chip button:hover { background: rgba(224,107,107,0.5); color: #fff; }
-.db__hint { font-size: 12px; color: rgba(255,255,255,0.35); }
+@media (hover: hover) and (pointer: fine) {
+  .db__chip button:hover { background: color-mix(in srgb, var(--danger) 50%, transparent); color: var(--text-1); }
+}
+.db__hint { font-size: 12px; color: var(--text-3); }
 .db__add { display: flex; gap: 8px; }
 .db__add input {
   flex: 1; min-width: 0; height: 42px; padding: 0 13px;
-  border-radius: 12px; font-size: 14px; color: #fff;
-  background: rgba(255,255,255,0.055);
-  border: 1px solid rgba(255,255,255,0.08); outline: none;
+  border-radius: var(--radius-md); font-size: 14px; color: var(--text-1);
+  background: var(--surface-2);
+  border: 1px solid var(--line-default); outline: none;
 }
-.db__add input:focus { border-color: rgba(212,168,83,0.55); }
+.db__add input:focus { border-color: var(--accent); }
 .db__add button {
   height: 42px; padding: 0 18px;
-  border: none; border-radius: 12px;
-  font-size: 13.5px; font-weight: 600; color: #1c1810;
-  background: linear-gradient(180deg, #e8cd92, #cba85c); cursor: pointer;
+  border: none; border-radius: var(--radius-md);
+  font-size: var(--fs-meta); font-weight: 600; color: var(--surface-0);
+  background: linear-gradient(180deg, var(--accent), var(--accent-press)); cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .db__submit {
+    transition: none;
+  }
 }
 </style>

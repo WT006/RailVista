@@ -10,6 +10,8 @@
  *   带顶条（国家高速 / 省级高速 / 此生必驾）→ 纵向盾形，顶部色带 + 下方编号；
  *   无顶条（国道 / 省道 / 县道 / 乡道 / 村道）→ 横向圆角矩形 + 双边框 + 居中编号。
  */
+/* 【作用域例外层】票面印刷层（GB 5768 路牌绘制的印刷色/微字号）：按印刷品规范保留，
+ * 不套用界面令牌体系；界面交互控件不在此例外内（2026-10-09 鸿蒙化收敛裁定）。 */
 import { computed } from 'vue';
 import { classifyRoadSign, hasBand, type RoadSignSpec } from '@railvista/shared';
 

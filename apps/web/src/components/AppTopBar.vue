@@ -14,7 +14,6 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { appVersionInfo, APP_VERSION } from '@railvista/shared';
 import BrandLogo from './BrandLogo.vue';
-import AppNavLinks from './AppNavLinks.vue';
 
 /** 版本号与变更摘要（悬浮显示，与 CHANGELOG.md 首条同源） */
 const versionInfo = appVersionInfo();
@@ -37,10 +36,6 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
       <div class="appbar__left">
         <!-- 品牌组合图已自带中英文字标，无需再叠副标题 -->
         <BrandLogo :height="34" />
-        <nav class="appbar__nav" aria-label="主导航">
-          <!-- 默认全站导航（行程 / 自驾 / 全国地图），页面可用具名 slot 覆盖 -->
-          <slot name="nav"><AppNavLinks /></slot>
-        </nav>
       </div>
 
       <div class="appbar__right">
@@ -64,6 +59,8 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   /* 总高含安全区；内层仍按 --appbar-h 排布，Logo 不会顶到状态栏 */
   height: var(--appbar-offset);
   padding-top: var(--safe-top);
+  /* ≥840 让出侧边 Tab：品牌/版本与页面内容列严格对齐（--sidenav-w 断点赋值） */
+  padding-left: var(--sidenav-w);
   box-sizing: border-box;
   /* 与主页面融为一体：去掉底部硬描边，背景几乎透明，仅保留极淡的玻璃模糊，
    * 让顶栏像"悬浮在页面之上"而非一块独立的条。滚过内容后才微微加深，给出层级暗示。
@@ -73,23 +70,23 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   border-bottom: none;
   background: linear-gradient(
     to bottom,
-    rgba(11, 14, 20, 0.72) 0%,
-    rgba(11, 14, 20, 0.5) var(--safe-top),
-    rgba(11, 14, 20, 0.24) calc(var(--safe-top) + 72%),
-    rgba(11, 14, 20, 0)
+    color-mix(in srgb, var(--surface-0) 72%, transparent) 0%,
+    color-mix(in srgb, var(--surface-0) 50%, transparent) var(--safe-top),
+    color-mix(in srgb, var(--surface-0) 24%, transparent) calc(var(--safe-top) + 72%),
+    transparent
   );
-  backdrop-filter: blur(10px) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(10px) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur-chrome)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-chrome)) saturate(var(--glass-saturate));
 }
 
 /* 滚动后：轻轻托底，让 Logo 始终可辨，但仍不出现硬边框 */
 .appbar.is-scrolled {
   background: linear-gradient(
     to bottom,
-    rgba(11, 14, 20, 0.82) 0%,
-    rgba(11, 14, 20, 0.66) var(--safe-top),
-    rgba(11, 14, 20, 0.38) calc(var(--safe-top) + 72%),
-    rgba(11, 14, 20, 0)
+    color-mix(in srgb, var(--surface-0) 82%, transparent) 0%,
+    color-mix(in srgb, var(--surface-0) 66%, transparent) var(--safe-top),
+    color-mix(in srgb, var(--surface-0) 38%, transparent) calc(var(--safe-top) + 72%),
+    transparent
   );
 }
 
@@ -108,22 +105,10 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   min-width: 0;
 }
 
-/* 主导航链接组（默认内容 AppNavLinks.vue，页面可用具名 slot 覆盖） */
-.appbar__nav {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-/* 移动端：顶栏只留品牌，主导航改到底栏 AppBottomNav */
+/* 主导航已由底部页签（<840）与侧边 Tab（≥840）承担：顶栏只保留品牌与操作区 */
 @media (max-width: 599px) {
   .appbar__left {
     gap: var(--space-2);
-  }
-
-  .appbar__nav {
-    display: none;
   }
 }
 
@@ -148,6 +133,11 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 @media (max-width: 420px) {
   .appbar__version {
     display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .appbar {
+    transition: none;
   }
 }
 </style>

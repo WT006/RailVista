@@ -138,7 +138,7 @@ const countdownText = computed(() => {
 .approach-card {
   /* fixed：与 .bottom-panel 同一坐标系，避免 absolute 相对 .trip-page 时宽屏叠压错位 */
   position: fixed;
-  left: calc(12px + var(--safe-left, 0px));
+  left: calc(12px + var(--safe-left, 0px) + var(--sidenav-w));
   right: calc(12px + var(--safe-right, 0px));
   /* 叠在底栏上方；高度仅取底栏占位，避免与 --bottom-overlay 互相抬升 */
   bottom: calc(var(--bottom-panel-clearance, var(--bottom-overlay, 168px)) + 8px);
@@ -147,12 +147,12 @@ const countdownText = computed(() => {
   max-height: min(42vh, 260px);
   overflow: auto;
   padding: 10px 12px 11px;
-  border-radius: 14px;
-  background: linear-gradient(165deg, rgba(30, 41, 59, 0.96), var(--bg-base));
-  border: 1px solid var(--border-default);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
-  color: var(--text-secondary);
-  font-size: 12.5px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(165deg, var(--surface-lift), var(--surface-0));
+  border: 1px solid var(--line-default);
+  box-shadow: var(--elev-float-strong);
+  color: var(--text-2);
+  font-size: var(--fs-cap);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -189,7 +189,7 @@ const countdownText = computed(() => {
 }
 
 .approach-card__countdown {
-  color: var(--text-muted);
+  color: var(--text-3);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
@@ -205,7 +205,7 @@ const countdownText = computed(() => {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-1);
 }
 
 .approach-card__meta {
@@ -219,23 +219,23 @@ const countdownText = computed(() => {
   display: inline-flex;
   align-items: center;
   padding: 2px 7px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 650;
-  color: var(--text-secondary);
-  background: rgba(148, 163, 184, 0.12);
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  color: var(--text-2);
+  background: color-mix(in srgb, var(--text-2) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-2) 18%, transparent);
 }
 
 .approach-card__chip--muted {
-  color: var(--text-muted);
+  color: var(--text-3);
   font-weight: 500;
 }
 
 .approach-card__chip--night {
   color: var(--warning);
-  background: rgba(223, 179, 87, 0.12);
-  border-color: rgba(223, 179, 87, 0.28);
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--warning) 28%, transparent);
 }
 
 .approach-card__wx {
@@ -244,7 +244,7 @@ const countdownText = computed(() => {
 
 .approach-card__intro {
   margin: 6px 0 0;
-  color: var(--text-muted);
+  color: var(--text-3);
   font-size: 12px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -261,17 +261,17 @@ const countdownText = computed(() => {
 }
 
 .approach-card__honor {
-  font-size: 10.5px;
+  font-size: var(--fs-micro);
   padding: 2px 6px;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   color: var(--accent-hover);
-  background: var(--accent-container);
+  background: var(--accent-soft);
 }
 
 .approach-card__honor--more {
-  color: var(--text-muted);
+  color: var(--text-3);
   background: transparent;
-  border: 1px dashed var(--border-default);
+  border: 1px dashed var(--line-default);
 }
 
 .approach-card__blocked {
@@ -285,7 +285,14 @@ const countdownText = computed(() => {
 
 .approach-enter-active,
 .approach-leave-active {
-  transition: opacity 0.22s ease, transform 0.22s ease;
+  transition: opacity var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .approach-enter-active,
+  .approach-leave-active {
+    transition: none;
+  }
 }
 .approach-enter-from,
 .approach-leave-to {

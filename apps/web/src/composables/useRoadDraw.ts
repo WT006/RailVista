@@ -25,7 +25,11 @@ export function useRoadDraw(pathRef: Ref<SVGPathElement | null>, duration = 520)
       path.style.strokeDashoffset = String(length);
 
       raf = requestAnimationFrame(() => {
-        path.style.transition = `stroke-dashoffset ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+        // 无障碍：系统开启「减少动态效果」时直接落到终态，不播放描绘动画
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!reduce) {
+          path.style.transition = `stroke-dashoffset ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+        }
         path.style.strokeDashoffset = '0';
       });
     } catch {

@@ -49,6 +49,9 @@ export function roadClassLabel(cls: string | undefined): string {
   return ROAD_CLASS_LABELS[cls as RoadClass] ?? '公路';
 }
 
+/** 路线投影描边（AMap Polyline 底层阴影）：非主题色，属地图数据语义，统一从本文件取 */
+export const ROAD_SHADOW_STROKE = '#0a1628';
+
 /** 编号前缀 → 等级（编号键盘高亮用；G+4 位与 G1~G99 为高速，见 PRD §3.2） */
 export function classOfRef(ref: string): RoadClass {
   if (/^G\d{4}$/.test(ref)) return 'expressway';

@@ -122,17 +122,17 @@ const title = computed(() => {
 
 <style scoped>
 .side-badge {
-  --side-color: var(--text-muted);
-  --side-bg: var(--border-hairline);
+  --side-color: var(--text-3);
+  --side-bg: var(--line-hairline);
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 3px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--side-color);
   background: var(--side-bg);
   color: var(--side-color);
-  font-size: 11.5px;
+  font-size: var(--fs-micro);
   font-weight: 650;
   line-height: 1.3;
   white-space: nowrap;
@@ -141,24 +141,24 @@ const title = computed(() => {
 
 .side-badge--left {
   --side-color: var(--info);
-  --side-bg: var(--accent-container);
+  --side-bg: var(--accent-soft);
 }
 
 .side-badge--right {
   --side-color: var(--accent);
-  --side-bg: var(--accent-container);
+  --side-bg: var(--accent-soft);
 }
 
 /* 两侧均可：正向色（青绿），与左/右同等「可信」，不再用灰色暗示不可靠 */
 .side-badge--both {
   --side-color: var(--info);
-  --side-bg: var(--success-container);
+  --side-bg: var(--success-soft);
 }
 
 /* 待确认：虚线边框，避免与「两侧均可」的实线灰混淆 */
 .side-badge--unknown {
-  --side-color: var(--text-muted);
-  --side-bg: var(--border-hairline);
+  --side-color: var(--text-3);
+  --side-bg: var(--line-hairline);
   border-style: dashed;
 }
 
@@ -184,7 +184,7 @@ const title = computed(() => {
 }
 
 .side-badge__body {
-  fill: var(--bg-inset);
+  fill: var(--surface-sunken);
   stroke: var(--side-color);
   stroke-width: 1.2;
 }
@@ -224,7 +224,14 @@ const title = computed(() => {
 .side-flip-leave-active {
   transition:
     transform var(--dur-fast) var(--ease-overshoot),
-    opacity var(--dur-fast) var(--ease-out);
+    opacity var(--dur-fast) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-flip-enter-active,
+  .side-flip-leave-active {
+    transition: none;
+  }
 }
 
 .side-flip-enter-from {

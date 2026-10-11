@@ -160,10 +160,16 @@ export function getTravelRegions(): TravelRegionsPayload {
 export function listTravelRoutes(q: TravelQuery = {}): TravelRouteListResult {
   const snap = snapshot();
   const summaries = snap.routes.map(toTravelSummary);
-  const filtered = queryTravelRoutes(summaries, q);
-  // counts 始终基于全量而不是筛选结果：列表页要显示「全国有多少条」这种总量
-  const counts: TravelCounts = summarizeTravel(summaries);
-  return { total: filtered.length, routes: filtered, counts };
+  // 2026-10-11：total 必须是截断前的全量计数，否则列表页"共 N 条"与右上角 overview 不一致
+  const { limit, offset, ...queryWithoutPaging } = q;
+  const allFiltered = queryTravelRoutes(summaries, queryWithoutPaging);
+  const total = allFiltered.length;
+  const start = Math.max(0, offset ?? 0);
+  const end = limit && limit > 0 ? start + limit : allFiltered.length;
+  const routes = allFiltered.slice(start, end);
+  // counts 始终基于全量 published 而不是筛选结果：列表页要显示「全国有多少条」这种总量
+  const counts: TravelCounts = summarizeTravel(summaries.filter((r) => r.status === 'published'));
+  return { total, routes, counts };
 }
 
 export function getTravelRoute(id: string): TravelRouteDetail | null {
@@ -190,10 +196,13 @@ export interface TravelOverview {
 /** 一次性给列表页用的概览包（区划 + 统计 + 文件清单），避免前端打三次接口。 */
 export function getTravelOverview(): TravelOverview {
   const snap = snapshot();
-  const counts = summarizeTravel(snap.routes.map(toTravelSummary));
+  const publishedSummaries = snap.routes.filter((r) => r.status === 'published').map(toTravelSummary);
+  const counts = summarizeTravel(publishedSummaries);
+  // 2026-10-11：totalRoutes 只算 published，与 listTravelRoutes 口径一致（不含 draft）
+  const published = snap.routes.filter((r) => r.status === 'published');
   return {
-    totalRoutes: snap.routes.length,
-    totalPois: snap.routes.reduce((s, r) => s + r.pois.length, 0),
+    totalRoutes: published.length,
+    totalPois: published.reduce((s, r) => s + r.pois.length, 0),
     provinces: snap.provinces,
     files: snap.files.map((f) => ({
       file: f.file,

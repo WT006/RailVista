@@ -66,6 +66,8 @@ const LAYERS: { key: TravelLayer; label: string }[] = RECOMMEND_LAYER_ROTATION.m
 const EMPTY_LAYER_COUNTS: Record<TravelLayer, number> = { L1: 0, L2: 0, L3: 0, L4: 0, L5: 0 };
 /** 分层路线数（取服务端 counts.byLayer，全库口径，不随筛选变化） */
 const layerCounts = ref<Record<TravelLayer, number>>({ ...EMPTY_LAYER_COUNTS });
+/** 每省路线数（取服务端 counts.byProvince 全库口径，避免从被 limit 截断的 routes 本地统计导致缺省） */
+const provinceCounts = ref<Record<string, number>>({});
 
 const SORTS: { key: string; label: string; hint: string }[] = [
   { key: 'recommend', label: '推荐序', hint: '按内容分层轮转推荐' },
@@ -110,13 +112,15 @@ const citiesOfProvince = computed(() => {
 
 const selectableCities = computed(() => citiesOfProvince.value.filter((c) => c.routeIds?.length));
 
-/** 每个省挂了几条路线（用于 chips 上的角标） */
+/** 每个省挂了几条路线（用于 chips 上的角标）：优先用服务端全量 counts.byProvince，
+ *  回退到从当前页 routes 本地统计（仅当服务端未返回时） */
 const routeCountByProvince = computed(() => {
+  if (Object.keys(provinceCounts.value).length) return provinceCounts.value;
   const map = new Map<string, number>();
   for (const r of routes.value) {
     for (const p of r.provinces) map.set(p, (map.get(p) ?? 0) + 1);
   }
-  return map;
+  return Object.fromEntries(map);
 });
 
 async function loadOverview() {
@@ -146,6 +150,7 @@ async function loadRoutes() {
     routes.value = data.routes;
     total.value = data.total;
     layerCounts.value = data.counts?.byLayer ?? { ...EMPTY_LAYER_COUNTS };
+    provinceCounts.value = data.counts?.byProvince ?? {};
   } catch (e) {
     error.value = e instanceof Error ? e.message : '加载失败';
   } finally {
@@ -391,8 +396,8 @@ function seasonText(months: number[]): string {
             @click="pickProvince(p.shortName)"
           >
             {{ p.shortName }}
-            <i v-if="routeCountByProvince.get(p.shortName)" class="rb-chip-n">
-              {{ routeCountByProvince.get(p.shortName) }}
+            <i v-if="routeCountByProvince[p.shortName]" class="rb-chip-n">
+              {{ routeCountByProvince[p.shortName] }}
             </i>
           </button>
         </div>

@@ -378,8 +378,8 @@ export interface FlightEndpointInfo {
 }
 
 export interface FlightLookup {
-  /** 数据来源：airlabs=在线实时/历史；local=本地（仅航司/机场等确定信息） */
-  source: 'airlabs' | 'local';
+  /** 数据来源：fr24=FlightRadar24在线动态；airlabs=AirLabs在线实时/历史；local=本地（仅航司/机场等确定信息） */
+  source: 'fr24' | 'airlabs' | 'local';
   flightNumber: string;
   airlineIata?: string;
   date: string;

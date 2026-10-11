@@ -60,7 +60,7 @@ async function query() {
   try {
     const res = await api.lookupFlight(flightNo.value.trim(), date.value);
     lookup.value = res;
-    if (res.source === 'airlabs') {
+    if (res.source !== 'local') {
       form.depIata = '';
       form.arrIata = '';
     }

@@ -70,12 +70,12 @@ const disabledTitle = computed(() => {
       <span v-for="t in item.tags" :key="t" class="drive-tag">{{ t }}</span>
     </div>
     <div class="drive-board-item__actions">
-      <router-link v-if="along" class="btn primary btn-sm" :to="along!">看沿程景点 →</router-link>
+      <router-link v-if="along" class="btn primary btn-sm rv-hit" :to="along!">看沿程景点 →</router-link>
       <!-- B3：无可用 OD（from===to 或全空/仅供灵感）时禁用跳转并说明原因 -->
-      <span v-else class="btn ghost btn-sm is-disabled" :title="disabledTitle">
+      <span v-else class="btn ghost btn-sm is-disabled" :title="disabledTitle" aria-disabled="true">
         {{ disabledLabel }}
       </span>
-      <router-link v-if="roadbook" class="btn ghost btn-sm" :to="roadbook!">深度路书</router-link>
+      <router-link v-if="roadbook" class="btn ghost btn-sm rv-hit" :to="roadbook!">深度路书</router-link>
       <span
         v-if="item.roadKeys.length && !hasGeom && !item.inspirationOnly"
         class="drive-board-item__hint"

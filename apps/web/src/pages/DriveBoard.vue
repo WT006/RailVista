@@ -15,6 +15,7 @@ import { useRoute } from 'vue-router';
 import { api } from '../api/client';
 import DriveSubNav from '../components/DriveSubNav.vue';
 import BoardItemCard from '../components/rankings/BoardItemCard.vue';
+import cngLogo from '../assets/cng-logo.png'; // 中国国家地理官方刊头（dili360.com 站点 logo）
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 
 usePointerSpotlight();
@@ -142,8 +143,13 @@ onMounted(async () => {
           <!-- CNG 杂志横幅：复刻《中国最美公路》增刊「G TOP 3」扉页版式 -->
           <div v-if="groupedSections.length" class="cng-banner rv-card" data-spotlight>
             <div class="cng-banner__brand">
-              <span class="cng-banner__mark" aria-hidden="true">C</span>
-              <span class="cng-banner__brandname">中国国家地理<i>CHINESE NATIONAL GEOGRAPHY</i></span>
+              <img
+                class="cng-banner__logo"
+                :src="cngLogo"
+                alt="中国国家地理 CHINESE NATIONAL GEOGRAPHY"
+                width="180"
+                height="63"
+              >
             </div>
             <div class="cng-banner__title">
               <span class="cng-banner__top">TOP 3</span>

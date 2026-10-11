@@ -270,10 +270,12 @@ html {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  /* #app 提权 + animation:none：入场动画 rv-card-in 的 fill:both 会持续级联
-     transform 终态，否则 hover 抬升声明被压制（按压态同理，见下方触屏规则） */
+  /* #app 提权：hover 抬升需要绕过入场动画 fill 的 transform 级联。
+     2026-10-11：入场动画 fill 已从 both 改为 backwards——动画结束后不再持有
+     终态（自然态 == to 关键帧），hover transform 直接生效，因此不再需要
+     animation:none。此前 hover 移出会重设 animation-name 导致入场动画
+     从头重放（卡片闪一下），正是本规则要消除的闪烁。 */
   #app .rv-card:hover {
-    animation: none;
     transform: translateY(-2px) scale(1.006);
     border-color: var(--line-accent);
     box-shadow: var(--elev-3), var(--glow-accent);
@@ -306,10 +308,9 @@ html {
  * 点亮、pointerup 时移除；光晕圆心即触点（--mx/--my）。
  * prefers-reduced-motion 下组合式函数不注册，类名永不出现。
  * ══════════════════════════════════════════════════════════════════════════ */
-/* #app 提权：① 压过入场动画 fill:both 级联的 transform 终态（animation:none）；
-   ② 压过翻面卡 .query-flip__card.is-measured .query-flip__face--front（0,3,0）的位移声明 */
+/* #app 提权：压过翻面卡 .query-flip__card.is-measured .query-flip__face--front（0,3,0）的位移声明。
+   入场动画 fill 已改 backwards，按压态无需再 animation:none（详见上方 hover 注释） */
 #app .rv-card.is-press-active {
-  animation: none;
   transform: scale(0.997);
   border-color: var(--line-accent);
 }
@@ -355,8 +356,12 @@ html {
 
 @media (prefers-reduced-motion: reduce) {
   .rv-card,
-  .rv-tile {
+  .rv-tile,
+  .select-form--panel,
+  .query-flip {
     transform: none !important;
+    /* 入场动画也一并关掉：reduce 下不应保留 rv-card-in 的透明度渐显 */
+    animation: none;
   }
 }
 
@@ -641,7 +646,9 @@ html {
 }
 
 /* 卡片入场：鸿蒙展示类规范用「强调缓动 + 轻微上浮」，按 DOM 序做 40ms 级联，
- * 避免整屏同帧弹出；对卡片统一施加，减少各模块各自写动画造成的节奏不一。 */
+ * 避免整屏同帧弹出；对卡片统一施加，减少各模块各自写动画造成的节奏不一。
+ * fill 用 backwards 而非 both：动画结束后不持有终态（自然态 == to 关键帧），
+ * 悬停抬升/按压形变直接生效，且状态切换不会再重置 animation-name 导致重放闪烁。 */
 @keyframes rv-card-in {
   from {
     opacity: 0;
@@ -654,7 +661,7 @@ html {
 }
 
 .rv-card {
-  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) both;
+  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) backwards;
 }
 
 /* 栅格主栏 / 侧栏内的卡片按序轻微错峰 */
@@ -671,7 +678,7 @@ html {
 
 .select-form--panel {
   gap: var(--space-4);
-  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) 60ms both;
+  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) 60ms backwards;
 }
 
 /* ── 查询面板切换（按站 ↔ 车次号）──
@@ -679,7 +686,7 @@ html {
  * 两面绝对叠放，交叉淡入 + 上下微位移。 */
 .query-flip {
   position: relative;
-  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) 60ms both;
+  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) 60ms backwards;
 }
 
 .query-flip__card {

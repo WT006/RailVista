@@ -2314,7 +2314,8 @@
   }
 }
 
-/* transition + 入场动画 */
+/* transition + 入场动画（fill: backwards，结束后不持有终态——
+   悬停抬升直接生效，也不会因 :hover 切换重放入场动画造成闪烁） */
 .drive-route-card,
 .drive-stat,
 .drive-board-card,
@@ -2324,7 +2325,7 @@
   transition: transform var(--dur-base) var(--ease-spring),
               border-color var(--dur-base),
               box-shadow var(--dur-base);
-  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) both;
+  animation: rv-card-in var(--dur-enter) var(--ease-emphasized) backwards;
 }
 
 /* 错峰延迟 */
@@ -3906,7 +3907,7 @@
 }
 
 /* ══════════════ CNG「中国最美公路」分板块杂志版式（DriveBoard，board.groups 存在时触发）
- * 版式参照《中国国家地理·中国最美公路》增刊扉页：C 标 + TOP 3 大字 + 十大地貌领奖台列表。
+ * 版式参照《中国国家地理·中国最美公路》增刊扉页：官方刊头 + TOP 3 大字 + 十大地貌领奖台列表。
  * 配色按 HarmonyOS NEXT 色彩规范（developer.huawei.com 色彩 token）走系统语义令牌：
  * 品牌色宇宙蓝 --accent 做高亮，中性灰阶分层，琥珀 --warning 做第三名功能色。 */
 
@@ -3927,36 +3928,12 @@
   gap: var(--space-3);
 }
 
-.cng-banner__mark {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
+/* 官方刊头图（红底白字 logo，dili360.com 站点 header 同源资源），替代此前 CSS 手绘的「C」字块 */
+.cng-banner__logo {
+  display: block;
+  width: auto;
+  height: 52px;
   border-radius: var(--radius-sm);
-  background: var(--accent);
-  color: var(--text-on-accent);
-  font-family: var(--font-display);
-  font-size: 30px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.cng-banner__brandname {
-  display: grid;
-  gap: 2px;
-  font-size: var(--fs-cap);
-  font-weight: 700;
-  color: var(--text-1);
-  line-height: var(--lh-tight);
-}
-
-.cng-banner__brandname i {
-  font-style: normal;
-  font-family: var(--font-display);
-  font-size: var(--fs-micro);
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  color: var(--text-3);
 }
 
 .cng-banner__title {
@@ -4099,6 +4076,10 @@
 
   .cng-banner__top {
     font-size: 36px;
+  }
+
+  .cng-banner__logo {
+    height: 44px;
   }
 
   .cng-grid {

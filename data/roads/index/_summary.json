@@ -1,42 +1,42 @@
 {
  "version": 1,
- "updated": "2026-10-08",
- "source": "authoritative",
+ "updated": "2026-10-11",
+ "source": "osm-pbf-elements",
  "byClass": {
   "expressway": {
-   "total": 278,
-   "withGeometry": 0,
-   "coverage": 0,
-   "lengthKm": 0,
+   "total": 290,
+   "withGeometry": 251,
+   "coverage": 0.866,
+   "lengthKm": 191553,
    "precision": {
-    "A": 0,
-    "B": 0,
-    "C": 0,
-    "X": 0
+    "A": 9,
+    "B": 17,
+    "C": 224,
+    "X": 1
    }
   },
   "national": {
-   "total": 301,
-   "withGeometry": 0,
-   "coverage": 0,
-   "lengthKm": 0,
+   "total": 307,
+   "withGeometry": 307,
+   "coverage": 1,
+   "lengthKm": 304773,
    "precision": {
-    "A": 0,
-    "B": 0,
-    "C": 0,
+    "A": 30,
+    "B": 20,
+    "C": 257,
     "X": 0
    }
   },
   "provincial": {
-   "total": 12,
-   "withGeometry": 0,
-   "coverage": 0,
-   "lengthKm": 0,
+   "total": 14803,
+   "withGeometry": 14728,
+   "coverage": 0.995,
+   "lengthKm": 621036,
    "precision": {
-    "A": 0,
-    "B": 0,
-    "C": 0,
-    "X": 0
+    "A": 1,
+    "B": 1,
+    "C": 14716,
+    "X": 10
    }
   }
  }

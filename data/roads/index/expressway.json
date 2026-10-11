@@ -1,7 +1,7 @@
 {
  "version": 1,
- "updated": "2026-10-08",
- "count": 278,
+ "updated": "2026-10-11",
+ "count": 290,
  "roads": [
   {
    "key": "G1",
@@ -18,17 +18,20 @@
    ],
    "fromPlace": "北京",
    "toPlace": "哈尔滨",
-   "lengthKm": 1200,
+   "lengthKm": 1396.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.40533,
+    39.62361,
+    126.54803,
+    45.8068
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G0111",
@@ -37,17 +40,20 @@
    "provinces": [],
    "fromPlace": "秦皇岛",
    "toPlace": "滨州",
-   "lengthKm": 0,
+   "lengthKm": 495.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    117.53558,
+    37.3801,
+    119.52389,
+    39.93655
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0112",
@@ -75,17 +81,20 @@
    "provinces": [],
    "fromPlace": "北京",
    "toPlace": "秦皇岛",
-   "lengthKm": 0,
+   "lengthKm": 349.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.40533,
+    39.88839,
+    119.59215,
+    40.14152
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0122",
@@ -121,17 +130,20 @@
    ],
    "fromPlace": "北京",
    "toPlace": "上海",
-   "lengthKm": 1210,
+   "lengthKm": 1373.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.40533,
+    31.22294,
+    121.47367,
+    39.90432
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0211",
@@ -140,17 +152,20 @@
    "provinces": [],
    "fromPlace": "天津",
    "toPlace": "石家庄天津滨海新区",
-   "lengthKm": 0,
+   "lengthKm": 293.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.51413,
+    38.04169,
+    116.97533,
+    38.9479
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0212",
@@ -188,17 +203,20 @@
    ],
    "fromPlace": "北京",
    "toPlace": "台北",
-   "lengthKm": 2030,
+   "lengthKm": 2343.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.33501,
+    25.97813,
+    119.29692,
+    39.90432
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0311",
@@ -207,17 +225,20 @@
    "provinces": [],
    "fromPlace": "济南",
    "toPlace": "聊城",
-   "lengthKm": 0,
+   "lengthKm": 100,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    115.86055,
+    36.46211,
+    116.85757,
+    36.77118
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0321",
@@ -226,17 +247,20 @@
    "provinces": [],
    "fromPlace": "德州",
    "toPlace": "上饶",
-   "lengthKm": 0,
+   "lengthKm": 1590.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    115.48024,
+    28.45511,
+    117.99855,
+    37.43761
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0322",
@@ -255,7 +279,8 @@
    "spotCount": 0,
    "hasGeom": false,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true
   },
   {
    "key": "G0323",
@@ -264,17 +289,20 @@
    "provinces": [],
    "fromPlace": "济宁",
    "toPlace": "合肥",
-   "lengthKm": 0,
+   "lengthKm": 652.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.45072,
+    31.7869,
+    117.8453,
+    35.41477
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4",
@@ -292,17 +320,20 @@
    ],
    "fromPlace": "北京",
    "toPlace": "港澳",
-   "lengthKm": 2285,
+   "lengthKm": 2637.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.81861,
+    22.27845,
+    116.40545,
+    39.90432
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0411",
@@ -311,17 +342,20 @@
    "provinces": [],
    "fromPlace": "安阳",
    "toPlace": "长治",
-   "lengthKm": 0,
+   "lengthKm": 175.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.11358,
+    36.05695,
+    114.39314,
+    36.28854
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0412",
@@ -330,17 +364,20 @@
    "provinces": [],
    "fromPlace": "深圳",
    "toPlace": "南宁",
-   "lengthKm": 0,
+   "lengthKm": 168.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.53168,
+    22.59371,
+    110.01094,
+    22.73822
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0413",
@@ -368,17 +405,20 @@
    "provinces": [],
    "fromPlace": "许昌",
    "toPlace": "广州",
-   "lengthKm": 0,
+   "lengthKm": 1793.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.36492,
+    23.12999,
+    113.85136,
+    34.03723
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0422",
@@ -387,17 +427,20 @@
    "provinces": [],
    "fromPlace": "武汉",
    "toPlace": "深圳",
-   "lengthKm": 0,
+   "lengthKm": 1323.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.38687,
+    22.90668,
+    114.33342,
+    30.59423
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0423",
@@ -406,17 +449,20 @@
    "provinces": [],
    "fromPlace": "乐昌",
    "toPlace": "广州",
-   "lengthKm": 0,
+   "lengthKm": 291.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.97284,
+    23.45096,
+    113.57458,
+    25.29706
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0424",
@@ -425,17 +471,20 @@
    "provinces": [],
    "fromPlace": "北京",
    "toPlace": "武汉",
-   "lengthKm": 0,
+   "lengthKm": 1407.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.62444,
+    30.59423,
+    116.43071,
+    39.90432
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0425",
@@ -444,17 +493,20 @@
    "provinces": [],
    "fromPlace": "广州",
    "toPlace": "澳门",
-   "lengthKm": 0,
+   "lengthKm": 156.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.2241,
+    22.18717,
+    113.57681,
+    23.13012
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5",
@@ -471,17 +523,20 @@
    ],
    "fromPlace": "北京",
    "toPlace": "昆明",
-   "lengthKm": 2865,
+   "lengthKm": 3425.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    101.69651,
+    24.88163,
+    116.40545,
+    39.90432
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0511",
@@ -490,17 +545,20 @@
    "provinces": [],
    "fromPlace": "德阳",
    "toPlace": "都江堰",
-   "lengthKm": 0,
+   "lengthKm": 92.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.63664,
+    30.94936,
+    104.42978,
+    31.2232
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0512",
@@ -509,17 +567,20 @@
    "provinces": [],
    "fromPlace": "成都",
    "toPlace": "乐山",
-   "lengthKm": 0,
+   "lengthKm": 148.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.61718,
+    29.55308,
+    104.06736,
+    30.57317
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0513",
@@ -538,7 +599,8 @@
    "spotCount": 0,
    "hasGeom": false,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true
   },
   {
    "key": "G6",
@@ -556,17 +618,20 @@
    ],
    "fromPlace": "北京",
    "toPlace": "拉萨",
-   "lengthKm": 3710,
+   "lengthKm": 3830.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    90.53165,
+    29.59856,
+    116.40533,
+    41.01674
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "A",
+   "componentCount": 2
   },
   {
    "key": "G0611",
@@ -575,17 +640,20 @@
    "provinces": [],
    "fromPlace": "张掖",
    "toPlace": "汶川",
-   "lengthKm": 0,
+   "lengthKm": 1106.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    100.44946,
+    32.54188,
+    103.62936,
+    38.92645
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0612",
@@ -594,17 +662,20 @@
    "provinces": [],
    "fromPlace": "西宁",
    "toPlace": "和田",
-   "lengthKm": 0,
+   "lengthKm": 2683.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    79.92064,
+    36.64997,
+    101.75749,
+    39.21352
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0613",
@@ -613,17 +684,20 @@
    "provinces": [],
    "fromPlace": "西宁",
    "toPlace": "丽江",
-   "lengthKm": 0,
+   "lengthKm": 1979,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    97.00624,
+    26.85394,
+    101.75749,
+    36.68323
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0615",
@@ -632,17 +706,20 @@
    "provinces": [],
    "fromPlace": "德令哈",
    "toPlace": "康定",
-   "lengthKm": 0,
+   "lengthKm": 1138.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    97.36221,
+    29.99865,
+    102.64799,
+    37.37009
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G0616",
@@ -651,17 +728,20 @@
    "provinces": [],
    "fromPlace": "乌拉特前旗",
    "toPlace": "甘其毛都",
-   "lengthKm": 0,
+   "lengthKm": 155.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    107.60279,
+    41.53157,
+    108.50052,
+    42.33588
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G7",
@@ -677,17 +757,20 @@
    ],
    "fromPlace": "北京",
    "toPlace": "乌鲁木齐",
-   "lengthKm": 2768,
+   "lengthKm": 3034.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    87.59998,
+    39.90432,
+    116.40533,
+    44.17639
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G0711",
@@ -696,17 +779,20 @@
    "provinces": [],
    "fromPlace": "乌鲁木齐",
    "toPlace": "若羌",
-   "lengthKm": 0,
+   "lengthKm": 856.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    86.13503,
+    39.09779,
+    88.41154,
+    43.6676
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0712",
@@ -739,17 +825,20 @@
    ],
    "fromPlace": "鹤岗",
    "toPlace": "大连",
-   "lengthKm": 1390,
+   "lengthKm": 1583.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    121.61428,
+    38.91388,
+    131.02102,
+    47.35047
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1111",
@@ -758,17 +847,20 @@
    "provinces": [],
    "fromPlace": "鹤岗",
    "toPlace": "哈尔滨",
-   "lengthKm": 0,
+   "lengthKm": 479.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    126.52998,
+    45.80331,
+    130.29867,
+    47.73339
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1112",
@@ -777,17 +869,20 @@
    "provinces": [],
    "fromPlace": "集安",
    "toPlace": "双辽",
-   "lengthKm": 0,
+   "lengthKm": 479,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    123.50117,
+    41.12454,
+    126.21994,
+    43.52328
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1113",
@@ -796,17 +891,20 @@
    "provinces": [],
    "fromPlace": "丹东",
    "toPlace": "阜新",
-   "lengthKm": 0,
+   "lengthKm": 512.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    121.66524,
+    40.00059,
+    124.35574,
+    42.36225
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1115",
@@ -815,17 +913,20 @@
    "provinces": [],
    "fromPlace": "鸡西",
    "toPlace": "建三江",
-   "lengthKm": 0,
+   "lengthKm": 388.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    130.84631,
+    45.30029,
+    133.07133,
+    47.30839
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1116",
@@ -834,17 +935,20 @@
    "provinces": [],
    "fromPlace": "伊春",
    "toPlace": "北安",
-   "lengthKm": 0,
+   "lengthKm": 177.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    126.73855,
+    47.55397,
+    128.48275,
+    48.1606
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1117",
@@ -853,17 +957,20 @@
    "provinces": [],
    "fromPlace": "绥化",
    "toPlace": "北安",
-   "lengthKm": 0,
+   "lengthKm": 222.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    126.4277,
+    46.54541,
+    126.97096,
+    48.31862
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1118",
@@ -910,17 +1017,20 @@
    "provinces": [],
    "fromPlace": "牡丹江",
    "toPlace": "延吉",
-   "lengthKm": 0,
+   "lengthKm": 53.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    129.49959,
+    43.00563,
+    129.68118,
+    43.32924
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G15",
@@ -939,17 +1049,20 @@
    ],
    "fromPlace": "沈阳",
    "toPlace": "海口",
-   "lengthKm": 3710,
+   "lengthKm": 4448.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    109.99478,
+    20.04545,
+    123.46679,
+    41.67708
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G1511",
@@ -962,17 +1075,20 @@
    ],
    "fromPlace": "日照",
    "toPlace": "兰考",
-   "lengthKm": 470,
+   "lengthKm": 534.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.81851,
+    34.85622,
+    119.52721,
+    35.59162
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G1512",
@@ -984,17 +1100,20 @@
    ],
    "fromPlace": "宁波",
    "toPlace": "金华",
-   "lengthKm": 180,
+   "lengthKm": 258.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    119.63033,
+    29.07783,
+    121.63256,
+    29.87065
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1513",
@@ -1003,17 +1122,20 @@
    "provinces": [],
    "fromPlace": "温州",
    "toPlace": "丽水",
-   "lengthKm": 0,
+   "lengthKm": 134.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    119.89111,
+    27.92804,
+    120.68821,
+    28.39947
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1514",
@@ -1022,17 +1144,20 @@
    "provinces": [],
    "fromPlace": "宁德",
    "toPlace": "上饶",
-   "lengthKm": 0,
+   "lengthKm": 401.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    117.78932,
+    26.54063,
+    119.54756,
+    28.4634
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1515",
@@ -1041,17 +1166,20 @@
    "provinces": [],
    "fromPlace": "盐城",
    "toPlace": "靖江",
-   "lengthKm": 0,
+   "lengthKm": 173.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    120.03824,
+    32.12395,
+    120.22237,
+    33.52945
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1516",
@@ -1060,17 +1188,20 @@
    "provinces": [],
    "fromPlace": "盐城",
    "toPlace": "洛阳",
-   "lengthKm": 0,
+   "lengthKm": 998.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.45557,
+    33.21952,
+    120.71937,
+    34.61949
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1517",
@@ -1079,17 +1210,20 @@
    "provinces": [],
    "fromPlace": "莆田",
    "toPlace": "炎陵",
-   "lengthKm": 0,
+   "lengthKm": 924.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.77208,
+    25.44453,
+    119.20575,
+    27.09153
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1518",
@@ -1117,17 +1251,20 @@
    "provinces": [],
    "fromPlace": "南通",
    "toPlace": "如东",
-   "lengthKm": 0,
+   "lengthKm": 36.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    120.95177,
+    32.08457,
+    121.22354,
+    32.30346
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1521",
@@ -1136,17 +1273,20 @@
    "provinces": [],
    "fromPlace": "常熟",
    "toPlace": "嘉善",
-   "lengthKm": 0,
+   "lengthKm": 124.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    120.75138,
+    30.83055,
+    120.98143,
+    31.65562
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1522",
@@ -1155,17 +1295,20 @@
    "provinces": [],
    "fromPlace": "常熟",
    "toPlace": "台州",
-   "lengthKm": 0,
+   "lengthKm": 428.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    120.58436,
+    28.65587,
+    121.42483,
+    31.65562
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1523",
@@ -1174,17 +1317,20 @@
    "provinces": [],
    "fromPlace": "宁波",
    "toPlace": "东莞",
-   "lengthKm": 0,
+   "lengthKm": 1561.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.75068,
+    22.9363,
+    121.92899,
+    29.86394
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G1531",
@@ -1212,17 +1358,20 @@
    "provinces": [],
    "fromPlace": "泉州",
    "toPlace": "梅州",
-   "lengthKm": 0,
+   "lengthKm": 548.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.12147,
+    24.26471,
+    118.67897,
+    25.39177
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1533",
@@ -1269,17 +1418,20 @@
    "provinces": [],
    "fromPlace": "潮州",
    "toPlace": "南昌",
-   "lengthKm": 0,
+   "lengthKm": 36.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    115.87153,
+    24.35566,
+    116.09654,
+    24.53172
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1536",
@@ -1319,17 +1471,20 @@
    ],
    "fromPlace": "长春",
    "toPlace": "深圳",
-   "lengthKm": 3585,
+   "lengthKm": 4171.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.05871,
+    22.54273,
+    125.3231,
+    43.88113
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G2511",
@@ -1338,17 +1493,20 @@
    "provinces": [],
    "fromPlace": "新民",
    "toPlace": "鲁北",
-   "lengthKm": 0,
+   "lengthKm": 367.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    119.92168,
+    40.0922,
+    122.86488,
+    42.00205
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2512",
@@ -1357,17 +1515,20 @@
    "provinces": [],
    "fromPlace": "阜新",
    "toPlace": "锦州",
-   "lengthKm": 0,
+   "lengthKm": 119.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    121.26166,
+    41.07749,
+    121.58823,
+    42.06359
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2513",
@@ -1379,17 +1540,20 @@
    ],
    "fromPlace": "淮安",
    "toPlace": "徐州",
-   "lengthKm": 200,
+   "lengthKm": 190.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    117.29187,
+    33.6134,
+    118.92099,
+    34.35988
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "A",
+   "componentCount": 1
   },
   {
    "key": "G2515",
@@ -1417,17 +1581,20 @@
    "provinces": [],
    "fromPlace": "东营",
    "toPlace": "吕梁",
-   "lengthKm": 0,
+   "lengthKm": 867.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    111.14433,
+    36.65088,
+    118.67538,
+    37.52997
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G2517",
@@ -1436,17 +1603,20 @@
    "provinces": [],
    "fromPlace": "沙县",
    "toPlace": "厦门",
-   "lengthKm": 0,
+   "lengthKm": 312.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    117.79212,
+    24.47913,
+    118.24067,
+    26.39631
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G2518",
@@ -1455,17 +1625,20 @@
    "provinces": [],
    "fromPlace": "深圳",
    "toPlace": "岑溪",
-   "lengthKm": 0,
+   "lengthKm": 405.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    110.99451,
+    22.51675,
+    114.06262,
+    22.91887
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2519",
@@ -1484,7 +1657,8 @@
    "spotCount": 0,
    "hasGeom": false,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true
   },
   {
    "key": "G2531",
@@ -1519,17 +1693,20 @@
    ],
    "fromPlace": "济南",
    "toPlace": "广州",
-   "lengthKm": 2100,
+   "lengthKm": 2577.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.25896,
+    23.12538,
+    117.1839,
+    36.6661
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 2
   },
   {
    "key": "G3511",
@@ -1538,17 +1715,20 @@
    "provinces": [],
    "fromPlace": "菏泽",
    "toPlace": "宝鸡",
-   "lengthKm": 0,
+   "lengthKm": 594.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    107.23703,
+    34.35522,
+    115.48028,
+    35.47909
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G3512",
@@ -1587,17 +1767,20 @@
    ],
    "fromPlace": "大庆",
    "toPlace": "广州",
-   "lengthKm": 3550,
+   "lengthKm": 3766.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.2584,
+    23.12869,
+    125.10506,
+    46.58973
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4511",
@@ -1606,17 +1789,20 @@
    "provinces": [],
    "fromPlace": "龙南",
    "toPlace": "河源",
-   "lengthKm": 0,
+   "lengthKm": 185.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.69915,
+    23.74459,
+    115.01922,
+    24.91143
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4512",
@@ -1625,17 +1811,20 @@
    "provinces": [],
    "fromPlace": "双辽",
    "toPlace": "嫩江",
-   "lengthKm": 0,
+   "lengthKm": 731,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    122.79345,
+    43.51727,
+    125.22501,
+    49.18607
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4513",
@@ -1644,17 +1833,20 @@
    "provinces": [],
    "fromPlace": "奈曼旗",
    "toPlace": "营口",
-   "lengthKm": 0,
+   "lengthKm": 386.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    120.6502,
+    40.62578,
+    122.2589,
+    42.86758
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4515",
@@ -1663,17 +1855,20 @@
    "provinces": [],
    "fromPlace": "赤峰",
    "toPlace": "绥中",
-   "lengthKm": 0,
+   "lengthKm": 338.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    118.88693,
+    40.27426,
+    120.34407,
+    42.25815
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G55",
@@ -1690,17 +1885,20 @@
    ],
    "fromPlace": "二连浩特",
    "toPlace": "广州",
-   "lengthKm": 2685,
+   "lengthKm": 3083.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    111.29793,
+    23.12869,
+    113.3682,
+    43.64357
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G5511",
@@ -1709,17 +1907,20 @@
    "provinces": [],
    "fromPlace": "集宁",
    "toPlace": "阿荣旗",
-   "lengthKm": 0,
+   "lengthKm": 2588.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.16461,
+    36.18073,
+    123.47095,
+    48.12793
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5512",
@@ -1728,17 +1929,20 @@
    "provinces": [],
    "fromPlace": "晋城",
    "toPlace": "新乡",
-   "lengthKm": 0,
+   "lengthKm": 166.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.8516,
+    35.00989,
+    113.92712,
+    35.49082
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5513",
@@ -1750,17 +1954,20 @@
    ],
    "fromPlace": "长沙",
    "toPlace": "张家界",
-   "lengthKm": 310,
+   "lengthKm": 362.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    110.47915,
+    28.22827,
+    112.93795,
+    29.4292
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G5515",
@@ -1769,17 +1976,20 @@
    "provinces": [],
    "fromPlace": "张家界",
    "toPlace": "南充",
-   "lengthKm": 0,
+   "lengthKm": 833,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.11044,
+    29.11545,
+    110.47915,
+    31.07872
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5516",
@@ -1788,17 +1998,20 @@
    "provinces": [],
    "fromPlace": "苏尼特右旗",
    "toPlace": "张家口",
-   "lengthKm": 0,
+   "lengthKm": 392.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.64304,
+    40.76899,
+    114.96966,
+    42.74582
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5517",
@@ -1807,17 +2020,20 @@
    "provinces": [],
    "fromPlace": "常德",
    "toPlace": "长沙",
-   "lengthKm": 0,
+   "lengthKm": 164.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    111.6985,
+    28.22862,
+    112.93795,
+    29.0333
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5518",
@@ -1826,17 +2042,20 @@
    "provinces": [],
    "fromPlace": "晋城",
    "toPlace": "潼关",
-   "lengthKm": 0,
+   "lengthKm": 9.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.47654,
+    35.4522,
+    112.55184,
+    35.50178
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G59",
@@ -1853,17 +2072,20 @@
    ],
    "fromPlace": "呼和浩特",
    "toPlace": "北海",
-   "lengthKm": 2600,
+   "lengthKm": 3123.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    109.1213,
+    21.48211,
+    112.468,
+    40.84189
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 3
   },
   {
    "key": "G5911",
@@ -1919,17 +2141,20 @@
    ],
    "fromPlace": "包头",
    "toPlace": "茂名",
-   "lengthKm": 3010,
+   "lengthKm": 3323.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.54634,
+    21.66295,
+    111.27942,
+    40.62032
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6511",
@@ -1957,17 +2182,20 @@
    "provinces": [],
    "fromPlace": "秀山",
    "toPlace": "从江",
-   "lengthKm": 0,
+   "lengthKm": 31.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    109.01199,
+    28.25766,
+    109.0761,
+    28.49465
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6517",
@@ -1976,17 +2204,20 @@
    "provinces": [],
    "fromPlace": "梧州",
    "toPlace": "柳州",
-   "lengthKm": 0,
+   "lengthKm": 304.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    109.4049,
+    23.3461,
+    111.27942,
+    24.32687
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6521",
@@ -1995,17 +2226,20 @@
    "provinces": [],
    "fromPlace": "榆林",
    "toPlace": "蓝田",
-   "lengthKm": 0,
+   "lengthKm": 2313.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    109.47133,
+    24.96296,
+    118.22575,
+    38.28556
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6522",
@@ -2014,17 +2248,20 @@
    "provinces": [],
    "fromPlace": "延安",
    "toPlace": "西安",
-   "lengthKm": 0,
+   "lengthKm": 415.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.90068,
+    34.34258,
+    109.66171,
+    36.65145
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G69",
@@ -2041,17 +2278,20 @@
    ],
    "fromPlace": "银川",
    "toPlace": "百色",
-   "lengthKm": 2200,
+   "lengthKm": 2567.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.22935,
+    23.90275,
+    109.18685,
+    38.48851
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6911",
@@ -2060,17 +2300,20 @@
    "provinces": [],
    "fromPlace": "安康",
    "toPlace": "来凤",
-   "lengthKm": 0,
+   "lengthKm": 579.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.96401,
+    29.49514,
+    109.73705,
+    32.68481
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G75",
@@ -2088,17 +2331,20 @@
    ],
    "fromPlace": "兰州",
    "toPlace": "海口",
-   "lengthKm": 2650,
+   "lengthKm": 2944.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.68925,
+    20.04608,
+    110.35813,
+    36.06428
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G7511",
@@ -2107,17 +2353,20 @@
    "provinces": [],
    "fromPlace": "钦州",
    "toPlace": "东兴",
-   "lengthKm": 0,
+   "lengthKm": 25,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.44117,
+    21.87569,
+    108.50275,
+    21.97018
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G7512",
@@ -2126,17 +2375,20 @@
    "provinces": [],
    "fromPlace": "贵阳",
    "toPlace": "成都",
-   "lengthKm": 0,
+   "lengthKm": 848.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    104.06638,
+    26.64651,
+    106.62826,
+    30.57684
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G7521",
@@ -2145,17 +2397,20 @@
    "provinces": [],
    "fromPlace": "重庆",
    "toPlace": "贵阳",
-   "lengthKm": 0,
+   "lengthKm": 421.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.53565,
+    26.64517,
+    107.12647,
+    29.56294
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G7522",
@@ -2164,17 +2419,20 @@
    "provinces": [],
    "fromPlace": "贵阳",
    "toPlace": "北海",
-   "lengthKm": 0,
+   "lengthKm": 950,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.62586,
+    21.48188,
+    109.42887,
+    26.64651
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G85",
@@ -2188,17 +2446,20 @@
    ],
    "fromPlace": "银川",
    "toPlace": "昆明",
-   "lengthKm": 1100,
+   "lengthKm": 2296.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    102.82661,
+    24.88163,
+    107.28722,
+    38.48851
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G8511",
@@ -2207,17 +2468,20 @@
    "provinces": [],
    "fromPlace": "昆明",
    "toPlace": "磨憨",
-   "lengthKm": 0,
+   "lengthKm": 784.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    100.8711,
+    21.25456,
+    102.8176,
+    24.98939
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G8512",
@@ -2226,17 +2490,20 @@
    "provinces": [],
    "fromPlace": "景洪",
    "toPlace": "打洛",
-   "lengthKm": 0,
+   "lengthKm": 63.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    100.44821,
+    21.93814,
+    100.91692,
+    22.07324
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G8513",
@@ -2245,17 +2512,20 @@
    "provinces": [],
    "fromPlace": "平凉",
    "toPlace": "绵阳",
-   "lengthKm": 0,
+   "lengthKm": 933.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    104.17314,
+    31.46796,
+    106.6848,
+    35.54246
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G8515",
@@ -2264,17 +2534,20 @@
    "provinces": [],
    "fromPlace": "广安",
    "toPlace": "泸州",
-   "lengthKm": 0,
+   "lengthKm": 318.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    105.43394,
+    28.87205,
+    106.63333,
+    30.45586
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G8516",
@@ -2283,17 +2556,20 @@
    "provinces": [],
    "fromPlace": "巴中",
    "toPlace": "成都",
-   "lengthKm": 0,
+   "lengthKm": 338.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    104.20603,
+    30.702,
+    106.74991,
+    31.94659
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G8517",
@@ -2302,17 +2578,20 @@
    "provinces": [],
    "fromPlace": "屏山",
    "toPlace": "兴义",
-   "lengthKm": 0,
+   "lengthKm": 694.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    104.34648,
+    25.09147,
+    104.93212,
+    28.82855
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G10",
@@ -2325,17 +2604,20 @@
    ],
    "fromPlace": "绥芬河",
    "toPlace": "满洲里",
-   "lengthKm": 1300,
+   "lengthKm": 1470.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    117.37655,
+    44.37538,
+    131.15213,
+    49.60034
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G1011",
@@ -2344,17 +2626,20 @@
    "provinces": [],
    "fromPlace": "哈尔滨",
    "toPlace": "同江",
-   "lengthKm": 0,
+   "lengthKm": 224.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    126.79796,
+    45.73382,
+    128.18704,
+    45.81866
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1012",
@@ -2363,17 +2648,20 @@
    "provinces": [],
    "fromPlace": "建三江",
    "toPlace": "黑瞎子岛",
-   "lengthKm": 0,
+   "lengthKm": 249.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    132.62961,
+    47.2563,
+    134.75271,
+    48.36742
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1013",
@@ -2382,17 +2670,20 @@
    "provinces": [],
    "fromPlace": "海拉尔",
    "toPlace": "张家口",
-   "lengthKm": 0,
+   "lengthKm": 1485.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.71974,
+    40.76931,
+    121.07113,
+    49.2347
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1015",
@@ -2401,17 +2692,20 @@
    "provinces": [],
    "fromPlace": "铁力",
    "toPlace": "科尔沁右翼中旗",
-   "lengthKm": 0,
+   "lengthKm": 907.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    121.47171,
+    44.71935,
+    128.83412,
+    46.98563
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1016",
@@ -2462,17 +2756,20 @@
    ],
    "fromPlace": "珲春",
    "toPlace": "乌兰浩特",
-   "lengthKm": 890,
+   "lengthKm": 1001.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    122.09313,
+    42.86265,
+    130.36584,
+    46.0716
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G1211",
@@ -2481,17 +2778,20 @@
    "provinces": [],
    "fromPlace": "吉林",
    "toPlace": "黑河",
-   "lengthKm": 0,
+   "lengthKm": 711.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    125.32646,
+    43.89681,
+    127.32082,
+    48.25385
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1212",
@@ -2500,17 +2800,20 @@
    "provinces": [],
    "fromPlace": "沈阳",
    "toPlace": "吉林",
-   "lengthKm": 0,
+   "lengthKm": 452.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    123.46531,
+    41.65775,
+    126.06066,
+    43.90335
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1213",
@@ -2519,17 +2822,20 @@
    "provinces": [],
    "fromPlace": "北安",
    "toPlace": "漠河",
-   "lengthKm": 0,
+   "lengthKm": 31,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    126.19879,
+    48.31896,
+    126.4262,
+    48.54664
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1215",
@@ -2538,17 +2844,20 @@
    "provinces": [],
    "fromPlace": "松江",
    "toPlace": "长白山",
-   "lengthKm": 0,
+   "lengthKm": 14.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    128.13648,
+    42.45343,
+    128.20405,
+    42.57037
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1216",
@@ -2576,17 +2885,20 @@
    "provinces": [],
    "fromPlace": "延吉",
    "toPlace": "长春",
-   "lengthKm": 0,
+   "lengthKm": 532.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    125.3231,
+    42.4928,
+    129.50748,
+    43.81644
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G16",
@@ -2599,17 +2911,20 @@
    ],
    "fromPlace": "丹东",
    "toPlace": "锡林浩特",
-   "lengthKm": 600,
+   "lengthKm": 1112.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.08606,
+    39.9315,
+    124.35574,
+    43.93473
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1611",
@@ -2618,17 +2933,20 @@
    "provinces": [],
    "fromPlace": "克什克腾",
    "toPlace": "承德",
-   "lengthKm": 0,
+   "lengthKm": 428.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.74336,
+    40.95139,
+    117.99705,
+    43.2653
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1612",
@@ -2663,17 +2981,20 @@
    ],
    "fromPlace": "荣成",
    "toPlace": "乌海",
-   "lengthKm": 1800,
+   "lengthKm": 1991.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.79439,
+    36.93669,
+    122.48597,
+    39.81701
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G1811",
@@ -2685,17 +3006,20 @@
    ],
    "fromPlace": "黄骅",
    "toPlace": "石家庄",
-   "lengthKm": 300,
+   "lengthKm": 281.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.51506,
+    37.97979,
+    117.33031,
+    38.373
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "A",
+   "componentCount": 1
   },
   {
    "key": "G1812",
@@ -2709,17 +3033,20 @@
    ],
    "fromPlace": "沧州",
    "toPlace": "榆林",
-   "lengthKm": 600,
+   "lengthKm": 924.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    109.69101,
+    38.27067,
+    116.83877,
+    39.02698
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1813",
@@ -2728,17 +3055,20 @@
    "provinces": [],
    "fromPlace": "威海",
    "toPlace": "青岛",
-   "lengthKm": 0,
+   "lengthKm": 236.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    120.25307,
+    36.40336,
+    121.40364,
+    36.82154
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1815",
@@ -2747,17 +3077,20 @@
    "provinces": [],
    "fromPlace": "潍坊",
    "toPlace": "日照",
-   "lengthKm": 0,
+   "lengthKm": 199.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    119.11949,
+    35.41345,
+    119.52721,
+    36.70889
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1816",
@@ -2766,17 +3099,20 @@
    "provinces": [],
    "fromPlace": "乌海",
    "toPlace": "玛沁",
-   "lengthKm": 0,
+   "lengthKm": 1739.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    100.2386,
+    34.45036,
+    107.05558,
+    39.65535
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1817",
@@ -2785,17 +3121,20 @@
    "provinces": [],
    "fromPlace": "乌海",
    "toPlace": "银川",
-   "lengthKm": 0,
+   "lengthKm": 271.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    105.63337,
+    38.34649,
+    106.79687,
+    39.65535
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1818",
@@ -2830,17 +3169,20 @@
    ],
    "fromPlace": "青岛",
    "toPlace": "银川",
-   "lengthKm": 1580,
+   "lengthKm": 1648.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.22935,
+    36.0673,
+    120.40644,
+    38.48851
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2011",
@@ -2849,17 +3191,20 @@
    "provinces": [],
    "fromPlace": "青岛",
    "toPlace": "新河",
-   "lengthKm": 0,
+   "lengthKm": 111,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    119.64926,
+    36.24397,
+    120.43009,
+    36.94233
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2012",
@@ -2873,17 +3218,20 @@
    ],
    "fromPlace": "定边",
    "toPlace": "武威",
-   "lengthKm": 400,
+   "lengthKm": 502.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    102.63674,
+    37.42339,
+    107.60123,
+    37.92884
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G22",
@@ -2899,17 +3247,20 @@
    ],
    "fromPlace": "青岛",
    "toPlace": "兰州",
-   "lengthKm": 1800,
+   "lengthKm": 2240.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.83326,
+    35.26728,
+    120.38236,
+    36.6449
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2211",
@@ -2918,17 +3269,20 @@
    "provinces": [],
    "fromPlace": "长治",
    "toPlace": "延安",
-   "lengthKm": 0,
+   "lengthKm": 499.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    109.49433,
+    36.1535,
+    113.11659,
+    36.88796
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G30",
@@ -2945,17 +3299,20 @@
    ],
    "fromPlace": "连云港",
    "toPlace": "霍尔果斯",
-   "lengthKm": 4395,
+   "lengthKm": 4370.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    80.41461,
+    34.08701,
+    119.22139,
+    44.64831
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "A",
+   "componentCount": 1
   },
   {
    "key": "G3011",
@@ -2968,17 +3325,20 @@
    ],
    "fromPlace": "柳园",
    "toPlace": "格尔木",
-   "lengthKm": 400,
+   "lengthKm": 582.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    94.24874,
+    36.40655,
+    95.50801,
+    40.51608
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3012",
@@ -2987,17 +3347,20 @@
    "provinces": [],
    "fromPlace": "吐鲁番",
    "toPlace": "和田",
-   "lengthKm": 0,
+   "lengthKm": 1851.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    75.99065,
+    37.10872,
+    89.25109,
+    42.97292
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3013",
@@ -3006,17 +3369,20 @@
    "provinces": [],
    "fromPlace": "阿图什",
    "toPlace": "伊尔克什坦",
-   "lengthKm": 0,
+   "lengthKm": 103.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    75.00706,
+    39.65164,
+    75.96391,
+    39.76248
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3014",
@@ -3025,17 +3391,20 @@
    "provinces": [],
    "fromPlace": "奎屯",
    "toPlace": "阿勒泰",
-   "lengthKm": 0,
+   "lengthKm": 538.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    84.70053,
+    44.42517,
+    88.14252,
+    47.84436
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3015",
@@ -3044,17 +3413,20 @@
    "provinces": [],
    "fromPlace": "奎屯",
    "toPlace": "塔城",
-   "lengthKm": 0,
+   "lengthKm": 383.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    82.97983,
+    44.42517,
+    84.90337,
+    46.74506
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3016",
@@ -3063,17 +3435,20 @@
    "provinces": [],
    "fromPlace": "清水河",
    "toPlace": "伊宁",
-   "lengthKm": 0,
+   "lengthKm": 83,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    80.77858,
+    43.9639,
+    81.2258,
+    44.21695
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3017",
@@ -3082,17 +3457,20 @@
    "provinces": [],
    "fromPlace": "武威",
    "toPlace": "金昌",
-   "lengthKm": 0,
+   "lengthKm": 128.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    102.20729,
+    37.93016,
+    102.59147,
+    38.50185
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3018",
@@ -3101,17 +3479,20 @@
    "provinces": [],
    "fromPlace": "精河",
    "toPlace": "阿拉山口",
-   "lengthKm": 0,
+   "lengthKm": 47.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    82.63597,
+    44.64162,
+    82.97863,
+    44.95444
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3019",
@@ -3120,17 +3501,20 @@
    "provinces": [],
    "fromPlace": "博乐",
    "toPlace": "阿拉山口",
-   "lengthKm": 0,
+   "lengthKm": 75,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    82.05145,
+    44.85458,
+    82.55398,
+    45.17279
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3021",
@@ -3139,17 +3523,20 @@
    "provinces": [],
    "fromPlace": "临潼",
    "toPlace": "兴平",
-   "lengthKm": 0,
+   "lengthKm": 104.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.49082,
+    34.30014,
+    109.21461,
+    34.54875
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3031",
@@ -3158,17 +3545,20 @@
    "provinces": [],
    "fromPlace": "商丘",
    "toPlace": "固始",
-   "lengthKm": 0,
+   "lengthKm": 341.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    115.09262,
+    32.16417,
+    115.65617,
+    34.41456
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3032",
@@ -3177,17 +3567,20 @@
    "provinces": [],
    "fromPlace": "永登",
    "toPlace": "海晏",
-   "lengthKm": 0,
+   "lengthKm": 318.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    100.99527,
+    36.67708,
+    103.26071,
+    37.15753
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3033",
@@ -3234,17 +3627,20 @@
    "provinces": [],
    "fromPlace": "阿克苏",
    "toPlace": "阿拉尔",
-   "lengthKm": 0,
+   "lengthKm": 93.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    80.38886,
+    40.56406,
+    81.09582,
+    41.11951
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G36",
@@ -3258,17 +3654,20 @@
    ],
    "fromPlace": "南京",
    "toPlace": "洛阳",
-   "lengthKm": 720,
+   "lengthKm": 864,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.45557,
+    32.0593,
+    118.81733,
+    34.61949
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G3611",
@@ -3277,17 +3676,20 @@
    "provinces": [],
    "fromPlace": "南京",
    "toPlace": "信阳",
-   "lengthKm": 0,
+   "lengthKm": 732.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.09026,
+    31.81611,
+    118.79661,
+    32.69857
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3612",
@@ -3296,17 +3698,20 @@
    "provinces": [],
    "fromPlace": "平顶山",
    "toPlace": "宜昌",
-   "lengthKm": 0,
+   "lengthKm": 123.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.56697,
+    32.8989,
+    113.44043,
+    33.63058
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3613",
@@ -3334,17 +3739,20 @@
    "provinces": [],
    "fromPlace": "洛阳",
    "toPlace": "卢氏",
-   "lengthKm": 0,
+   "lengthKm": 215,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    111.0114,
+    34.05113,
+    112.45557,
+    34.61949
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G40",
@@ -3361,17 +3769,20 @@
    ],
    "fromPlace": "上海",
    "toPlace": "西安",
-   "lengthKm": 1490,
+   "lengthKm": 1545.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.93999,
+    31.23045,
+    121.4857,
+    34.34408
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "A",
+   "componentCount": 3
   },
   {
    "key": "G4011",
@@ -3380,17 +3791,20 @@
    "provinces": [],
    "fromPlace": "扬州",
    "toPlace": "溧阳",
-   "lengthKm": 0,
+   "lengthKm": 117.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    119.35569,
+    31.41631,
+    119.48392,
+    32.39376
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G4012",
@@ -3399,17 +3813,20 @@
    "provinces": [],
    "fromPlace": "溧阳",
    "toPlace": "宁德",
-   "lengthKm": 0,
+   "lengthKm": 887.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    118.41543,
+    26.63727,
+    119.78451,
+    31.41785
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4013",
@@ -3418,17 +3835,20 @@
    "provinces": [],
    "fromPlace": "扬州",
    "toPlace": "乐清",
-   "lengthKm": 0,
+   "lengthKm": 818.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    119.36286,
+    28.02408,
+    120.98797,
+    32.39376
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4015",
@@ -3437,17 +3857,20 @@
    "provinces": [],
    "fromPlace": "丹凤",
    "toPlace": "宁陕",
-   "lengthKm": 0,
+   "lengthKm": 77.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    110.06626,
+    33.44427,
+    110.44157,
+    33.48597
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G42",
@@ -3464,17 +3887,20 @@
    ],
    "fromPlace": "上海",
    "toPlace": "成都",
-   "lengthKm": 1960,
+   "lengthKm": 2577.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    104.06625,
+    30.22521,
+    121.47367,
+    32.13147
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4211",
@@ -3487,17 +3913,20 @@
    ],
    "fromPlace": "南京",
    "toPlace": "芜湖",
-   "lengthKm": 60,
+   "lengthKm": 98.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    118.43123,
+    31.35247,
+    118.79661,
+    32.05983
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4212",
@@ -3506,17 +3935,20 @@
    "provinces": [],
    "fromPlace": "合肥",
    "toPlace": "安庆",
-   "lengthKm": 0,
+   "lengthKm": 226.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.87801,
+    30.48188,
+    117.27547,
+    31.79285
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4213",
@@ -3525,17 +3957,20 @@
    "provinces": [],
    "fromPlace": "麻城",
    "toPlace": "安康",
-   "lengthKm": 0,
+   "lengthKm": 832.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    109.02944,
+    31.10326,
+    115.00796,
+    32.69341
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4215",
@@ -3548,17 +3983,20 @@
    ],
    "fromPlace": "成都",
    "toPlace": "遵义",
-   "lengthKm": 450,
+   "lengthKm": 542.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    104.06629,
+    27.67018,
+    106.87205,
+    30.57317
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4216",
@@ -3567,17 +4005,20 @@
    "provinces": [],
    "fromPlace": "成都",
    "toPlace": "丽江",
-   "lengthKm": 0,
+   "lengthKm": 401.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    100.22533,
+    26.44667,
+    104.17657,
+    30.57317
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 3
   },
   {
    "key": "G4217",
@@ -3586,17 +4027,20 @@
    "provinces": [],
    "fromPlace": "成都",
    "toPlace": "昌都",
-   "lengthKm": 0,
+   "lengthKm": 335.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    102.27432,
+    30.75179,
+    103.94417,
+    31.88028
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4218",
@@ -3605,17 +4049,20 @@
    "provinces": [],
    "fromPlace": "雅安",
    "toPlace": "叶城",
-   "lengthKm": 0,
+   "lengthKm": 3091.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    79.7827,
+    29.0447,
+    103.04211,
+    32.88972
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 3
   },
   {
    "key": "G4219",
@@ -3624,17 +4071,20 @@
    "provinces": [],
    "fromPlace": "曲水",
    "toPlace": "乃东",
-   "lengthKm": 0,
+   "lengthKm": 98.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    90.86562,
+    29.26576,
+    91.75032,
+    29.36126
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4221",
@@ -3649,17 +4099,20 @@
    ],
    "fromPlace": "上海",
    "toPlace": "武汉",
-   "lengthKm": 800,
+   "lengthKm": 1073.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.30071,
+    30.53105,
+    121.47367,
+    31.92307
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4222",
@@ -3668,17 +4121,20 @@
    "provinces": [],
    "fromPlace": "和县",
    "toPlace": "襄阳",
-   "lengthKm": 0,
+   "lengthKm": 909.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.12145,
+    31.39007,
+    118.3566,
+    32.16871
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4223",
@@ -3687,17 +4143,20 @@
    "provinces": [],
    "fromPlace": "武汉",
    "toPlace": "重庆",
-   "lengthKm": 0,
+   "lengthKm": 1068.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.55196,
+    29.5624,
+    114.3006,
+    31.20944
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G4231",
@@ -3706,17 +4165,20 @@
    "provinces": [],
    "fromPlace": "南京",
    "toPlace": "九江",
-   "lengthKm": 0,
+   "lengthKm": 119.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.968,
+    30.69364,
+    117.82884,
+    31.23738
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G50",
@@ -3733,17 +4195,20 @@
    ],
    "fromPlace": "上海",
    "toPlace": "重庆",
-   "lengthKm": 1770,
+   "lengthKm": 2088.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.5512,
+    29.56264,
+    121.47367,
+    31.23045
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5011",
@@ -3755,17 +4220,20 @@
    ],
    "fromPlace": "芜湖",
    "toPlace": "合肥",
-   "lengthKm": 100,
+   "lengthKm": 159.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    117.22703,
+    31.35055,
+    118.43123,
+    31.86185
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5012",
@@ -3774,17 +4242,20 @@
    "provinces": [],
    "fromPlace": "恩施",
    "toPlace": "广元",
-   "lengthKm": 0,
+   "lengthKm": 604.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    105.84423,
+    30.18804,
+    109.4888,
+    32.43606
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5013",
@@ -3797,17 +4268,20 @@
    ],
    "fromPlace": "重庆",
    "toPlace": "成都",
-   "lengthKm": 260,
+   "lengthKm": 386.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    104.06638,
+    29.56214,
+    106.55195,
+    30.65142
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5015",
@@ -3845,7 +4319,8 @@
    "spotCount": 0,
    "hasGeom": false,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true
   },
   {
    "key": "G5021",
@@ -3854,17 +4329,20 @@
    "provinces": [],
    "fromPlace": "石柱",
    "toPlace": "重庆",
-   "lengthKm": 0,
+   "lengthKm": 196.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.72619,
+    29.5383,
+    108.17071,
+    30.03196
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G56",
@@ -3882,17 +4360,20 @@
    ],
    "fromPlace": "杭州",
    "toPlace": "瑞丽",
-   "lengthKm": 3405,
+   "lengthKm": 3509.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    97.85624,
+    24.01859,
+    120.21053,
+    30.27726
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "A",
+   "componentCount": 1
   },
   {
    "key": "G5611",
@@ -3904,17 +4385,20 @@
    ],
    "fromPlace": "大理",
    "toPlace": "丽江",
-   "lengthKm": 260,
+   "lengthKm": 217.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    99.92315,
+    25.53855,
+    100.34343,
+    26.88635
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G5612",
@@ -3923,17 +4407,20 @@
    "provinces": [],
    "fromPlace": "大理",
    "toPlace": "临沧",
-   "lengthKm": 0,
+   "lengthKm": 288.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    100.02976,
+    23.88421,
+    100.60378,
+    25.68469
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5613",
@@ -3942,17 +4429,20 @@
    "provinces": [],
    "fromPlace": "保山",
    "toPlace": "泸水",
-   "lengthKm": 0,
+   "lengthKm": 111.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    98.83678,
+    25.34172,
+    99.19086,
+    25.88038
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5615",
@@ -3961,17 +4451,20 @@
    "provinces": [],
    "fromPlace": "天保",
    "toPlace": "猴桥",
-   "lengthKm": 0,
+   "lengthKm": 2609.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    98.27808,
+    23.34728,
+    112.40241,
+    29.21496
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5616",
@@ -3990,7 +4483,8 @@
    "spotCount": 0,
    "hasGeom": false,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true
   },
   {
    "key": "G5617",
@@ -3999,17 +4493,20 @@
    "provinces": [],
    "fromPlace": "临沧",
    "toPlace": "勐海",
-   "lengthKm": 0,
+   "lengthKm": 63.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    99.84502,
+    23.47784,
+    100.06602,
+    23.79862
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5618",
@@ -4018,17 +4515,20 @@
    "provinces": [],
    "fromPlace": "临沧",
    "toPlace": "清水河",
-   "lengthKm": 0,
+   "lengthKm": 2862.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    100.08972,
+    23.81386,
+    111.64734,
+    39.92765
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5621",
@@ -4037,17 +4537,20 @@
    "provinces": [],
    "fromPlace": "昆明",
    "toPlace": "大理",
-   "lengthKm": 0,
+   "lengthKm": 378,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    100.30098,
+    24.88082,
+    102.83376,
+    25.68687
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G60",
@@ -4064,17 +4567,20 @@
    ],
    "fromPlace": "上海",
    "toPlace": "昆明",
-   "lengthKm": 2730,
+   "lengthKm": 2818.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    102.82661,
+    24.88163,
+    121.47367,
+    31.23045
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6011",
@@ -4083,17 +4589,20 @@
    "provinces": [],
    "fromPlace": "南昌",
    "toPlace": "韶关",
-   "lengthKm": 0,
+   "lengthKm": 664.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.5976,
+    24.81088,
+    115.90219,
+    28.68405
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6012",
@@ -4102,17 +4611,20 @@
    "provinces": [],
    "fromPlace": "曲靖",
    "toPlace": "弥勒",
-   "lengthKm": 0,
+   "lengthKm": 176.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.41572,
+    24.40968,
+    103.84914,
+    25.49091
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6021",
@@ -4121,17 +4633,20 @@
    "provinces": [],
    "fromPlace": "杭州",
    "toPlace": "长沙",
-   "lengthKm": 0,
+   "lengthKm": 1057.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.93795,
+    28.15985,
+    120.21323,
+    30.2482
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6022",
@@ -4140,17 +4655,20 @@
    "provinces": [],
    "fromPlace": "醴陵",
    "toPlace": "娄底",
-   "lengthKm": 0,
+   "lengthKm": 179.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.11747,
+    27.59711,
+    113.5865,
+    27.69041
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6023",
@@ -4169,7 +4687,8 @@
    "spotCount": 0,
    "hasGeom": false,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true
   },
   {
    "key": "G6025",
@@ -4205,17 +4724,20 @@
    ],
    "fromPlace": "福州",
    "toPlace": "银川",
-   "lengthKm": 2445,
+   "lengthKm": 1889.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    105.59909,
+    26.07102,
+    119.29605,
+    38.48851
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 2
   },
   {
    "key": "G7011",
@@ -4224,17 +4746,20 @@
    "provinces": [],
    "fromPlace": "十堰",
    "toPlace": "天水",
-   "lengthKm": 0,
+   "lengthKm": 835.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    105.28099,
+    32.6202,
+    110.79894,
+    34.58176
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G7012",
@@ -4243,17 +4768,20 @@
    "provinces": [],
    "fromPlace": "抚州",
    "toPlace": "吉安",
-   "lengthKm": 0,
+   "lengthKm": 180.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.97921,
+    27.16789,
+    116.38591,
+    27.86417
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G7013",
@@ -4262,17 +4790,20 @@
    "provinces": [],
    "fromPlace": "沙县",
    "toPlace": "南平",
-   "lengthKm": 0,
+   "lengthKm": 172,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    117.72289,
+    26.3963,
+    118.13257,
+    27.38175
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G7021",
@@ -4281,17 +4812,20 @@
    "provinces": [],
    "fromPlace": "宁德",
    "toPlace": "武汉",
-   "lengthKm": 0,
+   "lengthKm": 1183.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.30071,
+    26.53493,
+    119.54756,
+    30.61086
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G72",
@@ -4306,17 +4840,20 @@
    ],
    "fromPlace": "泉州",
    "toPlace": "南宁",
-   "lengthKm": 1500,
+   "lengthKm": 1708.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.36664,
+    22.81817,
+    118.6757,
+    27.17054
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G7211",
@@ -4328,17 +4865,20 @@
    ],
    "fromPlace": "南宁",
    "toPlace": "友谊关",
-   "lengthKm": 180,
+   "lengthKm": 280.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.71016,
+    21.97369,
+    108.26759,
+    22.75027
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "X",
+   "componentCount": 1
   },
   {
    "key": "G7212",
@@ -4347,17 +4887,20 @@
    "provinces": [],
    "fromPlace": "柳州",
    "toPlace": "北海",
-   "lengthKm": 0,
+   "lengthKm": 402.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    109.1213,
+    21.48211,
+    109.7117,
+    24.32687
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G7221",
@@ -4366,17 +4909,20 @@
    "provinces": [],
    "fromPlace": "衡阳",
    "toPlace": "南宁",
-   "lengthKm": 0,
+   "lengthKm": 674,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.32447,
+    22.81817,
+    112.57222,
+    26.89394
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 3
   },
   {
    "key": "G76",
@@ -4393,17 +4939,20 @@
    ],
    "fromPlace": "厦门",
    "toPlace": "成都",
-   "lengthKm": 2300,
+   "lengthKm": 2401.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    104.06638,
+    24.47908,
+    118.09228,
+    30.58547
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G7611",
@@ -4412,17 +4961,20 @@
    "provinces": [],
    "fromPlace": "都匀",
    "toPlace": "香格里拉",
-   "lengthKm": 0,
+   "lengthKm": 852,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    102.1791,
+    26.02911,
+    107.51913,
+    27.89992
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G7612",
@@ -4431,17 +4983,20 @@
    "provinces": [],
    "fromPlace": "纳雍",
    "toPlace": "兴义",
-   "lengthKm": 0,
+   "lengthKm": 378,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    104.89528,
+    25.09147,
+    105.53763,
+    26.77911
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G78",
@@ -4456,17 +5011,20 @@
    ],
    "fromPlace": "汕头",
    "toPlace": "昆明",
-   "lengthKm": 1800,
+   "lengthKm": 2163.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    102.83342,
+    23.35423,
+    116.68417,
+    25.14653
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "B",
+   "componentCount": 1
   },
   {
    "key": "G80",
@@ -4480,17 +5038,20 @@
    ],
    "fromPlace": "广州",
    "toPlace": "昆明",
-   "lengthKm": 1600,
+   "lengthKm": 1601,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    102.83342,
+    22.7367,
+    113.264,
+    24.96958
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G8011",
@@ -4499,17 +5060,20 @@
    "provinces": [],
    "fromPlace": "开远",
    "toPlace": "河口",
-   "lengthKm": 0,
+   "lengthKm": 256.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.26751,
+    22.53004,
+    103.96157,
+    23.97888
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G8012",
@@ -4518,17 +5082,20 @@
    "provinces": [],
    "fromPlace": "弥勒",
    "toPlace": "楚雄",
-   "lengthKm": 0,
+   "lengthKm": 357.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    101.52751,
+    24.19025,
+    103.41663,
+    25.08215
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G8013",
@@ -4537,17 +5104,20 @@
    "provinces": [],
    "fromPlace": "砚山",
    "toPlace": "文山",
-   "lengthKm": 0,
+   "lengthKm": 37.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    104.15309,
+    23.42684,
+    104.31569,
+    23.66515
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G91",
@@ -4559,17 +5129,20 @@
    ],
    "fromPlace": "辽中地区环线",
    "toPlace": "辽中地区环线",
-   "lengthKm": 400,
+   "lengthKm": 394.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    122.61436,
+    41.15684,
+    124.07259,
+    42.21938
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "A",
+   "componentCount": 1
   },
   {
    "key": "G9111",
@@ -4578,17 +5151,20 @@
    "provinces": [],
    "fromPlace": "本溪",
    "toPlace": "集安",
-   "lengthKm": 0,
+   "lengthKm": 322.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    123.76691,
+    41.12454,
+    126.21994,
+    41.45012
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G92",
@@ -4600,17 +5176,20 @@
    ],
    "fromPlace": "杭州湾地区环线",
    "toPlace": "杭州湾地区环线",
-   "lengthKm": 450,
+   "lengthKm": 596.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    120.20874,
+    29.83698,
+    121.6886,
+    31.23136
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9211",
@@ -4619,17 +5198,20 @@
    "provinces": [],
    "fromPlace": "宁波",
    "toPlace": "舟山",
-   "lengthKm": 0,
+   "lengthKm": 99.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    121.57864,
+    29.85906,
+    122.20816,
+    30.10199
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9221",
@@ -4638,17 +5220,20 @@
    "provinces": [],
    "fromPlace": "杭州",
    "toPlace": "宁波",
-   "lengthKm": 0,
+   "lengthKm": 218.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    120.20928,
+    29.86051,
+    121.70961,
+    30.28278
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G93",
@@ -4661,17 +5246,20 @@
    ],
    "fromPlace": "成渝地区环线",
    "toPlace": "成渝地区环线",
-   "lengthKm": 1200,
+   "lengthKm": 1185.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.04206,
+    28.69825,
+    106.55203,
+    31.46988
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "A",
+   "componentCount": 1
   },
   {
    "key": "G94",
@@ -4683,17 +5271,20 @@
    ],
    "fromPlace": "珠江三角洲地区环线",
    "toPlace": "珠江三角洲地区环线",
-   "lengthKm": 200,
+   "lengthKm": 564.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.9785,
+    22.18692,
+    114.17044,
+    23.43911
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9411",
@@ -4702,17 +5293,20 @@
    "provinces": [],
    "fromPlace": "东莞",
    "toPlace": "佛山",
-   "lengthKm": 0,
+   "lengthKm": 116.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    113.12119,
+    22.77014,
+    113.75158,
+    23.02122
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G95",
@@ -4726,17 +5320,20 @@
    ],
    "fromPlace": "首都地区环线",
    "toPlace": "首都地区环线",
-   "lengthKm": 900,
+   "lengthKm": 1328.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.88648,
+    39.3033,
+    118.01441,
+    41.67119
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9511",
@@ -4745,17 +5342,20 @@
    "provinces": [],
    "fromPlace": "涞水",
    "toPlace": "涞源",
-   "lengthKm": 0,
+   "lengthKm": 119.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.69469,
+    39.32243,
+    115.71316,
+    39.42997
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G98",
@@ -4767,17 +5367,20 @@
    ],
    "fromPlace": "海南地区环线",
    "toPlace": "海南地区环线",
-   "lengthKm": 613,
+   "lengthKm": 633.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.69356,
+    18.3119,
+    110.49684,
+    19.94928
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "A",
+   "componentCount": 1
   },
   {
    "key": "G9811",
@@ -4786,17 +5389,20 @@
    "provinces": [],
    "fromPlace": "海口",
    "toPlace": "乐东",
-   "lengthKm": 0,
+   "lengthKm": 249.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.94838,
+    18.56115,
+    110.28868,
+    19.95007
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9812",
@@ -4805,17 +5411,20 @@
    "provinces": [],
    "fromPlace": "海口",
    "toPlace": "琼海",
-   "lengthKm": 0,
+   "lengthKm": 159.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    110.20008,
+    19.25862,
+    110.80509,
+    20.04617
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9813",
@@ -4824,17 +5433,20 @@
    "provinces": [],
    "fromPlace": "万宁",
    "toPlace": "洋浦",
-   "lengthKm": 0,
+   "lengthKm": 162.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    109.24007,
+    18.89668,
+    110.42402,
+    19.64477
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9901",
@@ -4843,17 +5455,20 @@
    "provinces": [],
    "fromPlace": "哈尔滨都市圈环线",
    "toPlace": "哈尔滨都市圈环线",
-   "lengthKm": 0,
+   "lengthKm": 65.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    126.8325,
+    45.37344,
+    127.10106,
+    45.76468
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9902",
@@ -4862,17 +5477,20 @@
    "provinces": [],
    "fromPlace": "长春都市圈环线",
    "toPlace": "长春都市圈环线",
-   "lengthKm": 0,
+   "lengthKm": 352.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    124.73304,
+    43.40938,
+    126.00961,
+    44.45524
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9903",
@@ -4881,17 +5499,20 @@
    "provinces": [],
    "fromPlace": "杭州都市圈环线",
    "toPlace": "杭州都市圈环线",
-   "lengthKm": 0,
+   "lengthKm": 326.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    119.82573,
+    29.80539,
+    120.57163,
+    30.59839
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9904",
@@ -4900,17 +5521,20 @@
    "provinces": [],
    "fromPlace": "南京都市圈环线",
    "toPlace": "南京都市圈环线",
-   "lengthKm": 0,
+   "lengthKm": 15.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    119.07957,
+    32.21149,
+    119.12717,
+    32.33483
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9905",
@@ -4938,17 +5562,20 @@
    "provinces": [],
    "fromPlace": "武汉都市圈环线",
    "toPlace": "武汉都市圈环线",
-   "lengthKm": 0,
+   "lengthKm": 714.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.54156,
+    29.29003,
+    114.80145,
+    30.92036
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9907",
@@ -4967,7 +5594,8 @@
    "spotCount": 0,
    "hasGeom": false,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true
   },
   {
    "key": "G9908",
@@ -4995,17 +5623,20 @@
    "provinces": [],
    "fromPlace": "重庆都市圈环线",
    "toPlace": "重庆都市圈环线",
-   "lengthKm": 0,
+   "lengthKm": 523.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    105.83707,
+    28.95925,
+    107.39954,
+    30.01619
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9910",
@@ -5014,17 +5645,20 @@
    "provinces": [],
    "fromPlace": "成都都市圈环线",
    "toPlace": "成都都市圈环线",
-   "lengthKm": 0,
+   "lengthKm": 450.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.34655,
+    30.12384,
+    104.76866,
+    31.2232
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9911",
@@ -5033,17 +5667,20 @@
    "provinces": [],
    "fromPlace": "济南都市圈环线",
    "toPlace": "济南都市圈环线",
-   "lengthKm": 0,
+   "lengthKm": 304.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.63837,
+    36.54989,
+    117.53396,
+    37.18962
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G9912",
@@ -5052,17 +5689,20 @@
    "provinces": [],
    "fromPlace": "合肥都市圈环线",
    "toPlace": "合肥都市圈环线",
-   "lengthKm": 0,
+   "lengthKm": 195.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    117.15202,
+    31.62032,
+    117.90696,
+    31.8807
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0401",
@@ -5071,17 +5711,20 @@
    "provinces": [],
    "fromPlace": "长沙市绕城高速",
    "toPlace": "长沙市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 109,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.84506,
+    28.08447,
+    113.17362,
+    28.33143
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G0601",
@@ -5109,17 +5752,20 @@
    "provinces": [],
    "fromPlace": "沈阳市绕城高速",
    "toPlace": "沈阳市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 82.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    123.26628,
+    41.69559,
+    123.59352,
+    41.91106
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1503",
@@ -5128,17 +5774,20 @@
    "provinces": [],
    "fromPlace": "上海市绕城高速",
    "toPlace": "上海市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 1083.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    117.72281,
+    24.78852,
+    121.52106,
+    31.41627
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1504",
@@ -5147,17 +5796,20 @@
    "provinces": [],
    "fromPlace": "宁波市绕城高速",
    "toPlace": "宁波市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 97.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    121.40857,
+    29.78115,
+    121.70749,
+    29.99453
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1505",
@@ -5166,17 +5818,20 @@
    "provinces": [],
    "fromPlace": "福州市绕城高速",
    "toPlace": "福州市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 138.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    119.13613,
+    25.85906,
+    119.61936,
+    26.24976
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1508",
@@ -5185,17 +5840,20 @@
    "provinces": [],
    "fromPlace": "广州市绕城高速",
    "toPlace": "广州市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 228.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.89222,
+    22.83134,
+    113.50043,
+    23.31859
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2501",
@@ -5204,17 +5862,20 @@
    "provinces": [],
    "fromPlace": "长春市绕城高速",
    "toPlace": "长春市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 90.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    125.13141,
+    43.73334,
+    125.4563,
+    44.03306
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2502",
@@ -5223,17 +5884,20 @@
    "provinces": [],
    "fromPlace": "天津市绕城高速",
    "toPlace": "天津市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 579.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.8595,
+    38.7736,
+    118.18852,
+    39.55315
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2503",
@@ -5242,17 +5906,20 @@
    "provinces": [],
    "fromPlace": "南京市绕城高速",
    "toPlace": "南京市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 167.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    118.55853,
+    31.8756,
+    118.96255,
+    32.42537
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2504",
@@ -5261,17 +5928,20 @@
    "provinces": [],
    "fromPlace": "杭州市绕城高速",
    "toPlace": "杭州市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 110.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    120.03861,
+    30.08804,
+    120.35628,
+    30.39263
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4501",
@@ -5280,17 +5950,20 @@
    "provinces": [],
    "fromPlace": "北京市绕城高速",
    "toPlace": "北京市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 120,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    116.08676,
+    39.6914,
+    116.59696,
+    40.17538
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5901",
@@ -5299,17 +5972,20 @@
    "provinces": [],
    "fromPlace": "呼和浩特市绕城高速",
    "toPlace": "呼和浩特市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 121.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    111.4477,
+    40.67012,
+    111.91239,
+    40.90278
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G1001",
@@ -5318,17 +5994,20 @@
    "provinces": [],
    "fromPlace": "哈尔滨市绕城高速",
    "toPlace": "哈尔滨市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 93.9,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    126.47135,
+    45.63818,
+    126.83556,
+    45.86332
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2001",
@@ -5337,17 +6016,20 @@
    "provinces": [],
    "fromPlace": "济南市绕城高速",
    "toPlace": "济南市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 264.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    115.79917,
+    36.54987,
+    116.99804,
+    37.06821
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2002",
@@ -5356,17 +6038,20 @@
    "provinces": [],
    "fromPlace": "石家庄市绕城高速",
    "toPlace": "石家庄市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 41.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.31374,
+    38.05619,
+    114.62675,
+    38.21501
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2003",
@@ -5375,17 +6060,20 @@
    "provinces": [],
    "fromPlace": "太原市绕城高速",
    "toPlace": "太原市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 572.8,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    112.0508,
+    37.44416,
+    112.90965,
+    38.1802
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2004",
@@ -5394,17 +6082,20 @@
    "provinces": [],
    "fromPlace": "银川市绕城高速",
    "toPlace": "银川市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 40.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.04679,
+    38.44426,
+    106.33051,
+    38.58689
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G2201",
@@ -5413,17 +6104,20 @@
    "provinces": [],
    "fromPlace": "兰州市绕城高速",
    "toPlace": "兰州市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 68.4,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.54648,
+    35.95751,
+    103.99703,
+    36.18331
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3001",
@@ -5432,17 +6126,20 @@
    "provinces": [],
    "fromPlace": "郑州市绕城高速",
    "toPlace": "郑州市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 1103.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.99703,
+    34.46016,
+    113.81017,
+    35.97804
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G3002",
@@ -5451,17 +6148,20 @@
    "provinces": [],
    "fromPlace": "西安市绕城高速",
    "toPlace": "西安市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 88.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    108.78029,
+    34.18773,
+    109.08991,
+    34.36602
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G3003",
@@ -5470,17 +6170,20 @@
    "provinces": [],
    "fromPlace": "乌鲁木齐市绕城高速",
    "toPlace": "乌鲁木齐市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 178.7,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    87.25132,
+    43.64207,
+    87.8252,
+    44.11268
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4001",
@@ -5489,17 +6192,20 @@
    "provinces": [],
    "fromPlace": "合肥市绕城高速",
    "toPlace": "合肥市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 123.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    117.09866,
+    31.79106,
+    117.52123,
+    32.02287
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4201",
@@ -5508,17 +6214,20 @@
    "provinces": [],
    "fromPlace": "武汉市绕城高速",
    "toPlace": "武汉市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 77.1,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    114.03499,
+    30.54084,
+    114.45595,
+    30.86048
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G4202",
@@ -5527,17 +6236,20 @@
    "provinces": [],
    "fromPlace": "成都市绕城高速",
    "toPlace": "成都市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 87.3,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    103.92998,
+    30.56798,
+    104.20547,
+    30.78825
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5001",
@@ -5546,17 +6258,20 @@
    "provinces": [],
    "fromPlace": "重庆市绕城高速",
    "toPlace": "重庆市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 210.5,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.27439,
+    29.24634,
+    106.78817,
+    29.79898
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G5601",
@@ -5565,17 +6280,20 @@
    "provinces": [],
    "fromPlace": "昆明市绕城高速",
    "toPlace": "昆明市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 258.2,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    102.51923,
+    24.61285,
+    103.11913,
+    25.16442
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G6001",
@@ -5584,17 +6302,20 @@
    "provinces": [],
    "fromPlace": "南昌市绕城高速",
    "toPlace": "南昌市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 1413,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.82693,
+    26.60251,
+    116.15556,
+    28.83995
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 2
   },
   {
    "key": "G6002",
@@ -5603,17 +6324,20 @@
    "provinces": [],
    "fromPlace": "贵阳市绕城高速",
    "toPlace": "贵阳市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 115.6,
    "bbox": [
-    0,
-    0,
-    0,
-    0
+    106.57354,
+    26.46232,
+    106.88474,
+    26.71814
    ],
    "spotCount": 0,
-   "hasGeom": false,
+   "hasGeom": true,
    "source": "authoritative",
-   "status": "ok"
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   },
   {
    "key": "G7201",
@@ -5622,7 +6346,281 @@
    "provinces": [],
    "fromPlace": "南宁市绕城高速",
    "toPlace": "南宁市绕城高速",
-   "lengthKm": 0,
+   "lengthKm": 131.3,
+   "bbox": [
+    108.15638,
+    22.66929,
+    108.5809,
+    22.94488
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "authoritative",
+   "status": "ok",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G3531",
+   "ref": "G3531",
+   "name": "新康大道",
+   "class": "expressway",
+   "provinces": [
+    "重庆"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 2.4,
+   "bbox": [
+    106.63407,
+    29.01756,
+    106.65008,
+    29.02918
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G6026",
+   "ref": "G6026",
+   "name": "垭口寨隧道",
+   "class": "expressway",
+   "provinces": [
+    "贵州"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 79.2,
+   "bbox": [
+    105.94325,
+    26.32877,
+    106.58409,
+    26.63968
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G8311",
+   "ref": "G8311",
+   "name": "南阳北绕城高速",
+   "class": "expressway",
+   "provinces": [
+    "河南"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 0.5,
+   "bbox": [
+    112.42307,
+    33.09775,
+    112.42779,
+    33.09941
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G4521",
+   "ref": "G4521",
+   "name": "南龙高速",
+   "class": "expressway",
+   "provinces": [
+    "江西"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 136.9,
+   "bbox": [
+    114.64117,
+    24.86006,
+    114.82122,
+    25.91398
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G1202",
+   "ref": "G1202",
+   "name": "松原绕城高速",
+   "class": "expressway",
+   "provinces": [
+    "吉林"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 37.2,
+   "bbox": [
+    124.76389,
+    45.07893,
+    124.9047,
+    45.25315
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G3022",
+   "ref": "G3022",
+   "name": "渭南过境高速",
+   "class": "expressway",
+   "provinces": [
+    "陕西"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 16.6,
+   "bbox": [
+    109.4161,
+    34.48372,
+    109.55771,
+    34.49534
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G3023",
+   "ref": "G3023",
+   "name": "西安高架快速干道",
+   "class": "expressway",
+   "provinces": [
+    "陕西"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 39.4,
+   "bbox": [
+    108.53164,
+    34.2807,
+    108.80621,
+    34.31338
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G3024",
+   "ref": "G3024",
+   "name": "宝鸡城市快速干线",
+   "class": "expressway",
+   "provinces": [
+    "陕西"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 38.3,
+   "bbox": [
+    107.0417,
+    34.34285,
+    107.4339,
+    34.37287
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G1502",
+   "ref": "G1502",
+   "class": "expressway",
+   "provinces": [
+    "山东"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 0.4,
+   "bbox": [
+    120.15357,
+    36.04604,
+    120.15706,
+    36.04732
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G0521",
+   "ref": "G0521",
+   "name": "汉蓉高速",
+   "class": "expressway",
+   "provinces": [
+    "四川"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 114.9,
+   "bbox": [
+    104.18447,
+    30.73091,
+    104.88289,
+    31.37877
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
+  },
+  {
+   "key": "G8514",
+   "ref": "G8514",
+   "name": "内江绕城高速",
+   "class": "expressway",
+   "provinces": [
+    "四川"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 19.9,
    "bbox": [
     0,
     0,
@@ -5631,8 +6629,33 @@
    ],
    "spotCount": 0,
    "hasGeom": false,
-   "source": "authoritative",
-   "status": "ok"
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true
+  },
+  {
+   "key": "G3300",
+   "ref": "G3300",
+   "class": "expressway",
+   "provinces": [
+    "浙江"
+   ],
+   "fromPlace": "",
+   "toPlace": "",
+   "lengthKm": 0.2,
+   "bbox": [
+    119.22573,
+    29.36509,
+    119.22692,
+    29.36645
+   ],
+   "spotCount": 0,
+   "hasGeom": true,
+   "source": "osm_only",
+   "status": "unverified",
+   "inOsm": true,
+   "precision": "C",
+   "componentCount": 1
   }
  ]
 }

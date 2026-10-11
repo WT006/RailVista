@@ -17,7 +17,12 @@ import {
   parseFlightIata,
   type FlightEndpointInfo,
   type FlightLookup,
+  type FlightSearchResult,
 } from '@railvista/shared';
+import { execFile } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const TIMEOUT_MS = 8000;
 
@@ -230,4 +235,102 @@ export async function lookupFlight(flightNo: string, date: string): Promise<Flig
   if (fr24) return fr24;
   const online = await queryAirlabs(flightIata, date);
   return online ?? localResult(flightIata, date);
+}
+// ── FlyClaw 子进程航线搜索 ──────────────────────────────────────────────────
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const FLYCLAW_DIR = join(__dirname, '../../../../tools/flyclaw');
+const FLYCLAW_SCRIPT = join(FLYCLAW_DIR, 'flyclaw.py');
+
+/** 查找 Python 可执行文件 */
+function findPython(): string {
+  if (process.env.FLYCLAW_PYTHON) return process.env.FLYCLAW_PYTHON;
+  const commonPaths = [
+    'C:/Program Files/Python311/python.exe',
+    'C:/Program Files/Python312/python.exe',
+    'C:/Program Files/Python313/python.exe',
+  ];
+  for (const p of commonPaths) {
+    if (existsSync(p)) return p;
+  }
+  return 'python';
+}
+
+interface FlyClawRecord {
+  flight_number?: string;
+  airline?: string;
+  origin_iata?: string;
+  origin_city?: string;
+  destination_iata?: string;
+  destination_city?: string;
+  scheduled_departure?: string;
+  scheduled_arrival?: string;
+  duration_minutes?: number;
+  price?: number;
+  currency?: string;
+  stops?: number;
+  cabin_class?: string;
+  source?: string;
+}
+
+/**
+ * 通过 FlyClaw 子进程按航线搜索航班（飞猪源，不受 Cloudflare 拦截）。
+ *
+ * FlyClaw 项目：https://github.com/AI4MSE/FlyClaw（Apache-2.0）
+ * 需要本地安装 Python 3.11+ 及 FlyClaw 依赖（requests/pyyaml/curl_cffi）。
+ */
+export async function searchFlightsByRoute(
+  from: string,
+  to: string,
+  date: string,
+): Promise<FlightSearchResult[]> {
+  const python = findPython();
+  const args = [
+    FLYCLAW_SCRIPT,
+    'search',
+    '--from', from.toUpperCase(),
+    '--to', to.toUpperCase(),
+    '--date', date,
+    '-o', 'json',
+  ];
+
+  return new Promise((resolve) => {
+    execFile(python, args, {
+      cwd: FLYCLAW_DIR,
+      timeout: 30000,
+      maxBuffer: 1024 * 1024,
+    }, (err, stdout) => {
+      if (err) {
+        console.warn('[flyclaw] search failed:', err.message);
+        resolve([]);
+        return;
+      }
+      try {
+        const raw = JSON.parse(stdout) as FlyClawRecord[];
+        if (!Array.isArray(raw)) {
+          resolve([]);
+          return;
+        }
+        const results: FlightSearchResult[] = raw.map((r) => ({
+          flightNumber: r.flight_number ?? '',
+          airlineName: r.airline,
+          airlineIata: r.flight_number ? r.flight_number.replace(/\d.*$/, '').toUpperCase() : undefined,
+          depIata: r.origin_iata ?? '',
+          arrIata: r.destination_iata ?? '',
+          depCity: r.origin_city,
+          arrCity: r.destination_city,
+          scheduledDeparture: r.scheduled_departure?.slice(11, 16),
+          scheduledArrival: r.scheduled_arrival?.slice(11, 16),
+          durationMin: r.duration_minutes,
+          price: r.price,
+          currency: r.currency,
+          stops: r.stops,
+          cabinClass: r.cabin_class,
+          source: r.source ?? 'flyclaw',
+        })).filter((r) => r.flightNumber && r.depIata && r.arrIata);
+        resolve(results);
+      } catch {
+        resolve([]);
+      }
+    });
+  });
 }

@@ -1,0 +1,37 @@
+{
+  "MF8561": {
+    "origin": "PKX",
+    "destination": "PVG",
+    "last_seen": 1791732201
+  },
+  "MU5231": {
+    "origin": "PKX",
+    "destination": "PVG",
+    "last_seen": 1791732201
+  },
+  "MU5138": {
+    "origin": "PKX",
+    "destination": "SHA",
+    "last_seen": 1791732201
+  },
+  "HU7613": {
+    "origin": "PEK",
+    "destination": "PVG",
+    "last_seen": 1791732201
+  },
+  "MU5100": {
+    "origin": "PEK",
+    "destination": "PVG",
+    "last_seen": 1791732201
+  },
+  "Y87596": {
+    "origin": "PEK",
+    "destination": "PVG",
+    "last_seen": 1791732201
+  },
+  "HO1254": {
+    "origin": "PKX",
+    "destination": "PVG",
+    "last_seen": 1791732201
+  }
+}

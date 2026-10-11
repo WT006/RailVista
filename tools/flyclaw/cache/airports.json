@@ -1,0 +1,1582 @@
+{
+  "PEK": {
+    "iata": "PEK",
+    "icao": "ZBAA",
+    "name_cn": "北京首都国际机场",
+    "name_en": "Beijing Capital International Airport",
+    "city_cn": "北京",
+    "city_en": "Beijing",
+    "lat": 40.08,
+    "lng": 116.58
+  },
+  "PKX": {
+    "iata": "PKX",
+    "icao": "ZBAD",
+    "name_cn": "北京大兴国际机场",
+    "name_en": "Beijing Daxing International Airport",
+    "city_cn": "北京",
+    "city_en": "Beijing",
+    "lat": 39.51,
+    "lng": 116.41
+  },
+  "NAY": {
+    "iata": "NAY",
+    "icao": "ZBNY",
+    "name_cn": "北京南苑机场",
+    "name_en": "Beijing Nanyuan Airport",
+    "city_cn": "北京",
+    "city_en": "Beijing",
+    "lat": 39.79,
+    "lng": 116.39
+  },
+  "TSN": {
+    "iata": "TSN",
+    "icao": "ZBTJ",
+    "name_cn": "天津滨海国际机场",
+    "name_en": "Tianjin Binhai International Airport",
+    "city_cn": "天津",
+    "city_en": "Tianjin",
+    "lat": 39.12,
+    "lng": 117.35
+  },
+  "SJW": {
+    "iata": "SJW",
+    "icao": "ZBSJ",
+    "name_cn": "石家庄正定国际机场",
+    "name_en": "Shijiazhuang Zhengding International Airport",
+    "city_cn": "石家庄",
+    "city_en": "Shijiazhuang",
+    "lat": 38.28,
+    "lng": 114.7
+  },
+  "HDG": {
+    "iata": "HDG",
+    "icao": "ZBHD",
+    "name_cn": "邯郸机场",
+    "name_en": "Handan Airport",
+    "city_cn": "邯郸",
+    "city_en": "Handan",
+    "lat": 36.53,
+    "lng": 114.43
+  },
+  "TYN": {
+    "iata": "TYN",
+    "icao": "ZBYN",
+    "name_cn": "太原武宿国际机场",
+    "name_en": "Taiyuan Wusu International Airport",
+    "city_cn": "太原",
+    "city_en": "Taiyuan",
+    "lat": 37.74,
+    "lng": 112.63
+  },
+  "DAT": {
+    "iata": "DAT",
+    "icao": "ZBDT",
+    "name_cn": "大同云冈机场",
+    "name_en": "Datong Yungang Airport",
+    "city_cn": "大同",
+    "city_en": "Datong",
+    "lat": 40.06,
+    "lng": 113.48
+  },
+  "CIH": {
+    "iata": "CIH",
+    "icao": "ZBCZ",
+    "name_cn": "长治王村机场",
+    "name_en": "Changzhi Wangcun Airport",
+    "city_cn": "长治",
+    "city_en": "Changzhi",
+    "lat": 36.08,
+    "lng": 113.13
+  },
+  "YCU": {
+    "iata": "YCU",
+    "icao": "ZBYC",
+    "name_cn": "运城张孝机场",
+    "name_en": "Yuncheng Zhangxiao Airport",
+    "city_cn": "运城",
+    "city_en": "Yuncheng",
+    "lat": 35.12,
+    "lng": 111.03
+  },
+  "WUT": {
+    "iata": "WUT",
+    "icao": "ZBXZ",
+    "name_cn": "忻州五台山机场",
+    "name_en": "Xinzhou Wutaishan Airport",
+    "city_cn": "忻州",
+    "city_en": "Xinzhou",
+    "lat": 38.6,
+    "lng": 112.97
+  },
+  "LLV": {
+    "iata": "LLV",
+    "icao": "ZBLL",
+    "name_cn": "吕梁大武机场",
+    "name_en": "Lvliang Dawu Airport",
+    "city_cn": "吕梁",
+    "city_en": "Lvliang",
+    "lat": 37.69,
+    "lng": 111.14
+  },
+  "HET": {
+    "iata": "HET",
+    "icao": "ZBHH",
+    "name_cn": "呼和浩特白塔国际机场",
+    "name_en": "Hohhot Baita International Airport",
+    "city_cn": "呼和浩特",
+    "city_en": "Hohhot",
+    "lat": 40.85,
+    "lng": 111.82
+  },
+  "BAV": {
+    "iata": "BAV",
+    "icao": "ZBOW",
+    "name_cn": "包头东河机场",
+    "name_en": "Baotou Donghe Airport",
+    "city_cn": "包头",
+    "city_en": "Baotou",
+    "lat": 40.56,
+    "lng": 110
+  },
+  "XIL": {
+    "iata": "XIL",
+    "icao": "ZBXH",
+    "name_cn": "锡林浩特机场",
+    "name_en": "Xilinhot Airport",
+    "city_cn": "锡林浩特",
+    "city_en": "Xilinhot",
+    "lat": 43.91,
+    "lng": 116.1
+  },
+  "CIF": {
+    "iata": "CIF",
+    "icao": "ZBCF",
+    "name_cn": "赤峰玉龙机场",
+    "name_en": "Chifeng Yulong Airport",
+    "city_cn": "赤峰",
+    "city_en": "Chifeng",
+    "lat": 42.16,
+    "lng": 118.84
+  },
+  "HLH": {
+    "iata": "HLH",
+    "icao": "ZBUL",
+    "name_cn": "乌兰浩特义勒力特机场",
+    "name_en": "Ulanhot Yileleeteuk Airport",
+    "city_cn": "乌兰浩特",
+    "city_en": "Ulanhot",
+    "lat": 46.2,
+    "lng": 122.01
+  },
+  "TGO": {
+    "iata": "TGO",
+    "icao": "ZBTL",
+    "name_cn": "通辽机场",
+    "name_en": "Tongliao Airport",
+    "city_cn": "通辽",
+    "city_en": "Tongliao",
+    "lat": 43.56,
+    "lng": 122.2
+  },
+  "ERL": {
+    "iata": "ERL",
+    "icao": "ZBER",
+    "name_cn": "二连浩特赛乌苏国际机场",
+    "name_en": "Erenhot Saiwusu International Airport",
+    "city_cn": "二连浩特",
+    "city_en": "Erenhot",
+    "lat": 43.69,
+    "lng": 112.08
+  },
+  "WUA": {
+    "iata": "WUA",
+    "icao": "ZBUH",
+    "name_cn": "乌海机场",
+    "name_en": "Wuhai Airport",
+    "city_cn": "乌海",
+    "city_en": "Wuhai",
+    "lat": 39.68,
+    "lng": 106.8
+  },
+  "EJN": {
+    "iata": "EJN",
+    "icao": "ZBEN",
+    "name_cn": "额济纳旗桃来机场",
+    "name_en": "Ejina Banner Taolai Airport",
+    "city_cn": "额济纳旗",
+    "city_en": "Ejina",
+    "lat": 41.95,
+    "lng": 100.9
+  },
+  "HLD": {
+    "iata": "HLD",
+    "icao": "ZBLA",
+    "name_cn": "海拉尔东山机场",
+    "name_en": "Hailar Dongshan Airport",
+    "city_cn": "海拉尔",
+    "city_en": "Hailar",
+    "lat": 49.21,
+    "lng": 119.82
+  },
+  "NZH": {
+    "iata": "NZH",
+    "icao": "ZBMZ",
+    "name_cn": "满洲里西郊机场",
+    "name_en": "Manzhouli Xijiao Airport",
+    "city_cn": "满洲里",
+    "city_en": "Manzhouli",
+    "lat": 49.57,
+    "lng": 117.33
+  },
+  "SHE": {
+    "iata": "SHE",
+    "icao": "ZYTX",
+    "name_cn": "沈阳桃仙国际机场",
+    "name_en": "Shenyang Taoxian International Airport",
+    "city_cn": "沈阳",
+    "city_en": "Shenyang",
+    "lat": 41.64,
+    "lng": 123.48
+  },
+  "DLC": {
+    "iata": "DLC",
+    "icao": "ZYTL",
+    "name_cn": "大连周水子国际机场",
+    "name_en": "Dalian Zhoushuizi International Airport",
+    "city_cn": "大连",
+    "city_en": "Dalian",
+    "lat": 38.96,
+    "lng": 121.54
+  },
+  "JNZ": {
+    "iata": "JNZ",
+    "icao": "ZYJZ",
+    "name_cn": "锦州锦州湾机场",
+    "name_en": "Jinzhou Jinzhouwan Airport",
+    "city_cn": "锦州",
+    "city_en": "Jinzhou",
+    "lat": 39.07,
+    "lng": 121.29
+  },
+  "AOG": {
+    "iata": "AOG",
+    "icao": "ZYAS",
+    "name_cn": "鞍山腾鳌机场",
+    "name_en": "Anshan Tengao Airport",
+    "city_cn": "鞍山",
+    "city_en": "Anshan",
+    "lat": 41.1,
+    "lng": 122.96
+  },
+  "HRB": {
+    "iata": "HRB",
+    "icao": "ZYHB",
+    "name_cn": "哈尔滨太平国际机场",
+    "name_en": "Harbin Taiping International Airport",
+    "city_cn": "哈尔滨",
+    "city_en": "Harbin",
+    "lat": 45.62,
+    "lng": 126.25
+  },
+  "MDG": {
+    "iata": "MDG",
+    "icao": "ZYMD",
+    "name_cn": "牡丹江海浪国际机场",
+    "name_en": "Mudanjiang Hailang International Airport",
+    "city_cn": "牡丹江",
+    "city_en": "Mudanjiang",
+    "lat": 44.53,
+    "lng": 129.57
+  },
+  "JMU": {
+    "iata": "JMU",
+    "icao": "ZYJM",
+    "name_cn": "佳木斯东郊机场",
+    "name_en": "Jiamusi Dongjiao Airport",
+    "city_cn": "佳木斯",
+    "city_en": "Jiamusi",
+    "lat": 46.84,
+    "lng": 130.46
+  },
+  "HEK": {
+    "iata": "HEK",
+    "icao": "ZYHE",
+    "name_cn": "黑河瑷珲机场",
+    "name_en": "Heihe Aihui Airport",
+    "city_cn": "黑河",
+    "city_en": "Heihe",
+    "lat": 50.22,
+    "lng": 127.49
+  },
+  "OHE": {
+    "iata": "OHE",
+    "icao": "ZYMH",
+    "name_cn": "漠河古莲机场",
+    "name_en": "Mohe Gulian Airport",
+    "city_cn": "漠河",
+    "city_en": "Mohe",
+    "lat": 52.91,
+    "lng": 122.42
+  },
+  "DQA": {
+    "iata": "DQA",
+    "icao": "ZYDQ",
+    "name_cn": "大庆萨尔图机场",
+    "name_en": "Daqing Sartu Airport",
+    "city_cn": "大庆",
+    "city_en": "Daqing",
+    "lat": 46.74,
+    "lng": 125.13
+  },
+  "CGQ": {
+    "iata": "CGQ",
+    "icao": "ZYCC",
+    "name_cn": "长春龙嘉国际机场",
+    "name_en": "Changchun Longjia International Airport",
+    "city_cn": "长春",
+    "city_en": "Changchun",
+    "lat": 43.99,
+    "lng": 125.69
+  },
+  "JIL": {
+    "iata": "JIL",
+    "icao": "ZYJL",
+    "name_cn": "吉林二台子机场",
+    "name_en": "Jilin Ertaizi Airport",
+    "city_cn": "吉林",
+    "city_en": "Jilin",
+    "lat": 43.87,
+    "lng": 126.39
+  },
+  "YNJ": {
+    "iata": "YNJ",
+    "icao": "ZYYJ",
+    "name_cn": "延吉朝阳川国际机场",
+    "name_en": "Yanji Chaoyangchuan International Airport",
+    "city_cn": "延吉",
+    "city_en": "Yanji",
+    "lat": 42.88,
+    "lng": 129.45
+  },
+  "PVG": {
+    "iata": "PVG",
+    "icao": "ZSPD",
+    "name_cn": "上海浦东国际机场",
+    "name_en": "Shanghai Pudong International Airport",
+    "city_cn": "上海",
+    "city_en": "Shanghai",
+    "lat": 31.14,
+    "lng": 121.81
+  },
+  "SHA": {
+    "iata": "SHA",
+    "icao": "ZSSS",
+    "name_cn": "上海虹桥国际机场",
+    "name_en": "Shanghai Hongqiao International Airport",
+    "city_cn": "上海",
+    "city_en": "Shanghai",
+    "lat": 31.2,
+    "lng": 121.34
+  },
+  "HGH": {
+    "iata": "HGH",
+    "icao": "ZSHC",
+    "name_cn": "杭州萧山国际机场",
+    "name_en": "Hangzhou Xiaoshan International Airport",
+    "city_cn": "杭州",
+    "city_en": "Hangzhou",
+    "lat": 30.23,
+    "lng": 120.43
+  },
+  "NGB": {
+    "iata": "NGB",
+    "icao": "ZSNB",
+    "name_cn": "宁波栎社国际机场",
+    "name_en": "Ningbo Lishe International Airport",
+    "city_cn": "宁波",
+    "city_en": "Ningbo",
+    "lat": 29.83,
+    "lng": 121.46
+  },
+  "WNZ": {
+    "iata": "WNZ",
+    "icao": "ZSWZ",
+    "name_cn": "温州龙湾国际机场",
+    "name_en": "Wenzhou Longwan International Airport",
+    "city_cn": "温州",
+    "city_en": "Wenzhou",
+    "lat": 27.91,
+    "lng": 120.85
+  },
+  "YIW": {
+    "iata": "YIW",
+    "icao": "ZSYW",
+    "name_cn": "义乌机场",
+    "name_en": "Yiwu Airport",
+    "city_cn": "义乌",
+    "city_en": "Yiwu",
+    "lat": 29.34,
+    "lng": 120.03
+  },
+  "HSN": {
+    "iata": "HSN",
+    "icao": "ZSZS",
+    "name_cn": "舟山普陀山机场",
+    "name_en": "Zhoushan Putuoshan Airport",
+    "city_cn": "舟山",
+    "city_en": "Zhoushan",
+    "lat": 29.94,
+    "lng": 122.36
+  },
+  "HYN": {
+    "iata": "HYN",
+    "icao": "ZSLQ",
+    "name_cn": "台州路桥机场",
+    "name_en": "Taizhou Luqiao Airport",
+    "city_cn": "台州",
+    "city_en": "Taizhou",
+    "lat": 28.56,
+    "lng": 121.42
+  },
+  "NKG": {
+    "iata": "NKG",
+    "icao": "ZSNJ",
+    "name_cn": "南京禄口国际机场",
+    "name_en": "Nanjing Lukou International Airport",
+    "city_cn": "南京",
+    "city_en": "Nanjing",
+    "lat": 31.74,
+    "lng": 118.86
+  },
+  "WUX": {
+    "iata": "WUX",
+    "icao": "ZSWX",
+    "name_cn": "无锡硕放机场",
+    "name_en": "Wuxi Shuofang Airport",
+    "city_cn": "无锡",
+    "city_en": "Wuxi",
+    "lat": 31.5,
+    "lng": 120.43
+  },
+  "CZX": {
+    "iata": "CZX",
+    "icao": "ZSCZ",
+    "name_cn": "常州奔牛国际机场",
+    "name_en": "Changzhou Benniu International Airport",
+    "city_cn": "常州",
+    "city_en": "Changzhou",
+    "lat": 31.92,
+    "lng": 119.78
+  },
+  "XUZ": {
+    "iata": "XUZ",
+    "icao": "ZSXZ",
+    "name_cn": "徐州观音国际机场",
+    "name_en": "Xuzhou Guanyin International Airport",
+    "city_cn": "徐州",
+    "city_en": "Xuzhou",
+    "lat": 34.06,
+    "lng": 117.56
+  },
+  "YNZ": {
+    "iata": "YNZ",
+    "icao": "ZSYN",
+    "name_cn": "盐城南洋国际机场",
+    "name_en": "Yancheng Nanyang International Airport",
+    "city_cn": "盐城",
+    "city_en": "Yancheng",
+    "lat": 33.43,
+    "lng": 120.2
+  },
+  "HFE": {
+    "iata": "HFE",
+    "icao": "ZSOF",
+    "name_cn": "合肥新桥国际机场",
+    "name_en": "Hefei Xinqiao International Airport",
+    "city_cn": "合肥",
+    "city_en": "Hefei",
+    "lat": 31.86,
+    "lng": 116.97
+  },
+  "FUG": {
+    "iata": "FUG",
+    "icao": "ZSFY",
+    "name_cn": "阜阳西关机场",
+    "name_en": "Fuyang Xiguan Airport",
+    "city_cn": "阜阳",
+    "city_en": "Fuyang",
+    "lat": 32.88,
+    "lng": 115.74
+  },
+  "JIU": {
+    "iata": "JIU",
+    "icao": "ZSJJ",
+    "name_cn": "九江庐山机场",
+    "name_en": "Jiujiang Lushan Airport",
+    "city_cn": "九江",
+    "city_en": "Jiujiang",
+    "lat": 29.71,
+    "lng": 116.03
+  },
+  "KHN": {
+    "iata": "KHN",
+    "icao": "ZSCN",
+    "name_cn": "南昌昌北国际机场",
+    "name_en": "Nanchang Changbei International Airport",
+    "city_cn": "南昌",
+    "city_en": "Nanchang",
+    "lat": 28.43,
+    "lng": 115.9
+  },
+  "FOC": {
+    "iata": "FOC",
+    "icao": "ZSFZ",
+    "name_cn": "福州长乐国际机场",
+    "name_en": "Fuzhou Changle International Airport",
+    "city_cn": "福州",
+    "city_en": "Fuzhou",
+    "lat": 25.94,
+    "lng": 119.66
+  },
+  "XMN": {
+    "iata": "XMN",
+    "icao": "ZSAM",
+    "name_cn": "厦门高崎国际机场",
+    "name_en": "Xiamen Gaoqi International Airport",
+    "city_cn": "厦门",
+    "city_en": "Xiamen",
+    "lat": 24.54,
+    "lng": 118.13
+  },
+  "JJN": {
+    "iata": "JJN",
+    "icao": "ZSQZ",
+    "name_cn": "泉州晋江国际机场",
+    "name_en": "Quanzhou Jinjiang International Airport",
+    "city_cn": "泉州",
+    "city_en": "Quanzhou",
+    "lat": 24.8,
+    "lng": 118.59
+  },
+  "WUS": {
+    "iata": "WUS",
+    "icao": "ZSWY",
+    "name_cn": "武夷山机场",
+    "name_en": "Wuyishan Airport",
+    "city_cn": "南平",
+    "city_en": "Wuyishan",
+    "lat": 27.45,
+    "lng": 118
+  },
+  "TNA": {
+    "iata": "TNA",
+    "icao": "ZSJN",
+    "name_cn": "济南遥墙国际机场",
+    "name_en": "Jinan Yaoqiang International Airport",
+    "city_cn": "济南",
+    "city_en": "Jinan",
+    "lat": 36.86,
+    "lng": 117.22
+  },
+  "TAO": {
+    "iata": "TAO",
+    "icao": "ZSQD",
+    "name_cn": "青岛胶东国际机场",
+    "name_en": "Qingdao Jiaodong International Airport",
+    "city_cn": "青岛",
+    "city_en": "Qingdao",
+    "lat": 36.27,
+    "lng": 120.37
+  },
+  "YNT": {
+    "iata": "YNT",
+    "icao": "ZSYT",
+    "name_cn": "烟台蓬莱国际机场",
+    "name_en": "Yantai Penglai International Airport",
+    "city_cn": "烟台",
+    "city_en": "Yantai",
+    "lat": 37.64,
+    "lng": 120.72
+  },
+  "WEF": {
+    "iata": "WEF",
+    "icao": "ZSWF",
+    "name_cn": "潍坊机场",
+    "name_en": "Weifang Airport",
+    "city_cn": "潍坊",
+    "city_en": "Weifang",
+    "lat": 36.79,
+    "lng": 119.12
+  },
+  "DOY": {
+    "iata": "DOY",
+    "icao": "ZSDY",
+    "name_cn": "东营胜利机场",
+    "name_en": "Dongying Shengli Airport",
+    "city_cn": "东营",
+    "city_en": "Dongying",
+    "lat": 37.5,
+    "lng": 118.79
+  },
+  "RIZ": {
+    "iata": "RIZ",
+    "icao": "ZSRZ",
+    "name_cn": "日照山字河机场",
+    "name_en": "Rizhao Shanzihe Airport",
+    "city_cn": "日照",
+    "city_en": "Rizhao",
+    "lat": 35.4,
+    "lng": 119.32
+  },
+  "CGO": {
+    "iata": "CGO",
+    "icao": "ZHCC",
+    "name_cn": "郑州新郑国际机场",
+    "name_en": "Zhengzhou Xinzheng International Airport",
+    "city_cn": "郑州",
+    "city_en": "Zhengzhou",
+    "lat": 34.52,
+    "lng": 113.84
+  },
+  "LYA": {
+    "iata": "LYA",
+    "icao": "ZHLY",
+    "name_cn": "洛阳北郊机场",
+    "name_en": "Luoyang Beijiao Airport",
+    "city_cn": "洛阳",
+    "city_en": "Luoyang",
+    "lat": 34.74,
+    "lng": 112.39
+  },
+  "NNY": {
+    "iata": "NNY",
+    "icao": "ZHNY",
+    "name_cn": "南阳姜营机场",
+    "name_en": "Nanyang Jiangying Airport",
+    "city_cn": "南阳",
+    "city_en": "Nanyang",
+    "lat": 33,
+    "lng": 112.62
+  },
+  "WUH": {
+    "iata": "WUH",
+    "icao": "ZHHH",
+    "name_cn": "武汉天河国际机场",
+    "name_en": "Wuhan Tianhe International Airport",
+    "city_cn": "武汉",
+    "city_en": "Wuhan",
+    "lat": 30.78,
+    "lng": 114.21
+  },
+  "YIH": {
+    "iata": "YIH",
+    "icao": "ZHYC",
+    "name_cn": "宜昌三峡机场",
+    "name_en": "Yichang Sanxia Airport",
+    "city_cn": "宜昌",
+    "city_en": "Yichang",
+    "lat": 30.55,
+    "lng": 111.48
+  },
+  "WDS": {
+    "iata": "WDS",
+    "icao": "ZHSY",
+    "name_cn": "十堰武当山机场",
+    "name_en": "Shiyan Wudangshan Airport",
+    "city_cn": "十堰",
+    "city_en": "Shiyan",
+    "lat": 32.59,
+    "lng": 110.91
+  },
+  "XFN": {
+    "iata": "XFN",
+    "icao": "ZHXF",
+    "name_cn": "襄阳刘集机场",
+    "name_en": "Xiangyang Liuji Airport",
+    "city_cn": "襄阳",
+    "city_en": "Xiangyang",
+    "lat": 32.15,
+    "lng": 112.29
+  },
+  "ENH": {
+    "iata": "ENH",
+    "icao": "ZHES",
+    "name_cn": "恩施许家坪机场",
+    "name_en": "Enshi Xujiaping Airport",
+    "city_cn": "恩施",
+    "city_en": "Enshi",
+    "lat": 30.32,
+    "lng": 109.49
+  },
+  "CSX": {
+    "iata": "CSX",
+    "icao": "ZGHA",
+    "name_cn": "长沙黄花国际机场",
+    "name_en": "Changsha Huanghua International Airport",
+    "city_cn": "长沙",
+    "city_en": "Changsha",
+    "lat": 28.19,
+    "lng": 113.22
+  },
+  "DYG": {
+    "iata": "DYG",
+    "icao": "ZGDY",
+    "name_cn": "张家界荷花机场",
+    "name_en": "Zhangjiajie Hehua Airport",
+    "city_cn": "张家界",
+    "city_en": "Zhangjiajie",
+    "lat": 29.1,
+    "lng": 110.44
+  },
+  "CAN": {
+    "iata": "CAN",
+    "icao": "ZGGG",
+    "name_cn": "广州白云国际机场",
+    "name_en": "Guangzhou Baiyun International Airport",
+    "city_cn": "广州",
+    "city_en": "Guangzhou",
+    "lat": 23.39,
+    "lng": 113.3
+  },
+  "ZUH": {
+    "iata": "ZUH",
+    "icao": "ZGSD",
+    "name_cn": "珠海金湾机场",
+    "name_en": "Zhuhai Jinwan Airport",
+    "city_cn": "珠海",
+    "city_en": "Zhuhai",
+    "lat": 22.01,
+    "lng": 113.38
+  },
+  "SWA": {
+    "iata": "SWA",
+    "icao": "ZGOW",
+    "name_cn": "揭阳潮汕国际机场",
+    "name_en": "Jieyang Chaoshan International Airport",
+    "city_cn": "揭阳",
+    "city_en": "Jieyang",
+    "lat": 23.56,
+    "lng": 116.51
+  },
+  "ZHA": {
+    "iata": "ZHA",
+    "icao": "ZGZJ",
+    "name_cn": "湛江吴川机场",
+    "name_en": "Zhanjiang Wuchuan Airport",
+    "city_cn": "湛江",
+    "city_en": "Zhanjiang",
+    "lat": 21.22,
+    "lng": 110.36
+  },
+  "HUZ": {
+    "iata": "HUZ",
+    "icao": "ZGHZ",
+    "name_cn": "惠州平潭机场",
+    "name_en": "Huizhou Pingtan Airport",
+    "city_cn": "惠州",
+    "city_en": "Huizhou",
+    "lat": 23.25,
+    "lng": 114.6
+  },
+  "MXZ": {
+    "iata": "MXZ",
+    "icao": "ZGMX",
+    "name_cn": "梅州梅县机场",
+    "name_en": "Meizhou Meixian Airport",
+    "city_cn": "梅州",
+    "city_en": "Meizhou",
+    "lat": 24.26,
+    "lng": 116.1
+  },
+  "NNG": {
+    "iata": "NNG",
+    "icao": "ZGNN",
+    "name_cn": "南宁吴圩国际机场",
+    "name_en": "Nanning Wuxu International Airport",
+    "city_cn": "南宁",
+    "city_en": "Nanning",
+    "lat": 22.61,
+    "lng": 108.17
+  },
+  "BHY": {
+    "iata": "BHY",
+    "icao": "ZGBH",
+    "name_cn": "北海福成机场",
+    "name_en": "Beihai Fucheng Airport",
+    "city_cn": "北海",
+    "city_en": "Beihai",
+    "lat": 21.54,
+    "lng": 109.29
+  },
+  "KWL": {
+    "iata": "KWL",
+    "icao": "ZGKL",
+    "name_cn": "桂林两江国际机场",
+    "name_en": "Guilin Liangjiang International Airport",
+    "city_cn": "桂林",
+    "city_en": "Guilin",
+    "lat": 25.22,
+    "lng": 110.04
+  },
+  "HAK": {
+    "iata": "HAK",
+    "icao": "ZJHK",
+    "name_cn": "海口美兰国际机场",
+    "name_en": "Haikou Meilan International Airport",
+    "city_cn": "海口",
+    "city_en": "Haikou",
+    "lat": 19.94,
+    "lng": 110.46
+  },
+  "SYX": {
+    "iata": "SYX",
+    "icao": "ZJSY",
+    "name_cn": "三亚凤凰国际机场",
+    "name_en": "Sanya Phoenix International Airport",
+    "city_cn": "三亚",
+    "city_en": "Sanya",
+    "lat": 18.3,
+    "lng": 109.41
+  },
+  "CTU": {
+    "iata": "CTU",
+    "icao": "ZUUU",
+    "name_cn": "成都双流国际机场",
+    "name_en": "Chengdu Shuangliu International Airport",
+    "city_cn": "成都",
+    "city_en": "Chengdu",
+    "lat": 30.58,
+    "lng": 103.95
+  },
+  "TFU": {
+    "iata": "TFU",
+    "icao": "ZUTF",
+    "name_cn": "成都天府国际机场",
+    "name_en": "Chengdu Tianfu International Airport",
+    "city_cn": "成都",
+    "city_en": "Chengdu",
+    "lat": 30.32,
+    "lng": 104.44
+  },
+  "MIG": {
+    "iata": "MIG",
+    "icao": "ZUMY",
+    "name_cn": "绵阳南郊机场",
+    "name_en": "Mianyang Nanjiao Airport",
+    "city_cn": "绵阳",
+    "city_en": "Mianyang",
+    "lat": 31.43,
+    "lng": 104.74
+  },
+  "DAX": {
+    "iata": "DAX",
+    "icao": "ZUDX",
+    "name_cn": "达州河市机场",
+    "name_en": "Dazhou Heshi Airport",
+    "city_cn": "达州",
+    "city_en": "Dazhou",
+    "lat": 31.13,
+    "lng": 107.43
+  },
+  "YBP": {
+    "iata": "YBP",
+    "icao": "ZUYB",
+    "name_cn": "宜宾五粮液机场",
+    "name_en": "Yibin Wuliangye Airport",
+    "city_cn": "宜宾",
+    "city_en": "Yibin",
+    "lat": 28.86,
+    "lng": 104.55
+  },
+  "LZO": {
+    "iata": "LZO",
+    "icao": "ZULZ",
+    "name_cn": "泸州云龙机场",
+    "name_en": "Luzhou Yunlong Airport",
+    "city_cn": "泸州",
+    "city_en": "Luzhou",
+    "lat": 28.85,
+    "lng": 105.47
+  },
+  "NAO": {
+    "iata": "NAO",
+    "icao": "ZUNC",
+    "name_cn": "南充高坪机场",
+    "name_en": "Nanchong Gaoping Airport",
+    "city_cn": "南充",
+    "city_en": "Nanchong",
+    "lat": 30.8,
+    "lng": 106.17
+  },
+  "XTC": {
+    "iata": "XTC",
+    "icao": "ZUXC",
+    "name_cn": "西昌青山机场",
+    "name_en": "Xichang Qingshan Airport",
+    "city_cn": "西昌",
+    "city_en": "Xichang",
+    "lat": 27.99,
+    "lng": 102.18
+  },
+  "CKG": {
+    "iata": "CKG",
+    "icao": "ZUCK",
+    "name_cn": "重庆江北国际机场",
+    "name_en": "Chongqing Jiangbei International Airport",
+    "city_cn": "重庆",
+    "city_en": "Chongqing",
+    "lat": 29.72,
+    "lng": 106.64
+  },
+  "WXN": {
+    "iata": "WXN",
+    "icao": "ZUWX",
+    "name_cn": "万州五桥机场",
+    "name_en": "Wanzhou Wuqiao Airport",
+    "city_cn": "万州",
+    "city_en": "Wanzhou",
+    "lat": 30.8,
+    "lng": 108.43
+  },
+  "JIQ": {
+    "iata": "JIQ",
+    "icao": "ZUQJ",
+    "name_cn": "黔江武陵山机场",
+    "name_en": "Qianjiang Wulingshan Airport",
+    "city_cn": "黔江",
+    "city_en": "Qianjiang",
+    "lat": 29.52,
+    "lng": 108.83
+  },
+  "KMG": {
+    "iata": "KMG",
+    "icao": "ZPPP",
+    "name_cn": "昆明长水国际机场",
+    "name_en": "Kunming Changshui International Airport",
+    "city_cn": "昆明",
+    "city_en": "Kunming",
+    "lat": 25.1,
+    "lng": 102.93
+  },
+  "JHG": {
+    "iata": "JHG",
+    "icao": "ZPJH",
+    "name_cn": "西双版纳嘎洒国际机场",
+    "name_en": "Xishuangbanna Gasa International Airport",
+    "city_cn": "景洪",
+    "city_en": "Jinghong",
+    "lat": 21.99,
+    "lng": 100.76
+  },
+  "LJG": {
+    "iata": "LJG",
+    "icao": "ZPLJ",
+    "name_cn": "丽江三义国际机场",
+    "name_en": "Lijiang Sanyi International Airport",
+    "city_cn": "丽江",
+    "city_en": "Lijiang",
+    "lat": 26.68,
+    "lng": 100.25
+  },
+  "DLU": {
+    "iata": "DLU",
+    "icao": "ZPDL",
+    "name_cn": "大理荒草坝机场",
+    "name_en": "Dali Huangcaoba Airport",
+    "city_cn": "大理",
+    "city_en": "Dali",
+    "lat": 25.65,
+    "lng": 100.32
+  },
+  "DIG": {
+    "iata": "DIG",
+    "icao": "ZPDQ",
+    "name_cn": "迪庆香格里拉机场",
+    "name_en": "Diqing Shangri-La Airport",
+    "city_cn": "迪庆",
+    "city_en": "Diqing",
+    "lat": 27.79,
+    "lng": 99.68
+  },
+  "LUM": {
+    "iata": "LUM",
+    "icao": "ZPMS",
+    "name_cn": "德宏芒市国际机场",
+    "name_en": "Dehong Mangshi International Airport",
+    "city_cn": "芒市",
+    "city_en": "Mangshi",
+    "lat": 24.4,
+    "lng": 98.53
+  },
+  "TCZ": {
+    "iata": "TCZ",
+    "icao": "ZPTC",
+    "name_cn": "腾冲驼峰机场",
+    "name_en": "Tengchong Tuofeng Airport",
+    "city_cn": "腾冲",
+    "city_en": "Tengchong",
+    "lat": 24.94,
+    "lng": 98.49
+  },
+  "BSD": {
+    "iata": "BSD",
+    "icao": "ZPBS",
+    "name_cn": "保山云瑞机场",
+    "name_en": "Baoshan Yunrui Airport",
+    "city_cn": "保山",
+    "city_en": "Baoshan",
+    "lat": 25.05,
+    "lng": 99.17
+  },
+  "LNJ": {
+    "iata": "LNJ",
+    "icao": "ZPLC",
+    "name_cn": "临沧博尚机场",
+    "name_en": "Lincang Boshang Airport",
+    "city_cn": "临沧",
+    "city_en": "Lincang",
+    "lat": 23.74,
+    "lng": 100.03
+  },
+  "KWE": {
+    "iata": "KWE",
+    "icao": "ZUGY",
+    "name_cn": "贵阳龙洞堡国际机场",
+    "name_en": "Guiyang Longdongbao International Airport",
+    "city_cn": "贵阳",
+    "city_en": "Guiyang",
+    "lat": 26.54,
+    "lng": 106.8
+  },
+  "ZYI": {
+    "iata": "ZYI",
+    "icao": "ZUZY",
+    "name_cn": "遵义新舟机场",
+    "name_en": "Zunyi Xinzhou Airport",
+    "city_cn": "遵义",
+    "city_en": "Zunyi",
+    "lat": 27.81,
+    "lng": 107.25
+  },
+  "WMT": {
+    "iata": "WMT",
+    "icao": "ZUMT",
+    "name_cn": "遵义茅台机场",
+    "name_en": "Zunyi Maotai Airport",
+    "city_cn": "遵义",
+    "city_en": "Zunyi",
+    "lat": 27.97,
+    "lng": 106.44
+  },
+  "ACX": {
+    "iata": "ACX",
+    "icao": "ZUYI",
+    "name_cn": "兴义万峰林机场",
+    "name_en": "Xingyi Wanfenglin Airport",
+    "city_cn": "兴义",
+    "city_en": "Xingyi",
+    "lat": 25.09,
+    "lng": 104.96
+  },
+  "TEN": {
+    "iata": "TEN",
+    "icao": "ZUTR",
+    "name_cn": "铜仁凤凰机场",
+    "name_en": "Tongren Fenghuang Airport",
+    "city_cn": "铜仁",
+    "city_en": "Tongren",
+    "lat": 27.89,
+    "lng": 109.3
+  },
+  "LXA": {
+    "iata": "LXA",
+    "icao": "ZULS",
+    "name_cn": "拉萨贡嘎国际机场",
+    "name_en": "Lhasa Gonggar International Airport",
+    "city_cn": "拉萨",
+    "city_en": "Lhasa",
+    "lat": 29.3,
+    "lng": 90.91
+  },
+  "LZY": {
+    "iata": "LZY",
+    "icao": "ZUNZ",
+    "name_cn": "林芝米林机场",
+    "name_en": "Nyingchi Mainling Airport",
+    "city_cn": "林芝",
+    "city_en": "Nyingchi",
+    "lat": 29.31,
+    "lng": 94.34
+  },
+  "BPX": {
+    "iata": "BPX",
+    "icao": "ZUBD",
+    "name_cn": "昌都邦达机场",
+    "name_en": "Qamdo Bamda Airport",
+    "city_cn": "昌都",
+    "city_en": "Qamdo",
+    "lat": 30.55,
+    "lng": 97.11
+  },
+  "NGQ": {
+    "iata": "NGQ",
+    "icao": "ZUAL",
+    "name_cn": "阿里普兰机场",
+    "name_en": "Ngari Burang Airport",
+    "city_cn": "阿里",
+    "city_en": "Ngari",
+    "lat": 30.2,
+    "lng": 81.15
+  },
+  "GOQ": {
+    "iata": "GOQ",
+    "icao": "ZLGM",
+    "name_cn": "格尔木机场",
+    "name_en": "Golmud Airport",
+    "city_cn": "格尔木",
+    "city_en": "Golmud",
+    "lat": 36.4,
+    "lng": 94.79
+  },
+  "XNN": {
+    "iata": "XNN",
+    "icao": "ZLXN",
+    "name_cn": "西宁曹家堡国际机场",
+    "name_en": "Xining Caojiabao International Airport",
+    "city_cn": "西宁",
+    "city_en": "Xining",
+    "lat": 36.53,
+    "lng": 102.04
+  },
+  "UYN": {
+    "iata": "UYN",
+    "icao": "ZLYL",
+    "name_cn": "榆林榆阳机场",
+    "name_en": "Yulin Yuyang Airport",
+    "city_cn": "榆林",
+    "city_en": "Yulin",
+    "lat": 38.27,
+    "lng": 109.73
+  },
+  "LHW": {
+    "iata": "LHW",
+    "icao": "ZLLL",
+    "name_cn": "兰州中川国际机场",
+    "name_en": "Lanzhou Zhongchuan International Airport",
+    "city_cn": "兰州",
+    "city_en": "Lanzhou",
+    "lat": 36.52,
+    "lng": 103.62
+  },
+  "DNZ": {
+    "iata": "DNZ",
+    "icao": "ZLDH",
+    "name_cn": "敦煌莫高国际机场",
+    "name_en": "Dunhuang Mogao International Airport",
+    "city_cn": "敦煌",
+    "city_en": "Dunhuang",
+    "lat": 40.17,
+    "lng": 94.81
+  },
+  "JGN": {
+    "iata": "JGN",
+    "icao": "ZLJQ",
+    "name_cn": "嘉峪关酒泉机场",
+    "name_en": "Jiayuguan Jiuquan Airport",
+    "city_cn": "嘉峪关",
+    "city_en": "Jiayuguan",
+    "lat": 39.86,
+    "lng": 98.29
+  },
+  "IQN": {
+    "iata": "IQN",
+    "icao": "ZLQY",
+    "name_cn": "庆阳西峰机场",
+    "name_en": "Qingyang Xifeng Airport",
+    "city_cn": "庆阳",
+    "city_en": "Qingyang",
+    "lat": 35.8,
+    "lng": 107.6
+  },
+  "CHW": {
+    "iata": "CHW",
+    "icao": "ZLJC",
+    "name_cn": "张掖甘州机场",
+    "name_en": "Zhangye Ganzhou Airport",
+    "city_cn": "张掖",
+    "city_en": "Zhangye",
+    "lat": 38.8,
+    "lng": 100.31
+  },
+  "THQ": {
+    "iata": "THQ",
+    "icao": "ZLTS",
+    "name_cn": "天水麦积山机场",
+    "name_en": "Tianshui Maijishan Airport",
+    "city_cn": "天水",
+    "city_en": "Tianshui",
+    "lat": 34.56,
+    "lng": 105.86
+  },
+  "GXH": {
+    "iata": "GXH",
+    "icao": "ZLXH",
+    "name_cn": "甘南夏河机场",
+    "name_en": "Gannan Xiahe Airport",
+    "city_cn": "甘南",
+    "city_en": "Gannan",
+    "lat": 34.81,
+    "lng": 102.91
+  },
+  "URC": {
+    "iata": "URC",
+    "icao": "ZWWW",
+    "name_cn": "乌鲁木齐地窝堡国际机场",
+    "name_en": "Urumqi Diwopu International Airport",
+    "city_cn": "乌鲁木齐",
+    "city_en": "Urumqi",
+    "lat": 43.91,
+    "lng": 87.47
+  },
+  "KHG": {
+    "iata": "KHG",
+    "icao": "ZWSH",
+    "name_cn": "喀什徕宁国际机场",
+    "name_en": "Kashgar Laining International Airport",
+    "city_cn": "喀什",
+    "city_en": "Kashgar",
+    "lat": 39.54,
+    "lng": 75.99
+  },
+  "HMI": {
+    "iata": "HMI",
+    "icao": "ZWHM",
+    "name_cn": "哈密伊州机场",
+    "name_en": "Hami Yizhou Airport",
+    "city_cn": "哈密",
+    "city_en": "Hami",
+    "lat": 42.84,
+    "lng": 93.67
+  },
+  "KRL": {
+    "iata": "KRL",
+    "icao": "ZWKL",
+    "name_cn": "库尔勒梨城机场",
+    "name_en": "Korla Licheng Airport",
+    "city_cn": "库尔勒",
+    "city_en": "Korla",
+    "lat": 41.63,
+    "lng": 86.15
+  },
+  "AKU": {
+    "iata": "AKU",
+    "icao": "ZWAK",
+    "name_cn": "阿克苏红旗坡机场",
+    "name_en": "Aksu Hongqipo Airport",
+    "city_cn": "阿克苏",
+    "city_en": "Aksu",
+    "lat": 41.26,
+    "lng": 80.29
+  },
+  "HTN": {
+    "iata": "HTN",
+    "icao": "ZWTN",
+    "name_cn": "和田昆冈机场",
+    "name_en": "Hotan Kungang Airport",
+    "city_cn": "和田",
+    "city_en": "Hotan",
+    "lat": 37.04,
+    "lng": 79.86
+  },
+  "NLT": {
+    "iata": "NLT",
+    "icao": "ZWKN",
+    "name_cn": "阿勒泰雪都机场",
+    "name_en": "Altay Xuedu Airport",
+    "city_cn": "阿勒泰",
+    "city_en": "Altay",
+    "lat": 47.75,
+    "lng": 88.09
+  },
+  "KRY": {
+    "iata": "KRY",
+    "icao": "ZWKM",
+    "name_cn": "克拉玛依古海机场",
+    "name_en": "Karamay Guhai Airport",
+    "city_cn": "克拉玛依",
+    "city_en": "Karamay",
+    "lat": 45.47,
+    "lng": 84.96
+  },
+  "BPL": {
+    "iata": "BPL",
+    "icao": "ZWBL",
+    "name_cn": "博乐阿拉山口机场",
+    "name_en": "Bole Alashankou Airport",
+    "city_cn": "博乐",
+    "city_en": "Bole",
+    "lat": 44.89,
+    "lng": 82.3
+  },
+  "FYN": {
+    "iata": "FYN",
+    "icao": "ZWFY",
+    "name_cn": "富蕴可可托海机场",
+    "name_en": "Fuyun Koktokay Airport",
+    "city_cn": "富蕴",
+    "city_en": "Fuyun",
+    "lat": 46.82,
+    "lng": 89.52
+  },
+  "RQA": {
+    "iata": "RQA",
+    "icao": "ZWRQ",
+    "name_cn": "若羌楼兰机场",
+    "name_en": "Ruoqiang Loulan Airport",
+    "city_cn": "若羌",
+    "city_en": "Ruoqiang",
+    "lat": 39.04,
+    "lng": 88.17
+  },
+  "IQM": {
+    "iata": "IQM",
+    "icao": "ZWCQ",
+    "name_cn": "且末玉都机场",
+    "name_en": "Qiemo Yudu Airport",
+    "city_cn": "且末",
+    "city_en": "Qiemo",
+    "lat": 38.15,
+    "lng": 85.53
+  },
+  "YIN": {
+    "iata": "YIN",
+    "icao": "ZWYC",
+    "name_cn": "银川河东国际机场",
+    "name_en": "Yinchuan Hedong International Airport",
+    "city_cn": "银川",
+    "city_en": "Yinchuan",
+    "lat": 38.33,
+    "lng": 106.39
+  },
+  "ZHY": {
+    "iata": "ZHY",
+    "icao": "ZLZW",
+    "name_cn": "中卫沙坡头机场",
+    "name_en": "Zhongwei Shapotou Airport",
+    "city_cn": "中卫",
+    "city_en": "Zhongwei",
+    "lat": 37.57,
+    "lng": 105.14
+  },
+  "ZQZ": {
+    "iata": "ZQZ",
+    "icao": "ZBCZ",
+    "name_cn": "张家口宁远机场",
+    "name_en": "Zhangjiakou Ningyuan Airport",
+    "city_cn": "张家口",
+    "city_en": "Zhangjiakou",
+    "lat": 40.74,
+    "lng": 114.93
+  },
+  "HKG": {
+    "iata": "HKG",
+    "icao": "VHHH",
+    "name_cn": "香港国际机场",
+    "name_en": "Hong Kong International Airport",
+    "city_cn": "香港",
+    "city_en": "Hong Kong",
+    "lat": 22.31,
+    "lng": 113.91
+  },
+  "MFM": {
+    "iata": "MFM",
+    "icao": "VMMC",
+    "name_cn": "澳门国际机场",
+    "name_en": "Macau International Airport",
+    "city_cn": "澳门",
+    "city_en": "Macau",
+    "lat": 22.15,
+    "lng": 113.59
+  },
+  "TPE": {
+    "iata": "TPE",
+    "icao": "RCTP",
+    "name_cn": "台北桃园国际机场",
+    "name_en": "Taiwan Taoyuan International Airport",
+    "city_cn": "桃园",
+    "city_en": "Taoyuan",
+    "lat": 25.08,
+    "lng": 121.23
+  },
+  "TSA": {
+    "iata": "TSA",
+    "icao": "RCSS",
+    "name_cn": "台北松山机场",
+    "name_en": "Taipei Songshan Airport",
+    "city_cn": "台北",
+    "city_en": "Taipei",
+    "lat": 25.07,
+    "lng": 121.55
+  },
+  "KHH": {
+    "iata": "KHH",
+    "icao": "RCKH",
+    "name_cn": "高雄小港国际机场",
+    "name_en": "Kaohsiung International Airport",
+    "city_cn": "高雄",
+    "city_en": "Kaohsiung",
+    "lat": 22.58,
+    "lng": 120.35
+  },
+  "BKK": {
+    "iata": "BKK",
+    "icao": "VTBS",
+    "name_cn": "曼谷素万那普机场",
+    "name_en": "Suvarnabhumi Airport",
+    "city_cn": "曼谷",
+    "city_en": "Bangkok",
+    "lat": 13.69,
+    "lng": 100.75
+  },
+  "SIN": {
+    "iata": "SIN",
+    "icao": "WSSS",
+    "name_cn": "新加坡樟宜机场",
+    "name_en": "Singapore Changi Airport",
+    "city_cn": "新加坡",
+    "city_en": "Singapore",
+    "lat": 1.36,
+    "lng": 103.99
+  },
+  "NRT": {
+    "iata": "NRT",
+    "icao": "RJAA",
+    "name_cn": "东京成田国际机场",
+    "name_en": "Narita International Airport",
+    "city_cn": "东京",
+    "city_en": "Tokyo",
+    "lat": 35.77,
+    "lng": 140.39
+  },
+  "HND": {
+    "iata": "HND",
+    "icao": "RJTT",
+    "name_cn": "东京羽田国际机场",
+    "name_en": "Tokyo Haneda International Airport",
+    "city_cn": "东京",
+    "city_en": "Tokyo",
+    "lat": 35.55,
+    "lng": 139.78
+  },
+  "ICN": {
+    "iata": "ICN",
+    "icao": "RKSI",
+    "name_cn": "首尔仁川国际机场",
+    "name_en": "Incheon International Airport",
+    "city_cn": "首尔",
+    "city_en": "Seoul",
+    "lat": 37.46,
+    "lng": 126.44
+  },
+  "KUL": {
+    "iata": "KUL",
+    "icao": "WMKK",
+    "name_cn": "吉隆坡国际机场",
+    "name_en": "Kuala Lumpur International Airport",
+    "city_cn": "吉隆坡",
+    "city_en": "Kuala Lumpur",
+    "lat": 2.75,
+    "lng": 101.71
+  },
+  "DPS": {
+    "iata": "DPS",
+    "icao": "WADD",
+    "name_cn": "巴厘岛登巴萨机场",
+    "name_en": "I Gusti Ngurah Rai International Airport",
+    "city_cn": "巴厘岛",
+    "city_en": "Bali",
+    "lat": 8.75,
+    "lng": 115.17
+  },
+  "DXB": {
+    "iata": "DXB",
+    "icao": "OMDB",
+    "name_cn": "迪拜国际机场",
+    "name_en": "Dubai International Airport",
+    "city_cn": "迪拜",
+    "city_en": "Dubai",
+    "lat": 25.25,
+    "lng": 55.36
+  },
+  "LHR": {
+    "iata": "LHR",
+    "icao": "EGLL",
+    "name_cn": "伦敦希思罗机场",
+    "name_en": "London Heathrow Airport",
+    "city_cn": "伦敦",
+    "city_en": "London",
+    "lat": 51.47,
+    "lng": -0.45
+  },
+  "CDG": {
+    "iata": "CDG",
+    "icao": "LFPG",
+    "name_cn": "巴黎戴高乐机场",
+    "name_en": "Paris Charles de Gaulle Airport",
+    "city_cn": "巴黎",
+    "city_en": "Paris",
+    "lat": 49.01,
+    "lng": 2.55
+  },
+  "JFK": {
+    "iata": "JFK",
+    "icao": "KJFK",
+    "name_cn": "纽约约翰·肯尼迪机场",
+    "name_en": "John F. Kennedy International Airport",
+    "city_cn": "纽约",
+    "city_en": "New York",
+    "lat": 40.64,
+    "lng": -73.78
+  },
+  "LAX": {
+    "iata": "LAX",
+    "icao": "KLAX",
+    "name_cn": "洛杉矶国际机场",
+    "name_en": "Los Angeles International Airport",
+    "city_cn": "洛杉矶",
+    "city_en": "Los Angeles",
+    "lat": 33.94,
+    "lng": -118.41
+  },
+  "SYD": {
+    "iata": "SYD",
+    "icao": "YSSY",
+    "name_cn": "悉尼金斯福德·史密斯机场",
+    "name_en": "Sydney Kingsford Smith Airport",
+    "city_cn": "悉尼",
+    "city_en": "Sydney",
+    "lat": -33.95,
+    "lng": 151.18
+  },
+  "IST": {
+    "iata": "IST",
+    "icao": "LTFM",
+    "name_cn": "伊斯坦布尔机场",
+    "name_en": "Istanbul Airport",
+    "city_cn": "伊斯坦布尔",
+    "city_en": "Istanbul",
+    "lat": 41.26,
+    "lng": 28.74
+  },
+  "KTM": {
+    "iata": "KTM",
+    "icao": "VNKT",
+    "name_cn": "加德满都特里布万机场",
+    "name_en": "Kathmandu Tribhuvan Airport",
+    "city_cn": "加德满都",
+    "city_en": "Kathmandu",
+    "lat": 27.7,
+    "lng": 85.36
+  }
+}

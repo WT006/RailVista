@@ -1,13 +1,13 @@
 <script setup lang="ts">
 /**
  * 飞行纪念票构建器（鸿蒙风格）：
- * 航班号 + 日期查询：
- *  - 在线服务可用：起降机场（含英文名）、时刻、登机口、时长/里程/巡航高度全自动；
- *  - 未配置：补选起降机场（机场英文名/里程/巡航高度仍自动匹配），时刻选填。
+ * 两种模式：
+ *  1. 航班号 + 日期查询：在线服务可用时自动带出起降机场/时刻；否则本地兜底补选。
+ *  2. 航线搜索：出发地+目的地+日期 → FlyClaw（飞猪源）返回航班列表，选择后自动成票。
  * 用户只需：舱位（滚轮选择）、座位号、舷窗侧（选）。
  */
 import { computed, reactive, ref, watch } from 'vue';
-import { CABIN_CLASSES, type FlightLookup } from '@railvista/shared';
+import { CABIN_CLASSES, getAirport, haversineKm, cruiseAltitudeM, type FlightLookup, type FlightSearchResult } from '@railvista/shared';
 import { api } from '../../api/client';
 import { useTicketStore } from '../../stores/ticketStore';
 import HmField from './hm/HmField.vue';
@@ -17,12 +17,18 @@ import type { WheelOption } from './hm/HmWheel.vue';
 
 const store = useTicketStore();
 
+const mode = ref<'flightNo' | 'route'>('flightNo');
 const flightNo = ref('');
 const date = ref(new Date().toISOString().slice(0, 10));
 const loading = ref(false);
 const error = ref('');
 const lookup = ref<FlightLookup | null>(null);
 const showTimes = ref(false);
+
+// 航线搜索
+const routeFrom = ref('');
+const routeTo = ref('');
+const searchResults = ref<FlightSearchResult[]>([]);
 
 const cabinOptions: WheelOption[] = CABIN_CLASSES.map((c) => ({ label: c.value, value: c.value }));
 const sideOptions: WheelOption[] = [
@@ -71,6 +77,46 @@ async function query() {
   }
 }
 
+async function searchRoute() {
+  error.value = '';
+  searchResults.value = [];
+  if (!routeFrom.value || !routeTo.value) {
+    error.value = '请选择出发和到达机场';
+    return;
+  }
+  loading.value = true;
+  try {
+    const results = await api.searchFlights(routeFrom.value, routeTo.value, date.value);
+    searchResults.value = results;
+    if (!results.length) error.value = '未找到航班，请尝试其他日期或航线';
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : '搜索失败，请稍后重试';
+  } finally {
+    loading.value = false;
+  }
+}
+
+function selectFlight(r: FlightSearchResult) {
+  flightNo.value = r.flightNumber;
+  const ap = getAirport(r.depIata);
+  const bp = getAirport(r.arrIata);
+  const distanceKm = ap && bp ? Math.round(haversineKm(ap, bp)) : undefined;
+  lookup.value = {
+    source: 'fr24',
+    flightNumber: r.flightNumber,
+    airlineIata: r.airlineIata,
+    date: date.value,
+    dep: { iata: r.depIata, scheduled: r.scheduledDeparture },
+    arr: { iata: r.arrIata, scheduled: r.scheduledArrival },
+    durationMin: r.durationMin,
+    distanceKm,
+    cruiseAltitudeM: distanceKm ? cruiseAltitudeM(distanceKm) : undefined,
+  };
+  form.depIata = '';
+  form.arrIata = '';
+  searchResults.value = [];
+}
+
 let t: ReturnType<typeof setTimeout> | undefined;
 watch(
   [ready, () => form.cabin, () => form.seat, () => form.windowSide, depIata, arrIata,
@@ -96,7 +142,14 @@ watch(
 
 <template>
   <div class="fb">
-    <form class="fb__top" @submit.prevent="query">
+    <!-- 模式切换 -->
+    <div class="fb__mode">
+      <button type="button" :class="['fb__mode-btn', { active: mode === 'flightNo' }]" @click="mode = 'flightNo'">按航班号</button>
+      <button type="button" :class="['fb__mode-btn', { active: mode === 'route' }]" @click="mode = 'route'">按航线搜索</button>
+    </div>
+
+    <!-- 航班号查询模式 -->
+    <form v-if="mode === 'flightNo'" class="fb__top" @submit.prevent="query">
       <div class="fb__no">
         <HmField v-model="flightNo" label="航班号" placeholder="如 CZ3467" hint="两位航司代码 + 数字，如 CA4401、3U8633" />
       </div>
@@ -110,7 +163,31 @@ watch(
       </button>
     </form>
 
+    <!-- 航线搜索模式 -->
+    <form v-else class="fb__top" @submit.prevent="searchRoute">
+      <AirportField v-model="routeFrom" label="出发机场" placeholder="如 北京、上海" />
+      <AirportField v-model="routeTo" label="到达机场" placeholder="如 广州、成都" />
+      <div class="fb__date">
+        <label class="fb__label">出发日期</label>
+        <div class="fb__datebox"><input v-model="date" type="date" /></div>
+      </div>
+      <button class="fb__submit" type="submit" :disabled="loading">
+        <svg viewBox="0 0 24 24" width="17" height="17"><path fill="currentColor" d="M21 15.4v-2l-8-5V3.5a1.5 1.5 0 00-3 0V8.4l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-6.1z"/></svg>
+        {{ loading ? '搜索中…' : '搜索航班' }}
+      </button>
+    </form>
+
     <p v-if="error" class="fb__error">{{ error }}</p>
+
+    <!-- 航线搜索结果 -->
+    <div v-if="searchResults.length" class="fb__results">
+      <button v-for="r in searchResults" :key="r.flightNumber + r.scheduledDeparture" type="button" class="fb__result" @click="selectFlight(r)">
+        <span class="fb__result-no">{{ r.flightNumber }}</span>
+        <span class="fb__result-route">{{ r.depIata }} → {{ r.arrIata }}</span>
+        <span class="fb__result-time">{{ r.scheduledDeparture }}–{{ r.scheduledArrival }}</span>
+        <span v-if="r.price" class="fb__result-price">¥{{ Math.round(r.price) }}</span>
+      </button>
+    </div>
 
     <!-- 本地模式：补选机场 -->
     <div v-if="isLocal" class="fb__local">
@@ -155,6 +232,13 @@ watch(
 </template>
 
 <style scoped>
+.fb__mode { display: flex; gap: 0; margin-bottom: 12px; border-radius: var(--radius-full); background: var(--surface-2); padding: 3px; }
+.fb__mode-btn {
+  flex: 1; padding: 8px 0; border: none; border-radius: var(--radius-full);
+  font-size: 13px; font-weight: 500; color: var(--text-2);
+  background: transparent; cursor: pointer; transition: all var(--dur-micro) var(--ease-standard);
+}
+.fb__mode-btn.active { color: var(--surface-0); background: var(--accent); }
 .fb__top { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
 .fb__no { grid-column: 1 / -1; }
 .fb__label { display: block; margin-bottom: 7px; font-size: var(--fs-cap); letter-spacing: 0.04em; color: var(--text-2); }
@@ -201,6 +285,19 @@ watch(
 }
 .fb__personal { margin-top: 16px; padding: 14px; border-radius: var(--radius-md); background: var(--surface-2); border: 1px solid var(--line-default); }
 .fb__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 12px; }
+
+.fb__results { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.fb__result {
+  display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px; align-items: center;
+  padding: 12px 14px; border: 1px solid var(--line-default); border-radius: var(--radius-md);
+  background: var(--surface-2); cursor: pointer; transition: border-color var(--dur-micro) var(--ease-standard);
+  font-size: 14px; color: var(--text-1); text-align: left;
+}
+.fb__result:hover { border-color: var(--accent); }
+.fb__result-no { font-weight: 600; color: var(--accent); }
+.fb__result-route { color: var(--text-2); font-size: 13px; }
+.fb__result-time { font-variant-numeric: tabular-nums; font-size: 13px; }
+.fb__result-price { font-weight: 600; color: var(--success); }
 
 @media (prefers-reduced-motion: reduce) {
   .fb__submit {

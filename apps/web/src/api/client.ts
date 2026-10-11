@@ -510,4 +510,9 @@ export const api = {
     const qs = new URLSearchParams({ flightNo, date });
     return request<import('@railvista/shared').FlightLookup>(`/flights/lookup?${qs}`);
   },
+  /** 按航线搜索航班（出发地+目的地+日期），返回航班列表含价格 */
+  searchFlights(from: string, to: string, date: string) {
+    const qs = new URLSearchParams({ from, to, date });
+    return request<import('@railvista/shared').FlightSearchResult[]>(`/flights/search?${qs}`);
+  },
 };

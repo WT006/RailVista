@@ -49,8 +49,15 @@
 
   /* chrome 层（顶栏 / 底栏）玻璃：与卡片玻璃分档，模糊更轻 */
   --glass-blur-chrome: 14px;
-  /* 底部页签上方渐变蒙层高度（底部页签规范：高于内容最顶边 16vp，颜色与页面背景一致） */
+  /* 底部页签上方渐变蒙层高度（HarmonyOS《底部页签》：高于内容最顶边 16vp，颜色与页面背景一致） */
   --bottomnav-scrim-h: 16px;
+  /* 悬浮式底栏：胶囊距屏幕两侧/底边的留白（barFloatingStyle.barBottomMargin 等效，8vp） */
+  --nav-float-inset: 12px;
+  --nav-float-gap: 8px;
+  /* 点按点光源（沉浸光感·按压点光源）：触屏按压时触点光晕的峰值透明度与半径 */
+  --press-glow-alpha: 0.16;
+  --press-glow-alpha-tile: 0.12;
+  --press-glow-radius: 220px;
 
   /* ══════════ 描边（整体降不透明度：框体更轻盈，突出内容本身）══════════ */
   --line-hairline: rgba(255, 255, 255, 0.04);
@@ -228,11 +235,11 @@
  *   ≥1200 桌面      → 收窄到 1120px，保证双栏阅读宽度与行宽舒适
  */
 
-/* 底部页签档（<840）：内容区高度取规范悬浮式 56vp 档（图标 24 + 文字双行结构），
-   安全区由组件用 env(safe-area-inset-bottom) 另行追加 */
+/* 底部页签档（<840）：悬浮胶囊本体 56vp + 底边悬浮留白 8vp（--nav-float-gap），
+   内容避让总高取 64vp；安全区由消费处用 env(safe-area-inset-bottom) 另行追加 */
 @media (max-width: 839px) {
   :root {
-    --bottomnav-h: 56px;
+    --bottomnav-h: 64px;
   }
 }
 

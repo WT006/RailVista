@@ -270,7 +270,10 @@ html {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .rv-card:hover {
+  /* #app 提权 + animation:none：入场动画 rv-card-in 的 fill:both 会持续级联
+     transform 终态，否则 hover 抬升声明被压制（按压态同理，见下方触屏规则） */
+  #app .rv-card:hover {
+    animation: none;
     transform: translateY(-2px) scale(1.006);
     border-color: var(--line-accent);
     box-shadow: var(--elev-3), var(--glow-accent);
@@ -295,6 +298,59 @@ html {
   .rank-row:hover::after {
     opacity: 1;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * 触屏按压反馈（HarmonyOS 沉浸光感·按压点光源 + 交互形变）
+ * 触屏没有 hover，.is-press-active 由 usePointerSpotlight 在 pointerdown 时
+ * 点亮、pointerup 时移除；光晕圆心即触点（--mx/--my）。
+ * prefers-reduced-motion 下组合式函数不注册，类名永不出现。
+ * ══════════════════════════════════════════════════════════════════════════ */
+/* #app 提权：① 压过入场动画 fill:both 级联的 transform 终态（animation:none）；
+   ② 压过翻面卡 .query-flip__card.is-measured .query-flip__face--front（0,3,0）的位移声明 */
+#app .rv-card.is-press-active {
+  animation: none;
+  transform: scale(0.997);
+  border-color: var(--line-accent);
+}
+
+#app .rv-card.is-press-active::after {
+  opacity: 1;
+  background:
+    radial-gradient(
+      var(--press-glow-radius) circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, var(--press-glow-alpha)),
+      var(--glow-accent-layer) 42%,
+      transparent 68%
+    );
+}
+
+.rv-card.is-press-active::before {
+  opacity: 0.7;
+}
+
+#app .rv-tile.is-press-active,
+#app .recent-card.is-press-active,
+#app .train-card.is-press-active,
+#app .rank-card.is-press-active,
+#app .rank-row.is-press-active {
+  animation: none;
+  transform: scale(0.992);
+  border-color: var(--line-strong);
+  background: var(--surface-3);
+}
+
+.rv-tile.is-press-active::after,
+.recent-card.is-press-active::after,
+.train-card.is-press-active::after,
+.rank-card.is-press-active::after,
+.rank-row.is-press-active::after {
+  opacity: 1;
+  background: radial-gradient(
+    calc(var(--press-glow-radius) * 0.8) circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, var(--press-glow-alpha-tile)),
+    transparent 64%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {

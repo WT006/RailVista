@@ -329,6 +329,32 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
 .ed__hint--warn { color: var(--warning); }
 .ed__actions { display: flex; gap: var(--space-1); justify-content: flex-end; }
 
+/* 触屏设备（手机竖屏）：鸿蒙触控规范命中区 ≥44vp。
+   桌面（精确指针）保留紧凑密度，不放大。 */
+@media (pointer: coarse) {
+  .ed__chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 8px 14px;
+  }
+  .ed__check {
+    min-height: 40px;
+  }
+  .ed__check input {
+    width: 20px;
+    height: 20px;
+  }
+  /* 原生 range 轨道仅 16px 高，触屏上几乎无法拖：撑到 32px 命中带 */
+  .ed__range {
+    height: 32px;
+  }
+  .ed__listrow .btn {
+    min-width: 44px;
+    min-height: 40px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ed__input,
   .ed__chip {

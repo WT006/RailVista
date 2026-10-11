@@ -7,7 +7,8 @@
   position: relative;
   isolation: isolate;
   min-height: 100dvh;
-  padding-bottom: var(--space-8);
+  /* 手机竖屏避让悬浮页签胶囊 + Home 指示条；≥840 时 --bottomnav-h=0，等同原留白 */
+  padding-bottom: calc(var(--space-8) + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
   /* 与 .rv-page 同一纪律：末层底色透出 App 级背景层（见 base.css .rv-page 注释） */
   background:
     radial-gradient(ellipse 70% 42% at 10% -8%, var(--accent-soft), transparent 58%),

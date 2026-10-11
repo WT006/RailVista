@@ -181,8 +181,18 @@ function trainKind(code: string): 'hsr' | 'intercity' | 'conventional' | 'other'
 <style scoped>
 .tp__form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0,1fr)：轨道最小宽为 0，避免原生 date 输入的固有 min-content
+     把双列栅格撑出卡片（手机竖屏曾横向溢出 86px，到达站/查询钮顶出基础组件） */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+.tp__station { min-width: 0; }
+
+/* 手机竖屏（≤560px）：出发站 / 到达站 / 日期纵向单列，查询钮整宽 */
+@media (max-width: 560px) {
+  .tp__form {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .tp__label { display: block; margin-bottom: 7px; font-size: var(--fs-cap); letter-spacing: 0.04em; color: var(--text-2); }
 .tp__control, .tp__datebox {

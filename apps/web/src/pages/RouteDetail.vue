@@ -433,7 +433,9 @@ watch(corridorId, async () => {
 <style scoped>
 .route-page {
   min-height: 100%;
-  padding: 14px 14px 40px;
+  /* 底部避让悬浮页签胶囊（--bottomnav-h 已含 8vp 悬浮留白）+ Home 指示条安全区，
+     此前固定 40px 在手机竖屏会让末段内容被胶囊压住约 21px */
+  padding: 14px 14px calc(40px + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
   background: var(--surface-0);
   color: var(--text-2);
 }

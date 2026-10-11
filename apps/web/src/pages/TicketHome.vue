@@ -190,16 +190,15 @@ const showAdvanced = ref(false);
 .tk-toolbar__hint { font-size: var(--fs-cap); color: var(--text-3); letter-spacing: 0.04em; }
 .tk-toolbar__acts { display: flex; gap: var(--space-1); }
 
-/* 票面竖向比例：桌面 3:4.2；手机竖屏（≤480px）票面更窄，同比缩版后内容仍偏高，
-   加高到 3:4.45 保证铁路 / 自驾票面页脚（二维码/票号）完整不被裁切 */
+/* 票面框：3:4.2 竖向比例。
+   同时是 TicketFace 的容器查询祖先（container-type 必须建在父元素上：
+   cqw 在容器自身上不引用自己，写在 .tk 上会回退到视口宽度，桌面宽屏下
+   票面会被放大数倍、圆角变「车窗」——2026-10-11 回归修复）。
+   框内一切尺寸按框宽等比缩放，因此同一比例在手机/桌面版式完全一致，无需断点。 */
 .tk-face-wrap {
   width: 100%; max-width: 380px; margin: 0 auto;
   aspect-ratio: 3 / 4.2;
-}
-@media (max-width: 480px) {
-  .tk-face-wrap {
-    aspect-ratio: 3 / 4.45;
-  }
+  container-type: inline-size;
 }
 
 .tk-notice { margin: var(--space-2) 0 0; text-align: center; font-size: var(--fs-meta); color: var(--success); }

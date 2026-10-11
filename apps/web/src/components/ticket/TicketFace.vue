@@ -337,12 +337,13 @@ const statsView = computed(() =>
 /*
  * 票面是「印刷品」：所有尺寸（字号 / 间距 / 线宽 / 圆角 / 图标尺寸）均以
  * 票面容器宽度为基准等比缩放，基准设计宽度 380px（TicketHome 的 .tk-face-wrap）。
- *   --s = 1cqw / 3.8  —— 380px 容器下 1 设计 px；窄屏手机上面宽收缩到 ~294-340px
- *   时，全部版式同比缩小，杜绝「票面被压缩、页脚被裁、宫格文字出格」。
- * 仅 inline-size 容器（不影响高度由 aspect-ratio 决定）。
+ *   --s = 1cqw / 3.8  —— 380px 容器下 1 设计 px；票面框收窄时全部版式同比缩小，
+ *   杜绝「票面被压缩、页脚被裁、宫格文字出格」。
+ * 注意：container-type 建在父级 .tk-face-wrap 上 —— cqw 单位只引用「祖先」
+ * 容器，元素自身的 containment 对自身不生效；写在 .tk 上且无祖先容器时
+ * 1cqw 会回退为视口宽度的 1%，宽屏下票面将被放大成巨型圆角（车窗回归）。
  */
 .tk {
-  container-type: inline-size;
   --s: calc(1cqw / 3.8);
   position: relative;
   width: 100%; height: 100%;
@@ -547,25 +548,13 @@ const statsView = computed(() =>
 .fl-strip__cell span { font-size: calc(8.5 * var(--s)); letter-spacing: 0.08em; color: var(--tk-tx3); }
 .fl-strip__cell strong { font-size: calc(12.5 * var(--s)); font-weight: 700; }
 
-/* ────────── 窄票面（≤340px，典型手机竖屏）──────────
- * 英文副标隐藏、宫格数值微缩、内边距收紧：为铁路 / 自驾票面争取纵向空间，
- * 保证页脚（二维码 / 条码 / 票号）在票面框内完整可见。 */
+/* ────────── 窄票面（≤340px，手机竖屏）──────────
+ * 四宫格双语标签（「海拔爬升 ASCENT」）等比缩到窄框后英文部分仍会被省略号
+ * 截断（MILE…/DUR…）；窄框下只保留中文主信息，票面更整洁。
+ * 桌面（380/430px 框）不触发，票面与原设计一致。 */
 @container (max-width: 340px) {
-  .tk__inner {
-    padding: calc(18 * var(--s)) calc(18 * var(--s)) calc(14 * var(--s));
-  }
-  .tk-stats__item {
-    padding: calc(7 * var(--s)) calc(8 * var(--s));
-  }
   .tk-stats__label-en {
     display: none;
-  }
-  .tk-stats__value {
-    font-size: calc(12.5 * var(--s));
-  }
-  .tk-foot {
-    padding-top: calc(11 * var(--s));
-    gap: calc(10 * var(--s));
   }
 }
 </style>

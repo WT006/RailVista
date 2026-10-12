@@ -1,4 +1,3 @@
-/** 上线前把 CORS_ORIGIN 改成你的 https 域名。密钥放 apps/api/.env，勿写进本文件。 */
 module.exports = {
   apps: [
     {
@@ -7,7 +6,7 @@ module.exports = {
       cwd: __dirname + '/..',
       env: {
         PORT: 3000,
-        CORS_ORIGIN: 'https://waybook.tyuho.cn',
+        CORS_ORIGIN: 'https://your.domain.com',
         NODE_ENV: 'production',
       },
     },

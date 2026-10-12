@@ -32,6 +32,43 @@ interface SpotsState {
   grid: SpotGrid;
   /** 加载时按 CHINA_LAND_BBOX 剔除的境外 / 非法坐标 POI 数 */
   droppedOob: number;
+  /** v2：字段完备度统计（前端「数据声明」卡片用，诚实告知覆盖率） */
+  stats: SpotStats;
+}
+
+export interface SpotStats {
+  bySource: Record<string, number>;
+  byDetourClass: Record<string, number>;
+  byTier: Record<string, number>;
+  /** 有真实评分（高德 biz_ext.rating）的条数 */
+  withRating: number;
+  /** 有开放时间的条数 */
+  withVisitHours: number;
+  /** 有简介的条数（人工撰写 + 合成兜底都算） */
+  withIntro: number;
+  /** 有照片的条数 */
+  withPhoto: number;
+}
+
+function computeStats(spots: RoadsideSpot[]): SpotStats {
+  const bySource: Record<string, number> = {};
+  const byDetourClass: Record<string, number> = {};
+  const byTier: Record<string, number> = {};
+  let withRating = 0;
+  let withVisitHours = 0;
+  let withIntro = 0;
+  let withPhoto = 0;
+  for (const s of spots) {
+    const src = String(s.source ?? 'unknown').split(':')[0];
+    bySource[src] = (bySource[src] ?? 0) + 1;
+    if (s.detourClass) byDetourClass[s.detourClass] = (byDetourClass[s.detourClass] ?? 0) + 1;
+    if (s.tier) byTier[s.tier] = (byTier[s.tier] ?? 0) + 1;
+    if (typeof s.rating === 'number' && s.rating > 0) withRating += 1;
+    if (s.visitHours) withVisitHours += 1;
+    if (s.intro && String(s.intro).trim()) withIntro += 1;
+    if (s.photoUrl) withPhoto += 1;
+  }
+  return { bySource, byDetourClass, byTier, withRating, withVisitHours, withIntro, withPhoto };
 }
 
 let state: SpotsState | null = null;
@@ -49,6 +86,7 @@ function loadSpots(): SpotsState | null {
       file: { ...file, spots: kept },
       grid: buildSpotGrid(kept),
       droppedOob: dropped.length,
+      stats: computeStats(kept),
     };
     return state;
   } catch {
@@ -72,6 +110,8 @@ export function roadsideSpotsMeta(): {
   droppedOob: number;
   updated: string;
   note?: string;
+  version: number;
+  stats: SpotStats;
 } {
   const s = loadSpots();
   return {
@@ -80,6 +120,9 @@ export function roadsideSpotsMeta(): {
     droppedOob: s?.droppedOob ?? 0,
     updated: s?.file.updated ?? '',
     note: s?.file.note,
+    version: s?.file.version ?? 1,
+    stats:
+      s?.stats ?? { bySource: {}, byDetourClass: {}, byTier: {}, withRating: 0, withVisitHours: 0, withIntro: 0, withPhoto: 0 },
   };
 }
 

@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { lookupFlight } from '../services/flightLookup.js';
+import { lookupFlight, searchFlightsByRoute } from '../services/flightLookup.js';
 
 export const flightsRoute = new Hono();
 
@@ -21,5 +21,27 @@ flightsRoute.get('/lookup', async (c) => {
     );
   }
   const data = await lookupFlight(flightNo, date);
+  return c.json({ ok: true, data });
+});
+
+/**
+ * GET /flights/search?from=PEK&to=SHA&date=2026-10-15
+ * 按航线（出发地+目的地+日期）搜索航班，返回航班列表含价格。
+ * 数据源：FlyClaw 子进程（飞猪/Fliggy 源，不受 Cloudflare 拦截）。
+ */
+flightsRoute.get('/search', async (c) => {
+  const from = (c.req.query('from') ?? '').trim();
+  const to = (c.req.query('to') ?? '').trim();
+  const date = (c.req.query('date') ?? '').trim();
+  if (!from || !to || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return c.json(
+      {
+        ok: false,
+        error: { code: 'BAD_REQUEST', message: '需要 from、to 与 date(YYYY-MM-DD) 参数' },
+      },
+      400,
+    );
+  }
+  const data = await searchFlightsByRoute(from, to, date);
   return c.json({ ok: true, data });
 });

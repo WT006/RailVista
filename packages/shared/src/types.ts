@@ -716,6 +716,12 @@ export interface RoadGeometry {
 export type RoadVisibility = 'roadside' | 'detour5' | 'detour20' | 'distant';
 
 /** 公路侧景点（data/roads/roadside-spots.json，目标 3 万条） */
+/**
+ * v2（2026-10-12 重建）：字段向铁路景点库看齐，并补上公路特有的
+ * 「能不能顺路到」语义。核心新增是 `detourClass` —— 公路与铁路的根本差异是
+ * **可以停下来、可以绕路**，只给一个「距路线多少公里」是不够的，要告诉用户
+ * 这个点是路过就能看、绕几公里能到、还是值得专程跑一趟。
+ */
 export interface RoadsideSpot {
   id: string;
   name: string;
@@ -728,16 +734,59 @@ export interface RoadsideSpot {
   /** 沿程可见性（决定缓冲半径），默认 detour20 */
   visibility?: RoadVisibility;
   intro?: string;
+  /** 一句话卖点（路书 POI 的 tagline，UI 列表副标题优先取它） */
+  tagline?: string;
   tags?: string[];
   province?: string;
+  /** 地级市（自驾规划与「顺路可达」判断都需要它，不能只留省） */
+  city?: string;
   /** 官方资质：['5A','世界遗产','中国传统村落'] */
   honors?: string[];
+  /** 资质等级原文，如「世界自然遗产 · 国家5A级旅游景区」 */
+  level?: string;
   bestView?: SpotBestView;
   stayMin?: number;
   /** 是否可停车（Tier C 小确幸关键属性） */
   canPark?: boolean;
+
+  /**
+   * 能否顺路到达（公路版核心差异字段）：
+   *  - pass    路线本身经过或就在路边（≤1km），不停也能看 / 即停即看
+   *  - detour  绕行几公里可达，20 分钟内能打个来回
+   *  - spur    超出常规沿程范围，需要专程绕行；必须同时给 spurReason 说明为什么值得
+   */
+  detourClass?: 'pass' | 'detour' | 'spur';
+  /** detourClass==='spur' 时的绕行理由（「为什么值得专程跑一趟」） */
+  spurReason?: string;
+
+  /** 开放时间。只写可核实的口径（「全天开放」「旺季 8:00–17:30」等），未知留空 */
+  visitHours?: string;
+  /** 票务提示。**严禁写具体金额**（与路书库同一条红线），只写「需预约」「含在景区大门票内」等 */
+  ticketNote?: string;
+  /** 到达方式：从哪条路下道、走多远、要不要换乘摆渡车 / 徒步 */
+  accessNote?: string;
+  /** 评分（0–5）。没有可信来源时留空，不要造 */
+  rating?: number;
+  ratingSource?: string;
+
+  /** 地址（高德 POI） */
+  address?: string;
+  tel?: string;
+  /** 最近可达的干线编号（由路网几何反查，不是估算） */
+  roadRefs?: string[];
+  /** 到最近干线的直线距离（km） */
+  roadDistKm?: number;
+  amapId?: string;
+  amapType?: string;
+  /**
+   * 首图 URL（高德 POI 照片，公开 CDN 无需 key）。
+   * 只存一张 —— 列表卡片够用，40k 条的库里存多张会把文件撑到不可接受。
+   */
+  photoUrl?: string;
+
   source: string;
   verified?: boolean;
+  reviewedAt?: string;
 }
 
 /** 合成路线章节（沿程分段标题） */
@@ -824,6 +873,11 @@ export interface AlongRouteOptions {
   /** 最少「值得一看」分值，过滤路人 POI；C1/C2 默认 35，C3 实时默认 45 */
   minScore?: number;
   maxCount?: number;
+  /**
+   * 是否把「专程绕行」景点（detourClass==='spur'）一并带出，默认 true。
+   * 传 false 时只保留路线经过 / 顺路可达的景点（纯自驾沿程视角）。
+   */
+  includeSpur?: boolean;
 }
 
 /** 沿程景点（filterSpotsAlongRoad 输出，按 progressKm 升序） */
@@ -836,8 +890,12 @@ export interface AlongSpot {
   progressKm: number;
   /** 到路线的垂直距离（km） */
   distKm: number;
-  /** 左右侧：相对路线正方向 */
-  side: 'left' | 'right' | 'unknown';
+  /**
+   * 左右侧：相对路线正方向。
+   * 2026-10-12 起补齐 'both' —— 与铁路 spotSide 同语义：贴线通过（距路 ≤0.3km）
+   * 的景点本来就两边都能看，把它判成 left/right 是错的。
+   */
+  side: 'left' | 'right' | 'both' | 'unknown';
   sideConfidence: 'high' | 'mid' | 'low';
   category: string;
   score: number;
@@ -846,12 +904,32 @@ export interface AlongSpot {
   /** 建议停留（分钟） */
   stayMin?: number;
   intro?: string;
+  /** 一句话卖点 */
+  tagline?: string;
   tier: 'A' | 'B' | 'C';
   visibility?: RoadVisibility;
   honors?: string[];
+  /** 资质等级原文 */
+  level?: string;
   bestView?: SpotBestView;
   canPark?: boolean;
   province?: string;
+  city?: string;
+  /** 展示标签（分类 + 资质 + 高德 keytag 合并去重后的结果） */
+  tags?: string[];
+  /** 顺路经过 / 绕行可达 / 专程绕行 */
+  detourClass?: 'pass' | 'detour' | 'spur';
+  spurReason?: string;
+  visitHours?: string;
+  ticketNote?: string;
+  accessNote?: string;
+  rating?: number;
+  ratingSource?: string;
+  photoUrl?: string;
+  address?: string;
+  /** 最近可达干线编号（离线可用的「怎么去」依据） */
+  roadRefs?: string[];
+  roadDistKm?: number;
   /**
    * 未贯通 orphan 段下标（相对 route.segments）。
    * 有值时 progressKm 是该断段内的局部里程，不得并进主链进度条 / 章节统计。
@@ -878,6 +956,23 @@ export interface RankingItem {
   tags?: string[];
   /** 归属榜单的交叉索引：这条路同时出现在哪些榜 */
   alsoIn?: string[];
+  /**
+   * 分板块展示：值对应 RankingBoard.groups[].key，items 顺序即板块内名次序。
+   * 无 groups 的榜单忽略此字段（平铺渲染，行为与旧版一致）。
+   */
+  group?: string;
+  /** 仅供灵感：库内确定无法沿程展示（如台湾路网），禁用「看沿程景点」跳转 */
+  inspirationOnly?: boolean;
+}
+
+/** 榜单分板块（如 CNG 最美公路的 10 类地貌 × TOP3 + 特别致敬/极致板块） */
+export interface RankingBoardGroup {
+  /** 稳定 key，RankingItem.group 指向它 */
+  key: string;
+  title: string;
+  description?: string;
+  /** terrain=地貌区域 TOP3 领奖台 / tribute=长线致敬 / extreme=极致公路网格 */
+  kind?: 'terrain' | 'tribute' | 'extreme';
 }
 
 /** 统一榜单模型（一个 schema 装下所有榜单，加新榜单 = 加一个 JSON，零代码） */
@@ -895,6 +990,11 @@ export interface RankingBoard {
   cover?: string;
   itemCount: number;
   items: RankingItem[];
+  /**
+   * 分板块元数据（可选；items 保持平铺、顺序 = 展示顺序）。
+   * 有值时 DriveBoard 渲染分板块杂志式布局；无值走通用平铺布局。
+   */
+  groups?: RankingBoardGroup[];
 }
 
 /** 榜单摘要（列表页用，不含 items） */

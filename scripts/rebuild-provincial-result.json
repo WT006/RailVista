@@ -1,0 +1,1034 @@
+[
+ {
+  "f": "天津_S3305.json",
+  "before": {
+   "comps": 8,
+   "total": 55
+  },
+  "after": {
+   "comps": 3,
+   "total": 67,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "河北_S317.json",
+  "before": {
+   "comps": 8,
+   "total": 55
+  },
+  "after": {
+   "comps": 7,
+   "total": 55,
+   "gaps": 6
+  }
+ },
+ {
+  "f": "河北_S3305.json",
+  "before": {
+   "comps": 8,
+   "total": 55
+  },
+  "after": {
+   "comps": 3,
+   "total": 67,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "浙江_S308.json",
+  "before": {
+   "comps": 8,
+   "total": 55
+  },
+  "after": {
+   "comps": 6,
+   "total": 55,
+   "gaps": 5
+  }
+ },
+ {
+  "f": "河北_S306.json",
+  "before": {
+   "comps": 7,
+   "total": 54
+  },
+  "after": {
+   "comps": 6,
+   "total": 54,
+   "gaps": 5
+  }
+ },
+ {
+  "f": "河南_S305.json",
+  "before": {
+   "comps": 6,
+   "total": 54
+  },
+  "after": {
+   "comps": 3,
+   "total": 54,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "浙江_S203.json",
+  "before": {
+   "comps": 7,
+   "total": 54
+  },
+  "after": {
+   "comps": 5,
+   "total": 54,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "广东_S42.json",
+  "before": {
+   "comps": 7,
+   "total": 53
+  },
+  "after": {
+   "comps": 4,
+   "total": 53,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "江苏_S238.json",
+  "before": {
+   "comps": 8,
+   "total": 53
+  },
+  "after": {
+   "comps": 4,
+   "total": 128,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "河北_S101.json",
+  "before": {
+   "comps": 11,
+   "total": 53
+  },
+  "after": {
+   "comps": 5,
+   "total": 53,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "陕西_S215.json",
+  "before": {
+   "comps": 8,
+   "total": 53
+  },
+  "after": {
+   "comps": 4,
+   "total": 107,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "江苏_S325.json",
+  "before": {
+   "comps": 6,
+   "total": 52
+  },
+  "after": {
+   "comps": 6,
+   "total": 114,
+   "gaps": 5
+  }
+ },
+ {
+  "f": "江苏_S333.json",
+  "before": {
+   "comps": 9,
+   "total": 52
+  },
+  "after": {
+   "comps": 3,
+   "total": 127,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "天津_S210.json",
+  "before": {
+   "comps": 7,
+   "total": 51
+  },
+  "after": {
+   "comps": 5,
+   "total": 51,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "广东_S288.json",
+  "before": {
+   "comps": 6,
+   "total": 51
+  },
+  "after": {
+   "comps": 5,
+   "total": 51,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "江苏_S262.json",
+  "before": {
+   "comps": 6,
+   "total": 51
+  },
+  "after": {
+   "comps": 5,
+   "total": 51,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "江苏_S237.json",
+  "before": {
+   "comps": 8,
+   "total": 50
+  },
+  "after": {
+   "comps": 6,
+   "total": 50,
+   "gaps": 5
+  }
+ },
+ {
+  "f": "河北_S325.json",
+  "before": {
+   "comps": 10,
+   "total": 50
+  },
+  "after": {
+   "comps": 4,
+   "total": 50,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "湖北_S103.json",
+  "before": {
+   "comps": 13,
+   "total": 50
+  },
+  "after": {
+   "comps": 10,
+   "total": 169,
+   "gaps": 9
+  }
+ },
+ {
+  "f": "江西_S308.json",
+  "before": {
+   "comps": 12,
+   "total": 47
+  },
+  "after": {
+   "comps": 3,
+   "total": 154,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "北京_S321.json",
+  "before": {
+   "comps": 6,
+   "total": 46
+  },
+  "after": {
+   "comps": 2,
+   "total": 46,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "江苏_S121.json",
+  "before": {
+   "comps": 8,
+   "total": 46
+  },
+  "after": {
+   "comps": 3,
+   "total": 46,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "安徽_S460.json",
+  "before": {
+   "comps": 6,
+   "total": 45
+  },
+  "after": {
+   "comps": 2,
+   "total": 45,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "广东_S359.json",
+  "before": {
+   "comps": 11,
+   "total": 45
+  },
+  "after": {
+   "comps": 5,
+   "total": 137,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "广东_S505.json",
+  "before": {
+   "comps": 7,
+   "total": 45
+  },
+  "after": {
+   "comps": 3,
+   "total": 45,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "福建_S221.json",
+  "before": {
+   "comps": 6,
+   "total": 45
+  },
+  "after": {
+   "comps": 4,
+   "total": 45,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "上海_S202.json",
+  "before": {
+   "comps": 11,
+   "total": 44
+  },
+  "after": {
+   "comps": 7,
+   "total": 46,
+   "gaps": 6
+  }
+ },
+ {
+  "f": "安徽_S327.json",
+  "before": {
+   "comps": 7,
+   "total": 44
+  },
+  "after": {
+   "comps": 3,
+   "total": 44,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "河北_S393.json",
+  "before": {
+   "comps": 7,
+   "total": 44
+  },
+  "after": {
+   "comps": 4,
+   "total": 44,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "江西_S230.json",
+  "before": {
+   "comps": 7,
+   "total": 43
+  },
+  "after": {
+   "comps": 1,
+   "total": 247,
+   "gaps": 0
+  }
+ },
+ {
+  "f": "内蒙古_S43.json",
+  "before": {
+   "comps": 6,
+   "total": 42
+  },
+  "after": {
+   "comps": 3,
+   "total": 42,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "广东_S257.json",
+  "before": {
+   "comps": 9,
+   "total": 42
+  },
+  "after": {
+   "comps": 3,
+   "total": 43,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "江苏_S402.json",
+  "before": {
+   "comps": 6,
+   "total": 42
+  },
+  "after": {
+   "comps": 2,
+   "total": 43,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "江苏_S504.json",
+  "before": {
+   "comps": 7,
+   "total": 42
+  },
+  "after": {
+   "comps": 5,
+   "total": 48,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "福建_S303.json",
+  "before": {
+   "comps": 7,
+   "total": 42
+  },
+  "after": {
+   "comps": 6,
+   "total": 42,
+   "gaps": 5
+  }
+ },
+ {
+  "f": "湖南_S307.json",
+  "before": {
+   "comps": 6,
+   "total": 41
+  },
+  "after": {
+   "comps": 3,
+   "total": 41,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "天津_S245.json",
+  "before": {
+   "comps": 7,
+   "total": 40
+  },
+  "after": {
+   "comps": 4,
+   "total": 40,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "河北_S207.json",
+  "before": {
+   "comps": 11,
+   "total": 40
+  },
+  "after": {
+   "comps": 7,
+   "total": 117,
+   "gaps": 6
+  }
+ },
+ {
+  "f": "河北_S228.json",
+  "before": {
+   "comps": 7,
+   "total": 40
+  },
+  "after": {
+   "comps": 2,
+   "total": 40,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "广东_S296.json",
+  "before": {
+   "comps": 8,
+   "total": 39
+  },
+  "after": {
+   "comps": 3,
+   "total": 39,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "江苏_S407.json",
+  "before": {
+   "comps": 9,
+   "total": 39
+  },
+  "after": {
+   "comps": 4,
+   "total": 40,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "江西_S231.json",
+  "before": {
+   "comps": 6,
+   "total": 39
+  },
+  "after": {
+   "comps": 5,
+   "total": 76,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "江苏_S263.json",
+  "before": {
+   "comps": 8,
+   "total": 38
+  },
+  "after": {
+   "comps": 4,
+   "total": 45,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "江苏_S367.json",
+  "before": {
+   "comps": 8,
+   "total": 38
+  },
+  "after": {
+   "comps": 2,
+   "total": 69,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "河北_S313.json",
+  "before": {
+   "comps": 6,
+   "total": 37
+  },
+  "after": {
+   "comps": 5,
+   "total": 162,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "北京_S205.json",
+  "before": {
+   "comps": 6,
+   "total": 35
+  },
+  "after": {
+   "comps": 2,
+   "total": 35,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "河北_S371.json",
+  "before": {
+   "comps": 6,
+   "total": 34
+  },
+  "after": {
+   "comps": 3,
+   "total": 68,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "河南_S212.json",
+  "before": {
+   "comps": 8,
+   "total": 34
+  },
+  "after": {
+   "comps": 5,
+   "total": 34,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "湖南_S204.json",
+  "before": {
+   "comps": 6,
+   "total": 34
+  },
+  "after": {
+   "comps": 4,
+   "total": 34,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "河北_S303.json",
+  "before": {
+   "comps": 7,
+   "total": 32
+  },
+  "after": {
+   "comps": 4,
+   "total": 32,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "广西_S206.json",
+  "before": {
+   "comps": 9,
+   "total": 31
+  },
+  "after": {
+   "comps": 4,
+   "total": 125,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "广东_S501.json",
+  "before": {
+   "comps": 8,
+   "total": 30
+  },
+  "after": {
+   "comps": 3,
+   "total": 32,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "江西_S320.json",
+  "before": {
+   "comps": 8,
+   "total": 30
+  },
+  "after": {
+   "comps": 6,
+   "total": 30,
+   "gaps": 5
+  }
+ },
+ {
+  "f": "河南_S227.json",
+  "before": {
+   "comps": 7,
+   "total": 30
+  },
+  "after": {
+   "comps": 4,
+   "total": 184,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "广东_S358.json",
+  "before": {
+   "comps": 6,
+   "total": 29
+  },
+  "after": {
+   "comps": 3,
+   "total": 29,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "浙江_S319.json",
+  "before": {
+   "comps": 8,
+   "total": 29
+  },
+  "after": {
+   "comps": 5,
+   "total": 29,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "安徽_S335.json",
+  "before": {
+   "comps": 11,
+   "total": 27
+  },
+  "after": {
+   "comps": 6,
+   "total": 101,
+   "gaps": 5
+  }
+ },
+ {
+  "f": "北京_S316.json",
+  "before": {
+   "comps": 10,
+   "total": 25
+  },
+  "after": {
+   "comps": 1,
+   "total": 25,
+   "gaps": 0
+  }
+ },
+ {
+  "f": "北京_S302.json",
+  "before": {
+   "comps": 7,
+   "total": 24
+  },
+  "after": {
+   "comps": 4,
+   "total": 24,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "河北_S222.json",
+  "before": {
+   "comps": 10,
+   "total": 24
+  },
+  "after": {
+   "comps": 8,
+   "total": 123,
+   "gaps": 7
+  }
+ },
+ {
+  "f": "湖北_S203.json",
+  "before": {
+   "comps": 14,
+   "total": 24
+  },
+  "after": {
+   "comps": 7,
+   "total": 191,
+   "gaps": 6
+  }
+ },
+ {
+  "f": "西藏_S301.json",
+  "before": {
+   "comps": 16,
+   "total": 1846
+  },
+  "after": {
+   "comps": 8,
+   "total": 1897,
+   "gaps": 7
+  }
+ },
+ {
+  "f": "浙江_S212.json",
+  "before": {
+   "comps": 8,
+   "total": 23
+  },
+  "after": {
+   "comps": 3,
+   "total": 23,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "江苏_S250.json",
+  "before": {
+   "comps": 7,
+   "total": 20
+  },
+  "after": {
+   "comps": 6,
+   "total": 185,
+   "gaps": 5
+  }
+ },
+ {
+  "f": "广东_S113.json",
+  "before": {
+   "comps": 8,
+   "total": 19
+  },
+  "after": {
+   "comps": 6,
+   "total": 19,
+   "gaps": 5
+  }
+ },
+ {
+  "f": "河北_S302.json",
+  "before": {
+   "comps": 11,
+   "total": 18
+  },
+  "after": {
+   "comps": 7,
+   "total": 75,
+   "gaps": 6
+  }
+ },
+ {
+  "f": "浙江_S101.json",
+  "before": {
+   "comps": 7,
+   "total": 16
+  },
+  "after": {
+   "comps": 5,
+   "total": 29,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "浙江_S324.json",
+  "before": {
+   "comps": 9,
+   "total": 16
+  },
+  "after": {
+   "comps": 5,
+   "total": 66,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "浙江_S7.json",
+  "before": {
+   "comps": 7,
+   "total": 15
+  },
+  "after": {
+   "comps": 4,
+   "total": 59,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "湖南_S231.json",
+  "before": {
+   "comps": 8,
+   "total": 15
+  },
+  "after": {
+   "comps": 3,
+   "total": 28,
+   "gaps": 2
+  }
+ },
+ {
+  "f": "天津_S116.json",
+  "before": {
+   "comps": 8,
+   "total": 14
+  },
+  "after": {
+   "comps": 2,
+   "total": 30,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "河北_S116.json",
+  "before": {
+   "comps": 8,
+   "total": 14
+  },
+  "after": {
+   "comps": 2,
+   "total": 30,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "广东_S268.json",
+  "before": {
+   "comps": 13,
+   "total": 13
+  },
+  "after": {
+   "comps": 9,
+   "total": 113,
+   "gaps": 8
+  }
+ },
+ {
+  "f": "浙江_S38.json",
+  "before": {
+   "comps": 6,
+   "total": 13
+  },
+  "after": {
+   "comps": 4,
+   "total": 15,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "福建_S301.json",
+  "before": {
+   "comps": 7,
+   "total": 12
+  },
+  "after": {
+   "comps": 4,
+   "total": 12,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "四川_S303.json",
+  "before": {
+   "comps": 11,
+   "total": 526
+  },
+  "after": {
+   "comps": 5,
+   "total": 528,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "甘肃_S301.json",
+  "before": {
+   "comps": 8,
+   "total": 403
+  },
+  "after": {
+   "comps": 7,
+   "total": 403,
+   "gaps": 6
+  }
+ },
+ {
+  "f": "山东_S32.json",
+  "before": {
+   "comps": 7,
+   "total": 5
+  },
+  "after": {
+   "comps": 1,
+   "total": 46,
+   "gaps": 0
+  }
+ },
+ {
+  "f": "青海_S102.json",
+  "before": {
+   "comps": 6,
+   "total": 189
+  },
+  "after": {
+   "comps": 2,
+   "total": 189,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "四川_S217.json",
+  "before": {
+   "comps": 4,
+   "total": 1205
+  },
+  "after": {
+   "comps": 4,
+   "total": 1205,
+   "gaps": 3
+  }
+ },
+ {
+  "f": "河北_S272.json",
+  "before": {
+   "comps": 3,
+   "total": 160
+  },
+  "after": {
+   "comps": 2,
+   "total": 160,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "青海_S202.json",
+  "before": {
+   "comps": 7,
+   "total": 157
+  },
+  "after": {
+   "comps": 2,
+   "total": 157,
+   "gaps": 1
+  }
+ },
+ {
+  "f": "湖南_S228.json",
+  "before": {
+   "comps": 6,
+   "total": 46
+  },
+  "after": {
+   "comps": 5,
+   "total": 46,
+   "gaps": 4
+  }
+ },
+ {
+  "f": "青海_S101.json",
+  "before": {
+   "comps": 10,
+   "total": 365
+  },
+  "after": {
+   "comps": 8,
+   "total": 972,
+   "gaps": 7
+  }
+ },
+ {
+  "f": "四川_S211.json",
+  "before": {
+   "comps": 15,
+   "total": 38
+  },
+  "after": {
+   "comps": 8,
+   "total": 299,
+   "gaps": 7
+  }
+ },
+ {
+  "f": "云南_S308.json",
+  "before": {
+   "comps": 1,
+   "total": 48
+  },
+  "after": {
+   "comps": 1,
+   "total": 49,
+   "gaps": 0
+  }
+ }
+]

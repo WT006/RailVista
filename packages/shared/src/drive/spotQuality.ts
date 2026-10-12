@@ -34,10 +34,20 @@ export type AtlasRoadDisplaySpot = {
   ele?: number;
 };
 
+/**
+ * 已经是「运营目的地」的数据源，不需要再用海拔去猜它是不是测绘支峰。
+ *
+ * `ele` 那套海拔门槛是为 **OSM 众包**设计的（`osm_batch` 里满是罗马数字峰、
+ * 海拔峰、Kangri 之类测绘点）。v2 库改成高德风景名胜 + 路书 POI 之后，
+ * 这些源里的山岳本身就是景区，没有 `ele` 字段也不该被当成测绘点杀掉 ——
+ * 否则 五台山 / 秦岭 这类真名山会从图集里整片消失。
+ */
+const TRUSTED_SOURCE_RE = /^(hand-curated|amap-poi|roadbook|migrated)/;
+
 function isNotableMountain(s: AtlasRoadDisplaySpot): boolean {
   const name = s.name ?? '';
   const score = s.score ?? 0;
-  if (String(s.source ?? '').startsWith('hand-curated')) return true;
+  if (TRUSTED_SOURCE_RE.test(String(s.source ?? ''))) return true;
   if (!CJK_RE.test(name) || SURVEY_PEAK.test(name) || FALSE_FAMOUS.test(name)) return false;
   const ele = s.ele;
   if (NOTABLE_PEAK.test(name) && !/神山/.test(name)) {

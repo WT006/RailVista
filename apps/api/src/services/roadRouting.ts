@@ -13,9 +13,11 @@
 import { computeCumKm, gcj02ToWgs84 } from '@railvista/shared';
 import type { GapAnnotation, RoadPoint, RoadRoute } from '@railvista/shared';
 import { getRoadEntry, getRoadGeometry, getRoadGeometryFull } from './roadNetwork.js';
-import { geocodeFallback, resolvePlace } from './roadIndex.js';
+import { amapKey, geocodeFallback, nearestPlaceName, resolvePlace } from './roadIndex.js';
 import { buildChapters } from './roadsideSpots.js';
+import type { RoadGeometryNode } from '@railvista/shared';
 import {
+  edgeClassBetween,
   edgeLineBetween,
   loadRoadTopology,
   nearestRoadNode,
@@ -30,7 +32,17 @@ export interface PlanRouteInput {
   from: string;
   to: string;
   via?: string[];
-  engine?: 'auto' | 'local';
+  /**
+   * auto（默认）→ 本地干线 A*，失败再试高德；
+   * local → 只用本地拓扑；
+   * amap → 只用高德驾车规划。
+   *
+   * 2026-10-11：默认从「高德优先」改为「本地优先」。国道/省道几何补全后
+   * 本地拓扑已是 148.9 万节点 / 370.3 万边、主连通分量覆盖 98.2% 节点的全国网，
+   * 上海→拉萨这类跨省 OD 实测 3802km / 382ms 可解；而高德依赖 key 类型与配额，
+   * 作为兜底比作为主路径更符合「数据在本地、可离线复算」的定位。
+   */
+  engine?: 'auto' | 'local' | 'amap';
 }
 
 export class PlaceNotFoundError extends Error {
@@ -85,7 +97,7 @@ async function resolveEndpoint(text: string, field: 'from' | 'to'): Promise<{ pt
 
 // ── 引擎 1：高德驾车规划（v5，GCJ-02 → WGS-84） ─────────────────────────────
 async function amapDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [number, number][]; distanceM: number; durationSec: number } | null> {
-  const key = process.env.AMAP_KEY;
+  const key = amapKey();
   if (!key) return null;
   const fmt = (p: Pt) => `${p.lng.toFixed(6)},${p.lat.toFixed(6)}`;
   const qs = new URLSearchParams({
@@ -136,8 +148,25 @@ async function amapDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [n
 }
 
 // ── 引擎 2：本地干线 A*（snap 5km，超限端点外接） ────────────────────────────
+/** 时长估算用等级限速（km/h）：只用来把里程折成「约几小时」，标注为估算，不代表真实路况 */
+const EST_SPEED_KMH: Record<string, number> = { expressway: 85, national: 65, provincial: 50, connector: 40 };
+
+function edgeClassOf(u: number, v: number): keyof typeof EST_SPEED_KMH {
+  const flag = edgeClassBetween(u, v);
+  if (flag & 1) return 'expressway';
+  if (flag & 2) return 'national';
+  if (flag & 4) return 'provincial';
+  return 'connector'; // 跨线边（flag 0）
+}
+
+function straightKm(a: Pt, b: Pt): number {
+  const dLng = (b.lng - a.lng) * Math.cos(((a.lat + b.lat) / 2) * Math.PI / 180);
+  const dLat = b.lat - a.lat;
+  return Math.sqrt(dLng * dLng + dLat * dLat) * 111;
+}
+
 function localDriveRoute(from: Pt, to: Pt, preferKeys: string[]):
-  | { coords: [number, number][]; roadKeys: string[]; spliced: boolean }
+  | { coords: [number, number][]; roadKeys: string[]; spliced: boolean; estMin: number }
   | null {
   if (!loadRoadTopology()) return null;
   // 容差 5km；超限用 150km 宽容 snap（端点外接段 + 干线主段拼接）
@@ -158,11 +187,22 @@ function localDriveRoute(from: Pt, to: Pt, preferKeys: string[]):
   if (!path || path.length < 2) return null;
 
   const roadKeys = new Set<string>();
+  let estMin = 0;
   for (let i = 1; i < path.length; i += 1) {
-    const lineId = edgeLineBetween(path[i - 1]!, path[i]!);
+    const u = path[i - 1]!;
+    const v = path[i]!;
+    const lineId = edgeLineBetween(u, v);
     const key = lineId >= 0 ? roadKeyOfLine(lineId) : undefined;
     if (key) roadKeys.add(key);
+    const a = roadNodeCoords(u);
+    const b = roadNodeCoords(v);
+    if (a && b) estMin += (straightKm(a, b) / EST_SPEED_KMH[edgeClassOf(u, v)]) * 60;
   }
+  // 端点外接段（输入点到最近干线节点）按连接线速度补上
+  const a0 = roadNodeCoords(path[0]!);
+  const bN = roadNodeCoords(path[path.length - 1]!);
+  if (a0) estMin += (straightKm(from, a0) / EST_SPEED_KMH.connector) * 60;
+  if (bN) estMin += (straightKm(bN, to) / EST_SPEED_KMH.connector) * 60;
 
   const coords: [number, number][] = [[from.lng, from.lat]];
   for (const idx of path) {
@@ -170,7 +210,47 @@ function localDriveRoute(from: Pt, to: Pt, preferKeys: string[]):
     if (p) coords.push([p.lng, p.lat]);
   }
   coords.push([to.lng, to.lat]);
-  return { coords, roadKeys: [...roadKeys], spliced };
+  return { coords, roadKeys: [...roadKeys], spliced, estMin: Math.round(estMin) };
+}
+
+/**
+ * OD 折线的地名锚点（供章节起名）。
+ *
+ * 几何自带的 nodes 只有「整条公路」入口才有（C2），点对点规划出来的折线没有，
+ * 于是 buildChapters 只能退回 120km 数字窗口，章节名全是「第 7 段 · 720—840 km」——
+ * 用户看不出自己会经过哪。现在按里程每 OD_CHAPTER_KM 取一个点，用行政区划库
+ * 反查最近地名补上，段名变成「上海 — 湖州」。
+ *
+ * 首尾直接用用户输入的起终点名（source 'place'，比反查更可信）。
+ */
+const OD_CHAPTER_KM = 120;
+
+function odPlaceAnchors(
+  coords: [number, number][],
+  cum: number[],
+  fromLabel: string,
+  toLabel: string,
+): RoadGeometryNode[] {
+  const total = cum[cum.length - 1] ?? 0;
+  if (!(total > 0) || cum.length !== coords.length) return [];
+  const nodes: RoadGeometryNode[] = [
+    { name: fromLabel, atKm: 0, type: 'endpoint', source: 'place' },
+  ];
+  let cursor = 0;
+  for (let target = OD_CHAPTER_KM; target < total - OD_CHAPTER_KM / 2; target += OD_CHAPTER_KM) {
+    // cum 单调递增，游标只前进
+    while (cursor + 1 < cum.length && cum[cursor + 1]! < target) cursor += 1;
+    const p = coords[cursor];
+    if (!p) continue;
+    const hit = nearestPlaceName(p[0], p[1]);
+    if (!hit) continue;
+    const atKm = Math.round(cum[cursor]! * 10) / 10;
+    const last = nodes[nodes.length - 1]!;
+    if (last.name === hit.name) continue; // 相邻段落在同一个城市里，不重复起名
+    nodes.push({ name: hit.name, atKm, type: 'settlement', source: 'place' });
+  }
+  nodes.push({ name: toLabel, atKm: Math.round(total * 10) / 10, type: 'endpoint', source: 'place' });
+  return nodes;
 }
 
 // ── 主入口 ───────────────────────────────────────────────────────────────────
@@ -188,20 +268,41 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
   let durationMin: number | undefined;
   let roadKeys: string[] = [];
 
-  if (input.engine !== 'local') {
+  // 本地优先（见 PlanRouteInput.engine 注释）；engine='amap' 时跳过本地。
+  // 有途经点时先按 from→via…→to 逐段 A* 再首尾相接（旧实现对本地引擎直接无视 via，
+  // 换成本地优先后会变成「静默少走途经点」，比报错更糟）。
+  if (input.engine !== 'amap') {
+    const pts = [from.pt, ...viaPts, to.pt];
+    const legs: [number, number][][] = [];
+    const keys = new Set<string>();
+    let estMin = 0;
+    let spliced = false;
+    let legOk = true;
+    for (let i = 1; i < pts.length; i += 1) {
+      const leg = localDriveRoute(pts[i - 1]!, pts[i]!, preferKeys);
+      if (!leg) {
+        legOk = false;
+        break;
+      }
+      // 第 2 段起去掉与上一段重复的接驳点
+      legs.push(i === 1 ? leg.coords : leg.coords.slice(1));
+      for (const k of leg.roadKeys) keys.add(k);
+      spliced = spliced || leg.spliced;
+      estMin += leg.estMin;
+    }
+    if (legOk && legs.length) {
+      engine = spliced ? 'local-spliced' : 'local';
+      coords = legs.flat();
+      roadKeys = [...keys];
+      durationMin = estMin > 0 ? estMin : undefined;
+    }
+  }
+  if (!coords.length && input.engine !== 'local') {
     const amap = await amapDriveRoute(from.pt, to.pt, viaPts);
     if (amap) {
       engine = 'amap';
       coords = amap.coords;
       if (amap.durationSec > 0) durationMin = Math.round(amap.durationSec / 60);
-    }
-  }
-  if (!coords.length) {
-    const local = localDriveRoute(from.pt, to.pt, preferKeys);
-    if (local) {
-      engine = local.spliced ? 'local-spliced' : 'local';
-      coords = local.coords;
-      roadKeys = local.roadKeys;
     }
   }
   if (!coords.length) {
@@ -225,7 +326,11 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
     lengthKm,
     durationMin,
     coords,
-    chapters: buildChapters(coords, lengthKm),
+    // v0.6.5 P0-1 同款：必须在**抽稀之前**按全分辨率链算好随坐标下发。
+    // OD 折线动辄 6000+ 节点（上海→拉萨 6636），抽稀到 600 后前端若自己重算
+    // haversine，里程会大幅缩水，章节区间落不到折线上 → 分段无高亮。
+    cumKm: cum,
+    chapters: buildChapters(coords, lengthKm, odPlaceAnchors(coords, cum, from.label, to.label)),
     engine,
     engineNote: routeEngineNote(engine),
   };
@@ -281,10 +386,12 @@ export function planRoadRoute(key: string): (RoadRoute & {
 /** 供 /along 响应标注引擎信息 */
 export function routeEngineNote(engine: string): string {
   if (engine === 'amap') return '高德驾车规划（GCJ-02 已转 WGS-84）';
-  if (engine === 'local') return '本地干线拓扑 A*';
-  if (engine === 'local-spliced') return '本地干线 A*（端点外接段拼接）';
-  // A3 实测：本地路网连通分量 1237 个、主分量 bbox 仅 lng[84.8,109.1]/lat[25.3,40.3]（青藏东部），
-  // 华东/华南/华北均不在主分量内，跨省 OD 无法规划。这里如实说明覆盖边界，
+  // 2026-10-11：国道/省道几何补全后本地网已是全国网（主分量覆盖 98.2% 节点）。
+  // 里程是路网实算，时长是按等级限速折的估算——两件事必须分开说，不能让用户
+  // 把「约 N 小时」当成导航 ETA。
+  if (engine === 'local') return '本地公路网 A*（里程路网实算 · 时长按等级限速估算）';
+  if (engine === 'local-spliced') return '本地公路网 A*（端点附近无干线节点，首尾为外接段 · 时长估算）';
+  // 走到这里说明两端都没 snap 上（端点落在海面/境外/无路区）。如实说明，
   // 避免用户把两点直线误认为真实路线规划结果。
-  return '两点直连示意：本地路网仅覆盖青藏部分干线，跨省规划暂不可用（不代表真实路线）';
+  return '两点直连示意：起终点附近没有可吸附的公路网节点，未做寻路（不代表真实路线）';
 }

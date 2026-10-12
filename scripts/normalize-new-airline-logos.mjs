@@ -18,13 +18,20 @@ const SRC = 'tmp-logos';
 const OUT = 'apps/web/src/assets/ticket';
 const SIDE_MAX = 480;
 
-// code -> 源文件名
+// code -> 源文件名（可用命令行覆盖：`node scripts/normalize-new-airline-logos.mjs 9c=tmp/x.png hu=tmp/y.png`）
 const SRC_MAP = {
   eu: 'eu.png', gs: 'gs.png', kn: 'kn.png', fu: 'fu.png', uq: 'uq.png', gj: 'gj.png',
   jd: 'jd.png', ns: 'ns.png', aq: 'aq.png', g5: 'g5.png', wz: 'wz.png', a6: 'a6.png',
   qw: 'qw2.png', ry: 'ry2.jpg', gx: 'gx3.png', gt: 'gt.png',
 };
-const NO_CROP = new Set(['gt']);
+for (const arg of process.argv.slice(2)) {
+  const m = /^([a-z0-9]{2})=(.+)$/.exec(arg);
+  if (m) SRC_MAP[m[1]] = m[2];
+}
+// 整块色底 app 图标（官方方块底为品牌识别一部分）：不裁内容，整幅缩方
+const NO_CROP = new Set(['gt', '9c', 'hu']);
+// 透明圆角占比小（<5%）会被误判为不透明、圆角被铺成 cornerColor 黑底：强制按透明处理
+const FORCE_TRANSPARENT = new Set(['9c']);
 
 function decode(buf) {
   const isPng = buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
@@ -103,11 +110,15 @@ function blit(src, dst, dx, dy) {
       const si = (y * src.width + x) * 4;
       const di = ((y + dy) * dst.width + (x + dx)) * 4;
       const sa = src.data[si + 3] / 255;
-      // 源不透明则覆盖；半透明按 alpha 混合到画布底色
-      dst.data[di] = src.data[si] * sa + dst.data[di] * (1 - sa);
-      dst.data[di + 1] = src.data[si + 1] * sa + dst.data[di + 1] * (1 - sa);
-      dst.data[di + 2] = src.data[si + 2] * sa + dst.data[di + 2] * (1 - sa);
-      dst.data[di + 3] = Math.max(dst.data[di + 3], src.data[si + 3]);
+      const da = dst.data[di + 3] / 255;
+      // 标准 source-over（直通 alpha）：不透明画布上退化为原覆盖式混合
+      const oa = sa + da * (1 - sa);
+      if (oa > 0) {
+        for (let c = 0; c < 3; c++) {
+          dst.data[di + c] = (src.data[si + c] * sa + dst.data[di + c] * da * (1 - sa)) / oa;
+        }
+      }
+      dst.data[di + 3] = Math.round(oa * 255);
     }
   }
 }
@@ -115,11 +126,14 @@ function blit(src, dst, dx, dy) {
 fs.mkdirSync(OUT, { recursive: true });
 
 for (const [code, file] of Object.entries(SRC_MAP)) {
-  const fp = path.join(SRC, file);
+  // CLI 传入的是相对/绝对路径，内置表是 tmp-logos/ 下的裸文件名
+  const fp = path.isAbsolute(file) || fs.existsSync(file) ? file : path.join(SRC, file);
   if (!fs.existsSync(fp)) { console.log(`[${code}] MISSING ${file}`); continue; }
   const img = decode(fs.readFileSync(fp));
   const { minA, transRatio } = alphaStats(img);
-  const transparent = img.hasAlpha && minA === 0 && transRatio > 0.05;
+  const transparent = FORCE_TRANSPARENT.has(code)
+    ? img.hasAlpha && minA === 0
+    : img.hasAlpha && minA === 0 && transRatio > 0.05;
   const bg = transparent ? null : cornerColor(img);
 
   let content = img;

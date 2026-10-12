@@ -1,0 +1,27 @@
+{
+ "generatedAt": "2026-10-11 17:15",
+ "total": 36893,
+ "bySource": {
+  "roadbook": 1037,
+  "hand-curated": 64,
+  "migrated": 561,
+  "amap-poi": 35033,
+  "osm_only": 198
+ },
+ "byTier": {
+  "A": 4053,
+  "C": 6857,
+  "B": 25983
+ },
+ "byDetourClass": {
+  "pass": 15626,
+  "detour": 20738,
+  "spur": 529
+ },
+ "dropped": {
+  "dup": 810,
+  "noise": 132,
+  "nameDup": 398
+ },
+ "legacyBackup": ".tmp-diag/roadside-spots.legacy-20261012.json（未跟踪；git 历史里也有）"
+}

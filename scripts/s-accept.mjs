@@ -30,6 +30,9 @@ console.log(`现状: overLong ${now.overLong} · tooShort ${now.tooShort} · fra
 const provBase = baseline.filter((r) => r.cls === 'provincial');
 const provStill = stillBad.filter((r) => (baseMap.get(r.f) || {}).cls === 'provincial');
 console.log(`省级: 基线问题 ${provBase.length} · 仍问题 ${provStill.length}`);
+const cntBase = baseline.filter((r) => r.cls === 'county');
+const cntStill = stillBad.filter((r) => (baseMap.get(r.f) || {}).cls === 'county');
+console.log(`县级: 基线问题 ${cntBase.length} · 仍问题 ${cntStill.length}`);
 const reuseSplit = files.filter((f) => {
   try { return JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')).reuseSplit === true; } catch { return false; }
 });

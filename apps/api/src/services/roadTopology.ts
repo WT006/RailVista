@@ -395,6 +395,21 @@ export function roadKeyOfLine(lineId: number): string | undefined {
   return state?.roadKeys[lineId];
 }
 
+/**
+ * 相邻两节点间边的等级标记（edgeFlag：bit0 高速 / bit1 国道 / bit2 省道；0 = 跨线边）。
+ * 供路由器按等级折算估算时长；找不到返回 -1（调用方按最慢的连接线处理）。
+ */
+export function edgeClassBetween(u: number, v: number): number {
+  const s = state;
+  if (!s?.loaded) return -1;
+  const start = s.edgeOffset[u]!;
+  const end = s.edgeOffset[u + 1]!;
+  for (let p = start; p < end; p += 1) {
+    if (s.edgeTo[p] === v) return s.edgeFlag[p]!;
+  }
+  return -1;
+}
+
 export function roadTopologyInfo(): { loaded: boolean; nodeCount: number; edgeCount: number; roadKeyCount: number } {
   return {
     loaded: !!state?.loaded,

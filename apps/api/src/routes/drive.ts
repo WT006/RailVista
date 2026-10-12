@@ -52,10 +52,11 @@ driveRoute.get('/suggest', async (c) => {
   const q = c.req.query('q') ?? '';
   const kindRaw = c.req.query('kind');
   const limit = Math.min(80, Math.max(1, Number(c.req.query('limit')) || 20));
+  const province = c.req.query('province') || undefined;
   const kind = ['place', 'road', 'spot', 'facility'].includes(kindRaw ?? '')
     ? (kindRaw as PlaceKind)
     : undefined;
-  let hits = suggestPlaces(q, kind, limit);
+  let hits = suggestPlaces(q, kind, limit, province);
   // 降级链：本地未命中 → 高德 → Nominatim（PRD §4.3；place 语义才兜底）
   if (!hits.length && q.trim().length >= 2 && (!kind || kind === 'place')) {
     const remote = await geocodeFallback(q.trim());
@@ -133,7 +134,10 @@ driveRoute.get('/route', async (c) => {
   const from = c.req.query('from');
   const to = c.req.query('to');
   const via = (c.req.query('via') ?? '').split(';').map((s) => s.trim()).filter(Boolean);
-  const engine = c.req.query('engine') === 'local' ? 'local' : 'auto';
+  // auto（默认，本地网优先）/ local（只用本地拓扑）/ amap（只用高德驾车规划）
+  const engineQuery = c.req.query('engine');
+  const engine: 'auto' | 'local' | 'amap' =
+    engineQuery === 'local' ? 'local' : engineQuery === 'amap' ? 'amap' : 'auto';
   if (!from || !to) return badRequest(c, '缺少 from / to 参数');
   try {
     const route = await planDriveRoute({ from, to, via, engine });
@@ -202,7 +206,13 @@ driveRoute.get('/along', async (c) => {
   } else if (from && to) {
     // C1 点对点
     try {
-      route = await planDriveRoute({ from, to, engine: c.req.query('engine') === 'local' ? 'local' : 'auto' });
+      // 与 /route 同口径：engine=local|amap 显式指定，缺省 auto
+      const eq = c.req.query('engine');
+      route = await planDriveRoute({
+        from,
+        to,
+        engine: eq === 'local' ? 'local' : eq === 'amap' ? 'amap' : 'auto',
+      });
     } catch (e) {
       if (e instanceof PlaceNotFoundError) {
         return c.json({ ok: false, error: { code: e.code, message: e.message, field: e.field } }, 404);
@@ -227,11 +237,15 @@ driveRoute.get('/along', async (c) => {
   const matchCumKm = route.cumKm
     ? decimated.indices.map((i) => route.cumKm![i]!)
     : undefined;
+  // spur=0 可以关掉「专程绕行」景点（纯自驾沿程视角，只要路过就能看的）。
+  // 默认带上 —— 需求要求「值得专程绕行的景点单独标注理由」，关掉就看不见了。
+  const spurRaw = c.req.query('spur');
   const alongOpts = {
     categories: cat.length ? cat : undefined,
     minScore: Number.isFinite(min) ? min : undefined,
     maxCount: Number.isFinite(max) && max > 0 ? Math.min(max, 500) : 200,
     bufferKm: Number.isFinite(buffer) && buffer > 0 ? buffer : undefined,
+    includeSpur: spurRaw === undefined ? true : spurRaw !== '0' && spurRaw !== 'false',
   };
 
   // 主链景点 vs 未贯通段景点分离（禁止 orphan 里程偏移叠进主链 progressKm）。

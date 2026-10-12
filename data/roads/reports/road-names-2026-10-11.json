@@ -1,0 +1,43 @@
+{
+ "generatedAt": "2026-10-11T13:43:22.958Z",
+ "date": "2026-10-11",
+ "total": 14803,
+ "okNamed": 8248,
+ "counts": {
+  "C1_garbage": 0,
+  "C2_synonym": 0,
+  "C3_multilang": 1,
+  "C4_hwyname": 1084,
+  "C6_noName": 5470
+ },
+ "samples": {
+  "C1_garbage": [],
+  "C2_synonym": [],
+  "C3_multilang": [
+   {
+    "key": "新疆:S21",
+    "name": "阿乌高速 - ئالتاي - ئۈرۈمچى يۇقىرى سۈرئەتلىك يولى（新疆）"
+   }
+  ],
+  "C4_hwyname": [
+   {
+    "key": "北京:X12",
+    "name": "顺密支线（北京）"
+   },
+   {
+    "key": "福建:X985",
+    "name": "机场支线（福建）"
+   },
+   {
+    "key": "广西:X54",
+    "name": "新江支线公路（广西）"
+   }
+  ],
+  "C5_bareRef": [],
+  "C6_noName": [
+   "安徽:X101",
+   "安徽:X102",
+   "安徽:X110"
+  ]
+ }
+}

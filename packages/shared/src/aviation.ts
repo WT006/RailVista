@@ -378,8 +378,8 @@ export interface FlightEndpointInfo {
 }
 
 export interface FlightLookup {
-  /** 数据来源：airlabs=在线实时/历史；local=本地（仅航司/机场等确定信息） */
-  source: 'airlabs' | 'local';
+  /** 数据来源：fr24=FlightRadar24在线动态；airlabs=AirLabs在线实时/历史；local=本地（仅航司/机场等确定信息） */
+  source: 'fr24' | 'airlabs' | 'local';
   flightNumber: string;
   airlineIata?: string;
   date: string;
@@ -391,4 +391,25 @@ export interface FlightLookup {
   status?: string;
   /** 给用户的说明（尤其本地模式为何缺时刻） */
   note?: string;
+}
+/** 航线搜索结果（按出发地+目的地+日期搜索航班） */
+export interface FlightSearchResult {
+  flightNumber: string;
+  airlineName?: string;
+  airlineIata?: string;
+  depIata: string;
+  arrIata: string;
+  depCity?: string;
+  arrCity?: string;
+  /** 计划起飞 HH:MM */
+  scheduledDeparture?: string;
+  /** 计划到达 HH:MM */
+  scheduledArrival?: string;
+  durationMin?: number;
+  price?: number;
+  currency?: string;
+  stops?: number;
+  cabinClass?: string;
+  /** 数据来源（flyclaw/fliggy等） */
+  source: string;
 }

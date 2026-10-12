@@ -24,12 +24,15 @@ import {
 } from '@railvista/shared';
 import { api } from '../api/client';
 import DriveSubNav from '../components/DriveSubNav.vue';
+import RoadSideBadge from '../components/drive/RoadSideBadge.vue';
+import RoadSpotCard from '../components/drive/RoadSpotCard.vue';
 import { useGeolocation } from '../composables/useGeolocation';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
 import { useRoadDraw } from '../composables/useRoadDraw';
 import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
 import { driveTierColor } from '../data/roadColors';
+import { spotCategoryLabel } from '../data/roadSpotLabels';
 import { loadAmap } from '../map/amap';
 
 usePointerSpotlight();
@@ -61,7 +64,20 @@ const spots = ref<AlongSpot[]>([]);
 const orphanSpots = ref<AlongSpot[]>([]);
 const spotStats = ref<{ main: number; orphan: number } | null>(null);
 const chapters = ref<RoadChapter[]>([]);
-const spotLibrary = ref<{ count: number; updated: string; note?: string } | null>(null);
+const spotLibrary = ref<{
+  count: number;
+  updated: string;
+  note?: string;
+  version?: number;
+  stats?: {
+    bySource?: Record<string, number>;
+    byDetourClass?: Record<string, number>;
+    withRating?: number;
+    withVisitHours?: number;
+    withIntro?: number;
+    withPhoto?: number;
+  };
+} | null>(null);
 const progress = ref(0);
 
 const entryMode = computed<'od' | 'road' | 'route'>(() => {
@@ -215,8 +231,18 @@ const CATEGORY_FILTERS = [
   { key: 'experience', label: '体验' },
   { key: 'service', label: '服务' },
 ];
+/**
+ * 「可达性」筛选替代原来的「只看值得绕行」开关。
+ * 自驾最关心的不是距离数字，而是**能不能顺路到** —— 按 detourClass 三档给，
+ * 用户一眼就能把「路过就能看」和「值得专程跑一趟」分开。
+ */
+const REACH_FILTERS = [
+  { key: 'pass', label: '顺路即停', hint: '路线经过或就在路边（≤1 km）' },
+  { key: 'detour', label: '短绕可达', hint: '绕几公里，20 分钟内能打个来回（≤12 km）' },
+  { key: 'spur', label: '专程绕行', hint: '超出常规沿程范围，需单独安排时间' },
+];
 const activeCategories = ref<string[]>([]);
-const onlyDetour = ref(false);
+const activeReach = ref<string[]>([]);
 const filterPulse = ref(false);
 
 const filteredSpots = computed(() => {
@@ -224,11 +250,21 @@ const filteredSpots = computed(() => {
   if (activeCategories.value.length) {
     list = list.filter((s) => activeCategories.value.some((c) => s.category.startsWith(c)));
   }
-  if (onlyDetour.value) {
-    list = list.filter((s) => s.visibility !== 'distant' && s.detourKm > 0);
+  if (activeReach.value.length) {
+    // 缺省（无 detourClass）按距离兜底分档，与数据层 alongClassOf 同口径
+    list = list.filter((s) =>
+      activeReach.value.includes(s.detourClass ?? (s.distKm <= 1 ? 'pass' : s.distKm <= 12 ? 'detour' : 'spur')),
+    );
   }
   return list;
 });
+
+function toggleReach(key: string) {
+  const i = activeReach.value.indexOf(key);
+  if (i >= 0) activeReach.value.splice(i, 1);
+  else activeReach.value.push(key);
+  pulseFilterList();
+}
 
 function pulseFilterList() {
   filterPulse.value = false;
@@ -244,20 +280,8 @@ function toggleCategory(key: string) {
   pulseFilterList();
 }
 
-function toggleOnlyDetour() {
-  onlyDetour.value = !onlyDetour.value;
-  pulseFilterList();
-}
-
 // ── 展示辅助 ─────────────────────────────────────────────────────────────────
 const TIER_LABEL: Record<string, string> = { A: '讲解级', B: '沿途可看', C: '小确幸' };
-const SIDE_LABEL: Record<string, string> = { left: '左侧', right: '右侧', unknown: '侧向待定' };
-const VIS_LABEL: Record<string, string> = {
-  roadside: '就在路边',
-  detour5: '5 分钟能绕到',
-  detour20: '20 分钟能绕到',
-  distant: '远景可见',
-};
 
 function tierColor(tier: string): string {
   return driveTierColor(tier);
@@ -275,12 +299,7 @@ function kmText(km: number): string {
 }
 
 function categoryLabel(cat: string): string {
-  const [dim, sub] = cat.split('.');
-  const dimLabel: Record<string, string> = {
-    nature: '自然', culture: '人文', engineering: '工程',
-    viewpoint: '观景', experience: '体验', service: '服务',
-  };
-  return `${dimLabel[dim] ?? dim}${sub ? ' · ' + sub : ''}`;
+  return spotCategoryLabel(cat);
 }
 
 // ── 沿程进度跨度 ─────────────────────────────────────────────────────────────
@@ -608,6 +627,14 @@ watch(gps, (sample) => {
                       <span class="drive-upcoming__meta">
                         {{ kmText(s.progressKm) }} · {{ categoryLabel(s.category) }} · {{ detourText(s) }}
                       </span>
+                      <!-- 自驾要提前知道往哪边拐，所以这里必须带方位 -->
+                      <RoadSideBadge
+                        class="drive-upcoming__side"
+                        :side="s.side"
+                        :dist-km="s.distKm"
+                        :low="s.sideConfidence === 'low'"
+                        compact
+                      />
                     </span>
                     <span class="drive-spot__tier" :class="'is-' + s.tier">{{ TIER_LABEL[s.tier] ?? s.tier }}</span>
                   </button>
@@ -699,12 +726,15 @@ watch(gps, (sample) => {
                   {{ f.label }}
                 </button>
                 <button
+                  v-for="r in REACH_FILTERS"
+                  :key="r.key"
                   type="button"
-                  class="road-kbd__chip"
-                  :class="{ 'is-on': onlyDetour }"
-                  @click="toggleOnlyDetour"
+                  class="road-kbd__chip is-reach"
+                  :class="{ 'is-on': activeReach.includes(r.key) }"
+                  :title="r.hint"
+                  @click="toggleReach(r.key)"
                 >
-                  只看值得绕行
+                  {{ r.label }}
                 </button>
               </div>
             </div>
@@ -714,45 +744,24 @@ watch(gps, (sample) => {
               :class="{ 'is-filter-pulse': filterPulse }"
               @animationend="filterPulse = false"
             >
-              <article
+              <RoadSpotCard
                 v-for="s in filteredSpots"
                 :key="s.id"
-                class="drive-spot"
-                :class="{ 'is-expanded': expandedSpotId === s.id }"
-                :style="{ '--spot-color': tierColor(s.tier) }"
-                @click="toggleSpot(s)"
-              >
-                <div class="drive-spot__head">
-                  <span class="drive-spot__km">{{ kmText(s.progressKm) }}</span>
-                  <span class="drive-spot__name">{{ s.name }}</span>
-                  <span class="drive-spot__tier" :class="'is-' + s.tier">{{ TIER_LABEL[s.tier] ?? s.tier }}</span>
-                </div>
-                <div class="drive-spot__meta">
-                  <span>{{ categoryLabel(s.category) }}</span>
-                  <span>{{ SIDE_LABEL[s.side] ?? s.side }}</span>
-                  <span>距路线 {{ s.distKm }} km</span>
-                  <span v-if="s.honors?.length" class="drive-spot__honor">{{ s.honors.slice(0, 2).join(' · ') }}</span>
-                </div>
-                <div class="drive-spot__detour" :class="{ 'is-distant': s.visibility === 'distant' }">
-                  {{ detourText(s) }}
-                  <template v-if="s.stayMin"> · 建议停留 {{ s.stayMin }} 分钟</template>
-                </div>
-                <Transition name="drive-spot-expand">
-                  <div v-if="expandedSpotId === s.id" class="drive-spot__expand">
-                    <div class="drive-spot__expand-inner">
-                      <p v-if="s.intro" class="drive-spot__intro">{{ s.intro }}</p>
-                      <p class="drive-spot__vis">{{ VIS_LABEL[s.visibility ?? 'detour20'] }} · {{ VIS_LABEL[s.visibility ?? 'detour20'] === '就在路边' ? '可即停即看' : '缓冲 ' + (s.visibility === 'distant' ? '35' : s.visibility === 'detour20' ? '12' : '3') + ' km' }}</p>
-                    </div>
-                  </div>
-                </Transition>
-              </article>
+                :spot="s"
+                :expanded="expandedSpotId === s.id"
+                compact-distance
+                @toggle="toggleSpot"
+              />
             </div>
             <p v-if="!filteredSpots.length" class="drive-empty">
               该路段暂无匹配景点（试试放开筛选，或降低 minScore）
             </p>
 
-            <p v-if="spotLibrary" class="drive-footnote">
-              景点库 {{ spotLibrary.count }} 条 · {{ spotLibrary.note ?? '持续扩充中' }} ·
+            <p v-if="spotLibrary" class="drive-footnote" :title="spotLibrary.note">
+              景点库 {{ spotLibrary.count }} 条<template v-if="spotLibrary.stats?.withRating"> ·
+                {{ spotLibrary.stats.withRating }} 条带平台评分</template><template v-if="spotLibrary.stats?.withVisitHours"> ·
+                {{ spotLibrary.stats.withVisitHours }} 条有开放时间</template><template v-if="spotLibrary.stats?.withPhoto"> ·
+                {{ spotLibrary.stats.withPhoto }} 条有实拍图</template><br />
               路网数据来自 OpenStreetMap 众包，里程与走向为估算，不作为导航依据
             </p>
           </section>

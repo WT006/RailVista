@@ -2,6 +2,7 @@ export * from './geo.js';
 export * from './radar.js';
 export * from './trackSampler.js';
 export * from './alongRoute.js';
+export * from './spotSide.js';
 export * from './spotGrid.js';
 export * from './spotQuality.js';
 export * from './chapterVisualScale.js';

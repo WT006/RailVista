@@ -3,9 +3,10 @@
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
+const CLS = process.env.REBUILD_CLS || 'provincial';
 const issues = JSON.parse(fs.readFileSync('scripts/provincial-issues.json', 'utf8'));
 const targets = issues.filter((r) => {
-  if (r.cls !== 'provincial') return false;
+  if (r.cls !== (process.env.REBUILD_CLS || 'provincial')) return false;
   if (r.kind === 'fragmented' || r.kind === 'overLong' || r.kind === 'tooShort') return true;
   return false;
 });
@@ -33,7 +34,7 @@ for (const t of targets) {
     results.push({ f: t.f, error: String(e.message).slice(0, 80) });
   }
 }
-fs.writeFileSync('scripts/rebuild-fragmented-result.json', JSON.stringify(results, null, 1));
+fs.writeFileSync(`scripts/rebuild-${CLS}-result.json`, JSON.stringify(results, null, 1));
 const ok = results.filter((r) => !r.error);
 const improved = ok.filter((r) => r.after.comps < r.before.comps);
 console.log(`完成 ${ok.length}/${targets.length}（跳过已重写 ${skipped}），组件减少 ${improved.length} 条`);

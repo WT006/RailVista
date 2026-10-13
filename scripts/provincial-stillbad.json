@@ -585,19 +585,12 @@
   "kind": "fragmented",
   "total": 136,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "四川_Y11.json",
   "kind": "fragmented",
   "total": 62,
-  "official": 0,
-  "comps": 7
- },
- {
-  "f": "四川_Y12.json",
-  "kind": "fragmented",
-  "total": 27,
   "official": 0,
   "comps": 6
  },
@@ -605,13 +598,6 @@
   "f": "四川_Y5.json",
   "kind": "fragmented",
   "total": 61,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "四川_Y9.json",
-  "kind": "fragmented",
-  "total": 37,
   "official": 0,
   "comps": 6
  },
@@ -1047,49 +1033,21 @@
   "kind": "fragmented",
   "total": 65,
   "official": 0,
-  "comps": 9
- },
- {
-  "f": "安徽_Y11.json",
-  "kind": "fragmented",
-  "total": 33,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "安徽_Y12.json",
-  "kind": "fragmented",
-  "total": 31,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "安徽_Y13.json",
-  "kind": "fragmented",
-  "total": 18,
-  "official": 0,
-  "comps": 7
+  "comps": 8
  },
  {
   "f": "安徽_Y15.json",
   "kind": "fragmented",
   "total": 35,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "安徽_Y2.json",
   "kind": "fragmented",
   "total": 53,
   "official": 0,
-  "comps": 11
- },
- {
-  "f": "安徽_Y21.json",
-  "kind": "fragmented",
-  "total": 22,
-  "official": 0,
-  "comps": 6
+  "comps": 9
  },
  {
   "f": "安徽_Y6.json",
@@ -1334,21 +1292,21 @@
   "kind": "fragmented",
   "total": 131,
   "official": 0,
-  "comps": 14
+  "comps": 10
  },
  {
   "f": "山西_Y10.json",
   "kind": "fragmented",
   "total": 84,
   "official": 0,
-  "comps": 14
+  "comps": 8
  },
  {
   "f": "山西_Y11.json",
   "kind": "fragmented",
   "total": 68,
   "official": 0,
-  "comps": 10
+  "comps": 8
  },
  {
   "f": "山西_Y12.json",
@@ -1362,28 +1320,28 @@
   "kind": "fragmented",
   "total": 55,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "山西_Y14.json",
   "kind": "fragmented",
   "total": 48,
   "official": 0,
-  "comps": 12
+  "comps": 7
  },
  {
   "f": "山西_Y15.json",
   "kind": "fragmented",
   "total": 36,
   "official": 0,
-  "comps": 9
+  "comps": 6
  },
  {
   "f": "山西_Y16.json",
   "kind": "fragmented",
   "total": 62,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "山西_Y17.json",
@@ -1393,18 +1351,11 @@
   "comps": 7
  },
  {
-  "f": "山西_Y19.json",
-  "kind": "fragmented",
-  "total": 28,
-  "official": 0,
-  "comps": 6
- },
- {
   "f": "山西_Y2.json",
   "kind": "fragmented",
   "total": 170,
   "official": 0,
-  "comps": 24
+  "comps": 15
  },
  {
   "f": "山西_Y20.json",
@@ -1414,60 +1365,53 @@
   "comps": 6
  },
  {
-  "f": "山西_Y22.json",
-  "kind": "fragmented",
-  "total": 27,
-  "official": 0,
-  "comps": 6
- },
- {
   "f": "山西_Y3.json",
   "kind": "fragmented",
   "total": 136,
   "official": 0,
-  "comps": 15
+  "comps": 11
  },
  {
   "f": "山西_Y4.json",
   "kind": "fragmented",
   "total": 76,
   "official": 0,
-  "comps": 11
+  "comps": 9
  },
  {
   "f": "山西_Y5.json",
   "kind": "fragmented",
   "total": 102,
   "official": 0,
-  "comps": 16
+  "comps": 10
  },
  {
   "f": "山西_Y6.json",
   "kind": "fragmented",
   "total": 127,
   "official": 0,
-  "comps": 15
+  "comps": 12
  },
  {
   "f": "山西_Y7.json",
   "kind": "fragmented",
   "total": 112,
   "official": 0,
-  "comps": 15
+  "comps": 10
  },
  {
   "f": "山西_Y8.json",
   "kind": "fragmented",
   "total": 90,
   "official": 0,
-  "comps": 10
+  "comps": 6
  },
  {
   "f": "山西_Y9.json",
   "kind": "fragmented",
   "total": 107,
   "official": 0,
-  "comps": 14
+  "comps": 10
  },
  {
   "f": "广东_S113.json",
@@ -1640,23 +1584,23 @@
  {
   "f": "广东_Y101.json",
   "kind": "fragmented",
-  "total": 52,
+  "total": 56,
   "official": 0,
-  "comps": 11
+  "comps": 9
  },
  {
   "f": "广东_Y102.json",
   "kind": "fragmented",
   "total": 63,
   "official": 0,
-  "comps": 11
+  "comps": 9
  },
  {
   "f": "广东_Y103.json",
   "kind": "fragmented",
   "total": 24,
   "official": 0,
-  "comps": 13
+  "comps": 8
  },
  {
   "f": "广东_Y104.json",
@@ -1670,56 +1614,49 @@
   "kind": "fragmented",
   "total": 59,
   "official": 0,
-  "comps": 15
+  "comps": 13
  },
  {
   "f": "广东_Y106.json",
   "kind": "fragmented",
-  "total": 20,
+  "total": 86,
   "official": 0,
-  "comps": 15
+  "comps": 12
  },
  {
   "f": "广东_Y107.json",
   "kind": "fragmented",
   "total": 41,
   "official": 0,
-  "comps": 11
+  "comps": 10
  },
  {
   "f": "广东_Y108.json",
   "kind": "fragmented",
-  "total": 49,
+  "total": 50,
   "official": 0,
-  "comps": 14
+  "comps": 12
  },
  {
   "f": "广东_Y109.json",
   "kind": "fragmented",
   "total": 57,
   "official": 0,
-  "comps": 14
- },
- {
-  "f": "广东_Y11.json",
-  "kind": "fragmented",
-  "total": 15,
-  "official": 0,
-  "comps": 6
+  "comps": 12
  },
  {
   "f": "广东_Y110.json",
   "kind": "fragmented",
   "total": 34,
   "official": 0,
-  "comps": 12
+  "comps": 11
  },
  {
   "f": "广东_Y111.json",
   "kind": "fragmented",
   "total": 31,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y112.json",
@@ -1733,21 +1670,21 @@
   "kind": "fragmented",
   "total": 42,
   "official": 0,
-  "comps": 11
+  "comps": 9
  },
  {
   "f": "广东_Y114.json",
   "kind": "fragmented",
   "total": 21,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y115.json",
   "kind": "fragmented",
-  "total": 52,
+  "total": 53,
   "official": 0,
-  "comps": 15
+  "comps": 14
  },
  {
   "f": "广东_Y116.json",
@@ -1761,98 +1698,98 @@
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 10
+  "comps": 7
  },
  {
   "f": "广东_Y118.json",
   "kind": "fragmented",
   "total": 31,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y119.json",
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y12.json",
   "kind": "fragmented",
   "total": 13,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y120.json",
   "kind": "fragmented",
   "total": 42,
   "official": 0,
-  "comps": 12
+  "comps": 11
  },
  {
   "f": "广东_Y121.json",
   "kind": "fragmented",
   "total": 57,
   "official": 0,
-  "comps": 11
+  "comps": 10
  },
  {
   "f": "广东_Y122.json",
   "kind": "fragmented",
   "total": 43,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y123.json",
   "kind": "fragmented",
-  "total": 42,
+  "total": 41,
   "official": 0,
-  "comps": 13
+  "comps": 11
  },
  {
   "f": "广东_Y124.json",
   "kind": "fragmented",
   "total": 21,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y125.json",
   "kind": "fragmented",
   "total": 30,
   "official": 0,
-  "comps": 12
+  "comps": 10
  },
  {
   "f": "广东_Y126.json",
   "kind": "fragmented",
   "total": 46,
   "official": 0,
-  "comps": 13
+  "comps": 12
  },
  {
   "f": "广东_Y127.json",
   "kind": "fragmented",
   "total": 29,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y128.json",
   "kind": "fragmented",
   "total": 51,
   "official": 0,
-  "comps": 11
+  "comps": 9
  },
  {
   "f": "广东_Y129.json",
   "kind": "fragmented",
   "total": 37,
   "official": 0,
-  "comps": 11
+  "comps": 9
  },
  {
   "f": "广东_Y13.json",
@@ -1866,7 +1803,7 @@
   "kind": "fragmented",
   "total": 27,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y131.json",
@@ -1880,63 +1817,63 @@
   "kind": "fragmented",
   "total": 25,
   "official": 0,
-  "comps": 12
+  "comps": 11
  },
  {
   "f": "广东_Y133.json",
   "kind": "fragmented",
   "total": 30,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y134.json",
   "kind": "fragmented",
   "total": 57,
   "official": 0,
-  "comps": 15
+  "comps": 12
  },
  {
   "f": "广东_Y135.json",
   "kind": "fragmented",
   "total": 25,
   "official": 0,
-  "comps": 10
+  "comps": 8
  },
  {
   "f": "广东_Y136.json",
   "kind": "fragmented",
   "total": 45,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y137.json",
   "kind": "fragmented",
-  "total": 28,
+  "total": 40,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "广东_Y138.json",
   "kind": "fragmented",
   "total": 33,
   "official": 0,
-  "comps": 9
+  "comps": 6
  },
  {
   "f": "广东_Y139.json",
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y140.json",
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 13
+  "comps": 8
  },
  {
   "f": "广东_Y141.json",
@@ -1950,49 +1887,35 @@
   "kind": "fragmented",
   "total": 43,
   "official": 0,
-  "comps": 11
+  "comps": 10
  },
  {
   "f": "广东_Y143.json",
   "kind": "fragmented",
-  "total": 37,
+  "total": 38,
   "official": 0,
-  "comps": 15
- },
- {
-  "f": "广东_Y145.json",
-  "kind": "fragmented",
-  "total": 15,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y146.json",
-  "kind": "fragmented",
-  "total": 25,
-  "official": 0,
-  "comps": 6
+  "comps": 9
  },
  {
   "f": "广东_Y147.json",
   "kind": "fragmented",
   "total": 22,
   "official": 0,
-  "comps": 13
+  "comps": 9
  },
  {
   "f": "广东_Y148.json",
   "kind": "fragmented",
   "total": 32,
   "official": 0,
-  "comps": 10
+  "comps": 8
  },
  {
   "f": "广东_Y149.json",
   "kind": "fragmented",
   "total": 16,
   "official": 0,
-  "comps": 10
+  "comps": 8
  },
  {
   "f": "广东_Y15.json",
@@ -2004,16 +1927,16 @@
  {
   "f": "广东_Y151.json",
   "kind": "fragmented",
-  "total": 56,
+  "total": 57,
   "official": 0,
-  "comps": 15
+  "comps": 13
  },
  {
   "f": "广东_Y152.json",
   "kind": "fragmented",
   "total": 32,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y153.json",
@@ -2027,49 +1950,49 @@
   "kind": "fragmented",
   "total": 12,
   "official": 0,
-  "comps": 7
+  "comps": 8
  },
  {
   "f": "广东_Y155.json",
   "kind": "fragmented",
   "total": 29,
   "official": 0,
-  "comps": 8
+  "comps": 6
  },
  {
   "f": "广东_Y156.json",
   "kind": "fragmented",
   "total": 39,
   "official": 0,
-  "comps": 12
+  "comps": 11
  },
  {
   "f": "广东_Y157.json",
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y158.json",
   "kind": "fragmented",
   "total": 16,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y159.json",
   "kind": "fragmented",
   "total": 24,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y161.json",
   "kind": "fragmented",
   "total": 41,
   "official": 0,
-  "comps": 12
+  "comps": 11
  },
  {
   "f": "广东_Y162.json",
@@ -2083,126 +2006,119 @@
   "kind": "fragmented",
   "total": 24,
   "official": 0,
-  "comps": 10
- },
- {
-  "f": "广东_Y164.json",
-  "kind": "fragmented",
-  "total": 16,
-  "official": 0,
-  "comps": 6
+  "comps": 8
  },
  {
   "f": "广东_Y165.json",
   "kind": "fragmented",
   "total": 19,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "广东_Y166.json",
   "kind": "fragmented",
   "total": 30,
   "official": 0,
-  "comps": 12
+  "comps": 10
  },
  {
   "f": "广东_Y167.json",
   "kind": "fragmented",
   "total": 28,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y168.json",
   "kind": "fragmented",
   "total": 21,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y169.json",
   "kind": "fragmented",
   "total": 28,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y170.json",
   "kind": "fragmented",
   "total": 25,
   "official": 0,
-  "comps": 11
+  "comps": 10
  },
  {
   "f": "广东_Y171.json",
   "kind": "fragmented",
   "total": 41,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y172.json",
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y173.json",
   "kind": "fragmented",
   "total": 32,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y174.json",
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 8
+  "comps": 6
  },
  {
   "f": "广东_Y175.json",
   "kind": "fragmented",
   "total": 18,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y176.json",
   "kind": "fragmented",
   "total": 44,
   "official": 0,
-  "comps": 10
+  "comps": 8
  },
  {
   "f": "广东_Y177.json",
   "kind": "fragmented",
   "total": 30,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y178.json",
   "kind": "fragmented",
   "total": 25,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "广东_Y179.json",
   "kind": "fragmented",
   "total": 42,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y180.json",
   "kind": "fragmented",
   "total": 45,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "广东_Y181.json",
@@ -2216,21 +2132,21 @@
   "kind": "fragmented",
   "total": 28,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y183.json",
   "kind": "fragmented",
   "total": 43,
   "official": 0,
-  "comps": 10
+  "comps": 7
  },
  {
   "f": "广东_Y184.json",
   "kind": "fragmented",
   "total": 21,
   "official": 0,
-  "comps": 8
+  "comps": 6
  },
  {
   "f": "广东_Y185.json",
@@ -2258,49 +2174,42 @@
   "kind": "fragmented",
   "total": 22,
   "official": 0,
-  "comps": 10
- },
- {
-  "f": "广东_Y192.json",
-  "kind": "fragmented",
-  "total": 12,
-  "official": 0,
-  "comps": 6
+  "comps": 8
  },
  {
   "f": "广东_Y193.json",
   "kind": "fragmented",
   "total": 19,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y194.json",
   "kind": "fragmented",
   "total": 27,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y195.json",
   "kind": "fragmented",
   "total": 40,
   "official": 0,
-  "comps": 10
+  "comps": 7
  },
  {
   "f": "广东_Y199.json",
   "kind": "fragmented",
   "total": 51,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y2.json",
   "kind": "fragmented",
   "total": 39,
   "official": 0,
-  "comps": 8
+  "comps": 6
  },
  {
   "f": "广东_Y200.json",
@@ -2314,13 +2223,6 @@
   "kind": "fragmented",
   "total": 45,
   "official": 0,
-  "comps": 9
- },
- {
-  "f": "广东_Y202.json",
-  "kind": "fragmented",
-  "total": 27,
-  "official": 0,
   "comps": 8
  },
  {
@@ -2328,35 +2230,35 @@
   "kind": "fragmented",
   "total": 27,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y204.json",
   "kind": "fragmented",
   "total": 10,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y205.json",
   "kind": "fragmented",
   "total": 21,
   "official": 0,
-  "comps": 11
+  "comps": 7
  },
  {
   "f": "广东_Y206.json",
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y207.json",
   "kind": "fragmented",
   "total": 33,
   "official": 0,
-  "comps": 11
+  "comps": 10
  },
  {
   "f": "广东_Y208.json",
@@ -2370,35 +2272,35 @@
   "kind": "fragmented",
   "total": 32,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y210.json",
   "kind": "fragmented",
   "total": 19,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y211.json",
   "kind": "fragmented",
   "total": 53,
   "official": 0,
-  "comps": 15
+  "comps": 8
  },
  {
   "f": "广东_Y212.json",
   "kind": "fragmented",
   "total": 30,
   "official": 0,
-  "comps": 8
+  "comps": 6
  },
  {
   "f": "广东_Y213.json",
   "kind": "fragmented",
   "total": 36,
   "official": 0,
-  "comps": 11
+  "comps": 10
  },
  {
   "f": "广东_Y214.json",
@@ -2419,14 +2321,14 @@
   "kind": "fragmented",
   "total": 21,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y219.json",
   "kind": "fragmented",
   "total": 22,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y220.json",
@@ -2438,7 +2340,7 @@
  {
   "f": "广东_Y222.json",
   "kind": "fragmented",
-  "total": 12,
+  "total": 49,
   "official": 0,
   "comps": 9
  },
@@ -2447,13 +2349,6 @@
   "kind": "fragmented",
   "total": 29,
   "official": 0,
-  "comps": 10
- },
- {
-  "f": "广东_Y224.json",
-  "kind": "fragmented",
-  "total": 30,
-  "official": 0,
   "comps": 8
  },
  {
@@ -2461,19 +2356,12 @@
   "kind": "fragmented",
   "total": 20,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y228.json",
   "kind": "fragmented",
   "total": 15,
-  "official": 0,
-  "comps": 7
- },
- {
-  "f": "广东_Y231.json",
-  "kind": "fragmented",
-  "total": 19,
   "official": 0,
   "comps": 6
  },
@@ -2482,7 +2370,7 @@
   "kind": "fragmented",
   "total": 26,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y234.json",
@@ -2496,7 +2384,7 @@
   "kind": "fragmented",
   "total": 15,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y236.json",
@@ -2506,18 +2394,11 @@
   "comps": 7
  },
  {
-  "f": "广东_Y238.json",
-  "kind": "fragmented",
-  "total": 13,
-  "official": 0,
-  "comps": 8
- },
- {
   "f": "广东_Y240.json",
   "kind": "fragmented",
   "total": 20,
   "official": 0,
-  "comps": 10
+  "comps": 6
  },
  {
   "f": "广东_Y241.json",
@@ -2531,35 +2412,35 @@
   "kind": "fragmented",
   "total": 42,
   "official": 0,
-  "comps": 11
+  "comps": 8
  },
  {
   "f": "广东_Y243.json",
   "kind": "fragmented",
   "total": 25,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y244.json",
   "kind": "fragmented",
   "total": 29,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y245.json",
   "kind": "fragmented",
   "total": 29,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y246.json",
   "kind": "fragmented",
   "total": 22,
   "official": 0,
-  "comps": 10
+  "comps": 7
  },
  {
   "f": "广东_Y247.json",
@@ -2573,7 +2454,7 @@
   "kind": "fragmented",
   "total": 20,
   "official": 0,
-  "comps": 8
+  "comps": 6
  },
  {
   "f": "广东_Y249.json",
@@ -2587,28 +2468,28 @@
   "kind": "fragmented",
   "total": 27,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y251.json",
   "kind": "fragmented",
   "total": 62,
   "official": 0,
-  "comps": 13
+  "comps": 9
  },
  {
   "f": "广东_Y252.json",
   "kind": "fragmented",
   "total": 35,
   "official": 0,
-  "comps": 10
+  "comps": 8
  },
  {
   "f": "广东_Y253.json",
   "kind": "fragmented",
   "total": 35,
   "official": 0,
-  "comps": 9
+  "comps": 6
  },
  {
   "f": "广东_Y254.json",
@@ -2622,14 +2503,14 @@
   "kind": "fragmented",
   "total": 21,
   "official": 0,
-  "comps": 9
+  "comps": 6
  },
  {
   "f": "广东_Y256.json",
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y257.json",
@@ -2643,21 +2524,21 @@
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "广东_Y260.json",
   "kind": "fragmented",
   "total": 24,
   "official": 0,
-  "comps": 10
+  "comps": 8
  },
  {
   "f": "广东_Y261.json",
   "kind": "fragmented",
   "total": 14,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y262.json",
@@ -2678,14 +2559,14 @@
   "kind": "fragmented",
   "total": 27,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y266.json",
   "kind": "fragmented",
   "total": 21,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y267.json",
@@ -2702,18 +2583,11 @@
   "comps": 8
  },
  {
-  "f": "广东_Y269.json",
-  "kind": "fragmented",
-  "total": 15,
-  "official": 0,
-  "comps": 7
- },
- {
   "f": "广东_Y270.json",
   "kind": "fragmented",
   "total": 18,
   "official": 0,
-  "comps": 12
+  "comps": 8
  },
  {
   "f": "广东_Y272.json",
@@ -2727,42 +2601,21 @@
   "kind": "fragmented",
   "total": 27,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "广东_Y274.json",
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y275.json",
   "kind": "fragmented",
   "total": 20,
   "official": 0,
-  "comps": 9
- },
- {
-  "f": "广东_Y276.json",
-  "kind": "fragmented",
-  "total": 13,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y277.json",
-  "kind": "fragmented",
-  "total": 19,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y281.json",
-  "kind": "fragmented",
-  "total": 31,
-  "official": 0,
-  "comps": 6
+  "comps": 7
  },
  {
   "f": "广东_Y282.json",
@@ -2800,30 +2653,9 @@
   "comps": 7
  },
  {
-  "f": "广东_Y287.json",
-  "kind": "fragmented",
-  "total": 5,
-  "official": 0,
-  "comps": 6
- },
- {
   "f": "广东_Y288.json",
   "kind": "fragmented",
   "total": 24,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y289.json",
-  "kind": "fragmented",
-  "total": 21,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y290.json",
-  "kind": "fragmented",
-  "total": 19,
   "official": 0,
   "comps": 6
  },
@@ -2832,7 +2664,7 @@
   "kind": "fragmented",
   "total": 20,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y295.json",
@@ -2842,18 +2674,11 @@
   "comps": 6
  },
  {
-  "f": "广东_Y297.json",
-  "kind": "fragmented",
-  "total": 19,
-  "official": 0,
-  "comps": 6
- },
- {
   "f": "广东_Y298.json",
   "kind": "fragmented",
   "total": 24,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y299.json",
@@ -2867,21 +2692,21 @@
   "kind": "fragmented",
   "total": 31,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y300.json",
   "kind": "fragmented",
   "total": 25,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y301.json",
   "kind": "fragmented",
   "total": 29,
   "official": 0,
-  "comps": 11
+  "comps": 8
  },
  {
   "f": "广东_Y302.json",
@@ -2895,19 +2720,19 @@
   "kind": "fragmented",
   "total": 17,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y304.json",
   "kind": "fragmented",
   "total": 22,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y305.json",
   "kind": "fragmented",
-  "total": 11,
+  "total": 12,
   "official": 0,
   "comps": 6
  },
@@ -2916,7 +2741,7 @@
   "kind": "fragmented",
   "total": 22,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y307.json",
@@ -2924,13 +2749,6 @@
   "total": 24,
   "official": 0,
   "comps": 7
- },
- {
-  "f": "广东_Y308.json",
-  "kind": "fragmented",
-  "total": 49,
-  "official": 0,
-  "comps": 6
  },
  {
   "f": "广东_Y309.json",
@@ -2965,14 +2783,14 @@
   "kind": "fragmented",
   "total": 15,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y316.json",
   "kind": "fragmented",
   "total": 22,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y318.json",
@@ -2996,13 +2814,6 @@
   "comps": 6
  },
  {
-  "f": "广东_Y322.json",
-  "kind": "fragmented",
-  "total": 28,
-  "official": 0,
-  "comps": 6
- },
- {
   "f": "广东_Y323.json",
   "kind": "fragmented",
   "total": 14,
@@ -3017,23 +2828,9 @@
   "comps": 7
  },
  {
-  "f": "广东_Y328.json",
-  "kind": "fragmented",
-  "total": 37,
-  "official": 0,
-  "comps": 6
- },
- {
   "f": "广东_Y329.json",
   "kind": "fragmented",
   "total": 29,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y334.json",
-  "kind": "fragmented",
-  "total": 10,
   "official": 0,
   "comps": 6
  },
@@ -3042,7 +2839,7 @@
   "kind": "fragmented",
   "total": 41,
   "official": 0,
-  "comps": 11
+  "comps": 8
  },
  {
   "f": "广东_Y342.json",
@@ -3056,14 +2853,14 @@
   "kind": "fragmented",
   "total": 28,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y347.json",
   "kind": "fragmented",
   "total": 25,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y348.json",
@@ -3084,21 +2881,14 @@
   "kind": "fragmented",
   "total": 35,
   "official": 0,
-  "comps": 9
- },
- {
-  "f": "广东_Y358.json",
-  "kind": "fragmented",
-  "total": 16,
-  "official": 0,
-  "comps": 6
+  "comps": 8
  },
  {
   "f": "广东_Y360.json",
   "kind": "fragmented",
   "total": 24,
   "official": 0,
-  "comps": 8
+  "comps": 6
  },
  {
   "f": "广东_Y361.json",
@@ -3112,28 +2902,7 @@
   "kind": "fragmented",
   "total": 14,
   "official": 0,
-  "comps": 7
- },
- {
-  "f": "广东_Y367.json",
-  "kind": "fragmented",
-  "total": 14,
-  "official": 0,
   "comps": 6
- },
- {
-  "f": "广东_Y381.json",
-  "kind": "fragmented",
-  "total": 16,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y383.json",
-  "kind": "fragmented",
-  "total": 34,
-  "official": 0,
-  "comps": 7
  },
  {
   "f": "广东_Y386.json",
@@ -3141,13 +2910,6 @@
   "total": 18,
   "official": 0,
   "comps": 7
- },
- {
-  "f": "广东_Y410.json",
-  "kind": "fragmented",
-  "total": 9,
-  "official": 0,
-  "comps": 6
  },
  {
   "f": "广东_Y421.json",
@@ -3161,40 +2923,12 @@
   "kind": "fragmented",
   "total": 29,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y459.json",
   "kind": "fragmented",
   "total": 23,
-  "official": 0,
-  "comps": 7
- },
- {
-  "f": "广东_Y468.json",
-  "kind": "fragmented",
-  "total": 29,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y475.json",
-  "kind": "fragmented",
-  "total": 21,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y487.json",
-  "kind": "fragmented",
-  "total": 20,
-  "official": 0,
-  "comps": 7
- },
- {
-  "f": "广东_Y494.json",
-  "kind": "fragmented",
-  "total": 15,
   "official": 0,
   "comps": 6
  },
@@ -3203,7 +2937,7 @@
   "kind": "fragmented",
   "total": 25,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "广东_Y502.json",
@@ -3222,7 +2956,7 @@
  {
   "f": "广东_Y504.json",
   "kind": "fragmented",
-  "total": 38,
+  "total": 40,
   "official": 0,
   "comps": 7
  },
@@ -3231,21 +2965,21 @@
   "kind": "fragmented",
   "total": 28,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y507.json",
   "kind": "fragmented",
   "total": 36,
   "official": 0,
-  "comps": 8
+  "comps": 6
  },
  {
   "f": "广东_Y510.json",
   "kind": "fragmented",
   "total": 41,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y512.json",
@@ -3259,7 +2993,7 @@
   "kind": "fragmented",
   "total": 36,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "广东_Y517.json",
@@ -3280,7 +3014,7 @@
   "kind": "fragmented",
   "total": 24,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y524.json",
@@ -3301,13 +3035,6 @@
   "kind": "fragmented",
   "total": 37,
   "official": 0,
-  "comps": 7
- },
- {
-  "f": "广东_Y532.json",
-  "kind": "fragmented",
-  "total": 29,
-  "official": 0,
   "comps": 6
  },
  {
@@ -3315,19 +3042,12 @@
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 8
+  "comps": 7
  },
  {
   "f": "广东_Y536.json",
   "kind": "fragmented",
   "total": 46,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y539.json",
-  "kind": "fragmented",
-  "total": 37,
   "official": 0,
   "comps": 6
  },
@@ -3346,44 +3066,9 @@
   "comps": 6
  },
  {
-  "f": "广东_Y549.json",
-  "kind": "fragmented",
-  "total": 33,
-  "official": 0,
-  "comps": 7
- },
- {
   "f": "广东_Y588.json",
   "kind": "fragmented",
   "total": 20,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y616.json",
-  "kind": "fragmented",
-  "total": 18,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y617.json",
-  "kind": "fragmented",
-  "total": 36,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y626.json",
-  "kind": "fragmented",
-  "total": 56,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y629.json",
-  "kind": "fragmented",
-  "total": 11,
   "official": 0,
   "comps": 6
  },
@@ -3393,20 +3078,6 @@
   "total": 29,
   "official": 0,
   "comps": 7
- },
- {
-  "f": "广东_Y643.json",
-  "kind": "fragmented",
-  "total": 15,
-  "official": 0,
-  "comps": 7
- },
- {
-  "f": "广东_Y658.json",
-  "kind": "fragmented",
-  "total": 50,
-  "official": 0,
-  "comps": 6
  },
  {
   "f": "广东_Y699.json",
@@ -3420,42 +3091,14 @@
   "kind": "fragmented",
   "total": 39,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "广东_Y706.json",
   "kind": "fragmented",
-  "total": 29,
-  "official": 0,
-  "comps": 8
- },
- {
-  "f": "广东_Y712.json",
-  "kind": "fragmented",
-  "total": 24,
+  "total": 34,
   "official": 0,
   "comps": 7
- },
- {
-  "f": "广东_Y728.json",
-  "kind": "fragmented",
-  "total": 30,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y761.json",
-  "kind": "fragmented",
-  "total": 17,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y764.json",
-  "kind": "fragmented",
-  "total": 15,
-  "official": 0,
-  "comps": 6
  },
  {
   "f": "广东_Y8.json",
@@ -3468,13 +3111,6 @@
   "f": "广东_Y805.json",
   "kind": "fragmented",
   "total": 22,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y818.json",
-  "kind": "fragmented",
-  "total": 27,
   "official": 0,
   "comps": 6
  },
@@ -3493,30 +3129,9 @@
   "comps": 6
  },
  {
-  "f": "广东_Y846.json",
-  "kind": "fragmented",
-  "total": 13,
-  "official": 0,
-  "comps": 6
- },
- {
   "f": "广东_Y861.json",
   "kind": "fragmented",
   "total": 26,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y871.json",
-  "kind": "fragmented",
-  "total": 24,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "广东_Y891.json",
-  "kind": "fragmented",
-  "total": 18,
   "official": 0,
   "comps": 6
  },
@@ -3560,7 +3175,7 @@
   "kind": "fragmented",
   "total": 22,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广东_Y942.json",
@@ -3574,7 +3189,7 @@
   "kind": "fragmented",
   "total": 26,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广西_S201.json",
@@ -3630,14 +3245,14 @@
   "kind": "fragmented",
   "total": 67,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "广西_Y5.json",
   "kind": "fragmented",
   "total": 36,
   "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "新疆_S205.json",
@@ -4137,46 +3752,25 @@
   "comps": 10
  },
  {
-  "f": "江苏_Y1.json",
-  "kind": "fragmented",
-  "total": 76,
-  "official": 0,
-  "comps": 6
- },
- {
   "f": "江苏_Y101.json",
   "kind": "fragmented",
   "total": 23,
   "official": 0,
-  "comps": 8
- },
- {
-  "f": "江苏_Y15.json",
-  "kind": "fragmented",
-  "total": 39,
-  "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "江苏_Y19.json",
   "kind": "fragmented",
   "total": 39,
   "official": 0,
-  "comps": 9
- },
- {
-  "f": "江苏_Y307.json",
-  "kind": "fragmented",
-  "total": 16,
-  "official": 0,
-  "comps": 7
+  "comps": 6
  },
  {
   "f": "江苏_Y5.json",
   "kind": "fragmented",
   "total": 41,
   "official": 0,
-  "comps": 8
+  "comps": 6
  },
  {
   "f": "江苏_Y9.json",
@@ -4760,13 +4354,6 @@
   "comps": 8
  },
  {
-  "f": "河北_Y12.json",
-  "kind": "fragmented",
-  "total": 15,
-  "official": 0,
-  "comps": 6
- },
- {
   "f": "河南_S102.json",
   "kind": "fragmented",
   "total": 190,
@@ -5212,14 +4799,14 @@
   "kind": "fragmented",
   "total": 168,
   "official": 0,
-  "comps": 15
+  "comps": 10
  },
  {
   "f": "河南_Y10.json",
   "kind": "fragmented",
   "total": 215,
   "official": 0,
-  "comps": 25
+  "comps": 17
  },
  {
   "f": "河南_Y11.json",
@@ -5240,119 +4827,105 @@
   "kind": "fragmented",
   "total": 47,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "河南_Y14.json",
   "kind": "fragmented",
   "total": 91,
   "official": 0,
-  "comps": 13
+  "comps": 10
  },
  {
   "f": "河南_Y16.json",
   "kind": "fragmented",
   "total": 75,
   "official": 0,
-  "comps": 12
+  "comps": 9
  },
  {
   "f": "河南_Y17.json",
   "kind": "fragmented",
   "total": 83,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "河南_Y18.json",
   "kind": "fragmented",
   "total": 90,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "河南_Y2.json",
   "kind": "fragmented",
   "total": 101,
   "official": 0,
-  "comps": 15
+  "comps": 13
  },
  {
   "f": "河南_Y20.json",
   "kind": "fragmented",
   "total": 35,
   "official": 0,
-  "comps": 11
+  "comps": 7
  },
  {
   "f": "河南_Y22.json",
   "kind": "fragmented",
   "total": 57,
   "official": 0,
-  "comps": 12
+  "comps": 8
  },
  {
   "f": "河南_Y24.json",
   "kind": "fragmented",
   "total": 78,
   "official": 0,
-  "comps": 12
+  "comps": 9
  },
  {
   "f": "河南_Y26.json",
   "kind": "fragmented",
   "total": 83,
   "official": 0,
-  "comps": 15
+  "comps": 10
  },
  {
   "f": "河南_Y28.json",
   "kind": "fragmented",
   "total": 60,
   "official": 0,
-  "comps": 9
+  "comps": 6
  },
  {
   "f": "河南_Y3.json",
   "kind": "fragmented",
   "total": 120,
   "official": 0,
-  "comps": 16
- },
- {
-  "f": "河南_Y30.json",
-  "kind": "fragmented",
-  "total": 39,
-  "official": 0,
-  "comps": 6
+  "comps": 12
  },
  {
   "f": "河南_Y32.json",
   "kind": "fragmented",
   "total": 65,
   "official": 0,
-  "comps": 9
- },
- {
-  "f": "河南_Y34.json",
-  "kind": "fragmented",
-  "total": 36,
-  "official": 0,
-  "comps": 7
+  "comps": 8
  },
  {
   "f": "河南_Y38.json",
   "kind": "fragmented",
-  "total": 67,
+  "total": 69,
   "official": 0,
-  "comps": 9
+  "comps": 7
  },
  {
   "f": "河南_Y4.json",
   "kind": "fragmented",
   "total": 201,
   "official": 0,
-  "comps": 23
+  "comps": 18
  },
  {
   "f": "河南_Y40.json",
@@ -5362,53 +4935,39 @@
   "comps": 7
  },
  {
-  "f": "河南_Y42.json",
-  "kind": "fragmented",
-  "total": 30,
-  "official": 0,
-  "comps": 7
- },
- {
-  "f": "河南_Y44.json",
-  "kind": "fragmented",
-  "total": 23,
-  "official": 0,
-  "comps": 6
- },
- {
   "f": "河南_Y5.json",
   "kind": "fragmented",
   "total": 145,
   "official": 0,
-  "comps": 19
+  "comps": 14
  },
  {
   "f": "河南_Y6.json",
   "kind": "fragmented",
   "total": 113,
   "official": 0,
-  "comps": 13
+  "comps": 10
  },
  {
   "f": "河南_Y7.json",
   "kind": "fragmented",
   "total": 126,
   "official": 0,
-  "comps": 15
+  "comps": 14
  },
  {
   "f": "河南_Y8.json",
   "kind": "fragmented",
   "total": 85,
   "official": 0,
-  "comps": 9
+  "comps": 8
  },
  {
   "f": "河南_Y9.json",
   "kind": "fragmented",
   "total": 55,
   "official": 0,
-  "comps": 10
+  "comps": 7
  },
  {
   "f": "浙江_S201.json",
@@ -6524,37 +6083,16 @@
   "comps": 9
  },
  {
-  "f": "贵州_Y1.json",
-  "kind": "fragmented",
-  "total": 112,
-  "official": 0,
-  "comps": 6
- },
- {
-  "f": "贵州_Y12.json",
-  "kind": "fragmented",
-  "total": 107,
-  "official": 0,
-  "comps": 7
- },
- {
   "f": "贵州_Y3.json",
   "kind": "fragmented",
   "total": 74,
   "official": 0,
-  "comps": 10
+  "comps": 9
  },
  {
   "f": "贵州_Y6.json",
   "kind": "fragmented",
   "total": 87,
-  "official": 0,
-  "comps": 8
- },
- {
-  "f": "贵州_Y9.json",
-  "kind": "fragmented",
-  "total": 82,
   "official": 0,
   "comps": 6
  },
@@ -6777,10 +6315,10 @@
  },
  {
   "f": "青海_S101.json",
-  "kind": "fragmented",
-  "total": 438,
+  "kind": "tooShort",
+  "total": 69,
   "official": 400,
-  "comps": 8
+  "comps": 9
  },
  {
   "f": "青海_S102.json",
@@ -6879,12 +6417,5 @@
   "total": 418,
   "official": 0,
   "comps": 9
- },
- {
-  "f": "黑龙江_Y3.json",
-  "kind": "fragmented",
-  "total": 71,
-  "official": 0,
-  "comps": 6
  }
 ]

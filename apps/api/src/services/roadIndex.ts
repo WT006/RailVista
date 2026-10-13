@@ -244,7 +244,7 @@ function suggestPlacesOfKind(q: string, kind: PlaceKind, limit: number, province
         kind: 'road',
         id: r.key,
         name: r.ref,
-        sub: `${prov || r.key.split(':')[0]} · ${r.name ? r.name + ' · ' : ''}${r.fromPlace} → ${r.toPlace}`,
+        sub: [prov || r.key.split(':')[0], r.name, r.fromPlace && r.toPlace ? `${r.fromPlace} → ${r.toPlace}` : r.fromPlace || r.toPlace || ''].filter(Boolean).join(' · '),
         lng: r.bbox[0] || 104,
         lat: r.bbox[1] || 35,
         score,

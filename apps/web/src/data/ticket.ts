@@ -37,6 +37,9 @@ import logoKy from '../assets/ticket/ky.png';
 import logoA6 from '../assets/ticket/a6.png';
 import logoGx from '../assets/ticket/gx.png';
 import logoRy from '../assets/ticket/ry.png';
+import logoTv from '../assets/ticket/tv.png';
+import logoAq from '../assets/ticket/aq.png';
+import logoGt from '../assets/ticket/gt.png';
 import logoSkyteam from '../assets/ticket/skyteam.jpg';
 import logoStarAlliance from '../assets/ticket/staralliance-crop.png';
 import logoOneworld from '../assets/ticket/oneworld.jpg';
@@ -189,6 +192,7 @@ export const AIRLINES: Record<string, AirlineMeta> = {
   gj: { code: 'gj', name: '长龙航空', en: 'LOONG AIR', prefix: 'GJ', logo: logoGj, alliance: null },
   qw: { code: 'qw', name: '青岛航空', en: 'QINGDAO AIRLINES', prefix: 'QW', logo: logoQw, alliance: null },
   ky: { code: 'ky', name: '昆明航空', en: 'KUNMING AIRLINES', prefix: 'KY', logo: logoKy, alliance: null },
+  gt: { code: 'gt', name: '桂林航空', en: 'AIR GUILIN', prefix: 'GT', logo: logoGt, alliance: null },
   a6: { code: 'a6', name: '湖南航空', en: 'HUNAN AIRLINES', prefix: 'A6', logo: logoA6, alliance: null },
   gx: { code: 'gx', name: '北部湾航空', en: 'BEGUI BAY AIRLINES', prefix: 'GX', logo: logoGx, alliance: null },
   ry: { code: 'ry', name: '江西航空', en: 'JIANGXI AIRLINES', prefix: 'RY', logo: logoRy, alliance: null },
@@ -199,6 +203,8 @@ export const AIRLINES: Record<string, AirlineMeta> = {
   jr: { code: 'jr', name: '幸福航空', en: 'JOY AIR', prefix: 'JR', logo: '', alliance: null },
   dr: { code: 'dr', name: '瑞丽航空', en: 'RUILI AIRLINES', prefix: 'DR', logo: '', alliance: null },
   '9h': { code: '9h', name: '长安航空', en: 'AIR CHANGAN', prefix: '9H', logo: '', alliance: null },
+  tv: { code: 'tv', name: '西藏航空', en: 'TIBET AIRLINES', prefix: 'TV', logo: logoTv, alliance: null },
+  aq: { code: 'aq', name: '九元航空', en: '9 AIR', prefix: 'AQ', logo: logoAq, alliance: null },
   oq: { code: 'oq', name: '重庆航空', en: 'CHONGQING AIRLINES', prefix: 'OQ', logo: '', alliance: null },
   // 港澳台
   cx: { code: 'cx', name: '国泰航空', en: 'CATHAY PACIFIC', prefix: 'CX', logo: '', alliance: 'oneworld' },

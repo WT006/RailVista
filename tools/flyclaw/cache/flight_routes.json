@@ -2,36 +2,761 @@
   "MF8561": {
     "origin": "PKX",
     "destination": "PVG",
-    "last_seen": 1791732201
+    "last_seen": 1791738595
   },
   "MU5231": {
     "origin": "PKX",
     "destination": "PVG",
-    "last_seen": 1791732201
+    "last_seen": 1791738595
   },
   "MU5138": {
     "origin": "PKX",
     "destination": "SHA",
-    "last_seen": 1791732201
+    "last_seen": 1791738595
   },
   "HU7613": {
     "origin": "PEK",
     "destination": "PVG",
-    "last_seen": 1791732201
+    "last_seen": 1791738595
   },
   "MU5100": {
     "origin": "PEK",
     "destination": "PVG",
-    "last_seen": 1791732201
+    "last_seen": 1791738595
   },
   "Y87596": {
     "origin": "PEK",
     "destination": "PVG",
-    "last_seen": 1791732201
+    "last_seen": 1791738595
   },
   "HO1254": {
     "origin": "PKX",
     "destination": "PVG",
-    "last_seen": 1791732201
+    "last_seen": 1791738595
+  },
+  "AQ1002": {
+    "origin": "PKX",
+    "destination": "CAN",
+    "last_seen": 1791733898
+  },
+  "CZ3116": {
+    "origin": "PKX",
+    "destination": "CAN",
+    "last_seen": 1791733898
+  },
+  "MU6297": {
+    "origin": "PKX",
+    "destination": "CAN",
+    "last_seen": 1791733898
+  },
+  "MF8395": {
+    "origin": "PKX",
+    "destination": "CAN",
+    "last_seen": 1791733898
+  },
+  "MU6303": {
+    "origin": "PKX",
+    "destination": "CAN",
+    "last_seen": 1791733898
+  },
+  "CZ3000": {
+    "origin": "PKX",
+    "destination": "CAN",
+    "last_seen": 1791733898
+  },
+  "ZH9148": {
+    "origin": "PEK",
+    "destination": "CAN",
+    "last_seen": 1791733898
+  },
+  "KN5977": {
+    "origin": "PKX",
+    "destination": "PVG",
+    "last_seen": 1791735268
+  },
+  "MU5251": {
+    "origin": "TYN",
+    "destination": "CAN",
+    "last_seen": 1791734766
+  },
+  "CZ3378": {
+    "origin": "TYN",
+    "destination": "CAN",
+    "last_seen": 1791734766
+  },
+  "CZ3696": {
+    "origin": "TYN",
+    "destination": "CAN",
+    "last_seen": 1791734766
+  },
+  "CZ6528": {
+    "origin": "TYN",
+    "destination": "CAN",
+    "last_seen": 1791734766
+  },
+  "HU7250": {
+    "origin": "TYN",
+    "destination": "CAN",
+    "last_seen": 1791734766
+  },
+  "CZ3702": {
+    "origin": "TYN",
+    "destination": "CAN",
+    "last_seen": 1791734766
+  },
+  "CZ8768": {
+    "origin": "TYN",
+    "destination": "CAN",
+    "last_seen": 1791734766
+  },
+  "9C8932": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791786628
+  },
+  "HO1854": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791734867
+  },
+  "9C6722": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791734867
+  },
+  "CA1866": {
+    "origin": "CAN",
+    "destination": "PVG",
+    "last_seen": 1791786628
+  },
+  "9C6892": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791734867
+  },
+  "AQ1011": {
+    "origin": "CAN",
+    "destination": "PVG",
+    "last_seen": 1791786628
+  },
+  "9C6720": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791734867
+  },
+  "CA8341": {
+    "origin": "PKX",
+    "destination": "PVG",
+    "last_seen": 1791735268
+  },
+  "CZ8882": {
+    "origin": "PKX",
+    "destination": "PVG",
+    "last_seen": 1791735268
+  },
+  "3U8896": {
+    "origin": "PEK",
+    "destination": "CTU",
+    "last_seen": 1791739407
+  },
+  "MU6641": {
+    "origin": "PKX",
+    "destination": "CTU",
+    "last_seen": 1791739407
+  },
+  "CZ6107": {
+    "origin": "PKX",
+    "destination": "TFU",
+    "last_seen": 1791739407
+  },
+  "KN5155": {
+    "origin": "PKX",
+    "destination": "TFU",
+    "last_seen": 1791736689
+  },
+  "MU6649": {
+    "origin": "PKX",
+    "destination": "CTU",
+    "last_seen": 1791739407
+  },
+  "NS8001": {
+    "origin": "PKX",
+    "destination": "TFU",
+    "last_seen": 1791739407
+  },
+  "HU7147": {
+    "origin": "PEK",
+    "destination": "TFU",
+    "last_seen": 1791739407
+  },
+  "MU6733": {
+    "origin": "CAN",
+    "destination": "DAT",
+    "last_seen": 1791736736
+  },
+  "JD5292": {
+    "origin": "NNG",
+    "destination": "PKX",
+    "last_seen": 1791736750
+  },
+  "HU7154": {
+    "origin": "NNG",
+    "destination": "PEK",
+    "last_seen": 1791736750
+  },
+  "CA1932": {
+    "origin": "NNG",
+    "destination": "PEK",
+    "last_seen": 1791736750
+  },
+  "CZ3277": {
+    "origin": "NNG",
+    "destination": "PKX",
+    "last_seen": 1791736750
+  },
+  "CZ8992": {
+    "origin": "NNG",
+    "destination": "PKX",
+    "last_seen": 1791736750
+  },
+  "NS8052": {
+    "origin": "NNG",
+    "destination": "PKX",
+    "last_seen": 1791736750
+  },
+  "ZH9169": {
+    "origin": "NNG",
+    "destination": "PEK",
+    "last_seen": 1791736750
+  },
+  "9C6466": {
+    "origin": "NNG",
+    "destination": "SJW",
+    "last_seen": 1791736759
+  },
+  "GX8863": {
+    "origin": "NNG",
+    "destination": "HET",
+    "last_seen": 1791736771
+  },
+  "GJ8567": {
+    "origin": "CAN",
+    "destination": "HET",
+    "last_seen": 1791736783
+  },
+  "CZ3197": {
+    "origin": "CAN",
+    "destination": "HET",
+    "last_seen": 1791736783
+  },
+  "CZ3181": {
+    "origin": "CAN",
+    "destination": "HET",
+    "last_seen": 1791736783
+  },
+  "CZ3245": {
+    "origin": "CAN",
+    "destination": "HET",
+    "last_seen": 1791736783
+  },
+  "CZ3239": {
+    "origin": "CAN",
+    "destination": "HET",
+    "last_seen": 1791736783
+  },
+  "CA1381": {
+    "origin": "CAN",
+    "destination": "HET",
+    "last_seen": 1791736783
+  },
+  "HU7113": {
+    "origin": "CAN",
+    "destination": "HET",
+    "last_seen": 1791736783
+  },
+  "GJ8990": {
+    "origin": "CAN",
+    "destination": "HGH",
+    "last_seen": 1791736794
+  },
+  "JD5269": {
+    "origin": "CAN",
+    "destination": "HGH",
+    "last_seen": 1791736794
+  },
+  "GJ8860": {
+    "origin": "CAN",
+    "destination": "HGH",
+    "last_seen": 1791736794
+  },
+  "ZH9429": {
+    "origin": "CAN",
+    "destination": "HGH",
+    "last_seen": 1791736794
+  },
+  "GJ8996": {
+    "origin": "CAN",
+    "destination": "HGH",
+    "last_seen": 1791736794
+  },
+  "MF8312": {
+    "origin": "CAN",
+    "destination": "HGH",
+    "last_seen": 1791736794
+  },
+  "MU6991": {
+    "origin": "CAN",
+    "destination": "HGH",
+    "last_seen": 1791736794
+  },
+  "JD5250": {
+    "origin": "HAK",
+    "destination": "PKX",
+    "last_seen": 1791737328
+  },
+  "KN5812": {
+    "origin": "HAK",
+    "destination": "PKX",
+    "last_seen": 1791737328
+  },
+  "MU5598": {
+    "origin": "HAK",
+    "destination": "PKX",
+    "last_seen": 1791737328
+  },
+  "HU7581": {
+    "origin": "HAK",
+    "destination": "PEK",
+    "last_seen": 1791737328
+  },
+  "CZ3119": {
+    "origin": "HAK",
+    "destination": "PKX",
+    "last_seen": 1791737328
+  },
+  "HU7381": {
+    "origin": "HAK",
+    "destination": "PEK",
+    "last_seen": 1791737328
+  },
+  "HU7181": {
+    "origin": "HAK",
+    "destination": "PEK",
+    "last_seen": 1791737328
+  },
+  "MU5418": {
+    "origin": "CTU",
+    "destination": "PVG",
+    "last_seen": 1791738466
+  },
+  "9C6102": {
+    "origin": "TFU",
+    "destination": "SHA",
+    "last_seen": 1791738466
+  },
+  "3U6991": {
+    "origin": "TFU",
+    "destination": "PVG",
+    "last_seen": 1791738466
+  },
+  "MU5442": {
+    "origin": "TFU",
+    "destination": "PVG",
+    "last_seen": 1791738466
+  },
+  "EU6677": {
+    "origin": "CTU",
+    "destination": "PVG",
+    "last_seen": 1791738466
+  },
+  "MU9184": {
+    "origin": "TFU",
+    "destination": "SHA",
+    "last_seen": 1791738466
+  },
+  "MU9188": {
+    "origin": "TFU",
+    "destination": "SHA",
+    "last_seen": 1791738466
+  },
+  "JD5559": {
+    "origin": "PKX",
+    "destination": "TFU",
+    "last_seen": 1791739407
+  },
+  "9C8796": {
+    "origin": "SJW",
+    "destination": "PVG",
+    "last_seen": 1791785013
+  },
+  "KN2320": {
+    "origin": "SJW",
+    "destination": "PVG",
+    "last_seen": 1791785013
+  },
+  "NS3227": {
+    "origin": "SJW",
+    "destination": "PVG",
+    "last_seen": 1791785013
+  },
+  "KN2355": {
+    "origin": "SJW",
+    "destination": "PVG",
+    "last_seen": 1791785013
+  },
+  "NS3217": {
+    "origin": "SJW",
+    "destination": "PVG",
+    "last_seen": 1791785013
+  },
+  "NS3219": {
+    "origin": "SJW",
+    "destination": "SHA",
+    "last_seen": 1791785013
+  },
+  "KN2930": {
+    "origin": "SJW",
+    "destination": "PVG",
+    "last_seen": 1791785013
+  },
+  "FM9254": {
+    "origin": "HAK",
+    "destination": "SHA",
+    "last_seen": 1791763990
+  },
+  "MU5550": {
+    "origin": "HAK",
+    "destination": "PVG",
+    "last_seen": 1791763990
+  },
+  "FM7258": {
+    "origin": "HAK",
+    "destination": "PVG",
+    "last_seen": 1791763990
+  },
+  "CZ3515": {
+    "origin": "HAK",
+    "destination": "PVG",
+    "last_seen": 1791763990
+  },
+  "FM9270": {
+    "origin": "HAK",
+    "destination": "SHA",
+    "last_seen": 1791763990
+  },
+  "FM9256": {
+    "origin": "HAK",
+    "destination": "PVG",
+    "last_seen": 1791763990
+  },
+  "FM9252": {
+    "origin": "HAK",
+    "destination": "SHA",
+    "last_seen": 1791763990
+  },
+  "HU7121": {
+    "origin": "HAK",
+    "destination": "TYN",
+    "last_seen": 1791764007
+  },
+  "MU5676": {
+    "origin": "HAK",
+    "destination": "TYN",
+    "last_seen": 1791764007
+  },
+  "HU7045": {
+    "origin": "HAK",
+    "destination": "TYN",
+    "last_seen": 1791764007
+  },
+  "KN2929": {
+    "origin": "PVG",
+    "destination": "SJW",
+    "last_seen": 1791764171
+  },
+  "NS3228": {
+    "origin": "PVG",
+    "destination": "SJW",
+    "last_seen": 1791764171
+  },
+  "9C6517": {
+    "origin": "SHA",
+    "destination": "SJW",
+    "last_seen": 1791764171
+  },
+  "KN2319": {
+    "origin": "PVG",
+    "destination": "SJW",
+    "last_seen": 1791764171
+  },
+  "KN2356": {
+    "origin": "PVG",
+    "destination": "SJW",
+    "last_seen": 1791764171
+  },
+  "9C8795": {
+    "origin": "PVG",
+    "destination": "SJW",
+    "last_seen": 1791764171
+  },
+  "NS3218": {
+    "origin": "PVG",
+    "destination": "SJW",
+    "last_seen": 1791764171
+  },
+  "CZ6110": {
+    "origin": "CTU",
+    "destination": "PKX",
+    "last_seen": 1791764196
+  },
+  "MF8438": {
+    "origin": "TFU",
+    "destination": "PKX",
+    "last_seen": 1791764196
+  },
+  "CZ6136": {
+    "origin": "CTU",
+    "destination": "PKX",
+    "last_seen": 1791764196
+  },
+  "MU6654": {
+    "origin": "TFU",
+    "destination": "PKX",
+    "last_seen": 1791764196
+  },
+  "NS8002": {
+    "origin": "TFU",
+    "destination": "PKX",
+    "last_seen": 1791764196
+  },
+  "MU6843": {
+    "origin": "TFU",
+    "destination": "PKX",
+    "last_seen": 1791764196
+  },
+  "CA1426": {
+    "origin": "CTU",
+    "destination": "PEK",
+    "last_seen": 1791764196
+  },
+  "JD5162": {
+    "origin": "TFU",
+    "destination": "CAN",
+    "last_seen": 1791764208
+  },
+  "TV9765": {
+    "origin": "CTU",
+    "destination": "CAN",
+    "last_seen": 1791764208
+  },
+  "CA4305": {
+    "origin": "CTU",
+    "destination": "CAN",
+    "last_seen": 1791764208
+  },
+  "AQ1116": {
+    "origin": "TFU",
+    "destination": "CAN",
+    "last_seen": 1791764208
+  },
+  "EU2235": {
+    "origin": "CTU",
+    "destination": "CAN",
+    "last_seen": 1791764208
+  },
+  "CA9550": {
+    "origin": "CTU",
+    "destination": "CAN",
+    "last_seen": 1791764208
+  },
+  "MU5321": {
+    "origin": "TFU",
+    "destination": "CAN",
+    "last_seen": 1791764208
+  },
+  "8L9679": {
+    "origin": "TFU",
+    "destination": "LXA",
+    "last_seen": 1791790742
+  },
+  "8L9675": {
+    "origin": "TFU",
+    "destination": "LXA",
+    "last_seen": 1791790742
+  },
+  "8L9643": {
+    "origin": "TFU",
+    "destination": "LXA",
+    "last_seen": 1791790742
+  },
+  "MU5825": {
+    "origin": "TFU",
+    "destination": "LXA",
+    "last_seen": 1791790742
+  },
+  "TV9885": {
+    "origin": "CTU",
+    "destination": "LXA",
+    "last_seen": 1791790742
+  },
+  "CA2531": {
+    "origin": "TFU",
+    "destination": "LXA",
+    "last_seen": 1791790742
+  },
+  "3U6631": {
+    "origin": "TFU",
+    "destination": "LXA",
+    "last_seen": 1791790742
+  },
+  "AQ1033": {
+    "origin": "CAN",
+    "destination": "NKG",
+    "last_seen": 1791785083
+  },
+  "AQ1029": {
+    "origin": "CAN",
+    "destination": "NKG",
+    "last_seen": 1791785083
+  },
+  "MU9768": {
+    "origin": "CAN",
+    "destination": "NKG",
+    "last_seen": 1791785083
+  },
+  "ZH9861": {
+    "origin": "CAN",
+    "destination": "NKG",
+    "last_seen": 1791785083
+  },
+  "ZH9863": {
+    "origin": "CAN",
+    "destination": "NKG",
+    "last_seen": 1791785083
+  },
+  "ZH9875": {
+    "origin": "CAN",
+    "destination": "NKG",
+    "last_seen": 1791785083
+  },
+  "MU2818": {
+    "origin": "CAN",
+    "destination": "NKG",
+    "last_seen": 1791785083
+  },
+  "8L9627": {
+    "origin": "TFU",
+    "destination": "KMG",
+    "last_seen": 1791786159
+  },
+  "3U8669": {
+    "origin": "CTU",
+    "destination": "KMG",
+    "last_seen": 1791786159
+  },
+  "3U8667": {
+    "origin": "CTU",
+    "destination": "KMG",
+    "last_seen": 1791786159
+  },
+  "MU5850": {
+    "origin": "CTU",
+    "destination": "KMG",
+    "last_seen": 1791786545
+  },
+  "MU5848": {
+    "origin": "TFU",
+    "destination": "KMG",
+    "last_seen": 1791786159
+  },
+  "CA2541": {
+    "origin": "TFU",
+    "destination": "KMG",
+    "last_seen": 1791786789
+  },
+  "MU5852": {
+    "origin": "CTU",
+    "destination": "KMG",
+    "last_seen": 1791786789
+  },
+  "TV9961": {
+    "origin": "CTU",
+    "destination": "KMG",
+    "last_seen": 1791786159
+  },
+  "KY8246": {
+    "origin": "TFU",
+    "destination": "KMG",
+    "last_seen": 1791786789
+  },
+  "8L9946": {
+    "origin": "TFU",
+    "destination": "KMG",
+    "last_seen": 1791786789
+  },
+  "CA4411": {
+    "origin": "CTU",
+    "destination": "KMG",
+    "last_seen": 1791786789
+  },
+  "HO1852": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791786628
+  },
+  "HO2298": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791786628
+  },
+  "9C8856": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791786628
+  },
+  "HO1870": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791786628
+  },
+  "CA2926": {
+    "origin": "XNN",
+    "destination": "TYN",
+    "last_seen": 1791815868
+  },
+  "CZ3586": {
+    "origin": "CAN",
+    "destination": "PVG",
+    "last_seen": 1791816918
+  },
+  "MU5328": {
+    "origin": "CAN",
+    "destination": "PVG",
+    "last_seen": 1791816918
+  },
+  "MU9200": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791816918
+  },
+  "MU5362": {
+    "origin": "CAN",
+    "destination": "PVG",
+    "last_seen": 1791816918
+  },
+  "MU5320": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791816918
+  },
+  "MU5318": {
+    "origin": "CAN",
+    "destination": "PVG",
+    "last_seen": 1791816918
+  },
+  "FM9312": {
+    "origin": "CAN",
+    "destination": "SHA",
+    "last_seen": 1791816918
   }
 }

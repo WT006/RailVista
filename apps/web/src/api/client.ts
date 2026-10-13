@@ -515,8 +515,10 @@ export const api = {
   },
   // ── 万里路书 · 飞行纪念票 ─────────────────────────────────────────────────
   /** 航班号 + 日期查询航班（在线服务可用时自动带出起降机场/时刻/登机口；否则本地兜底） */
-  lookupFlight(flightNo: string, date: string) {
+  lookupFlight(flightNo: string, date: string, from?: string, to?: string) {
     const qs = new URLSearchParams({ flightNo, date });
+    if (from) qs.set('from', from);
+    if (to) qs.set('to', to);
     return request<import('@railvista/shared').FlightLookup>(`/flights/lookup?${qs}`);
   },
   /** 按航线搜索航班（出发地+目的地+日期），返回航班列表含价格 */

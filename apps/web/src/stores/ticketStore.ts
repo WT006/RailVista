@@ -21,6 +21,7 @@ import {
   haversineKm,
   makeTicketSerial,
   normalizeShieldCode,
+  parseFlightIata,
   type FlightLookup,
   type RoadRoute,
   type TicketConfig,
@@ -224,7 +225,8 @@ export const useTicketStore = defineStore('ticket', () => {
     const shortName = (a?: ReturnType<typeof getAirport>) =>
       a ? a.name.replace(/国际机场$/, '').replace(/机场$/, '') : '';
 
-    const airlineIata = lookup.airlineIata;
+    // 二字码缺失时从航班号自解析：3U/8L/9C 这类数字开头码易被上游截空
+    const airlineIata = lookup.airlineIata || parseFlightIata(lookup.flightNumber)?.airlineIata;
     const airlineInfo = airlineIata ? getAirline(airlineIata) : undefined;
 
     const stats: TicketConfig['stats'] = [

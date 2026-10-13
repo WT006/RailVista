@@ -32,6 +32,49 @@ const AUTH_DIR = join(ROOT, 'data/roads/authoritative');
 const mergeGeom = process.argv.includes('--merge') || process.argv.includes('--from-net');
 const fromNet = process.argv.includes('--from-net');
 
+// ── 起讫反解（2026-10-13：S/X/Y 索引条目 fromPlace/toPlace 补全）──────────────
+// OSM derived 条目没有官方起讫语义（G/E 才有规划表）。用 geom 主链首尾点 →
+// places-admin.json（省/市/县 3564 点）网格最近邻反解为县级地名，供候选副标题
+// 与搜索 odScore 使用。无网络依赖；结果诚实到"县"级，不做编造。
+let _placeGrid = null;
+function placeGrid() {
+  if (_placeGrid) return _placeGrid;
+  const grid = new Map(); // 0.25° 网格 → 地名点数组
+  try {
+    const { places } = JSON.parse(readFileSync(join(ROOT, 'data/roads/places-admin.json'), 'utf8'));
+    for (const p of places) {
+      const k = `${Math.floor(p.lng * 4)}:${Math.floor(p.lat * 4)}`;
+      let cell = grid.get(k);
+      if (!cell) { cell = []; grid.set(k, cell); }
+      cell.push(p);
+    }
+  } catch { /* 无地名文件时保持空网格，起讫留空 */ }
+  _placeGrid = grid;
+  return grid;
+}
+function nearestCountyName(lng, lat) {
+  const gx = Math.floor(lng * 4), gy = Math.floor(lat * 4);
+  const pts = [];
+  for (let dx = -1; dx <= 1; dx += 1) {
+    for (let dy = -1; dy <= 1; dy += 1) {
+      const cell = placeGrid().get(`${gx + dx}:${gy + dy}`);
+      if (cell) pts.push(...cell);
+    }
+  }
+  const cos = Math.cos((lat * Math.PI) / 180);
+  let fine = null, fineD = Infinity; // 市/县级点（优先）
+  let any = null, anyD = Infinity; // 省级点（回退）
+  for (const p of pts) {
+    const d = (p.lng - lng) ** 2 * cos + (p.lat - lat) ** 2;
+    if (p.level === 'province') { if (d < anyD) { anyD = d; any = p; } continue; }
+    if (d < fineD) { fineD = d; fine = p; }
+  }
+  // 阈值为平方度：0.8≈90km（县/市），0.36≈60km（省点回退更严）；无人区/边境留空比错标好
+  if (fine && fineD <= 0.8) return fine.name;
+  if (any && anyD <= 0.36) return any.name;
+  return '';
+}
+
 /** PBF 省片 slug → 中文省名 */
 const SLUG_TO_NAME = {
   anhui: '安徽', beijing: '北京', chongqing: '重庆', fujian: '福建', gansu: '甘肃',
@@ -425,6 +468,12 @@ function mergeGeometry(rows) {
       }
       if (g.precision) entry.precision = g.precision;
       if (Number.isFinite(g.componentCount)) entry.componentCount = g.componentCount;
+      // 2026-10-13：S/X/Y 主链首尾点反解县级起讫（同县时只留起点，避免「X县 → X县」）
+      if ((entry.class === 'provincial' || entry.class === 'county' || entry.class === 'township') && !entry.fromPlace) {
+        const fp = nearestCountyName(g.points[0][0], g.points[0][1]);
+        const tp = nearestCountyName(g.points[g.points.length - 1][0], g.points[g.points.length - 1][1]);
+        if (fp) { entry.fromPlace = fp; entry.toPlace = tp === fp ? '' : tp; }
+      }
       entry.hasGeom = true;
     } catch {
       /* skip broken geometry file */

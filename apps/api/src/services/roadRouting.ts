@@ -149,13 +149,15 @@ async function amapDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [n
 
 // ── 引擎 2：本地干线 A*（snap 5km，超限端点外接） ────────────────────────────
 /** 时长估算用等级限速（km/h）：只用来把里程折成「约几小时」，标注为估算，不代表真实路况 */
-const EST_SPEED_KMH: Record<string, number> = { expressway: 85, national: 65, provincial: 50, connector: 40 };
+const EST_SPEED_KMH: Record<string, number> = { expressway: 85, national: 65, provincial: 50, county: 40, township: 30, connector: 40 };
 
 function edgeClassOf(u: number, v: number): keyof typeof EST_SPEED_KMH {
   const flag = edgeClassBetween(u, v);
   if (flag & 1) return 'expressway';
   if (flag & 2) return 'national';
   if (flag & 4) return 'provincial';
+  if (flag & 8) return 'county';
+  if (flag & 16) return 'township';
   return 'connector'; // 跨线边（flag 0）
 }
 

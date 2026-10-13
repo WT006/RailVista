@@ -201,7 +201,11 @@ const hasDetail = computed(
   border-radius: var(--radius-md);
   border: 1px solid var(--line-hairline);
   border-left: 3px solid var(--spot-color);
-  background: var(--surface);
+  /* 叠在地图背景上：实色兜底 + 半透明提亮；勿用未定义的 --surface（会整条失效变全透明） */
+  background: var(--surface-0);
+  background: color-mix(in srgb, var(--surface-0) 86%, var(--surface-lift) 14%);
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   cursor: pointer;
   transition:
     border-color var(--dur-fast) var(--ease-standard),
@@ -210,12 +214,14 @@ const hasDetail = computed(
 }
 
 .road-spot:hover {
-  background: var(--surface-raised);
+  background: var(--surface-lift);
+  background: color-mix(in srgb, var(--surface-0) 78%, var(--surface-lift) 22%);
   transform: translateX(2px);
 }
 
 .road-spot.is-expanded {
-  background: var(--surface-raised);
+  background: var(--surface-lift);
+  background: color-mix(in srgb, var(--surface-0) 72%, var(--surface-lift) 28%);
   border-color: var(--spot-color);
 }
 

@@ -15,7 +15,9 @@ const reviewedAt = '2026-10-05';
 const WRITE = process.argv.includes('--write');
 
 const PROV_NAMES = new Set(
-  PROVINCE_BBOXES.map((p) => p.name).filter((n) => !['香港', '澳门', '台湾'].includes(n)),
+  PROVINCE_BBOXES.map((p) => p.name).filter(
+    (n) => !['中国香港', '香港', '中国澳门', '澳门', '中国台湾', '台湾'].includes(n),
+  ),
 );
 
 // corridorId → 走廊主省候选（L3 消歧用）

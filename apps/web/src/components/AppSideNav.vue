@@ -1,13 +1,9 @@
 <script setup lang="ts">
 /**
- * 侧边 Tab（≥840px）。
+ * 侧边 Tab（840px–1199px，《响应式应用架构》挪移布局）。
  *
- * 规范来源：《响应式应用架构》——「当窗口宽度达到对应的断点值，底部 Tab 可以结合
- * 挪移布局的方法，把 Tab 组件挪移到左侧。在大尺寸设备上提高交互易用性。」
- * 侧边 Tab 的导航选项继承底部 Tab（同 APP_NAV_ITEMS、同图标映射、同选中态规则）。
- *
- * 布局：固定于页面左侧、顶栏之下；宽度 = --sidenav-w（tokens.css 在 ≥840 赋值，
- * 各页面/浮层用该令牌让出空间）。嵌入显示（贴边、玻璃材质），不做悬浮。
+ * 导航选项继承底部 Tab；≥1200 网页档改由顶栏承载。
+ * 布局：固定左侧、顶栏之下；宽度 = --sidenav-w。
  */
 import { useRoute } from 'vue-router';
 import { APP_NAV_ITEMS } from '../data/appNav';
@@ -38,7 +34,7 @@ const route = useRoute();
   display: none;
 }
 
-@media (min-width: 840px) {
+@media (min-width: 840px) and (max-width: 1199px) {
   .sidenav {
     position: fixed;
     left: 0;

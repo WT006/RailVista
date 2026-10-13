@@ -1,21 +1,20 @@
 <script setup lang="ts">
 /**
- * 票面配置编辑器：TicketConfig 所有展示项均可编辑，禁止硬编码文案。
- * 直接读写 ticketStore.config（草稿自动落盘），保存动作入 saved 列表。
+ * 票面高级微调：只暴露「票面真实会渲染」的字段，并按票种显隐。
+ * 引导构建器负责成票；此处不做印章 / 海拔等未上票死字段。
  */
 import { computed, ref } from 'vue';
-import type {
-  TicketRouteConfig,
-  TicketSealEmblem,
-  TicketStatItem,
-  TicketTagItem,
-} from '@railvista/shared';
+import type { TicketRouteConfig, TicketStatItem, TicketTagItem } from '@railvista/shared';
+import { classifyRoadSign, scenicPresets } from '@railvista/shared';
 import { useTicketStore } from '../../stores/ticketStore';
 import { AIRLINES, ALLIANCES, themesForKind } from '../../data/ticket';
-import { classifyRoadSign, scenicPresets } from '@railvista/shared';
 
 const store = useTicketStore();
 const config = computed(() => store.config);
+const kind = computed(() => config.value.kind);
+const isRail = computed(() => kind.value === 'railway');
+const isDrive = computed(() => kind.value === 'drive');
+const isFlight = computed(() => kind.value === 'flight');
 
 function patchRoute(p: Partial<TicketRouteConfig>) {
   store.patch({ route: { ...config.value.route, ...p } });
@@ -37,7 +36,6 @@ const shieldsText = computed({
     patchRoute({ shields: v.split(/[,，\s]/).map((s) => s.trim()).filter(Boolean) }),
 });
 
-/** 实时回显每个编号被识别成的国标制式，方便确认自动识别是否正确 */
 const shieldSpecs = computed(() => (config.value.route.shields ?? []).map((r) => classifyRoadSign(r)));
 
 function appendShield(code: string) {
@@ -45,16 +43,6 @@ function appendShield(code: string) {
   if (cur.includes(code)) return;
   patchRoute({ shields: [...cur, code] });
 }
-const elevText = computed({
-  get: () => (config.value.route.elevPoints ?? []).join(', '),
-  set: (v: string) =>
-    patchRoute({
-      elevPoints: v
-        .split(/[,，\s]/)
-        .map((s) => Number(s.trim()))
-        .filter((n) => Number.isFinite(n)),
-    }),
-});
 
 function updateStat(i: number, p: Partial<TicketStatItem>) {
   const stats = config.value.stats.map((s, j) => (j === i ? { ...s, ...p } : s));
@@ -64,8 +52,10 @@ function removeStat(i: number) {
   store.patch({ stats: config.value.stats.filter((_, j) => j !== i) });
 }
 function addStat() {
+  if (config.value.stats.length >= 6) return;
   store.patch({ stats: [...config.value.stats, { label: '新数据项', value: '—' }] });
 }
+
 function updateTag(i: number, p: Partial<TicketTagItem>) {
   const tags = config.value.tags.map((t, j) => (j === i ? { ...t, ...p } : t));
   store.patch({ tags });
@@ -73,9 +63,13 @@ function updateTag(i: number, p: Partial<TicketTagItem>) {
 function removeTag(i: number) {
   store.patch({ tags: config.value.tags.filter((_, j) => j !== i) });
 }
-function addTag() {
-  store.patch({ tags: [...config.value.tags, { text: '新标签' }] });
+function addTag(text = '新标签', hot = false) {
+  if (config.value.tags.length >= 8) return;
+  if (config.value.tags.some((t) => t.text === text)) return;
+  store.patch({ tags: [...config.value.tags, { text, hot }] });
 }
+
+const TAG_PRESETS = ['风景侧', '已打卡', '窗边', '供氧车厢'] as const;
 
 function onAirlineCode(code: string) {
   const meta = AIRLINES[code];
@@ -94,6 +88,7 @@ function onAirlineCode(code: string) {
 
 /** 背景图校验提示（替代 window.alert：与页面提示条模式一致，自动消退） */
 const bgNotice = ref('');
+const bgFileName = ref('');
 let bgNoticeTimer: number | undefined;
 function showBgNotice(msg: string) {
   bgNotice.value = msg;
@@ -109,10 +104,12 @@ function onBgFile(ev: Event) {
   if (!file) return;
   if (file.size > 1.5 * 1024 * 1024) {
     showBgNotice('背景图建议小于 1.5MB（需存入本地配置）');
+    input.value = '';
     return;
   }
   const reader = new FileReader();
   reader.onload = () => {
+    bgFileName.value = file.name;
     store.patch({
       background: { ...config.value.background, imageUrl: String(reader.result) },
     });
@@ -121,21 +118,21 @@ function onBgFile(ev: Event) {
   input.value = '';
 }
 
-const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
-  { value: 'none', label: '无徽记' },
-  { value: 'rail', label: '铁路徽' },
-  { value: 'road', label: '公路徽' },
-  { value: 'air', label: '民航徽' },
-];
+function clearBgFile() {
+  bgFileName.value = '';
+  store.patch({
+    background: { ...config.value.background, imageUrl: undefined },
+  });
+}
 </script>
 
 <template>
   <div class="ed">
-    <!-- 主题 -->
+    <!-- 外观 -->
     <section class="ed__sec">
-      <h3>票面主题</h3>
+      <h3>外观</h3>
       <label class="ed__row">
-        <span>风格</span>
+        <span>主题</span>
         <select
           class="ed__select"
           :value="config.background.theme"
@@ -144,23 +141,29 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
           <option v-for="t in themesForKind(config.kind)" :key="t.id" :value="t.id">{{ t.label }}</option>
         </select>
       </label>
-      <label class="ed__row">
+      <div class="ed__row">
         <span>背景图</span>
-        <input
-          class="ed__input"
-          type="text"
-          placeholder="URL 或留空（也可选文件）"
-          :value="config.background.imageUrl ?? ''"
-          @change="store.patch({ background: { ...config.background, imageUrl: ($event.target as HTMLInputElement).value || undefined } })"
-        />
-      </label>
-      <label class="ed__row">
-        <span>选文件</span>
-        <input class="ed__input" type="file" accept="image/*" @change="onBgFile" />
-      </label>
+        <div class="ed__file">
+          <label class="ed__file-btn">
+            <input type="file" accept="image/*" class="ed__file-input" @change="onBgFile" />
+            {{ bgFileName || config.background.imageUrl ? '更换图片' : '选择图片' }}
+          </label>
+          <span class="ed__file-name" :title="bgFileName || undefined">
+            {{ bgFileName || (config.background.imageUrl ? '已选背景图' : '未选择') }}
+          </span>
+          <button
+            v-if="bgFileName || config.background.imageUrl"
+            type="button"
+            class="ed__file-clear"
+            @click="clearBgFile"
+          >
+            清除
+          </button>
+        </div>
+      </div>
       <p v-if="bgNotice" class="ed__hint ed__hint--warn" role="status">{{ bgNotice }}</p>
       <label class="ed__row">
-        <span>背景图透明度 {{ config.background.opacity.toFixed(2) }}</span>
+        <span>透明度 {{ config.background.opacity.toFixed(2) }}</span>
         <input
           class="ed__range"
           type="range"
@@ -173,92 +176,156 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
       </label>
     </section>
 
-    <!-- 基础文案 -->
+    <!-- 文案 -->
     <section class="ed__sec">
-      <h3>基础文案</h3>
-      <label class="ed__row"><span>主标题</span><input class="ed__input" :value="config.title" @input="store.patch({ title: ($event.target as HTMLInputElement).value })" /></label>
-      <label class="ed__row"><span>副标题</span><input class="ed__input" :value="config.subtitle" @input="store.patch({ subtitle: ($event.target as HTMLInputElement).value })" /></label>
-      <label class="ed__row"><span>票号</span><input class="ed__input" :value="config.serial" @input="store.patch({ serial: ($event.target as HTMLInputElement).value })" /></label>
-      <label class="ed__row"><span>日期行</span><input class="ed__input" :value="config.dateText" @input="store.patch({ dateText: ($event.target as HTMLInputElement).value })" /></label>
-      <label class="ed__row"><span>路线左注</span><input class="ed__input" :value="config.metaLeft ?? ''" @input="store.patch({ metaLeft: ($event.target as HTMLInputElement).value })" /></label>
-      <label class="ed__row"><span>路线右注</span><input class="ed__input" :value="config.metaRight ?? ''" @input="store.patch({ metaRight: ($event.target as HTMLInputElement).value })" /></label>
+      <h3>文案</h3>
+      <label class="ed__row">
+        <span>存档名称</span>
+        <input
+          class="ed__input"
+          :value="config.title"
+          placeholder="保存到列表时使用，不印在票面"
+          @input="store.patch({ title: ($event.target as HTMLInputElement).value })"
+        />
+      </label>
+      <label class="ed__row">
+        <span>票号</span>
+        <input class="ed__input" :value="config.serial" @input="store.patch({ serial: ($event.target as HTMLInputElement).value })" />
+      </label>
+      <template v-if="isDrive">
+        <label class="ed__row">
+          <span>路线名</span>
+          <input class="ed__input" :value="config.subtitle" @input="store.patch({ subtitle: ($event.target as HTMLInputElement).value })" />
+        </label>
+        <label class="ed__row">
+          <span>日期行</span>
+          <input class="ed__input" :value="config.dateText" @input="store.patch({ dateText: ($event.target as HTMLInputElement).value })" />
+        </label>
+        <label class="ed__row">
+          <span>行程摘要</span>
+          <input class="ed__input" :value="config.metaLeft ?? ''" @input="store.patch({ metaLeft: ($event.target as HTMLInputElement).value })" />
+        </label>
+      </template>
+      <template v-if="isRail">
+        <label class="ed__row">
+          <span>乘车信息</span>
+          <input class="ed__input" :value="config.metaLeft ?? ''" placeholder="日期 · 开车时刻" @input="store.patch({ metaLeft: ($event.target as HTMLInputElement).value })" />
+        </label>
+        <label class="ed__row">
+          <span>座位信息</span>
+          <input class="ed__input" :value="config.metaRight ?? ''" placeholder="车厢 / 座位" @input="store.patch({ metaRight: ($event.target as HTMLInputElement).value })" />
+        </label>
+      </template>
     </section>
 
     <!-- 路线 -->
     <section class="ed__sec">
       <h3>路线</h3>
-      <label class="ed__row"><span>起点名</span><input class="ed__input" :value="config.route.ends[0].name" @input="patchEnd(0, { name: ($event.target as HTMLInputElement).value })" /></label>
-      <label class="ed__row"><span>起点拼音</span><input class="ed__input" :value="config.route.ends[0].pinyin ?? ''" @input="patchEnd(0, { pinyin: ($event.target as HTMLInputElement).value || undefined })" /></label>
-      <label class="ed__row"><span>起点三字码</span><input class="ed__input" :value="config.route.ends[0].code ?? ''" @input="patchEnd(0, { code: ($event.target as HTMLInputElement).value || undefined })" /></label>
-      <label class="ed__row"><span>终点名</span><input class="ed__input" :value="config.route.ends[1].name" @input="patchEnd(1, { name: ($event.target as HTMLInputElement).value })" /></label>
-      <label class="ed__row"><span>终点拼音</span><input class="ed__input" :value="config.route.ends[1].pinyin ?? ''" @input="patchEnd(1, { pinyin: ($event.target as HTMLInputElement).value || undefined })" /></label>
-      <label class="ed__row"><span>终点三字码</span><input class="ed__input" :value="config.route.ends[1].code ?? ''" @input="patchEnd(1, { code: ($event.target as HTMLInputElement).value || undefined })" /></label>
-      <label class="ed__row"><span>中线胶囊</span><input class="ed__input" placeholder="车次号 / 航班号" :value="config.route.middleLabel ?? ''" @input="patchRoute({ middleLabel: ($event.target as HTMLInputElement).value || undefined })" /></label>
-      <label class="ed__row"><span>途经点链</span><input class="ed__input" placeholder="逗号分隔，>2 项时启用" v-model="waypointsText" /></label>
-      <label class="ed__row"><span>路牌编号</span><input class="ed__input" placeholder="G6, G3011, G109, S203, 此生必驾318" v-model="shieldsText" /></label>
-      <div class="ed__row">
-        <span>此生必驾</span>
-        <div class="ed__chips">
-          <button v-for="p in scenicPresets()" :key="p.ref" class="ed__chip" type="button" @click="appendShield(p.ref)">{{ p.label }}</button>
-          <button class="ed__chip" type="button" @click="appendShield('G6')">+ G6</button>
-          <button class="ed__chip" type="button" @click="appendShield('G109')">+ G109</button>
-          <button class="ed__chip" type="button" @click="appendShield('S203')">+ S203</button>
+
+      <template v-if="isRail">
+        <label class="ed__row"><span>出发站</span><input class="ed__input" :value="config.route.ends[0].name" @input="patchEnd(0, { name: ($event.target as HTMLInputElement).value })" /></label>
+        <label class="ed__row"><span>出发拼音</span><input class="ed__input" :value="config.route.ends[0].pinyin ?? ''" @input="patchEnd(0, { pinyin: ($event.target as HTMLInputElement).value || undefined })" /></label>
+        <label class="ed__row"><span>到达站</span><input class="ed__input" :value="config.route.ends[1].name" @input="patchEnd(1, { name: ($event.target as HTMLInputElement).value })" /></label>
+        <label class="ed__row"><span>到达拼音</span><input class="ed__input" :value="config.route.ends[1].pinyin ?? ''" @input="patchEnd(1, { pinyin: ($event.target as HTMLInputElement).value || undefined })" /></label>
+        <label class="ed__row"><span>车次</span><input class="ed__input" placeholder="如 Z8991" :value="config.route.middleLabel ?? ''" @input="patchRoute({ middleLabel: ($event.target as HTMLInputElement).value || undefined })" /></label>
+      </template>
+
+      <template v-else-if="isDrive">
+        <label class="ed__row"><span>途经点</span><input class="ed__input" placeholder="逗号分隔，如 西宁,青海湖,敦煌" v-model="waypointsText" /></label>
+        <label class="ed__row"><span>路牌</span><input class="ed__input" placeholder="G6, G109, 此生必驾318" v-model="shieldsText" /></label>
+        <div class="ed__row">
+          <span>快捷加</span>
+          <div class="ed__chips">
+            <button v-for="p in scenicPresets()" :key="p.ref" class="ed__chip" type="button" @click="appendShield(p.ref)">{{ p.label }}</button>
+            <button class="ed__chip" type="button" @click="appendShield('G6')">+ G6</button>
+            <button class="ed__chip" type="button" @click="appendShield('G109')">+ G109</button>
+            <button class="ed__chip" type="button" @click="appendShield('S203')">+ S203</button>
+          </div>
         </div>
-      </div>
-      <p v-if="shieldSpecs.length" class="ed__hint">
-        自动识别：{{ shieldSpecs.map((s) => `${s.ref}→${s.label}${s.scenicName ? '·' + s.scenicName : ''}`).join('；') }}
-      </p>
-      <p class="ed__hint">制式按 GB 5768 自动判定：G+1/2/4 位=国家高速（绿底红顶条）、G+3 位=国道（红底）、S+3 位=省道（黄底）、X/Y/C=县/乡/村道（白底）；「此生必驾」为收藏向主题徽记。</p>
-      <label class="ed__row"><span>海拔采样</span><input class="ed__input" placeholder="2200, 3200, 3817…" v-model="elevText" /></label>
-      <label class="ed__row"><span>峰值标注</span><input class="ed__input" :value="config.route.elevPeakLabel ?? ''" @input="patchRoute({ elevPeakLabel: ($event.target as HTMLInputElement).value || undefined })" /></label>
+        <p v-if="shieldSpecs.length" class="ed__hint">
+          {{ shieldSpecs.map((s) => `${s.ref}→${s.label}${s.scenicName ? '·' + s.scenicName : ''}`).join('；') }}
+        </p>
+      </template>
+
+      <template v-else>
+        <label class="ed__row"><span>出发机场</span><input class="ed__input" :value="config.route.ends[0].name" @input="patchEnd(0, { name: ($event.target as HTMLInputElement).value })" /></label>
+        <label class="ed__row"><span>出发三字码</span><input class="ed__input" :value="config.route.ends[0].code ?? ''" @input="patchEnd(0, { code: ($event.target as HTMLInputElement).value || undefined })" /></label>
+        <label class="ed__row"><span>出发英文</span><input class="ed__input" :value="config.route.ends[0].pinyin ?? ''" @input="patchEnd(0, { pinyin: ($event.target as HTMLInputElement).value || undefined })" /></label>
+        <label class="ed__row"><span>到达机场</span><input class="ed__input" :value="config.route.ends[1].name" @input="patchEnd(1, { name: ($event.target as HTMLInputElement).value })" /></label>
+        <label class="ed__row"><span>到达三字码</span><input class="ed__input" :value="config.route.ends[1].code ?? ''" @input="patchEnd(1, { code: ($event.target as HTMLInputElement).value || undefined })" /></label>
+        <label class="ed__row"><span>到达英文</span><input class="ed__input" :value="config.route.ends[1].pinyin ?? ''" @input="patchEnd(1, { pinyin: ($event.target as HTMLInputElement).value || undefined })" /></label>
+        <label class="ed__row"><span>航班号</span><input class="ed__input" placeholder="如 CZ3467" :value="config.route.middleLabel ?? ''" @input="patchRoute({ middleLabel: ($event.target as HTMLInputElement).value || undefined })" /></label>
+      </template>
     </section>
 
-    <!-- 数据宫格 -->
+    <!-- 数据：宫格 + 标签 -->
     <section class="ed__sec">
-      <h3>数据宫格</h3>
-      <div v-for="(s, i) in config.stats" :key="i" class="ed__listrow">
+      <h3>数据与标签</h3>
+      <p class="ed__hint">宫格建议不超过 6 项；标签不超过 8 个。</p>
+      <div v-for="(s, i) in config.stats" :key="'s' + i" class="ed__listrow">
         <input class="ed__input" placeholder="标签" :value="s.label" @input="updateStat(i, { label: ($event.target as HTMLInputElement).value })" />
         <input class="ed__input" placeholder="值" :value="s.value" @input="updateStat(i, { value: ($event.target as HTMLInputElement).value })" />
         <input class="ed__input ed__input--narrow" placeholder="单位" :value="s.unit ?? ''" @input="updateStat(i, { unit: ($event.target as HTMLInputElement).value || undefined })" />
         <button class="btn ghost btn-sm" type="button" @click="removeStat(i)">删</button>
       </div>
-      <button class="btn ghost btn-sm" type="button" @click="addStat">+ 数据项</button>
-    </section>
+      <button class="btn ghost btn-sm" type="button" :disabled="config.stats.length >= 6" @click="addStat">+ 数据项</button>
 
-    <!-- 标签 -->
-    <section class="ed__sec">
-      <h3>标签胶囊</h3>
-      <div v-for="(t, i) in config.tags" :key="i" class="ed__listrow">
+      <div v-for="(t, i) in config.tags" :key="'t' + i" class="ed__listrow">
         <input class="ed__input" placeholder="文案" :value="t.text" @input="updateTag(i, { text: ($event.target as HTMLInputElement).value })" />
         <label class="ed__check"><input type="checkbox" :checked="!!t.hot" @change="updateTag(i, { hot: ($event.target as HTMLInputElement).checked })" />高亮</label>
         <button class="btn ghost btn-sm" type="button" @click="removeTag(i)">删</button>
       </div>
-      <button class="btn ghost btn-sm" type="button" @click="addTag">+ 标签</button>
+      <div class="ed__chips">
+        <button
+          v-for="p in TAG_PRESETS"
+          :key="p"
+          class="ed__chip"
+          type="button"
+          :disabled="config.tags.length >= 8"
+          @click="addTag(p, true)"
+        >
+          + {{ p }}
+        </button>
+        <button class="ed__chip" type="button" :disabled="config.tags.length >= 8" @click="addTag()">+ 自定义</button>
+      </div>
     </section>
 
-    <!-- 感言 / 印章 / 二维码 / 品牌 -->
+    <!-- 页脚：感言 / 码 / 品牌 -->
     <section class="ed__sec">
-      <h3>感言 · 印章 · 二维码 · 品牌</h3>
-      <label class="ed__row"><span>一句话感言</span><textarea class="ed__input ed__textarea" rows="2" :value="config.quote" @input="store.patch({ quote: ($event.target as HTMLTextAreaElement).value })"></textarea></label>
-      <label class="ed__check"><input type="checkbox" :checked="config.seal.enabled" @change="store.patch({ seal: { ...config.seal, enabled: ($event.target as HTMLInputElement).checked } })" />启用印章</label>
+      <h3>感言与页脚</h3>
       <label class="ed__row">
-        <span>徽记</span>
-        <select class="ed__select" :value="config.seal.emblem" @change="store.patch({ seal: { ...config.seal, emblem: ($event.target as HTMLSelectElement).value as TicketSealEmblem } })">
-          <option v-for="e in EMBLEMS" :key="e.value" :value="e.value">{{ e.label }}</option>
-        </select>
+        <span>感言</span>
+        <textarea
+          class="ed__input ed__textarea"
+          rows="2"
+          :value="config.quote"
+          @input="store.patch({ quote: ($event.target as HTMLTextAreaElement).value })"
+        ></textarea>
       </label>
-      <label class="ed__row"><span>印章文字</span><input class="ed__input" :value="config.seal.text" @input="store.patch({ seal: { ...config.seal, text: ($event.target as HTMLInputElement).value } })" /></label>
-      <label class="ed__row"><span>印章副文</span><input class="ed__input" :value="config.seal.sub ?? ''" @input="store.patch({ seal: { ...config.seal, sub: ($event.target as HTMLInputElement).value || undefined } })" /></label>
-      <label class="ed__check"><input type="checkbox" :checked="config.qr.enabled" @change="store.patch({ qr: { ...config.qr, enabled: ($event.target as HTMLInputElement).checked } })" />启用二维码</label>
-      <label class="ed__row"><span>二维码注</span><input class="ed__input" :value="config.qr.caption" @input="store.patch({ qr: { ...config.qr, caption: ($event.target as HTMLInputElement).value } })" /></label>
-      <label class="ed__row"><span>二维码内容</span><input class="ed__input" :value="config.qr.value" @input="store.patch({ qr: { ...config.qr, value: ($event.target as HTMLInputElement).value } })" /></label>
-      <label class="ed__check"><input type="checkbox" :checked="config.brand.logo" @change="store.patch({ brand: { ...config.brand, logo: ($event.target as HTMLInputElement).checked } })" />顶部品牌微标</label>
-      <label class="ed__check"><input type="checkbox" :checked="config.brand.watermark" @change="store.patch({ brand: { ...config.brand, watermark: ($event.target as HTMLInputElement).checked } })" />票面品牌水印</label>
-      <label class="ed__row"><span>页脚文字</span><textarea class="ed__input ed__textarea" rows="2" :value="config.brand.footerText" @input="store.patch({ brand: { ...config.brand, footerText: ($event.target as HTMLTextAreaElement).value } })"></textarea></label>
+
+      <label
+        v-if="!isFlight"
+        class="ed__check"
+      >
+        <input
+          type="checkbox"
+          :checked="config.qr.enabled"
+          @change="store.patch({ qr: { ...config.qr, enabled: ($event.target as HTMLInputElement).checked } })"
+        />
+        启用二维码
+      </label>
+      <label class="ed__check">
+        <input
+          type="checkbox"
+          :checked="config.brand.watermark"
+          @change="store.patch({ brand: { ...config.brand, watermark: ($event.target as HTMLInputElement).checked } })"
+        />
+        票面品牌水印
+      </label>
     </section>
 
-    <!-- 航司（飞行票） -->
-    <section v-if="config.kind === 'flight'" class="ed__sec">
+    <!-- 航司（飞行） -->
+    <section v-if="isFlight" class="ed__sec">
       <h3>承运航司</h3>
       <label class="ed__row">
         <span>航司</span>
@@ -266,7 +333,14 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
           <option v-for="a in Object.values(AIRLINES)" :key="a.code" :value="a.code">{{ a.name }} {{ a.prefix }}</option>
         </select>
       </label>
-      <label class="ed__row"><span>航班号</span><input class="ed__input" :value="config.airline?.flightNo ?? ''" @input="store.patch({ airline: { ...(config.airline ?? { code: '', name: '', en: '', flightNo: '' }), flightNo: ($event.target as HTMLInputElement).value } })" /></label>
+      <label class="ed__row">
+        <span>航班号</span>
+        <input
+          class="ed__input"
+          :value="config.airline?.flightNo ?? ''"
+          @input="store.patch({ airline: { ...(config.airline ?? { code: '', name: '', en: '', flightNo: '' }), flightNo: ($event.target as HTMLInputElement).value } })"
+        />
+      </label>
       <label class="ed__row">
         <span>联盟</span>
         <select
@@ -278,7 +352,6 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
           <option v-for="(a, id) in ALLIANCES" :key="id" :value="id">{{ a.name }}</option>
         </select>
       </label>
-      <p class="ed__hint">联盟口径：南航 2019 年已退出天合联盟；选航司时会自动带出正确联盟。</p>
     </section>
 
     <div class="ed__actions">
@@ -311,6 +384,72 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
 .ed__input--narrow { max-width: 64px; }
 .ed__textarea { resize: vertical; min-height: 52px; }
 .ed__range { width: 100%; accent-color: var(--accent); }
+.ed__file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.ed__file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+.ed__file-btn {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-default);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background var(--dur-fast) var(--ease-standard);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ed__file-btn:hover {
+    border-color: var(--accent-border, var(--accent));
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+}
+.ed__file-btn:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.ed__file-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ed__file-clear {
+  flex: none;
+  min-height: 32px;
+  padding: 0 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-3);
+  font-size: var(--fs-cap);
+  cursor: pointer;
+}
+@media (hover: hover) and (pointer: fine) {
+  .ed__file-clear:hover { color: var(--danger); }
+}
 .ed__check { display: flex; align-items: center; gap: 6px; font-size: var(--fs-meta); color: var(--text-2); }
 .ed__check input { accent-color: var(--accent); }
 .ed__listrow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
@@ -322,15 +461,14 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
   border-radius: var(--radius-full); padding: 3px 10px; cursor: pointer;
   transition: border-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
 }
+.ed__chip:disabled { opacity: 0.45; cursor: not-allowed; }
 @media (hover: hover) and (pointer: fine) {
-  .ed__chip:hover { border-color: var(--accent); color: var(--accent); }
+  .ed__chip:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 }
 .ed__hint { font-size: var(--fs-cap); color: var(--text-3); margin: 0; line-height: 1.6; }
 .ed__hint--warn { color: var(--warning); }
 .ed__actions { display: flex; gap: var(--space-1); justify-content: flex-end; }
 
-/* 触屏设备（手机竖屏）：鸿蒙触控规范命中区 ≥44vp。
-   桌面（精确指针）保留紧凑密度，不放大。 */
 @media (pointer: coarse) {
   .ed__chip {
     display: inline-flex;
@@ -345,7 +483,6 @@ const EMBLEMS: { value: TicketSealEmblem; label: string }[] = [
     width: 20px;
     height: 20px;
   }
-  /* 原生 range 轨道仅 16px 高，触屏上几乎无法拖：撑到 32px 命中带 */
   .ed__range {
     height: 32px;
   }

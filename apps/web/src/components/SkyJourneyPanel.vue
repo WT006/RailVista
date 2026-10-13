@@ -338,7 +338,8 @@ defineExpose({ compute });
 
     <p v-if="errorMsg" class="sky-error" role="alert" aria-live="polite">{{ errorMsg }}</p>
 
-    <template v-if="timeline">
+    <!-- 头部/发车固定，正文可滚：避免 chips 占高后日月时刻被 overflow:hidden 裁切 -->
+    <div v-if="timeline" class="sky-body">
       <div class="sky-chips">
         <div class="sky-chip">
           <span class="sky-chip__k">月相</span>
@@ -439,7 +440,7 @@ defineExpose({ compute });
       <footer class="sky-foot">
         <p>指数由沿途逐时气象（云量分层/能见度/湿度）与天文条件合成；光污染为城市灯光影响场估算。</p>
       </footer>
-    </template>
+    </div>
   </aside>
 </template>
 
@@ -461,11 +462,26 @@ defineExpose({ compute });
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: var(--elev-3);
   overflow: hidden;
+  min-height: 0;
 }
 
 .sky-panel.is-compact {
   left: var(--gutter);
   width: auto;
+}
+
+/* 可滚正文：chips / 日月时刻 / 看点 / 时间轴都在此区内，避免底部裁切 */
+.sky-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-stack);
+  padding-right: 2px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sky-head {
@@ -727,8 +743,6 @@ defineExpose({ compute });
 }
 
 .sky-timeline {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -737,9 +751,6 @@ defineExpose({ compute });
   margin: 0;
   padding: 0;
   list-style: none;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  min-height: 0;
 }
 
 .sky-item {
@@ -907,7 +918,7 @@ defineExpose({ compute });
 @media (min-width: 641px) {
   /* 桌面：让开右侧固定按钮列（定位/卫星/图例/天象），互不遮挡 */
   .sky-panel {
-    right: calc(var(--gutter) + 98px + var(--safe-right, 0px));
+    right: calc(var(--gutter) + 84px + var(--safe-right, 0px));
   }
 }
 
@@ -924,13 +935,18 @@ defineExpose({ compute });
     border-radius: var(--radius-md);
   }
 
-  /* chips 横向轻扫，不占纵向空间 */
+  /* chips 横向轻扫，少占竖向，给日月时刻留位置 */
   .sky-chips {
     flex-wrap: nowrap;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
     padding-bottom: 2px;
+    flex: none;
+  }
+
+  .sky-moments {
+    flex: none;
   }
 
   .sky-chips::-webkit-scrollbar {

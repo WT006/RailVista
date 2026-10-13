@@ -1249,7 +1249,7 @@
           "distanceKm": 60,
           "driveHours": 1.5,
           "condition": "G105 京珠线广州北段，双向多车道为主，路面良好；过太和以后路口与村镇密度上升，周末出城方向排队明显。",
-          "note": "G105 编号取自项目内 data/roads/index/national.json（京珠线：北京—澳门，经广东）；沿途电动车与摩托车多，注意让行。",
+          "note": "G105 编号取自项目内 data/roads/index/national.json（京珠线：北京—中国澳门，经广东）；沿途电动车与摩托车多，注意让行。",
           "poiIds": []
         },
         {
@@ -1479,7 +1479,7 @@
       },
       "sources": [
         {
-          "title": "项目内 data/roads/index/national.json（G105 京珠线：北京—澳门，经广东、广州）",
+          "title": "项目内 data/roads/index/national.json（G105 京珠线：北京—中国澳门，经广东、广州）",
           "publisher": "RailVista 公路索引",
           "usedFor": "广州市区—从化段国道编号；从化—良口、良口—派潭、增城—广州三段无稳定编号，按俗称 + refPending 处理"
         },

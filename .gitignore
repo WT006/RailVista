@@ -7,6 +7,9 @@ dist
 apps/web/.env
 apps/web/.env.production
 apps/api/.env
+
+# 本机打好的上线包（可能含密钥，勿提交）
+deploy/out/
 config.js
 data/station_name.cache.json
 data/cache/
@@ -80,3 +83,17 @@ ticket-assets/
 
 # 公路堵点填补脚本的中间缓存（158MB，远超 GitHub 100MB 单文件上限）
 data/roads/gapfill/
+
+# 根目录验收截图 / 临时探测产物（probe 脚本生成，勿入库）
+/probe-*.png
+/probe-*.json
+/tmp-*.mjs
+/tmp-*.txt
+/tmp-*.json
+
+# 根目录纪念票设计稿 / 原型 / 一次性清单（产品参考，非运行时资源）
+/*纪念票*.png
+/*纪念票*.html
+/*纪念票*.md
+/RailVista-*景点总清单*.docx
+/*.bak-*

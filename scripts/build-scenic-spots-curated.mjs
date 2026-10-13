@@ -3151,12 +3151,12 @@ spots.push(
   }),
   spot({
     id: 'guangshengang-hongkong-distant',
-    name: '香港西九龙门户',
+    name: '中国香港西九龙门户',
     lng: 114.164274,
     lat: 22.306248,
     visibility: 'window',
     category: 'other',
-    intro: '广深港高铁终点香港西九龙，跨境高铁与维港都会门户。',
+    intro: '广深港高铁终点中国香港西九龙，跨境高铁与维港都会门户。',
   }),
 
   // 福厦：湄洲/泉州

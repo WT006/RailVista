@@ -316,7 +316,7 @@
     "湖北",
     "湖南",
     "广东",
-    "澳门"
+    "中国澳门"
    ],
    "fromPlace": "北京",
    "toPlace": "港澳",
@@ -492,7 +492,7 @@
    "class": "expressway",
    "provinces": [],
    "fromPlace": "广州",
-   "toPlace": "澳门",
+   "toPlace": "中国澳门",
    "lengthKm": 156.7,
    "bbox": [
     113.2241,

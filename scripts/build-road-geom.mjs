@@ -52,9 +52,9 @@ const SLUG_TO_NAME = {
   guangdong: '广东', guangxi: '广西', guizhou: '贵州', hainan: '海南', hebei: '河北',
   heilongjiang: '黑龙江', henan: '河南', hubei: '湖北', hunnan: '湖南', hunan: '湖南',
   inner_mongolia: '内蒙古', jiangsu: '江苏', jiangxi: '江西', jilin: '吉林', liaoning: '辽宁',
-  macau: '澳门', ningxia: '宁夏', qinghai: '青海', shaanxi: '陕西', shandong: '山东',
+  macau: '中国澳门', ningxia: '宁夏', qinghai: '青海', shaanxi: '陕西', shandong: '山东',
   shanghai: '上海', shanxi: '山西', sichuan: '四川', tianjin: '天津', tibet: '西藏',
-  xinjiang: '新疆', yunnan: '云南', zhejiang: '浙江', hong_kong: '香港',
+  xinjiang: '新疆', yunnan: '云南', zhejiang: '浙江', hong_kong: '中国香港',
 };
 
 // ── 权威名录（官方里程 / 起讫点） ───────────────────────────────────────────

@@ -13,6 +13,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api, type AtlasCorridorDetail, type AtlasCorridorSpot } from '../api/client';
+import { ATLAS_RAIL_STROKE } from '../data/atlasColors';
 import { findRankingsByCorridor } from '../data/beautifulRailings';
 import {
   SPOT_DIMENSIONS,
@@ -24,6 +25,13 @@ import {
   type DimensionMeta,
 } from '../data/spotDimensions';
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
+
+/** AMap Polyline 只认实色，不认 CSS 变量（历史坑：strokeColor:'var(--accent)' → 路线不可见） */
+function readToken(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
 
 const route = useRoute();
 const router = useRouter();
@@ -161,7 +169,7 @@ async function drawMap() {
 
   const line = new AMapRef.Polyline({
     path,
-    strokeColor: 'var(--accent)',
+    strokeColor: readToken('--rail', ATLAS_RAIL_STROKE),
     strokeWeight: 4,
     strokeOpacity: 0.95,
     strokeStyle: 'solid',
@@ -432,11 +440,16 @@ watch(corridorId, async () => {
 
 <style scoped>
 .route-page {
+  position: relative;
+  z-index: 1;
   min-height: 100%;
   /* 底部避让悬浮页签胶囊（--bottomnav-h 已含 8vp 悬浮留白）+ Home 指示条安全区，
      此前固定 40px 在手机竖屏会让末段内容被胶囊压住约 21px */
   padding: 14px 14px calc(40px + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
+  /* 半透明遮罩压住背景星点，卡片再叠一层；勿用全透明否则字叠光斑。
+     双声明：不支持 color-mix 时回退不透明底，避免整页透穿。 */
   background: var(--surface-0);
+  background: color-mix(in srgb, var(--surface-0) 78%, transparent);
   color: var(--text-2);
 }
 
@@ -524,7 +537,14 @@ watch(corridorId, async () => {
   padding: 12px 13px;
   border-radius: var(--radius-md);
   border: 1px solid var(--line-default);
-  background: linear-gradient(180deg, var(--surface-2), var(--surface-1));
+  background: var(--surface-1);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-0) 45%, var(--surface-2)),
+    color-mix(in srgb, var(--surface-0) 40%, var(--surface-1))
+  );
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
 
 .route-head__od {
@@ -588,6 +608,7 @@ watch(corridorId, async () => {
   overflow: hidden;
   border: 1px solid var(--line-default);
   background: var(--surface-sunken);
+  background: color-mix(in srgb, var(--surface-0) 50%, var(--surface-sunken));
 }
 
 .route-map {
@@ -669,6 +690,9 @@ watch(corridorId, async () => {
   border-radius: var(--radius-md);
   border: 1px solid var(--line-hairline);
   background: var(--surface-2);
+  background: color-mix(in srgb, var(--surface-0) 42%, var(--surface-2));
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
 }
 
 .route-group__title {

@@ -51,6 +51,9 @@ body:has(.drive-map-page) {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
+  /* 全屏地图不挂侧边/底栏：清零占位，浮层不再为页面切换让位 */
+  --sidenav-w: 0px;
+  --bottomnav-h: 0px;
 }
 
 /* #app 的高度锁同样只在页面级地图生效：.trip-page{height:100%} 需要父级有确定高度 */
@@ -357,7 +360,13 @@ html:has(.drive-map-page) #app {
   background: var(--surface-sunken);
 }
 
+.status-meta__item--mode.is-warn {
+  border-color: color-mix(in srgb, var(--warning) 35%, transparent);
+  background: color-mix(in srgb, var(--warning) 10%, var(--surface-sunken));
+}
+
 .status-meta__item--mode .status-meta__v {
+  flex: 1;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -389,11 +398,13 @@ html:has(.drive-map-page) #app {
 }
 
 .status-meta__k {
+  flex-shrink: 0;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-3);
+  white-space: nowrap;
 }
 
 .status-meta__v {
@@ -401,6 +412,10 @@ html:has(.drive-map-page) #app {
   font-weight: 650;
   color: var(--text-1);
   font-variant-numeric: tabular-nums;
+}
+
+.status-meta__v--warn {
+  color: var(--warning);
 }
 
 .clock {
@@ -612,6 +627,16 @@ html:has(.drive-map-page) #app {
   box-shadow: var(--elev-up);
 }
 
+/* 底栏档：整卡抬到悬浮页签上方，避免进度条/景点信息被底栏挡住 */
+@media (max-width: 839px) {
+  .bottom-panel {
+    bottom: calc(var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
+    /* 安全区已计入 bottom，内边距不再叠一层 Home 指示条 */
+    padding-bottom: 10px;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+}
+
 .location-card {
   margin-bottom: 6px;
 }
@@ -670,13 +695,56 @@ html:has(.drive-map-page) #app {
   margin: 8px 0;
 }
 
+.upcoming-card .next-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin-bottom: 4px;
+}
+
 .upcoming-card .next-name {
+  flex: 1 1 auto;
+  min-width: 0;
   font-size: clamp(17px, 4.8vw, 21px);
   font-weight: 700;
   color: var(--text-1);
   line-height: 1.25;
-  margin-bottom: 4px;
+  margin-bottom: 0;
   word-break: break-word;
+}
+
+.upcoming-card .next-name-row .side-badge {
+  flex: none;
+}
+
+.upcoming-card .next-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 6px;
+}
+
+.upcoming-card .next-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.3;
+  white-space: nowrap;
+  /* 叠地图上要够实，避免透字；双声明兜底不支持 color-mix 的引擎 */
+  background: var(--surface-lift);
+  background: color-mix(in srgb, var(--surface-0) 78%, var(--surface-lift) 22%);
+  border: 1px solid var(--line-default);
+  color: var(--text-1);
+}
+
+.upcoming-card .next-tag--dist {
+  color: var(--text-2);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .upcoming-card .next-meta {
@@ -1109,8 +1177,8 @@ html:has(.drive-map-page) #app {
   bottom: calc(var(--bottom-overlay) + 10px);
   z-index: 101;
   box-sizing: border-box;
-  width: 88px;
-  height: 40px;
+  width: 72px;
+  height: 32px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -1121,7 +1189,7 @@ html:has(.drive-map-page) #app {
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   color: var(--success);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -1131,11 +1199,11 @@ html:has(.drive-map-page) #app {
 .satellite-btn {
   position: fixed;
   right: calc(10px + var(--safe-right));
-  bottom: calc(var(--bottom-overlay) + 58px);
+  bottom: calc(var(--bottom-overlay) + 48px);
   z-index: 101;
   box-sizing: border-box;
-  width: 88px;
-  height: 40px;
+  width: 72px;
+  height: 32px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -1146,7 +1214,7 @@ html:has(.drive-map-page) #app {
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   color: var(--text-1);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
@@ -1162,11 +1230,11 @@ html:has(.drive-map-page) #app {
 .legend-toggle {
   position: fixed;
   right: calc(10px + var(--safe-right));
-  bottom: calc(var(--bottom-overlay) + 106px);
+  bottom: calc(var(--bottom-overlay) + 86px);
   z-index: 101;
   box-sizing: border-box;
-  width: 88px;
-  height: 40px;
+  width: 72px;
+  height: 32px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -1178,7 +1246,7 @@ html:has(.drive-map-page) #app {
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   color: var(--text-1);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
@@ -1188,11 +1256,11 @@ html:has(.drive-map-page) #app {
 .sky-btn {
   position: fixed;
   right: calc(10px + var(--safe-right));
-  bottom: calc(var(--bottom-overlay) + 154px);
+  bottom: calc(var(--bottom-overlay) + 124px);
   z-index: 101;
   box-sizing: border-box;
-  width: 88px;
-  height: 40px;
+  width: 72px;
+  height: 32px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -1201,7 +1269,7 @@ html:has(.drive-map-page) #app {
   border-radius: var(--radius-full);
   background: var(--panel-bg);
   color: var(--text-1);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
@@ -1217,19 +1285,19 @@ html:has(.drive-map-page) #app {
 .legend {
   position: fixed;
   right: calc(10px + var(--safe-right));
-  bottom: calc(var(--bottom-overlay) + 202px);
+  bottom: calc(var(--bottom-overlay) + 162px);
   z-index: 101;
   display: none;
-  min-width: 104px;
+  min-width: 88px;
   /* 同 legend-toggle：压住底图注记，避免「风景」等行出现重影 */
   background: color-mix(in srgb, var(--surface-0) 88%, var(--surface-lift));
   backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
   border: 1px solid var(--line-default);
   border-radius: var(--radius-md);
-  padding: 8px 10px;
-  font-size: 12px;
-  line-height: 1.4;
+  padding: 5px 7px;
+  font-size: 11px;
+  line-height: 1.3;
   color: var(--text-2);
   box-shadow: var(--elev-float-strong);
 }
@@ -1250,17 +1318,17 @@ html:has(.drive-map-page) #app {
 
 .legend-item--toggle {
   display: grid;
-  grid-template-columns: 16px minmax(0, 1fr);
+  grid-template-columns: 14px minmax(0, 1fr);
   align-items: center;
-  column-gap: 8px;
+  column-gap: 6px;
   width: 100%;
   margin: 0;
-  padding: 5px 4px;
+  padding: 3px 2px;
   border: none;
   background: transparent;
   color: inherit;
   font: inherit;
-  line-height: 1.35;
+  line-height: 1.3;
   text-align: left;
   cursor: pointer;
   border-radius: var(--radius-xs);
@@ -1579,22 +1647,22 @@ html:has(.drive-map-page) #app {
     display: none;
   }
 
-  /* 桌面图例常显：定位/卫星放在图例上方（TripMap 图例较高，留足空隙） */
+  /* 桌面图例常显：定位/卫星按实测图例高度叠在上方（--map-controls-lift） */
   .legend {
     display: block;
     bottom: calc(var(--bottom-overlay) + 12px);
   }
 
   .locate-btn {
-    bottom: calc(var(--bottom-overlay) + 190px);
+    bottom: calc(var(--bottom-overlay) + var(--map-controls-lift, 158px));
   }
 
   .satellite-btn {
-    bottom: calc(var(--bottom-overlay) + 238px);
+    bottom: calc(var(--bottom-overlay) + var(--map-controls-lift, 158px) + 38px);
   }
 
   .sky-btn {
-    bottom: calc(var(--bottom-overlay) + 286px);
+    bottom: calc(var(--bottom-overlay) + var(--map-controls-lift, 158px) + 76px);
   }
 
   .bottom-panel .meta {
@@ -1604,7 +1672,6 @@ html:has(.drive-map-page) #app {
 
 @media (max-width: 380px) {
   .status-meta {
-    grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
     gap: 4px;
   }
 
@@ -1701,6 +1768,13 @@ html:has(.drive-map-page) #app {
   border-top: 1px solid var(--line-hairline);
 }
 
+/* 手机点「图例」只保留图层开关；车窗方位说明占位多，桌面常显图例再展示 */
+@media (max-width: 839px) {
+  .legend-side {
+    display: none;
+  }
+}
+
 .legend-side__title {
   width: 100%;
   color: var(--text-2);
@@ -1715,214 +1789,121 @@ html:has(.drive-map-page) #app {
   font-size: var(--fs-micro);
 }
 
-/* ── U1 精度状态面板（PreciseRoutePanel）─────────────────────────────────
-   与 .status-card 同一语言：12–14 圆角、1px 描边、低饱和底色；
-   主色 var(--accent) / 成功 var(--info) / 警示 var(--warning) / 失败 var(--danger) / 离线 var(--text-2)。 */
-.precise-panel {
-  display: grid;
-  gap: 6px;
-  margin-top: 8px;
-  padding: 8px 10px 9px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--line-default);
-  background: linear-gradient(180deg, var(--surface-2), var(--surface-scrim));
-  transition: border-color var(--dur-fast) var(--ease-standard), background var(--dur-fast) var(--ease-standard);
-}
-
-.precise-panel--compact {
-  padding: 7px 8px 8px;
-  gap: 5px;
-}
-
-.precise-panel__head {
-  display: flex;
+/* ── 精准路线单按钮（PreciseRoutePanel）────────────────────────────────
+   可点：idle / failed；不可点：busy / done / partial / offline。 */
+.precise-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-width: 0;
+  gap: 7px;
+  max-width: 100%;
+  margin-top: 8px;
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 8px;
+  border: 1px solid var(--accent-soft);
+  background: linear-gradient(180deg, var(--accent-press), var(--accent));
+  color: var(--text-1);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--dur-micro) var(--ease-standard),
+    border-color var(--dur-micro) var(--ease-standard),
+    opacity var(--dur-micro) var(--ease-standard);
 }
 
-.precise-dot {
-  width: 8px;
-  height: 8px;
+.precise-btn--compact {
+  height: 28px;
+  padding: 0 9px;
+  font-size: 11px;
+}
+
+.precise-btn__dot {
+  width: 7px;
+  height: 7px;
   border-radius: var(--radius-full);
   flex-shrink: 0;
-  background: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  background: currentColor;
+  opacity: 0.85;
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 22%, transparent);
 }
 
-.precise-panel--done .precise-dot {
-  background: var(--info);
-  box-shadow: 0 0 0 3px var(--success-soft);
-}
-.precise-panel--partial .precise-dot,
-.precise-panel--bridging .precise-dot {
-  background: var(--warning);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--warning) 16%, transparent);
-}
-.precise-panel--failed .precise-dot {
-  background: var(--danger);
-  box-shadow: 0 0 0 3px var(--danger-soft);
-}
-.precise-panel--offline .precise-dot {
-  background: var(--text-2);
-  box-shadow: 0 0 0 3px var(--line-hairline);
-}
-
-.precise-panel__title {
-  flex: 1;
+.precise-btn__label {
   min-width: 0;
-  font-size: var(--fs-meta);
-  font-weight: 700;
-  color: var(--text-1);
-  line-height: 1.35;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.precise-panel__ratio,
-.precise-tier {
-  flex-shrink: 0;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-2);
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
-  background: var(--line-hairline);
-}
-
-.precise-tier {
-  color: var(--accent-hover);
-  background: var(--accent-soft);
-}
-
-.precise-panel--done .precise-tier {
-  color: var(--info);
-  background: var(--success-soft);
-}
-
-.precise-panel__toggle,
-.precise-panel__cancel {
-  flex-shrink: 0;
-  border: 1px solid var(--line-default);
-  background: var(--line-hairline);
-  color: var(--text-2);
-  border-radius: 8px;
-  height: 22px;
-  min-width: 22px;
-  padding: 0 6px;
-  font-size: 11px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.precise-panel__cancel:hover {
-  color: var(--danger);
-  border-color: var(--danger);
-  background: var(--danger-soft);
-}
-
-.precise-progress {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.precise-progress__track {
-  flex: 1;
-  height: 4px;
-  border-radius: var(--radius-full);
-  background: var(--line-hairline);
-  overflow: hidden;
-}
-
-.precise-progress__bar {
-  height: 100%;
-  width: 100%;
-  transform-origin: 0 50%;
-  border-radius: var(--radius-full);
-  background: linear-gradient(90deg, var(--accent-press), var(--accent));
-  transition: transform var(--dur-base) var(--ease-standard);
-}
-
-.precise-panel--bridging .precise-progress__bar {
-  background: linear-gradient(90deg, var(--warning), var(--warning));
-}
-
-.precise-progress__pct {
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-2);
-  min-width: 30px;
-  text-align: right;
-}
-
-.precise-panel__note,
-.precise-panel__desc,
-.precise-panel__stale {
-  margin: 0;
-  font-size: 11px;
-  color: var(--text-2);
-  line-height: 1.4;
-}
-
-.precise-panel__stale {
-  color: var(--warning);
-}
-
-.precise-panel__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.precise-btn {
-  height: 28px;
-  padding: 0 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: background var(--dur-micro) var(--ease-standard), border-color var(--dur-micro) var(--ease-standard);
-}
-
-.precise-btn--primary {
-  background: linear-gradient(180deg, var(--accent-press), var(--accent-press));
-  border-color: var(--accent-soft);
-  color: var(--text-1);
-  font-weight: 600;
-}
-
-.precise-btn--primary:disabled {
-  opacity: 0.55;
+.precise-btn--static,
+.precise-btn:disabled {
   cursor: default;
 }
 
-.precise-btn--ghost {
-  background: var(--line-hairline);
+.precise-btn--busy {
   border-color: var(--line-default);
+  background: linear-gradient(180deg, var(--surface-2), var(--surface-scrim));
   color: var(--text-2);
+  font-weight: 600;
+  opacity: 1;
 }
 
-.precise-panel--done .precise-btn--primary {
+.precise-btn--busy .precise-btn__dot {
+  background: var(--accent);
+  animation: precise-pulse 1.1s var(--ease-standard) infinite;
+}
+
+.precise-btn--bridging .precise-btn__dot {
+  background: var(--warning);
+}
+
+.precise-btn--loaded,
+.precise-btn--done,
+.precise-btn--partial {
+  border-color: color-mix(in srgb, var(--info) 45%, transparent);
   background: linear-gradient(180deg, var(--success-soft), var(--success-soft));
-  border-color: var(--info);
   color: var(--info);
+  font-weight: 600;
+  opacity: 1;
 }
 
-.precise-panel__summary {
-  display: flex;
+.precise-btn--partial {
+  border-color: color-mix(in srgb, var(--warning) 45%, transparent);
+  background: color-mix(in srgb, var(--warning) 14%, var(--surface-2));
+  color: var(--warning);
 }
 
-.precise-panel__summary-text {
-  font-size: 11px;
-  color: var(--info);
+.precise-btn--failed {
+  border-color: color-mix(in srgb, var(--danger) 50%, transparent);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.precise-btn--offline {
+  border-color: var(--line-default);
+  background: var(--line-hairline);
+  color: var(--text-2);
+  font-weight: 500;
+  opacity: 1;
+}
+
+@keyframes precise-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .precise-panel,
-  .precise-progress__bar,
-  .precise-btn {
+  .precise-btn,
+  .precise-btn--busy .precise-btn__dot {
     transition: none;
+    animation: none;
   }
 }

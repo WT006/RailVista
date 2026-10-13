@@ -61,6 +61,13 @@ TARGETS = {
     "a6": ("hunan-airlines", "湖南航空"),
     "gx": ("begui-bay-airlines", "北部湾航空"),
     "ry": ("jiangxi-airlines", "江西航空"),
+    # 大陆缺图补齐（2026-10）
+    "fm": ("shanghai-airlines", "上海航空"),
+    "y8": ("suparna-airlines", "金鹏航空"),
+    "jr": ("joy-air", "幸福航空"),
+    "dr": ("ruili-airlines", "瑞丽航空"),
+    "9h": ("air-changan", "长安航空"),
+    "oq": ("chongqing-airlines", "重庆航空"),
 }
 
 PAGE_URLS = [

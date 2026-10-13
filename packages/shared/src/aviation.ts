@@ -4,8 +4,8 @@
  * 设计原则：
  * - 机场中文名、IATA/ICAO、英文名、坐标为**确定性数据**，本地即可自动匹配，
  *   不依赖任何在线服务（例如 广州白云 CAN ↔ Guangzhou Baiyun International Airport）。
- * - 起降时刻、登机口等动态信息只能来自航班数据服务商，见 apps/api flightLookup：
- *   配置 AIRLABS_API_KEY 后自动拉取；未配置时这些字段留空，由前端标注「待补」。
+ * - 起降时刻等动态信息由 apps/api flightLookup 经 FlyClaw 拉取；
+ *   在线源不可用时由前端补选机场/时刻。
  */
 
 /** 机场 */
@@ -214,11 +214,11 @@ const AIRPORT_LIST: Airport[] = [
   { iata: 'ZQZ', icao: 'ZBCZ', name: '张家口宁远机场', short: '宁远', city: '张家口', province: '河北', nameEn: 'Zhangjiakou Ningyuan Airport', cityEn: 'Zhangjiakou', lat: 40.74, lng: 114.93 },
 
   // 港澳台
-  { iata: 'HKG', icao: 'VHHH', name: '香港国际机场', short: '赤鱲角', city: '香港', province: '香港', nameEn: 'Hong Kong International Airport', cityEn: 'Hong Kong', lat: 22.31, lng: 113.91 },
-  { iata: 'MFM', icao: 'VMMC', name: '澳门国际机场', short: '澳门', city: '澳门', province: '澳门', nameEn: 'Macau International Airport', cityEn: 'Macau', lat: 22.15, lng: 113.59 },
-  { iata: 'TPE', icao: 'RCTP', name: '台北桃园国际机场', short: '桃园', city: '桃园', province: '台湾', nameEn: 'Taiwan Taoyuan International Airport', cityEn: 'Taoyuan', lat: 25.08, lng: 121.23 },
-  { iata: 'TSA', icao: 'RCSS', name: '台北松山机场', short: '松山', city: '台北', province: '台湾', nameEn: 'Taipei Songshan Airport', cityEn: 'Taipei', lat: 25.07, lng: 121.55 },
-  { iata: 'KHH', icao: 'RCKH', name: '高雄小港国际机场', short: '小港', city: '高雄', province: '台湾', nameEn: 'Kaohsiung International Airport', cityEn: 'Kaohsiung', lat: 22.58, lng: 120.35 },
+  { iata: 'HKG', icao: 'VHHH', name: '中国香港国际机场', short: '赤鱲角', city: '中国香港', province: '中国香港', nameEn: 'Hong Kong International Airport', cityEn: 'Hong Kong', lat: 22.31, lng: 113.91 },
+  { iata: 'MFM', icao: 'VMMC', name: '中国澳门国际机场', short: '中国澳门', city: '中国澳门', province: '中国澳门', nameEn: 'Macau International Airport', cityEn: 'Macau', lat: 22.15, lng: 113.59 },
+  { iata: 'TPE', icao: 'RCTP', name: '台北桃园国际机场', short: '桃园', city: '桃园', province: '中国台湾', nameEn: 'Taiwan Taoyuan International Airport', cityEn: 'Taoyuan', lat: 25.08, lng: 121.23 },
+  { iata: 'TSA', icao: 'RCSS', name: '台北松山机场', short: '松山', city: '台北', province: '中国台湾', nameEn: 'Taipei Songshan Airport', cityEn: 'Taipei', lat: 25.07, lng: 121.55 },
+  { iata: 'KHH', icao: 'RCKH', name: '高雄小港国际机场', short: '小港', city: '高雄', province: '中国台湾', nameEn: 'Kaohsiung International Airport', cityEn: 'Kaohsiung', lat: 22.58, lng: 120.35 },
 
   // 常用国际枢纽
   { iata: 'BKK', icao: 'VTBS', name: '曼谷素万那普机场', short: '素万那普', city: '曼谷', nameEn: 'Suvarnabhumi Airport', cityEn: 'Bangkok', lat: 13.69, lng: 100.75 },
@@ -283,7 +283,7 @@ const AIRLINE_LIST: Airline[] = [
   { iata: 'CX', icao: 'CPA', name: '国泰航空', nameEn: 'Cathay Pacific', short: '国泰航空', alliance: '寰宇一家', color: '#00633F' },
   { iata: 'BR', icao: 'EVA', name: '长荣航空', nameEn: 'EVA Air', short: '长荣航空', alliance: '星空联盟', color: '#006B3F' },
   { iata: 'CI', icao: 'CAL', name: '中华航空', nameEn: 'China Airlines', short: '中华航空', alliance: '天合联盟', color: '#003D79' },
-  { iata: 'NX', icao: 'AMU', name: '澳门航空', nameEn: 'Air Macau', short: '澳门航空', color: '#C8102E' },
+  { iata: 'NX', icao: 'AMU', name: '中国澳门航空', nameEn: 'Air Macau', short: '中国澳门航空', color: '#C8102E' },
   // 国际常用
   { iata: 'AA', icao: 'AAL', name: '美国航空', nameEn: 'American Airlines', short: '美航', alliance: '寰宇一家', color: '#C8102E' },
   { iata: 'UA', icao: 'UAL', name: '美国联合航空', nameEn: 'United Airlines', short: '美联航', alliance: '星空联盟', color: '#0033A0' },
@@ -380,8 +380,8 @@ export interface FlightEndpointInfo {
 }
 
 export interface FlightLookup {
-  /** 数据来源：fr24=FlightRadar24在线动态；airlabs=AirLabs在线实时/历史；local=本地（仅航司/机场等确定信息） */
-  source: 'fr24' | 'airlabs' | 'local';
+  /** 数据来源：flyclaw=FlyClaw 在线查询；local=本地（仅航司等确定信息） */
+  source: 'flyclaw' | 'local';
   flightNumber: string;
   airlineIata?: string;
   date: string;

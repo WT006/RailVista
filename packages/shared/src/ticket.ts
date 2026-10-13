@@ -41,7 +41,7 @@ export interface TicketSealConfig {
 export interface TicketQrConfig {
   enabled: boolean;
   caption: string;
-  /** 二维码内容（分享短链）；渲染层据此生成确定性码图 */
+  /** 二维码 / 条形码内容（可扫描 URL）；渲染层生成真实可扫码图 */
   value: string;
 }
 
@@ -141,9 +141,9 @@ export function createTicketConfig(kind: TicketKind): TicketConfig {
     tags: [],
     quote: '',
     seal: { enabled: true, emblem: 'none', text: '' },
-    qr: { enabled: true, caption: 'SCAN · 路书', value: 'https://hw.hey.world/t/demo' },
+    qr: { enabled: true, caption: 'SCAN · 路书', value: 'https://waybook.tyuho.cn' },
     background: { theme: '', opacity: 0.18 },
-    brand: { logo: true, watermark: true, footerText: '万里路书 HEY WORLD\n扫码查看完整路书' },
+    brand: { logo: true, watermark: true, footerText: '万里路书 HEY WORLD' },
     airline: null,
     updatedAt: Date.now(),
   };
@@ -156,7 +156,7 @@ export function createTicketConfig(kind: TicketKind): TicketConfig {
       serial: makeTicketSerial('railway', '2026-07-15'),
       dateText: '2026.07.15 · 19:40 开',
       metaLeft: '2026.07.15 · 19:40 开',
-      metaRight: '07车15号下铺 · 风景侧',
+      metaRight: '07车15号下铺',
       route: {
         ends: [
           { name: '西宁西', pinyin: 'XININGXI' },

@@ -158,11 +158,16 @@ export async function geocodeOne(address) {
  *   roads:[{name,distanceM}],
  *   steps:[{name,distanceM,points:[[lng,lat]]}]   // 每个 step 自带点，便于按路名门控/切分
  * }
+ * opts.strategy：v3 驾车策略（缺省 0 速度优先；6=不走高速，用于地面走线兜底）。
+ * 磁盘缓存：data/cache/amap/drive/leg-{o}-{d}-s{n}.json（坐标 1e-5 ≈ 1.1m 粒度），
+ * 批量重建时同一 leg 不重复消耗配额。
  */
-export async function drivingLeg(origin, dest) {
-  const o = `${origin[0]},${origin[1]}`;
-  const d = `${dest[0]},${dest[1]}`;
-  const url = `${REST}/v3/direction/driving?origin=${o}&destination=${d}&key=${AMAP_KEY}&extensions=all&output=json`;
+export async function drivingLeg(origin, dest, { strategy = 0 } = {}) {
+  const q = (p) => p[0].toFixed(5) + ',' + p[1].toFixed(5);
+  const o = q(origin), d = q(dest);
+  const cp = cachePath(`drive/leg-${o.replace(',', '_')}__${d.replace(',', '_')}-s${strategy}.json`);
+  if (existsSync(cp)) return JSON.parse(readFileSync(cp, 'utf8'));
+  const url = `${REST}/v3/direction/driving?origin=${o}&destination=${d}&key=${AMAP_KEY}&extensions=all&output=json&strategy=${strategy}`;
   const j = await getJson(url);
   const path = j.route?.paths?.[0];
   if (!path) throw new Error('无路径');
@@ -182,5 +187,8 @@ export async function drivingLeg(origin, dest) {
     roads.push({ name, distanceM });
     steps.push({ name, distanceM, points: spts });
   }
-  return { points, distanceM: Number(path.distance) || 0, roads, steps };
+  const leg = { points, distanceM: Number(path.distance) || 0, roads, steps };
+  mkdirSync(join(CACHE_DIR, 'drive'), { recursive: true });
+  writeFileSync(cp, JSON.stringify(leg));
+  return leg;
 }

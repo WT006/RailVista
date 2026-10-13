@@ -277,6 +277,8 @@ const AIRLINE_LIST: Airline[] = [
   { iata: 'GT', icao: 'CGH', name: '桂林航空', nameEn: 'Air Guilin', short: '桂林航空', color: '#B41F21' },
   { iata: 'DR', icao: 'RLH', name: '瑞丽航空', nameEn: 'Ruili Airlines', short: '瑞丽航空', color: '#8B0000' },
   { iata: '9H', icao: 'CGN', name: '长安航空', nameEn: 'Air Changan', short: '长安航空', color: '#B41F21' },
+  { iata: 'TV', icao: 'TBA', name: '西藏航空', nameEn: 'Tibet Airlines', short: '西藏航空', color: '#007B43' },
+  { iata: 'AQ', icao: 'JYH', name: '九元航空', nameEn: '9 Air', short: '九元航空', color: '#F9007B' },
   // 港澳台
   { iata: 'CX', icao: 'CPA', name: '国泰航空', nameEn: 'Cathay Pacific', short: '国泰航空', alliance: '寰宇一家', color: '#00633F' },
   { iata: 'BR', icao: 'EVA', name: '长荣航空', nameEn: 'EVA Air', short: '长荣航空', alliance: '星空联盟', color: '#006B3F' },

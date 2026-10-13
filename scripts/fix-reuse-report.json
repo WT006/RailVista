@@ -1,9 +1,77 @@
 [
  {
+  "f": "四川_S303",
+  "issue": "official-segment-missing",
+  "comps": 5,
+  "total": 528
+ },
+ {
+  "f": "甘肃_S301",
+  "issue": "official-segment-missing",
+  "comps": 7,
+  "total": 403
+ },
+ {
+  "f": "青海_S102",
+  "mainKm": 108,
+  "official": 40,
+  "reuse": 2,
+  "reuseKm": 133
+ },
+ {
+  "f": "四川_S217",
+  "issue": "official-segment-missing",
+  "comps": 4,
+  "total": 1205
+ },
+ {
+  "f": "河北_S272",
+  "issue": "official-segment-missing",
+  "comps": 2,
+  "total": 160
+ },
+ {
+  "f": "青海_S202",
+  "issue": "official-segment-missing",
+  "comps": 2,
+  "total": 157
+ },
+ {
+  "f": "西藏_S301",
+  "issue": "official-segment-missing",
+  "comps": 8,
+  "total": 1897
+ },
+ {
+  "f": "云南_S308",
+  "issue": "official-segment-missing",
+  "comps": 1,
+  "total": 49
+ },
+ {
+  "f": "四川_S211",
+  "issue": "official-segment-missing",
+  "comps": 8,
+  "total": 299
+ },
+ {
   "f": "青海_S101",
-  "mainKm": 793,
+  "mainKm": 873,
   "official": 400,
   "reuse": 6,
-  "reuseKm": 1330
+  "reuseKm": 891
+ },
+ {
+  "f": "新疆_S101",
+  "issue": "official-segment-missing",
+  "comps": 4,
+  "total": 311
+ },
+ {
+  "f": "湖南_S228",
+  "mainKm": 15,
+  "official": 40,
+  "reuse": 3,
+  "reuseKm": 40
  }
 ]

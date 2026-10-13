@@ -11,6 +11,8 @@ export const flightsRoute = new Hono();
 flightsRoute.get('/lookup', async (c) => {
   const flightNo = (c.req.query('flightNo') ?? '').trim();
   const date = (c.req.query('date') ?? '').trim();
+  const from = (c.req.query('from') ?? '').trim() || undefined;
+  const to = (c.req.query('to') ?? '').trim() || undefined;
   if (!flightNo || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return c.json(
       {
@@ -20,7 +22,7 @@ flightsRoute.get('/lookup', async (c) => {
       400,
     );
   }
-  const data = await lookupFlight(flightNo, date);
+  const data = await lookupFlight(flightNo, date, from, to);
   return c.json({ ok: true, data });
 });
 

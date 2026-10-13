@@ -1,14 +1,13 @@
 <script setup lang="ts">
 /**
  * 铁路个性化（选完车次后展示）：
- * 席别滚轮选择；车厢号、座位号；硬卧/软卧选铺位；里程选填；风景侧开关；一句感言。
+ * 席别滚轮选择；车厢号、座位号；硬卧/软卧选铺位；里程选填；一句感言。
  * 任意修改实时联动票面。
  */
 import { reactive, watch } from 'vue';
 import { useTicketStore } from '../../stores/ticketStore';
 import HmField from './hm/HmField.vue';
 import HmSelect from './hm/HmSelect.vue';
-import HmSwitch from './hm/HmSwitch.vue';
 import type { WheelOption } from './hm/HmWheel.vue';
 
 const store = useTicketStore();
@@ -36,7 +35,6 @@ const form = reactive({
   seatNo: '',
   berth: '',
   mileage: '' as string | number,
-  scenicSide: false,
   quote: '',
 });
 
@@ -57,7 +55,6 @@ watch(
         berth: isBerth() ? form.berth : undefined,
         mileage: form.mileage === '' ? null : Number(form.mileage),
         quote: form.quote,
-        scenicSide: form.scenicSide,
       });
     }, 180);
   },
@@ -110,10 +107,6 @@ watch(
       suffix="km"
     />
 
-    <div class="rp-card__switch">
-      <HmSwitch v-model="form.scenicSide" label="风景侧座位" desc="靠风景一侧，如青藏线看雪山" />
-    </div>
-
     <HmField v-model="form.quote" label="一句感言（选填）" placeholder="如 在可可西里看到了藏羚羊" />
   </div>
 </template>
@@ -134,5 +127,4 @@ watch(
 .rp-card__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ticket-gold); box-shadow: 0 0 8px color-mix(in srgb, var(--ticket-gold) 70%, transparent); }
 .rp-card__tip { margin-left: auto; font-size: 11px; font-weight: 400; color: var(--text-3); }
 .rp-card__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 12px; }
-.rp-card__switch { padding: 10px 0 14px; border-bottom: 1px solid var(--line-default); margin-bottom: 14px; }
 </style>

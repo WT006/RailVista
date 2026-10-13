@@ -1,7 +1,7 @@
 /**
  * 地级政区：图集展示层按真实市界归点（不写回景点库）。
  * 先点面判定 DataV 转写的地级多边形；未命中（离岛、填海）再退回全国驻地最近邻。
- * 香港/澳门用独立界，不再并进深圳/珠海。
+ * 中国香港/中国澳门用独立界，不再并进深圳/珠海。
  */
 import boundsFile from './prefectureBounds.json';
 
@@ -366,13 +366,13 @@ const RAW: Array<[string, string, number, number]> = [
   ['新疆', '塔城', 82.98, 46.75],
   ['新疆', '阿勒泰', 88.14, 47.85],
   ['新疆', '石河子', 86.04, 44.31],
-  ['香港', '香港', 114.17, 22.32],
-  ['澳门', '澳门', 113.54, 22.19],
-  ['台湾', '台北', 121.57, 25.04],
-  ['台湾', '高雄', 120.31, 22.62],
-  ['台湾', '台中', 120.67, 24.15],
-  ['台湾', '台南', 120.21, 22.99],
-  ['台湾', '花莲', 121.6, 23.97],
+  ['中国香港', '中国香港', 114.17, 22.32],
+  ['中国澳门', '中国澳门', 113.54, 22.19],
+  ['中国台湾', '台北', 121.57, 25.04],
+  ['中国台湾', '高雄', 120.31, 22.62],
+  ['中国台湾', '台中', 120.67, 24.15],
+  ['中国台湾', '台南', 120.21, 22.99],
+  ['中国台湾', '花莲', 121.6, 23.97],
 ];
 
 const BY_PROV = new Map<string, PrefectureSeed[]>();
@@ -429,9 +429,9 @@ function pipPlace(lng: number, lat: number): AtlasPlace | null {
     }
   }
   if (!best) return null;
-  if (best.p === '台湾' && best.n === '台湾') {
-    const tw = nearestSeedInProv(lng, lat, '台湾');
-    if (tw) return { province: '台湾', city: tw.n };
+  if (best.p === '中国台湾' && (best.n === '中国台湾' || best.n === '中国台湾省' || best.n === '台湾' || best.n === '台湾省')) {
+    const tw = nearestSeedInProv(lng, lat, '中国台湾');
+    if (tw) return { province: '中国台湾', city: tw.n };
   }
   return { province: best.p, city: best.n };
 }
@@ -491,6 +491,19 @@ export function cityOfPoint(lng: number, lat: number, province?: string): string
   return placeOfPoint(lng, lat, province).city;
 }
 
+/** 展示层合规：港/澳/台统一加「中国」前缀（兼容旧数据短名） */
+export function canonicalRegionLabel(name: string): string {
+  const t = name.trim();
+  if (!t) return t;
+  if (t === '香港' || t === '香港特别行政区') return '中国香港';
+  if (t === '澳门' || t === '澳门特别行政区') return '中国澳门';
+  if (t === '台湾' || t === '台湾省') return '中国台湾';
+  if (t === '中国香港特别行政区') return '中国香港';
+  if (t === '中国澳门特别行政区') return '中国澳门';
+  if (t === '中国台湾省') return '中国台湾';
+  return t;
+}
+
 /**
  * 公路景点展示归属：按经纬度重算，不把库内 province 当权威。
  * 命中地级界 → 界内省/市；未命中再退回采集标签（不用最近驻地，避免港/澳并进广东）。
@@ -502,11 +515,11 @@ export function roadDisplayPlace(
 ): { displayProvince: string; displayCity: string } {
   const pip = pipPlace(lng, lat);
   if (pip) {
-    const displayProvince = pip.province.trim() || '未标注省份';
-    const displayCity = pip.city.trim() || displayProvince;
+    const displayProvince = canonicalRegionLabel(pip.province.trim() || '未标注省份');
+    const displayCity = canonicalRegionLabel(pip.city.trim() || displayProvince);
     return { displayProvince, displayCity };
   }
   const stored = String(storedProvince ?? '').trim();
-  const displayProvince = stored || '未标注省份';
+  const displayProvince = canonicalRegionLabel(stored || '未标注省份');
   return { displayProvince, displayCity: displayProvince };
 }

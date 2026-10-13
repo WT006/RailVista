@@ -37,9 +37,9 @@ export const PROVINCE_BBOXES = [
   { code: '54', name: '西藏', bbox: [26.5, 78.4, 36.5, 99.1] },
   { code: '64', name: '宁夏', bbox: [35.1, 104.3, 39.3, 107.7] },
   { code: '65', name: '新疆', bbox: [34.3, 73.5, 49.2, 96.4] },
-  { code: '91', name: '香港', bbox: [22.1, 113.8, 22.6, 114.5] },
-  { code: '92', name: '澳门', bbox: [22.1, 113.5, 22.2, 113.6] },
-  { code: '71T', name: '台湾', bbox: [21.8, 119.6, 25.6, 122.1] },
+  { code: '91', name: '中国香港', bbox: [22.1, 113.8, 22.6, 114.5] },
+  { code: '92', name: '中国澳门', bbox: [22.1, 113.5, 22.2, 113.6] },
+  { code: '71T', name: '中国台湾', bbox: [21.8, 119.6, 25.6, 122.1] },
 ];
 
 function inProvinceBbox(lng, lat, bbox) {
@@ -48,7 +48,7 @@ function inProvinceBbox(lng, lat, bbox) {
 }
 
 /** 嵌在邻省框内的特别行政区：有大陆省命中时不抢标签 */
-const NESTED_SA = new Set(['香港', '澳门', '台湾']);
+const NESTED_SA = new Set(['中国香港', '香港', '中国澳门', '澳门', '中国台湾', '台湾']);
 
 /**
  * 点落省。分片 bbox 外扩后会重叠：甘肃框盖住青海湖/茶卡，若按数组顺序取首个命中

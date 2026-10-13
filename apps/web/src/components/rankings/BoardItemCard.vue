@@ -48,7 +48,7 @@ const disabledLabel = computed(() => {
 });
 
 const disabledTitle = computed(() => {
-  if (props.item.inspirationOnly) return '该条目在库内暂无对应路网（如台湾/在建线路），仅供灵感参考';
+  if (props.item.inspirationOnly) return '该条目在库内暂无对应路网（如中国台湾/在建线路），仅供灵感参考';
   if (props.boardLevel === 'international')
     return '海外路线暂不支持查看沿程景点，本产品路网覆盖中国公路';
   return '该条目尚未关联公路编号，也没有起终点数据，暂时无法查看沿程景点';

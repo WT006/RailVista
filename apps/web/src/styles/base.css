@@ -76,14 +76,15 @@ html {
   min-height: 100dvh;
   padding-bottom: calc(var(--space-8) + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
   /*
-   * 末层底色改为 transparent：背景层已从各页面内提升到 App 根（AppBackdrop），
-   * 页面若仍铺一层不透明 --surface-0 就会把背景整块盖住。
-   * 页面底色由 body（base.css 的 --surface-0）兜底，观感不变。
+   * 背景层在 App 根（AppBackdrop）；页面末层用 --page-scrim 轻压星点/热力，
+   * 仍透出地图轮廓。勿改回全透明——卡片半透明时正文会叠在光斑上。
+   * 双声明：不支持 color-mix 时回退 surface-0，避免整页透穿。
    */
+  background: var(--surface-0);
   background:
     radial-gradient(ellipse 70% 42% at 10% -8%, var(--accent-soft), transparent 58%),
     radial-gradient(ellipse 60% 38% at 92% 4%, var(--fill-accent), transparent 55%),
-    transparent;
+    var(--page-scrim);
   color: var(--text-1);
 }
 

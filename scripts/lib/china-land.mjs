@@ -4,7 +4,7 @@
  */
 const CJK_RE = /[\u4e00-\u9fff]/;
 const CN_COUNTRY_RE =
-  /^(CN|CHN|China|PRC|HK|MO|TW|中国|中华人民共和国|香港|澳门|台湾)$/i;
+  /^(CN|CHN|China|PRC|HK|MO|TW|中国|中华人民共和国|中国香港|香港|中国澳门|澳门|中国台湾|台湾)$/i;
 const FOREIGN_NAME_RE =
   /\b(Nepal|Kathmandu|Pokhara|Namche|Lukla|Sikkim|Gangtok|Thimphu|Paro|Hanuman|Chorten|Melamchi|Lobuche|Kongma|Chukhung|Everest viewpoint|Haa valley|Bahrabise|Nasim Pati)\b/i;
 

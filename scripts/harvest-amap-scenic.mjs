@@ -95,7 +95,14 @@ async function placeText(city, page, tries = 4) {
 
 // ── 城市清单：行政区划库的地级市 + 四个直辖市 ─────────────────────────────────
 const admin = JSON.parse(readFileSync(ADMIN_PATH, 'utf8'));
-const SKIP_PROVINCE = new Set(['台湾', '香港', '澳门']); // 路网未覆盖，先不采
+const SKIP_PROVINCE = new Set([
+  '中国台湾',
+  '台湾',
+  '中国香港',
+  '香港',
+  '中国澳门',
+  '澳门',
+]); // 路网未覆盖，先不采
 const cities = admin.places
   .filter((p) => p.level === 'city' && !SKIP_PROVINCE.has(p.province))
   .map((p) => p.name);

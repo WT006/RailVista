@@ -5,7 +5,7 @@
  * 引导式制作（鸿蒙风格交互）：
  *  - 顶部 HmSegmented 切票种；
  *  - 侧栏按票种给出引导构建器（铁路=选车次+少量个性化；自驾=规划路线+路牌增删；飞行=航班号查询）；
- *  - 主栏票面实时预览；全字段编辑器折叠为「高级」。
+ *  - 主栏票面实时预览；按票种裁剪的微调编辑器折叠为「高级微调」。
  */
 import { computed, ref } from 'vue';
 import type { TicketKind, TrainSummary } from '@railvista/shared';
@@ -116,7 +116,7 @@ const showAdvanced = ref(false);
           <!-- 高级全字段 -->
           <section class="rv-card" data-spotlight>
             <button type="button" class="adv-toggle" @click="showAdvanced = !showAdvanced">
-              <span>高级 · 全字段编辑</span>
+              <span>高级微调</span>
               <svg v-if="!showAdvanced" viewBox="0 0 24 24" width="17" height="17"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 9l6 6 6-6"/></svg>
               <svg v-else viewBox="0 0 24 24" width="17" height="17"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 15l6-6 6 6"/></svg>
             </button>

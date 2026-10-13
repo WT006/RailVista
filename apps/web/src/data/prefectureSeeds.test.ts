@@ -36,9 +36,9 @@ describe('roadDisplayPlace', () => {
 
   it('keeps Hong Kong / Macau out of Guangdong', () => {
     const hk = roadDisplayPlace(114.16765, 22.29062, '广东');
-    assert.equal(hk.displayProvince, '香港');
+    assert.equal(hk.displayProvince, '中国香港');
     const mo = roadDisplayPlace(113.543, 22.198, '广东');
-    assert.equal(mo.displayProvince, '澳门');
+    assert.equal(mo.displayProvince, '中国澳门');
   });
 
   it('falls back to the harvest label only when the point misses prefecture polygons', () => {

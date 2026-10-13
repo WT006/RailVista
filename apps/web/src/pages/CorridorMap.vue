@@ -887,11 +887,11 @@ watch([displayFrom, displayTo], async () => {
 /* 走廊图图例更矮：按钮紧贴图例上方，与图例右缘对齐成一列 */
 @media (min-width: 641px) {
   .locate-btn {
-    bottom: calc(var(--bottom-overlay) + 128px);
+    bottom: calc(var(--bottom-overlay) + 108px);
   }
 
   .satellite-btn {
-    bottom: calc(var(--bottom-overlay) + 176px);
+    bottom: calc(var(--bottom-overlay) + 146px);
   }
 }
 </style>

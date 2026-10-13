@@ -81,8 +81,12 @@ export type AtlasSpot = {
   matchKind: 'line' | 'geo' | null;
   /** 数据来源：rail=铁路景点库，road=公路景点库（前端合并筛选/着色时用） */
   origin?: 'rail' | 'road';
-  /** 采集/库内省份。公路侧只作来源标签；展示用前端 displayProvince / displayCity */
+  /** 采集/库内省份。公路侧只作来源标签；展示用 displayProvince / displayCity */
   province?: string;
+  /** 公路景点展示省（服务端按库内省市写入，免前端 2.7 万次点-in-polygon） */
+  displayProvince?: string;
+  /** 公路景点展示市 */
+  displayCity?: string;
   /** 观赏评分（0–100）：公路侧有，铁路侧数据源无此字段 */
   score?: number;
   /** 质量分级 A/B/C */
@@ -305,24 +309,46 @@ let overviewCache: { at: number; data: AtlasOverview } | null = null;
 
 /**
  * 公路侧单独缓存。
- * 铁路侧的 overviewCache 只有 60s TTL，而公路侧构建要读几何 + 遍历上万景点
- * （实测 42s），若跟着 60s 一起重建会周期性卡死请求链路。
- * 公路数据变更极少（路网几何 + 景点库都是构建期产物），故按「文件指纹 + 10 分钟」
- * 双条件缓存：数据没变就一直复用。
+ * 铁路侧的 overviewCache 只有 60s TTL；公路侧按「文件指纹 + 10 分钟」缓存。
+ * 冷路径：overview 只碰 getRoadMetaLite（廉价计数）；完整图层等 /atlas/road 才建。
  */
 const ROAD_TTL_MS = 600_000;
+
+export type AtlasRoadCluster = {
+  name: string;
+  /** 市圈带所属省，便于按省筛选 */
+  province?: string;
+  lng: number;
+  lat: number;
+  count: number;
+};
+
+type RoadLayerData = {
+  roadCorridors: AtlasRoadCorridor[];
+  /** 内存全量落图点（slim），供 /atlas/road/spots 按需切片；默认不塞进 JSON */
+  roadSpots: AtlasSpot[];
+  provinces: AtlasRoadCluster[];
+  cities: AtlasRoadCluster[];
+  topSpots: AtlasSpot[];
+  excluded: number;
+  libraryCount: number;
+};
+
 type RoadLayerCache = {
   stamp: string;
   at: number;
-  data: {
-    roadCorridors: AtlasRoadCorridor[];
-    roadSpots: AtlasSpot[];
-    excluded: number;
-    /** 公路原生景点库总量（未做图集落图过滤） */
-    libraryCount: number;
-  };
+  data: RoadLayerData;
 };
 let roadCache: RoadLayerCache | null = null;
+
+type RoadMetaLite = {
+  roadCorridorCount: number;
+  roadSpotCount: number;
+  roadSpotLibraryCount: number;
+  roadMigratedExcluded: number;
+};
+let roadMetaCache: { stamp: string; at: number; data: RoadMetaLite } | null = null;
+
 let cacheStamp = '';
 
 function stamp(): string {
@@ -430,7 +456,9 @@ function buildOverview(): AtlasOverview {
 
   const out: AtlasCorridor[] = corridors.map((c) => {
     const lineIds = lineIdsByCorridor.get(c.id) || [];
+    // geo 已排除与 line 重复的 id；详情/榜单小地图要与正式行程一致，合并两侧
     const geoIds = (geoIdsByCorridor.get(c.id) || []).filter((x) => !lineIds.includes(x));
+    const spotIds = [...lineIds, ...geoIds];
     return {
       id: c.id,
       name: c.name,
@@ -438,37 +466,36 @@ function buildOverview(): AtlasOverview {
       polyline: c.polyline,
       lineSpotCount: lineIds.length,
       geoSpotCount: geoIds.length,
-      spotCount: lineIds.length || geoIds.length,
-      spotIds: lineIds.length ? lineIds : geoIds,
+      spotCount: spotIds.length,
+      spotIds,
       lengthKm: c.lengthKm,
     };
   });
 
-  // ── 公路侧（双源融合）：线路 + 公路原生景点 ────────────────────────────────
-  // 任一侧加载失败都不影响铁路侧（Promise 级别的降级在前端，这里用 try 兜住即可）
-  const road = getRoadLayer();
-  const roadCorridors = road.roadCorridors;
-  const roadSpots = road.roadSpots;
-  const roadMigratedExcluded = road.excluded;
-  const roadSpotLibraryCount = road.libraryCount;
-
   // 铁路景点补来源标记，前端合并成一个列表时可区分
   for (const s of spots) s.origin = 'rail';
+
+  /*
+   * v0.6.x 性能：此处**不再**同步构建公路层。
+   * 旧路径把 2.7 万公路点 + 250 条几何归属算进 overview，冷构建 ~25s，
+   * 首屏「正在加载全国铁路与景点数据…」一直挂着。
+   * 公路明细改走 /atlas/road（聚合轻量包）与 /atlas/road/spots（按省/市按需）；
+   * meta 里公路计数用廉价 getRoadMetaLite()，不读几何、不做沿线归属。
+   */
+  const roadMeta = getRoadMetaLite();
 
   return {
     corridors: out,
     spots,
-    roadCorridors,
-    roadSpots,
+    roadCorridors: [],
+    roadSpots: [],
     meta: {
       corridorCount: out.length,
       spotCount: spots.length,
-      roadCorridorCount: roadCorridors.length,
-      /** 图集实际落图（已滤测绘噪音） */
-      roadSpotCount: roadSpots.length,
-      /** 公路原生库总量，供 UI「展示 N / 库内 M」 */
-      roadSpotLibraryCount,
-      roadMigratedExcluded,
+      roadCorridorCount: roadMeta.roadCorridorCount,
+      roadSpotCount: roadMeta.roadSpotCount,
+      roadSpotLibraryCount: roadMeta.roadSpotLibraryCount,
+      roadMigratedExcluded: roadMeta.roadMigratedExcluded,
       generatedAt: new Date().toISOString(),
       buildMs: Date.now() - t0,
     },
@@ -477,8 +504,8 @@ function buildOverview(): AtlasOverview {
 
 /** 公路图层指纹：几何目录与景点库任一变化即失效；含落图规则版本以免规则改了仍吃旧缓存 */
 function roadStamp(): string {
-  // 与落图/去重规则同步 bump（v3 = 近名去重 + 城区限流）
-  let out = 'atlas-road-display:v3|';
+  // v4 = 聚合轻量包 + roadRefs 归属（不再对 2.7 万点做几何 geoMatch）
+  let out = 'atlas-road-display:v4|';
   try {
     if (existsSync(SPOTS_PATH)) out += String(statSync(SPOTS_PATH).mtimeMs);
   } catch {
@@ -497,7 +524,161 @@ function roadStamp(): string {
   return out;
 }
 
-function getRoadLayer(): RoadLayerCache['data'] {
+/** 有几何的编号公路条数（上限 250，与图层一致）；只扫目录名，不读内容 */
+function countGeomCorridors(): number {
+  try {
+    if (!existsSync(GEOM_DIR)) return 0;
+    let n = 0;
+    for (const f of readdirSync(GEOM_DIR)) {
+      if (f.endsWith('.json')) n += 1;
+      if (n >= 250) return 250;
+    }
+    return n;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * overview 用的公路 meta：
+ * - 已有公路图层缓存 → 精确计数
+ * - 否则只扫 geom 目录拿 corridor 数，**不读 37MB 景点库**
+ *   （读库 + 落图去重曾把冷 overview 拖到 40s+）
+ * 景点精确数等 /atlas/road 轻量包回来后由前端补上。
+ */
+function getRoadMetaLite(): RoadMetaLite {
+  const now = Date.now();
+  const cur = roadStamp();
+  if (roadMetaCache && roadMetaCache.stamp === cur && now - roadMetaCache.at < ROAD_TTL_MS) {
+    return roadMetaCache.data;
+  }
+  if (roadCache && roadCache.stamp === cur && now - roadCache.at < ROAD_TTL_MS) {
+    const d = roadCache.data;
+    const data: RoadMetaLite = {
+      roadCorridorCount: d.roadCorridors.length || countGeomCorridors(),
+      roadSpotCount: d.roadSpots.length,
+      roadSpotLibraryCount: d.libraryCount,
+      roadMigratedExcluded: d.excluded,
+    };
+    roadMetaCache = { stamp: cur, at: now, data };
+    return data;
+  }
+  const data: RoadMetaLite = {
+    roadCorridorCount: countGeomCorridors(),
+    roadSpotCount: 0,
+    roadSpotLibraryCount: 0,
+    roadMigratedExcluded: 0,
+  };
+  roadMetaCache = { stamp: cur, at: now, data };
+  return data;
+}
+
+function collectRoadDisplaySpots(): {
+  spots: AtlasSpot[];
+  excluded: number;
+  libraryCount: number;
+  refsById: Map<string, string[]>;
+} {
+  const all = getRoadsideSpots() as unknown as Array<Record<string, unknown>>;
+  const native = all.filter((s) => !String(s.source ?? '').startsWith('migrated'));
+  const excluded = all.length - native.length;
+  const libraryCount = native.length;
+  const candidates: AtlasSpot[] = [];
+  const refsById = new Map<string, string[]>();
+  for (const s of native) {
+    const lng = Number(s.lng);
+    const lat = Number(s.lat);
+    const id = String(s.id ?? s.name ?? '');
+    if (!Number.isFinite(lng) || !Number.isFinite(lat) || !id) continue;
+    const tags = s.osmTags && typeof s.osmTags === 'object' ? (s.osmTags as Record<string, unknown>) : {};
+    const ele = Number.parseFloat(String(tags.ele ?? ''));
+    const name = String(s.name ?? id);
+    const score = Number.isFinite(Number(s.score)) ? Number(s.score) : undefined;
+    const category = typeof s.category === 'string' ? s.category : undefined;
+    const source = typeof s.source === 'string' && s.source ? s.source : undefined;
+    if (
+      !isAtlasRoadDisplaySpot({
+        name,
+        lng,
+        lat,
+        score,
+        category,
+        source,
+        ele: Number.isFinite(ele) ? ele : undefined,
+      })
+    ) {
+      continue;
+    }
+    const province = typeof s.province === 'string' && s.province ? s.province : undefined;
+    const city = typeof s.city === 'string' && s.city ? s.city : undefined;
+    candidates.push({
+      id,
+      name,
+      lng: round4(lng),
+      lat: round4(lat),
+      category,
+      province,
+      displayProvince: province || '未标注省份',
+      displayCity: city || province || '未分市',
+      score,
+      tier: typeof s.tier === 'string' ? s.tier : undefined,
+      source,
+      corridorIds: [],
+      matchKind: null,
+      origin: 'road',
+    });
+    const refs = Array.isArray(s.roadRefs) ? s.roadRefs.map((r) => String(r)).filter(Boolean) : [];
+    if (refs.length) refsById.set(id, refs);
+  }
+  const spots = dedupeAtlasRoadSpots(candidates);
+  return { spots, excluded, libraryCount, refsById };
+}
+
+function clusterRoadSpots(spots: AtlasSpot[]): { provinces: AtlasRoadCluster[]; cities: AtlasRoadCluster[] } {
+  type Acc = { lng: number; lat: number; count: number; province?: string };
+  const byProv = new Map<string, Acc>();
+  const byCity = new Map<string, Acc>();
+  for (const s of spots) {
+    const prov = s.displayProvince || s.province || '未标注省份';
+    const city = s.displayCity || prov;
+    const p = byProv.get(prov);
+    if (p) {
+      p.lng += s.lng;
+      p.lat += s.lat;
+      p.count += 1;
+    } else byProv.set(prov, { lng: s.lng, lat: s.lat, count: 1 });
+    const ck = `${prov}\0${city}`;
+    const c = byCity.get(ck);
+    if (c) {
+      c.lng += s.lng;
+      c.lat += s.lat;
+      c.count += 1;
+    } else byCity.set(ck, { lng: s.lng, lat: s.lat, count: 1, province: prov });
+  }
+  const provinces: AtlasRoadCluster[] = [...byProv.entries()]
+    .map(([name, a]) => ({
+      name,
+      lng: round4(a.lng / a.count),
+      lat: round4(a.lat / a.count),
+      count: a.count,
+    }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'zh'));
+  const cities: AtlasRoadCluster[] = [...byCity.entries()]
+    .map(([key, a]) => {
+      const name = key.split('\0')[1] || key;
+      return {
+        name,
+        province: a.province,
+        lng: round4(a.lng / a.count),
+        lat: round4(a.lat / a.count),
+        count: a.count,
+      };
+    })
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'zh'));
+  return { provinces, cities };
+}
+
+function getRoadLayer(): RoadLayerData {
   const now = Date.now();
   const cur = roadStamp();
   if (roadCache && roadCache.stamp === cur && now - roadCache.at < ROAD_TTL_MS) {
@@ -505,102 +686,58 @@ function getRoadLayer(): RoadLayerCache['data'] {
   }
   const data = buildRoadLayer();
   roadCache = { stamp: cur, at: now, data };
+  roadMetaCache = {
+    stamp: cur,
+    at: now,
+    data: {
+      roadCorridorCount: data.roadCorridors.length,
+      roadSpotCount: data.roadSpots.length,
+      roadSpotLibraryCount: data.libraryCount,
+      roadMigratedExcluded: data.excluded,
+    },
+  };
   return data;
 }
 
-function buildRoadLayer(): RoadLayerCache['data'] {
-  const empty = {
-    roadCorridors: [] as AtlasRoadCorridor[],
-    roadSpots: [] as AtlasSpot[],
+function buildRoadLayer(): RoadLayerData {
+  const empty: RoadLayerData = {
+    roadCorridors: [],
+    roadSpots: [],
+    provinces: [],
+    cities: [],
+    topSpots: [],
     excluded: 0,
     libraryCount: 0,
   };
   try {
-    // 取 250 条上限：索引里 hasGeom 标了 15107 条，但实际几何文件只有 448 个
-    // （既有数据不一致，本轮不修数据），按里程降序取前 250 条能覆盖到全部
-    // 真实有几何的干线（约 201 条），剩下的会因文件缺失被 buildNetworkOverview 跳过。
     const { roads } = roadNetworkOverview({ limit: 250, maxPoints: 160 });
-    const all = getRoadsideSpots() as unknown as Array<Record<string, unknown>>;
-    // 公路网只显示公路原生景点；source=migrated:* 是早期从铁路侧迁来的，
-    // 它们的坐标贴铁路走廊，画在公路网上位置就是错的（需求方明确指出的严重问题）
-    const native = all.filter((s) => !String(s.source ?? '').startsWith('migrated'));
-    const excluded = all.length - native.length;
-    const libraryCount = native.length;
-
-    const roadGrid = buildGeoIndex(roads.map((r) => ({ id: r.key, polyline: r.polyline })));
-    const roadIdsByKey = new Map<string, string[]>();
-    const candidates: AtlasSpot[] = [];
-    for (const s of native) {
-      const lng = Number(s.lng);
-      const lat = Number(s.lat);
-      const id = String(s.id ?? s.name ?? '');
-      if (!Number.isFinite(lng) || !Number.isFinite(lat) || !id) continue;
-      const tags = s.osmTags && typeof s.osmTags === 'object' ? (s.osmTags as Record<string, unknown>) : {};
-      const ele = Number.parseFloat(String(tags.ele ?? ''));
-      const name = String(s.name ?? id);
-      const score = Number.isFinite(Number(s.score)) ? Number(s.score) : undefined;
-      const category = typeof s.category === 'string' ? s.category : undefined;
-      const source = typeof s.source === 'string' && s.source ? s.source : undefined;
-      const hasWiki = Boolean(tags.wikipedia || tags['wikipedia:zh'] || tags.wikidata);
-      if (
-        !isAtlasRoadDisplaySpot({
-          name,
-          lng,
-          lat,
-          score,
-          category,
-          source,
-          ele: Number.isFinite(ele) ? ele : undefined,
-        })
-      ) {
-        continue;
-      }
-      candidates.push({
-        id,
-        name,
-        lng: round4(lng),
-        lat: round4(lat),
-        intro: typeof s.intro === 'string' ? s.intro.slice(0, 60) : undefined,
-        category,
-        province: typeof s.province === 'string' && s.province ? s.province : undefined,
-        score,
-        tier: typeof s.tier === 'string' ? s.tier : undefined,
-        source,
-        ele: Number.isFinite(ele) ? ele : undefined,
-        hasWiki: hasWiki || undefined,
-        corridorIds: [],
-        matchKind: null,
-        origin: 'road',
-      });
+    const { spots, excluded, libraryCount, refsById } = collectRoadDisplaySpots();
+    const keySet = new Set(roads.map((r) => r.key));
+    const countByKey = new Map<string, number>();
+    for (const spot of spots) {
+      const refs = refsById.get(spot.id) || [];
+      const hit = refs.filter((k) => keySet.has(k));
+      spot.corridorIds = hit.slice(0, 12);
+      spot.matchKind = hit.length ? 'line' : null;
+      for (const k of hit) countByKey.set(k, (countByKey.get(k) ?? 0) + 1);
     }
-    // 近名合并 + 城区密集聚限流（城门群 / 馆群），再挂公路归属
-    const roadSpots = dedupeAtlasRoadSpots(candidates);
-    for (const spot of roadSpots) {
-      const keys = [...geoMatch(roadGrid, spot.lng, spot.lat, 20).keys()];
-      spot.corridorIds = keys;
-      spot.matchKind = keys.length ? 'geo' : null;
-      for (const k of keys) {
-        const arr = roadIdsByKey.get(k);
-        if (arr) arr.push(spot.id);
-        else roadIdsByKey.set(k, [spot.id]);
-      }
-    }
-    const roadCorridors: AtlasRoadCorridor[] = roads.map((r) => {
-      const ids = roadIdsByKey.get(r.key) ?? [];
-      return {
-        key: r.key,
-        ref: r.ref,
-        name: r.name,
-        class: r.class,
-        polyline: r.polyline,
-        lengthKm: r.lengthKm,
-        spotCount: ids.length,
-        spotIds: ids,
-      };
-    });
-    return { roadCorridors, roadSpots, excluded, libraryCount };
+    const roadCorridors: AtlasRoadCorridor[] = roads.map((r) => ({
+      key: r.key,
+      ref: r.ref,
+      name: r.name,
+      class: r.class,
+      polyline: r.polyline,
+      lengthKm: r.lengthKm,
+      spotCount: countByKey.get(r.key) ?? 0,
+      spotIds: [],
+    }));
+    const { provinces, cities } = clusterRoadSpots(spots);
+    const topSpots = spots
+      .slice()
+      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || a.name.localeCompare(b.name, 'zh'))
+      .slice(0, 10);
+    return { roadCorridors, roadSpots: spots, provinces, cities, topSpots, excluded, libraryCount };
   } catch {
-    // 公路侧不可用（无路网数据/服务未初始化）：铁路侧完整保留
     return empty;
   }
 }
@@ -620,14 +757,6 @@ function getOverview(): AtlasOverview {
 atlasRoute.get('/overview', (c) => {
   try {
     const data = getOverview();
-    /*
-     * v0.6.3：此处**不再**返回 roadCorridors / roadSpots。
-     * 公路侧一旦并入，响应体从 ~200KB 涨到 4.4MB（624 铁路 + 1.2 万公路景点），
-     * 浏览器要解析 4.4MB JSON 再把 1.2 万个点交给 AMap 聚类，主线程长时间阻塞，
-     * 表现为「可选要素一直不加载、页面卡住」（实测冷加载路径）。
-     * 公路侧改由 /atlas/road 按需提供：meta 里仍带 roadSpotCount 等轻量计数，
-     * 侧栏能显示「铁路 624 · 公路 12087」，但明细等用户真要看公路时才拉。
-     */
     const { roadCorridors: _rc, roadSpots: _rs, ...railOnly } = data;
     return c.json({ ok: true, data: railOnly });
   } catch (e) {
@@ -638,27 +767,82 @@ atlasRoute.get('/overview', (c) => {
   }
 });
 
-/** v0.6.3：公路侧明细（编号公路折线 + 公路原生景点），前端按需拉取 */
+/** 公路轻量包：折线 + 省/市聚合 + Top10；全量点走 /atlas/road/spots */
 atlasRoute.get('/road', (c) => {
   try {
-    const { roadCorridors, roadSpots, meta } = getOverview();
+    const layer = getRoadLayer();
     return c.json({
       ok: true,
       data: {
-        roadCorridors,
-        roadSpots,
+        roadCorridors: layer.roadCorridors,
+        provinces: layer.provinces,
+        cities: layer.cities,
+        topSpots: layer.topSpots,
         meta: {
-          roadCorridorCount: meta.roadCorridorCount,
-          roadSpotCount: meta.roadSpotCount,
-          roadSpotLibraryCount: meta.roadSpotLibraryCount,
-          roadMigratedExcluded: meta.roadMigratedExcluded,
-          generatedAt: meta.generatedAt,
+          roadCorridorCount: layer.roadCorridors.length,
+          roadSpotCount: layer.roadSpots.length,
+          roadSpotLibraryCount: layer.libraryCount,
+          roadMigratedExcluded: layer.excluded,
+          generatedAt: new Date().toISOString(),
         },
       },
     });
   } catch (e) {
     return c.json(
       { ok: false, error: { code: 'ATLAS_ROAD_FAIL', message: e instanceof Error ? e.message : '公路图层聚合失败' } },
+      500,
+    );
+  }
+});
+
+/** 按省/市切片公路景点；无筛选时返回全量 slim（热力用） */
+atlasRoute.get('/road/spots', (c) => {
+  try {
+    const layer = getRoadLayer();
+    const province = String(c.req.query('province') || '').trim();
+    const city = String(c.req.query('city') || '').trim();
+    const limitRaw = Number(c.req.query('limit') || 0);
+    let list = layer.roadSpots;
+    if (province) {
+      list = list.filter((s) => (s.displayProvince || s.province || '') === province);
+    }
+    if (city) {
+      list = list.filter((s) => (s.displayCity || '') === city);
+    }
+    if (Number.isFinite(limitRaw) && limitRaw > 0) {
+      list = list
+        .slice()
+        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+        .slice(0, Math.min(2000, Math.floor(limitRaw)));
+    }
+    const spots = list.map((s) => ({
+      id: s.id,
+      name: s.name,
+      lng: s.lng,
+      lat: s.lat,
+      score: s.score,
+      tier: s.tier,
+      category: s.category,
+      province: s.province,
+      displayProvince: s.displayProvince,
+      displayCity: s.displayCity,
+      corridorIds: s.corridorIds,
+      matchKind: s.matchKind,
+      origin: 'road' as const,
+    }));
+    return c.json({
+      ok: true,
+      data: {
+        spots,
+        meta: { count: spots.length, province: province || null, city: city || null },
+      },
+    });
+  } catch (e) {
+    return c.json(
+      {
+        ok: false,
+        error: { code: 'ATLAS_ROAD_SPOTS_FAIL', message: e instanceof Error ? e.message : '公路景点切片失败' },
+      },
       500,
     );
   }

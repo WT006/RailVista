@@ -23,6 +23,22 @@ const routes = ref<TravelRouteSummary[]>([]);
 const total = ref(0);
 const overview = ref({ totalRoutes: 0, totalPois: 0, latestUpdated: '' });
 
+/** 每页条数：卡片栅格一屏可读，不再一次塞满全库 */
+const PAGE_SIZE = 12;
+const page = ref(1);
+const pageCount = computed(() => Math.max(1, Math.ceil(total.value / PAGE_SIZE)));
+const pageWindow = computed(() => {
+  const totalPages = pageCount.value;
+  const cur = page.value;
+  // 最多露出 5 个页码，当前页尽量居中
+  let start = Math.max(1, cur - 2);
+  let end = Math.min(totalPages, start + 4);
+  start = Math.max(1, end - 4);
+  const pages: number[] = [];
+  for (let i = start; i <= end; i += 1) pages.push(i);
+  return pages;
+});
+
 const province = ref('');
 const city = ref('');
 const mode = ref('');
@@ -145,17 +161,42 @@ async function loadRoutes() {
       maxDays: maxDays.value === '' ? undefined : maxDays.value,
       q: keyword.value.trim() || undefined,
       sort: sort.value,
-      limit: 100,
+      limit: PAGE_SIZE,
+      offset: (page.value - 1) * PAGE_SIZE,
     });
     routes.value = data.routes;
     total.value = data.total;
     layerCounts.value = data.counts?.byLayer ?? { ...EMPTY_LAYER_COUNTS };
     provinceCounts.value = data.counts?.byProvince ?? {};
+    // 筛选后总页数变少时，钳回末页，避免空页
+    const maxPage = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
+    if (page.value > maxPage) {
+      page.value = maxPage;
+      if (data.total > 0 && !data.routes.length) {
+        await loadRoutes();
+        return;
+      }
+    }
   } catch (e) {
     error.value = e instanceof Error ? e.message : '加载失败';
   } finally {
     loading.value = false;
   }
+}
+
+function goPage(n: number) {
+  const next = Math.min(pageCount.value, Math.max(1, n));
+  if (next === page.value) return;
+  page.value = next;
+  void loadRoutes().then(() => {
+    document.querySelector('.rb-result-head')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
+/** 换筛选条件时回到第 1 页再拉列表 */
+function reloadFromFirstPage() {
+  page.value = 1;
+  void loadRoutes();
 }
 
 function pickSort(key: string) {
@@ -184,19 +225,19 @@ onBeforeUnmount(() => {
   document.removeEventListener('pointerdown', onDocPointerDown, true);
 });
 
-// 省份切换时清空城市；其余条件变化时重新拉列表
+// 省份切换时清空城市；其余条件变化时回到第 1 页再拉列表
 watch(
   [() => province.value, () => mode.value, () => layer.value, () => sort.value, () => maxDays.value],
   () => {
     city.value = '';
-    loadRoutes();
+    reloadFromFirstPage();
   },
 );
 
 let keywordTimer: ReturnType<typeof setTimeout> | undefined;
 watch(keyword, () => {
   if (keywordTimer) clearTimeout(keywordTimer);
-  keywordTimer = setTimeout(loadRoutes, 300);
+  keywordTimer = setTimeout(reloadFromFirstPage, 300);
 });
 
 function pickProvince(name: string) {
@@ -206,7 +247,7 @@ function pickProvince(name: string) {
 
 function pickCity(name: string) {
   city.value = city.value === name ? '' : name;
-  loadRoutes();
+  reloadFromFirstPage();
 }
 
 /** 分层 chip 与省份/玩法是「与」关系；再点一次取消选择（传 '' 表示回到「全部」） */
@@ -230,7 +271,7 @@ function reset() {
   filtersOpen.value = false;
   provinceExpanded.value = false;
   sortOpen.value = false;
-  loadRoutes();
+  reloadFromFirstPage();
 }
 
 function clearProvince() {
@@ -240,7 +281,7 @@ function clearProvince() {
 
 function clearCity() {
   city.value = '';
-  loadRoutes();
+  reloadFromFirstPage();
 }
 
 function clearMode() {
@@ -515,7 +556,12 @@ function seasonText(months: number[]): string {
       </section>
 
       <div class="rb-result-head">
-        <span class="rb-result-head__count">共 <b>{{ total }}</b> 条</span>
+        <span class="rb-result-head__count">
+          共 <b>{{ total }}</b> 条
+          <template v-if="total > PAGE_SIZE">
+            · 第 {{ page }} / {{ pageCount }} 页
+          </template>
+        </span>
         <div class="rb-sort">
           <button
             type="button"
@@ -598,6 +644,40 @@ function seasonText(months: number[]): string {
           </footer>
         </article>
       </section>
+
+      <nav
+        v-if="!loading && !error && total > PAGE_SIZE"
+        class="rb-pager"
+        aria-label="路书列表分页"
+      >
+        <button
+          type="button"
+          class="rb-pager__btn"
+          :disabled="page <= 1"
+          @click="goPage(page - 1)"
+        >
+          上一页
+        </button>
+        <button
+          v-for="n in pageWindow"
+          :key="n"
+          type="button"
+          class="rb-pager__num"
+          :class="{ on: n === page }"
+          :aria-current="n === page ? 'page' : undefined"
+          @click="goPage(n)"
+        >
+          {{ n }}
+        </button>
+        <button
+          type="button"
+          class="rb-pager__btn"
+          :disabled="page >= pageCount"
+          @click="goPage(page + 1)"
+        >
+          下一页
+        </button>
+      </nav>
     </main>
   </div>
 </template>
@@ -1030,7 +1110,56 @@ function seasonText(months: number[]): string {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-3);
-  padding-bottom: var(--space-10);
+}
+
+.rb-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: var(--space-5) 0 var(--space-8);
+}
+
+.rb-pager__btn,
+.rb-pager__num {
+  min-height: 40px;
+  min-width: 40px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.rb-pager__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rb-pager__num.on {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rb-pager__btn:not(:disabled):hover,
+  .rb-pager__num:not(.on):hover {
+    border-color: var(--line-strong);
+    color: var(--text-1);
+    background: var(--surface-3);
+  }
+}
+
+.rb-pager__btn:focus-visible,
+.rb-pager__num:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .rb-card {

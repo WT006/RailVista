@@ -40,6 +40,12 @@ import logoRy from '../assets/ticket/ry.png';
 import logoTv from '../assets/ticket/tv.png';
 import logoAq from '../assets/ticket/aq.png';
 import logoGt from '../assets/ticket/gt.png';
+import logoFm from '../assets/ticket/fm.png';
+import logoY8 from '../assets/ticket/y8.png';
+import logoJr from '../assets/ticket/jr.png';
+import logoDr from '../assets/ticket/dr.png';
+import logo9h from '../assets/ticket/9h.png';
+import logoOq from '../assets/ticket/oq.png';
 import logoSkyteam from '../assets/ticket/skyteam.jpg';
 import logoStarAlliance from '../assets/ticket/staralliance-crop.png';
 import logoOneworld from '../assets/ticket/oneworld.jpg';
@@ -198,19 +204,19 @@ export const AIRLINES: Record<string, AirlineMeta> = {
   ry: { code: 'ry', name: '江西航空', en: 'JIANGXI AIRLINES', prefix: 'RY', logo: logoRy, alliance: null },
 
   // ── 补充航司（2026-10-12 新增，覆盖 aviation.ts 全部大陆航司）──
-  fm: { code: 'fm', name: '上海航空', en: 'SHANGHAI AIRLINES', prefix: 'FM', logo: '', alliance: 'skyteam' },
-  y8: { code: 'y8', name: '金鹏航空', en: 'SUPARNA AIRLINES', prefix: 'Y8', logo: '', alliance: null },
-  jr: { code: 'jr', name: '幸福航空', en: 'JOY AIR', prefix: 'JR', logo: '', alliance: null },
-  dr: { code: 'dr', name: '瑞丽航空', en: 'RUILI AIRLINES', prefix: 'DR', logo: '', alliance: null },
-  '9h': { code: '9h', name: '长安航空', en: 'AIR CHANGAN', prefix: '9H', logo: '', alliance: null },
+  fm: { code: 'fm', name: '上海航空', en: 'SHANGHAI AIRLINES', prefix: 'FM', logo: logoFm, alliance: 'skyteam' },
+  y8: { code: 'y8', name: '金鹏航空', en: 'SUPARNA AIRLINES', prefix: 'Y8', logo: logoY8, alliance: null },
+  jr: { code: 'jr', name: '幸福航空', en: 'JOY AIR', prefix: 'JR', logo: logoJr, alliance: null },
+  dr: { code: 'dr', name: '瑞丽航空', en: 'RUILI AIRLINES', prefix: 'DR', logo: logoDr, alliance: null },
+  '9h': { code: '9h', name: '长安航空', en: 'AIR CHANGAN', prefix: '9H', logo: logo9h, alliance: null },
   tv: { code: 'tv', name: '西藏航空', en: 'TIBET AIRLINES', prefix: 'TV', logo: logoTv, alliance: null },
   aq: { code: 'aq', name: '九元航空', en: '9 AIR', prefix: 'AQ', logo: logoAq, alliance: null },
-  oq: { code: 'oq', name: '重庆航空', en: 'CHONGQING AIRLINES', prefix: 'OQ', logo: '', alliance: null },
-  // 港澳台
+  oq: { code: 'oq', name: '重庆航空', en: 'CHONGQING AIRLINES', prefix: 'OQ', logo: logoOq, alliance: null },
+  // 港澳台 / 国际：按产品约定不补外国 logo
   cx: { code: 'cx', name: '国泰航空', en: 'CATHAY PACIFIC', prefix: 'CX', logo: '', alliance: 'oneworld' },
   br: { code: 'br', name: '长荣航空', en: 'EVA AIR', prefix: 'BR', logo: '', alliance: 'staralliance' },
   ci: { code: 'ci', name: '中华航空', en: 'CHINA AIRLINES', prefix: 'CI', logo: '', alliance: 'skyteam' },
-  nx: { code: 'nx', name: '澳门航空', en: 'AIR MACAU', prefix: 'NX', logo: '', alliance: null },
+  nx: { code: 'nx', name: '中国澳门航空', en: 'AIR MACAU', prefix: 'NX', logo: '', alliance: null },
   // 国际常用
   aa: { code: 'aa', name: '美国航空', en: 'AMERICAN AIRLINES', prefix: 'AA', logo: '', alliance: 'oneworld' },
   ua: { code: 'ua', name: '美国联合航空', en: 'UNITED AIRLINES', prefix: 'UA', logo: '', alliance: 'staralliance' },

@@ -256,12 +256,25 @@ function odPlaceAnchors(
 }
 
 // ── 主入口 ───────────────────────────────────────────────────────────────────
+/** 途经点：能解析就进折线；解析不到就跳过（可写景点/任意文案，不挡 OD 规划） */
+async function resolveViaSoft(text: string): Promise<Pt | null> {
+  const t = text.trim();
+  if (!t) return null;
+  try {
+    return (await resolveEndpoint(t, 'from')).pt;
+  } catch (e) {
+    if (e instanceof PlaceNotFoundError) return null;
+    throw e;
+  }
+}
+
 export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> {
   const from = await resolveEndpoint(input.from, 'from');
   const to = await resolveEndpoint(input.to, 'to');
   const viaPts: Pt[] = [];
   for (const v of input.via ?? []) {
-    viaPts.push((await resolveEndpoint(v, 'from')).pt);
+    const pt = await resolveViaSoft(v);
+    if (pt) viaPts.push(pt);
   }
 
   const preferKeys = [from.roadKey, to.roadKey].filter((k): k is string => !!k);

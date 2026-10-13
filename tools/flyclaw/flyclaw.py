@@ -912,20 +912,27 @@ def cmd_query(args):
         return_time = query_cfg.get("return_time")
 
     # Phase 1: concurrent query all sources
+    # --fr24-only：纪念票等只要起降/时刻时跳过慢且常失败的 GF / ADS-B
+    fr24_only = getattr(args, "fr24_only", False)
     tasks = []
 
     if sources_cfg["fr24"]["enabled"]:
         timeout = sources_cfg["fr24"]["timeout"]
         tasks.append(("FR24", _query_fr24_flight, (args.flight, timeout)))
 
-    if sources_cfg["google_flights"]["enabled"]:
+    if not fr24_only and sources_cfg["google_flights"]["enabled"]:
         timeout = sources_cfg["google_flights"]["timeout"]
         serpapi_key = sources_cfg["google_flights"].get("serpapi_key", "")
         tasks.append(("GoogleFlights", _query_gf_flight, (args.flight, timeout, serpapi_key)))
 
-    if sources_cfg["airplanes_live"]["enabled"]:
+    if not fr24_only and sources_cfg["airplanes_live"]["enabled"]:
         timeout = sources_cfg["airplanes_live"]["timeout"]
         tasks.append(("AirplanesLive", _query_al_flight, (args.flight, timeout)))
+
+    if fr24_only:
+        # 单源：FR24 一返回就结束，不必再等 return_time
+        return_time = 0
+        relay_enabled = False
 
     task_names = [t[0] for t in tasks]
     phase1_start = _time.monotonic()
@@ -1359,6 +1366,10 @@ def build_parser() -> argparse.ArgumentParser:
     query_p.add_argument(
         "--no-relay", action="store_true", default=False, dest="no_relay",
         help="Disable route relay (skip Phase 2 Google Flights price lookup)",
+    )
+    query_p.add_argument(
+        "--fr24-only", action="store_true", default=False, dest="fr24_only",
+        help="Only query FlightRadar24 (skip Google Flights / Airplanes.live)",
     )
     query_p.add_argument(
         "--date", "-d", default=None,

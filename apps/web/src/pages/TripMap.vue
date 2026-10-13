@@ -73,6 +73,7 @@ const { gps, available: gpsAvailable } = useGeolocation();
 const now = useNow();
 
 const mapEl = ref<HTMLElement | null>(null);
+const pageEl = ref<HTMLElement | null>(null);
 const error = ref('');
 const compact = ref(false);
 const progress = ref(0);
@@ -151,9 +152,11 @@ const currentKm = computed(() => progress.value * pathMetrics.lengthKm);
 /**
  * 当前处于「临近窗口」内的景点：进入点前 5km 起提示，过境 2km 后淡出（§4.3）。
  * 多个同时命中时取最先到达的那个。
+ * 尚未发车（progress≤0）不弹——起点附近景点会落在 5km 窗口内，否则一进地图就误报。
  */
 const approachingSpot = computed<ScenicSpot | null>(() => {
   if (!prefs.layers.spot) return null;
+  if (progress.value <= 0) return null;
   const list = trip.scenicSpots;
   if (!list?.length) return null;
   const km = currentKm.value;
@@ -200,6 +203,24 @@ const modeParts = computed(() => {
   const hit = m.match(/^(.*?)[（(](.+?)[）)]\s*$/);
   if (hit) return { main: hit[1]!.trim(), note: hit[2]!.trim() };
   return { main: m, note: '' };
+});
+
+/** 窄屏仍占原位：把主状态+备注收成短标签，完整文案放 title */
+const modeCompactLine = computed(() => {
+  const { main, note } = modeParts.value;
+  // 时刻表估算 → 时刻；GPS 实时 → GPS；已校准 → 校准
+  let short = main
+    .replace(/^时刻表估算$/, '时刻')
+    .replace(/^时刻表$/, '时刻')
+    .replace(/^GPS\s*实时.*$/, 'GPS')
+    .replace(/^已校准.*$/, '校准');
+  if (short === main && main.length > 4) short = main.slice(0, 2);
+  if (!note) return short;
+  const shortNote = note
+    .replace(/^偏离铁路较远$/, '偏轨')
+    .replace(/^偏离铁路$/, '偏轨')
+    .replace(/^信号弱$/, '弱信号');
+  return `${short}·${shortNote}`;
 });
 
 const progressPct = computed(() => Math.round(progress.value * 100));
@@ -327,27 +348,62 @@ async function ensureTripLoaded() {
 }
 
 function updateOverlayMetrics() {
-  const top = document.querySelector('.top-bar')?.getBoundingClientRect().height || 72;
+  const root = pageEl.value;
+  const scope = root || document;
+  const top = scope.querySelector('.top-bar')?.getBoundingClientRect().height || 72;
   const vh = window.innerHeight;
-  const panel = document.querySelector('.bottom-panel')?.getBoundingClientRect();
-  const approach = document.querySelector('.approach-card')?.getBoundingClientRect();
+  const panel = scope.querySelector('.bottom-panel')?.getBoundingClientRect();
+  const legend = scope.querySelector('.legend')?.getBoundingClientRect();
 
-  // 仅底栏占位（给临近景点卡叠放用，避免把自身高度算进 --bottom-overlay 造成抬升环）
-  let panelClearance = 118;
+  // 按底栏实测高度抬升右侧控件，避免天气条/前方景点撑高后盖住图例
+  let panelClearance = compact.value ? 140 : 118;
   if (panel && panel.height > 0) {
-    panelClearance = Math.ceil(vh - panel.top);
+    panelClearance = Math.max(panelClearance, Math.ceil(vh - panel.top));
   }
 
-  // 地图/图例/定位按钮：清到底栏与景点卡的最高顶边
-  let bottomClearance = panelClearance;
-  if (approach && approach.height > 0) {
-    bottomClearance = Math.max(bottomClearance, Math.ceil(vh - approach.top));
-  }
+  const legendH = legend && legend.height > 0 ? Math.ceil(legend.height) : 0;
+  // 桌面常显图例：按钮叠在图例顶边之上；手机点开图例时同样按实测抬升
+  const controlsLift = legendH > 0 ? legendH + 12 : compact.value ? 48 : 158;
 
-  document.documentElement.style.setProperty('--top-overlay', `${Math.ceil(top) + 16}px`);
-  document.documentElement.style.setProperty('--bottom-panel-clearance', `${panelClearance}px`);
-  document.documentElement.style.setProperty('--bottom-overlay', `${bottomClearance + 12}px`);
-  map?.resize();
+  const topOverlay = `${Math.ceil(top) + 16}px`;
+  const bottomClearance = `${panelClearance}px`;
+  const bottomOverlay = `${panelClearance + 12}px`;
+  const lift = `${controlsLift}px`;
+
+  if (root) {
+    root.style.setProperty('--top-overlay', topOverlay);
+    root.style.setProperty('--bottom-panel-clearance', bottomClearance);
+    root.style.setProperty('--bottom-overlay', bottomOverlay);
+    root.style.setProperty('--map-controls-lift', lift);
+  }
+  document.documentElement.style.setProperty('--top-overlay', topOverlay);
+  document.documentElement.style.setProperty('--bottom-panel-clearance', bottomClearance);
+  document.documentElement.style.setProperty('--bottom-overlay', bottomOverlay);
+  document.documentElement.style.setProperty('--map-controls-lift', lift);
+  try {
+    map?.resize?.();
+  } catch {
+    /* */
+  }
+}
+
+let bottomPanelObserver: ResizeObserver | null = null;
+
+function bindOverlayObserver() {
+  bottomPanelObserver?.disconnect();
+  bottomPanelObserver = null;
+  if (typeof ResizeObserver === 'undefined') return;
+  const scope = pageEl.value || document;
+  const panel = scope.querySelector('.bottom-panel');
+  const legend = scope.querySelector('.legend');
+  const topBar = scope.querySelector('.top-bar');
+  if (!panel && !legend) return;
+  bottomPanelObserver = new ResizeObserver(() => {
+    updateOverlayMetrics();
+  });
+  if (panel) bottomPanelObserver.observe(panel);
+  if (legend) bottomPanelObserver.observe(legend);
+  if (topBar) bottomPanelObserver.observe(topBar);
 }
 
 function getMapPadding() {
@@ -487,7 +543,38 @@ const upcoming = computed(() => {
   const weather = spot ? weatherBySpotId.value[String(spot.id)] : undefined;
   const wx = weather?.queried ? spotWeatherParts(weather, spot?.visibility) : null;
 
-  return { ...u, timeBrief, hint, wx, spotId: spot ? String(spot.id) : '', visibility: spot?.visibility };
+  /** 底栏常驻：方位 / 距轨 / 最佳时段（原 SpotApproachCard 展示项） */
+  const side = spot ? spotSideKey(spot) : null;
+  const sideLow = spot?.sideConfidence === 'low';
+  const sideNeedsReview = Boolean(spot?.sideNeedsReview);
+  const distKm = typeof spot?.distKm === 'number' ? spot.distKm : null;
+  const distText =
+    distKm == null
+      ? ''
+      : `距轨 ${distKm < 10 ? distKm.toFixed(1) : Math.round(distKm)} km`;
+  const tod = spot?.bestView?.timeOfDay;
+  const bestTime = tod
+    ? ({ day: '白天最佳', dawn: '清晨最佳', dusk: '黄昏最佳', night: '夜间最佳', any: '全天可看' } as const)[
+        tod
+      ] ?? ''
+    : spot?.nightOnly
+      ? '夜间最佳'
+      : '';
+
+  return {
+    ...u,
+    timeBrief,
+    hint,
+    wx,
+    spotId: spot ? String(spot.id) : '',
+    visibility: spot?.visibility,
+    side,
+    sideLow,
+    sideNeedsReview,
+    distKm,
+    distText,
+    bestTime,
+  };
 });
 
 const upcomingTitle = computed(() => {
@@ -1161,6 +1248,7 @@ async function initMap() {
   applyLayers();
   applySatelliteLayers();
   await nextTick();
+  bindOverlayObserver();
   updateOverlayMetrics();
   if (coords.length) map.setFitView(null, false, getMapPadding());
   tick();
@@ -1401,8 +1489,20 @@ watch(approachingSpot, async () => {
   updateOverlayMetrics();
 });
 
+watch(legendOpen, async () => {
+  await nextTick();
+  updateOverlayMetrics();
+});
+
+watch(statusCollapsed, async () => {
+  await nextTick();
+  updateOverlayMetrics();
+});
+
 onUnmounted(() => {
   if (weatherFetchTimer) window.clearTimeout(weatherFetchTimer);
+  bottomPanelObserver?.disconnect();
+  bottomPanelObserver = null;
   window.removeEventListener('pagehide', onPageHidePersist);
   document.removeEventListener('visibilitychange', onVisibilityPersist);
   window.removeEventListener('resize', onWindowResize);
@@ -1413,7 +1513,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="trip-page">
+  <div ref="pageEl" class="trip-page">
     <div ref="mapEl" id="map" class="map-root" />
 
     <div v-if="error" class="error-overlay show">
@@ -1482,19 +1582,36 @@ onUnmounted(() => {
                   <span class="status-meta__k">发车</span>
                   <span class="status-meta__v">{{ formatDepartBadge(schedule.departure) }}</span>
                 </button>
-                <div class="status-meta__item status-meta__item--mode">
+                <div
+                  class="status-meta__item status-meta__item--mode"
+                  :class="{ 'is-warn': !!modeParts.note }"
+                  :title="mode"
+                >
                   <span class="status-meta__k">定位</span>
-                  <span class="status-meta__v">{{ modeParts.main }}</span>
-                  <span v-if="modeParts.note" class="status-meta__note">{{ modeParts.note }}</span>
+                  <span
+                    class="status-meta__v"
+                    :class="{ 'status-meta__v--warn': !!modeParts.note }"
+                  >{{ compact ? modeCompactLine : modeParts.main }}</span>
+                  <span
+                    v-if="!compact && modeParts.note"
+                    class="status-meta__note"
+                  >{{ modeParts.note }}</span>
                 </div>
                 <button
                   type="button"
                   class="calibrate-btn"
                   :class="{ 'is-active': !!prefs.calibration }"
                   :aria-expanded="calibrateOpen"
+                  :title="prefs.calibration ? `已校准 · ${prefs.calibration.stationName}` : '站点校准'"
                   @click="calibrateOpen = !calibrateOpen"
                 >
-                  {{ prefs.calibration ? `校准 · ${prefs.calibration.stationName}` : '站点校准' }}
+                  {{
+                    prefs.calibration
+                      ? `校准·${prefs.calibration.stationName}`
+                      : compact
+                        ? '校准'
+                        : '站点校准'
+                  }}
                 </button>
               </div>
 
@@ -1580,6 +1697,7 @@ onUnmounted(() => {
             ]
           }}</span>
         </button>
+        <!-- 桌面默认不展开；手机即使用 legendOpen 也由 CSS 隐藏，避免挡主屏 -->
         <div v-if="legendOpen" class="legend-side">
           <span class="legend-side__title">车窗方位徽标（点开景点可见）</span>
           <SideBadge v-for="item in SIDE_LEGEND" :key="item.side" :side="item.side" compact />
@@ -1637,7 +1755,25 @@ onUnmounted(() => {
           <div class="bottom-panel__head">
             <h2>{{ upcomingTitle }}</h2>
           </div>
-          <div class="next-name">{{ upcoming?.name || '—' }}</div>
+          <div class="next-name-row">
+            <div class="next-name">{{ upcoming?.name || '—' }}</div>
+            <SideBadge
+              v-if="upcoming?.kind === 'spot' && upcoming.side"
+              :side="upcoming.side"
+              :dist-km="upcoming.distKm"
+              :needs-review="upcoming.sideNeedsReview"
+              :low="upcoming.sideLow"
+              compact
+              text-only
+            />
+          </div>
+          <div
+            v-if="upcoming?.kind === 'spot' && (upcoming.bestTime || upcoming.distText)"
+            class="next-tags"
+          >
+            <span v-if="upcoming.bestTime" class="next-tag next-tag--best">{{ upcoming.bestTime }}</span>
+            <span v-if="upcoming.distText" class="next-tag next-tag--dist">{{ upcoming.distText }}</span>
+          </div>
           <div v-if="upcomingMetaLine" class="next-meta">{{ upcomingMetaLine }}</div>
           <div v-if="upcoming?.wx" class="wx-strip">
             <div class="wx-strip__main">

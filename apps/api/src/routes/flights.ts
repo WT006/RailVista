@@ -5,8 +5,7 @@ export const flightsRoute = new Hono();
 
 /**
  * GET /flights/lookup?flightNo=CZ3467&date=2026-10-07
- * 按航班号 + 日期查询航班（在线服务可用时自动带出起降机场、时刻、登机口；
- * 否则返回本地确定信息，由前端补选）。
+ * 按航班号 + 日期查询：FlyClaw query → 本地兜底。
  */
 flightsRoute.get('/lookup', async (c) => {
   const flightNo = (c.req.query('flightNo') ?? '').trim();
@@ -28,8 +27,7 @@ flightsRoute.get('/lookup', async (c) => {
 
 /**
  * GET /flights/search?from=PEK&to=SHA&date=2026-10-15
- * 按航线（出发地+目的地+日期）搜索航班，返回航班列表含价格。
- * 数据源：FlyClaw 子进程（飞猪/Fliggy 源，不受 Cloudflare 拦截）。
+ * 按航线搜索：FlyClaw search（飞猪等），返回列表含价格。
  */
 flightsRoute.get('/search', async (c) => {
   const from = (c.req.query('from') ?? '').trim();

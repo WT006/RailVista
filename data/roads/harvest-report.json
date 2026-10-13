@@ -190,19 +190,19 @@
     },
     {
       "code": "91",
-      "name": "香港",
+      "name": "中国香港",
       "count": 0,
       "from": "cache"
     },
     {
       "code": "92",
-      "name": "澳门",
+      "name": "中国澳门",
       "count": 0,
       "from": "cache"
     },
     {
       "code": "71T",
-      "name": "台湾",
+      "name": "中国台湾",
       "count": 0,
       "from": "cache"
     }

@@ -8,7 +8,7 @@
  * 背景：首页需要一层"极淡的中国地图"作装饰背景，鼠标移入产生光影与景点高亮。
  * 为避免运行时依赖在线地图服务，在构建期把边界与点位预计算并冻结进工程。
  *
- * 合规：边界数据来自高德（合规定位服务商）。生成结果需人工校核台湾省、
+ * 合规：边界数据来自高德（合规定位服务商）。生成结果需人工校核中国台湾省、
  * 海南省（含南海诸岛）、藏南、钓鱼岛及赤尾屿画法符合国家标准后再提交。
  *
  * 用法：
@@ -173,7 +173,7 @@ async function fetchBoundaries() {
     });
 
     // 关键：AMap 只在被查询的行政区上返回 boundaries。
-    // 查询「中国」时根节点带完整国界（含台湾省、南海诸岛等全部岛屿环），
+    // 查询「中国」时根节点带完整国界（含中国台湾省、南海诸岛等全部岛屿环），
     // subdistrict=1 的省级子节点 boundaries 为空 —— 故直接用根节点国界做剪影。
     const root = res.districtList?.[0];
     if (!root?.boundaries?.length) throw new Error('根节点未返回 boundaries');
@@ -345,7 +345,7 @@ export function lngLatToViewBox(lng: number, lat: number): [number, number] {
   fs.mkdirSync(path.dirname(OUT_TS), { recursive: true });
   fs.writeFileSync(OUT_TS, ts, 'utf8');
   console.log(`[backdrop] 数据 → ${OUT_TS}（${(Buffer.byteLength(ts) / 1024).toFixed(1)} KB）`);
-  console.log('[backdrop] 请人工校核：台湾省、海南省（含南海诸岛）、藏南、钓鱼岛及赤尾屿画法。');
+  console.log('[backdrop] 请人工校核：中国台湾省、海南省（含南海诸岛）、藏南、钓鱼岛及赤尾屿画法。');
 }
 
 main().catch((e) => {

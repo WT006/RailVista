@@ -30,7 +30,14 @@ function select(i: number) {
 
 <template>
   <div class="hm-seg">
-    <span class="hm-seg__indicator" :style="{ width: 100 / options.length + '%', transform: `translateX(${activeIndex * 100}%)` }" />
+    <!-- 宽度扣掉左右 padding(4+4)，避免末段 translateX 后贴出圆角 -->
+    <span
+      class="hm-seg__indicator"
+      :style="{
+        width: `calc((100% - 8px) / ${options.length})`,
+        transform: `translateX(${activeIndex * 100}%)`,
+      }"
+    />
     <button
       v-for="(o, i) in options"
       :key="String(o.value)"
@@ -54,10 +61,11 @@ function select(i: number) {
   border-radius: var(--radius-md);
   background: var(--surface-2);
   border: 1px solid var(--line-default);
+  overflow: hidden;
 }
 .hm-seg__indicator {
   position: absolute; top: 4px; bottom: 4px; left: 4px;
-  width: 33%;
+  box-sizing: border-box;
   border-radius: var(--radius-sm);
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);

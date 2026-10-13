@@ -1,16 +1,9 @@
 <script setup lang="ts">
 /**
- * 底部主导航（悬浮胶囊式页签，<840px）。
+ * 底部主导航（悬浮胶囊式页签，窗口宽度 <840）。
  *
- * 规范要点（HarmonyOS《底部页签》+ 沉浸光感典型场景 barFloatingStyle）：
- *   - barOverlap + barBottomMargin:8：悬浮圆角胶囊，内容从胶囊下方穿过（透底）；
- *   - 胶囊本体为沉浸式系统材质（半透明渐变 + backdrop 毛玻璃 + 上缘 1px 流光描边）；
- *   - 图标 24vp + 文字标签，选中态品牌高亮、未选弱化；切换有「选中弹跳」反馈；
- *   - 点击当前页签回滚至页面顶部；
- *   - 沉浸光感·按压点光源：按压时触点位置产生光晕扩散 + 轻微弹性缩放（触屏可用，
- *     非 hover 专属）；系统「减少动态效果」下关闭动效、仅保留色相反馈；
- *   - 胶囊上方保留全宽渐变蒙层（与页面背景同色）；
- *   - ≥840px 时本组件隐藏，由 AppSideNav 侧边 Tab 接管（《响应式应用架构》挪移布局）。
+ * 挪移：本组件底栏 → 840–1199 侧边 Tab → ≥1200 顶栏；选项同源。
+ * 规范要点（HarmonyOS《底部页签》+ barFloatingStyle）：悬浮胶囊、毛玻璃、选中弹跳、按压点光源。
  */
 import { onBeforeUnmount, ref } from 'vue';
 import { useRoute } from 'vue-router';

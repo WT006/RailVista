@@ -31,24 +31,24 @@
    "level": "province"
   },
   {
-   "name": "香港",
+   "name": "中国香港",
    "lng": 114.17,
    "lat": 22.32,
-   "province": "香港",
+   "province": "中国香港",
    "level": "province"
   },
   {
-   "name": "澳门",
+   "name": "中国澳门",
    "lng": 113.55,
    "lat": 22.19,
-   "province": "澳门",
+   "province": "中国澳门",
    "level": "province"
   },
   {
    "name": "台北",
    "lng": 121.56,
    "lat": 25.03,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "province"
   },
   {

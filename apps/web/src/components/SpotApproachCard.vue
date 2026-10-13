@@ -1,302 +1,204 @@
 <script setup lang="ts">
 /**
- * 临近景点提示卡，对应 docs/scenic-supplement-20260928.md §4.3
- *
- * 触发窗口：进入点前 5 km 开始提示，离开点后 2 km 淡出。
- * 夜间通过 / 声屏障等阻挡情形给出「本次错过」提示，避免用户白等。
+ * 临近景点通告：只提示「到了哪个景点 + 一句介绍」。
+ * 方位 / 天气 / 距轨 / 进度 由右下角下一站面板承担，避免重复。
+ * 进入点前 ~5 km 弹一次（须已发车，由 TripMap 在 progress>0 时才传入 spot）；
+ * 可关，约 10s 自动收起。
  */
-import { computed } from 'vue';
-import { honorLabels, type ScenicSpot, type SpotWeatherParts } from '@railvista/shared';
-import { AlertTriangle } from 'lucide-vue-next';
-import SideBadge from './SideBadge.vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import type { ScenicSpot, SpotWeatherParts } from '@railvista/shared';
 
 const props = withDefaults(
   defineProps<{
     spot: ScenicSpot | null;
-    /** 列车当前里程（沿本次行程折线） */
     currentKm?: number;
     compact?: boolean;
-    /** 结构化天气（emoji / 气温 / 观景提示） */
+    /** 保留 props 兼容 TripMap 传入，通告本身不再展示天气 */
     weather?: SpotWeatherParts | null;
   }>(),
   { currentKm: 0, compact: false, weather: null },
 );
 
-const TIME_OF_DAY: Record<string, string> = {
-  day: '白天最佳',
-  dawn: '清晨最佳',
-  dusk: '黄昏最佳',
-  night: '夜间最佳',
-  any: '全天可看',
-};
+const open = ref(false);
+const silencedId = ref<string | null>(null);
+let hideTimer: ReturnType<typeof setTimeout> | undefined;
 
-const blockReason: Record<string, string> = {
-  night_pass: '本次夜间通过，可能看不到',
-  tunnel: '前方隧道遮挡',
-  sound_barrier: '有声屏障遮挡',
-  urban: '城区遮挡较多',
-};
+const AUTO_HIDE_MS = 10_000;
 
-/** 进入前剩余公里；已进入为负 */
-const kmToEnter = computed(() => {
-  const s = props.spot;
-  if (!s) return 0;
-  return Math.round(((s.progressKm ?? 0) - props.currentKm) * 10) / 10;
-});
-
-const arrived = computed(() => kmToEnter.value <= 0);
-
-const timeLabel = computed(() => {
-  const t = props.spot?.bestView?.timeOfDay;
-  return t ? TIME_OF_DAY[t] ?? '' : '';
-});
-
-const monthsText = computed(() => {
-  const m = props.spot?.bestView?.months;
-  if (!m?.length) return '';
-  return `${Math.min(...m)}–${Math.max(...m)} 月`;
-});
-
-const honorList = computed(() => honorLabels(props.spot?.honors));
-const visibleHonors = computed(() => honorList.value.slice(0, 3));
-const honorRest = computed(() => Math.max(0, honorList.value.length - visibleHonors.value.length));
-
-const blocks = computed(() =>
-  (props.spot?.bestView?.blocked ?? []).map((b) => blockReason[b] ?? b).filter(Boolean),
-);
-
-const distText = computed(() => {
-  const d = props.spot?.distKm;
-  return d == null ? '' : `距轨 ${d < 10 ? d.toFixed(1) : Math.round(d)} km`;
-});
-
-const countdownText = computed(() => {
-  if (arrived.value) return '正在经过';
-  return `${kmToEnter.value} km 后到达`;
-});
-</script>
-
-<template>
-  <Transition name="approach">
-    <section v-if="spot" class="approach-card" :class="{ 'approach-card--compact': compact }">
-      <div class="approach-card__lead">
-        <span class="approach-card__kicker">{{ arrived ? '正在经过' : '即将到达' }}</span>
-        <span class="approach-card__countdown">{{ countdownText }}</span>
-      </div>
-
-      <div class="approach-card__body">
-        <h3 class="approach-card__title">{{ spot.name }}</h3>
-        <SideBadge
-          :side="spot.sideRuntime ?? spot.side"
-          :dist-km="spot.distKm"
-          :needs-review="spot.sideNeedsReview"
-          :low="spot.sideConfidence === 'low'"
-          :compact="compact"
-        />
-      </div>
-
-      <div class="approach-card__meta">
-        <span v-if="timeLabel" class="approach-card__chip">{{ timeLabel }}</span>
-        <span v-if="monthsText" class="approach-card__chip">{{ monthsText }}</span>
-        <span v-if="distText" class="approach-card__chip approach-card__chip--muted">{{ distText }}</span>
-        <span v-if="spot.nightOnly" class="approach-card__chip approach-card__chip--night">夜间</span>
-      </div>
-
-      <div v-if="weather" class="wx-strip approach-card__wx">
-        <div class="wx-strip__main">
-          <span class="wx-strip__emoji" aria-hidden="true">{{ weather.emoji }}</span>
-          <span v-if="weather.cond" class="wx-strip__cond">{{ weather.cond }}</span>
-          <span v-if="weather.temp" class="wx-strip__temp">{{ weather.temp }}</span>
-        </div>
-        <span
-          v-if="weather.hint"
-          class="wx-strip__hint"
-          :class="{
-            'is-good': weather.viewHint === 'good',
-            'is-fair': weather.viewHint === 'fair',
-            'is-poor': weather.viewHint === 'poor',
-          }"
-        >{{ weather.hint }}</span>
-        <span v-else-if="weather.vis" class="wx-strip__vis">{{ weather.vis }}</span>
-      </div>
-
-      <p v-if="spot.intro" class="approach-card__intro">{{ spot.intro }}</p>
-
-      <div v-if="visibleHonors.length" class="approach-card__honors">
-        <span v-for="h in visibleHonors" :key="h" class="approach-card__honor">{{ h }}</span>
-        <span v-if="honorRest" class="approach-card__honor approach-card__honor--more">
-          +{{ honorRest }}
-        </span>
-      </div>
-
-      <p v-if="blocks.length" class="approach-card__blocked"><AlertTriangle :size="14" /> {{ blocks.join(' · ') }}</p>
-    </section>
-  </Transition>
-</template>
-
-<style scoped>
-.approach-card {
-  /* fixed：与 .bottom-panel 同一坐标系，避免 absolute 相对 .trip-page 时宽屏叠压错位 */
-  position: fixed;
-  left: calc(12px + var(--safe-left, 0px) + var(--sidenav-w));
-  right: calc(12px + var(--safe-right, 0px));
-  /* 叠在底栏上方；高度仅取底栏占位，避免与 --bottom-overlay 互相抬升 */
-  bottom: calc(var(--bottom-panel-clearance, var(--bottom-overlay, 168px)) + 8px);
-  z-index: 99;
-  max-width: 100%;
-  max-height: min(42vh, 260px);
-  overflow: auto;
-  padding: 10px 12px 11px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(165deg, var(--surface-lift), var(--surface-0));
-  border: 1px solid var(--line-default);
-  box-shadow: var(--elev-float-strong);
-  color: var(--text-2);
-  font-size: var(--fs-cap);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* 宽屏：左下浮卡，与右下 .bottom-panel 成对，不再拉满全宽压住右侧 */
-@media (min-width: 960px) {
-  .approach-card {
-    left: var(--space-4);
-    right: auto;
-    bottom: var(--space-4);
-    width: min(380px, calc(50vw - 2.5 * var(--space-4)));
-    max-height: min(48vh, 320px);
+function clearHideTimer() {
+  if (hideTimer) {
+    clearTimeout(hideTimer);
+    hideTimer = undefined;
   }
 }
 
-.approach-card--compact {
-  padding: 8px 10px 9px;
-  font-size: 12px;
+function scheduleHide() {
+  clearHideTimer();
+  hideTimer = setTimeout(() => {
+    silencedId.value = props.spot ? String(props.spot.id) : silencedId.value;
+    open.value = false;
+  }, AUTO_HIDE_MS);
 }
 
-.approach-card__lead {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 5px;
+function dismiss() {
+  silencedId.value = props.spot ? String(props.spot.id) : null;
+  open.value = false;
+  clearHideTimer();
 }
 
-.approach-card__kicker {
-  color: var(--accent-hover);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+watch(
+  () => (props.spot ? String(props.spot.id) : ''),
+  (id, prev) => {
+    if (!id) {
+      open.value = false;
+      clearHideTimer();
+      return;
+    }
+    if (prev && id !== prev) silencedId.value = null;
+    if (id === silencedId.value) {
+      open.value = false;
+      return;
+    }
+    open.value = true;
+    scheduleHide();
+  },
+  { immediate: true },
+);
+
+onBeforeUnmount(clearHideTimer);
+
+const arrived = computed(() => {
+  const s = props.spot;
+  if (!s) return false;
+  return (s.progressKm ?? 0) - props.currentKm <= 0;
+});
+
+const kicker = computed(() => (arrived.value ? '正在经过' : '即将到达'));
+
+const intro = computed(() => {
+  const t = props.spot?.intro?.trim();
+  return t || '';
+});
+
+const show = computed(() => Boolean(props.spot && open.value));
+</script>
+
+<template>
+  <Teleport to="body">
+    <Transition name="approach-toast">
+      <aside
+        v-if="show && spot"
+        class="approach-toast"
+        :class="{ 'approach-toast--compact': compact }"
+        role="status"
+        aria-live="polite"
+        aria-label="临近景点提示"
+      >
+        <header class="approach-toast__head">
+          <span class="approach-toast__kicker">{{ kicker }}</span>
+          <button type="button" class="approach-toast__close" aria-label="关闭提示" @click="dismiss">
+            ×
+          </button>
+        </header>
+        <h3 class="approach-toast__title">{{ spot.name }}</h3>
+        <p v-if="intro" class="approach-toast__intro">{{ intro }}</p>
+      </aside>
+    </Transition>
+  </Teleport>
+</template>
+
+<style scoped>
+.approach-toast {
+  position: fixed;
+  top: calc(var(--top-overlay, 88px) + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 130;
+  width: min(360px, calc(100vw - 28px - var(--sidenav-w, 0px)));
+  padding: 12px 14px 14px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-1) 92%, transparent);
+  border: 1px solid var(--line-default);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--elev-3);
+  color: var(--text-2);
 }
 
-.approach-card__countdown {
-  color: var(--text-3);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
+.approach-toast--compact {
+  padding: 10px 12px 12px;
 }
 
-.approach-card__body {
+.approach-toast__head {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  flex-wrap: wrap;
+  margin-bottom: 4px;
 }
 
-.approach-card__title {
-  margin: 0;
-  font-size: 15px;
+.approach-toast__kicker {
+  font-size: var(--fs-micro);
   font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent-hover);
+}
+
+.approach-toast__close {
+  width: 28px;
+  height: 28px;
+  margin: -6px -8px -6px 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-3);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.approach-toast__close:hover {
+  color: var(--text-1);
+  background: var(--fill-subtle);
+}
+
+.approach-toast__title {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  line-height: var(--lh-tight);
   color: var(--text-1);
 }
 
-.approach-card__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 6px;
-}
-
-.approach-card__chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 7px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: 650;
-  color: var(--text-2);
-  background: color-mix(in srgb, var(--text-2) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--text-2) 18%, transparent);
-}
-
-.approach-card__chip--muted {
+.approach-toast__intro {
+  margin: 8px 0 0;
+  font-size: var(--fs-meta);
+  line-height: var(--lh-normal);
   color: var(--text-3);
-  font-weight: 500;
-}
-
-.approach-card__chip--night {
-  color: var(--warning);
-  background: color-mix(in srgb, var(--warning) 12%, transparent);
-  border-color: color-mix(in srgb, var(--warning) 28%, transparent);
-}
-
-.approach-card__wx {
-  margin-top: 8px;
-}
-
-.approach-card__intro {
-  margin: 6px 0 0;
-  color: var(--text-3);
-  font-size: 12px;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.approach-card__honors {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 7px;
-}
-
-.approach-card__honor {
-  font-size: var(--fs-micro);
-  padding: 2px 6px;
-  border-radius: var(--radius-xs);
-  color: var(--accent-hover);
-  background: var(--accent-soft);
-}
-
-.approach-card__honor--more {
-  color: var(--text-3);
-  background: transparent;
-  border: 1px dashed var(--line-default);
-}
-
-.approach-card__blocked {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 8px 0 0;
-  color: var(--warning);
-  font-size: 12px;
-}
-
-.approach-enter-active,
-.approach-leave-active {
-  transition: opacity var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
+.approach-toast-enter-active,
+.approach-toast-leave-active {
+  transition:
+    opacity var(--dur-base) var(--ease-standard),
+    transform var(--dur-base) var(--ease-standard);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .approach-enter-active,
-  .approach-leave-active {
+  .approach-toast-enter-active,
+  .approach-toast-leave-active {
     transition: none;
   }
 }
-.approach-enter-from,
-.approach-leave-to {
+
+.approach-toast-enter-from,
+.approach-toast-leave-to {
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateX(-50%) translateY(-8px);
 }
 </style>

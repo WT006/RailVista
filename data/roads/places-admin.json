@@ -1735,7 +1735,7 @@
    "level": "county"
   },
   {
-   "name": "澳门大学横琴校区(由澳门实施管辖)",
+   "name": "中国澳门大学横琴校区(由中国澳门实施管辖)",
    "lng": 113.543871,
    "lat": 22.12912,
    "province": "广东",
@@ -17266,225 +17266,225 @@
    "level": "county"
   },
   {
-   "name": "澳门",
+   "name": "中国澳门",
    "lng": 113.537971,
    "lat": 22.18986,
-   "province": "澳门",
+   "province": "中国澳门",
    "level": "province"
   },
   {
    "name": "花王堂区",
    "lng": 113.543871,
    "lat": 22.202158,
-   "province": "澳门",
-   "city": "澳门",
+   "province": "中国澳门",
+   "city": "中国澳门",
    "level": "county"
   },
   {
    "name": "望德堂区",
    "lng": 113.545096,
    "lat": 22.196672,
-   "province": "澳门",
-   "city": "澳门",
+   "province": "中国澳门",
+   "city": "中国澳门",
    "level": "county"
   },
   {
    "name": "嘉模堂区",
    "lng": 113.553641,
    "lat": 22.156712,
-   "province": "澳门",
-   "city": "澳门",
+   "province": "中国澳门",
+   "city": "中国澳门",
    "level": "county"
   },
   {
    "name": "圣方济各堂区",
    "lng": 113.554895,
    "lat": 22.126429,
-   "province": "澳门",
-   "city": "澳门",
+   "province": "中国澳门",
+   "city": "中国澳门",
    "level": "county"
   },
   {
    "name": "花地玛堂区",
    "lng": 113.547815,
    "lat": 22.210831,
-   "province": "澳门",
-   "city": "澳门",
+   "province": "中国澳门",
+   "city": "中国澳门",
    "level": "county"
   },
   {
    "name": "路氹填海区",
    "lng": 113.564558,
    "lat": 22.139592,
-   "province": "澳门",
-   "city": "澳门",
+   "province": "中国澳门",
+   "city": "中国澳门",
    "level": "county"
   },
   {
    "name": "风顺堂区",
    "lng": 113.53682,
    "lat": 22.190299,
-   "province": "澳门",
-   "city": "澳门",
+   "province": "中国澳门",
+   "city": "中国澳门",
    "level": "county"
   },
   {
    "name": "大堂区",
    "lng": 113.54857,
    "lat": 22.191495,
-   "province": "澳门",
-   "city": "澳门",
+   "province": "中国澳门",
+   "city": "中国澳门",
    "level": "county"
   },
   {
-   "name": "香港",
+   "name": "中国香港",
    "lng": 114.165753,
    "lat": 22.281096,
-   "province": "香港",
+   "province": "中国香港",
    "level": "province"
   },
   {
    "name": "北区",
    "lng": 114.142328,
    "lat": 22.498833,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "大埔区",
    "lng": 114.166774,
    "lat": 22.448425,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "西贡区",
    "lng": 114.259841,
    "lat": 22.317055,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "沙田区",
    "lng": 114.190463,
    "lat": 22.38234,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "屯门区",
    "lng": 113.971646,
    "lat": 22.396776,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "黄大仙区",
    "lng": 114.199006,
    "lat": 22.339135,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "九龙城区",
    "lng": 114.187942,
    "lat": 22.315301,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "深水埗区",
    "lng": 114.158257,
    "lat": 22.336595,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "观塘区",
    "lng": 114.209198,
    "lat": 22.323663,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "油尖旺区",
    "lng": 114.168376,
    "lat": 22.314459,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "东区",
    "lng": 114.22117,
    "lat": 22.28252,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "离岛区",
    "lng": 113.941256,
    "lat": 22.289392,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "中西区",
    "lng": 114.149368,
    "lat": 22.284693,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "南区",
    "lng": 114.155024,
    "lat": 22.248609,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "元朗区",
    "lng": 114.027373,
    "lat": 22.444202,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "荃湾区",
    "lng": 114.115995,
    "lat": 22.370991,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "葵青区",
    "lng": 114.134272,
    "lat": 22.366582,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
    "name": "湾仔区",
    "lng": 114.177987,
    "lat": 22.279153,
-   "province": "香港",
-   "city": "香港",
+   "province": "中国香港",
+   "city": "中国香港",
    "level": "county"
   },
   {
@@ -24574,24 +24574,24 @@
    "level": "county"
   },
   {
-   "name": "台湾",
+   "name": "中国台湾",
    "lng": 121.505133,
    "lat": 25.047131,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "province"
   },
   {
    "name": "南投县",
    "lng": 120.690507,
    "lat": 23.902667,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "南投市",
    "lng": 120.687067,
    "lat": 23.911501,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24599,7 +24599,7 @@
    "name": "鱼池乡",
    "lng": 120.935676,
    "lat": 23.895775,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24607,7 +24607,7 @@
    "name": "国姓乡",
    "lng": 120.85753,
    "lat": 24.040019,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24615,7 +24615,7 @@
    "name": "埔里镇",
    "lng": 120.969169,
    "lat": 23.966523,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24623,7 +24623,7 @@
    "name": "草屯镇",
    "lng": 120.68022,
    "lat": 23.973688,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24631,7 +24631,7 @@
    "name": "仁爱乡",
    "lng": 121.185999,
    "lat": 24.022845,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24639,7 +24639,7 @@
    "name": "名间乡",
    "lng": 120.702916,
    "lat": 23.838169,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24647,7 +24647,7 @@
    "name": "鹿谷乡",
    "lng": 120.753445,
    "lat": 23.745838,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24655,7 +24655,7 @@
    "name": "中寮乡",
    "lng": 120.766099,
    "lat": 23.879,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24663,7 +24663,7 @@
    "name": "集集镇",
    "lng": 120.786505,
    "lat": 23.82844,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24671,7 +24671,7 @@
    "name": "水里乡",
    "lng": 120.85609,
    "lat": 23.811399,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24679,7 +24679,7 @@
    "name": "竹山镇",
    "lng": 120.671688,
    "lat": 23.757853,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24687,7 +24687,7 @@
    "name": "信义乡",
    "lng": 120.854567,
    "lat": 23.6968,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "南投县",
    "level": "county"
   },
@@ -24695,14 +24695,14 @@
    "name": "花莲县",
    "lng": 121.619813,
    "lat": 23.991323,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "瑞穗乡",
    "lng": 121.446209,
    "lat": 23.491829,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24710,7 +24710,7 @@
    "name": "富里乡",
    "lng": 121.250234,
    "lat": 23.17948,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24718,7 +24718,7 @@
    "name": "玉里镇",
    "lng": 121.3151,
    "lat": 23.335527,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24726,7 +24726,7 @@
    "name": "卓溪乡",
    "lng": 121.302793,
    "lat": 23.34459,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24734,7 +24734,7 @@
    "name": "万荣乡",
    "lng": 121.410986,
    "lat": 23.714779,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24742,7 +24742,7 @@
    "name": "光复乡",
    "lng": 121.423312,
    "lat": 23.669344,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24750,7 +24750,7 @@
    "name": "凤林镇",
    "lng": 121.451837,
    "lat": 23.744689,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24758,7 +24758,7 @@
    "name": "寿丰乡",
    "lng": 121.508931,
    "lat": 23.870361,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24766,7 +24766,7 @@
    "name": "新城乡",
    "lng": 121.60437,
    "lat": 24.039333,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24774,7 +24774,7 @@
    "name": "秀林乡",
    "lng": 121.503017,
    "lat": 23.961327,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24782,7 +24782,7 @@
    "name": "花莲市",
    "lng": 121.606744,
    "lat": 23.982131,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24790,7 +24790,7 @@
    "name": "吉安乡",
    "lng": 121.563652,
    "lat": 23.972947,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24798,7 +24798,7 @@
    "name": "丰滨乡",
    "lng": 121.521156,
    "lat": 23.601204,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "花莲县",
    "level": "county"
   },
@@ -24806,14 +24806,14 @@
    "name": "苗栗县",
    "lng": 120.820748,
    "lat": 24.564858,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "三湾乡",
    "lng": 120.960277,
    "lat": 24.654824,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24821,7 +24821,7 @@
    "name": "头屋乡",
    "lng": 120.851097,
    "lat": 24.577729,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24829,7 +24829,7 @@
    "name": "泰安乡",
    "lng": 120.908174,
    "lat": 24.447204,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24837,7 +24837,7 @@
    "name": "卓兰镇",
    "lng": 120.824462,
    "lat": 24.31305,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24845,7 +24845,7 @@
    "name": "造桥乡",
    "lng": 120.865285,
    "lat": 24.638294,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24853,7 +24853,7 @@
    "name": "三义乡",
    "lng": 120.770244,
    "lat": 24.412917,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24861,7 +24861,7 @@
    "name": "狮潭乡",
    "lng": 120.920395,
    "lat": 24.539338,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24869,7 +24869,7 @@
    "name": "大湖乡",
    "lng": 120.866175,
    "lat": 24.423381,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24877,7 +24877,7 @@
    "name": "西湖乡",
    "lng": 120.755561,
    "lat": 24.560236,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24885,7 +24885,7 @@
    "name": "公馆乡",
    "lng": 120.828502,
    "lat": 24.505869,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24893,7 +24893,7 @@
    "name": "头份市",
    "lng": 120.912898,
    "lat": 24.686482,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24901,7 +24901,7 @@
    "name": "苗栗市",
    "lng": 120.819027,
    "lat": 24.561681,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24909,7 +24909,7 @@
    "name": "南庄乡",
    "lng": 121.000325,
    "lat": 24.597051,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24917,7 +24917,7 @@
    "name": "铜锣乡",
    "lng": 120.787875,
    "lat": 24.487053,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24925,7 +24925,7 @@
    "name": "通霄镇",
    "lng": 120.684242,
    "lat": 24.49127,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24933,7 +24933,7 @@
    "name": "苑里镇",
    "lng": 120.653255,
    "lat": 24.439642,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24941,7 +24941,7 @@
    "name": "后龙镇",
    "lng": 120.792062,
    "lat": 24.614037,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24949,7 +24949,7 @@
    "name": "竹南镇",
    "lng": 120.873354,
    "lat": 24.683848,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "苗栗县",
    "level": "county"
   },
@@ -24957,14 +24957,14 @@
    "name": "台中",
    "lng": 120.646848,
    "lat": 24.161851,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "西屯区",
    "lng": 120.633805,
    "lat": 24.165447,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -24972,7 +24972,7 @@
    "name": "潭子区",
    "lng": 120.723216,
    "lat": 24.2035,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -24980,7 +24980,7 @@
    "name": "后里区",
    "lng": 120.71074,
    "lat": 24.304942,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -24988,7 +24988,7 @@
    "name": "南屯区",
    "lng": 120.644279,
    "lat": 24.134514,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -24996,7 +24996,7 @@
    "name": "东势区",
    "lng": 120.827959,
    "lat": 24.258578,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25004,7 +25004,7 @@
    "name": "新社区",
    "lng": 120.810023,
    "lat": 24.23418,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25012,7 +25012,7 @@
    "name": "乌日区",
    "lng": 120.623851,
    "lat": 24.104614,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25020,7 +25020,7 @@
    "name": "中区",
    "lng": 120.679623,
    "lat": 24.143842,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25028,7 +25028,7 @@
    "name": "外埔区",
    "lng": 120.654318,
    "lat": 24.332118,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25036,7 +25036,7 @@
    "name": "神冈区",
    "lng": 120.661404,
    "lat": 24.257991,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25044,7 +25044,7 @@
    "name": "丰原区",
    "lng": 120.718116,
    "lat": 24.241919,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25052,7 +25052,7 @@
    "name": "沙鹿区",
    "lng": 120.566127,
    "lat": 24.233191,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25060,7 +25060,7 @@
    "name": "雾峰区",
    "lng": 120.700121,
    "lat": 24.061049,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25068,7 +25068,7 @@
    "name": "石冈区",
    "lng": 120.780324,
    "lat": 24.274791,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25076,7 +25076,7 @@
    "name": "大里区",
    "lng": 120.685883,
    "lat": 24.099962,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25084,7 +25084,7 @@
    "name": "大肚区",
    "lng": 120.545593,
    "lat": 24.151141,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25092,7 +25092,7 @@
    "name": "北屯区",
    "lng": 120.686396,
    "lat": 24.1827,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25100,7 +25100,7 @@
    "name": "大雅区",
    "lng": 120.647823,
    "lat": 24.229126,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25108,7 +25108,7 @@
    "name": "龙井区",
    "lng": 120.545585,
    "lat": 24.19273,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25116,7 +25116,7 @@
    "name": "梧栖区",
    "lng": 120.531619,
    "lat": 24.254876,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25124,7 +25124,7 @@
    "name": "清水区",
    "lng": 120.559795,
    "lat": 24.268207,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25132,7 +25132,7 @@
    "name": "大甲区",
    "lng": 120.622473,
    "lat": 24.349135,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台中",
    "level": "county"
   },
@@ -25140,14 +25140,14 @@
    "name": "彰化县",
    "lng": 120.544525,
    "lat": 24.075582,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "埔心乡",
    "lng": 120.543524,
    "lat": 23.953113,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25155,7 +25155,7 @@
    "name": "北斗镇",
    "lng": 120.521877,
    "lat": 23.871427,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25163,7 +25163,7 @@
    "name": "田尾乡",
    "lng": 120.525974,
    "lat": 23.892297,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25171,7 +25171,7 @@
    "name": "社头乡",
    "lng": 120.585792,
    "lat": 23.89689,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25179,7 +25179,7 @@
    "name": "员林市",
    "lng": 120.574392,
    "lat": 23.959028,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25187,7 +25187,7 @@
    "name": "花坛乡",
    "lng": 120.550213,
    "lat": 24.031295,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25195,7 +25195,7 @@
    "name": "大村乡",
    "lng": 120.547192,
    "lat": 23.993494,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25203,7 +25203,7 @@
    "name": "溪州乡",
    "lng": 120.498992,
    "lat": 23.851642,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25211,7 +25211,7 @@
    "name": "二水乡",
    "lng": 120.618988,
    "lat": 23.806641,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25219,7 +25219,7 @@
    "name": "溪湖镇",
    "lng": 120.483599,
    "lat": 23.966415,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25227,7 +25227,7 @@
    "name": "埔盐乡",
    "lng": 120.463653,
    "lat": 24.000524,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25235,7 +25235,7 @@
    "name": "彰化市",
    "lng": 120.542273,
    "lat": 24.080933,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25243,7 +25243,7 @@
    "name": "永靖乡",
    "lng": 120.547729,
    "lat": 23.924699,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25251,7 +25251,7 @@
    "name": "埤头乡",
    "lng": 120.462139,
    "lat": 23.891683,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25259,7 +25259,7 @@
    "name": "秀水乡",
    "lng": 120.502791,
    "lat": 24.035477,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25267,7 +25267,7 @@
    "name": "福兴乡",
    "lng": 120.443689,
    "lat": 24.047686,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25275,7 +25275,7 @@
    "name": "二林镇",
    "lng": 120.374407,
    "lat": 23.90003,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25283,7 +25283,7 @@
    "name": "鹿港镇",
    "lng": 120.435045,
    "lat": 24.057317,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25291,7 +25291,7 @@
    "name": "大城乡",
    "lng": 120.320888,
    "lat": 23.85235,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25299,7 +25299,7 @@
    "name": "田中镇",
    "lng": 120.580937,
    "lat": 23.861577,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25307,7 +25307,7 @@
    "name": "芳苑乡",
    "lng": 120.320386,
    "lat": 23.924437,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25315,7 +25315,7 @@
    "name": "芬园乡",
    "lng": 120.628995,
    "lat": 24.013665,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25323,7 +25323,7 @@
    "name": "竹塘乡",
    "lng": 120.427705,
    "lat": 23.860515,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25331,7 +25331,7 @@
    "name": "和美镇",
    "lng": 120.494365,
    "lat": 24.108506,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25339,7 +25339,7 @@
    "name": "线西乡",
    "lng": 120.470552,
    "lat": 24.130798,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25347,7 +25347,7 @@
    "name": "伸港乡",
    "lng": 120.486188,
    "lat": 24.159785,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "彰化县",
    "level": "county"
   },
@@ -25355,14 +25355,14 @@
    "name": "台南",
    "lng": 120.185078,
    "lat": 22.992405,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "白河区",
    "lng": 120.415818,
    "lat": 23.351234,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25370,7 +25370,7 @@
    "name": "大内区",
    "lng": 120.356829,
    "lat": 23.119077,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25378,7 +25378,7 @@
    "name": "关庙区",
    "lng": 120.327679,
    "lat": 22.963023,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25386,7 +25386,7 @@
    "name": "新化区",
    "lng": 120.310848,
    "lat": 23.038558,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25394,7 +25394,7 @@
    "name": "佳里区",
    "lng": 120.177032,
    "lat": 23.165151,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25402,7 +25402,7 @@
    "name": "左镇区",
    "lng": 120.408711,
    "lat": 23.05679,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25410,7 +25410,7 @@
    "name": "山上区",
    "lng": 120.352637,
    "lat": 23.103631,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25418,7 +25418,7 @@
    "name": "南化区",
    "lng": 120.477872,
    "lat": 23.043023,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25426,7 +25426,7 @@
    "name": "盐水区",
    "lng": 120.266089,
    "lat": 23.320013,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25434,7 +25434,7 @@
    "name": "六甲区",
    "lng": 120.347408,
    "lat": 23.231808,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25442,7 +25442,7 @@
    "name": "归仁区",
    "lng": 120.294004,
    "lat": 22.967293,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25450,7 +25450,7 @@
    "name": "新营区",
    "lng": 120.316576,
    "lat": 23.310176,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25458,7 +25458,7 @@
    "name": "永康区",
    "lng": 120.257021,
    "lat": 23.026252,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25466,7 +25466,7 @@
    "name": "西港区",
    "lng": 120.203423,
    "lat": 23.122973,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25474,7 +25474,7 @@
    "name": "龙崎区",
    "lng": 120.365038,
    "lat": 22.963168,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25482,7 +25482,7 @@
    "name": "学甲区",
    "lng": 120.182297,
    "lat": 23.23053,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25490,7 +25490,7 @@
    "name": "后壁区",
    "lng": 120.361967,
    "lat": 23.365987,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25498,7 +25498,7 @@
    "name": "楠西区",
    "lng": 120.486327,
    "lat": 23.174127,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25506,7 +25506,7 @@
    "name": "麻豆区",
    "lng": 120.258447,
    "lat": 23.184957,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25514,7 +25514,7 @@
    "name": "善化区",
    "lng": 120.296784,
    "lat": 23.132431,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25522,7 +25522,7 @@
    "name": "玉井区",
    "lng": 120.460123,
    "lat": 23.123797,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25530,7 +25530,7 @@
    "name": "柳营区",
    "lng": 120.311628,
    "lat": 23.278397,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25538,7 +25538,7 @@
    "name": "仁德区",
    "lng": 120.251691,
    "lat": 22.97244,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25546,7 +25546,7 @@
    "name": "下营区",
    "lng": 120.264421,
    "lat": 23.235553,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25554,7 +25554,7 @@
    "name": "官田区",
    "lng": 120.315383,
    "lat": 23.193136,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25562,7 +25562,7 @@
    "name": "安南区",
    "lng": 120.184789,
    "lat": 23.047209,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25570,7 +25570,7 @@
    "name": "安平区",
    "lng": 120.16903,
    "lat": 22.994567,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25578,7 +25578,7 @@
    "name": "七股区",
    "lng": 120.13878,
    "lat": 23.1403,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25586,7 +25586,7 @@
    "name": "北门区",
    "lng": 120.125342,
    "lat": 23.26771,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25594,7 +25594,7 @@
    "name": "将军区",
    "lng": 120.158711,
    "lat": 23.199054,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台南",
    "level": "county"
   },
@@ -25602,14 +25602,14 @@
    "name": "台东县",
    "lng": 121.150288,
    "lat": 22.755663,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "关山镇",
    "lng": 121.163069,
    "lat": 23.047514,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25617,7 +25617,7 @@
    "name": "海端乡",
    "lng": 121.176519,
    "lat": 23.102124,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25625,7 +25625,7 @@
    "name": "金峰乡",
    "lng": 120.960598,
    "lat": 22.594707,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25633,7 +25633,7 @@
    "name": "池上乡",
    "lng": 121.214996,
    "lat": 23.122497,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25641,7 +25641,7 @@
    "name": "延平乡",
    "lng": 121.086023,
    "lat": 22.902604,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25649,7 +25649,7 @@
    "name": "鹿野乡",
    "lng": 121.15164,
    "lat": 22.939915,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25657,7 +25657,7 @@
    "name": "达仁乡",
    "lng": 120.883075,
    "lat": 22.296925,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25665,7 +25665,7 @@
    "name": "大武乡",
    "lng": 120.890013,
    "lat": 22.340515,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25673,7 +25673,7 @@
    "name": "台东市",
    "lng": 121.146642,
    "lat": 22.754691,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25681,7 +25681,7 @@
    "name": "卑南乡",
    "lng": 121.0871,
    "lat": 22.782822,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25689,7 +25689,7 @@
    "name": "东河乡",
    "lng": 121.302723,
    "lat": 22.96907,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25697,7 +25697,7 @@
    "name": "成功镇",
    "lng": 121.38078,
    "lat": 23.10507,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25705,7 +25705,7 @@
    "name": "长滨乡",
    "lng": 121.451532,
    "lat": 23.315292,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25713,7 +25713,7 @@
    "name": "太麻里乡",
    "lng": 121.007509,
    "lat": 22.615582,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25721,7 +25721,7 @@
    "name": "绿岛乡",
    "lng": 121.468372,
    "lat": 22.66933,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25729,7 +25729,7 @@
    "name": "兰屿乡",
    "lng": 121.556342,
    "lat": 22.024681,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台东县",
    "level": "county"
   },
@@ -25737,14 +25737,14 @@
    "name": "云林县",
    "lng": 120.526415,
    "lat": 23.699029,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "土库镇",
    "lng": 120.39202,
    "lat": 23.677695,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25752,7 +25752,7 @@
    "name": "林内乡",
    "lng": 120.612933,
    "lat": 23.756331,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25760,7 +25760,7 @@
    "name": "古坑乡",
    "lng": 120.561966,
    "lat": 23.642672,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25768,7 +25768,7 @@
    "name": "北港镇",
    "lng": 120.302314,
    "lat": 23.575989,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25776,7 +25776,7 @@
    "name": "虎尾镇",
    "lng": 120.445211,
    "lat": 23.708418,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25784,7 +25784,7 @@
    "name": "水林乡",
    "lng": 120.24591,
    "lat": 23.572781,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25792,7 +25792,7 @@
    "name": "莿桐乡",
    "lng": 120.502574,
    "lat": 23.760997,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25800,7 +25800,7 @@
    "name": "元长乡",
    "lng": 120.319766,
    "lat": 23.642822,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25808,7 +25808,7 @@
    "name": "褒忠乡",
    "lng": 120.303722,
    "lat": 23.691085,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25816,7 +25816,7 @@
    "name": "二仑乡",
    "lng": 120.412964,
    "lat": 23.771119,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25824,7 +25824,7 @@
    "name": "大埤乡",
    "lng": 120.431427,
    "lat": 23.6461,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25832,7 +25832,7 @@
    "name": "西螺镇",
    "lng": 120.46553,
    "lat": 23.797981,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25840,7 +25840,7 @@
    "name": "仑背乡",
    "lng": 120.359134,
    "lat": 23.761959,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25848,7 +25848,7 @@
    "name": "斗南镇",
    "lng": 120.477695,
    "lat": 23.68027,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25856,7 +25856,7 @@
    "name": "斗六市",
    "lng": 120.527001,
    "lat": 23.697164,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25864,7 +25864,7 @@
    "name": "东势乡",
    "lng": 120.252607,
    "lat": 23.674972,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25872,7 +25872,7 @@
    "name": "麦寮乡",
    "lng": 120.251305,
    "lat": 23.754037,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25880,7 +25880,7 @@
    "name": "台西乡",
    "lng": 120.190676,
    "lat": 23.720099,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25888,7 +25888,7 @@
    "name": "口湖乡",
    "lng": 120.185817,
    "lat": 23.582696,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25896,7 +25896,7 @@
    "name": "四湖乡",
    "lng": 120.224325,
    "lat": 23.638068,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "云林县",
    "level": "county"
   },
@@ -25904,14 +25904,14 @@
    "name": "屏东县",
    "lng": 120.487929,
    "lat": 22.682979,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "里港乡",
    "lng": 120.494509,
    "lat": 22.779233,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25919,7 +25919,7 @@
    "name": "来义乡",
    "lng": 120.631575,
    "lat": 22.526179,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25927,7 +25927,7 @@
    "name": "崁顶乡",
    "lng": 120.514043,
    "lat": 22.514768,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25935,7 +25935,7 @@
    "name": "高树乡",
    "lng": 120.600291,
    "lat": 22.826725,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25943,7 +25943,7 @@
    "name": "九如乡",
    "lng": 120.490348,
    "lat": 22.740443,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25951,7 +25951,7 @@
    "name": "内埔乡",
    "lng": 120.570487,
    "lat": 22.608338,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25959,7 +25959,7 @@
    "name": "屏东市",
    "lng": 120.49144,
    "lat": 22.662508,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25967,7 +25967,7 @@
    "name": "南州乡",
    "lng": 120.50986,
    "lat": 22.490379,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25975,7 +25975,7 @@
    "name": "玛家乡",
    "lng": 120.651462,
    "lat": 22.708329,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25983,7 +25983,7 @@
    "name": "麟洛乡",
    "lng": 120.52722,
    "lat": 22.65066,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25991,7 +25991,7 @@
    "name": "三地门乡",
    "lng": 120.654126,
    "lat": 22.716195,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -25999,7 +25999,7 @@
    "name": "狮子乡",
    "lng": 120.705407,
    "lat": 22.201839,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26007,7 +26007,7 @@
    "name": "长治乡",
    "lng": 120.527306,
    "lat": 22.676593,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26015,7 +26015,7 @@
    "name": "潮州镇",
    "lng": 120.542974,
    "lat": 22.549852,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26023,7 +26023,7 @@
    "name": "春日乡",
    "lng": 120.629087,
    "lat": 22.370994,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26031,7 +26031,7 @@
    "name": "万丹乡",
    "lng": 120.485033,
    "lat": 22.589499,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26039,7 +26039,7 @@
    "name": "泰武乡",
    "lng": 120.632061,
    "lat": 22.59178,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26047,7 +26047,7 @@
    "name": "万峦乡",
    "lng": 120.567811,
    "lat": 22.572679,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26055,7 +26055,7 @@
    "name": "新埤乡",
    "lng": 120.549882,
    "lat": 22.470194,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26063,7 +26063,7 @@
    "name": "竹田乡",
    "lng": 120.543991,
    "lat": 22.584732,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26071,7 +26071,7 @@
    "name": "盐埔乡",
    "lng": 120.572493,
    "lat": 22.754442,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26079,7 +26079,7 @@
    "name": "雾台乡",
    "lng": 120.728267,
    "lat": 22.749093,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26087,7 +26087,7 @@
    "name": "恒春镇",
    "lng": 120.747253,
    "lat": 22.00374,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26095,7 +26095,7 @@
    "name": "满州乡",
    "lng": 120.838638,
    "lat": 22.02082,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26103,7 +26103,7 @@
    "name": "牡丹乡",
    "lng": 120.774309,
    "lat": 22.12615,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26111,7 +26111,7 @@
    "name": "车城乡",
    "lng": 120.714271,
    "lat": 22.073933,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26119,7 +26119,7 @@
    "name": "枋山乡",
    "lng": 120.652283,
    "lat": 22.264021,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26127,7 +26127,7 @@
    "name": "枋寮乡",
    "lng": 120.599628,
    "lat": 22.356146,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26135,7 +26135,7 @@
    "name": "佳冬乡",
    "lng": 120.552432,
    "lat": 22.419215,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26143,7 +26143,7 @@
    "name": "林边乡",
    "lng": 120.50992,
    "lat": 22.431584,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26151,7 +26151,7 @@
    "name": "东港镇",
    "lng": 120.459136,
    "lat": 22.463996,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26159,7 +26159,7 @@
    "name": "新园乡",
    "lng": 120.461505,
    "lat": 22.543844,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26167,7 +26167,7 @@
    "name": "琉球乡",
    "lng": 120.382614,
    "lat": 22.348509,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "屏东县",
    "level": "county"
   },
@@ -26175,14 +26175,14 @@
    "name": "高雄",
    "lng": 120.312016,
    "lat": 22.620626,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "冈山区",
    "lng": 120.2951,
    "lat": 22.797508,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26190,7 +26190,7 @@
    "name": "六龟区",
    "lng": 120.632698,
    "lat": 22.998435,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26198,7 +26198,7 @@
    "name": "湖内区",
    "lng": 120.211713,
    "lat": 22.908312,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26206,7 +26206,7 @@
    "name": "大树区",
    "lng": 120.414345,
    "lat": 22.683911,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26214,7 +26214,7 @@
    "name": "阿莲区",
    "lng": 120.327405,
    "lat": 22.883195,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26222,7 +26222,7 @@
    "name": "大社区",
    "lng": 120.34661,
    "lat": 22.730167,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26230,7 +26230,7 @@
    "name": "凤山区",
    "lng": 120.362561,
    "lat": 22.627065,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26238,7 +26238,7 @@
    "name": "大寮区",
    "lng": 120.395588,
    "lat": 22.605513,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26246,7 +26246,7 @@
    "name": "路竹区",
    "lng": 120.25923,
    "lat": 22.854643,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26254,7 +26254,7 @@
    "name": "甲仙区",
    "lng": 120.5877,
    "lat": 23.083916,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26262,7 +26262,7 @@
    "name": "鸟松区",
    "lng": 120.364349,
    "lat": 22.659827,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26270,7 +26270,7 @@
    "name": "内门区",
    "lng": 120.462584,
    "lat": 22.942878,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26278,7 +26278,7 @@
    "name": "美浓区",
    "lng": 120.541947,
    "lat": 22.894806,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26286,7 +26286,7 @@
    "name": "茂林区",
    "lng": 120.663256,
    "lat": 22.88618,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26294,7 +26294,7 @@
    "name": "旗山区",
    "lng": 120.483473,
    "lat": 22.888659,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26302,7 +26302,7 @@
    "name": "那玛夏区",
    "lng": 120.720066,
    "lat": 23.276713,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26310,7 +26310,7 @@
    "name": "前金区",
    "lng": 120.294304,
    "lat": 22.627564,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26318,7 +26318,7 @@
    "name": "田寮区",
    "lng": 120.359425,
    "lat": 22.86988,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26326,7 +26326,7 @@
    "name": "仁武区",
    "lng": 120.347776,
    "lat": 22.701124,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26334,7 +26334,7 @@
    "name": "燕巢区",
    "lng": 120.361962,
    "lat": 22.788146,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26342,7 +26342,7 @@
    "name": "三民区",
    "lng": 120.299845,
    "lat": 22.647667,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26350,7 +26350,7 @@
    "name": "桃源区",
    "lng": 120.764048,
    "lat": 23.159418,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26358,7 +26358,7 @@
    "name": "桥头区",
    "lng": 120.305533,
    "lat": 22.757612,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26366,7 +26366,7 @@
    "name": "杉林区",
    "lng": 120.540073,
    "lat": 22.971754,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26374,7 +26374,7 @@
    "name": "林园区",
    "lng": 120.39432,
    "lat": 22.512915,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26382,7 +26382,7 @@
    "name": "小港区",
    "lng": 120.338037,
    "lat": 22.565202,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26390,7 +26390,7 @@
    "name": "旗津区",
    "lng": 120.284474,
    "lat": 22.590488,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26398,7 +26398,7 @@
    "name": "前镇区",
    "lng": 120.318299,
    "lat": 22.586558,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26406,7 +26406,7 @@
    "name": "苓雅区",
    "lng": 120.312186,
    "lat": 22.621735,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26414,7 +26414,7 @@
    "name": "盐埕区",
    "lng": 120.286725,
    "lat": 22.624683,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26422,7 +26422,7 @@
    "name": "鼓山区",
    "lng": 120.280963,
    "lat": 22.636782,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26430,7 +26430,7 @@
    "name": "左营区",
    "lng": 120.294904,
    "lat": 22.68996,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26438,7 +26438,7 @@
    "name": "楠梓区",
    "lng": 120.32637,
    "lat": 22.728403,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26446,7 +26446,7 @@
    "name": "梓官区",
    "lng": 120.267153,
    "lat": 22.760642,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26454,7 +26454,7 @@
    "name": "弥陀区",
    "lng": 120.250699,
    "lat": 22.7815,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26462,7 +26462,7 @@
    "name": "永安区",
    "lng": 120.224197,
    "lat": 22.818314,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26470,7 +26470,7 @@
    "name": "茄萣区",
    "lng": 120.182459,
    "lat": 22.906646,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "高雄",
    "level": "county"
   },
@@ -26478,21 +26478,21 @@
    "name": "嘉义",
    "lng": 120.453666,
    "lat": 23.481308,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "新竹",
    "lng": 120.968948,
    "lat": 24.80679,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "香山区",
    "lng": 120.942256,
    "lat": 24.794159,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹",
    "level": "county"
   },
@@ -26500,14 +26500,14 @@
    "name": "台北",
    "lng": 121.564356,
    "lat": 25.037542,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "士林区",
    "lng": 121.519649,
    "lat": 25.092686,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台北",
    "level": "county"
   },
@@ -26515,7 +26515,7 @@
    "name": "内湖区",
    "lng": 121.589087,
    "lat": 25.069318,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台北",
    "level": "county"
   },
@@ -26523,7 +26523,7 @@
    "name": "南港区",
    "lng": 121.606657,
    "lat": 25.054683,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台北",
    "level": "county"
   },
@@ -26531,7 +26531,7 @@
    "name": "文山区",
    "lng": 121.570159,
    "lat": 24.989623,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台北",
    "level": "county"
   },
@@ -26539,7 +26539,7 @@
    "name": "中正区",
    "lng": 121.518332,
    "lat": 25.032204,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台北",
    "level": "county"
   },
@@ -26547,7 +26547,7 @@
    "name": "信义区",
    "lng": 121.581987,
    "lat": 25.037765,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台北",
    "level": "county"
   },
@@ -26555,7 +26555,7 @@
    "name": "北投区",
    "lng": 121.46828,
    "lat": 25.124723,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台北",
    "level": "county"
   },
@@ -26563,7 +26563,7 @@
    "name": "万华区",
    "lng": 121.49987,
    "lat": 25.034931,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "台北",
    "level": "county"
   },
@@ -26571,14 +26571,14 @@
    "name": "桃园",
    "lng": 121.30104,
    "lat": 24.992925,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "桃园区",
    "lng": 121.301663,
    "lat": 24.993851,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26586,7 +26586,7 @@
    "name": "中坜区",
    "lng": 121.224989,
    "lat": 24.96558,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26594,7 +26594,7 @@
    "name": "平镇区",
    "lng": 121.218329,
    "lat": 24.945559,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26602,7 +26602,7 @@
    "name": "杨梅区",
    "lng": 121.145816,
    "lat": 24.907536,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26610,7 +26610,7 @@
    "name": "龙潭区",
    "lng": 121.222451,
    "lat": 24.870486,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26618,7 +26618,7 @@
    "name": "龟山区",
    "lng": 121.337813,
    "lat": 24.992503,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26626,7 +26626,7 @@
    "name": "大溪区",
    "lng": 121.287116,
    "lat": 24.880542,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26634,7 +26634,7 @@
    "name": "八德区",
    "lng": 121.284635,
    "lat": 24.928978,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26642,7 +26642,7 @@
    "name": "芦竹区",
    "lng": 121.295138,
    "lat": 25.046968,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26650,7 +26650,7 @@
    "name": "大园区",
    "lng": 121.195464,
    "lat": 25.063861,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26658,7 +26658,7 @@
    "name": "观音区",
    "lng": 121.083558,
    "lat": 25.028087,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26666,7 +26666,7 @@
    "name": "新屋区",
    "lng": 121.105535,
    "lat": 24.972542,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "桃园",
    "level": "county"
   },
@@ -26674,14 +26674,14 @@
    "name": "宜兰县",
    "lng": 121.763121,
    "lat": 24.730673,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "三星乡",
    "lng": 121.653984,
    "lat": 24.665487,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26689,7 +26689,7 @@
    "name": "冬山乡",
    "lng": 121.793018,
    "lat": 24.634386,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26697,7 +26697,7 @@
    "name": "罗东镇",
    "lng": 121.766972,
    "lat": 24.676912,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26705,7 +26705,7 @@
    "name": "宜兰市",
    "lng": 121.753375,
    "lat": 24.752073,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26713,7 +26713,7 @@
    "name": "礁溪乡",
    "lng": 121.771184,
    "lat": 24.823448,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26721,7 +26721,7 @@
    "name": "员山乡",
    "lng": 121.723124,
    "lat": 24.743428,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26729,7 +26729,7 @@
    "name": "大同乡",
    "lng": 121.609085,
    "lat": 24.677424,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26737,7 +26737,7 @@
    "name": "南澳乡",
    "lng": 121.803742,
    "lat": 24.466074,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26745,7 +26745,7 @@
    "name": "苏澳镇",
    "lng": 121.842134,
    "lat": 24.594413,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26753,7 +26753,7 @@
    "name": "头城镇",
    "lng": 121.821308,
    "lat": 24.854832,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26761,7 +26761,7 @@
    "name": "黄尾屿",
    "lng": 123.682642,
    "lat": 25.923902,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26769,7 +26769,7 @@
    "name": "小元宝岛",
    "lng": 123.54304,
    "lat": 25.779927,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26777,7 +26777,7 @@
    "name": "赤尾屿",
    "lng": 124.558068,
    "lat": 25.922273,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26785,7 +26785,7 @@
    "name": "钓鱼岛",
    "lng": 123.470762,
    "lat": 25.745042,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26793,7 +26793,7 @@
    "name": "花瓶屿",
    "lng": 121.941651,
    "lat": 25.427914,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26801,7 +26801,7 @@
    "name": "飞云岛",
    "lng": 123.53986,
    "lat": 25.77934,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26809,7 +26809,7 @@
    "name": "北小岛",
    "lng": 123.541039,
    "lat": 25.730779,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26817,7 +26817,7 @@
    "name": "元宝岛",
    "lng": 123.541262,
    "lat": 25.779185,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26825,7 +26825,7 @@
    "name": "南屿",
    "lng": 123.566751,
    "lat": 25.755065,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26833,7 +26833,7 @@
    "name": "南小岛",
    "lng": 123.550054,
    "lat": 25.723936,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26841,7 +26841,7 @@
    "name": "棉花屿",
    "lng": 122.105807,
    "lat": 25.485106,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26849,7 +26849,7 @@
    "name": "北屿仔岛",
    "lng": 123.543306,
    "lat": 25.780123,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26857,7 +26857,7 @@
    "name": "北屿",
    "lng": 123.543688,
    "lat": 25.781424,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26865,7 +26865,7 @@
    "name": "彭佳屿",
    "lng": 122.078878,
    "lat": 25.628662,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26873,7 +26873,7 @@
    "name": "壮围乡",
    "lng": 121.785746,
    "lat": 24.746879,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26881,7 +26881,7 @@
    "name": "飞屿",
    "lng": 123.506412,
    "lat": 25.735392,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26889,7 +26889,7 @@
    "name": "五结乡",
    "lng": 121.798312,
    "lat": 24.684652,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "宜兰县",
    "level": "county"
   },
@@ -26897,14 +26897,14 @@
    "name": "新竹县",
    "lng": 121.012905,
    "lat": 24.826869,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "新埔镇",
    "lng": 121.074072,
    "lat": 24.825613,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26912,7 +26912,7 @@
    "name": "竹东镇",
    "lng": 121.091743,
    "lat": 24.736745,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26920,7 +26920,7 @@
    "name": "尖石乡",
    "lng": 121.20232,
    "lat": 24.705124,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26928,7 +26928,7 @@
    "name": "湖口乡",
    "lng": 121.047864,
    "lat": 24.900998,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26936,7 +26936,7 @@
    "name": "五峰乡",
    "lng": 121.119559,
    "lat": 24.632052,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26944,7 +26944,7 @@
    "name": "芎林乡",
    "lng": 121.074754,
    "lat": 24.77763,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26952,7 +26952,7 @@
    "name": "横山乡",
    "lng": 121.141508,
    "lat": 24.716888,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26960,7 +26960,7 @@
    "name": "宝山乡",
    "lng": 120.99129,
    "lat": 24.765455,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26968,7 +26968,7 @@
    "name": "关西镇",
    "lng": 121.175834,
    "lat": 24.792464,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26976,7 +26976,7 @@
    "name": "北埔乡",
    "lng": 121.056189,
    "lat": 24.701978,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26984,7 +26984,7 @@
    "name": "峨眉乡",
    "lng": 121.019582,
    "lat": 24.688778,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -26992,7 +26992,7 @@
    "name": "竹北市",
    "lng": 121.004009,
    "lat": 24.839573,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -27000,7 +27000,7 @@
    "name": "新丰乡",
    "lng": 120.985218,
    "lat": 24.90069,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新竹县",
    "level": "county"
   },
@@ -27008,14 +27008,14 @@
    "name": "基隆",
    "lng": 121.744347,
    "lat": 25.131804,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "七堵区",
    "lng": 121.716475,
    "lat": 25.097615,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "基隆",
    "level": "county"
   },
@@ -27023,7 +27023,7 @@
    "name": "暖暖区",
    "lng": 121.735932,
    "lat": 25.100217,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "基隆",
    "level": "county"
   },
@@ -27031,7 +27031,7 @@
    "name": "安乐区",
    "lng": 121.72322,
    "lat": 25.121172,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "基隆",
    "level": "county"
   },
@@ -27039,7 +27039,7 @@
    "name": "仁爱区",
    "lng": 121.73662,
    "lat": 25.125192,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "基隆",
    "level": "county"
   },
@@ -27047,14 +27047,14 @@
    "name": "澎湖县",
    "lng": 119.566531,
    "lat": 23.570124,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "白沙乡",
    "lng": 119.598642,
    "lat": 23.666553,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "澎湖县",
    "level": "county"
   },
@@ -27062,7 +27062,7 @@
    "name": "望安乡",
    "lng": 119.50012,
    "lat": 23.357613,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "澎湖县",
    "level": "county"
   },
@@ -27070,7 +27070,7 @@
    "name": "西屿乡",
    "lng": 119.507059,
    "lat": 23.601134,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "澎湖县",
    "level": "county"
   },
@@ -27078,7 +27078,7 @@
    "name": "马公市",
    "lng": 119.578775,
    "lat": 23.566126,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "澎湖县",
    "level": "county"
   },
@@ -27086,7 +27086,7 @@
    "name": "湖西乡",
    "lng": 119.652654,
    "lat": 23.584004,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "澎湖县",
    "level": "county"
   },
@@ -27094,7 +27094,7 @@
    "name": "七美乡",
    "lng": 119.424529,
    "lat": 23.20669,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "澎湖县",
    "level": "county"
   },
@@ -27102,14 +27102,14 @@
    "name": "嘉义县",
    "lng": 120.292883,
    "lat": 23.458714,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "大林镇",
    "lng": 120.471213,
    "lat": 23.604078,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27117,7 +27117,7 @@
    "name": "大埔乡",
    "lng": 120.593575,
    "lat": 23.294763,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27125,7 +27125,7 @@
    "name": "番路乡",
    "lng": 120.554355,
    "lat": 23.464507,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27133,7 +27133,7 @@
    "name": "鹿草乡",
    "lng": 120.308412,
    "lat": 23.411385,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27141,7 +27141,7 @@
    "name": "朴子市",
    "lng": 120.245929,
    "lat": 23.457616,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27149,7 +27149,7 @@
    "name": "阿里山乡",
    "lng": 120.713504,
    "lat": 23.471271,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27157,7 +27157,7 @@
    "name": "溪口乡",
    "lng": 120.392344,
    "lat": 23.60252,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27165,7 +27165,7 @@
    "name": "义竹乡",
    "lng": 120.243233,
    "lat": 23.336209,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27173,7 +27173,7 @@
    "name": "民雄乡",
    "lng": 120.428391,
    "lat": 23.55166,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27181,7 +27181,7 @@
    "name": "六脚乡",
    "lng": 120.290744,
    "lat": 23.494095,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27189,7 +27189,7 @@
    "name": "太保市",
    "lng": 120.332403,
    "lat": 23.458871,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27197,7 +27197,7 @@
    "name": "水上乡",
    "lng": 120.40936,
    "lat": 23.430291,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27205,7 +27205,7 @@
    "name": "新港乡",
    "lng": 120.353283,
    "lat": 23.557687,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27213,7 +27213,7 @@
    "name": "梅山乡",
    "lng": 120.555626,
    "lat": 23.585262,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27221,7 +27221,7 @@
    "name": "中埔乡",
    "lng": 120.522944,
    "lat": 23.425207,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27229,7 +27229,7 @@
    "name": "竹崎乡",
    "lng": 120.551391,
    "lat": 23.522962,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27237,7 +27237,7 @@
    "name": "东石乡",
    "lng": 120.153733,
    "lat": 23.458822,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27245,7 +27245,7 @@
    "name": "布袋镇",
    "lng": 120.167085,
    "lat": 23.37824,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "嘉义县",
    "level": "county"
   },
@@ -27253,14 +27253,14 @@
    "name": "新北",
    "lng": 121.465544,
    "lat": 25.0123,
-   "province": "台湾",
+   "province": "中国台湾",
    "level": "city"
   },
   {
    "name": "树林区",
    "lng": 121.424638,
    "lat": 24.989972,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27268,7 +27268,7 @@
    "name": "五股区",
    "lng": 121.438087,
    "lat": 25.083051,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27276,7 +27276,7 @@
    "name": "深坑区",
    "lng": 121.615969,
    "lat": 25.002514,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27284,7 +27284,7 @@
    "name": "平溪区",
    "lng": 121.738225,
    "lat": 25.026623,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27292,7 +27292,7 @@
    "name": "芦洲区",
    "lng": 121.473831,
    "lat": 25.084678,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27300,7 +27300,7 @@
    "name": "双溪区",
    "lng": 121.865798,
    "lat": 25.033779,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27308,7 +27308,7 @@
    "name": "三峡区",
    "lng": 121.369078,
    "lat": 24.934183,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27316,7 +27316,7 @@
    "name": "莺歌区",
    "lng": 121.354308,
    "lat": 24.955982,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27324,7 +27324,7 @@
    "name": "中和区",
    "lng": 121.500763,
    "lat": 24.998654,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27332,7 +27332,7 @@
    "name": "汐止区",
    "lng": 121.658591,
    "lat": 25.06411,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27340,7 +27340,7 @@
    "name": "土城区",
    "lng": 121.442996,
    "lat": 24.972551,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27348,7 +27348,7 @@
    "name": "乌来区",
    "lng": 121.548058,
    "lat": 24.871835,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27356,7 +27356,7 @@
    "name": "板桥区",
    "lng": 121.459307,
    "lat": 25.009771,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27364,7 +27364,7 @@
    "name": "新店区",
    "lng": 121.541954,
    "lat": 24.967272,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27372,7 +27372,7 @@
    "name": "新庄区",
    "lng": 121.450394,
    "lat": 25.035853,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27380,7 +27380,7 @@
    "name": "石碇区",
    "lng": 121.657898,
    "lat": 24.991484,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27388,7 +27388,7 @@
    "name": "坪林区",
    "lng": 121.711757,
    "lat": 24.936141,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27396,7 +27396,7 @@
    "name": "永和区",
    "lng": 121.520294,
    "lat": 25.009204,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27404,7 +27404,7 @@
    "name": "三重区",
    "lng": 121.488431,
    "lat": 25.060783,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27412,7 +27412,7 @@
    "name": "贡寮区",
    "lng": 121.906115,
    "lat": 25.02091,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27420,7 +27420,7 @@
    "name": "万里区",
    "lng": 121.689467,
    "lat": 25.178047,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27428,7 +27428,7 @@
    "name": "石门区",
    "lng": 121.567826,
    "lat": 25.291251,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27436,7 +27436,7 @@
    "name": "淡水区",
    "lng": 121.443687,
    "lat": 25.18701,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27444,7 +27444,7 @@
    "name": "三芝区",
    "lng": 121.500948,
    "lat": 25.257764,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27452,7 +27452,7 @@
    "name": "林口区",
    "lng": 121.388631,
    "lat": 25.076788,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27460,7 +27460,7 @@
    "name": "八里区",
    "lng": 121.40643,
    "lat": 25.153769,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },
@@ -27468,7 +27468,7 @@
    "name": "瑞芳区",
    "lng": 121.809898,
    "lat": 25.10878,
-   "province": "台湾",
+   "province": "中国台湾",
    "city": "新北",
    "level": "county"
   },

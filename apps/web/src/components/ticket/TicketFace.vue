@@ -11,7 +11,14 @@
  * （2026-10-09 鸿蒙化收敛裁定，见 tokens.css 例外条款）。 */
 import { computed } from 'vue';
 import { mustDriveFromShields, type TicketConfig } from '@railvista/shared';
-import { AIRLINES, ALLIANCES, TICKET_KIND_META, ticketTheme } from '../../data/ticket';
+import { AIRLINES, ALLIANCES, ticketTheme } from '../../data/ticket';
+import {
+  buildCode128Bars,
+  buildQrMatrix,
+  TICKET_FOOTER_BRAND,
+  TICKET_QR_CAPTION,
+  WAYBOOK_URL,
+} from '../../lib/ticketCodes';
 import RoadShield from './RoadShield.vue';
 import brandLockup from '../../assets/heyworld-brand.png';
 import brandMark from '../../assets/heyworld-logo.png';
@@ -23,6 +30,8 @@ const theme = computed(() => ticketTheme(props.config.background.theme));
 
 const styleVars = computed<Record<string, string>>(() => {
   const t = theme.value;
+  // 深色票：白码透底；浅色蓝票：用主字色保证可扫
+  const codeInk = t.guil === 'blue' ? t.fg.tx : '#ffffff';
   return {
     '--tk-grad': `linear-gradient(165deg, ${t.grad[0]} 0%, ${t.grad[1]} 48%, ${t.grad[2]} 100%)`,
     '--tk-acc': t.accent,
@@ -34,10 +43,10 @@ const styleVars = computed<Record<string, string>>(() => {
     '--tk-chip': t.fg.chip,
     '--tk-chip-line': t.fg.chipLine,
     '--tk-serial': t.serialColor ?? t.accent,
+    '--tk-code': codeInk,
   };
 });
 
-const kindMeta = computed(() => TICKET_KIND_META[props.config.kind]);
 const airline = computed(() => {
   const ref = props.config.airline;
   if (!ref?.code) return null;
@@ -64,49 +73,37 @@ const displayShields = computed(() => {
   return shields.value.filter((s) => s.replace(/^[A-Za-z]/, '') !== mustNumber.value);
 });
 
-/** 确定性伪二维码（由 qr.value 哈希播种） */
-const qrCells = computed(() => {
-  const s = props.config.qr.value || 'railvista';
-  let h = 0x811c9dc5;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  let a = h >>> 0;
-  const rnd = () => {
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-  const n = 21;
-  const inFinder = (r: number, c: number) =>
-    (r < 8 && c < 8) || (r < 8 && c >= n - 8) || (r >= n - 8 && c < 8);
+/** 真实 QR：扫码目标固定为路书站，不可配置 */
+const qrMatrix = computed(() => buildQrMatrix(WAYBOOK_URL));
+
+const qrDarkCells = computed(() => {
+  const { modules } = qrMatrix.value;
   const cells: { r: number; c: number }[] = [];
-  for (let r = 0; r < n; r++) {
-    for (let c = 0; c < n; c++) {
-      if (!inFinder(r, c) && rnd() > 0.52) cells.push({ r, c });
+  for (let r = 0; r < modules.length; r++) {
+    const row = modules[r]!;
+    for (let c = 0; c < row.length; c++) {
+      if (row[c]) cells.push({ r, c });
     }
   }
   return cells;
 });
 
-/** 确定性一维条码（登机牌用）：条宽 1-3 */
-const barcode = computed<number[]>(() => {
-  const s = props.config.serial || 'barcode';
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
+/**
+ * 登机牌 Code128：与二维码同目标（固定路书站）。
+ * 仅渲染条空，不附网址文字；票号 serial 仍单独展示。
+ */
+const barcode = computed(() => buildCode128Bars(WAYBOOK_URL));
+
+const barcodePath = computed(() => {
+  const { bars } = barcode.value;
+  let x = 0;
+  const parts: string[] = [];
+  for (let i = 0; i < bars.length; i++) {
+    const w = bars[i]!;
+    if (i % 2 === 0) parts.push(`M${x} 0h${w}v20h-${w}z`);
+    x += w;
   }
-  let a = h >>> 0;
-  const rnd = () => {
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-  return Array.from({ length: 46 }, () => 1 + Math.floor(rnd() * 3));
+  return parts.join('');
 });
 
 const endA = computed(() => props.config.route.ends[0]);
@@ -214,6 +211,7 @@ const statsView = computed(() =>
         </header>
 
         <h2 class="dr-name">{{ config.subtitle || '我的自驾路线' }}</h2>
+        <p v-if="config.dateText" class="dr-date">{{ config.dateText }}</p>
         <p v-if="config.metaLeft" class="dr-summary">{{ config.metaLeft }}</p>
 
         <section v-if="waypoints.length" class="dr-way">
@@ -297,35 +295,43 @@ const statsView = computed(() =>
       </template>
 
       <!-- ════════════ 页脚 ════════════ -->
-      <footer class="tk-foot">
+      <footer class="tk-foot" :class="{ 'tk-foot--flight': config.kind === 'flight' }">
         <template v-if="config.kind === 'flight'">
-          <div class="tk-foot__barcode">
-            <span
-              v-for="(w, i) in barcode"
-              :key="i"
-              class="tk-foot__bar"
-              :style="{ width: w + 'px' }"
-            ></span>
-          </div>
+          <svg
+            class="tk-foot__barcode"
+            :viewBox="`0 0 ${barcode.width} 20`"
+            preserveAspectRatio="none"
+            role="img"
+            aria-label="路书条形码"
+          >
+            <!-- 透明底 + 白色条：与票面渐变融为一体 -->
+            <path :d="barcodePath" fill="currentColor" />
+          </svg>
           <span class="tk-foot__serial">{{ config.serial }}</span>
         </template>
         <template v-else>
-          <svg v-if="config.qr.enabled" class="tk-foot__qr" viewBox="0 0 21 21" shape-rendering="crispEdges">
-            <rect width="21" height="21" fill="#fff" />
-            <rect v-for="c in qrCells" :key="c.r + '-' + c.c" :x="c.c" :y="c.r" width="1" height="1" fill="#111" />
-            <!-- finder patterns -->
-            <g fill="#111">
-              <rect x="0" y="0" width="7" height="7" fill="none" stroke="#111" stroke-width="1.4"/>
-              <rect x="2.2" y="2.2" width="2.6" height="2.6"/>
-              <rect x="14" y="0" width="7" height="7" fill="none" stroke="#111" stroke-width="1.4"/>
-              <rect x="16.2" y="2.2" width="2.6" height="2.6"/>
-              <rect x="0" y="14" width="7" height="7" fill="none" stroke="#111" stroke-width="1.4"/>
-              <rect x="2.2" y="16.2" width="2.6" height="2.6"/>
-            </g>
+          <svg
+            v-if="config.qr.enabled"
+            class="tk-foot__qr"
+            :viewBox="`0 0 ${qrMatrix.size} ${qrMatrix.size}`"
+            shape-rendering="crispEdges"
+            role="img"
+            :aria-label="`扫码打开 ${WAYBOOK_URL}`"
+          >
+            <!-- 无白底方块：码点白色，空隙透出票面背景 -->
+            <rect
+              v-for="c in qrDarkCells"
+              :key="`${c.r}-${c.c}`"
+              :x="c.c"
+              :y="c.r"
+              width="1"
+              height="1"
+              fill="currentColor"
+            />
           </svg>
           <div class="tk-foot__meta">
-            <span class="tk-foot__caption">{{ config.qr.caption }}</span>
-            <span class="tk-foot__ftext">{{ config.brand.footerText.split('\n')[0] }}</span>
+            <span class="tk-foot__caption">{{ TICKET_QR_CAPTION }}</span>
+            <span class="tk-foot__ftext">{{ TICKET_FOOTER_BRAND }}</span>
           </div>
           <span class="tk-foot__serial">{{ config.serial }}</span>
         </template>
@@ -420,20 +426,38 @@ const statsView = computed(() =>
 }
 .tk-foot__qr {
   width: calc(52 * var(--s)); height: calc(52 * var(--s));
-  flex-shrink: 0; border-radius: calc(8 * var(--s));
+  flex-shrink: 0;
+  color: var(--tk-code, #fff);
+  background: transparent;
 }
-.tk-foot__meta { display: flex; flex-direction: column; gap: calc(3 * var(--s)); min-width: 0; }
-.tk-foot__caption { font-size: calc(11 * var(--s)); font-weight: 600; color: var(--tk-acc); letter-spacing: 0.05em; }
-.tk-foot__ftext { font-size: calc(9.5 * var(--s)); color: var(--tk-tx3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tk-foot__meta {
+  display: flex; flex-direction: column; gap: calc(2 * var(--s));
+  min-width: 0; flex: 1;
+  justify-content: center;
+}
+.tk-foot__caption {
+  font-size: calc(11 * var(--s)); font-weight: 600; color: var(--tk-acc); letter-spacing: 0.05em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tk-foot__ftext {
+  font-size: calc(9.5 * var(--s)); line-height: 1.35; color: var(--tk-tx3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .tk-foot__serial {
   margin-left: auto; font-size: calc(10 * var(--s)); letter-spacing: 0.06em;
   color: var(--tk-serial); font-family: 'Arial', monospace; white-space: nowrap;
+  flex-shrink: 0; align-self: center;
 }
 .tk-foot__barcode {
-  display: flex; align-items: stretch; gap: calc(1.5 * var(--s));
-  height: calc(40 * var(--s)); flex: 1; overflow: hidden;
+  flex: 1; min-width: 0;
+  height: calc(36 * var(--s));
+  /* 透明底 + 白条（浅色主题回退主字色），左右 quiet zone；不附网址 */
+  color: var(--tk-code, #fff);
+  background: transparent;
+  padding: 0 calc(6 * var(--s));
+  box-sizing: border-box;
+  overflow: visible;
 }
-.tk-foot__bar { background: var(--tk-tx); height: 100%; }
 
 /* ────────── 铁路 ────────── */
 .rail-head { display: flex; align-items: center; justify-content: space-between; gap: calc(8 * var(--s)); }
@@ -491,6 +515,15 @@ const statsView = computed(() =>
 .dr-head__brand span { font-size: calc(8.5 * var(--s)); letter-spacing: 0.2em; color: var(--tk-tx3); }
 .dr-head__serial { font-size: calc(9.5 * var(--s)); color: var(--tk-serial); font-family: Arial; white-space: nowrap; }
 .dr-name { margin: calc(14 * var(--s)) 0 0; font-size: calc(21 * var(--s)); font-weight: 800; text-align: center; letter-spacing: 0.02em; }
+.dr-date {
+  margin: calc(6 * var(--s)) 0 0;
+  font-size: calc(12 * var(--s));
+  font-weight: 650;
+  color: var(--ticket-gold, var(--tk-tx2));
+  text-align: center;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
 .dr-summary { margin: calc(7 * var(--s)) 0 0; font-size: calc(11.5 * var(--s)); color: var(--tk-tx2); text-align: center; letter-spacing: 0.04em; }
 .dr-way { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: calc(5 * var(--s)) calc(7 * var(--s)); margin-top: calc(16 * var(--s)); }
 .dr-way__dot { width: calc(7 * var(--s)); height: calc(7 * var(--s)); border-radius: 50%; background: var(--tk-tx3); }

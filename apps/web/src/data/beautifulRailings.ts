@@ -8,7 +8,7 @@
  *  - editors    综合公开报道整理的编辑口碑榜（非官方评选）
  *
  * corridorId 与 data/presets/corridors/*.json 逐一核对；
- * `null` 表示仓库暂无对应走廊几何（金丽温、台湾纵贯线、北京 S2 线、嘉阳小火车、滇越铁路），
+ * `null` 表示仓库暂无对应走廊几何（金丽温、中国台湾纵贯线、北京 S2 线、嘉阳小火车、滇越铁路），
  * UI 上弱化展示、不跳转详情页。
  *
  * 关于「按搜索量排名」：纯前端拿不到真实全网搜索量，**禁止伪造热度数据**。
@@ -152,12 +152,12 @@ export const RANKINGS: Ranking[] = [
       },
       {
         rank: 10,
-        name: '台湾纵贯线',
+        name: '中国台湾纵贯线',
         corridorId: null,
         from: '基隆',
         to: '高雄',
         tagline: '百年台铁古早味，穿行宝岛西部走廊',
-        note: '暂无线路地图（数据不含台湾）',
+        note: '暂无线路地图（数据不含中国台湾）',
       },
     ],
   },
@@ -443,7 +443,7 @@ export const RANKING_SOURCE_LINKS: Array<{ label: string; url: string }> = [
   { label: '人民铁道网「发现最美铁路」系列专题', url: 'https://www.peoplerail.com/rail/list-2001-1.html' },
   { label: '央视网《40条铁路贯穿你家乡的美景美食》（2019-10）', url: 'https://news.cctv.com/2019/10/29/ARTIkE2zDICEBg6CwHgtfDdj191029.shtml' },
   { label: '澎湃新闻《长白山进入高铁时代，国内还有这些最美列车》（2021）', url: 'https://m.thepaper.cn/wifiKey_detail.jsp?contid=16042048' },
-  { label: '中国国家地理网《台湾环岛铁路》（专题）', url: 'http://www.dili360.com/cng/article/p6a87fa573107946.htm' },
+  { label: '中国国家地理网《中国台湾环岛铁路》（专题）', url: 'http://www.dili360.com/cng/article/p6a87fa573107946.htm' },
 ];
 
 export type RankingHit = { ranking: Ranking; item: RankItem };

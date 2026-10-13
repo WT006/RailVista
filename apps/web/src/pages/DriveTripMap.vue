@@ -26,9 +26,52 @@ import { escHtml } from '../data/spotDimensions';
 import { DRIVE_TIER_COLORS, ROAD_COLORS, ROAD_SHADOW_STROKE, driveTierColor } from '../data/roadColors';
 import { spotCategoryLabel } from '../data/roadSpotLabels';
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
+import {
+  buildDriveCurrentFromPage,
+  clearDriveCurrentTrip,
+  driveTripKeyFromQuery,
+  getDriveCurrentTrip,
+  isDriveCurrentPinned,
+  setDriveCurrentTrip,
+  updateDriveCurrentProgress,
+} from '../lib/driveCurrentTrip';
 
 const route = useRoute();
 const router = useRouter();
+
+const tripKey = computed(() => driveTripKeyFromQuery(route.query));
+const isPinnedCurrent = ref(false);
+
+function refreshPinState() {
+  isPinnedCurrent.value = isDriveCurrentPinned(tripKey.value);
+}
+
+function setAsCurrentTrip() {
+  if (!roadRoute.value || !tripKey.value) return;
+  if (isPinnedCurrent.value) {
+    clearDriveCurrentTrip();
+    isPinnedCurrent.value = false;
+    showToast('已取消当前行程');
+    return;
+  }
+  const kind = entryMode.value;
+  const built = buildDriveCurrentFromPage({
+    kind,
+    title: roadRoute.value.name,
+    from: kind === 'od' ? String(route.query.from ?? '') : undefined,
+    to: kind === 'od' ? String(route.query.to ?? '') : undefined,
+    road: kind === 'road' ? String(route.query.road ?? '') : undefined,
+    route: kind === 'route' ? String(route.query.route ?? '') : undefined,
+    progress: progress.value,
+  });
+  if (!built) {
+    showToast('设置失败');
+    return;
+  }
+  setDriveCurrentTrip(built);
+  isPinnedCurrent.value = true;
+  showToast('已设为当前行程');
+}
 
 const OFF_ROUTE_MAX_M = 5000;
 const UPCOMING_LOOKAHEAD_KM = 80;
@@ -367,6 +410,13 @@ async function load() {
     chapters.value = data.chapters ?? [];
     const p = Number(route.query.progress);
     if (Number.isFinite(p)) progress.value = Math.max(0, Math.min(1, p));
+    else {
+      const pinned = getDriveCurrentTrip();
+      if (pinned && pinned.key === tripKey.value && pinned.progress != null) {
+        progress.value = Math.max(0, Math.min(1, pinned.progress));
+      }
+    }
+    refreshPinState();
   } catch (e) {
     loadError.value = e instanceof Error ? e.message : '加载失败';
   }
@@ -894,8 +944,10 @@ watch(gps, (sample) => {
   }
 });
 
-watch(progress, () => {
+watch(progress, (p) => {
   updateVehicleMarker();
+  const key = tripKey.value;
+  if (key && isPinnedCurrent.value) updateDriveCurrentProgress(key, p);
 });
 
 watch(
@@ -982,6 +1034,14 @@ onUnmounted(() => {
           <button type="button" class="map-back-btn" @click="goBack">
             <span class="map-back-btn__icon" aria-hidden="true">‹</span>
             返回沿程
+          </button>
+          <button
+            type="button"
+            class="map-pin-trip-btn"
+            :class="{ 'is-active': isPinnedCurrent }"
+            @click="setAsCurrentTrip"
+          >
+            {{ isPinnedCurrent ? '取消当前行程' : '设为当前行程' }}
           </button>
         </div>
 

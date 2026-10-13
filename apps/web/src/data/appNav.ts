@@ -1,4 +1,4 @@
-/** 全站主导航（顶栏桌面端 + 底栏移动端共用） */
+/** 全站主导航（底栏 / 侧栏 / 网页顶栏共用） */
 export type AppNavItem = {
   id: string;
   to?: string;

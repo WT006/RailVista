@@ -32,11 +32,40 @@ import {
 const DRAFT_KEY = 'railvista:ticketDraft';
 const SAVED_KEY = 'railvista:ticketSaved';
 
+/** 旧演示短链 → 正式路书站（仅迁移占位值，用户自定义 URL 不动） */
+const LEGACY_QR_URL = 'https://hw.hey.world/t/demo';
+const WAYBOOK_QR_URL = 'https://waybook.tyuho.cn';
+
 export interface SavedTicket {
   id: string;
   name: string;
   updatedAt: number;
   config: TicketConfig;
+}
+
+const ELEV_POINTS_MAX = 64;
+
+/** 草稿迁移：二维码域名 + 海拔采样异常膨胀清理（旧编辑器把 `, ` 拆出一串 0） */
+function migrateQrValue(cfg: TicketConfig): TicketConfig {
+  let next = cfg;
+  const elev = cfg.route?.elevPoints;
+  if (Array.isArray(elev) && elev.length > ELEV_POINTS_MAX) {
+    next = {
+      ...next,
+      route: { ...next.route, elevPoints: elev.slice(0, ELEV_POINTS_MAX) },
+    };
+  }
+  if (next.qr?.value !== LEGACY_QR_URL) return next;
+  return {
+    ...next,
+    qr: { ...next.qr, value: WAYBOOK_QR_URL },
+    brand: {
+      ...next.brand,
+      footerText: next.brand.footerText?.includes('hey.world')
+        ? '万里路书 · waybook.tyuho.cn\n微信扫二维码打开'
+        : next.brand.footerText,
+    },
+  };
 }
 
 function readJson<T>(key: string, fallback: T): T {
@@ -88,7 +117,6 @@ export interface RailPersonalize {
   berth?: string;
   mileage?: number | null;
   quote?: string;
-  scenicSide?: boolean;
 }
 
 export interface FlightChoices {
@@ -111,10 +139,16 @@ export interface DriveRouteMeta {
 }
 
 export const useTicketStore = defineStore('ticket', () => {
+  const draftRaw = readJson<TicketConfig | null>(DRAFT_KEY, null);
   const config = ref<TicketConfig>(
-    readJson<TicketConfig | null>(DRAFT_KEY, null) ?? createTicketConfig('railway'),
+    draftRaw ? migrateQrValue(draftRaw) : createTicketConfig('railway'),
   );
-  const saved = ref<SavedTicket[]>(readJson<SavedTicket[]>(SAVED_KEY, []));
+  const saved = ref<SavedTicket[]>(
+    readJson<SavedTicket[]>(SAVED_KEY, []).map((t) => ({
+      ...t,
+      config: migrateQrValue(t.config),
+    })),
+  );
   /** 纯预览模式：隐藏编辑侧栏，票面居中放大 */
   const previewOnly = ref(false);
 
@@ -182,9 +216,9 @@ export const useTicketStore = defineStore('ticket', () => {
 
   /** 铁路个性化：仅座位/铺位、里程、感言需要用户补，其余已自动 */
   function setRailPersonalize(p: RailPersonalize) {
-    const seatText =
-      [p.carNo ? `${p.carNo}车` : '', p.seatNo ? `${p.seatNo}号` : '', p.berth ?? '']
-        .join('') + (p.scenicSide ? ' · 风景侧' : '');
+    const seatText = [p.carNo ? `${p.carNo}车` : '', p.seatNo ? `${p.seatNo}号` : '', p.berth ?? '']
+      .filter(Boolean)
+      .join('');
 
     const stats = config.value.stats.map((s) => {
       if (s.label.startsWith('里程') && p.mileage != null && p.mileage > 0) {
@@ -288,41 +322,49 @@ export const useTicketStore = defineStore('ticket', () => {
   }
 
   // ── 自驾 ──────────────────────────────────────────────────────────────────
-  /** 自驾 OD 规划联动：RoadRoute → 路牌/里程/驾驶时长自动生成 */
+  /** 自驾 OD 规划联动：RoadRoute → 路牌/里程/驾驶时长 + 个性字段写入票面 */
   function applyDriveRoute(route: RoadRoute, meta: DriveRouteMeta = {}) {
     const shields = Array.from(
-      new Set((route.roadKeys ?? []).map((k) => normalizeShieldCode(k))),
+      new Set([
+        ...(route.roadKeys ?? []).map((k) => normalizeShieldCode(k)),
+        ...(config.value.route.shields ?? []),
+      ].filter(Boolean)),
     );
-    let waypoints = meta.waypoints ?? [];
+    let waypoints = (meta.waypoints ?? []).map((s) => s.trim()).filter(Boolean);
     if (!waypoints.length && route.name.includes('→')) {
       waypoints = route.name.split('→').map((s) => s.trim()).filter(Boolean);
     }
 
+    const days = meta.days?.trim() || '';
+    const dateText = meta.dateText?.trim() || '';
+    const routeName = meta.routeName?.trim() || '';
+    const vehicle = meta.vehicle?.trim() || '';
+
     const metaParts = [
-      meta.days,
-      `${nf(route.lengthKm)}km`,
-      route.durationMin ? `驾驶${hm(route.durationMin)}` : '',
+      days,
+      `${nf(route.lengthKm)} km`,
+      route.durationMin ? `驾驶 ${hm(route.durationMin)}` : '',
     ].filter(Boolean);
 
-    const stats: TicketConfig['stats'] = [
-      { label: '总里程 DISTANCE', value: nf(route.lengthKm), unit: 'km' },
-    ];
+    const stats: TicketConfig['stats'] = [];
+    if (days) stats.push({ label: '行程 TRIP', value: days });
+    stats.push({ label: '总里程 DISTANCE', value: nf(route.lengthKm), unit: 'km' });
     if (route.durationMin) stats.push({ label: '驾驶 DRIVING', value: hm(route.durationMin), unit: '' });
-    stats.push({ label: '途经点 WAYPOINTS', value: String(waypoints.length) });
+    if (waypoints.length) stats.push({ label: '途经点 WAYPOINTS', value: String(waypoints.length) });
     if (route.provinces?.length) {
       stats.push({ label: '跨越省份 PROVINCES', value: String(route.provinces.length) });
     }
-    stats.push({ label: '路牌 ROADS', value: String(shields.length) });
+    if (shields.length) stats.push({ label: '路牌 ROADS', value: String(shields.length) });
 
     const tags: TicketConfig['tags'] = [];
-    if (meta.vehicle) tags.push({ text: `🚙 ${meta.vehicle}` });
+    if (vehicle) tags.push({ text: `🚙 ${vehicle}` });
 
     patch({
       kind: 'drive',
       title: '自驾纪念票',
-      subtitle: meta.routeName ?? '',
+      subtitle: routeName || route.name || '我的自驾路线',
       serial: makeTicketSerial('drive', new Date().toISOString().slice(0, 10), saved.value.length + 1),
-      dateText: meta.dateText ?? '',
+      dateText,
       metaLeft: metaParts.join(' · '),
       metaRight: '',
       route: {
@@ -338,7 +380,12 @@ export const useTicketStore = defineStore('ticket', () => {
       stats,
       tags,
       quote: config.value.quote,
-      seal: { enabled: true, emblem: 'road', text: '万里路书 · 精品自驾公路', sub: meta.routeName ?? '自驾认证' },
+      seal: {
+        enabled: true,
+        emblem: 'road',
+        text: '万里路书 · 精品自驾公路',
+        sub: routeName || '自驾认证',
+      },
       background: { ...config.value.background, theme: 'drive-dusk' },
     });
   }
@@ -388,13 +435,44 @@ export const useTicketStore = defineStore('ticket', () => {
     });
   }
 
-  /** 自驾杂项（天数/日期/车辆/感言） */
-  function setDriveMeta(p: { days?: string; dateText?: string; vehicle?: string; quote?: string }) {
+  /** 自驾杂项（路线名/天数/日期/车辆/感言）——规划后微调时同步票面 */
+  function setDriveMeta(p: {
+    routeName?: string;
+    days?: string;
+    dateText?: string;
+    vehicle?: string;
+    quote?: string;
+  }) {
     const tags = config.value.tags.filter((t) => !t.text.startsWith('🚙'));
-    if (p.vehicle) tags.push({ text: `🚙 ${p.vehicle}` });
+    const vehicle = p.vehicle?.trim();
+    if (vehicle) tags.push({ text: `🚙 ${vehicle}` });
+
+    const days = p.days != null ? p.days.trim() : undefined;
+    const routeName = p.routeName != null ? p.routeName.trim() : undefined;
+
+    // 保留里程 / 驾驶文案，只替换天数段
+    let metaLeft = config.value.metaLeft ?? '';
+    if (days != null) {
+      const rest = metaLeft
+        .split(' · ')
+        .filter((part) => part && !/天|晚/.test(part) && !/^\d+D/i.test(part));
+      metaLeft = [days, ...rest].filter(Boolean).join(' · ');
+    }
+
+    const stats = config.value.stats.filter((s) => !s.label.startsWith('行程'));
+    if (days) stats.unshift({ label: '行程 TRIP', value: days });
+
     patch({
-      ...(p.dateText != null ? { dateText: p.dateText } : {}),
+      ...(p.dateText != null ? { dateText: p.dateText.trim() } : {}),
       ...(p.quote != null ? { quote: p.quote } : {}),
+      ...(routeName != null
+        ? {
+            subtitle: routeName || config.value.subtitle,
+            seal: { ...config.value.seal, sub: routeName || '自驾认证' },
+          }
+        : {}),
+      metaLeft,
+      stats,
       tags,
     });
   }

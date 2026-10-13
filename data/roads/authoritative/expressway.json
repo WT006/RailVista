@@ -131,7 +131,7 @@
     "湖北",
     "湖南",
     "广东",
-    "澳门"
+    "中国澳门"
    ],
    "officialLengthKm": 2285
   },
@@ -187,7 +187,7 @@
   {
    "ref": "G0425",
    "fromPlace": "广州",
-   "toPlace": "澳门",
+   "toPlace": "中国澳门",
    "provinces": [],
    "officialLengthKm": 0
   },

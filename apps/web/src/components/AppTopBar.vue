@@ -2,18 +2,17 @@
 /**
  * 顶部导航栏（App Bar）。
  *
- * 职责：
- *   1. 承载品牌标识（BrandLogo）与版本徽标，为页面提供统一的"顶部基线"；
- *   2. sticky 吸顶：随文档流滚动，滚动时保持可见（依赖 document 作为滚动容器）；
- *   3. 高度按断点走 --appbar-h 令牌（48 / 56 / 64），横屏短视口自动压缩；
- *   4. padding-top 吃掉 --safe-top，避免 Logo 与系统时间/电量重叠（viewport-fit=cover）。
- *
- * 版本徽标：v0.5.x 曾在 ba6d8d6「走廊全屏地图页」中被整块删掉，导致
- * packages/shared/src/version.ts 全仓无人消费（改了版本界面上看不到）。此处恢复。
+ * 职责：品牌 + 版本；≥1200 网页档额外承载主导航（与底栏/侧栏同源 APP_NAV_ITEMS）。
+ * 挪移：&lt;840 底栏 / 840–1199 侧边 Tab / ≥1200 本组件顶栏。
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { appVersionInfo, APP_VERSION } from '@railvista/shared';
+import { APP_NAV_ITEMS } from '../data/appNav';
+import { navIcon } from '../data/navIcons';
 import BrandLogo from './BrandLogo.vue';
+
+const route = useRoute();
 
 /** 版本号与变更摘要（悬浮显示，与 CHANGELOG.md 首条同源） */
 const versionInfo = appVersionInfo();
@@ -38,6 +37,22 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
         <BrandLogo :height="34" />
       </div>
 
+      <!-- 网页档主导航：仅 ≥1200 显示；平板走侧栏、手机走底栏 -->
+      <nav class="appbar__nav" aria-label="主导航">
+        <RouterLink
+          v-for="item in APP_NAV_ITEMS"
+          :key="item.id"
+          :to="item.to || '/'"
+          class="appbar__nav-item"
+          :class="{ 'is-active': item.match(route.path) }"
+        >
+          <span class="appbar__nav-icon" aria-hidden="true">
+            <component :is="navIcon(item.id)" :size="18" :stroke-width="1.9" />
+          </span>
+          <span class="appbar__nav-label">{{ item.label }}</span>
+        </RouterLink>
+      </nav>
+
       <div class="appbar__right">
         <slot name="actions" />
         <span
@@ -59,7 +74,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   /* 总高含安全区；内层仍按 --appbar-h 排布，Logo 不会顶到状态栏 */
   height: var(--appbar-offset);
   padding-top: var(--safe-top);
-  /* ≥840 让出侧边 Tab：品牌/版本与页面内容列严格对齐（--sidenav-w 断点赋值） */
+  /* 平板档让出侧边 Tab：品牌/版本与页面内容列严格对齐（--sidenav-w 断点赋值） */
   padding-left: var(--sidenav-w);
   box-sizing: border-box;
   /* 与主页面融为一体：去掉底部硬描边，背景几乎透明，仅保留极淡的玻璃模糊，
@@ -103,12 +118,63 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   align-items: center;
   gap: var(--space-4);
   min-width: 0;
+  flex-shrink: 0;
 }
 
-/* 主导航已由底部页签（<840）与侧边 Tab（≥840）承担：顶栏只保留品牌与操作区 */
 @media (max-width: 599px) {
   .appbar__left {
     gap: var(--space-2);
+  }
+}
+
+/* 默认隐藏；网页档（≥1200）在顶栏展示主导航 */
+.appbar__nav {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.appbar__nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-full);
+  color: var(--text-3);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color var(--dur-fast) var(--ease-standard),
+    background var(--dur-fast) var(--ease-standard);
+}
+
+.appbar__nav-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.appbar__nav-item.is-active {
+  color: var(--accent-hover);
+  background: var(--accent-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .appbar__nav-item:not(.is-active):hover {
+    color: var(--text-1);
+    background: var(--interactive-hover);
+  }
+}
+
+@media (min-width: 1200px) {
+  .appbar__nav {
+    display: flex;
   }
 }
 

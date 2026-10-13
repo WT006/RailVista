@@ -61,7 +61,7 @@
    "ref": "G105",
    "name": "京珠线",
    "fromPlace": "北京",
-   "toPlace": "澳门",
+   "toPlace": "中国澳门",
    "provinces": [
     "北京",
     "河北",
@@ -71,7 +71,7 @@
     "湖北",
     "江西",
     "广东",
-    "澳门"
+    "中国澳门"
    ],
    "officialLengthKm": 2285
   },
@@ -95,7 +95,7 @@
    "ref": "G107",
    "name": "京深线",
    "fromPlace": "北京",
-   "toPlace": "香港",
+   "toPlace": "中国香港",
    "provinces": [
     "北京",
     "河北",

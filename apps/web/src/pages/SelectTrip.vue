@@ -265,33 +265,11 @@ onMounted(async () => {
   try {
     await pruneRecentTrips();
     refreshRecentUi();
-    const stayOnSelect = consumeStayOnSelect();
-    const resumeKey = getAutoResumeTripKey();
-    // 仅在真正要自动跳回行程时才播加载动画；从全国地图等返回主页不应闪「已到达」
-    if (stayOnSelect || !resumeKey) return;
-
-    beginLoading('resume');
-    const snap = await getSnapshot(resumeKey);
-    if (snap) {
-      hydrateFromSnapshot(snap);
-      await endLoading('complete');
-      await router.replace({
-        path: '/trip',
-        query: {
-          trainCode: snap.segment.trainCode,
-          date: snap.segment.date,
-          from: snap.segment.fromName,
-          to: snap.segment.toName,
-        },
-      });
-      return;
-    }
-    clearAutoResume();
-    resumeHint.value = '无法恢复上次行程';
-    refreshRecentUi();
-    await endLoading('abort');
+    // 清掉「刻意留在首页」标记即可；有「当前行程」也只展示卡片，
+    // 不自动跳 /trip —— 刷新 / 重进都停在选程页，由用户点「继续行程」。
+    consumeStayOnSelect();
   } catch {
-    if (loading.value) await endLoading('abort');
+    /* */
   }
 });
 

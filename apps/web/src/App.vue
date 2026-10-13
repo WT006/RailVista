@@ -8,10 +8,12 @@ import AppTopBar from './components/AppTopBar.vue';
 
 const route = useRoute();
 /**
- * 全屏地图页（meta.fullscreenMap）：自带浮层控件，不渲染主顶栏，
- * 避免品牌 Logo 与地图顶栏（返回/状态卡）重叠（HIG safe-area / fixed-element-offset）。
+ * 全屏地图页（meta.fullscreenMap）：自带浮层控件（返回/状态卡），
+ * 不渲染主顶栏与页面切换（侧边 Tab / 底部页签），避免与地图控件抢空间。
  */
-const showTopBar = computed(() => !route.meta.fullscreenMap);
+const isFullscreenMap = computed(() => Boolean(route.meta.fullscreenMap));
+const showTopBar = computed(() => !isFullscreenMap.value);
+const showAppNav = computed(() => !isFullscreenMap.value);
 </script>
 
 <template>
@@ -30,9 +32,9 @@ const showTopBar = computed(() => !route.meta.fullscreenMap);
     模糊保持稳定；滚动加深背景的过渡也按沉浸光感规范做成平滑渐变。
   -->
   <AppTopBar v-if="showTopBar" />
-  <!-- 侧边 Tab（≥840）：底部页签的挪移布局；与 AppBottomNav 的互斥由 CSS 断点控制 -->
-  <AppSideNav />
-  <AppBottomNav />
+  <!-- 主导航：&lt;840 底栏 / 840–1199 侧栏 / ≥1200 顶栏；全屏地图页隐藏 -->
+  <AppSideNav v-if="showAppNav" />
+  <AppBottomNav v-if="showAppNav" />
 
   <RouterView v-slot="{ Component }">
     <Transition name="page" mode="out-in">

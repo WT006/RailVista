@@ -54,7 +54,7 @@ export function isWithinChinaLand(lng: number, lat: number): boolean {
 
 const CJK_RE = /[\u4e00-\u9fff]/;
 const CN_COUNTRY_RE =
-  /^(CN|CHN|China|PRC|HK|MO|TW|中国|中华人民共和国|香港|澳门|台湾)$/i;
+  /^(CN|CHN|China|PRC|HK|MO|TW|中国|中华人民共和国|中国香港|香港|中国澳门|澳门|中国台湾|台湾)$/i;
 /** 喜马拉雅南坡常见境外拉丁名（即便坐标被错标成西藏也不入库） */
 const FOREIGN_NAME_RE =
   /\b(Nepal|Kathmandu|Pokhara|Namche|Lukla|Sikkim|Gangtok|Thimphu|Paro|Hanuman|Chorten|Melamchi|Lobuche|Kongma|Chukhung|Everest viewpoint|Haa valley|Bahrabise|Nasim Pati)\b/i;

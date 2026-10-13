@@ -229,18 +229,40 @@ export function dedupeAtlasRoadSpots<T extends AtlasRoadDedupeSpot>(spots: T[]):
   }
 
   // 城区限流：非山岳，1km 内最多 ROAD_ATLAS_URBAN_TOP_K 处
+  // 用网格邻域代替 kept.filter，避免上万点 O(n²) 把 /atlas/road 冷构建拖到数十秒
   const sorted = afterName.slice().sort((a, b) => spotRank(b) - spotRank(a));
   const kept: T[] = [];
+  const urbanCell = 0.015; // ~1.5km，覆盖 1km 半径邻域
+  const urbanGrid = new Map<string, T[]>();
+  const urbanNeighbors = (s: T): T[] => {
+    const ix = Math.floor(s.lng / urbanCell);
+    const iy = Math.floor(s.lat / urbanCell);
+    const out: T[] = [];
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        const arr = urbanGrid.get(`${ix + dx},${iy + dy}`);
+        if (arr) out.push(...arr);
+      }
+    }
+    return out;
+  };
   for (const s of sorted) {
     if (isPeakCat(s.category)) {
       kept.push(s);
       continue;
     }
-    const nearby = kept.filter(
-      (o) => !isPeakCat(o.category) && haversineKm(s, o) <= ROAD_ATLAS_URBAN_RADIUS_KM,
-    );
-    if (nearby.length >= ROAD_ATLAS_URBAN_TOP_K) continue;
+    let nearby = 0;
+    for (const o of urbanNeighbors(s)) {
+      if (isPeakCat(o.category)) continue;
+      if (haversineKm(s, o) <= ROAD_ATLAS_URBAN_RADIUS_KM) nearby += 1;
+      if (nearby >= ROAD_ATLAS_URBAN_TOP_K) break;
+    }
+    if (nearby >= ROAD_ATLAS_URBAN_TOP_K) continue;
     kept.push(s);
+    const uk = `${Math.floor(s.lng / urbanCell)},${Math.floor(s.lat / urbanCell)}`;
+    const arr = urbanGrid.get(uk);
+    if (arr) arr.push(s);
+    else urbanGrid.set(uk, [s]);
   }
   return kept;
 }

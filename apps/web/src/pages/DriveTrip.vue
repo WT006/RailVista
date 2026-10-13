@@ -11,7 +11,7 @@
  * 有定位时静默投影到折线推进进度；无定位可点进度条预览。
  * 地图为离线 SVG（中国轮廓 + 当前路线 + 动态取景框），零密钥依赖。
  */
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
   buildChapterVisualScale,
@@ -34,6 +34,15 @@ import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
 import { driveTierColor } from '../data/roadColors';
 import { spotCategoryLabel } from '../data/roadSpotLabels';
 import { loadAmap } from '../map/amap';
+import {
+  buildDriveCurrentFromPage,
+  clearDriveCurrentTrip,
+  driveTripKeyFromQuery,
+  getDriveCurrentTrip,
+  isDriveCurrentPinned,
+  setDriveCurrentTrip,
+  updateDriveCurrentProgress,
+} from '../lib/driveCurrentTrip';
 
 usePointerSpotlight();
 const routePathRef = ref<SVGPathElement | null>(null);
@@ -41,6 +50,50 @@ useRoadDraw(routePathRef);
 
 const route = useRoute();
 const router = useRouter();
+
+const tripKey = computed(() => driveTripKeyFromQuery(route.query));
+const isPinnedCurrent = ref(false);
+const pinToast = ref('');
+let pinToastTimer: number | undefined;
+
+function refreshPinState() {
+  isPinnedCurrent.value = isDriveCurrentPinned(tripKey.value);
+}
+
+function showPinToast(msg: string) {
+  pinToast.value = msg;
+  if (pinToastTimer) window.clearTimeout(pinToastTimer);
+  pinToastTimer = window.setTimeout(() => {
+    pinToast.value = '';
+  }, 2200);
+}
+
+function setAsCurrentTrip() {
+  if (!roadRoute.value || !tripKey.value) return;
+  if (isPinnedCurrent.value) {
+    clearDriveCurrentTrip();
+    isPinnedCurrent.value = false;
+    showPinToast('已取消当前行程');
+    return;
+  }
+  const kind = entryMode.value;
+  const built = buildDriveCurrentFromPage({
+    kind,
+    title: roadRoute.value.name,
+    from: kind === 'od' ? String(route.query.from ?? '') : undefined,
+    to: kind === 'od' ? String(route.query.to ?? '') : undefined,
+    road: kind === 'road' ? String(route.query.road ?? '') : undefined,
+    route: kind === 'route' ? String(route.query.route ?? '') : undefined,
+    progress: progress.value,
+  });
+  if (!built) {
+    showPinToast('设置失败');
+    return;
+  }
+  setDriveCurrentTrip(built);
+  isPinnedCurrent.value = true;
+  showPinToast('已设为当前行程');
+}
 
 const VIEW_W = CHINA_OUTLINE_VIEWBOX.width;
 const VIEW_H = CHINA_OUTLINE_VIEWBOX.height;
@@ -114,6 +167,13 @@ async function load() {
 
     const p = Number(route.query.progress);
     if (Number.isFinite(p)) progress.value = Math.max(0, Math.min(1, p));
+    else {
+      const pinned = getDriveCurrentTrip();
+      if (pinned && pinned.key === tripKey.value && pinned.progress != null) {
+        progress.value = Math.max(0, Math.min(1, pinned.progress));
+      }
+    }
+    refreshPinState();
   } catch (e) {
     error.value = e instanceof Error ? e.message : '加载失败';
   } finally {
@@ -129,14 +189,40 @@ watch(
   },
 );
 
+watch(progress, (p) => {
+  const key = tripKey.value;
+  if (key && isPinnedCurrent.value) updateDriveCurrentProgress(key, p);
+});
+
+onBeforeUnmount(() => {
+  if (pinToastTimer) window.clearTimeout(pinToastTimer);
+});
+
 // ── 地图（离线 SVG：主链 + 未贯通段 + 动态取景框） ─────────────────────────────
+/** 超短线 viewBox <1 时 toFixed(1) 会把折线量化成折角钩子，按跨度选精度 */
+function pathCoordDecimals(coords: [number, number][]): number {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const [lng, lat] of coords) {
+    const [x, y] = lngLatToViewBox(lng, lat);
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+  }
+  const span = Math.max(maxX - minX, maxY - minY, 0.05);
+  if (span < 2) return 3;
+  if (span < 12) return 2;
+  return 1;
+}
+
 function pathFromCoords(coords: [number, number][] | undefined): string {
   if (!coords || coords.length < 2) return '';
+  const dec = pathCoordDecimals(coords);
   let d = '';
   for (let i = 0; i < coords.length; i++) {
     const [lng, lat] = coords[i]!;
     const [x, y] = lngLatToViewBox(lng, lat);
-    d += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+    d += `${i === 0 ? 'M' : 'L'}${x.toFixed(dec)} ${y.toFixed(dec)}`;
   }
   return d;
 }
@@ -175,16 +261,18 @@ const focusBbox = computed<[number, number, number, number]>(() => {
     for (const pt of seg) absorb(pt[0], pt[1]);
   }
 
-  const contentW = Math.max(maxX - minX, 4);
-  const contentH = Math.max(maxY - minY, 4);
+  // 短途在全国投影里可能不到 1 个 viewBox 单位（2km 级 ~0.3）；
+  // 禁止绝对 pad=20 / 强制 min=1，否则线挤中间、圆点相对巨粗。
+  const rawW = Math.max(maxX - minX, 0.05);
+  const rawH = Math.max(maxY - minY, 0.05);
   // 多段公路跨度大：用 meet 等比居中，不用 slice（避免裁掉边段）
   const TARGET_AR = 4 / 3;
-  let boxW = contentW;
-  let boxH = contentH;
+  let boxW = rawW;
+  let boxH = rawH;
   if (boxW / boxH > TARGET_AR) boxH = boxW / TARGET_AR;
   else boxW = boxH * TARGET_AR;
-  const padX = Math.max(boxW * 0.12, contentW * 0.1, 20);
-  const padY = Math.max(boxH * 0.12, contentH * 0.1, 20);
+  const padX = Math.max(boxW * 0.18, rawW * 0.14);
+  const padY = Math.max(boxH * 0.18, rawH * 0.14);
   const cx = (minX + maxX) / 2;
   const cy = (minY + maxY) / 2;
   return [cx - boxW / 2 - padX, cy - boxH / 2 - padY, boxW + padX * 2, boxH + padY * 2];
@@ -192,7 +280,52 @@ const focusBbox = computed<[number, number, number, number]>(() => {
 
 const viewBoxAttr = computed(() => {
   const [x, y, w, h] = focusBbox.value;
-  return `${x.toFixed(1)} ${y.toFixed(1)} ${Math.max(w, 4).toFixed(1)} ${Math.max(h, 4).toFixed(1)}`;
+  // 超短线 viewBox 可能 <1，必须保留小数，禁止再 Math.max(., 1) 把框撑开
+  const dec = Math.max(w, h) < 8 ? 3 : 1;
+  return `${x.toFixed(dec)} ${y.toFixed(dec)} ${Math.max(w, 0.05).toFixed(dec)} ${Math.max(h, 0.05).toFixed(dec)}`;
+});
+
+const mapSvgRef = ref<SVGSVGElement | null>(null);
+/** SVG 短边像素，供圆点按屏幕尺寸换算 */
+const mapSvgPx = ref(420);
+let mapSvgRo: ResizeObserver | null = null;
+
+function syncMapSvgPx() {
+  const el = mapSvgRef.value;
+  if (!el) return;
+  const px = Math.min(el.clientWidth || 0, el.clientHeight || 0);
+  if (px > 0) mapSvgPx.value = px;
+}
+
+watch(
+  mapSvgRef,
+  (el) => {
+    mapSvgRo?.disconnect();
+    mapSvgRo = null;
+    if (!el) return;
+    if (typeof ResizeObserver === 'undefined') {
+      void nextTick(syncMapSvgPx);
+      return;
+    }
+    mapSvgRo = new ResizeObserver(() => syncMapSvgPx());
+    mapSvgRo.observe(el);
+    void nextTick(syncMapSvgPx);
+  },
+  { flush: 'post' },
+);
+
+onBeforeUnmount(() => {
+  mapSvgRo?.disconnect();
+  mapSvgRo = null;
+});
+
+/** 圆点按屏幕像素计（目标直径 ~8px），与线宽 non-scaling 同思路，超短线不再糊成一坨 */
+const mapDotR = computed(() => {
+  const [, , w, h] = focusBbox.value;
+  const span = Math.max(w, h, 0.05);
+  const px = Math.max(mapSvgPx.value, 120);
+  const targetDiameterPx = 8;
+  return (targetDiameterPx / px) * (span / 2);
 });
 
 /** 有未贯通段时用 meet，保证全部分量可见；单链仍用 slice 铺满预览卡 */
@@ -203,6 +336,20 @@ const mapAspectRatio = computed(() =>
 function spotPos(s: AlongSpot): [number, number] {
   return lngLatToViewBox(s.lng, s.lat);
 }
+
+/** 总览只画落在取景框内、且离路线不远的点；远绕景点留在右侧列表 */
+function spotInFocus(s: AlongSpot): boolean {
+  const [x, y, bw, bh] = focusBbox.value;
+  const [sx, sy] = spotPos(s);
+  const m = Math.max(bw, bh) * 0.02;
+  if (sx < x - m || sy < y - m || sx > x + bw + m || sy > y + bh + m) return false;
+  const routeKm = roadRoute.value?.lengthKm ?? 0;
+  const nearKm = Math.max(1.2, Math.min(4, routeKm * 0.35 + 0.8));
+  return s.distKm <= nearKm;
+}
+
+const mapSpots = computed(() => filteredSpots.value.filter(spotInFocus));
+const mapOrphanSpots = computed(() => orphanSpots.value.filter(spotInFocus));
 
 const expandedSpotId = ref('');
 
@@ -521,6 +668,14 @@ watch(gps, (sample) => {
                   >{{ k }}</span>
                 </span>
               </div>
+              <button
+                type="button"
+                class="map-pin-trip-btn drive-pin-trip-btn"
+                :class="{ 'is-active': isPinnedCurrent }"
+                @click="setAsCurrentTrip"
+              >
+                {{ isPinnedCurrent ? '取消当前行程' : '设为当前行程' }}
+              </button>
             </section>
 
             <!-- 沿程进度：默认进度条，点击展开全部章节 -->
@@ -647,6 +802,7 @@ watch(gps, (sample) => {
           <!-- 中：地图（主链 + 未贯通段；点击进入全屏高德地图） -->
           <section class="drive-trip-map rv-card is-enterable" data-spotlight>
             <svg
+              ref="mapSvgRef"
               :viewBox="viewBoxAttr"
               :preserveAspectRatio="mapAspectRatio"
               class="drive-trip-map__svg"
@@ -663,12 +819,12 @@ watch(gps, (sample) => {
                 :d="d"
               />
               <circle
-                v-for="s in filteredSpots"
+                v-for="s in mapSpots"
                 :key="s.id"
                 class="drive-trip-map__dot"
                 :cx="spotPos(s)[0]"
                 :cy="spotPos(s)[1]"
-                r="0.85"
+                :r="expandedSpotId === s.id ? mapDotR * 1.7 : mapDotR"
                 :fill="tierColor(s.tier)"
                 :class="{ 'is-expanded': expandedSpotId === s.id }"
                 @click.stop="toggleSpot(s)"
@@ -676,12 +832,12 @@ watch(gps, (sample) => {
                 <title>{{ s.name }} · {{ kmText(s.progressKm) }}</title>
               </circle>
               <circle
-                v-for="s in orphanSpots"
+                v-for="s in mapOrphanSpots"
                 :key="'orphan-' + s.id"
                 class="drive-trip-map__dot is-orphan"
                 :cx="spotPos(s)[0]"
                 :cy="spotPos(s)[1]"
-                r="0.7"
+                :r="mapDotR * 0.85"
                 :fill="tierColor(s.tier)"
                 opacity="0.55"
                 @click.stop="toggleSpot(s)"
@@ -768,5 +924,7 @@ watch(gps, (sample) => {
         </div>
       </template>
     </main>
+
+    <div v-if="pinToast" class="toast">{{ pinToast }}</div>
   </div>
 </template>

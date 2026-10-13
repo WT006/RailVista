@@ -126,18 +126,26 @@ function cancel() {
 
 <style scoped>
 .hm-wheel { position: fixed; inset: 0; z-index: 120; }
-.hm-wheel__mask { position: absolute; inset: 0; background: var(--surface-scrim); backdrop-filter: blur(2px); }
+.hm-wheel__mask {
+  position: absolute; inset: 0;
+  background: color-mix(in srgb, var(--surface-0) 55%, transparent);
+  backdrop-filter: blur(var(--glass-blur-chrome)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-chrome)) saturate(var(--glass-saturate));
+}
 .hm-wheel__sheet {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   padding: 8px 16px calc(20px + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, var(--surface-lift), var(--surface-0));
+  background: color-mix(in srgb, var(--surface-0) 94%, transparent);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   border-top-left-radius: var(--radius-xl);
   border-top-right-radius: var(--radius-xl);
   border: 1px solid var(--line-default);
   border-bottom: none;
+  box-shadow: var(--elev-3);
 }
 .hm-wheel__grip { width: 40px; height: 4px; margin: 4px auto 6px; border-radius: var(--radius-xs); background: var(--line-strong); }
 .hm-wheel__header { display: flex; align-items: center; justify-content: space-between; height: 46px; }
@@ -175,8 +183,8 @@ function cancel() {
 .hm-wheel__item.is-active { color: var(--text-1); transform: scale(1.06); font-weight: 700; }
 .hm-wheel__item.is-active .hm-wheel__sub { color: var(--accent); }
 .hm-wheel__fade { position: absolute; left: 0; right: 0; z-index: 3; height: 88px; pointer-events: none; }
-.hm-wheel__fade.is-top { top: 0; background: linear-gradient(180deg, var(--surface-lift), transparent); }
-.hm-wheel__fade.is-bottom { bottom: 0; background: linear-gradient(0deg, var(--surface-0), transparent); }
+.hm-wheel__fade.is-top { top: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--surface-0) 94%, transparent), transparent); }
+.hm-wheel__fade.is-bottom { bottom: 0; background: linear-gradient(0deg, color-mix(in srgb, var(--surface-0) 94%, transparent), transparent); }
 
 .hm-sheet-enter-active, .hm-sheet-leave-active { transition: opacity var(--dur-base) var(--ease-standard); }
 .hm-sheet-enter-active .hm-wheel__sheet, .hm-sheet-leave-active .hm-wheel__sheet { transition: transform var(--dur-slow) var(--ease-emphasized); }

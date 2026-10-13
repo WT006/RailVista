@@ -961,7 +961,7 @@ export interface RankingItem {
    * 无 groups 的榜单忽略此字段（平铺渲染，行为与旧版一致）。
    */
   group?: string;
-  /** 仅供灵感：库内确定无法沿程展示（如台湾路网），禁用「看沿程景点」跳转 */
+  /** 仅供灵感：库内确定无法沿程展示（如中国台湾路网），禁用「看沿程景点」跳转 */
   inspirationOnly?: boolean;
 }
 

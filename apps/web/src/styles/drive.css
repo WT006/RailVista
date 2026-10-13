@@ -9,11 +9,12 @@
   min-height: 100dvh;
   /* 手机竖屏避让悬浮页签胶囊 + Home 指示条；≥840 时 --bottomnav-h=0，等同原留白 */
   padding-bottom: calc(var(--space-8) + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
-  /* 与 .rv-page 同一纪律：末层底色透出 App 级背景层（见 base.css .rv-page 注释） */
+  /* 与 .rv-page 同一纪律：--page-scrim 轻压背景星点（见 base.css .rv-page 注释） */
+  background: var(--surface-0);
   background:
     radial-gradient(ellipse 70% 42% at 10% -8%, var(--accent-soft), transparent 58%),
     radial-gradient(ellipse 60% 38% at 92% 4%, var(--fill-accent), transparent 55%),
-    transparent;
+    var(--page-scrim);
   color: var(--text-1);
 }
 
@@ -702,52 +703,6 @@
   color: var(--text-3);
 }
 
-/* —— 跨省寻路就绪度：把「有几何」与「能连线」分开说，避免两点直线被当成路线 —— */
-.drive-netpanel__topo {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--line-default);
-  border-radius: var(--radius-sm);
-  background: var(--fill-subtle);
-  font-size: var(--fs-cap);
-  line-height: var(--lh-snug);
-  color: var(--text-3);
-}
-
-.drive-netpanel__topo-dot {
-  flex: 0 0 auto;
-  width: 6px;
-  height: 6px;
-  margin-top: 5px;
-  border-radius: var(--radius-full);
-  background: var(--text-3);
-}
-
-.drive-netpanel__topo.is-ready {
-  border-color: var(--line-accent);
-  background: var(--fill-accent);
-  color: var(--text-2);
-}
-
-.drive-netpanel__topo.is-ready .drive-netpanel__topo-dot {
-  background: var(--accent);
-}
-
-.drive-netpanel__topo.is-stale,
-.drive-netpanel__topo.is-missing {
-  border-color: var(--warning);
-  background: var(--warning-soft);
-  color: var(--text-1);
-}
-
-.drive-netpanel__topo.is-stale .drive-netpanel__topo-dot,
-.drive-netpanel__topo.is-missing .drive-netpanel__topo-dot {
-  background: var(--warning);
-}
-
 .drive-coverage {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1322,6 +1277,11 @@
   background: var(--accent);
 }
 
+.drive-pin-trip-btn {
+  margin-top: var(--space-3);
+  align-self: flex-start;
+}
+
 .drive-trip-roadkeys {
   display: flex;
   flex-wrap: wrap;
@@ -1858,13 +1818,17 @@
   fill-opacity: 0.28;
   stroke: var(--line-default);
   stroke-opacity: 0.32;
-  stroke-width: 0.5;
+  /* 短途紧框时用户单位描边会变巨粗；轮廓用屏幕像素 */
+  stroke-width: 0.75px;
+  vector-effect: non-scaling-stroke;
 }
 
 .drive-trip-map__route {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 1.35;
+  /* 与 .is-active 同理：短途 viewBox 只有数个单位时，用户单位线宽会糊成一坨 */
+  stroke-width: 3.5px;
+  vector-effect: non-scaling-stroke;
   stroke-opacity: 0.92;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -1874,7 +1838,8 @@
 .drive-trip-map__segment {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 1.8;
+  stroke-width: 2.5px;
+  vector-effect: non-scaling-stroke;
   stroke-opacity: 0.45;
   stroke-dasharray: 5 4;
   stroke-linejoin: round;
@@ -1884,13 +1849,13 @@
 .drive-trip-map__dot {
   cursor: pointer;
   stroke: var(--surface-0);
-  stroke-width: 0.25;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
 }
 
 .drive-trip-map__dot.is-expanded {
-  r: 4;
   stroke: var(--accent);
-  stroke-width: 1.6;
+  stroke-width: 2.5px;
 }
 
 .drive-trip-map__dot.is-orphan {
@@ -1943,6 +1908,17 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
+}
+
+/* 叠在地图背景上的筛选 chip：给一点实底，避免透字 */
+.drive-flow-filters .road-kbd__chip {
+  background: color-mix(in srgb, var(--surface-0) 72%, transparent);
+  backdrop-filter: blur(var(--glass-blur-chrome)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-chrome)) saturate(var(--glass-saturate));
+}
+
+.drive-flow-filters .road-kbd__chip.is-on {
+  background: var(--accent-soft);
 }
 
 .drive-flow-list {
@@ -3067,7 +3043,8 @@
 /* ── R3：选中分段时主链变暗，高亮段加粗 ── */
 .drive-trip-map__route.is-dim {
   stroke-opacity: 0.28;
-  stroke-width: 2;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
 }
 
 /* v0.6.5（P0-2）：non-scaling-stroke 让线宽以**屏幕像素**计，不随 viewBox 缩放。
@@ -3924,11 +3901,11 @@
 .drive-map-page .drive-map-fit-btn {
   position: fixed;
   right: calc(10px + var(--safe-right));
-  bottom: calc(var(--bottom-overlay) + 106px);
+  bottom: calc(var(--bottom-overlay) + 86px);
   z-index: 101;
   box-sizing: border-box;
-  width: 88px;
-  height: 40px;
+  width: 72px;
+  height: 32px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -3937,7 +3914,7 @@
   border-radius: var(--radius-full);
   background: var(--panel-bg);
   color: var(--text-1);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
@@ -3953,7 +3930,7 @@
 
 /* 为「全览」腾出一层：图例开关再抬高一格 */
 .drive-map-page .legend-toggle {
-  bottom: calc(var(--bottom-overlay) + 154px);
+  bottom: calc(var(--bottom-overlay) + 124px);
 }
 
 .drive-map-page .legend {
@@ -3989,11 +3966,11 @@
   }
 
   .drive-map-page .satellite-btn {
-    bottom: calc(var(--bottom-overlay) + var(--drive-map-controls-lift, 220px) + 48px);
+    bottom: calc(var(--bottom-overlay) + var(--drive-map-controls-lift, 220px) + 38px);
   }
 
   .drive-map-page .drive-map-fit-btn {
-    bottom: calc(var(--bottom-overlay) + var(--drive-map-controls-lift, 220px) + 96px);
+    bottom: calc(var(--bottom-overlay) + var(--drive-map-controls-lift, 220px) + 76px);
   }
 }
 

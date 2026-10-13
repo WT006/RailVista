@@ -261,7 +261,7 @@
 | `guangmeishan__west__leg1` | 广梅段-leg1 | a→b | 71 | local-rail-graph |
 | `guangqing` | 广清城际 | 花都→清城 | 86 | china-hsr-simulation/hsr-rails.geojson |
 | `guangshenchengji` | 广深城际铁路 | 广州东→深圳 | 40 | local-rail-graph-legs |
-| `guangshengang` | 广深港高铁 | 广州南→香港西九龙 | 146 | china-hsr-simulation/hsr-rails.geojson |
+| `guangshengang` | 广深港高铁 | 广州南→中国香港西九龙 | 146 | china-hsr-simulation/hsr-rails.geojson |
 | `guangxiyanhai` | 广西沿海铁路 | 南宁东→防城港北 | 75 | osm-bbox |
 | `guangzhan` | 广湛高铁 | 广州白云→湛江北 | 346 | osm |
 | `guangzhao` | 广肇城际 | 广州南→肇庆 | 177 | china-hsr-simulation/hsr-rails.geojson |

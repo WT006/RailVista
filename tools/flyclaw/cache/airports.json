@@ -1382,9 +1382,9 @@
   "HKG": {
     "iata": "HKG",
     "icao": "VHHH",
-    "name_cn": "香港国际机场",
+    "name_cn": "中国香港国际机场",
     "name_en": "Hong Kong International Airport",
-    "city_cn": "香港",
+    "city_cn": "中国香港",
     "city_en": "Hong Kong",
     "lat": 22.31,
     "lng": 113.91
@@ -1392,9 +1392,9 @@
   "MFM": {
     "iata": "MFM",
     "icao": "VMMC",
-    "name_cn": "澳门国际机场",
+    "name_cn": "中国澳门国际机场",
     "name_en": "Macau International Airport",
-    "city_cn": "澳门",
+    "city_cn": "中国澳门",
     "city_en": "Macau",
     "lat": 22.15,
     "lng": 113.59

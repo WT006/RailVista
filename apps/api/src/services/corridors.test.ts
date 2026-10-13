@@ -323,7 +323,7 @@ describe('matchCorridor', () => {
     const hit = matchCorridor([
       { name: '广州南', lng: 113.269, lat: 22.989 },
       { name: '深圳北', lng: 114.029, lat: 22.609 },
-      { name: '香港西九龙', lng: 114.165, lat: 22.304 },
+      { name: '中国香港西九龙', lng: 114.165, lat: 22.304 },
     ]);
     assert.ok(hit);
     assert.equal(hit!.corridor.id, 'guangshengang');
@@ -335,7 +335,7 @@ describe('matchCorridor', () => {
     const sliced = sliceCorridorForStops(c, [
       { name: '广州南', lng: 113.269, lat: 22.989 },
       { name: '深圳北', lng: 114.029, lat: 22.609 },
-      { name: '香港西九龙' },
+      { name: '中国香港西九龙' },
     ]);
     assert.ok(sliced);
     const end = sliced!.at(-1)!;

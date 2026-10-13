@@ -147,6 +147,46 @@ async function amapDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [n
   }
 }
 
+// ── 引擎 1.5：OSRM 公共实例（开源 OSM 路网，WGS-84 免转换） ──────────────────
+// 2026-10-14 高德 Web 服务免费额度耗尽：驾车规划兜底改为开源优先。
+// OSRM（router.project-osrm.org）基于全量 OSM 路网，坐标进出均为 WGS-84，
+// 无 GCJ 偏移，也不占任何商业额度；失败再回落高德（key 恢复后自动恢复双保险）。
+async function osrmDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [number, number][]; distanceM: number; durationSec: number } | null> {
+  const pts = [from, ...via, to];
+  const coord = pts.map((p) => `${p.lng.toFixed(6)},${p.lat.toFixed(6)}`).join(';');
+  const qs = new URLSearchParams({ overview: 'full', geometries: 'geojson' });
+  try {
+    const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coord}?${qs}`, {
+      signal: AbortSignal.timeout(9000),
+      headers: { 'User-Agent': 'RailVista/0.4.0 (drive-routing)' },
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      code?: string;
+      routes?: Array<{
+        distance?: number;
+        duration?: number;
+        geometry?: { coordinates?: [number, number][] };
+      }>;
+    };
+    if (json.code !== 'Ok' || !json.routes?.length) return null;
+    const r = json.routes[0]!;
+    const coords: [number, number][] = [];
+    for (const c of r.geometry?.coordinates ?? []) {
+      const [lng, lat] = [Number(c[0]), Number(c[1])];
+      if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue;
+      coords.push([lng, lat]);
+    }
+    if (coords.length < 2) return null;
+    return {
+      coords,
+      distanceM: Number(r.distance) || 0,
+      durationSec: Number(r.duration) || 0,
+    };
+  } catch {
+    return null;
+  }
+}
 // ── 引擎 2：本地干线 A*（snap 5km，超限端点外接） ────────────────────────────
 /** 时长估算用等级限速（km/h）：只用来把里程折成「约几小时」，标注为估算，不代表真实路况 */
 const EST_SPEED_KMH: Record<string, number> = { expressway: 85, national: 65, provincial: 50, county: 40, township: 30, connector: 40 };
@@ -310,6 +350,15 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
       coords = legs.flat();
       roadKeys = [...keys];
       durationMin = estMin > 0 ? estMin : undefined;
+    }
+  }
+  if (!coords.length && input.engine !== 'local') {
+    // 开源优先：OSRM 兜底在前（额度耗尽后高德恒败，先打它省一次必败往返）
+    const osrm = await osrmDriveRoute(from.pt, to.pt, viaPts);
+    if (osrm) {
+      engine = 'osrm';
+      coords = osrm.coords;
+      if (osrm.durationSec > 0) durationMin = Math.round(osrm.durationSec / 60);
     }
   }
   if (!coords.length && input.engine !== 'local') {

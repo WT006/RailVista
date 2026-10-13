@@ -418,6 +418,7 @@ async function nominatimGeocode(name: string): Promise<PlaceAnchor | null> {
   }
 }
 
+
 /**
  * A4：geocode 结果缓存（24h）。
  * 原实现每次未命中都要走网络，且高德失败后才串行试Nominatim，最长阻塞 12s；
@@ -436,23 +437,30 @@ export async function geocodeFallback(name: string): Promise<PlaceHit | null> {
 
   // A4：原为串行 await（高德 6s 超时后才试 Nominatim 再 6s，最长 12s）。
   // 改为并行竞速，总耗时 = min(两者)，并把超时压到 3.5s。
+  // 2026-10-14 修竞速语义：Promise.any 对 fulfill(null) 也立即结算——高德额度
+  // 耗尽后恒快败返回 null，会把 Nominatim 的成功结果废掉（表现为「输入没反应」）。
+  // 改为 null 即 reject 再 any；全败（含 AggregateError）catch 归 null 不外抛。
   const hit = await Promise.any(
     [amapGeocode(key), nominatimGeocode(key)].map((p) =>
-      p.catch(() => null),
+      p.then((anchor) => {
+        if (!anchor) throw new Error('miss');
+        return anchor;
+      }),
     ),
-  ).then((anchor) => {
-    if (!anchor) return null;
-    rememberPlace(anchor);
-    return {
-      kind: 'place' as const,
-      id: anchor.name,
-      name: anchor.name,
-      sub: [anchor.province, '网络定位'].filter(Boolean).join(' · '),
-      lng: anchor.lng,
-      lat: anchor.lat,
-      score: 30,
-    };
-  });
+  )
+    .then((anchor) => {
+      rememberPlace(anchor);
+      return {
+        kind: 'place' as const,
+        id: anchor.name,
+        name: anchor.name,
+        sub: [anchor.province, '网络定位'].filter(Boolean).join(' · '),
+        lng: anchor.lng,
+        lat: anchor.lat,
+        score: 30,
+      };
+    })
+    .catch(() => null);
 
   if (geocodeCache.size >= GEOCACHE_MAX) {
     const oldest = geocodeCache.keys().next().value;

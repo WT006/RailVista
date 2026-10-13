@@ -33,6 +33,9 @@ console.log(`省级: 基线问题 ${provBase.length} · 仍问题 ${provStill.le
 const cntBase = baseline.filter((r) => r.cls === 'county');
 const cntStill = stillBad.filter((r) => (baseMap.get(r.f) || {}).cls === 'county');
 console.log(`县级: 基线问题 ${cntBase.length} · 仍问题 ${cntStill.length}`);
+const townBase = baseline.filter((r) => r.cls === 'township');
+const townStill = stillBad.filter((r) => (baseMap.get(r.f) || {}).cls === 'township');
+console.log(`乡道: 基线问题 ${townBase.length} · 仍问题 ${townStill.length}`);
 const reuseSplit = files.filter((f) => {
   try { return JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')).reuseSplit === true; } catch { return false; }
 });

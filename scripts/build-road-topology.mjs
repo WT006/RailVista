@@ -21,7 +21,7 @@ const INDEX_DIR = join(__dirname, '../data/roads/index');
 const OUT_BIN = join(__dirname, '../data/roads/china-road-topo.bin');
 const OUT_META = join(__dirname, '../data/roads/china-road-topo.meta.json');
 
-const CLASS_COEF = { expressway: 1.0, national: 1.15, provincial: 1.35 };
+const CLASS_COEF = { expressway: 1.0, national: 1.15, provincial: 1.35, county: 1.6, township: 1.9 };
 const QUANT = 1e-5; // 节点去重量化（度）
 const CROSS_LINK_KM = 1.0; // 跨线边阈值（km）
 const CROSS_PENALTY = 1.5;
@@ -79,7 +79,7 @@ for (const f of files) {
     roadKeys.push(key);
   }
   const line = roadIdByKey.get(key);
-  const flag = cls === 'expressway' ? 1 : cls === 'national' ? 2 : 4;
+  const flag = cls === 'expressway' ? 1 : cls === 'national' ? 2 : cls === 'provincial' ? 4 : cls === 'county' ? 8 : 16;
 
   // 采样建链：逐点，但跳过过密点（≥200m 才成边，控制边数）
   const buildEdges = (pts) => {

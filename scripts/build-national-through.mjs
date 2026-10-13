@@ -20,8 +20,7 @@ import {
 import { buildGraph, buildTraceStream } from './lib/road-trace.mjs';
 import { haversineM, simplifyDP, polylineM } from './lib/road-assemble.mjs';
 import { dedupBacktrack } from './lib/road-build.mjs';
-import { fillGap, evaluateLeg } from './lib/road-fill.mjs';
-import { drivingLeg } from './lib/amap.mjs';
+import { fillGap, bridgeGap } from './lib/road-fill.mjs';
 
 const BAND_KM = Number(process.env.BAND_KM || 40);
 const DP_TOL = 22;
@@ -65,7 +64,61 @@ function officialKmOf(ref) {
 
 const round1e5 = (p) => [Math.round(p[0] * 1e5) / 1e5, Math.round(p[1] * 1e5) / 1e5];
 
+// ── via 候选池（缺口分段递归的中间锚点）────────────────────────────────────
+// 三层来源，全部是「真实地名/真实道路上的点」，由高德吸附到最近道路：
+//   1) places-geo（省/市/县行政中心）  2) roadside-spots（路上/路旁真实点位）
+//   3) 弦均匀内插点（兜底，保证任何长缺口都能分段——高德会把任意坐标吸附到最近道路）
+let VIA_POOL = null;
+function viaPool() {
+  if (VIA_POOL) return VIA_POOL;
+  const pool = [];
+  try {
+    const pg = JSON.parse(readFileSync('data/roads/places-geo.json', 'utf8'));
+    const arr = Array.isArray(pg) ? pg : (pg.places ?? Object.values(pg));
+    for (const p of arr) if (Number.isFinite(p.lng) && Number.isFinite(p.lat)) pool.push([p.lng, p.lat]);
+  } catch { /* 缺文件不阻塞 */ }
+  try {
+    const sp = JSON.parse(readFileSync('data/roads/roadside-spots.json', 'utf8'));
+    const arr = Array.isArray(sp) ? sp : (sp.spots ?? Object.values(sp));
+    for (const p of arr) if (Number.isFinite(p.lng) && Number.isFinite(p.lat)) pool.push([p.lng, p.lat]);
+  } catch { /* 缺文件不阻塞 */ }
+  VIA_POOL = pool;
+  return pool;
+}
+
+/** 缺口 via 候选：池内落在缺口走廊盒的点 + 弦每 50km 内插点（上限 40） */
+function viasForGap(from, to) {
+  const chordM = haversineM(from[0], from[1], to[0], to[1]);
+  if (chordM < 40000) return null;
+  const cosLat = Math.cos(((from[1] + to[1]) / 2) * Math.PI / 180);
+  const latPad = Math.max(0.3, (chordM / 111320) * 0.6);
+  const lngPad = Math.max(0.3, (chordM / (111320 * cosLat)) * 0.6);
+  const minX = Math.min(from[0], to[0]) - lngPad, maxX = Math.max(from[0], to[0]) + lngPad;
+  const minY = Math.min(from[1], to[1]) - latPad, maxY = Math.max(from[1], to[1]) + latPad;
+  const vias = viaPool().filter((p) => p[0] >= minX && p[0] <= maxX && p[1] >= minY && p[1] <= maxY);
+  // 弦均匀内插兜底（25km 间隔，保证长缺口能细分段——高德会把任意坐标吸附到最近道路）
+  const stepsN = Math.max(1, Math.floor(chordM / 25000));
+  for (let t = 1; t < stepsN; t += 1) {
+    const f = t / stepsN;
+    vias.push([from[0] + (to[0] - from[0]) * f, from[1] + (to[1] - from[1]) * f]);
+  }
+  return vias.length ? vias.slice(0, 60) : null;
+}
+
 export async function buildOne(ref) {
+  // 贯通保护：已被 stitch-national / repair-national 缝成单线的编号，默认不再重装配
+  // （旧装配会重新引入断口）。确需重来：FORCE=1 node scripts/build-national-through.mjs G219
+  if (!process.env.FORCE) {
+    const gp = join('data', 'roads', 'geom', ref + '.json');
+    if (existsSync(gp)) {
+      try {
+        const prev = JSON.parse(readFileSync(gp, 'utf8'));
+        if ((prev.componentCount ?? 1) === 1 && (prev.throughStitchedAt || prev.repairedAt)) {
+          return { ref, skipped: '已贯通（跳过；FORCE=1 可强制重装配）' };
+        }
+      } catch { /* 读不出来就正常重装配 */ }
+    }
+  }
   const ctrl = readProvOrder(ref);
   if (!ctrl) throw new Error('缺控制点省序：' + ref);
   const provSlugs = ctrl.provOrder.map((p) => PROV_TO_SLUG[p]).filter(Boolean);
@@ -104,8 +157,9 @@ export async function buildOne(ref) {
     for (const el of stream) {
       if (el.nodes) atoms.push({ pts: el.nodes.map((n) => graph.coords[n]) });
       else if (el.gap) {
-        // 残余缺口：高德只补「非高速」真实地面线；高速大绕行/确实未建 → 诚实保留
-        const r = await fillGap(el.gap, { ref, coLineway: true });
+        // 残余缺口：高德只补「非高速」真实地面线（升级梯度：默认 → 不走高速 → via 分段）；
+        // 高速大绕行/确实未建 → 诚实保留
+        const r = await fillGap(el.gap, { ref, coLineway: true, vias: viasForGap(el.gap.from, el.gap.to) });
         for (const rn of r.runs) atoms.push(rn);
       }
     }
@@ -143,27 +197,18 @@ export async function buildOne(ref) {
   }
   flush();
 
-  // 组件缺口「干净单线」合并：trace 的缺口边界节点可能紧贴高速入口，导致逐段补线被迫反复上高速；
-  // 这里直接在相邻组件的真实端点间规划，只要整条 leg 通过 evaluateLeg（地面、绕行/横向/高速达标），
-  // 就用该真实走线把两组件合并为一条，杜绝绕路与重复线。
-  async function cleanLeg(a, b) {
-    try { return await drivingLeg(a, b); }
-    catch (e) {
-      if (/无路径|20011|INSUFFICIENT_ABROAD/.test(e.message || '')) return null;
-      throw e;
-    }
-  }
+  // 组件缺口「干净单线」合并：直接在相邻组件的真实端点间升级求解
+  // （默认策略 → 不走高速 → via 分段；门控 evaluateGapLeg 在 bridgeGap 内部执行），
+  // 通过即用该真实走线把两组件合并为一条，杜绝绕路与重复线。
   let merging = true;
   while (merging && comps.length > 1) {
     merging = false;
     for (let i = 0; i < comps.length - 1; i += 1) {
       const a = comps[i][comps[i].length - 1];
       const b = comps[i + 1][0];
-      const leg = await cleanLeg(a, b);
-      if (!leg) continue;
-      if (!evaluateLeg(leg, a, b, { coLineway: true }).accept) continue;
-      const mid = leg.steps.flatMap((s) => s.points);
-      comps[i] = comps[i].concat(mid, comps[i + 1]);
+      const br = await bridgeGap(a, b, { vias: viasForGap(a, b) });
+      if (!br || !br.complete) continue;
+      comps[i] = comps[i].concat(br.points, comps[i + 1]);
       comps.splice(i + 1, 1);
       merging = true;
       break;
@@ -195,7 +240,7 @@ export async function buildOne(ref) {
   const segments = simplified
     .map((c, i) => (i === mainIdx ? null : c.map(round1e5)))
     .filter(Boolean);
-  const cumKm = computeCumKm(points).map((k) => Math.round(k * 100) / 100);
+  const cumKm = computeCumKm(points).map((k) => Math.round((k / 1000) * 100) / 100);
   const drawnKm = Math.round((lengths.reduce((s, L) => s + L, 0) / 1000) * 10) / 10;
   const official = officialKmOf(ref);
   const deviation = official > 0 ? (drawnKm - official) / official : null;
@@ -238,6 +283,17 @@ const arg = process.argv[2];
 if (arg === '--all') {
   const national = JSON.parse(readFileSync('data/roads/index/national.json', 'utf8'));
   const refs = (national.roads ?? national).map((r) => r.ref ?? r).filter((r) => /^G\d{3}$/.test(r));
+  await runRefs(refs);
+} else if (arg === '--refs') {
+  const refs = (process.argv[3] ?? '').split(',').map((s) => s.trim()).filter((r) => /^G\d{3}$/.test(r));
+  if (!refs.length) { console.error('用法：--refs G219,G331,...'); process.exit(1); }
+  await runRefs(refs);
+} else if (arg) {
+  const r = await buildOne(arg);
+  console.log('✓', JSON.stringify(r));
+}
+
+async function runRefs(refs) {
   let ok = 0; const failures = [];
   const CONC = Number(process.env.BUILD_CONC || 2);
   let qi = 0;
@@ -251,7 +307,4 @@ if (arg === '--all') {
   }
   await Promise.all(Array.from({ length: CONC }, worker));
   console.log('完成', ok + '/' + refs.length, failures.length ? '| 失败 ' + failures.join(',') : '');
-} else if (arg) {
-  const r = await buildOne(arg);
-  console.log('✓', JSON.stringify(r));
 }

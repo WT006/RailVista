@@ -198,6 +198,8 @@ const date = new Date().toISOString().slice(0, 10);
 const stats = [];
 const byClass = {};
 let done = 0;
+let skippedThrough = 0;
+const forceRebuild = process.argv.includes('--force');
 const t0 = Date.now();
 
 const keys = [...keyMap.keys()]
@@ -206,6 +208,17 @@ const keys = [...keyMap.keys()]
   .sort();
 
 for (const key of keys) {
+  // 贯通保护：已由 stitch-national / repair-national 缝成「一条单线」的编号，
+  // 不再被 OSM 重装配覆盖（否则断口会回来）。需要重来时显式传 --force。
+  if (!forceRebuild) {
+    const gp = join(GEOM_DIR, keyToFileName(key));
+    if (existsSync(gp)) {
+      try {
+        const prev = JSON.parse(readFileSync(gp, 'utf8'));
+        if ((prev.componentCount ?? 1) === 1 && (prev.throughStitchedAt || prev.repairedAt)) { skippedThrough += 1; continue; }
+      } catch { /* 读不出来就按正常流程重装配 */ }
+    }
+  }
   const entry = keyMap.get(key);
   const tol = DP_TOL[entry.cls] ?? 60;
   const ways = [];
@@ -345,6 +358,7 @@ for (const key of keys) {
 
 // ── 汇总 ────────────────────────────────────────────────────────────────────
 console.log('\n== 装配汇总 ==');
+if (skippedThrough) console.log('  贯通保护：跳过已缝成单线的编号 ' + skippedThrough + ' 条（如需重装配请加 --force）');
 const order = ['expressway', 'national', 'provincial', 'county', 'township', 'village', 'other'];
 for (const cls of order) {
   const b = byClass[cls];

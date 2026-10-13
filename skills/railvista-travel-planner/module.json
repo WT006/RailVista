@@ -1,0 +1,6 @@
+{
+  "version": "1.0.0",
+  "availableOn": ["phone", "tablet"],
+  "minAPIVersion": 26,
+  "visibility": "system"
+}

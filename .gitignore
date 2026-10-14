@@ -21,10 +21,13 @@ data/presets/corridors/_hsr-rails.geojson
 data/presets/_scenic-calibration-*
 data/presets/_scenic-stuck-*
 data/presets/_scenic-calibrate-*
+data/presets/_scenic-staging*
 data/presets/_scenic-wikidata-batch-*
 data/presets/_scenic-wikidata-small-*
 data/presets/_scenic-wikidata-batches.json
 data/presets/_scenic-wikidata-combined.url.txt
+# 景点主库操作前备份（可重建，勿入库）
+data/presets/scenic-spots.pre-*
 # one-off extracts / wikidata raw dumps (not truths)
 data/presets/_tmp-*
 data/presets/_doc-*

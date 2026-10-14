@@ -106,7 +106,7 @@ function selectFlight(r: FlightSearchResult) {
   const bp = getAirport(r.arrIata);
   const distanceKm = ap && bp ? Math.round(haversineKm(ap, bp)) : undefined;
   lookup.value = {
-    source: 'fr24',
+    source: 'flyclaw',
     flightNumber: r.flightNumber,
     airlineIata: resultCode(r),
     date: date.value,

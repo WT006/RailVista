@@ -35,6 +35,8 @@ import {
   setDriveCurrentTrip,
   updateDriveCurrentProgress,
 } from '../lib/driveCurrentTrip';
+import { ticketConfigFromDriveRoute } from '../lib/ticketFromTrip';
+import { upsertTicketTrace } from '../lib/ticketTrace';
 
 const route = useRoute();
 const router = useRouter();
@@ -70,7 +72,22 @@ function setAsCurrentTrip() {
   }
   setDriveCurrentTrip(built);
   isPinnedCurrent.value = true;
-  showToast('已设为当前行程');
+  try {
+    const waypoints =
+      built.kind === 'od' && built.from && built.to
+        ? [built.from, built.to]
+        : undefined;
+    upsertTicketTrace({
+      sourceKey: built.key,
+      config: ticketConfigFromDriveRoute(roadRoute.value, {
+        routeName: roadRoute.value.name,
+        waypoints,
+      }),
+    });
+  } catch {
+    /* 痕迹落盘失败不影响设为当前 */
+  }
+  showToast('已设为当前行程，纪念票已留下痕迹');
 }
 
 const OFF_ROUTE_MAX_M = 5000;

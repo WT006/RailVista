@@ -40,7 +40,7 @@ const displayText = computed(() => {
   if (!props.modelValue) return '';
   const d = parseDate(props.modelValue);
   const wd = WEEKDAYS[d.getDay()];
-  return `${d.getMonth() + 1}月${d.getDate()}日 周${wd}`;
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 周${wd}`;
 });
 
 const viewYear = ref(selectedDate.value?.getFullYear() ?? new Date().getFullYear());
@@ -102,7 +102,6 @@ function isSelected(dateStr: string): boolean { return dateStr === props.modelVa
         <path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/>
       </svg>
       <span class="hm-dp__value" :class="{ 'is-placeholder': !modelValue }">{{ displayText || placeholder }}</span>
-      <span v-if="modelValue" class="hm-dp__raw">{{ modelValue }}</span>
     </button>
 
     <Teleport to="body">
@@ -170,9 +169,14 @@ function isSelected(dateStr: string): boolean { return dateStr === props.modelVa
   box-shadow: var(--focus-ring);
 }
 .hm-dp__icon { flex-shrink: 0; color: var(--text-3); }
-.hm-dp__value { flex: 1; font-size: var(--fs-body); color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hm-dp__value {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-body);
+  color: var(--text-1);
+  white-space: nowrap;
+}
 .hm-dp__value.is-placeholder { color: var(--text-3); }
-.hm-dp__raw { flex-shrink: 0; font-size: 11px; font-weight: 600; color: var(--accent); font-family: Arial, monospace; }
 </style>
 
 <style>

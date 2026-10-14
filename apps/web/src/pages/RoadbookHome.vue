@@ -38,6 +38,11 @@ const pageWindow = computed(() => {
   for (let i = start; i <= end; i += 1) pages.push(i);
   return pages;
 });
+/** 跳页输入（与当前页同步；用户改完回车或点「跳转」） */
+const jumpInput = ref('1');
+watch(page, (n) => {
+  jumpInput.value = String(n);
+});
 
 const province = ref('');
 const city = ref('');
@@ -186,11 +191,25 @@ async function loadRoutes() {
 
 function goPage(n: number) {
   const next = Math.min(pageCount.value, Math.max(1, n));
-  if (next === page.value) return;
+  if (next === page.value) {
+    jumpInput.value = String(next);
+    return;
+  }
   page.value = next;
+  jumpInput.value = String(next);
   void loadRoutes().then(() => {
     document.querySelector('.rb-result-head')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+}
+
+function jumpToPage() {
+  const raw = jumpInput.value.trim();
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n)) {
+    jumpInput.value = String(page.value);
+    return;
+  }
+  goPage(n);
 }
 
 /** 换筛选条件时回到第 1 页再拉列表 */
@@ -650,6 +669,9 @@ function seasonText(months: number[]): string {
         class="rb-pager"
         aria-label="路书列表分页"
       >
+        <span class="rb-pager__meta" aria-live="polite">
+          共 <b>{{ pageCount }}</b> 页
+        </span>
         <button
           type="button"
           class="rb-pager__btn"
@@ -677,6 +699,21 @@ function seasonText(months: number[]): string {
         >
           下一页
         </button>
+        <label class="rb-pager__jump">
+          <span class="rb-pager__jump-label">到</span>
+          <input
+            v-model="jumpInput"
+            class="rb-pager__jump-input"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            :max="pageCount"
+            :aria-label="`跳转到第几页，共 ${pageCount} 页`"
+            @keydown.enter.prevent="jumpToPage"
+          />
+          <span class="rb-pager__jump-label">页</span>
+          <button type="button" class="rb-pager__btn" @click="jumpToPage">跳转</button>
+        </label>
       </nav>
     </main>
   </div>
@@ -1121,6 +1158,17 @@ function seasonText(months: number[]): string {
   margin: var(--space-5) 0 var(--space-8);
 }
 
+.rb-pager__meta {
+  margin-right: var(--space-1);
+  color: var(--text-3);
+  font-size: var(--fs-cap);
+}
+
+.rb-pager__meta b {
+  color: var(--text-1);
+  font-weight: 700;
+}
+
 .rb-pager__btn,
 .rb-pager__num {
   min-height: 40px;
@@ -1145,6 +1193,45 @@ function seasonText(months: number[]): string {
   border-color: var(--accent-border);
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.rb-pager__jump {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: var(--space-1);
+}
+
+.rb-pager__jump-label {
+  color: var(--text-3);
+  font-size: var(--fs-cap);
+}
+
+.rb-pager__jump-input {
+  width: 3.25rem;
+  min-height: 40px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  color: var(--text-1);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  font-family: inherit;
+  text-align: center;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.rb-pager__jump-input::-webkit-outer-spin-button,
+.rb-pager__jump-input::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.rb-pager__jump-input:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 @media (hover: hover) and (pointer: fine) {

@@ -5,6 +5,10 @@
  * 默认只走本地轨网 + 走廊切片（`network:false`），不打公网 Overpass，
  * 也不写负缓存（避免预热失败反而挡住真实请求）。
  * 需要连公网预热时设置 RAIL_SEG_PREWARM_NETWORK=1（谨慎：会打到公共 Overpass）。
+ *
+ * 小内存机（如 4GB）建议 RAIL_SEG_PREWARM_MODE=hsr：只预热 G/D/C，
+ * 避免启动后立刻解析 ~70MB 普速 china-rail.graph。关预热：RAIL_SEG_PREWARM=0
+ * 或 RAIL_SEG_PREWARM_DELAY_MS=-1。
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -16,6 +20,7 @@ const HOTLIST = join(__dirname, '../../../../data/presets/precise-hotlist.json')
 
 type HotStop = { name?: string; lng?: number; lat?: number };
 type HotEntry = { id?: string; trainCode?: string; stops?: HotStop[] };
+type PrewarmMode = 'all' | 'hsr';
 
 function enabled(): boolean {
   const v = String(process.env.RAIL_SEG_PREWARM ?? '1').trim().toLowerCase();
@@ -25,6 +30,13 @@ function enabled(): boolean {
 function useNetwork(): boolean {
   const v = String(process.env.RAIL_SEG_PREWARM_NETWORK ?? '0').trim().toLowerCase();
   return v === '1' || v === 'true' || v === 'on' || v === 'yes';
+}
+
+/** all = 热清单全量；hsr = 只预热高铁车次（省普速大图内存） */
+export function prewarmMode(): PrewarmMode {
+  const m = String(process.env.RAIL_SEG_PREWARM_MODE ?? 'all').trim().toLowerCase();
+  if (m === 'hsr' || m === 'highspeed' || m === 'gdc') return 'hsr';
+  return 'all';
 }
 
 function loadHotlist(): HotEntry[] {
@@ -42,7 +54,17 @@ export async function prewarmSegments(): Promise<{ entries: number; segments: nu
   const empty = { entries: 0, segments: 0, ms: 0 };
   if (!enabled()) return empty;
 
-  const entries = loadHotlist();
+  const mode = prewarmMode();
+  let entries = loadHotlist();
+  if (mode === 'hsr') {
+    const before = entries.length;
+    entries = entries.filter((e) => isHighspeedTrain(e.trainCode));
+    if (before > entries.length) {
+      console.log(
+        `[seg-prewarm] mode=hsr skipped ${before - entries.length} conventional hotlist entries`,
+      );
+    }
+  }
   if (!entries.length) return empty;
 
   const network = useNetwork();
@@ -88,7 +110,7 @@ export async function prewarmSegments(): Promise<{ entries: number; segments: nu
 
   const ms = Date.now() - t0;
   console.log(
-    `[seg-prewarm] entries=${entries.length} segments=${pairs.length} network=${network} ${ms}ms`,
+    `[seg-prewarm] mode=${mode} entries=${entries.length} segments=${pairs.length} network=${network} ${ms}ms`,
   );
   return { entries: entries.length, segments: pairs.length, ms };
 }

@@ -10,6 +10,7 @@ import { useTicketStore } from '../../stores/ticketStore';
 import { AIRLINES, ALLIANCES, themesForKind } from '../../data/ticket';
 
 const store = useTicketStore();
+const emit = defineEmits<{ save: [] }>();
 const config = computed(() => store.config);
 const kind = computed(() => config.value.kind);
 const isRail = computed(() => kind.value === 'railway');
@@ -355,7 +356,7 @@ function clearBgFile() {
     </section>
 
     <div class="ed__actions">
-      <button class="btn primary btn-sm" type="button" @click="store.save()">保存配置</button>
+      <button class="btn primary btn-sm" type="button" @click="emit('save')">保存配置</button>
       <button class="btn ghost btn-sm" type="button" @click="store.newTicket(config.kind)">恢复默认</button>
     </div>
   </div>

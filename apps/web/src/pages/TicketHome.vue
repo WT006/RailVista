@@ -7,21 +7,56 @@
  *  - 侧栏按票种给出引导构建器（铁路=选车次+少量个性化；自驾=规划路线+路牌增删；飞行=航班号查询）；
  *  - 主栏票面实时预览；按票种裁剪的微调编辑器折叠为「高级微调」。
  */
-import { computed, ref } from 'vue';
-import type { TicketKind, TrainSummary } from '@railvista/shared';
+import { computed, nextTick, onMounted, ref } from 'vue';
+import type { TicketConfig, TicketKind, TrainSummary } from '@railvista/shared';
 import TicketFace from '../components/ticket/TicketFace.vue';
 import TicketEditor from '../components/ticket/TicketEditor.vue';
+import TicketExportModal from '../components/ticket/TicketExportModal.vue';
 import TrainPicker from '../components/ticket/TrainPicker.vue';
 import RailwayPersonalize from '../components/ticket/RailwayPersonalize.vue';
 import DriveBuilder from '../components/ticket/DriveBuilder.vue';
 import FlightBuilder from '../components/ticket/FlightBuilder.vue';
 import HmSegmented, { type SegOption } from '../components/ticket/hm/HmSegmented.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
-import { useTicketStore } from '../stores/ticketStore';
+import {
+  listTicketTraces,
+  removeTicketTrace,
+  type TicketTrace,
+} from '../lib/ticketTrace';
+import {
+  SAVED_TICKET_MAX,
+  ticketCoreName,
+  useTicketStore,
+  type SavedTicket,
+} from '../stores/ticketStore';
 
 usePointerSpotlight();
 
 const store = useTicketStore();
+const tracesAll = ref<TicketTrace[]>([]);
+/** 默认只展示最近 1 条，展开后显示其余 */
+const tracesExpanded = ref(false);
+
+function refreshTraces() {
+  tracesAll.value = listTicketTraces();
+}
+
+/** 只展示与当前票种一致的痕迹（铁路 / 自驾 / 飞行分开） */
+const traces = computed(() =>
+  tracesAll.value.filter((t) => t.kind === store.config.kind),
+);
+
+const visibleTraces = computed(() =>
+  tracesExpanded.value ? traces.value : traces.value.slice(0, 1),
+);
+const hiddenTraceCount = computed(() => Math.max(0, traces.value.length - 1));
+
+/** 已保存也按票种分开，不与异种混排 */
+const savedForKind = computed(() =>
+  store.saved.filter((s) => s.config.kind === store.config.kind),
+);
+
+onMounted(refreshTraces);
 
 const kindOptions: SegOption[] = [
   { label: '铁路', value: 'railway', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C8 2 6 3.6 6 7v7.5A2.5 2.5 0 008.5 17l-1.5 2h1.6l1.5-2h3.8l1.5 2H17l-1.5-2a2.5 2.5 0 002.5-2.5V7c0-3.4-2-5-6-5zm-2.5 3h5A1.5 1.5 0 0116 6.5V10H8V6.5A1.5 1.5 0 019.5 5zM8.5 13a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6zm7 0a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6z"/></svg>' },
@@ -39,16 +74,100 @@ function flash(msg: string) {
   }, 2400);
 }
 
+const exportOpen = ref(false);
+const exportName = ref('');
+const exportConfig = ref<TicketConfig | null>(null);
+
+/** 居中弹窗提示（重复保存等），自动消失；key 强制重挂载避免连点无感 */
+const alertOpen = ref(false);
+const alertMsg = ref('');
+const alertKey = ref(0);
+let alertTimer: number | undefined;
+async function showAlert(msg: string, ms = 2400) {
+  // 若票面预览还开着，先关掉，避免挡住提示
+  exportOpen.value = false;
+  window.clearTimeout(alertTimer);
+  alertMsg.value = msg;
+  alertOpen.value = false;
+  alertKey.value += 1;
+  await nextTick();
+  alertOpen.value = true;
+  alertTimer = window.setTimeout(() => {
+    alertOpen.value = false;
+  }, ms);
+}
+function closeAlert() {
+  window.clearTimeout(alertTimer);
+  alertOpen.value = false;
+}
+
 function onKind(v: string | number) {
-  if (v !== store.config.kind) store.newTicket(v as TicketKind);
+  if (v !== store.config.kind) {
+    store.newTicket(v as TicketKind);
+    tracesExpanded.value = false;
+  }
 }
 function onPickTrain(t: TrainSummary) {
   store.applyTrain(t);
   flash(`已自动生成票面：${t.trainCode} ${t.from.name} → ${t.to.name}`);
 }
+
+function openExport(item: Pick<SavedTicket, 'name' | 'config'>) {
+  exportName.value = item.name;
+  exportConfig.value = item.config;
+  exportOpen.value = true;
+}
+
+function closeExport() {
+  exportOpen.value = false;
+}
+
+/** 保存到本机列表后仍留在编辑页；点列表项再弹图片预览 / 下载 */
 function onSave() {
-  store.save();
-  flash('纪念票已保存到本机列表');
+  // 先本地判断，避免漏检时误走成功绿字
+  if (store.findDuplicate()) {
+    notice.value = '';
+    void showAlert('该纪念票已保存，请勿重复保存');
+    return;
+  }
+  const result = store.save();
+  if (result.status === 'duplicate') {
+    notice.value = '';
+    void showAlert('该纪念票已保存，请勿重复保存');
+    return;
+  }
+  refreshTraces();
+  flash('已保存到本机列表，点击条目可查看图片并下载');
+  openExport(result.item);
+}
+
+function onViewSaved(s: SavedTicket) {
+  openExport({ name: ticketCoreName(s.config) || s.name, config: s.config });
+}
+
+function onLoadSaved(s: SavedTicket) {
+  store.loadSaved(s.id);
+  flash(`已载入：${savedLabel(s)}`);
+}
+
+function onLoadTrace(t: TicketTrace) {
+  store.loadConfig(t.config);
+  flash(`已载入行程痕迹：${traceLabel(t)}`);
+}
+
+function onRemoveTrace(id: string) {
+  removeTicketTrace(id);
+  refreshTraces();
+  if (traces.value.length <= 1) tracesExpanded.value = false;
+  flash('已删除痕迹');
+}
+
+function savedLabel(s: SavedTicket) {
+  return ticketCoreName(s.config) || s.name;
+}
+
+function traceLabel(t: TicketTrace) {
+  return ticketCoreName(t.config) || t.name;
 }
 
 const hasTrain = computed(() => store.config.kind === 'railway' && !!store.config.route.middleLabel);
@@ -97,6 +216,47 @@ const showAdvanced = ref(false);
 
         <!-- 引导构建器 -->
         <div v-show="!store.previewOnly" class="rv-col rv-col--side">
+          <!-- 行程痕迹置顶：仅当前票种；默认最近 1 条，其余折叠 -->
+          <section v-if="traces.length" class="rv-card" data-spotlight>
+            <div class="trace-head">
+              <h2 class="builder-title">行程痕迹</h2>
+              <button
+                v-if="hiddenTraceCount > 0 || tracesExpanded"
+                type="button"
+                class="trace-more"
+                :aria-expanded="tracesExpanded"
+                @click="tracesExpanded = !tracesExpanded"
+              >
+                <span>{{ tracesExpanded ? '收起' : `更多 ${hiddenTraceCount} 条` }}</span>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  :style="{ transform: tracesExpanded ? 'rotate(180deg)' : undefined }"
+                >
+                  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 9l6 6 6-6"/>
+                </svg>
+              </button>
+            </div>
+            <ul class="saved-list">
+              <li v-for="t in visibleTraces" :key="t.id">
+                <button
+                  type="button"
+                  class="saved-list__meta"
+                  :aria-label="`载入痕迹 ${traceLabel(t)}`"
+                  @click="onLoadTrace(t)"
+                >
+                  <strong>{{ traceLabel(t) }}</strong>
+                  <span>{{ new Date(t.updatedAt).toLocaleString() }}</span>
+                </button>
+                <div class="saved-list__acts">
+                  <button class="btn ghost btn-sm" type="button" @click="onLoadTrace(t)">载入</button>
+                  <button class="btn ghost btn-sm" type="button" @click="onRemoveTrace(t.id)">删除</button>
+                </div>
+              </li>
+            </ul>
+          </section>
+
           <section v-if="store.config.kind === 'railway'" class="rv-card" data-spotlight>
             <h2 class="builder-title">① 选择车次</h2>
             <TrainPicker @pick="onPickTrain" />
@@ -120,20 +280,29 @@ const showAdvanced = ref(false);
               <svg v-if="!showAdvanced" viewBox="0 0 24 24" width="17" height="17"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 9l6 6 6-6"/></svg>
               <svg v-else viewBox="0 0 24 24" width="17" height="17"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 15l6-6 6 6"/></svg>
             </button>
-            <TicketEditor v-show="showAdvanced" />
+            <TicketEditor v-show="showAdvanced" @save="onSave" />
           </section>
 
-          <!-- 已保存 -->
-          <section v-if="store.saved.length" class="rv-card" data-spotlight>
+          <!-- 已保存：仅当前票种；载入编辑 / 图片预览下载 / 删除 -->
+          <section v-if="savedForKind.length" class="rv-card" data-spotlight>
             <h2 class="builder-title">已保存纪念票</h2>
+            <p class="saved-hint">
+              最多 {{ SAVED_TICKET_MAX }} 张 · 「载入」继续编辑，点名称可查看图片并下载
+            </p>
             <ul class="saved-list">
-              <li v-for="s in store.saved" :key="s.id">
-                <div class="saved-list__meta">
-                  <strong>{{ s.name }}</strong>
+              <li v-for="s in savedForKind" :key="s.id">
+                <button
+                  type="button"
+                  class="saved-list__meta"
+                  :aria-label="`查看 ${savedLabel(s)} 图片`"
+                  @click="onViewSaved(s)"
+                >
+                  <strong>{{ savedLabel(s) }}</strong>
                   <span>{{ new Date(s.updatedAt).toLocaleString() }}</span>
-                </div>
+                </button>
                 <div class="saved-list__acts">
-                  <button class="btn ghost btn-sm" type="button" @click="store.loadSaved(s.id)">载入</button>
+                  <button class="btn ghost btn-sm" type="button" @click="onLoadSaved(s)">载入</button>
+                  <button class="btn ghost btn-sm" type="button" @click="onViewSaved(s)">下载</button>
                   <button class="btn ghost btn-sm" type="button" @click="store.removeSaved(s.id)">删除</button>
                 </div>
               </li>
@@ -142,8 +311,34 @@ const showAdvanced = ref(false);
         </div>
       </div>
 
-      <p class="footnote">纪念票仅保存在本机浏览器；时刻 / 航班数据来自公开查询，未接入航班动态服务时起降时刻需自行补填，仅供纪念。</p>
+      <p class="footnote">
+        纪念票与行程痕迹仅保存在本机浏览器；时刻 / 航班数据来自公开查询，未接入航班动态服务时起降时刻需自行补填，仅供纪念。
+      </p>
     </div>
+
+    <TicketExportModal
+      :open="exportOpen"
+      :config="exportConfig"
+      :name="exportName"
+      @close="closeExport"
+    />
+
+    <Teleport to="body">
+      <div
+        v-if="alertOpen"
+        :key="alertKey"
+        class="tk-alert"
+        role="alertdialog"
+        aria-modal="true"
+        aria-live="assertive"
+      >
+        <button type="button" class="tk-alert__backdrop" aria-label="关闭" @click="closeAlert" />
+        <div class="tk-alert__panel">
+          <p class="tk-alert__msg">{{ alertMsg }}</p>
+          <button type="button" class="btn primary btn-sm" @click="closeAlert">知道了</button>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -211,27 +406,91 @@ const showAdvanced = ref(false);
 .builder-title { font-size: var(--fs-h3); margin: 0 0 var(--space-2); letter-spacing: 0.02em; }
 
 .adv-toggle {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-  /* 命中区 ≥44vp（鸿蒙触控规范；原 25px 高在手机上难以点按） */
-  min-height: 44px;
-  padding: 10px 2px;
-  border: none; background: transparent;
-  font-size: var(--fs-meta); color: var(--text-2); cursor: pointer;
+  min-height: 32px;
+  padding: 4px 2px;
+  border: none;
+  background: transparent;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
   font-family: inherit;
+  line-height: 1.2;
 }
+.adv-toggle svg { width: 14px; height: 14px; flex-shrink: 0; }
 @media (hover: hover) and (pointer: fine) {
   .adv-toggle:hover { color: var(--text-1); }
 }
 
+.saved-hint {
+  margin: calc(var(--space-1) * -1) 0 var(--space-2);
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+}
 .saved-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-1); }
 .saved-list li {
   display: flex; justify-content: space-between; align-items: center; gap: var(--space-1);
   padding: var(--space-1); border: 1px solid var(--surface-3); border-radius: var(--radius-sm);
 }
-.saved-list__meta { display: flex; flex-direction: column; min-width: 0; }
-.saved-list__meta strong { font-size: var(--fs-meta); color: var(--text-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.saved-list__meta {
+  display: flex; flex-direction: column; min-width: 0; flex: 1;
+  margin: 0; padding: 4px 6px; border: none; border-radius: var(--radius-sm);
+  background: transparent; text-align: left; cursor: pointer; font-family: inherit;
+}
+.saved-list__meta strong {
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+  font-size: var(--fs-meta); color: var(--text-1);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .saved-list__meta span { font-size: var(--fs-cap); color: var(--text-3); }
+.trace-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  margin-bottom: var(--space-1);
+  min-height: 28px;
+}
+.trace-head .builder-title {
+  margin: 0;
+  font-size: var(--fs-meta);
+  line-height: 1.2;
+}
+.trace-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+  min-height: 28px;
+  padding: 2px 8px;
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: transparent;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  line-height: 1;
+}
+.trace-more svg {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.15s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .trace-more:hover { color: var(--text-1); border-color: var(--line-strong); background: var(--surface-2); }
+}
+.trace-more:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+@media (hover: hover) and (pointer: fine) {
+  .saved-list__meta:hover strong { color: var(--accent); }
+}
+.saved-list__meta:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .saved-list__acts { display: flex; gap: 4px; flex-shrink: 0; }
 /* 触屏：载入/删除按钮命中区补齐 ≥44vp（桌面保留紧凑小按钮） */
 @media (pointer: coarse) {
@@ -242,4 +501,51 @@ const showAdvanced = ref(false);
 }
 
 .footnote { margin: var(--space-3) 0 0; color: var(--text-3); font-size: var(--fs-cap); text-align: center; }
+</style>
+
+<!-- Teleport 到 body：非 scoped，避免弹层无样式像「没反应」 -->
+<style>
+.tk-alert {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.tk-alert__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+}
+.tk-alert__panel {
+  position: relative;
+  z-index: 1;
+  width: min(320px, 100%);
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: #1a222e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+.tk-alert__msg {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #e7ecf3;
+  font-weight: 600;
+}
+.tk-alert__panel .btn {
+  min-width: 96px;
+  min-height: 40px;
+}
 </style>

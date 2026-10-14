@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
  * 铁路个性化（选完车次后展示）：
- * 席别滚轮选择；车厢号、座位号；硬卧/软卧选铺位；里程选填；一句感言。
- * 任意修改实时联动票面。
+ * 席别滚轮选择；车厢号、座位号；硬卧/软卧选铺位；一句感言。
+ * 里程由选车时自动写入票面，不在此填写。
  */
 import { reactive, watch } from 'vue';
 import { useTicketStore } from '../../stores/ticketStore';
@@ -34,7 +34,6 @@ const form = reactive({
   carNo: '',
   seatNo: '',
   berth: '',
-  mileage: '' as string | number,
   quote: '',
 });
 
@@ -53,7 +52,6 @@ watch(
         carNo: form.carNo,
         seatNo: noSeat() ? '' : form.seatNo,
         berth: isBerth() ? form.berth : undefined,
-        mileage: form.mileage === '' ? null : Number(form.mileage),
         quote: form.quote,
       });
     }, 180);
@@ -98,14 +96,6 @@ watch(
         :options="berthOptions(currentDef()!.berths!)"
       />
     </div>
-
-    <HmField
-      v-model="form.mileage"
-      label="里程（选填，系统已按直线预填，可改实际）"
-      placeholder="如 1972"
-      inputmode="numeric"
-      suffix="km"
-    />
 
     <HmField v-model="form.quote" label="一句感言（选填）" placeholder="如 在可可西里看到了藏羚羊" />
   </div>

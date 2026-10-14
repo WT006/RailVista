@@ -172,11 +172,30 @@ function parseTrainRow(raw: string, date: string): TrainSummary | null {
   }
   const fromSt = resolveTelecode(fromCode);
   const toSt = resolveTelecode(toCode);
+  const geo = loadStationsGeo();
+  const fromName = fromSt?.name || fromCode;
+  const toName = toSt?.name || toCode;
+  const fromGeo = geo[fromName] || geo[fromName.replace(/站$/, '')] || geo[fromCode];
+  const toGeo = geo[toName] || geo[toName.replace(/站$/, '')] || geo[toCode];
   return {
     trainCode,
     trainNo,
-    from: { name: fromSt?.name || fromCode, telecode: fromCode, pinyin: fromSt?.pinyin || undefined },
-    to: { name: toSt?.name || toCode, telecode: toCode, pinyin: toSt?.pinyin || undefined },
+    from: {
+      name: fromName,
+      telecode: fromCode,
+      pinyin: fromSt?.pinyin || undefined,
+      ...(fromGeo?.lng != null && fromGeo?.lat != null
+        ? { lng: Number(fromGeo.lng), lat: Number(fromGeo.lat) }
+        : {}),
+    },
+    to: {
+      name: toName,
+      telecode: toCode,
+      pinyin: toSt?.pinyin || undefined,
+      ...(toGeo?.lng != null && toGeo?.lat != null
+        ? { lng: Number(toGeo.lng), lat: Number(toGeo.lat) }
+        : {}),
+    },
     departTime,
     arriveTime,
     duration,

@@ -470,7 +470,7 @@ html {
 }
 
 .select-form input,
-.od-panel select {
+.od-panel input {
   width: 100%;
   padding: 0 var(--space-3);
   min-height: 46px;
@@ -491,22 +491,45 @@ html {
 }
 
 /* 输入框占位符：弱化但保持可辨识 */
-.select-form input::placeholder {
+.select-form input::placeholder,
+.od-panel input::placeholder {
   color: var(--text-3);
 }
 
 .select-form input:hover,
-.od-panel select:hover {
+.od-panel input:hover {
   border-color: var(--line-strong);
 }
 
 .select-form input:focus,
-.od-panel select:focus {
+.od-panel input:focus {
   outline: none;
   border-color: var(--accent);
   background: var(--surface-3);
   /* 焦点外发光：柔和的强调光晕，而非硬描边 */
   box-shadow: var(--focus-ring);
+}
+
+/* 上下车站：右侧 chevron，提示可展开经停列表 */
+.od-panel__pick .station-field__control > input {
+  padding-right: calc(var(--space-3) + 18px);
+}
+
+.od-panel__chevron {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid var(--text-3);
+  border-bottom: 1.5px solid var(--text-3);
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+
+.od-panel__pick .station-field__control:focus-within .od-panel__chevron {
+  border-color: var(--accent);
 }
 
 .station-field__control {
@@ -1347,6 +1370,9 @@ html {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: var(--space-2);
   margin: var(--space-2) 0 var(--space-1);
+  /* 下拉层绝对定位，避免被时间轴盖住或撑乱布局 */
+  position: relative;
+  z-index: 2;
 }
 
 .tl {
@@ -1508,7 +1534,7 @@ html {
 
   /* 横屏视口矮，输入框略降高度换取可见行数（仍 ≥40px，满足可点性） */
   .select-form input,
-  .od-panel select {
+  .od-panel input {
     min-height: 40px;
   }
 

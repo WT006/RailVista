@@ -115,6 +115,15 @@ export type AtlasRoadCorridorLite = {
   spotIds: string[];
 };
 
+/** /api/atlas/road 省/市聚合圈 */
+export type AtlasRoadCluster = {
+  name: string;
+  province?: string;
+  lng: number;
+  lat: number;
+  count: number;
+};
+
 export type AtlasOverviewData = {
   corridors: AtlasCorridorLite[];
   spots: AtlasSpotLite[];
@@ -256,14 +265,14 @@ export const api = {
     return request<AtlasOverviewData>('/atlas/overview');
   },
   /**
-   * v0.6.3：公路侧明细（编号公路折线 + 公路原生景点）。
-   * 与 overview 分开按需拉取 —— 并入后响应体 4.4MB，浏览器解析 + AMap 聚类
-   * 1.2 万个点会长时间阻塞主线程，侧栏一直停在"正在加载"。
+   * 公路轻量包：折线 + 省/市聚合 + Top；全量点走 getAtlasRoadSpots。
    */
   getAtlasRoad() {
     return request<{
       roadCorridors: AtlasRoadCorridorLite[];
-      roadSpots: AtlasSpotLite[];
+      provinces: AtlasRoadCluster[];
+      cities: AtlasRoadCluster[];
+      topSpots: AtlasSpotLite[];
       meta: {
         roadCorridorCount: number;
         roadSpotCount: number;
@@ -272,6 +281,18 @@ export const api = {
         generatedAt: string;
       };
     }>('/atlas/road');
+  },
+  /** 按省/市切片公路景点；无筛选时返回全量 slim（热力用） */
+  getAtlasRoadSpots(opts?: { province?: string; city?: string; limit?: number }) {
+    const qs = new URLSearchParams();
+    if (opts?.province) qs.set('province', opts.province);
+    if (opts?.city) qs.set('city', opts.city);
+    if (opts?.limit != null) qs.set('limit', String(opts.limit));
+    const q = qs.toString();
+    return request<{
+      spots: AtlasSpotLite[];
+      meta: { count: number; province: string | null; city: string | null };
+    }>(`/atlas/road/spots${q ? `?${q}` : ''}`);
   },
   /** 线路详情页：单条走廊完整折线 + 沿线景点（含里程） */
   getAtlasCorridor(id: string) {

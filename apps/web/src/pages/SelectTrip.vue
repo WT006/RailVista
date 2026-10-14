@@ -619,6 +619,115 @@ async function enterTrip() {
 
 const odOptions = computed(() => stops.value.map((s) => s.name));
 
+/** 确认上下车站：自定义下拉（对齐站名联想 .station-suggest，避免原生 select 灰底） */
+const boardFromOpen = ref(false);
+const boardToOpen = ref(false);
+const boardFromActive = ref(-1);
+const boardToActive = ref(-1);
+/** 打开时的草稿；与已选值相同时展示全量经停，便于改选 */
+const boardFromDraft = ref('');
+const boardToDraft = ref('');
+
+function filterOdOptions(draft: string, committed: string): string[] {
+  const opts = odOptions.value;
+  const q = draft.trim();
+  if (!q || q === committed) return opts;
+  return opts.filter((n) => n.includes(q));
+}
+
+const boardFromSuggest = computed(() =>
+  filterOdOptions(boardFromDraft.value, boardFrom.value),
+);
+const boardToSuggest = computed(() =>
+  filterOdOptions(boardToDraft.value, boardTo.value),
+);
+
+function openBoardPick(which: 'from' | 'to') {
+  const opts = odOptions.value;
+  if (which === 'from') {
+    boardToOpen.value = false;
+    boardFromDraft.value = boardFrom.value;
+    boardFromOpen.value = true;
+    const i = opts.indexOf(boardFrom.value);
+    boardFromActive.value = i >= 0 ? i : opts.length ? 0 : -1;
+  } else {
+    boardFromOpen.value = false;
+    boardToDraft.value = boardTo.value;
+    boardToOpen.value = true;
+    const i = opts.indexOf(boardTo.value);
+    boardToActive.value = i >= 0 ? i : opts.length ? 0 : -1;
+  }
+}
+
+function closeBoardPick(which: 'from' | 'to') {
+  if (which === 'from') {
+    const q = boardFromDraft.value.trim();
+    if (q && odOptions.value.includes(q)) boardFrom.value = q;
+    boardFromOpen.value = false;
+    boardFromDraft.value = boardFrom.value;
+    boardFromActive.value = -1;
+  } else {
+    const q = boardToDraft.value.trim();
+    if (q && odOptions.value.includes(q)) boardTo.value = q;
+    boardToOpen.value = false;
+    boardToDraft.value = boardTo.value;
+    boardToActive.value = -1;
+  }
+}
+
+function pickBoardStation(which: 'from' | 'to', name: string) {
+  if (which === 'from') {
+    boardFrom.value = name;
+    boardFromDraft.value = name;
+    boardFromOpen.value = false;
+    boardFromActive.value = -1;
+  } else {
+    boardTo.value = name;
+    boardToDraft.value = name;
+    boardToOpen.value = false;
+    boardToActive.value = -1;
+  }
+}
+
+function onBoardDraftInput(which: 'from' | 'to') {
+  const list = which === 'from' ? boardFromSuggest.value : boardToSuggest.value;
+  const active = which === 'from' ? boardFromActive : boardToActive;
+  const open = which === 'from' ? boardFromOpen : boardToOpen;
+  open.value = true;
+  active.value = list.length ? 0 : -1;
+}
+
+function onBoardKey(which: 'from' | 'to', e: KeyboardEvent) {
+  const list = which === 'from' ? boardFromSuggest.value : boardToSuggest.value;
+  const active = which === 'from' ? boardFromActive : boardToActive;
+  const open = which === 'from' ? boardFromOpen : boardToOpen;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (!open.value) {
+      openBoardPick(which);
+      return;
+    }
+    if (!list.length) return;
+    active.value = (active.value + 1) % list.length;
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!open.value || !list.length) return;
+    active.value = (active.value - 1 + list.length) % list.length;
+  } else if (e.key === 'Enter' && open.value && active.value >= 0 && list[active.value]) {
+    e.preventDefault();
+    pickBoardStation(which, list[active.value]!);
+  } else if (e.key === 'Escape') {
+    closeBoardPick(which);
+  }
+}
+
+watch(boardFrom, (v) => {
+  if (!boardFromOpen.value) boardFromDraft.value = v;
+});
+watch(boardTo, (v) => {
+  if (!boardToOpen.value) boardToDraft.value = v;
+});
+
 /** 仅首页展示当前行程 / 最近访问；有查询结果或确认 OD 时隐藏 */
 const showHomeLists = computed(() => step.value === 'search' && trains.value.length === 0);
 
@@ -1044,17 +1153,79 @@ function goBack() {
             </p>
 
             <div class="od-panel__pick">
-              <label>
+              <label class="station-field">
                 <span>上车站</span>
-                <select v-model="boardFrom">
-                  <option v-for="n in odOptions" :key="'f' + n" :value="n">{{ n }}</option>
-                </select>
+                <div class="station-field__control">
+                  <input
+                    v-model="boardFromDraft"
+                    type="text"
+                    role="combobox"
+                    autocomplete="off"
+                    aria-autocomplete="list"
+                    :aria-expanded="boardFromOpen"
+                    aria-controls="od-board-from-list"
+                    :placeholder="boardFrom || '选择上车站'"
+                    @focus="openBoardPick('from')"
+                    @blur="closeBoardPick('from')"
+                    @input="onBoardDraftInput('from')"
+                    @keydown="onBoardKey('from', $event)"
+                  />
+                  <span class="od-panel__chevron" aria-hidden="true" />
+                  <ul
+                    v-show="boardFromOpen && boardFromSuggest.length"
+                    id="od-board-from-list"
+                    class="station-suggest"
+                    role="listbox"
+                  >
+                    <li
+                      v-for="(n, i) in boardFromSuggest"
+                      :key="'f' + n"
+                      role="option"
+                      :aria-selected="i === boardFromActive"
+                      :class="{ 'is-active': i === boardFromActive }"
+                      @mousedown.prevent="pickBoardStation('from', n)"
+                    >
+                      {{ n }}
+                    </li>
+                  </ul>
+                </div>
               </label>
-              <label>
+              <label class="station-field">
                 <span>下车站</span>
-                <select v-model="boardTo">
-                  <option v-for="n in odOptions" :key="'t' + n" :value="n">{{ n }}</option>
-                </select>
+                <div class="station-field__control">
+                  <input
+                    v-model="boardToDraft"
+                    type="text"
+                    role="combobox"
+                    autocomplete="off"
+                    aria-autocomplete="list"
+                    :aria-expanded="boardToOpen"
+                    aria-controls="od-board-to-list"
+                    :placeholder="boardTo || '选择下车站'"
+                    @focus="openBoardPick('to')"
+                    @blur="closeBoardPick('to')"
+                    @input="onBoardDraftInput('to')"
+                    @keydown="onBoardKey('to', $event)"
+                  />
+                  <span class="od-panel__chevron" aria-hidden="true" />
+                  <ul
+                    v-show="boardToOpen && boardToSuggest.length"
+                    id="od-board-to-list"
+                    class="station-suggest"
+                    role="listbox"
+                  >
+                    <li
+                      v-for="(n, i) in boardToSuggest"
+                      :key="'t' + n"
+                      role="option"
+                      :aria-selected="i === boardToActive"
+                      :class="{ 'is-active': i === boardToActive }"
+                      @mousedown.prevent="pickBoardStation('to', n)"
+                    >
+                      {{ n }}
+                    </li>
+                  </ul>
+                </div>
               </label>
             </div>
 

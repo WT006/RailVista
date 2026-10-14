@@ -5,7 +5,7 @@
  * - config：当前编辑中的票面配置（草稿自动落盘 railvista:ticketDraft）
  * - saved：已保存的配置列表（railvista:ticketSaved）
  * - 智能联动：
- *   applyTrain  12306 车次 → 票面自动生成，仅座位/里程等少量个性化
+ *   applyTrain  12306 车次 → 票面自动生成（含里程估算），仅座位/感言等少量个性化
  *   applyFlight 航班查询结果 → 起降机场（含英文名）/时刻/里程/巡航高度自动匹配
  *   applyDriveRoute 自驾 OD 规划 → 路牌/里程/驾驶时长自动生成，路牌可手动增删
  */
@@ -20,6 +20,7 @@ import {
   getAirport,
   haversineKm,
   makeTicketSerial,
+  newTicketId,
   normalizeShieldCode,
   parseFlightIata,
   type FlightLookup,
@@ -31,6 +32,8 @@ import {
 
 const DRAFT_KEY = 'railvista:ticketDraft';
 const SAVED_KEY = 'railvista:ticketSaved';
+/** 本机已保存纪念票上限（超出淘汰最旧） */
+export const SAVED_TICKET_MAX = 5;
 
 /** 旧演示短链 → 正式路书站（仅迁移占位值，用户自定义 URL 不动） */
 const LEGACY_QR_URL = 'https://hw.hey.world/t/demo';
@@ -41,6 +44,8 @@ export interface SavedTicket {
   name: string;
   updatedAt: number;
   config: TicketConfig;
+  /** 保存时固化的去重键，避免二次计算漂移 */
+  fingerprint?: string;
 }
 
 const ELEV_POINTS_MAX = 64;
@@ -110,13 +115,105 @@ function nf(n: number): string {
   return Math.round(n).toLocaleString('en-US');
 }
 
+/** 从 dateText / serial 抽 YYYY.MM.DD 或 YYYY-MM-DD，用于展示与去重 */
+function coreDatePart(cfg: TicketConfig): string {
+  const fromText = (cfg.dateText || '').split(/[·•]/)[0]?.trim() ?? '';
+  if (fromText) return fromText.replace(/\s+/g, '');
+  const m = /HW-[A-Z]+-(\d{8})/i.exec(cfg.serial || '');
+  if (!m?.[1]) return '';
+  const d = m[1];
+  return `${d.slice(0, 4)}.${d.slice(4, 6)}.${d.slice(6, 8)}`;
+}
+
+function odLabel(cfg: TicketConfig): string {
+  const a = cfg.route.ends[0];
+  const b = cfg.route.ends[1];
+  const left = (a?.code || a?.name || '').trim();
+  const right = (b?.code || b?.name || '').trim();
+  if (left && right) return `${left}→${right}`;
+  return left || right;
+}
+
+/**
+ * 列表展示名：核心行程信息，避免千篇一律的「铁路纪念票」。
+ * 铁路 G123 北京南→上海虹桥 · 2026.10.14
+ * 飞行 CA4401 PEK→CTU · 2026.10.14
+ * 自驾 青甘大环线 · 西宁→西宁
+ */
+export function ticketCoreName(cfg: TicketConfig): string {
+  const od = odLabel(cfg);
+  const date = coreDatePart(cfg);
+  if (cfg.kind === 'railway') {
+    const code = (cfg.route.middleLabel || '').trim();
+    const head = [code, od].filter(Boolean).join(' ');
+    return [head, date].filter(Boolean).join(' · ') || cfg.title || '铁路纪念票';
+  }
+  if (cfg.kind === 'flight') {
+    const no = (cfg.airline?.flightNo || cfg.route.middleLabel || '').trim();
+    const head = [no, od].filter(Boolean).join(' ');
+    return [head, date].filter(Boolean).join(' · ') || cfg.title || '飞行纪念票';
+  }
+  const routeName = (cfg.subtitle || '').trim();
+  const head = routeName && od && !routeName.includes('→') ? `${routeName} · ${od}` : routeName || od;
+  return [head, date].filter(Boolean).join(' · ') || cfg.title || '自驾纪念票';
+}
+
+function normFpPart(s: string): string {
+  return String(s || '')
+    .trim()
+    .replace(/\s+/g, '')
+    .replace(/[·•．]/g, '.')
+    .toLowerCase();
+}
+
+/** 同一行程指纹（座位/感言等个性化不参与），用于重复保存提示 */
+export function ticketFingerprint(cfg: TicketConfig): string {
+  const a = normFpPart(cfg.route.ends[0]?.code || cfg.route.ends[0]?.name || '');
+  const b = normFpPart(cfg.route.ends[1]?.code || cfg.route.ends[1]?.name || '');
+  const date = normFpPart(coreDatePart(cfg));
+  if (cfg.kind === 'railway') {
+    return ['r', normFpPart(cfg.route.middleLabel || ''), a, b, date].join('|');
+  }
+  if (cfg.kind === 'flight') {
+    const no = normFpPart(cfg.airline?.flightNo || cfg.route.middleLabel || '');
+    return ['f', no, a, b, date].join('|');
+  }
+  const shields = [...(cfg.route.shields ?? [])]
+    .map((s) => normFpPart(s))
+    .filter(Boolean)
+    .sort()
+    .join(',');
+  return ['d', normFpPart(cfg.subtitle || ''), a, b, shields, date].join('|');
+}
+
 export interface RailPersonalize {
   seatClass?: string;
   carNo?: string;
   seatNo?: string;
   berth?: string;
-  mileage?: number | null;
   quote?: string;
+}
+
+/** 铁路里程：优先站坐标弦长×线型系数；无坐标时用历时×典型均速估算 */
+function estimateRailMileageKm(t: TrainSummary): number | undefined {
+  if (t.from.lat != null && t.from.lng != null && t.to.lat != null && t.to.lng != null) {
+    const chord = haversineKm(
+      { lat: t.from.lat, lng: t.from.lng },
+      { lat: t.to.lat, lng: t.to.lng },
+    );
+    if (chord > 0) {
+      const code = String(t.trainCode || '').toUpperCase();
+      const factor = /^[GDC]/.test(code) ? 1.12 : 1.22;
+      return Math.max(1, Math.round(chord * factor));
+    }
+  }
+  const m = /^(\d+):(\d{2})$/.exec(String(t.duration || '').trim());
+  if (!m) return undefined;
+  const hours = Number(m[1]) + Number(m[2]) / 60;
+  if (!(hours > 0)) return undefined;
+  const code = String(t.trainCode || '').toUpperCase();
+  const kmh = /^[GDC]/.test(code) ? 250 : /^Z/.test(code) ? 120 : 90;
+  return Math.max(1, Math.round(hours * kmh));
 }
 
 export interface FlightChoices {
@@ -144,10 +241,12 @@ export const useTicketStore = defineStore('ticket', () => {
     draftRaw ? migrateQrValue(draftRaw) : createTicketConfig('railway'),
   );
   const saved = ref<SavedTicket[]>(
-    readJson<SavedTicket[]>(SAVED_KEY, []).map((t) => ({
-      ...t,
-      config: migrateQrValue(t.config),
-    })),
+    readJson<SavedTicket[]>(SAVED_KEY, [])
+      .map((t) => ({
+        ...t,
+        config: migrateQrValue(t.config),
+      }))
+      .slice(0, SAVED_TICKET_MAX),
   );
   /** 纯预览模式：隐藏编辑侧栏，票面居中放大 */
   const previewOnly = ref(false);
@@ -172,16 +271,10 @@ export const useTicketStore = defineStore('ticket', () => {
   }
 
   // ── 铁路 ──────────────────────────────────────────────────────────────────
-  /** 车次选择联动：TrainSummary → 票面自动生成 */
+  /** 车次选择联动：TrainSummary → 票面自动生成（里程由站坐标/历时估算，无需用户填） */
   function applyTrain(t: TrainSummary) {
     const seq = saved.value.length + 1;
-    let mileage: string | undefined;
-    if (t.from.lat != null && t.from.lng != null && t.to.lat != null && t.to.lng != null) {
-      // 直线距离仅作占位，铁路实际里程更长，用户可在个性化中改
-      mileage = nf(
-        haversineKm({ lat: t.from.lat, lng: t.from.lng }, { lat: t.to.lat, lng: t.to.lng }),
-      );
-    }
+    const mileageKm = estimateRailMileageKm(t);
     patch({
       kind: 'railway',
       title: '铁路纪念票',
@@ -205,7 +298,7 @@ export const useTicketStore = defineStore('ticket', () => {
         { label: '出发 DEPART', value: t.departTime },
         { label: '到达 ARRIVE', value: t.arriveTime },
         { label: '历时 DURATION', value: t.duration || '—' },
-        { label: '里程 MILEAGE', value: mileage ?? '—', unit: 'km' },
+        { label: '里程 MILEAGE', value: mileageKm != null ? nf(mileageKm) : '—', unit: 'km' },
       ],
       tags: [],
       quote: '',
@@ -214,23 +307,16 @@ export const useTicketStore = defineStore('ticket', () => {
     });
   }
 
-  /** 铁路个性化：仅座位/铺位、里程、感言需要用户补，其余已自动 */
+  /** 铁路个性化：仅席别/座位/铺位/感言；里程已在选车时自动写入 */
   function setRailPersonalize(p: RailPersonalize) {
     const seatText = [p.carNo ? `${p.carNo}车` : '', p.seatNo ? `${p.seatNo}号` : '', p.berth ?? '']
       .filter(Boolean)
       .join('');
 
-    const stats = config.value.stats.map((s) => {
-      if (s.label.startsWith('里程') && p.mileage != null && p.mileage > 0) {
-        return { ...s, value: nf(p.mileage) };
-      }
-      return s;
-    });
     const tags: TicketConfig['tags'] = [];
     if (p.seatClass) tags.push({ text: p.seatClass });
     patch({
       metaRight: seatText,
-      stats,
       tags,
       ...(p.quote != null ? { quote: p.quote } : {}),
     });
@@ -477,23 +563,55 @@ export const useTicketStore = defineStore('ticket', () => {
     });
   }
 
-  function save(name?: string): SavedTicket {
+  /** 列表里是否已有同一张票（票号优先，其次行程指纹） */
+  function findDuplicate(cfg: TicketConfig = config.value): SavedTicket | undefined {
+    const serial = (cfg.serial || '').trim();
+    const fp = ticketFingerprint(cfg);
+    return saved.value.find((s) => {
+      const savedSerial = (s.config?.serial || '').trim();
+      if (serial && savedSerial && serial === savedSerial) return true;
+      if (s.fingerprint && s.fingerprint === fp) return true;
+      return ticketFingerprint(s.config) === fp;
+    });
+  }
+
+  /**
+   * 保存到本机列表。
+   * - 列表项 id 与草稿 id 脱钩：不同行程各占一条。
+   * - 同票号 / 同行程已存在 → 不写入，返回 duplicate。
+   */
+  function save(name?: string): { status: 'saved'; item: SavedTicket } | { status: 'duplicate' } {
+    const cfg = clone(config.value);
+    const displayName = name?.trim() || ticketCoreName(cfg);
+    const fp = ticketFingerprint(cfg);
+
+    if (findDuplicate(cfg)) {
+      return { status: 'duplicate' };
+    }
+
     const item: SavedTicket = {
-      id: config.value.id,
-      name: name?.trim() || config.value.title || '未命名纪念票',
+      id: newTicketId(),
+      name: displayName,
       updatedAt: Date.now(),
-      config: clone(config.value),
+      config: cfg,
+      fingerprint: fp,
     };
-    const i = saved.value.findIndex((s) => s.id === item.id);
-    if (i >= 0) saved.value.splice(i, 1, item);
-    else saved.value.unshift(item);
+    saved.value.unshift(item);
+    if (saved.value.length > SAVED_TICKET_MAX) {
+      saved.value = saved.value.slice(0, SAVED_TICKET_MAX);
+    }
     writeJson(SAVED_KEY, saved.value);
-    return item;
+    return { status: 'saved', item };
   }
 
   function loadSaved(id: string) {
     const hit = saved.value.find((s) => s.id === id);
     if (hit) config.value = clone(hit.config);
+  }
+
+  /** 从行程痕迹载入草稿（不自动写入 saved） */
+  function loadConfig(cfg: TicketConfig) {
+    config.value = clone(cfg);
   }
 
   function removeSaved(id: string) {
@@ -516,7 +634,9 @@ export const useTicketStore = defineStore('ticket', () => {
     setDriveWaypoints,
     setDriveMeta,
     save,
+    findDuplicate,
     loadSaved,
+    loadConfig,
     removeSaved,
   };
 });

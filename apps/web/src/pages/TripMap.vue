@@ -41,6 +41,8 @@ import {
 } from '@railvista/shared';
 import { api } from '../api/client';
 import { hydrateFromSnapshot, persistActiveTrip } from '../lib/persistTrip';
+import { ticketConfigFromRailSegment } from '../lib/ticketFromTrip';
+import { upsertTicketTrace } from '../lib/ticketTrace';
 import {
   clearAutoResume,
   getAutoResumeTripKey,
@@ -1339,8 +1341,17 @@ async function setAsCurrentTrip() {
   }
   const snap = await persistActiveTrip({ bumpOpenedAt: true, setResume: true });
   resumeKeyNow.value = getAutoResumeTripKey();
-  if (snap) showToast('已设为当前行程');
-  else showToast('设置失败，请稍后重试');
+  if (snap) {
+    try {
+      upsertTicketTrace({
+        sourceKey: snap.key,
+        config: ticketConfigFromRailSegment(snap.segment),
+      });
+    } catch {
+      /* 痕迹落盘失败不影响设为当前 */
+    }
+    showToast('已设为当前行程，纪念票已留下痕迹');
+  } else showToast('设置失败，请稍后重试');
 }
 
 function confirmDialogAction() {

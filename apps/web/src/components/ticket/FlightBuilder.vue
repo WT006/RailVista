@@ -106,7 +106,7 @@ function selectFlight(r: FlightSearchResult) {
   const bp = getAirport(r.arrIata);
   const distanceKm = ap && bp ? Math.round(haversineKm(ap, bp)) : undefined;
   lookup.value = {
-    source: 'fr24',
+    source: 'flyclaw',
     flightNumber: r.flightNumber,
     airlineIata: resultCode(r),
     date: date.value,
@@ -309,7 +309,8 @@ watch(
 .fb__mode-btn.active { color: var(--surface-0); background: var(--accent); }
 .fb__top { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
 .fb__top > * { min-width: 0; }
-.fb__no { grid-column: 1 / -1; }
+.fb__no,
+.fb__date { grid-column: 1 / -1; }
 .fb__label { display: block; margin-bottom: 7px; font-size: var(--fs-cap); letter-spacing: 0.04em; color: var(--text-2); }
 .fb__datebox {
   display: flex; align-items: center;

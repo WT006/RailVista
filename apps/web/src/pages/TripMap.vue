@@ -56,12 +56,15 @@ import {
   ATLAS_RAIL_STROKE,
   TRIP_GLOW_STROKE,
   TRIP_HIGHLIGHT_STROKE,
+  TRIP_SKY_BLUE_STROKE,
+  TRIP_SKY_GOLDEN_STROKE,
+  TRIP_SKY_SUN_STROKE,
 } from '../data/atlasColors';
 import { readSimulatedProgress, useGeolocation, useNow } from '../composables/useGeolocation';
 import DarkDateTimeField from '../components/DarkDateTimeField.vue';
 import PreciseRoutePanel from '../components/PreciseRoutePanel.vue';
 import SideBadge from '../components/SideBadge.vue';
-import SkyJourneyPanel from '../components/SkyJourneyPanel.vue';
+import SkyJourneyPanel, { type SkyFocusPayload } from '../components/SkyJourneyPanel.vue';
 import SpotApproachCard from '../components/SpotApproachCard.vue';
 import { usePrefsStore } from '../stores/prefsStore';
 import { useTripStore } from '../stores/tripStore';
@@ -88,8 +91,14 @@ let weatherFetchTimer: number | undefined;
 let weatherFetchSeq = 0;
 const legendOpen = ref(false);
 const calibrateOpen = ref(false);
-/** 天象观景面板开关（打开后按发车时间重算全线天象时间轴并在地图上标注） */
-const skyOpen = ref(false);
+/** 天象模式：地图彩色路段/标注常驻；与面板展开无关 */
+const skyMode = ref(false);
+/** 时间轴列表抽屉（按需打开；点天象默认不弹） */
+const skyPanelOpen = ref(false);
+/** 当前选中的时间轴片段（地图加粗高亮） */
+const skyFocus = ref<SkyFocusPayload | null>(null);
+/** 最近一次天象计算结果（迷你条摘要用） */
+const skyMapPayload = ref<SkyMapResult | null>(null);
 const STATUS_COLLAPSE_KEY = 'railvista:map:statusCollapsed';
 const statusCollapsed = ref(
   typeof localStorage !== 'undefined' && localStorage.getItem(STATUS_COLLAPSE_KEY) === '1',
@@ -411,8 +420,10 @@ function bindOverlayObserver() {
 function getMapPadding() {
   const side = compact.value ? 20 : 48;
   const top = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--top-overlay'), 10) || 72;
-  const bottom =
+  let bottom =
     parseInt(getComputedStyle(document.documentElement).getPropertyValue('--bottom-overlay'), 10) || 118;
+  // 手机天象短条占高；桌面无浮条
+  if (skyMode.value && !skyPanelOpen.value && compact.value) bottom += 52;
   return [top, side, bottom, side];
 }
 
@@ -964,17 +975,30 @@ function rebuildSpotMarkers() {
 
 // ── 天象观景：时间轴结果 → 地图标注 ─────────────────────────────────────────
 let skyOverlays: any[] = [];
+let skyFocusOverlays: any[] = [];
 
-function clearSkyOverlay() {
+function removeMapOverlays(list: any[]) {
   if (!map) return;
-  for (const m of skyOverlays) {
+  for (const m of list) {
     try {
       map.remove(m);
     } catch {
       /* ignore */
     }
   }
+}
+
+function clearSkyFocusOverlay() {
+  removeMapOverlays(skyFocusOverlays);
+  skyFocusOverlays = [];
+}
+
+function clearSkyOverlay() {
+  clearSkyFocusOverlay();
+  removeMapOverlays(skyOverlays);
   skyOverlays = [];
+  skyFocus.value = null;
+  skyMapPayload.value = null;
 }
 
 /** 天象标注配色：霞=暖橙 / 金=琥珀 / 蓝=冰蓝 / 日=朱红 / 月=靛紫（与面板 k-* 语义一致） */
@@ -988,6 +1012,69 @@ const SKY_EPISODE_CLS: Record<string, string> = {
   sunrise: 'is-sun',
   sunset: 'is-sun',
 };
+
+function skyStrokeForKind(kind: string): string {
+  if (kind === 'dawnGlow' || kind === 'duskGlow') return TRIP_GLOW_STROKE;
+  if (kind === 'goldenMorning' || kind === 'goldenEvening') return TRIP_SKY_GOLDEN_STROKE;
+  if (kind === 'blueMorning' || kind === 'blueEvening') return TRIP_SKY_BLUE_STROKE;
+  if (kind === 'sunrise' || kind === 'sunset') return TRIP_SKY_SUN_STROKE;
+  return TRIP_HIGHLIGHT_STROKE;
+}
+
+function skyLineWeight(kind: string): number {
+  if (kind === 'dawnGlow' || kind === 'duskGlow') return 7;
+  if (kind === 'goldenMorning' || kind === 'goldenEvening') return 7;
+  if (kind === 'blueMorning' || kind === 'blueEvening') return 6;
+  if (kind === 'sunrise' || kind === 'sunset') return 6;
+  if (kind === 'nautical' || kind === 'astroTwilight') return 4;
+  return 5;
+}
+
+function skyLineOpacity(kind: string): number {
+  if (kind === 'nautical' || kind === 'astroTwilight') return 0.55;
+  if (kind === 'night') return 0.85;
+  return 0.92;
+}
+
+/** 白天段不上色（会盖满全线）；短夜段跳过避免碎线 */
+function shouldPaintSkyEpisode(kind: string, startMs: number, endMs: number): boolean {
+  if (kind === 'day') return false;
+  if (kind === 'night' && endMs - startMs < 90 * 60_000) return false;
+  return true;
+}
+
+function skyMarkerClsForKind(kind: string): string {
+  if (kind === 'dawnGlow' || kind === 'duskGlow') return 'is-glow';
+  if (kind === 'goldenMorning' || kind === 'goldenEvening') return 'is-golden';
+  if (kind === 'blueMorning' || kind === 'blueEvening') return 'is-blue';
+  if (kind === 'sunrise' || kind === 'sunset') return 'is-sun';
+  if (kind === 'moonrise' || kind === 'moonset') return 'is-moon';
+  return 'is-star';
+}
+
+function episodeToFocus(e: {
+  id: string;
+  kind: string;
+  title: string;
+  lng: number;
+  lat: number;
+  startKm: number;
+  endKm: number;
+  startMs: number;
+  endMs: number;
+}): SkyFocusPayload {
+  return {
+    id: e.id,
+    kind: e.kind,
+    title: e.title,
+    lng: e.lng,
+    lat: e.lat,
+    startKm: e.startKm,
+    endKm: e.endKm,
+    startMs: e.startMs,
+    endMs: e.endMs,
+  };
+}
 
 /** 里程区间 → 路线折线切片（画路段高亮用） */
 function pathSliceKm(startKm: number, endKm: number): [number, number][] {
@@ -1010,41 +1097,65 @@ function sideShort(side: string): string {
   return side === 'right' ? '· 右' : side === 'left' ? '· 左' : '';
 }
 
+/** 迷你条一行状态（不再跟第二行白字） */
+const skyPeekKicker = computed(() => {
+  if (!skyMapPayload.value) return '天象计算中…';
+  const f = skyFocus.value;
+  if (f) return `已定位 · ${f.title}`;
+  return '路线已按天象上色';
+});
+
 /**
  * 天象时间轴 → 地图：
- *   1) 路线上的彩色路段：霞光段（暖橙）/ 观星段（靛紫，观星指数≥55 的夜段，如青藏高原）；
- *   2) 时刻标注（日出/日落/月出/月落）与看点标注，均带车窗左右侧。
+ *   1) 各看点时段彩色路段（蓝/霞/金/日/夜…），可点击聚焦；
+ *   2) 日月时刻与看点标注。
  */
 function rebuildSkyOverlay(payload: SkyMapResult | null) {
   if (!map || !AMapRef) return;
-  clearSkyOverlay();
-  if (!payload) return;
+  skyMapPayload.value = payload;
+  clearSkyFocusOverlay();
+  removeMapOverlays(skyOverlays);
+  skyOverlays = [];
+  if (!payload || !skyMode.value) return;
   const { result, scores } = payload;
 
-  const items: Array<{ lng: number; lat: number; text: string; title: string; cls: string }> = [];
+  const items: Array<{
+    lng: number;
+    lat: number;
+    text: string;
+    title: string;
+    cls: string;
+    focus?: SkyFocusPayload;
+  }> = [];
 
-  // 1) 彩色路段 + 路段中点标注
+  // 1) 全时段色带（白天除外）
+  for (const e of result.episodes) {
+    if (!shouldPaintSkyEpisode(e.kind, e.startMs, e.endMs)) continue;
+    const coords = pathSliceKm(e.startKm, e.endKm);
+    if (coords.length < 2) continue;
+    const focus = episodeToFocus(e);
+    const line = new AMapRef.Polyline({
+      path: coords,
+      strokeColor: skyStrokeForKind(e.kind),
+      strokeWeight: skyLineWeight(e.kind),
+      strokeOpacity: skyLineOpacity(e.kind),
+      lineJoin: 'round',
+      lineCap: 'round',
+      zIndex: 150,
+      cursor: 'pointer',
+      bubble: true,
+    });
+    line.on?.('click', () => onSkyFocus(focus));
+    map.add(line);
+    skyOverlays.push(line);
+  }
+
+  // 2) 路段中点标注：霞 / 高分夜段
   for (const e of result.episodes) {
     const isGlow = e.kind === 'dawnGlow' || e.kind === 'duskGlow';
     const score = scores[e.id];
     const isStar = e.kind === 'night' && (score?.score ?? 0) >= 55;
     if (!isGlow && !isStar) continue;
-    const coords = pathSliceKm(e.startKm, e.endKm);
-    if (coords.length >= 2) {
-      const line = new AMapRef.Polyline({
-        path: coords,
-        // JS 侧无法读 CSS 变量，取 tokens 同值：--spot #e0915a / --purple #8f7ae8
-        strokeColor: isGlow ? TRIP_GLOW_STROKE : TRIP_HIGHLIGHT_STROKE,
-        strokeWeight: isGlow ? 7 : 6,
-        strokeOpacity: 0.92,
-        lineJoin: 'round',
-        lineCap: 'round',
-        zIndex: 150,
-        bubble: true,
-      });
-      map.add(line);
-      skyOverlays.push(line);
-    }
     const midKm = (e.startKm + e.endKm) / 2;
     const mid = pointAtProgress(
       pathMetrics.path,
@@ -1059,6 +1170,7 @@ function rebuildSkyOverlay(payload: SkyMapResult | null) {
         text: `${t} ${e.title} ${sideShort(e.sunSide.side)}`,
         title: `${e.title} ${t} · ${e.nearName || '沿途'} · ${e.sunSide.label} · 指数 ${score?.score ?? '—'}`,
         cls: 'is-glow',
+        focus: episodeToFocus(e),
       });
     } else {
       const milky = (score?.note ?? '').includes('银河可见') ? ' · 银河' : '';
@@ -1068,11 +1180,12 @@ function rebuildSkyOverlay(payload: SkyMapResult | null) {
         text: `观星 ${score?.score ?? ''}${milky}`,
         title: `观星段 · ${e.nearName || '沿途'} · 指数 ${score?.score ?? '—'} · ${score?.note ?? ''}`,
         cls: 'is-star',
+        focus: episodeToFocus(e),
       });
     }
   }
 
-  // 2) 日月时刻标注（带左右侧）
+  // 3) 日月时刻标注
   for (const m of result.moments) {
     const isMoon = m.kind === 'moonrise' || m.kind === 'moonset';
     const t = formatTime(new Date(m.atMs));
@@ -1082,10 +1195,19 @@ function rebuildSkyOverlay(payload: SkyMapResult | null) {
       text: `${t} ${m.title} ${sideShort(m.sideInfo.side)}`,
       title: `${m.title} ${t} · ${m.nearName || '沿途'} · ${m.sideInfo.label}`,
       cls: isMoon ? 'is-moon' : 'is-sun',
+      focus: {
+        id: `moment-${m.kind}-${m.atMs}`,
+        kind: m.kind,
+        title: m.title,
+        lng: m.lng,
+        lat: m.lat,
+        startMs: m.atMs,
+        endMs: m.atMs,
+      },
     });
   }
 
-  // 3) 金/蓝时刻看点标注（日出日落、霞光已单独标注，避免重复）
+  // 4) 金/蓝时刻看点标注（霞/日已单独标注）
   for (const e of highlightEpisodes(result.episodes)) {
     const cls = SKY_EPISODE_CLS[e.kind];
     if (!cls || e.kind === 'sunrise' || e.kind === 'sunset') continue;
@@ -1097,6 +1219,7 @@ function rebuildSkyOverlay(payload: SkyMapResult | null) {
       text: `${t} ${e.title} ${sideShort(e.sunSide.side)}`,
       title: `${e.title} · ${e.nearName || '沿途'} · ${e.sunSide.label}`,
       cls,
+      focus: episodeToFocus(e),
     });
     if (items.length >= 28) break;
   }
@@ -1106,30 +1229,118 @@ function rebuildSkyOverlay(payload: SkyMapResult | null) {
       position: [it.lng, it.lat],
       title: it.title,
       content: `<div class="sky-marker ${it.cls}${compact.value ? ' sky-marker--compact' : ''}"><span class="sky-marker__text">${escHtml(it.text)}</span><span class="sky-marker__dot"></span></div>`,
-      // 圆点落在路线点上，文字悬在线路上方（景点式标注）
       anchor: 'bottom-center',
       zIndex: 160,
     });
+    if (it.focus) {
+      const focus = it.focus;
+      marker.on?.('click', () => onSkyFocus(focus));
+    }
     map.add(marker);
     skyOverlays.push(marker);
   }
+
+  if (skyFocus.value) paintSkyFocus(skyFocus.value);
+}
+
+/** 选中片段：加粗鲜艳路段（或点标注）+ 视野对准 */
+function paintSkyFocus(p: SkyFocusPayload) {
+  if (!map || !AMapRef) return;
+  clearSkyFocusOverlay();
+  const color = skyStrokeForKind(p.kind);
+  const cls = skyMarkerClsForKind(p.kind);
+  let coords: [number, number][] = [];
+  if (p.startKm != null && p.endKm != null && p.endKm > p.startKm) {
+    coords = pathSliceKm(p.startKm, p.endKm);
+  }
+
+  if (coords.length >= 2) {
+    const glow = new AMapRef.Polyline({
+      path: coords,
+      strokeColor: color,
+      strokeWeight: 16,
+      strokeOpacity: 0.32,
+      lineJoin: 'round',
+      lineCap: 'round',
+      zIndex: 168,
+      bubble: true,
+    });
+    const line = new AMapRef.Polyline({
+      path: coords,
+      strokeColor: color,
+      strokeWeight: 10,
+      strokeOpacity: 1,
+      lineJoin: 'round',
+      lineCap: 'round',
+      zIndex: 169,
+      bubble: true,
+    });
+    map.add([glow, line]);
+    skyFocusOverlays.push(glow, line);
+    try {
+      map.setFitView([line], false, getMapPadding(), 14);
+    } catch {
+      map.setZoomAndCenter(Math.max(map.getZoom?.() ?? 6, 10), [p.lng, p.lat], false, 300);
+    }
+  } else {
+    map.setZoomAndCenter(Math.max(map.getZoom?.() ?? 6, 10), [p.lng, p.lat], false, 300);
+  }
+
+  const t =
+    p.startMs != null
+      ? p.endMs != null && p.endMs !== p.startMs
+        ? `${formatTime(new Date(p.startMs))}~${formatTime(new Date(p.endMs))}`
+        : formatTime(new Date(p.startMs))
+      : '';
+  const text = t ? `${t} ${p.title}` : p.title;
+  const marker = new AMapRef.Marker({
+    position: [p.lng, p.lat],
+    title: p.title,
+    content: `<div class="sky-marker sky-marker--focus ${cls}"><span class="sky-marker__text">${escHtml(text)}</span><span class="sky-marker__dot"></span></div>`,
+    anchor: 'bottom-center',
+    zIndex: 175,
+  });
+  map.add(marker);
+  skyFocusOverlays.push(marker);
 }
 
 function toggleSky() {
-  skyOpen.value = !skyOpen.value;
-  if (!skyOpen.value) clearSkyOverlay();
+  if (skyMode.value) {
+    skyMode.value = false;
+    skyPanelOpen.value = false;
+    clearSkyOverlay();
+  } else {
+    // 默认只开地图彩段 + 迷你条，列表按需再开
+    skyMode.value = true;
+    skyPanelOpen.value = false;
+  }
+  nextTick(() => updateOverlayMetrics());
 }
 
-/** 面板里点某个时刻/片段 → 地图定位到该点 */
-function onSkyFocus(p: { lng: number; lat: number }) {
-  if (!map) return;
-  map.setZoomAndCenter(Math.max(map.getZoom?.() ?? 6, 8), [p.lng, p.lat], false, 300);
+/** 面板 ×：只收起，保留地图天象层 */
+function closeSkyPanel() {
+  skyPanelOpen.value = false;
+  nextTick(() => updateOverlayMetrics());
 }
 
-/** 面板里改发车时间 → 落 prefs 并刷新全程时刻估算 */
-function onSkyDepartChange(iso: string) {
-  prefs.setDeparture(iso);
-  tick();
+function openSkyPanel() {
+  skyPanelOpen.value = true;
+  nextTick(() => updateOverlayMetrics());
+}
+
+function exitSkyMode() {
+  skyMode.value = false;
+  skyPanelOpen.value = false;
+  clearSkyOverlay();
+  nextTick(() => updateOverlayMetrics());
+}
+
+/** 点时间轴/日月时刻 → 收起面板，高亮并对准路段 */
+function onSkyFocus(p: SkyFocusPayload) {
+  skyFocus.value = p;
+  skyPanelOpen.value = false;
+  paintSkyFocus(p);
+  nextTick(() => updateOverlayMetrics());
 }
 
 async function initMap() {
@@ -1683,11 +1894,21 @@ onUnmounted(() => {
         {{ satelliteOn ? '标准地图' : '卫星地图' }}
       </button>
       <button type="button" class="legend-toggle" @click="legendOpen = !legendOpen">图例</button>
+      <!-- 天象模式中：时间轴并入右侧控件列，避免再浮一条挡地图 -->
+      <button
+        v-if="skyMode && !skyPanelOpen"
+        type="button"
+        class="sky-timeline-btn"
+        @click="openSkyPanel"
+      >
+        时间轴
+      </button>
       <button
         type="button"
         class="sky-btn"
-        :class="{ 'is-active': skyOpen }"
-        :aria-pressed="skyOpen"
+        :class="{ 'is-active': skyMode }"
+        :aria-pressed="skyMode"
+        :title="skyMode ? '关闭天象模式' : '打开天象观景'"
         @click="toggleSky"
       >
         天象
@@ -1720,7 +1941,8 @@ onUnmounted(() => {
       </div>
 
       <SkyJourneyPanel
-        :open="skyOpen"
+        v-if="skyMode"
+        :open="skyPanelOpen"
         :train-code="segment.trainCode"
         :from-name="segment.fromName"
         :to-name="segment.toName"
@@ -1732,11 +1954,19 @@ onUnmounted(() => {
         :arrival-ms="schedule.arrival.getTime()"
         :offset-ms="schedule.offsetMs"
         :compact="compact"
-        @close="toggleSky"
+        @close="closeSkyPanel"
         @focus="onSkyFocus"
         @result="rebuildSkyOverlay"
-        @depart-change="onSkyDepartChange"
       />
+
+      <!-- 仅手机保留底栏短条；桌面用右侧「时间轴」+「天象」高亮，不再浮卡 -->
+      <div v-if="skyMode && !skyPanelOpen && compact" class="sky-peek" role="status">
+        <span class="sky-peek__kicker">{{ skyPeekKicker }}</span>
+        <div class="sky-peek__actions">
+          <button type="button" class="sky-peek__list" @click="openSkyPanel">时间轴</button>
+          <button type="button" class="sky-peek__exit" @click="exitSkyMode">退出</button>
+        </div>
+      </div>
 
       <SpotApproachCard
         v-if="approachingSpot"

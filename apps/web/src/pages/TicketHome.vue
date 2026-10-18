@@ -405,6 +405,14 @@ const showAdvanced = ref(false);
 
 .builder-title { font-size: var(--fs-h3); margin: 0 0 var(--space-2); letter-spacing: 0.02em; }
 
+/* 机场 / 车站联想展开时抬升整张构建卡。
+ * .rv-card 有 isolation:isolate，子元素 z-index 压不过后面的「高级微调」等兄弟卡
+ *（与 drive-od.has-suggest-open 同一做法）。 */
+.rv-card:has(:deep(.is-suggest-open)) {
+  position: relative;
+  z-index: 50;
+}
+
 .adv-toggle {
   display: flex;
   align-items: center;

@@ -86,7 +86,7 @@ function trainKind(code: string): 'hsr' | 'intercity' | 'conventional' | 'other'
 </script>
 
 <template>
-  <div class="tp">
+  <div class="tp" :class="{ 'is-suggest-open': (fromOpen && fromSuggest.length > 0) || (toOpen && toSuggest.length > 0) }">
     <form class="tp__form" @submit.prevent="search">
       <div class="tp__station">
         <label class="tp__label">出发站</label>

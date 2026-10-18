@@ -3,7 +3,8 @@
  * 顶部导航栏（App Bar）。
  *
  * 职责：品牌 + 版本；≥1200 网页档额外承载主导航（与底栏/侧栏同源 APP_NAV_ITEMS）。
- * 挪移：&lt;840 底栏 / 840–1199 侧边 Tab / ≥1200 本组件顶栏。
+ * 挪移：&lt;840 底栏（本条不渲染，safe-top 由页面 padding 承担）/
+ *       840–1199 侧边 Tab + 品牌条 / ≥1200 本组件顶栏。
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -111,6 +112,16 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   justify-content: space-between;
   gap: var(--space-4);
   height: var(--appbar-h);
+}
+
+/* 手机档：整条顶栏退出文档流（勿留透明占位）。
+ * 此前 height=safe-top + background:none 会露出 body 纯色条，
+ * 与下方 .drive-page / .rv-page 的 page-scrim 叠不成一条，公路网背景被「切断」。
+ * 刘海避让改由页面自身 padding-top: var(--safe-top) 承担（见 base.css）。 */
+@media (max-width: 839px) {
+  .appbar {
+    display: none;
+  }
 }
 
 .appbar__left {

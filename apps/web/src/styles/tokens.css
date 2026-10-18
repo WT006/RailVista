@@ -242,9 +242,13 @@
  * 主导航：<840 底栏 / 840–1199 侧边 Tab / ≥1200 顶栏
  */
 
-/* 底栏档：悬浮胶囊本体 56vp + 底边悬浮留白 8vp；内容避让总高 64vp */
+/* 底栏档：悬浮胶囊本体 56vp + 底边悬浮留白 8vp；内容避让总高 64vp。
+ * 顶栏品牌条收起（--appbar-h=0，AppTopBar display:none）：手机主导航在底栏；
+ * 刘海由 .rv-page/.drive-page 的 padding-top: var(--safe-top) 承担，
+ * 避免透明顶栏占位与页面 scrim 叠出纯色接缝。 */
 @media (max-width: 839px) {
   :root {
+    --appbar-h: 0px;
     --bottomnav-h: 64px;
     --sidenav-w: 0px;
   }
@@ -254,7 +258,6 @@
   :root {
     --gutter: 24px;
     --shell-max: 100%;
-    --appbar-h: 56px;
   }
 }
 

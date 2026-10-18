@@ -2,7 +2,7 @@
 /**
  * 可搜索机场选择字段（鸿蒙风格 ArkUI SearchField）：
  * 输入城市/机场名/IATA → 从本地机场库检索，下拉选择，值为 IATA。
- * 修复：下拉绝对定位不挤占布局、触屏点击不丢失、空态提示。
+ * 边输入边出联想；空输入不展开整库列表（避免一点击就铺开十几条）。
  */
 import { computed, ref, nextTick } from 'vue';
 import { searchAirports, type Airport } from '@railvista/shared';
@@ -18,30 +18,33 @@ const text = ref('');
 const open = ref(false);
 const boxRef = ref<HTMLElement | null>(null);
 
-const selected = computed(() => (props.modelValue ? text.value : ''));
+const query = computed(() => text.value.trim());
 const results = computed<Airport[]>(() => {
-  if (!open.value) return [];
-  return searchAirports(text.value, 15);
+  if (!open.value || !query.value) return [];
+  return searchAirports(query.value, 8);
 });
+/** 有输入且应展示下拉（有命中或空态提示） */
+const listVisible = computed(() => open.value && query.value.length > 0);
 
 function labelOf(a: Airport): string {
   return `${a.city} ${a.short}`;
 }
 
 function onFocus() {
-  open.value = true;
+  /* 仅已有关键字时重开联想；空白聚焦不铺整表 */
+  if (query.value) open.value = true;
 }
 
 function onInput(e: Event) {
   text.value = (e.target as HTMLInputElement).value;
-  open.value = true;
-  if (text.value === '') emit('update:modelValue', '');
+  open.value = query.value.length > 0;
+  if (!text.value) emit('update:modelValue', '');
 }
 
 function onClear() {
   text.value = '';
   emit('update:modelValue', '');
-  open.value = true;
+  open.value = false;
   nextTick(() => {
     (boxRef.value?.querySelector('input') as HTMLInputElement | null)?.focus();
   });
@@ -67,9 +70,9 @@ function onBlur() {
 </script>
 
 <template>
-  <div class="af">
+  <div class="af" :class="{ 'is-suggest-open': listVisible }">
     <label class="af__label">{{ label }}</label>
-    <div ref="boxRef" class="af__box" :class="{ 'is-open': open && results.length > 0 }">
+    <div ref="boxRef" class="af__box" :class="{ 'is-open': listVisible && results.length > 0 }">
       <svg class="af__icon" viewBox="0 0 24 24" width="16" height="16">
         <path fill="currentColor" d="M21 15.4v-2l-8-5V3.5a1.5 1.5 0 00-3 0V8.4l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-6.1z"/>
       </svg>
@@ -86,8 +89,8 @@ function onBlur() {
       </button>
       <span v-if="modelValue" class="af__code">{{ modelValue }}</span>
     </div>
-    <ul v-show="open && (results.length > 0 || text.length > 0)" class="af__list">
-      <li v-if="results.length === 0 && text.length > 0" class="af__empty">
+    <ul v-show="listVisible" class="af__list">
+      <li v-if="results.length === 0" class="af__empty">
         <span>未找到匹配机场</span>
       </li>
       <li
@@ -149,7 +152,8 @@ function onBlur() {
   border-radius: var(--radius-sm);
 }
 .af__list {
-  position: absolute; left: 0; right: 0; z-index: 30;
+  /* 卡内层级；跨卡压不住兄弟 .rv-card（isolation），由 TicketHome :has(.is-suggest-open) 抬整卡 */
+  position: absolute; left: 0; right: 0; z-index: 40;
   top: calc(100% + 4px);
   max-height: 280px; overflow-y: auto;
   margin: 0; padding: 6px;

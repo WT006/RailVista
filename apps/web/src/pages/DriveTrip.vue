@@ -273,8 +273,17 @@ const focusBbox = computed<[number, number, number, number]>(() => {
     if (y > maxY) maxY = y;
   };
   for (const [lng, lat] of coords) absorb(lng, lat);
-  // 未贯通段必须纳入取景；取景只跟路线几何，勿被离线景点主导 bbox（invariants §5）
+  // 未贯通段取景收紧（2026-10-18）：旧实现把全部散段点纳入 bbox，X/Y 编号省内复用的
+  // 一条乡道常带十几段 1~15km 散段，联动进去后主链被挤成小线（「还是很差」的观感病根）。
+  // 改为：主链框外扩 1/2 幅为入框边界，散段中心落在界内的才 absorb——贴链散段（断笔
+  // 缝合候选）保留在取景里；远散段照画虚线但不再主导取景，诚实呈现不变。
+  const padW = (maxX - minX) * 0.5 + 0.05;
+  const padH = (maxY - minY) * 0.5 + 0.05;
   for (const seg of roadRoute.value?.segments ?? []) {
+    if (!seg.length) continue;
+    const mid = seg[Math.floor(seg.length / 2)]!;
+    const [scx, scy] = lngLatToViewBox(mid[0], mid[1]);
+    if (scx < minX - padW || scx > maxX + padW || scy < minY - padH || scy > maxY + padH) continue;
     for (const pt of seg) absorb(pt[0], pt[1]);
   }
 

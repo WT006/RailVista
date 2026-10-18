@@ -24,6 +24,15 @@ export const TRIP_GLOW_STROKE = '#e0915a';
 /** 行程地图：线路高亮描边 */
 export const TRIP_HIGHLIGHT_STROKE = '#8f7ae8';
 
+/** 天象聚焦路段：金色时刻（与 tokens --warning 同值） */
+export const TRIP_SKY_GOLDEN_STROKE = '#e0b155';
+
+/** 天象聚焦路段：蓝色时刻（与 tokens --info 同值） */
+export const TRIP_SKY_BLUE_STROKE = '#7fb4d8';
+
+/** 天象聚焦路段：日出/日落（与 tokens --danger 同值） */
+export const TRIP_SKY_SUN_STROKE = '#e0765c';
+
 /** 未选中线路网络描边（低饱和灰蓝） */
 export const ATLAS_NETWORK_STROKE = '#7a8494';
 

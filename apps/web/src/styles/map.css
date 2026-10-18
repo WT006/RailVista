@@ -1282,6 +1282,135 @@ html:has(.drive-map-page) #app {
   color: var(--accent-hover);
 }
 
+/* 桌面：时间轴并入右侧控件列（与定位/卫星/天象同宽同风格） */
+.sky-timeline-btn {
+  position: fixed;
+  right: calc(10px + var(--safe-right));
+  bottom: calc(var(--bottom-overlay) + 162px);
+  z-index: 101;
+  box-sizing: border-box;
+  width: 72px;
+  height: 32px;
+  padding: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--elev-float);
+}
+
+.sky-timeline-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-1);
+}
+
+.sky-timeline-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 手机天象短条：贴底栏上方；桌面不展示（改走右侧按钮列） */
+.sky-peek {
+  display: none;
+  position: absolute;
+  left: calc(var(--gutter) + var(--safe-left, 0px));
+  right: auto;
+  bottom: calc(var(--bottom-overlay, 130px) + 6px);
+  z-index: 105;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  max-width: calc(100% - var(--gutter) - 88px - var(--safe-right, 0px));
+  padding: 6px 8px 6px 10px;
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-0) 90%, var(--surface-lift));
+  backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur-tile)) saturate(var(--glass-saturate));
+  box-shadow: var(--elev-float);
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+.sky-peek__kicker {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  color: var(--accent-hover);
+  letter-spacing: 0.02em;
+}
+
+.sky-peek__actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sky-peek__list,
+.sky-peek__exit {
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sky-peek__list {
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.sky-peek__list:hover {
+  border-color: var(--accent);
+  color: var(--text-1);
+}
+
+.sky-peek__exit:hover {
+  background: var(--surface-3);
+  color: var(--text-1);
+}
+
+.sky-peek__list:focus-visible,
+.sky-peek__exit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ≤640：手机用底栏短条；＞640：用右侧「时间轴」按钮 */
+@media (max-width: 640px) {
+  .sky-peek {
+    display: flex;
+  }
+
+  .sky-timeline-btn {
+    display: none !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .sky-timeline-btn {
+    display: inline-flex;
+  }
+}
+
 .legend {
   position: fixed;
   right: calc(10px + var(--safe-right));
@@ -1493,6 +1622,21 @@ html:has(.drive-map-page) #app {
   height: 6px;
 }
 
+/* 聚焦看点：手机也显示文字胶囊，避免只剩小圆点 */
+.sky-marker--focus .sky-marker__text {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 8px;
+  border: 1px solid var(--line-accent);
+  background: color-mix(in srgb, var(--surface-0) 92%, var(--accent-soft));
+}
+
+.sky-marker--focus .sky-marker__dot {
+  width: 9px;
+  height: 9px;
+  border-width: 2px;
+}
+
 .train-marker {
   position: relative;
   width: 16px;
@@ -1663,6 +1807,12 @@ html:has(.drive-map-page) #app {
 
   .sky-btn {
     bottom: calc(var(--bottom-overlay) + var(--map-controls-lift, 158px) + 76px);
+  }
+
+  /* 桌面：时间轴叠在天象按钮上方（同列） */
+  .sky-timeline-btn {
+    display: inline-flex;
+    bottom: calc(var(--bottom-overlay) + var(--map-controls-lift, 158px) + 114px);
   }
 
   .bottom-panel .meta {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 天象观景面板：选定铁路线后按发车时间重算整条线的
+ * 天象观景面板：按地图页发车时间重算整条线的
  * 日出日落 / 朝晚霞 / 蓝金时刻 / 月相月出落 / 光污染 / 观景指数时间轴。
  */
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -12,7 +12,6 @@ import {
   computeRimeIndex,
   computeRainbowIndex,
   computeViewScore,
-  estimateLightPollution,
   findMeteorShowers,
   formatTime,
   moonPhase,
@@ -29,7 +28,6 @@ import {
   type Stop,
 } from '@railvista/shared';
 import { api } from '../api/client';
-import { toDatetimeLocalValue, fromDatetimeLocalValue } from '@railvista/shared';
 
 const props = defineProps<{
   open: boolean;
@@ -40,7 +38,7 @@ const props = defineProps<{
   lengthKm: number;
   stops: Stop[];
   spots: ScenicSpot[];
-  /** 当前生效发车/到达（绝对 ms） */
+  /** 当前生效发车/到达（绝对 ms）；与地图页发车时间同步，面板内不可改 */
   departureMs: number;
   arrivalMs: number;
   /** 图定基准发车 → 实际发车的整体偏移 */
@@ -48,14 +46,24 @@ const props = defineProps<{
   compact: boolean;
 }>();
 
+/** 点时间轴/日月时刻 → 父级收起面板并高亮对应路段 */
+export type SkyFocusPayload = {
+  id: string;
+  kind: string;
+  title: string;
+  lng: number;
+  lat: number;
+  startKm?: number;
+  endKm?: number;
+  startMs?: number;
+  endMs?: number;
+};
+
 const emit = defineEmits<{
   (e: 'close'): void;
-  /** 地图定位到事件点 */
-  (e: 'focus', payload: { lng: number; lat: number }): void;
+  (e: 'focus', payload: SkyFocusPayload): void;
   /** 时间轴算完（父级画地图标注/路段，含各片段指数） */
   (e: 'result', payload: SkyMapResult | null): void;
-  /** 用户改发车时间（先落 prefs，再由父级回传新 departureMs 触发重算） */
-  (e: 'depart-change', iso: string): void;
 }>();
 
 const computing = ref(false);
@@ -63,7 +71,6 @@ const errorMsg = ref('');
 const timeline = ref<SkyTripResult | null>(null);
 const scores = ref<Record<string, SkyIndex>>({});
 const metByPoint = ref<Record<string, SkyMetSample | undefined>>({});
-const departInput = ref('');
 let computeSeq = 0;
 
 /** 片段 → 指数类型 */
@@ -116,7 +123,6 @@ const displayEpisodes = computed<SkyEpisode[]>(() => {
 
 const moments = computed<SkyMoment[]>(() => timeline.value?.moments ?? []);
 const moonInfo = computed(() => timeline.value?.moon ?? null);
-const lightInfo = computed(() => timeline.value?.light ?? null);
 
 /** 时段文案：17:32~18:05（跨天补「次日」） */
 function rangeLabel(startMs: number, endMs: number): string {
@@ -129,6 +135,7 @@ function rangeLabel(startMs: number, endMs: number): string {
   return `${mk(d0)}~${mk(new Date(endMs))}`;
 }
 
+/** 仅跨天时展示标签；当天行程省略「当天」以压缩行高 */
 function dayTag(ms: number): string {
   const dep = new Date(props.departureMs);
   const d = new Date(ms);
@@ -137,26 +144,13 @@ function dayTag(ms: number): string {
       new Date(dep.getFullYear(), dep.getMonth(), dep.getDate()).getTime()) /
       86_400_000,
   );
-  return diff === 0 ? '当天' : diff === 1 ? '次日' : `第${diff + 1}天`;
-}
-
-function bandText(idx: SkyIndex | undefined): string {
-  if (!idx) return '';
-  return idx.score >= 75 ? '极佳' : idx.score >= 55 ? '不错' : idx.score >= 35 ? '一般' : '较差';
+  if (diff === 0) return '';
+  return diff === 1 ? '次日' : `第${diff + 1}天`;
 }
 
 function sideGlyph(side: string): string {
   return side === 'right' ? '→' : '←';
 }
-
-/** 精选 3 个最佳看点 */
-const topPicks = computed(() => {
-  return displayEpisodes.value
-    .map((e) => ({ e, score: scores.value[e.id]?.score ?? 0 }))
-    .filter((x) => ['dawnGlow', 'duskGlow', 'goldenMorning', 'goldenEvening', 'sunrise', 'sunset'].includes(x.e.kind))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
-});
 
 const skyExtras = computed(() => {
   const keys = Object.keys(metByPoint.value);
@@ -273,35 +267,39 @@ async function compute() {
   }
 }
 
-watch(
-  () => props.open,
-  (open) => {
-    if (open) {
-      departInput.value = toDatetimeLocalValue(new Date(props.departureMs));
-      if (!timeline.value) void compute();
-    }
-  },
-);
-
+/** 天象模式挂载即算（不必等面板展开）；发车变化同步重算地图层 */
 watch(
   () => [props.departureMs, props.arrivalMs, props.lengthKm],
   () => {
-    departInput.value = toDatetimeLocalValue(new Date(props.departureMs));
-    if (props.open) void compute();
+    void compute();
   },
+  { immediate: true },
 );
 
-function onRecompute() {
-  const iso = fromDatetimeLocalValue(departInput.value);
-  if (iso) {
-    const ms = new Date(iso).getTime();
-    if (Number.isFinite(ms) && ms !== props.departureMs) emit('depart-change', iso);
-  }
-  void compute();
+function focusEpisode(e: SkyEpisode) {
+  emit('focus', {
+    id: e.id,
+    kind: e.kind,
+    title: e.title,
+    lng: e.lng,
+    lat: e.lat,
+    startKm: e.startKm,
+    endKm: e.endKm,
+    startMs: e.startMs,
+    endMs: e.endMs,
+  });
 }
 
-function focusEvent(payload: { lng: number; lat: number }) {
-  emit('focus', payload);
+function focusMoment(m: SkyMoment, index: number) {
+  emit('focus', {
+    id: `moment-${m.kind}-${index}`,
+    kind: m.kind,
+    title: m.title,
+    lng: m.lng,
+    lat: m.lat,
+    startMs: m.atMs,
+    endMs: m.atMs,
+  });
 }
 
 /** 浮层惯例：Esc 关闭 */
@@ -316,29 +314,29 @@ defineExpose({ compute });
 </script>
 
 <template>
-  <aside v-if="open" class="sky-panel" :class="{ 'is-compact': compact }" aria-label="天象观景">
+  <!-- v-show：天象模式常驻挂载，收起面板时保留计算结果，避免重算 -->
+  <aside
+    v-show="open"
+    class="sky-panel"
+    :class="{ 'is-compact': compact }"
+    :aria-hidden="open ? undefined : 'true'"
+    aria-label="天象观景"
+  >
     <header class="sky-head">
       <div>
         <p class="sky-eyebrow">SKY JOURNEY</p>
-        <h2 class="sky-title">天象观景</h2>
+        <h2 class="sky-title">
+          天象观景
+          <span v-if="computing" class="sky-busy" aria-live="polite">计算中…</span>
+        </h2>
         <p class="sky-route">{{ trainCode }} · {{ fromName }} → {{ toName }}</p>
       </div>
       <button type="button" class="sky-close" aria-label="关闭天象观景" @click="emit('close')">×</button>
     </header>
 
-    <div class="sky-controls">
-      <label class="sky-depart">
-        <span>发车</span>
-        <input v-model="departInput" type="datetime-local" />
-      </label>
-      <button type="button" class="sky-recompute" :disabled="computing" @click="onRecompute">
-        {{ computing ? '计算中…' : '重新计算' }}
-      </button>
-    </div>
-
     <p v-if="errorMsg" class="sky-error" role="alert" aria-live="polite">{{ errorMsg }}</p>
 
-    <!-- 头部/发车固定，正文可滚：避免 chips 占高后日月时刻被 overflow:hidden 裁切 -->
+    <!-- 头部固定，正文可滚：避免 chips 占高后日月时刻被 overflow:hidden 裁切 -->
     <div v-if="timeline" class="sky-body">
       <div class="sky-chips">
         <div class="sky-chip">
@@ -373,7 +371,7 @@ defineExpose({ compute });
           :key="i"
           type="button"
           class="sky-moment"
-          @click="focusEvent(m)"
+          @click="focusMoment(m, i)"
         >
           <span class="sky-moment__t">{{ formatTime(new Date(m.atMs)) }}</span>
           <span class="sky-moment__n">{{ m.title }}</span>
@@ -382,55 +380,33 @@ defineExpose({ compute });
         <p v-if="!moments.length" class="sky-empty">本次行程区间内没有日出/日落/月出/月落</p>
       </div>
 
-      <section v-if="topPicks.length" class="sky-picks" aria-label="最佳看点">
-        <h3 class="sky-h3">最佳看点</h3>
-        <button
-          v-for="p in topPicks"
-          :key="p.e.id"
-          type="button"
-          class="sky-pick"
-          @click="focusEvent(p.e)"
-        >
-          <span class="sky-pick__badge" :class="KIND_CLASS[p.e.kind]">{{ KIND_GLYPH[p.e.kind] }}</span>
-          <span class="sky-pick__main">
-            <strong>{{ p.e.title }}</strong>
-            <em>{{ rangeLabel(p.e.startMs, p.e.endMs) }} · {{ p.e.nearName || '沿途' }}</em>
-          </span>
-          <span class="sky-pick__side">{{ sideGlyph(p.e.sunSide.side) }} {{ p.e.sunSide.label }}</span>
-          <span class="sky-pick__score" :class="`b-${scores[p.e.id]?.band ?? 'fair'}`">{{ p.score }}</span>
-        </button>
-      </section>
-
       <section class="sky-timeline" aria-label="天象时间轴">
         <h3 class="sky-h3">时间轴</h3>
         <p v-if="!displayEpisodes.length" class="sky-empty">本次行程以白天行驶为主，没有突出的天象看点</p>
         <ol class="sky-list">
           <li v-for="e in displayEpisodes" :key="e.id">
-            <button type="button" class="sky-item" @click="focusEvent(e)">
-              <span class="sky-gutter" :class="KIND_CLASS[e.kind]" aria-hidden="true"></span>
+            <button type="button" class="sky-item" @click="focusEpisode(e)">
               <span class="sky-item__glyph" :class="KIND_CLASS[e.kind]" aria-hidden="true">{{ KIND_GLYPH[e.kind] }}</span>
               <span class="sky-item__main">
                 <span class="sky-item__row">
                   <strong>{{ e.title }}</strong>
-                  <em class="sky-item__day">{{ dayTag(e.startMs) }}</em>
+                  <em v-if="dayTag(e.startMs)" class="sky-item__day">{{ dayTag(e.startMs) }}</em>
+                  <span class="sky-item__time">{{ rangeLabel(e.startMs, e.endMs) }}</span>
+                  <span class="sky-side" :class="e.sunSide.side === 'right' ? 'is-right' : 'is-left'">
+                    {{ sideGlyph(e.sunSide.side) }}{{ e.sunSide.side === 'right' ? '右' : '左' }}
+                  </span>
                 </span>
-                <span class="sky-item__time">{{ rangeLabel(e.startMs, e.endMs) }}</span>
                 <span class="sky-item__meta">
                   {{ e.nearName || '沿途' }} · 太阳{{ e.sunSide.label }}
                   <template v-if="scoreKind(e.kind) === 'star'"> · 月亮{{ e.moonSide.side === 'right' ? '右' : '左' }}</template>
                   <template v-if="e.galCenter && e.galCenter.altDeg > -5">
                     · 银心{{ e.galCenter.side.side === 'right' ? '右' : '左' }}侧{{ e.galCenter.altDeg > 5 ? ` ${Math.round(e.galCenter.altDeg)}°` : '（低空）' }}
                   </template>
+                  <template v-if="scores[e.id]">
+                    · <span class="sky-score" :class="`b-${scores[e.id]!.band}`">{{ scores[e.id]!.score }}</span>
+                    <span v-if="scores[e.id]!.note" class="sky-note"> · {{ scores[e.id]!.note }}</span>
+                  </template>
                 </span>
-              </span>
-              <span class="sky-item__right">
-                <span class="sky-side" :class="e.sunSide.side === 'right' ? 'is-right' : 'is-left'">
-                  {{ sideGlyph(e.sunSide.side) }}{{ e.sunSide.side === 'right' ? '右' : '左' }}
-                </span>
-                <span v-if="scores[e.id]" class="sky-score" :class="`b-${scores[e.id]!.band}`">
-                  {{ scores[e.id]!.score }} · {{ bandText(scores[e.id]) }}
-                </span>
-                <span v-if="scores[e.id]" class="sky-note">{{ scores[e.id]!.note }}</span>
               </span>
             </button>
           </li>
@@ -438,9 +414,10 @@ defineExpose({ compute });
       </section>
 
       <footer class="sky-foot">
-        <p>指数由沿途逐时气象（云量分层/能见度/湿度）与天文条件合成；光污染为城市灯光影响场估算。</p>
+        <p>指数由沿途逐时气象与天文条件合成；光污染为城市灯光影响场估算。</p>
       </footer>
     </div>
+    <p v-else-if="computing" class="sky-empty sky-empty--pad">正在按地图发车时间计算天象…</p>
   </aside>
 </template>
 
@@ -449,13 +426,17 @@ defineExpose({ compute });
   position: absolute;
   top: calc(var(--top-overlay, 88px) + var(--safe-top, 0px));
   right: calc(var(--gutter) + var(--safe-right, 0px));
-  bottom: calc(var(--bottom-overlay, 130px) + var(--safe-bottom, 0px));
-  width: min(430px, calc(100vw - 2 * var(--gutter)));
+  bottom: auto;
+  width: min(380px, calc(100vw - 2 * var(--gutter)));
+  max-height: min(
+    62vh,
+    calc(100dvh - var(--top-overlay, 88px) - var(--bottom-overlay, 130px) - var(--safe-top, 0px) - var(--safe-bottom, 0px) - 24px)
+  );
   z-index: 110;
   display: flex;
   flex-direction: column;
-  gap: var(--gap-stack);
-  padding: var(--pad-card);
+  gap: var(--space-2);
+  padding: var(--space-3);
   background: var(--surface-1);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-lg);
@@ -479,7 +460,7 @@ defineExpose({ compute });
   overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  gap: var(--gap-stack);
+  gap: var(--space-2);
   padding-right: 2px;
   -webkit-overflow-scrolling: touch;
 }
@@ -489,6 +470,7 @@ defineExpose({ compute });
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--gap-inline);
+  flex: none;
 }
 
 .sky-eyebrow {
@@ -501,24 +483,33 @@ defineExpose({ compute });
 
 .sky-title {
   margin: 2px 0 0;
-  font-size: var(--fs-h1);
+  font-size: var(--fs-h2, 18px);
   color: var(--text-1);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.sky-busy {
+  font-size: var(--fs-cap);
+  font-weight: 500;
+  color: var(--text-3);
 }
 
 .sky-route {
-  margin: var(--space-1) 0 0;
-  font-size: var(--fs-meta);
+  margin: 2px 0 0;
+  font-size: var(--fs-cap);
   color: var(--text-2);
 }
 
 .sky-close {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: 1px solid var(--line-default);
   border-radius: var(--radius-full);
   background: var(--surface-2);
   color: var(--text-2);
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
@@ -530,62 +521,10 @@ defineExpose({ compute });
 }
 
 .sky-close:focus-visible,
-.sky-recompute:focus-visible,
 .sky-moment:focus-visible,
-.sky-pick:focus-visible,
-.sky-item:focus-visible,
-.sky-depart input:focus-visible {
+.sky-item:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-}
-
-.sky-controls {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--gap-inline);
-}
-
-.sky-depart {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  font-size: var(--fs-cap);
-  color: var(--text-3);
-}
-
-.sky-depart input {
-  width: 100%;
-  min-height: 40px;
-  padding: 0 var(--space-3);
-  background: var(--surface-2);
-  border: 1px solid var(--line-default);
-  border-radius: var(--radius-sm);
-  color: var(--text-1);
-  font-size: var(--fs-input);
-  color-scheme: dark;
-}
-
-.sky-recompute {
-  min-height: 40px;
-  padding: 0 var(--space-4);
-  background: var(--accent);
-  border: none;
-  border-radius: var(--radius-lg);
-  color: var(--text-on-accent);
-  font-size: var(--fs-meta);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-standard);
-}
-
-.sky-recompute:hover:not(:disabled) {
-  background: var(--accent-hover);
-}
-
-.sky-recompute:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 
 .sky-error {
@@ -597,18 +536,18 @@ defineExpose({ compute });
 .sky-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 .sky-chip {
   display: inline-flex;
   align-items: baseline;
   gap: var(--space-1);
-  padding: var(--space-1) var(--space-3);
+  padding: 2px var(--space-2);
   background: var(--surface-2);
   border: 1px solid var(--line-hairline);
   border-radius: var(--radius-full);
-  font-size: var(--fs-cap);
+  font-size: var(--fs-micro);
 }
 
 .sky-chip__k {
@@ -631,19 +570,19 @@ defineExpose({ compute });
 .sky-moments {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 .sky-moment {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
   background: var(--surface-sunken);
   border: 1px solid var(--line-hairline);
   border-radius: var(--radius-sm);
   color: var(--text-2);
-  font-size: var(--fs-cap);
+  font-size: var(--fs-micro);
   cursor: pointer;
   transition: border-color var(--dur-fast) var(--ease-standard);
 }
@@ -664,80 +603,26 @@ defineExpose({ compute });
 }
 
 .sky-h3 {
-  margin: 0 0 var(--space-2);
-  font-size: var(--fs-h3);
+  margin: 0 0 var(--space-1);
+  font-size: var(--fs-meta);
   color: var(--text-1);
 }
 
-.sky-picks {
-  padding: var(--space-3);
-  background: var(--surface-sunken);
-  border-radius: var(--radius-md);
-}
-
-.sky-pick {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  padding: var(--space-2) 0;
-  background: none;
-  border: none;
-  border-top: 1px solid var(--line-hairline);
-  color: var(--text-2);
-  text-align: left;
-  cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-standard);
-}
-
-.sky-pick:hover {
-  background: var(--fill-subtle);
-}
-
-.sky-pick:first-of-type {
-  border-top: none;
-}
-
-.sky-pick__badge,
 .sky-item__glyph {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   border-radius: var(--radius-full);
-  font-size: var(--fs-cap);
+  font-size: var(--fs-micro);
   font-weight: 600;
   flex: none;
 }
 
-.sky-pick__main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.sky-pick__main strong {
-  color: var(--text-1);
-  font-size: var(--fs-meta);
-}
-
-.sky-pick__main em {
-  font-style: normal;
-  font-size: var(--fs-cap);
-  color: var(--text-3);
-}
-
-.sky-pick__side {
-  font-size: var(--fs-cap);
-  color: var(--text-2);
-}
-
-.sky-pick__score,
 .sky-score {
   font-family: var(--font-display);
-  font-size: var(--fs-meta);
+  font-size: var(--fs-cap);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -755,10 +640,10 @@ defineExpose({ compute });
 
 .sky-item {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
+  align-items: center;
+  gap: var(--space-2);
   width: 100%;
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-1) 0;
   background: none;
   border: none;
   border-bottom: 1px solid var(--line-hairline);
@@ -772,66 +657,70 @@ defineExpose({ compute });
   background: var(--fill-subtle);
 }
 
-.sky-gutter {
-  width: 4px;
-  align-self: stretch;
-  border-radius: var(--radius-full);
-  flex: none;
-}
-
 .sky-item__main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
 }
 
 .sky-item__row {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
 }
 
 .sky-item__row strong {
   color: var(--text-1);
-  font-size: var(--fs-body);
+  font-size: var(--fs-meta);
+  flex: none;
+  max-width: 42%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sky-item__day {
   font-style: normal;
   font-size: var(--fs-micro);
   color: var(--text-3);
-  padding: 1px var(--space-2);
+  padding: 0 var(--space-1);
   border: 1px solid var(--line-hairline);
   border-radius: var(--radius-full);
+  flex: none;
 }
 
 .sky-item__time {
   font-family: var(--font-display);
-  font-size: var(--fs-meta);
+  font-size: var(--fs-cap);
   font-variant-numeric: tabular-nums;
   color: var(--text-2);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sky-item__meta {
-  font-size: var(--fs-cap);
+  font-size: var(--fs-micro);
   color: var(--text-3);
-}
-
-.sky-item__right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  max-width: 45%;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sky-side {
-  padding: 1px var(--space-2);
+  margin-left: auto;
+  padding: 0 var(--space-1);
   border-radius: var(--radius-full);
-  font-size: var(--fs-cap);
+  font-size: var(--fs-micro);
   font-weight: 600;
+  flex: none;
+  line-height: 1.5;
 }
 
 .sky-side.is-right {
@@ -847,7 +736,6 @@ defineExpose({ compute });
 .sky-note {
   font-size: var(--fs-micro);
   color: var(--text-3);
-  text-align: right;
 }
 
 .b-excellent {
@@ -903,9 +791,13 @@ defineExpose({ compute });
   color: var(--text-3);
 }
 
+.sky-empty--pad {
+  padding: var(--space-2) 0;
+}
+
 .sky-foot {
   border-top: 1px solid var(--line-hairline);
-  padding-top: var(--space-2);
+  padding-top: var(--space-1);
 }
 
 .sky-foot p {
@@ -923,15 +815,15 @@ defineExpose({ compute });
 }
 
 @media (max-width: 640px) {
-  /* 竖屏手机：面板贴底部成卡片（顶部留给车次徽章区），限高不遮地图 */
+  /* 竖屏手机：面板贴底部成卡片，限高留出地图 */
   .sky-panel {
     left: var(--gutter);
     right: var(--gutter);
     top: auto;
     bottom: calc(var(--bottom-overlay, 130px) + var(--safe-bottom, 0px));
     width: auto;
-    max-height: min(62vh, 560px);
-    padding: var(--space-3);
+    max-height: min(48vh, 420px);
+    padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-md);
   }
 
@@ -957,20 +849,8 @@ defineExpose({ compute });
     flex: none;
   }
 
-  /* 手机聚焦"接下来有什么"，最佳看点折叠进时间轴（分数已在列表中） */
-  .sky-picks {
-    display: none;
-  }
-
-  .sky-item__right {
-    max-width: 44%;
-  }
-
-  .sky-note {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
+  .sky-item__row strong {
+    max-width: 38%;
   }
 }
 @media (prefers-reduced-motion: reduce) {

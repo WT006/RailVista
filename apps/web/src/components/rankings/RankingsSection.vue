@@ -11,6 +11,7 @@
  * - 前三名领奖台（①居中通栏，②左③右；金/银/铜低饱和金属色），第 4 名起紧凑列表行；
  * - corridorId === null 条目弱化：无「查看线路」箭头，点击只展开亮点与说明；
  * - 点击有 corridorId 的条目 → /route/:corridorId；
+ * - 专题可选件：导语 lead、关键数据条 stats、条目车次/票价、相关报道 reports（外链，默认露出前 3 篇）；
  * - 末尾一句来源说明。
  */
 import { computed, ref } from 'vue';
@@ -30,6 +31,15 @@ const top3 = computed(() =>
   active.value.items.filter((i) => i.rank <= 3).sort((a, b) => a.rank - b.rank),
 );
 const rest = computed(() => active.value.items.filter((i) => i.rank > 3));
+
+/** 相关报道默认只露前 3 条：卡片住在侧栏，一次铺开十条会把整页撑长。 */
+const REPORT_PREVIEW = 3;
+const reportsExpanded = ref(false);
+const reportTotal = computed(() => active.value.reports?.length || 0);
+const visibleReports = computed(() => {
+  const list = active.value.reports || [];
+  return reportsExpanded.value ? list : list.slice(0, REPORT_PREVIEW);
+});
 
 function medal(rank: number): 'gold' | 'silver' | 'bronze' {
   return rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'bronze';
@@ -75,7 +85,7 @@ function onItemClick(item: RankItem) {
         class="rankings__tab"
         :class="{ 'is-active': r.id === activeId }"
         :aria-selected="r.id === activeId"
-        @click="activeId = r.id; expandedKey = null"
+        @click="activeId = r.id; expandedKey = null; reportsExpanded = false"
       >
         {{ r.title }}
       </button>
@@ -83,9 +93,27 @@ function onItemClick(item: RankItem) {
 
     <Transition name="rank-swap" mode="out-in">
       <div :key="active.id" class="rankings__body">
-        <p class="rankings__source">
+        <!-- 来源可点：口径、年份、原文都在链接里，不让读者二次检索 -->
+        <a
+          v-if="active.source.url"
+          class="rankings__source rankings__source--link"
+          :href="active.source.url"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {{ active.source.name }} · {{ active.source.year }}
-        </p>
+          <span class="rankings__ext" aria-hidden="true">↗</span>
+        </a>
+        <p v-else class="rankings__source">{{ active.source.name }} · {{ active.source.year }}</p>
+
+        <p v-if="active.lead" class="rankings__lead">{{ active.lead }}</p>
+
+        <dl v-if="active.stats?.length" class="rankings__stats">
+          <div v-for="s in active.stats" :key="s.label" class="rank-stat">
+            <dt class="rank-stat__value">{{ s.value }}</dt>
+            <dd class="rank-stat__label">{{ s.label }}</dd>
+          </div>
+        </dl>
 
         <div class="rankings__podium">
           <article
@@ -103,6 +131,10 @@ function onItemClick(item: RankItem) {
             <span class="rank-card__badge">{{ item.rank }}</span>
             <h3 class="rank-card__name">{{ item.name }}</h3>
             <span class="rank-od">{{ item.from }} → {{ item.to }}</span>
+            <span v-if="item.trainNo || item.fare" class="rank-facts">
+              <span v-if="item.trainNo" class="rank-fact rank-fact--key">{{ item.trainNo }} 次</span>
+              <span v-if="item.fare" class="rank-fact">{{ item.fare }}</span>
+            </span>
             <p class="rank-card__tagline">{{ item.tagline }}</p>
             <span v-if="item.corridorId" class="rank-card__go">查看线路 ›</span>
             <span v-else class="rank-card__none">暂无线路地图</span>
@@ -131,6 +163,10 @@ function onItemClick(item: RankItem) {
               <span class="rank-row__line">
                 <span class="rank-row__name">{{ item.name }}</span>
                 <span class="rank-od">{{ item.from }} → {{ item.to }}</span>
+                <span v-if="item.trainNo" class="rank-fact rank-fact--key">{{ item.trainNo }} 次</span>
+              </span>
+              <span v-if="item.fare" class="rank-facts">
+                <span class="rank-fact">{{ item.fare }}</span>
               </span>
               <span class="rank-row__tagline">{{ item.tagline }}</span>
               <span v-if="!item.corridorId && isExpanded(item)" class="rank-row__note">
@@ -140,6 +176,33 @@ function onItemClick(item: RankItem) {
             <span v-if="item.corridorId" class="rank-row__go" aria-hidden="true">›</span>
           </li>
         </ul>
+
+        <!-- 相关报道：官方与央媒的公开报道，让榜单的「国铁专题」口径可回溯 -->
+        <div v-if="reportTotal" class="rankings__reports">
+          <div class="rankings__divider" aria-hidden="true" />
+          <p class="rankings__reports-title">相关报道</p>
+          <ul class="rankings__report-list">
+            <li v-for="rep in visibleReports" :key="rep.url">
+              <a class="report" :href="rep.url" target="_blank" rel="noopener noreferrer">
+                <span class="report__title">{{ rep.title }}</span>
+                <span class="report__meta">
+                  <span>{{ rep.outlet }}<template v-if="rep.date"> · {{ rep.date }}</template></span>
+                  <span class="rankings__ext" aria-hidden="true">↗</span>
+                </span>
+                <span v-if="rep.summary" class="report__summary">{{ rep.summary }}</span>
+              </a>
+            </li>
+          </ul>
+          <button
+            v-if="reportTotal > REPORT_PREVIEW"
+            type="button"
+            class="rankings__reports-more"
+            :aria-expanded="reportsExpanded"
+            @click="reportsExpanded = !reportsExpanded"
+          >
+            {{ reportsExpanded ? '收起报道' : `展开全部 ${reportTotal} 篇报道` }}
+          </button>
+        </div>
       </div>
     </Transition>
 
@@ -263,6 +326,98 @@ function onItemClick(item: RankItem) {
   font-size: var(--fs-micro);
   line-height: var(--lh-normal);
   color: var(--text-3);
+}
+
+.rankings__source--link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: start;
+  text-decoration: none;
+  transition: color var(--dur-micro) var(--ease-standard);
+}
+
+.rankings__source--link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.rankings__ext {
+  font-size: var(--fs-micro);
+  line-height: 1;
+}
+
+/* ── 专题导语 ── */
+.rankings__lead {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 2px solid var(--line-accent);
+  background: var(--fill-accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-2);
+  font-size: var(--fs-cap);
+  line-height: var(--lh-snug);
+}
+
+/* ── 关键数据条：只放来源可核验的数字 ── */
+/* 6 枚数据条：112px 下限让侧栏（≈420px 内容宽）稳定排成 3×2，窄屏自动降为 2×3，
+   避免出现「最后一行只有一枚」的孤块。 */
+.rankings__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.rank-stat {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-sunken);
+}
+
+.rank-stat__value {
+  margin: 0;
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  color: var(--text-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.rank-stat__label {
+  margin: 0;
+  font-size: var(--fs-micro);
+  line-height: var(--lh-snug);
+  color: var(--text-3);
+}
+
+/* ── 条目事实徽章：车次 / 票价 ── */
+.rank-facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.rank-fact {
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-default);
+  background: var(--fill-subtle);
+  color: var(--text-2);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-snug);
+}
+
+.rank-fact--key {
+  border-color: var(--line-accent);
+  background: var(--fill-accent);
+  color: var(--accent-hover);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── 前三名领奖台：① 通栏居中置顶；②③ 左右并排略矮 ── */
@@ -574,6 +729,103 @@ function onItemClick(item: RankItem) {
   color: var(--accent);
   font-size: var(--fs-body);
   line-height: 1;
+}
+
+/* ── 相关报道 ── */
+.rankings__reports {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.rankings__reports-title {
+  margin: 0;
+  font-size: var(--fs-cap);
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+/* 展开 / 收起：纯文字按钮，不抢报道链接的视觉权重 */
+.rankings__reports-more {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rankings__reports-more:focus-visible {
+  border-radius: var(--radius-xs);
+  box-shadow: var(--focus-ring);
+}
+
+.rankings__report-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.report {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-sunken);
+  text-decoration: none;
+  transition:
+    transform var(--dur-micro) var(--ease-standard),
+    border-color var(--dur-micro) var(--ease-standard),
+    background-color var(--dur-micro) var(--ease-standard);
+}
+
+.report__title {
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  color: var(--text-2);
+}
+
+.report__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+}
+
+.report__summary {
+  font-size: var(--fs-micro);
+  line-height: var(--lh-snug);
+  color: var(--text-3);
+}
+
+.report:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .report:hover {
+    transform: translateY(-1px);
+    border-color: var(--line-accent);
+    background: var(--fill-subtle);
+  }
+
+  .report:hover .report__title {
+    color: var(--accent-hover);
+  }
+
+  .rankings__reports-more:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+  }
 }
 
 /* ── 来源脚注 ── */

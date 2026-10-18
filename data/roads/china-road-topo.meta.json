@@ -1,7 +1,7 @@
 {
  "version": 1,
- "nodeCount": 1499132,
- "edgeCount": 3746549,
+ "nodeCount": 1498548,
+ "edgeCount": 3706263,
  "roadKeys": [
   "G0111",
   "G0121",
@@ -15284,8 +15284,8 @@
   "黑龙江:Y8",
   "黑龙江:Y86"
  ],
- "crossLinks": 2030274,
- "mainCompNodes": 1476489,
+ "crossLinks": 1989746,
+ "mainCompNodes": 1472573,
  "generatedAt": "2026-10-13",
  "note": "干线可通行图（国道+高速+省道主干，城市内部道路不入库）；边权含等级系数（高速1.0/国道1.15/省道1.35），跨线边含换乘惩罚 1.5"
 }

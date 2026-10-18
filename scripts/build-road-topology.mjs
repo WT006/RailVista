@@ -82,7 +82,7 @@ for (const f of files) {
   const flag = cls === 'expressway' ? 1 : cls === 'national' ? 2 : cls === 'provincial' ? 4 : cls === 'county' ? 8 : 16;
 
   // 采样建链：逐点，但跳过过密点（≥200m 才成边，控制边数）
-  const buildEdges = (pts) => {
+  const buildEdges = (pts, lineOverride) => {
     if (!Array.isArray(pts) || pts.length < 2) return;
     let prev = nodeIdOf(pts[0][0], pts[0][1]);
     let prevPt = pts[0];
@@ -91,7 +91,7 @@ for (const f of files) {
       const d = haversineKm([prevPt[0], prevPt[1]], [p[0], p[1]]);
       if (d < 0.2 && i !== pts.length - 1) continue;
       const id = nodeIdOf(p[0], p[1]);
-      addEdge(prev, id, d * coef, flag, line);
+      addEdge(prev, id, d * coef, flag, lineOverride ?? line);
       prev = id;
       prevPt = p;
     }
@@ -100,6 +100,12 @@ for (const f of files) {
   // segments 段建边入拓扑（多段几何的 orphan 段也参与拓扑，提升主分量连通性）
   if (Array.isArray(g.segments)) {
     for (const seg of g.segments) buildEdges(seg);
+  }
+  // detachedSegments（同编号异路段，见 s-detach.mjs）：继续建边保寻路连通，
+  // 但用跨线边哨兵 65535 而非本 key 的 lineId —— prefer 不误命中，
+  // 途经统计 roadKeyOfLine(65535)=undefined 自然跳过。
+  if (Array.isArray(g.detachedSegments)) {
+    for (const seg of g.detachedSegments) buildEdges(seg, 65535);
   }
   roadsUsed += 1;
 }

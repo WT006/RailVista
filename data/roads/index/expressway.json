@@ -709,7 +709,7 @@
    "lengthKm": 1138.4,
    "bbox": [
     97.36221,
-    29.99865,
+    31.71446,
     102.64799,
     37.37009
    ],
@@ -719,7 +719,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "C",
-   "componentCount": 2
+   "componentCount": 1
   },
   {
    "key": "G0616",
@@ -1053,8 +1053,8 @@
    "bbox": [
     109.99478,
     20.04545,
-    123.46679,
-    41.67708
+    121.63256,
+    37.46291
    ],
    "spotCount": 0,
    "hasGeom": true,
@@ -1062,7 +1062,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "C",
-   "componentCount": 2
+   "componentCount": 1
   },
   {
    "key": "G1511",
@@ -1583,10 +1583,10 @@
    "toPlace": "吕梁",
    "lengthKm": 867.1,
    "bbox": [
-    111.14433,
+    112.53202,
     36.65088,
     118.67538,
-    37.52997
+    37.48692
    ],
    "spotCount": 0,
    "hasGeom": true,
@@ -1594,7 +1594,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "C",
-   "componentCount": 2
+   "componentCount": 1
   },
   {
    "key": "G2517",
@@ -1606,7 +1606,7 @@
    "lengthKm": 312.2,
    "bbox": [
     117.79212,
-    24.47913,
+    25.25949,
     118.24067,
     26.39631
    ],
@@ -1616,7 +1616,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "C",
-   "componentCount": 2
+   "componentCount": 1
   },
   {
    "key": "G2518",
@@ -2074,8 +2074,8 @@
    "toPlace": "北海",
    "lengthKm": 3123.1,
    "bbox": [
-    109.1213,
-    21.48211,
+    110.47784,
+    29.0808,
     112.468,
     40.84189
    ],
@@ -2085,7 +2085,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "B",
-   "componentCount": 3
+   "componentCount": 2
   },
   {
    "key": "G5911",
@@ -3772,8 +3772,8 @@
    "lengthKm": 1545.6,
    "bbox": [
     108.93999,
-    31.23045,
-    121.4857,
+    31.73594,
+    120.89313,
     34.34408
    ],
    "spotCount": 0,
@@ -3782,7 +3782,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "A",
-   "componentCount": 3
+   "componentCount": 1
   },
   {
    "key": "G4011",
@@ -4009,8 +4009,8 @@
    "bbox": [
     100.22533,
     26.44667,
-    104.17657,
-    30.57317
+    102.5799,
+    26.85731
    ],
    "spotCount": 0,
    "hasGeom": true,
@@ -4018,7 +4018,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "C",
-   "componentCount": 3
+   "componentCount": 1
   },
   {
    "key": "G4217",
@@ -4053,7 +4053,7 @@
    "bbox": [
     79.7827,
     29.0447,
-    103.04211,
+    96.91767,
     32.88972
    ],
    "spotCount": 0,
@@ -4062,7 +4062,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "C",
-   "componentCount": 3
+   "componentCount": 1
   },
   {
    "key": "G4219",
@@ -4147,7 +4147,7 @@
    "bbox": [
     106.55196,
     29.5624,
-    114.3006,
+    110.34307,
     31.20944
    ],
    "spotCount": 0,
@@ -4156,7 +4156,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "C",
-   "componentCount": 2
+   "componentCount": 1
   },
   {
    "key": "G4231",
@@ -4726,10 +4726,10 @@
    "toPlace": "银川",
    "lengthKm": 1889.8,
    "bbox": [
-    105.59909,
+    110.61053,
     26.07102,
     119.29605,
-    38.48851
+    32.79742
    ],
    "spotCount": 0,
    "hasGeom": true,
@@ -4737,7 +4737,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "B",
-   "componentCount": 2
+   "componentCount": 1
   },
   {
    "key": "G7011",
@@ -4913,8 +4913,8 @@
    "bbox": [
     108.32447,
     22.81817,
-    112.57222,
-    26.89394
+    109.39928,
+    25.22314
    ],
    "spotCount": 0,
    "hasGeom": true,
@@ -4922,7 +4922,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "C",
-   "componentCount": 3
+   "componentCount": 1
   },
   {
    "key": "G76",
@@ -4963,10 +4963,10 @@
    "toPlace": "香格里拉",
    "lengthKm": 852,
    "bbox": [
-    102.1791,
+    102.8799,
     26.02911,
     107.51913,
-    27.89992
+    27.5572
    ],
    "spotCount": 0,
    "hasGeom": true,
@@ -4974,7 +4974,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "C",
-   "componentCount": 2
+   "componentCount": 1
   },
   {
    "key": "G7612",
@@ -6302,7 +6302,7 @@
    "provinces": [],
    "fromPlace": "南昌市绕城高速",
    "toPlace": "南昌市绕城高速",
-   "lengthKm": 1413,
+   "lengthKm": 1413.1,
    "bbox": [
     106.82693,
     26.60251,
@@ -6315,7 +6315,7 @@
    "status": "ok",
    "inOsm": true,
    "precision": "C",
-   "componentCount": 2
+   "componentCount": 1
   },
   {
    "key": "G6002",

@@ -187,10 +187,29 @@ function onCancel() {
   void endLoading('abort');
 }
 
+/** 本地日历 yyyy-MM-dd；勿用 toISOString，+08 零点会被拨成 UTC 前一天 */
+function todayYmd(): string {
+  const n = new Date();
+  const y = n.getFullYear();
+  const mo = String(n.getMonth() + 1).padStart(2, '0');
+  const d = String(n.getDate()).padStart(2, '0');
+  return `${y}-${mo}-${d}`;
+}
+
+function shiftYmd(ymd: string, days: number): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd.trim());
+  const base = m
+    ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+    : new Date();
+  base.setDate(base.getDate() + days);
+  const y = base.getFullYear();
+  const mo = String(base.getMonth() + 1).padStart(2, '0');
+  const d = String(base.getDate()).padStart(2, '0');
+  return `${y}-${mo}-${d}`;
+}
+
 function defaultDate() {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().slice(0, 10);
+  return shiftYmd(todayYmd(), 1);
 }
 
 function refreshRecentUi() {
@@ -381,12 +400,9 @@ async function search() {
   }
 }
 
-/** 空态：换一天重新查 */
+/** 空态：换一天重新查（同步改乘车日期） */
 function retryWithDateShift(days: number) {
-  const base = date.value || defaultDate();
-  const d = new Date(`${base}T00:00:00+08:00`);
-  d.setDate(d.getDate() + days);
-  date.value = d.toISOString().slice(0, 10);
+  date.value = shiftYmd(date.value || todayYmd(), days);
   void search();
 }
 
@@ -1045,13 +1061,12 @@ function goBack() {
 
           <section v-if="showEmptyState" class="empty-state rv-card">
             <p class="empty-state__title">这个区间暂时没有查到直达车次</p>
-            <p class="empty-state__desc">可以换一天看看。</p>
+            <p class="empty-state__desc">
+              乘车日期指发车日；当日已发或在途的车查不到。可改查下一天出发的车次。
+            </p>
             <div class="empty-state__actions">
-              <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(-1)">
-                前一天
-              </button>
               <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(1)">
-                后一天
+                下一天
               </button>
             </div>
           </section>

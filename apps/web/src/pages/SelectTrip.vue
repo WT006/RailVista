@@ -819,7 +819,18 @@ const tripDurationHint = computed(() => {
 });
 
 /** 回溯合成列表（历史/当日已发车兜底）：顶部横幅与列表徽标的依据 */
-const isRetroList = computed(() => trains.value.some((t) => t.retro));
+const hasSimulated = computed(() => trains.value.some((t) => t.retro === 'simulated'));
+const hasHistorical = computed(() => trains.value.some((t) => t.retro === 'historical'));
+
+/** 当日车次运行状态（仅查询日期=今天时计算）：已发车/在途、已到达 */
+function trainStatus(t: TrainSummary): 'departed' | 'arrived' | null {
+  if (!t.departTime || t.date !== todayYmd()) return null;
+  const dep = Date.parse(`${t.date}T${t.departTime}:00+08:00`);
+  if (!Number.isFinite(dep) || Date.now() < dep) return null;
+  const m = /^(\d{1,3}):(\d{2})$/.exec(t.duration || '');
+  const arr = m ? dep + (Number(m[1]) * 60 + Number(m[2])) * 60_000 : NaN;
+  return Number.isFinite(arr) && Date.now() >= arr ? 'arrived' : 'departed';
+}
 
 function goBack() {
   if (loading.value) return;
@@ -1066,7 +1077,7 @@ function goBack() {
           <section v-if="showEmptyState" class="empty-state rv-card">
             <p class="empty-state__title">这个区间暂时没有查到直达车次</p>
             <p class="empty-state__desc">
-              乘车日期指发车日。已发车或在途的车次：按站查询会自动回溯合成时刻（可能不含当日实际全部车次）；直接输入车次号查询全程时刻表，结果更准确。
+              乘车日期指发车日。当天已发车/历史车次会按 12306 当日时刻表自动回溯补全；车次候选来自车站大屏与近期余票列表，个别售罄或隔日开行车次可能缺失，知道车次号时直接输入车次号查询全程时刻表更准确。
             </p>
             <div class="empty-state__actions">
               <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(1)">
@@ -1139,9 +1150,13 @@ function goBack() {
               直达车次
               <span class="train-list__count">{{ trains.length }} 趟</span>
             </h2>
-            <div v-if="isRetroList" class="retro-banner" role="note">
-              <strong>历史回溯</strong>
-              <span>已发车或在途的车次无法查票。以上车次与时刻按 12306 车次时刻表回溯合成，可能不含当日实际全部车次；隔日开行或调图时段或有出入。知道车次号时，直接输车次号查询更准确。</span>
+            <div v-if="hasHistorical" class="retro-banner" role="note">
+              <strong>已发车回溯</strong>
+              <span>含已发车/历史车次：按 12306 当日时刻表回溯（真实计划时刻，标「时刻回溯」），并标注「已发车/已到达」状态。知道车次号时，直接输车次号查询全程时刻表更准确。</span>
+            </div>
+            <div v-if="hasSimulated" class="retro-banner retro-banner--warn" role="note">
+              <strong>时刻模拟</strong>
+              <span>个别车次当日时刻表缺失，已按邻近日期同时刻表平移推算（标「时刻模拟」）。隔日开行或铁路调图时段，实际时刻或有出入。</span>
             </div>
             <div class="train-grid" v-auto-animate>
               <button
@@ -1163,6 +1178,14 @@ function goBack() {
                 <span class="train-card__meta">
                   {{ t.from.name }} → {{ t.to.name }}
                   <template v-if="t.duration"> · 历时 {{ t.duration }}</template>
+                  <template v-if="trainStatus(t)">
+                    ·
+                    <span
+                      class="train-card__status"
+                      :class="{ 'is-arrived': trainStatus(t) === 'arrived' }"
+                      >{{ trainStatus(t) === 'arrived' ? '已到达' : '已发车' }}</span
+                    >
+                  </template>
                   <template v-if="t.retro">
                     ·
                     <span class="train-card__retro" :class="{ 'is-sim': t.retro === 'simulated' }">{{ t.retro === 'simulated' ? '时刻模拟' : '时刻回溯' }}</span>
@@ -1396,6 +1419,29 @@ function goBack() {
   border-color: rgba(148, 163, 184, 0.45);
   color: #cbd5e1;
   background: rgba(148, 163, 184, 0.12);
+}
+/* 当日运行状态：已发车/在途、已到达（仅查询日期=今天时出现） */
+.train-card__status {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid rgba(96, 165, 250, 0.45);
+  border-radius: 999px;
+  color: #93c5fd;
+  background: rgba(96, 165, 250, 0.12);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+.train-card__status.is-arrived {
+  border-color: rgba(148, 163, 184, 0.4);
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.1);
+}
+.retro-banner--warn {
+  border-color: rgba(251, 146, 60, 0.35);
+  background: rgba(251, 146, 60, 0.08);
+}
+.retro-banner--warn strong {
+  color: #fb923c;
 }
 </style>
 

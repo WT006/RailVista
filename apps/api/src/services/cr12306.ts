@@ -310,12 +310,12 @@ function boardHm(v: string | undefined): string {
   return m ? `${String(Number(m[1])).padStart(2, '0')}:${m[2]}` : '';
 }
 
-/** 大屏请求串行队列：保证请求间有最小间隔，避免触发限流 */
+/** 大屏请求串行队列：保证请求间有最小间隔，避免触发限流（429 时 fetchBoardRowsUncached 退避重试） */
 let boardChain: Promise<void> = Promise.resolve();
 let boardLastAt = 0;
 function boardThrottled<T>(fn: () => Promise<T>): Promise<T> {
   const task = boardChain.then(async () => {
-    const wait = boardLastAt + 700 - Date.now();
+    const wait = boardLastAt + envInt('BOARD_MIN_INTERVAL_MS', 300) - Date.now();
     if (wait > 0) await sleep(wait);
     boardLastAt = Date.now();
     return fn();
@@ -426,19 +426,18 @@ export class Cr12306Source implements TrainDataSource {
     // 实测：今天 leftTicket 列表只含此刻之后的车（已发车行不返回），所以今天不能只直查——
     // 必须直查（真实余票行）+ 大屏回溯（当日已发车/售罄车次）合并，按 trainNo 去重。
     if (dayDiffFromToday(date) === 0) {
-      let direct: TrainSummary[] = [];
-      try {
-        direct = await this.fetchTrains(fromSt.telecode, toSt.telecode, date);
-      } catch {
-        /* 直查失败不致命，回溯兜底 */
-      }
+      // 直查与回溯互相独立，并行跑省掉直查的串行等待（冷查询约省 0.5-1.5s）
+      const directTask = this.fetchTrains(fromSt.telecode, toSt.telecode, date).catch(
+        () => [] as TrainSummary[],
+      );
       const retroKey = `retro:${cacheKey}`;
-      const retro = await trainCache.getOrLoad<TrainSummary[]>(
+      const retroTask = trainCache.getOrLoad<TrainSummary[]>(
         retroKey,
         600,
-        () => this.fetchRetroTrains(fromSt, toSt, date),
+        () => this.fetchRetroTrains(fromSt, toSt, date, { cacheKey: retroKey, ttlSec: 600 }),
         { staleWhileRevalidate: swrEnabled(), negativeTtlSec: negativeTtlSec() },
       );
+      const [direct, retro] = await Promise.all([directTask, retroTask]);
       const merged = mergeByTrainNo(direct, retro);
       logMetric('trains.search', {
         key: cacheKey,
@@ -454,7 +453,8 @@ export class Cr12306Source implements TrainDataSource {
       return trainCache.getOrLoad<TrainSummary[]>(
         retroKey,
         7 * 86400,
-        () => this.fetchRetroTrains(fromSt, toSt, date),
+        () =>
+          this.fetchRetroTrains(fromSt, toSt, date, { cacheKey: retroKey, ttlSec: 7 * 86400 }),
         { staleWhileRevalidate: swrEnabled(), negativeTtlSec: negativeTtlSec() },
       );
     }
@@ -565,55 +565,118 @@ export class Cr12306Source implements TrainDataSource {
     fromSt: { telecode: string; name: string },
     toSt: { telecode: string; name: string },
     date: string,
+    opts: { cacheKey?: string; ttlSec?: number } = {},
   ): Promise<TrainSummary[]> {
     const t0 = Date.now();
     const cands: TrainSummary[] = [];
     const seen = new Set<string>();
-    const addAll = (trs: TrainSummary[]): void => {
+    const out: TrainSummary[] = [];
+    const isToday = dayDiffFromToday(date) === 0;
+    // 今天查询时的「发车截止线」：余票候选发车时刻晚于 now+30min 的直接跳过——
+    // 它们必然还在直查（余票列表）结果里，且 30min > 余票缓存 TTL（10min），
+    // 缓存过期重建时它们已临近/发车，会被回溯覆盖，不会漏。
+    const hmToMin = (hm: string): number => {
+      const m = /^(\d{1,2}):(\d{2})$/.exec(hm || '');
+      return m ? Number(m[1]) * 60 + Number(m[2]) : NaN;
+    };
+    const nowMin = hmToMin(new Date(Date.now() + 8 * 3600_000).toISOString().slice(11, 16));
+    const addAll = (trs: TrainSummary[], fromTicket: boolean): void => {
+      // 每路候选限量 80（流式分批加入，不再统一 slice）：后台补全有界，两路合计 ≤160
+      let added = 0;
       for (const tr of trs) {
+        if (added >= 80) break;
         if (seen.has(tr.trainNo)) continue;
+        const dep = hmToMin(tr.departTime);
+        if (fromTicket && isToday && Number.isFinite(dep) && dep > nowMin + 30) continue;
         seen.add(tr.trainNo);
         cands.push(tr);
+        added += 1;
       }
     };
-    // 两路候选并行拉取（大屏走限流队列较慢，余票列表不受其拖累）
-    const bases = [bjTodayYmd(), shiftYmd(bjTodayYmd(), 1), shiftYmd(bjTodayYmd(), 2)];
-    const ticketTask = (async (): Promise<TrainSummary[]> => {
-      const out: TrainSummary[] = [];
-      for (const b of bases) {
-        try {
-          out.push(...(await this.fetchTrains(fromSt.telecode, toSt.telecode, b)));
-        } catch {
-          /* 单个候选日失败不致命 */
+    let source = 'none';
+    // 全程管线（流式）：余票并集先到（~0.6s）就立刻开跑逐车回溯，不等大屏（~3s）；
+    // 大屏候选到达后动态并入（worker 按 cands.length 动态拾取），第一波结束后补一波清理。
+    const pipeline = (async (): Promise<void> => {
+      const bases = [bjTodayYmd(), shiftYmd(bjTodayYmd(), 1), shiftYmd(bjTodayYmd(), 2)];
+      const ticketTask = (async (): Promise<TrainSummary[]> => {
+        const lists = await Promise.all(
+          bases.map((b) =>
+            this.fetchTrains(fromSt.telecode, toSt.telecode, b).catch(() => [] as TrainSummary[]),
+          ),
+        );
+        return lists.flat();
+      })();
+      const boardTask = this.boardCandidates(fromSt, toSt, date).catch(
+        () => null as TrainSummary[] | null,
+      );
+      let idx = 0;
+      const worker = async (): Promise<void> => {
+        while (idx < cands.length) {
+          const c = cands[idx++]!;
+          try {
+            // 单车限时：个别上游慢响应不拖死整个 worker
+            const r = await withDeadline(
+              this.retroOne(c, fromSt, toSt, date),
+              envInt('RETRO_ONE_TIMEOUT_MS', 3500),
+            );
+            if (r.value) out.push(r.value);
+          } catch {
+            /* 单车失败跳过 */
+          }
         }
-      }
-      return out;
-    })();
-    const board = await this.boardCandidates(fromSt, toSt, date);
-    const ticket = await ticketTask;
-    // 大屏候选优先（已确认当日开行），余票并集补缺（同城站聚合）
-    addAll(board || []);
-    addAll(ticket);
-    const source = [board ? 'board' : '', ticket.length ? 'ticket' : ''].filter(Boolean).join('+') || 'none';
-    if (!cands.length) return [];
-    const pool = cands.slice(0, 100);
-    const out: TrainSummary[] = [];
-    let idx = 0;
-    const worker = async (): Promise<void> => {
-      while (idx < pool.length) {
-        const c = pool[idx++]!;
-        try {
-          const r = await this.retroOne(c, fromSt, toSt, date);
-          if (r) out.push(r);
-        } catch {
-          /* 单车失败跳过 */
-        }
-      }
-    };
-    await Promise.all(Array.from({ length: 4 }, () => worker()));
-    out.sort((a, b) => a.departTime.localeCompare(b.departTime));
-    logMetric('retro.search', { ms: Date.now() - t0, source, cands: pool.length, hits: out.length });
-    return out;
+      };
+      const wave = async (): Promise<void> => {
+        await Promise.all(Array.from({ length: envInt('RETRO_CONCURRENCY', 6) }, () => worker()));
+      };
+      // 第一波：余票候选先到先跑（对今天查询已被发车截止线过滤到少量）
+      const ticket = await ticketTask;
+      addAll(ticket, true);
+      const firstWave = wave();
+      // 大屏候选（已确认当日开行，不做发车截止线过滤，保证完整性）后到并入
+      const board = await boardTask;
+      addAll(board || [], false);
+      source = [board ? 'board' : '', ticket.length ? 'ticket' : ''].filter(Boolean).join('+') || 'none';
+      await firstWave;
+      await wave(); // 清理大屏后到候选（若第一波 worker 已顺手消费则立即返回）
+    })().catch(() => {});
+    const snapshot = (): TrainSummary[] =>
+      [...out].sort((a, b) => a.departTime.localeCompare(b.departTime));
+    // 全程限时返回（含候选阶段）：软限时内没算完就先给已算出的部分，不阻塞用户查询；
+    // 若软限时到达时还一个都没算出（候选阶段太慢），放宽到硬限时，避免误报「无车次」。
+    // 后台算完回写完整缓存，下次查询即命中完整结果。
+    const soft = envInt('RETRO_SOFT_DEADLINE_MS', 3500);
+    const hard = envInt('RETRO_DEADLINE_MS', 7000);
+    let finished = await Promise.race([
+      pipeline.then(() => true),
+      sleep(soft).then(() => false),
+    ]);
+    if (!finished && out.length === 0) {
+      finished = await Promise.race([
+        pipeline.then(() => true),
+        sleep(Math.max(0, hard - soft)).then(() => false),
+      ]);
+    }
+    if (!finished && opts.cacheKey) {
+      const key = opts.cacheKey;
+      const ttl = opts.ttlSec ?? 600;
+      void pipeline.then(() => {
+        trainCache.set(key, snapshot(), ttl);
+        logMetric('retro.search.bg', {
+          ms: Date.now() - t0,
+          source,
+          cands: cands.length,
+          hits: out.length,
+        });
+      });
+    }
+    logMetric('retro.search', {
+      ms: Date.now() - t0,
+      source,
+      cands: cands.length,
+      hits: out.length,
+      partial: !finished,
+    });
+    return snapshot();
   }
 
   /**

@@ -48,6 +48,35 @@ function swrEnabled(): boolean {
   const v = String(process.env.TRAIN_SWR ?? '1').trim().toLowerCase();
   return !(v === '0' || v === 'false' || v === 'off');
 }
+/** 北京时间今天（yyyy-MM-dd） */
+function bjTodayYmd(): string {
+  return new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10);
+}
+/** 本地日期平移 N 天（yyyy-MM-dd，+08:00 基准） */
+function shiftYmd(ymd: string, days: number): string {
+  const d = new Date(`${ymd}T00:00:00+08:00`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+/** 目标日期相对北京时间今天的天数（负=过去） */
+function dayDiffFromToday(date: string): number {
+  return Math.round(
+    (Date.parse(`${date}T00:00:00+08:00`) - Date.parse(`${bjTodayYmd()}T00:00:00+08:00`)) / 86400_000,
+  );
+}
+/** 把 HH:MM(+dayOffset) 差格式化成 duration（HH:MM） */
+function durationBetween(a: Stop, b: Stop): string {
+  const mins = (s: Stop): number | null => {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(s.departTime || s.arriveTime || "");
+    if (!m) return null;
+    return (s.dayOffset || 0) * 1440 + Number(m[1]) * 60 + Number(m[2]);
+  };
+  const ma = mins(a);
+  const mb = mins(b);
+  if (ma == null || mb == null) return "";
+  const d = Math.max(mb - ma, 0);
+  return `${String(Math.floor(d / 60)).padStart(2, "0")}:${String(d % 60).padStart(2, "0")}`;
+}
 /** 车次缓存 TTL：按出发日期远近分层 */
 function trainsTtlSec(date: string): number {
   const override = Number(process.env.CACHE_TTL_TRAINS_SEC || 0);
@@ -290,6 +319,30 @@ export class Cr12306Source implements TrainDataSource {
     if (!fromSt || !toSt) throw Object.assign(new Error('车站无法识别'), { code: 'BAD_STATION' });
 
     const cacheKey = `trains:${fromSt.telecode}:${toSt.telecode}:${date}`;
+    // 2026-10-19 已发车/历史回溯：目标日期 ≤ 今天时（过去日期 leftTicket 直接返回
+    // HTML 错误页；今天列表常因售罄缺行），改为「同时刻表车次候选 → 逐车按目标日期
+    // 查经停」合成，retro 字段如实标注来源；余票/售价对回溯车次无意义。
+    // 今天：12306 Web 端今天列表本身含已发车车次，先直查（真实余票行）；空/失败再合成
+    if (dayDiffFromToday(date) === 0) {
+      try {
+        const direct = await this.fetchTrains(fromSt.telecode, toSt.telecode, date);
+        if (direct.length) {
+          logMetric("trains.search", { key: cacheKey, ms: Date.now() - t0, count: direct.length });
+          return direct;
+        }
+      } catch {
+        /* 落合成 */
+      }
+    }
+    if (dayDiffFromToday(date) <= 0) {
+      const retroKey = `retro:${cacheKey}`;
+      return trainCache.getOrLoad<TrainSummary[]>(
+        retroKey,
+        dayDiffFromToday(date) < 0 ? 7 * 86400 : 600,
+        () => this.fetchRetroTrains(fromSt, toSt, date),
+        { staleWhileRevalidate: swrEnabled(), negativeTtlSec: negativeTtlSec() },
+      );
+    }
     const trains = await trainCache.getOrLoad<TrainSummary[]>(
       cacheKey,
       trainsTtlSec(date),
@@ -325,6 +378,119 @@ export class Cr12306Source implements TrainDataSource {
       dropped: droppedRows,
     });
     return trains;
+  }
+
+  /**
+   * 已发车/历史日期的 OD 列表合成（leftTicket 对过去日期返回 HTML 错误页）。
+   * 车次候选：今天 ∪ 明天同 OD 余票列表的车次并集（Web 端今天列表含已发车车次；
+   * 隔日开行车靠并集覆盖两个相位）。候选不全（售罄行缺失/特管线路）时列表可能
+   * 少车——前端必须引导用户直接输车次号（queryByCode 对过去日期实测可用）。
+   */
+  private async fetchRetroTrains(
+    fromSt: { telecode: string; name: string },
+    toSt: { telecode: string; name: string },
+    date: string,
+  ): Promise<TrainSummary[]> {
+    const t0 = Date.now();
+    const bases = [bjTodayYmd(), shiftYmd(bjTodayYmd(), 1)];
+    const seen = new Set<string>();
+    const cands: TrainSummary[] = [];
+    for (const b of bases) {
+      try {
+        for (const tr of await this.fetchTrains(fromSt.telecode, toSt.telecode, b)) {
+          if (!seen.has(tr.trainNo)) {
+            seen.add(tr.trainNo);
+            cands.push(tr);
+          }
+        }
+      } catch {
+        /* 单个候选日失败不致命 */
+      }
+    }
+    if (!cands.length) return [];
+    const pool = cands.slice(0, 40);
+    const out: TrainSummary[] = [];
+    let idx = 0;
+    const worker = async (): Promise<void> => {
+      while (idx < pool.length) {
+        const c = pool[idx++]!;
+        try {
+          const r = await this.retroOne(c, fromSt, toSt, date);
+          if (r) out.push(r);
+        } catch {
+          /* 单车失败跳过 */
+        }
+      }
+    };
+    await Promise.all(Array.from({ length: 4 }, () => worker()));
+    out.sort((a, b) => a.departTime.localeCompare(b.departTime));
+    logMetric("retro.search", { ms: Date.now() - t0, cands: pool.length, hits: out.length });
+    return out;
+  }
+
+  /**
+   * 单车回溯：目标日期直查经停（czxx 过去日期实测可用）→ 空则按候选行原日期的
+   * 同时刻表把绝对时刻平移到目标日期模拟（retro=simulated，如实降级）。
+   * 返回 null = 该车不经停 OD 站或两个日期都拿不到时刻表。
+   */
+  private async retroOne(
+    cand: TrainSummary,
+    fromSt: { telecode: string; name: string },
+    toSt: { telecode: string; name: string },
+    date: string,
+  ): Promise<TrainSummary | null> {
+    const fromCode = cand.from.telecode || fromSt.telecode;
+    const toCode = cand.to.telecode || toSt.telecode;
+    let full: Stop[] | null = null;
+    let retro: "historical" | "simulated" = "historical";
+    try {
+      const s = await this.fetchStopsBase({ trainNo: cand.trainNo, date }, fromCode, toCode);
+      if (s.length >= 2) full = s;
+    } catch {
+      /* 落模拟 */
+    }
+    if (!full) {
+      try {
+        const s0 = await this.fetchStopsBase({ trainNo: cand.trainNo, date: cand.date }, fromCode, toCode);
+        if (s0.length >= 2) {
+          // 保留 HH:MM/dayOffset，绝对时刻按目标日期重算（跨天自动 +1/+2）
+          full = attachAbsoluteTimes(
+            s0.map((s) => ({ ...s, at: undefined, arrive: undefined, depart: undefined })),
+            date,
+          );
+          retro = "simulated";
+        }
+      } catch {
+        return null;
+      }
+    }
+    if (!full) return null;
+    const sliced = sliceStopsByOdNames(full, fromSt.name, toSt.name);
+    if (!sliced || sliced.length < 2) return null; // 该车不经停此 OD
+    const first = sliced[0]!;
+    const last = sliced[sliced.length - 1]!;
+    // attachAbsoluteTimes 后 departTime/arriveTime 是 ISO；UI 需要 HH:MM
+    const isoToHm = (iso: string | null | undefined): string =>
+      iso && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(iso) ? iso.slice(11, 16) : "";
+    const departTime = isoToHm(first.departTime) || isoToHm(first.arriveTime);
+    const arriveTime = isoToHm(last.arriveTime) || isoToHm(last.departTime);
+    if (!departTime || !arriveTime) return null;
+    const startIso = first.depart || first.arrive || first.at || "";
+    const endIso = last.arrive || last.depart || last.at || "";
+    const minutes = Math.max(0, Math.round((Date.parse(endIso) - Date.parse(startIso)) / 60_000));
+    if (!Number.isFinite(minutes) || minutes <= 0) return null;
+    const duration = `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+    return {
+      trainCode: cand.trainCode,
+      trainNo: cand.trainNo,
+      from: cand.from,
+      to: cand.to,
+      departTime,
+      arriveTime,
+      duration,
+      date,
+      retro,
+    };
   }
 
   async getStops(query: StopsQuery): Promise<Stop[]> {
@@ -467,7 +633,7 @@ export class Cr12306Source implements TrainDataSource {
       (r) => (r.station_train_code || '').toUpperCase() === code,
     );
     if (!hit?.train_no) {
-      throw Object.assign(new Error('未查到该车次，请核对车次号与日期（仅支持预售期内开行的车次）'), {
+      throw Object.assign(new Error('未查到该车次，请核对车次号与日期'), {
         code: 'NOT_FOUND',
       });
     }

@@ -388,7 +388,8 @@ async function search() {
       return;
     }
     trains.value = res.trains;
-    if (!trains.value.length) error.value = '这个区间暂时没有查到直达车次。';
+    if (!trains.value.length)
+      error.value = '这个区间暂时没有查到直达车次。若知道车次号，可直接输入车次号查询全程时刻表（已发车或在途车次支持回溯查询）。';
     await endLoading('complete');
   } catch (e) {
     if (isStale(seq)) {
@@ -817,6 +818,9 @@ const tripDurationHint = computed(() => {
   return t?.duration ? `历时 ${t.duration}` : '';
 });
 
+/** 回溯合成列表（历史/当日已发车兜底）：顶部横幅与列表徽标的依据 */
+const isRetroList = computed(() => trains.value.some((t) => t.retro));
+
 function goBack() {
   if (loading.value) return;
   if (step.value === 'od') {
@@ -1062,7 +1066,7 @@ function goBack() {
           <section v-if="showEmptyState" class="empty-state rv-card">
             <p class="empty-state__title">这个区间暂时没有查到直达车次</p>
             <p class="empty-state__desc">
-              乘车日期指发车日；当日已发或在途的车查不到。可改查下一天出发的车次。
+              乘车日期指发车日。已发车或在途的车次：按站查询会自动回溯合成时刻（可能不含当日实际全部车次）；直接输入车次号查询全程时刻表，结果更准确。
             </p>
             <div class="empty-state__actions">
               <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(1)">
@@ -1135,6 +1139,10 @@ function goBack() {
               直达车次
               <span class="train-list__count">{{ trains.length }} 趟</span>
             </h2>
+            <div v-if="isRetroList" class="retro-banner" role="note">
+              <strong>历史回溯</strong>
+              <span>已发车或在途的车次无法查票。以上车次与时刻按 12306 车次时刻表回溯合成，可能不含当日实际全部车次；隔日开行或调图时段或有出入。知道车次号时，直接输车次号查询更准确。</span>
+            </div>
             <div class="train-grid" v-auto-animate>
               <button
                 v-for="(t, i) in trains"
@@ -1155,6 +1163,10 @@ function goBack() {
                 <span class="train-card__meta">
                   {{ t.from.name }} → {{ t.to.name }}
                   <template v-if="t.duration"> · 历时 {{ t.duration }}</template>
+                  <template v-if="t.retro">
+                    ·
+                    <span class="train-card__retro" :class="{ 'is-sim': t.retro === 'simulated' }">{{ t.retro === 'simulated' ? '时刻模拟' : '时刻回溯' }}</span>
+                  </template>
                 </span>
               </button>
             </div>
@@ -1352,6 +1364,38 @@ function goBack() {
   .select-page * {
     transition: none;
   }
+}
+/* 历史回溯：横幅与列表徽标（时刻回溯 = 12306 车次时刻表直查；时刻模拟 = 次日同时刻表平移兜底） */
+.retro-banner {
+  margin: 0 0 10px;
+  padding: 10px 14px;
+  display: grid;
+  gap: 2px;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  background: rgba(250, 204, 21, 0.08);
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: rgba(226, 232, 240, 0.82);
+}
+.retro-banner strong {
+  color: #facc15;
+  font-size: 13px;
+}
+.train-card__retro {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid rgba(250, 204, 21, 0.4);
+  border-radius: 999px;
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.1);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+.train-card__retro.is-sim {
+  border-color: rgba(148, 163, 184, 0.45);
+  color: #cbd5e1;
+  background: rgba(148, 163, 184, 0.12);
 }
 </style>
 

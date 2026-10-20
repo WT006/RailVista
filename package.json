@@ -1,7 +1,7 @@
 {
   "name": "railvista",
   "private": true,
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "RailVista — 铁路旅客车上沿途风景与行程定位伴侣",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
@@ -29,6 +29,7 @@
     "places:build": "node scripts/build-place-index.mjs",
     "roads:build": "node scripts/build-road-ways.mjs --all && node scripts/build-road-geom.mjs && node scripts/build-road-index.mjs --from-net --merge && node --max-old-space-size=8192 scripts/build-road-topology.mjs && node scripts/verify-road-network.mjs && node scripts/build-drive-network-raster.mjs && node scripts/build-drive-backdrop.mjs",
     "roadbook:check": "pnpm --filter @railvista/shared build && node scripts/build-roadbook-index.mjs",
+    "roadbook:measure": "node --max-old-space-size=6144 apps/api/node_modules/tsx/dist/cli.mjs scripts/roadbook-measure.mts",
     "roads:audit": "node --max-old-space-size=6144 scripts/audit-road-network.mjs",
     "roads:selftest": "node scripts/selftest-road-assemble.mjs",
     "roads:png": "node scripts/render-road-png.mjs"

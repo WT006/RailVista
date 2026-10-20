@@ -14,6 +14,7 @@ import TicketEditor from '../components/ticket/TicketEditor.vue';
 import TicketExportModal from '../components/ticket/TicketExportModal.vue';
 import TrainPicker from '../components/ticket/TrainPicker.vue';
 import RailwayPersonalize from '../components/ticket/RailwayPersonalize.vue';
+import TicketThemePicker from '../components/ticket/TicketThemePicker.vue';
 import DriveBuilder from '../components/ticket/DriveBuilder.vue';
 import FlightBuilder from '../components/ticket/FlightBuilder.vue';
 import HmSegmented, { type SegOption } from '../components/ticket/hm/HmSegmented.vue';
@@ -271,6 +272,12 @@ const showAdvanced = ref(false);
           <section v-else class="rv-card" data-spotlight>
             <h2 class="builder-title">查询航班</h2>
             <FlightBuilder />
+          </section>
+
+          <!-- 票面主题：原先埋在「高级微调 · 外观」的下拉里，选色不可见；提到主流程做可视化选版 -->
+          <section class="rv-card" data-spotlight>
+            <h2 class="builder-title">票面主题</h2>
+            <TicketThemePicker />
           </section>
 
           <!-- 高级全字段 -->

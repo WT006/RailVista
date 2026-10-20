@@ -7,7 +7,7 @@ import { computed, ref } from 'vue';
 import type { TicketRouteConfig, TicketStatItem, TicketTagItem } from '@railvista/shared';
 import { classifyRoadSign, scenicPresets } from '@railvista/shared';
 import { useTicketStore } from '../../stores/ticketStore';
-import { AIRLINES, ALLIANCES, themesForKind } from '../../data/ticket';
+import { AIRLINES, ALLIANCES } from '../../data/ticket';
 
 const store = useTicketStore();
 const emit = defineEmits<{ save: [] }>();
@@ -129,19 +129,9 @@ function clearBgFile() {
 
 <template>
   <div class="ed">
-    <!-- 外观 -->
+    <!-- 外观（主题已移到主流程 TicketThemePicker） -->
     <section class="ed__sec">
       <h3>外观</h3>
-      <label class="ed__row">
-        <span>主题</span>
-        <select
-          class="ed__select"
-          :value="config.background.theme"
-          @change="store.patch({ background: { ...config.background, theme: ($event.target as HTMLSelectElement).value } })"
-        >
-          <option v-for="t in themesForKind(config.kind)" :key="t.id" :value="t.id">{{ t.label }}</option>
-        </select>
-      </label>
       <div class="ed__row">
         <span>背景图</span>
         <div class="ed__file">

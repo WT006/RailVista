@@ -11,7 +11,9 @@
  * - 前三名领奖台（①居中通栏，②左③右；金/银/铜低饱和金属色），第 4 名起紧凑列表行；
  * - corridorId === null 条目弱化：无「查看线路」箭头，点击只展开亮点与说明；
  * - 点击有 corridorId 的条目 → /route/:corridorId；
- * - 专题可选件：导语 lead、关键数据条 stats、条目车次/票价、相关报道 reports（外链，默认露出前 3 篇）；
+ * - 专题可选件：刊头（眉标 = 专题名 title、主标题 = 副标题 subtitle、导语 lead、主题词 topics）、
+ *   关键数据条 stats、条目车次/票价、相关报道 reports（外链，默认露出前 3 篇）、
+ *   口径说明 caveat（默认折叠）；
  * - 末尾一句来源说明。
  */
 import { computed, ref } from 'vue';
@@ -93,6 +95,19 @@ function onItemClick(item: RankItem) {
 
     <Transition name="rank-swap" mode="out-in">
       <div :key="active.id" class="rankings__body">
+        <!-- 专题刊头：带导语的榜单按杂志专题排版（眉标 / 主标题 / 一句导语 / 主题词），
+             口径沿革压到文末折叠区 —— 开篇不该是一段参考文献。 -->
+        <header v-if="active.lead" class="rank-feature">
+          <p class="rank-feature__kicker">专题 · {{ active.title }}</p>
+          <p class="rank-feature__title">{{ active.subtitle }}</p>
+          <p class="rank-feature__lead">{{ active.lead }}</p>
+          <p v-if="active.topics?.length" class="rank-feature__topics">
+            <span v-for="(t, i) in active.topics" :key="t">
+              <span v-if="i" class="rank-feature__dot" aria-hidden="true">·</span>{{ t }}
+            </span>
+          </p>
+        </header>
+
         <!-- 来源可点：口径、年份、原文都在链接里，不让读者二次检索 -->
         <a
           v-if="active.source.url"
@@ -105,8 +120,6 @@ function onItemClick(item: RankItem) {
           <span class="rankings__ext" aria-hidden="true">↗</span>
         </a>
         <p v-else class="rankings__source">{{ active.source.name }} · {{ active.source.year }}</p>
-
-        <p v-if="active.lead" class="rankings__lead">{{ active.lead }}</p>
 
         <dl v-if="active.stats?.length" class="rankings__stats">
           <div v-for="s in active.stats" :key="s.label" class="rank-stat">
@@ -203,6 +216,12 @@ function onItemClick(item: RankItem) {
             {{ reportsExpanded ? '收起报道' : `展开全部 ${reportTotal} 篇报道` }}
           </button>
         </div>
+
+        <!-- 口径说明：给较真的人，默认不打扰其他人 -->
+        <details v-if="active.caveat" class="rankings__caveat">
+          <summary>数据口径与来源说明</summary>
+          <p>{{ active.caveat }}</p>
+        </details>
       </div>
     </Transition>
 
@@ -347,16 +366,52 @@ function onItemClick(item: RankItem) {
   line-height: 1;
 }
 
-/* ── 专题导语 ── */
-.rankings__lead {
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  border-left: 2px solid var(--line-accent);
-  background: var(--fill-accent);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+/* ── 专题刊头（仅带导语的榜单）──
+ * 层级铁律：模块标题「中国最美铁路」用 --fs-h2（17px），是本卡最大的一号字，
+ * 刊头里任何一级都不许压过它 —— 专题名退到 11px 眉标，副标题才做 15px 主标题，
+ * 导语 13px、主题词 11px。整块只用一条强调左边线定位，不加外框与渐变。 */
+.rank-feature {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-1) 0 var(--space-1) var(--space-3);
+  border-left: 2px solid var(--accent);
   color: var(--text-2);
-  font-size: var(--fs-cap);
+}
+
+.rank-feature__kicker {
+  margin: 0;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--accent-hover);
+}
+
+.rank-feature__title {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  color: var(--text-1);
+}
+
+.rank-feature__lead {
+  margin: 0;
+  font-size: var(--fs-meta);
   line-height: var(--lh-snug);
+  color: var(--text-2);
+}
+
+/* 主题词排成一行小字，用间隔点分隔：胶囊形状已经全给了 OD / 车次 / 票价，不再添一种 */
+.rank-feature__topics {
+  margin: 0;
+  font-size: var(--fs-micro);
+  letter-spacing: 0.02em;
+  color: var(--text-3);
+}
+
+.rank-feature__dot {
+  margin: 0 var(--space-1);
+  color: var(--text-3);
 }
 
 /* ── 关键数据条：只放来源可核验的数字 ── */
@@ -380,7 +435,8 @@ function onItemClick(item: RankItem) {
 
 .rank-stat__value {
   margin: 0;
-  font-size: var(--fs-h3);
+  /* 13px：数据条是「读数」，不能和 15px 的专题主标题抢层级 */
+  font-size: var(--fs-meta);
   font-weight: 700;
   line-height: var(--lh-tight);
   color: var(--text-1);
@@ -760,6 +816,48 @@ function onItemClick(item: RankItem) {
 .rankings__reports-more:focus-visible {
   border-radius: var(--radius-xs);
   box-shadow: var(--focus-ring);
+}
+
+/* ── 口径说明（折叠）：小字、弱化，展开才占地方 ── */
+.rankings__caveat {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--line-hairline);
+}
+
+.rankings__caveat summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  cursor: pointer;
+  list-style: none;
+  color: var(--text-3);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+}
+
+.rankings__caveat summary::-webkit-details-marker {
+  display: none;
+}
+
+.rankings__caveat summary::before {
+  content: '+';
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.rankings__caveat[open] summary::before {
+  content: '−';
+}
+
+.rankings__caveat summary:hover {
+  color: var(--text-2);
+}
+
+.rankings__caveat p {
+  margin: var(--space-2) 0 0;
+  color: var(--text-3);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-normal);
 }
 
 .rankings__report-list {

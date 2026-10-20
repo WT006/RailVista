@@ -18,6 +18,13 @@ export interface TrainSummary {
   arriveTime: string;
   duration: string;
   date: string;
+  /**
+   * 已发车/历史日期回溯来源（2026-10-19）：
+   * - historical：12306 车次时刻表按目标日期直查（czxx 过去日期可用）
+   * - simulated：目标日期上游缺失，按同时刻表把绝对时刻平移到目标日期模拟
+   * 余票/售价等售票状态对回溯车次无意义，消费端必须明示「历史回溯/模拟」。
+   */
+  retro?: 'historical' | 'simulated';
 }
 
 /** 经停站 */

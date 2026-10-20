@@ -12,7 +12,8 @@ defineEmits<{ pick: [train: TrainSummary] }>();
 
 const from = ref('');
 const to = ref('');
-const date = ref(new Date().toISOString().slice(0, 10));
+// 北京本地今天（toISOString 是 UTC，凌晨会落到昨天）
+const date = ref(new Date(Date.now() + 8 * 3_600_000).toISOString().slice(0, 10));
 
 interface SuggestItem { name: string; telecode: string }
 const fromSuggest = ref<SuggestItem[]>([]);
@@ -169,6 +170,10 @@ function trainKind(code: string): 'hsr' | 'intercity' | 'conventional' | 'other'
         <span class="tp__meta">
           {{ t.from.name }} → {{ t.to.name }}
           <template v-if="t.duration"> · 历时 {{ t.duration }}</template>
+          <template v-if="t.retro">
+            ·
+            <span class="tp__retro" :class="{ 'is-sim': t.retro === 'simulated' }">{{ t.retro === 'simulated' ? '时刻模拟' : '时刻回溯' }}</span>
+          </template>
         </span>
       </button>
     </div>
@@ -296,5 +301,20 @@ function trainKind(code: string): 'hsr' | 'intercity' | 'conventional' | 'other'
   .tp__train {
     transition: none;
   }
+}
+.tp__retro {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid rgba(250, 204, 21, 0.4);
+  border-radius: 999px;
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.1);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+.tp__retro.is-sim {
+  border-color: rgba(148, 163, 184, 0.45);
+  color: #cbd5e1;
+  background: rgba(148, 163, 184, 0.12);
 }
 </style>

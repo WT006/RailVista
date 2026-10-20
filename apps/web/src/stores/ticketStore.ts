@@ -29,6 +29,7 @@ import {
   type TicketKind,
   type TrainSummary,
 } from '@railvista/shared';
+import { themesForKind } from '../data/ticket';
 
 const DRAFT_KEY = 'railvista:ticketDraft';
 const SAVED_KEY = 'railvista:ticketSaved';
@@ -194,6 +195,15 @@ export interface RailPersonalize {
   quote?: string;
 }
 
+/**
+ * 成票时的主题：用户已在主流程选定本票种的主题就沿用，否则回落到该票种首款。
+ * 否则「换主题 → 重新查车次」会把票面颜色悄悄改回默认。
+ */
+function resolveTheme(kind: TicketKind, current: string): string {
+  const list = themesForKind(kind);
+  return list.some((t) => t.id === current) ? current : (list[0]?.id ?? '');
+}
+
 /** 铁路里程：优先站坐标弦长×线型系数；无坐标时用历时×典型均速估算 */
 function estimateRailMileageKm(t: TrainSummary): number | undefined {
   if (t.from.lat != null && t.from.lng != null && t.to.lat != null && t.to.lng != null) {
@@ -303,7 +313,7 @@ export const useTicketStore = defineStore('ticket', () => {
       tags: [],
       quote: '',
       seal: { enabled: true, emblem: 'rail', text: '中国铁路 CHINA RAILWAY', sub: '纪念制票' },
-      background: { ...config.value.background, theme: 'rail-xuanlan' },
+      background: { ...config.value.background, theme: resolveTheme('railway', config.value.background.theme) },
     });
   }
 
@@ -394,7 +404,7 @@ export const useTicketStore = defineStore('ticket', () => {
       tags,
       quote: config.value.quote,
       seal: { enabled: true, emblem: 'air', text: '中国民航 · 纪念登机牌', sub: 'BOARDING PASS' },
-      background: { ...config.value.background, theme: 'flight-night' },
+      background: { ...config.value.background, theme: resolveTheme('flight', config.value.background.theme) },
       airline: airlineInfo
         ? {
             code: airlineInfo.iata.toLowerCase(),
@@ -472,7 +482,7 @@ export const useTicketStore = defineStore('ticket', () => {
         text: '万里路书 · 精品自驾公路',
         sub: routeName || '自驾认证',
       },
-      background: { ...config.value.background, theme: 'drive-dusk' },
+      background: { ...config.value.background, theme: resolveTheme('drive', config.value.background.theme) },
     });
   }
 

@@ -233,9 +233,20 @@ function suggestPlacesOfKind(q: string, kind: PlaceKind, limit: number, province
     // 2026-10-11：S/X/Y 编号跨省重复且候选远超 limit —— 选省过滤必须在打分截断之前，
     // 否则一省的碎片条目挤掉其他省编号，前端"选省"永远筛不到。
     const prov = province?.trim();
+    // 2026-10-18：支持完整 key 输入（用户从榜单/联动把「河南:Y10」粘进搜索框——
+    // 旧逻辑只有 ref 匹配，完整 key 恒 0 分导致 resolvePlace 解析失败）。
+    // 规范化全角冒号；q 形如完整 key 时优先做 key 级匹配（key 命中 100、
+    // 「省前缀+ref」组合命中 92），纯编号输入仍走原 ref/名称匹配。
+    const qNorm = q.replace('：', ':');
+    const qHasKey = qNorm.includes(':');
+    const [qProv, qRest] = qHasKey ? qNorm.split(':') : ['', ''];
     for (const r of loadRoadIndex().entries as RoadIndexEntry[]) {
       if (prov && !r.key.startsWith(`${prov}:`)) continue;
-      const refScore = r.ref === q ? 100 : r.ref.startsWith(q) ? 85 : 0;
+      let refScore = r.ref === q ? 100 : r.ref.startsWith(q) ? 85 : 0;
+      if (qHasKey && refScore < 92) {
+        if (r.key === qNorm) refScore = 100;
+        else if (qRest && r.key.split(':')[1] === qRest && r.key.startsWith(`${qProv}:`)) refScore = 92;
+      }
       const nameScore = r.name ? scoreText(q, r.name) * 0.6 : 0; // 中文名（沪聂线）60%
       const odScore = `${r.fromPlace}${r.toPlace}`.includes(q) ? 40 : 0;
       const score = Math.max(refScore, Math.round(nameScore), odScore);
@@ -398,6 +409,33 @@ async function amapGeocode(name: string): Promise<PlaceAnchor | null> {
   }
 }
 
+/**
+ * 百度地理编码（2026-10-18）：geocoding/v3，ret_coordtype=wgs84ll 直接回 WGS-84 免转换。
+ * 高德 Web 服务额度耗尽后恒快败返回 null，竞速数组里补百度源对冲。
+ */
+async function baiduGeocode(name: string): Promise<PlaceAnchor | null> {
+  const key = process.env.BAIDU_MAP_KEY;
+  if (!key) return null;
+  try {
+    const qs = new URLSearchParams({ address: name, ak: key, ret_coordtype: 'wgs84ll' });
+    const res = await fetch(`https://api.map.baidu.com/geocoding/v3/?${qs}`, {
+      signal: AbortSignal.timeout(3500),
+      headers: { 'User-Agent': 'RailVista/0.4.0 (drive-geocode)' },
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      status?: number;
+      result?: { location?: { lng?: number; lat?: number }; level?: string };
+    };
+    const loc = json.status === 0 ? json.result?.location : undefined;
+    if (!loc?.lng || !loc?.lat) return null;
+    if (!isPlausibleCnPoint(loc.lng, loc.lat)) return null;
+    return { name, lng: loc.lng, lat: loc.lat, level: 'county' };
+  } catch {
+    return null;
+  }
+}
+
 async function nominatimGeocode(name: string): Promise<PlaceAnchor | null> {
   const qs = new URLSearchParams({ format: 'json', q: name, countrycodes: 'cn', limit: '1' });
   try {
@@ -440,8 +478,9 @@ export async function geocodeFallback(name: string): Promise<PlaceHit | null> {
   // 2026-10-14 修竞速语义：Promise.any 对 fulfill(null) 也立即结算——高德额度
   // 耗尽后恒快败返回 null，会把 Nominatim 的成功结果废掉（表现为「输入没反应」）。
   // 改为 null 即 reject 再 any；全败（含 AggregateError）catch 归 null 不外抛。
+  // 2026-10-18 竞速源扩为 高德→百度→Nominatim（高德额度耗尽后百度兜上）。
   const hit = await Promise.any(
-    [amapGeocode(key), nominatimGeocode(key)].map((p) =>
+    [amapGeocode(key), baiduGeocode(key), nominatimGeocode(key)].map((p) =>
       p.then((anchor) => {
         if (!anchor) throw new Error('miss');
         return anchor;

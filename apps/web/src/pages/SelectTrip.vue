@@ -105,6 +105,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   queryFlipRo?.disconnect();
   queryFlipRo = null;
+  clearRecheck();
 });
 
 /** 车次类型前缀色板：单一来源已提取到 data/trainColors.ts（前缀键盘 + 车次列表共用，保证"对得上"）。 */
@@ -156,6 +157,41 @@ function isStale(seq: number): boolean {
 
 /** 「重新发车」要重跑的动作 */
 const retryFn = ref<(() => void) | null>(null);
+
+/** 静默复查定时器：今天/过去日期查询可能限时只返回部分结果，稍后无感复查补全 */
+let recheckTimers: ReturnType<typeof setTimeout>[] = [];
+
+function clearRecheck() {
+  for (const t of recheckTimers) clearTimeout(t);
+  recheckTimers = [];
+}
+
+/**
+ * 回溯查询限时返回（保证 1-3 秒出结果），后台会继续补全并写入缓存。
+ * 这里在 6s / 16s 各静默复查一次（无 loading），列表只增不减地补齐部分结果。
+ */
+function scheduleRetroRecheck(seq: number, q: { from: string; to: string; date: string }) {
+  clearRecheck();
+  if (q.date > todayYmd()) return;
+  for (const delay of [6000, 16000]) {
+    recheckTimers.push(
+      setTimeout(() => {
+        void (async () => {
+          try {
+            const res = await api.searchTrains(q.from, q.to, q.date);
+            if (isStale(seq)) return;
+            if (res.trains.length > trains.value.length) {
+              trains.value = res.trains;
+              error.value = '';
+            }
+          } catch {
+            /* 静默复查失败不影响已展示结果 */
+          }
+        })();
+      }, delay),
+    );
+  }
+}
 
 function beginLoading(phase: 'search' | 'stops' | 'enter' | 'demo' | 'resume') {
   loadingPhase.value = phase;
@@ -377,18 +413,22 @@ async function search() {
   }
   const seq = nextSeq();
   retryFn.value = () => void search();
+  clearRecheck();
   beginLoading('search');
   trains.value = [];
   step.value = 'search';
   selected.value = null;
   try {
-    const res = await api.searchTrains(from.value, to.value, date.value);
+    const q = { from: from.value, to: to.value, date: date.value };
+    const res = await api.searchTrains(q.from, q.to, q.date);
     if (isStale(seq)) {
       await endLoading('abort');
       return;
     }
     trains.value = res.trains;
-    if (!trains.value.length) error.value = '这个区间暂时没有查到直达车次。';
+    if (!trains.value.length)
+      error.value = '这个区间暂时没有查到直达车次。若知道车次号，可直接输入车次号查询全程时刻表（已发车或在途车次支持回溯查询）。';
+    scheduleRetroRecheck(seq, q);
     await endLoading('complete');
   } catch (e) {
     if (isStale(seq)) {
@@ -817,6 +857,20 @@ const tripDurationHint = computed(() => {
   return t?.duration ? `历时 ${t.duration}` : '';
 });
 
+/** 回溯合成列表（历史/当日已发车兜底）：顶部横幅与列表徽标的依据 */
+const hasSimulated = computed(() => trains.value.some((t) => t.retro === 'simulated'));
+const hasHistorical = computed(() => trains.value.some((t) => t.retro === 'historical'));
+
+/** 当日车次运行状态（仅查询日期=今天时计算）：已发车/在途、已到达 */
+function trainStatus(t: TrainSummary): 'departed' | 'arrived' | null {
+  if (!t.departTime || t.date !== todayYmd()) return null;
+  const dep = Date.parse(`${t.date}T${t.departTime}:00+08:00`);
+  if (!Number.isFinite(dep) || Date.now() < dep) return null;
+  const m = /^(\d{1,3}):(\d{2})$/.exec(t.duration || '');
+  const arr = m ? dep + (Number(m[1]) * 60 + Number(m[2])) * 60_000 : NaN;
+  return Number.isFinite(arr) && Date.now() >= arr ? 'arrived' : 'departed';
+}
+
 function goBack() {
   if (loading.value) return;
   if (step.value === 'od') {
@@ -1062,7 +1116,7 @@ function goBack() {
           <section v-if="showEmptyState" class="empty-state rv-card">
             <p class="empty-state__title">这个区间暂时没有查到直达车次</p>
             <p class="empty-state__desc">
-              乘车日期指发车日；当日已发或在途的车查不到。可改查下一天出发的车次。
+              乘车日期指发车日。当天已发车/历史车次会按 12306 当日时刻表自动回溯补全；车次候选来自车站大屏与近期余票列表，个别售罄或隔日开行车次可能缺失，知道车次号时直接输入车次号查询全程时刻表更准确。
             </p>
             <div class="empty-state__actions">
               <button type="button" class="btn ghost btn-sm" @click="retryWithDateShift(1)">
@@ -1135,6 +1189,14 @@ function goBack() {
               直达车次
               <span class="train-list__count">{{ trains.length }} 趟</span>
             </h2>
+            <div v-if="hasHistorical" class="retro-banner" role="note">
+              <strong>已发车回溯</strong>
+              <span>含已发车/历史车次：按 12306 当日时刻表回溯（真实计划时刻，标「时刻回溯」），并标注「已发车/已到达」状态。知道车次号时，直接输车次号查询全程时刻表更准确。</span>
+            </div>
+            <div v-if="hasSimulated" class="retro-banner retro-banner--warn" role="note">
+              <strong>时刻模拟</strong>
+              <span>个别车次当日时刻表缺失，已按邻近日期同时刻表平移推算（标「时刻模拟」）。隔日开行或铁路调图时段，实际时刻或有出入。</span>
+            </div>
             <div class="train-grid" v-auto-animate>
               <button
                 v-for="(t, i) in trains"
@@ -1155,6 +1217,18 @@ function goBack() {
                 <span class="train-card__meta">
                   {{ t.from.name }} → {{ t.to.name }}
                   <template v-if="t.duration"> · 历时 {{ t.duration }}</template>
+                  <template v-if="trainStatus(t)">
+                    ·
+                    <span
+                      class="train-card__status"
+                      :class="{ 'is-arrived': trainStatus(t) === 'arrived' }"
+                      >{{ trainStatus(t) === 'arrived' ? '已到达' : '已发车' }}</span
+                    >
+                  </template>
+                  <template v-if="t.retro">
+                    ·
+                    <span class="train-card__retro" :class="{ 'is-sim': t.retro === 'simulated' }">{{ t.retro === 'simulated' ? '时刻模拟' : '时刻回溯' }}</span>
+                  </template>
                 </span>
               </button>
             </div>
@@ -1352,6 +1426,61 @@ function goBack() {
   .select-page * {
     transition: none;
   }
+}
+/* 历史回溯：横幅与列表徽标（时刻回溯 = 12306 车次时刻表直查；时刻模拟 = 次日同时刻表平移兜底） */
+.retro-banner {
+  margin: 0 0 10px;
+  padding: 10px 14px;
+  display: grid;
+  gap: 2px;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  background: rgba(250, 204, 21, 0.08);
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: rgba(226, 232, 240, 0.82);
+}
+.retro-banner strong {
+  color: #facc15;
+  font-size: 13px;
+}
+.train-card__retro {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid rgba(250, 204, 21, 0.4);
+  border-radius: 999px;
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.1);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+.train-card__retro.is-sim {
+  border-color: rgba(148, 163, 184, 0.45);
+  color: #cbd5e1;
+  background: rgba(148, 163, 184, 0.12);
+}
+/* 当日运行状态：已发车/在途、已到达（仅查询日期=今天时出现） */
+.train-card__status {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid rgba(96, 165, 250, 0.45);
+  border-radius: 999px;
+  color: #93c5fd;
+  background: rgba(96, 165, 250, 0.12);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+.train-card__status.is-arrived {
+  border-color: rgba(148, 163, 184, 0.4);
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.1);
+}
+.retro-banner--warn {
+  border-color: rgba(251, 146, 60, 0.35);
+  background: rgba(251, 146, 60, 0.08);
+}
+.retro-banner--warn strong {
+  color: #fb923c;
 }
 </style>
 

@@ -5,13 +5,13 @@
  * 并在需要时按 SemVer 递增这里的 APP_VERSION（小迭代递增修订号）。
  * 前端首页显示的版本号直接读取本文件，因此不会出现文档与界面不一致。
  */
-export const APP_VERSION = '0.11.0';
+export const APP_VERSION = '0.11.1';
 
 /** 版本对应的发布/变更摘要，便于 UI 展示（与 CHANGELOG.md 首条一致） */
 export const APP_VERSION_SUMMARY =
-  '铁路榜单新增「公益性慢火车」专题：10 趟国铁公益慢火车 + 关键数据条 + 11 篇可核验相关报道，榜单卡片支持导语/数据条/车次票价/报道外链';
+  '路书库薄弱省补强：新建 8 个数据文件、上线 24 条路线，全库 147 → 171 条、地级覆盖 177 → 231 市，里程全部本地路网实算';
 
-export const APP_VERSION_DATE = '2026-10-13';
+export const APP_VERSION_DATE = '2026-10-19';
 
 export type AppVersionInfo = {
   version: string;

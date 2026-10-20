@@ -129,16 +129,25 @@ async function refreshSuggest(field: 'from' | 'to') {
     return;
   }
   try {
-    // A5：OD 框只接受「地点」，公路编号一律不在此联想 ——
-    // 公路编号有独立的「按公路编号直达」区。两个入口混在一个输入框里是自驾最大的 IA 歧义。
-    const data = await api.suggestDrivePlaces(q, 'place', 8);
+    // A5（2026-10-18 按主人要求修订）：县道（X/C）、乡道（Y）并入 OD 起终点搜索——
+    // 输入形如公路编号（裸编号 Y10 / 完整 key 河南:Y10）时，place 联想外并行追加 road
+    // 联想且公路候选排前（编号样式输入的意图明确是公路）；纯中文输入保持纯地名，
+    // 不复活旧版「两个入口混在一个输入框」的 IA 歧义。选中公路仍走整条公路页。
+    const looksLikeCode = /^[GSXYC]\d{1,4}$/i.test(q) || /^[^:：\s]{1,12}[:：][GSXYC]?\d{0,4}$/.test(q.replace(/\s/g, ''));
+    const [data, roadData] = await Promise.all([
+      api.suggestDrivePlaces(q, 'place', 8),
+      looksLikeCode
+        ? api.suggestDrivePlaces(q.replace(/[\s：]/g, (c) => (c === '：' ? ':' : '')), 'road', 6).catch(() => ({ hits: [] as PlaceHit[] }))
+        : Promise.resolve({ hits: [] as PlaceHit[] }),
+    ]);
+    const merged = [...roadData.hits, ...data.hits];
     if (seq !== suggestSeq[field]) return; // 本字段的迟到响应丢弃
     if (field === 'from') {
-      fromSuggest.value = data.hits;
-      fromOpen.value = data.hits.length > 0;
+      fromSuggest.value = merged;
+      fromOpen.value = merged.length > 0;
     } else {
-      toSuggest.value = data.hits;
-      toOpen.value = data.hits.length > 0;
+      toSuggest.value = merged;
+      toOpen.value = merged.length > 0;
     }
   } catch {
     /* 联想失败不打断输入 */

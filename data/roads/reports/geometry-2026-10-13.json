@@ -1,0 +1,31 @@
+{
+ "generatedAt": "2026-10-13T05:26:53.653Z",
+ "date": "2026-10-13",
+ "keyCount": 1,
+ "byClass": {
+  "township": {
+   "keys": 1,
+   "km": 5,
+   "A": 0,
+   "B": 0,
+   "C": 1,
+   "X": 0,
+   "segments": 5,
+   "multiComponent": 1,
+   "dup": 0
+  }
+ },
+ "items": [
+  {
+   "key": "广东:Y287",
+   "cls": "township",
+   "totalKm": 5,
+   "officialKm": null,
+   "deviationPct": null,
+   "precision": "C",
+   "componentCount": 5,
+   "wayCount": 21,
+   "points": 6
+  }
+ ]
+}

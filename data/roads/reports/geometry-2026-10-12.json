@@ -1,0 +1,31 @@
+{
+ "generatedAt": "2026-10-12T07:40:27.428Z",
+ "date": "2026-10-12",
+ "keyCount": 1,
+ "byClass": {
+  "provincial": {
+   "keys": 1,
+   "km": 48.8,
+   "A": 0,
+   "B": 0,
+   "C": 0,
+   "X": 1,
+   "segments": 1,
+   "multiComponent": 0,
+   "dup": 0
+  }
+ },
+ "items": [
+  {
+   "key": "云南:S308",
+   "cls": "provincial",
+   "totalKm": 48.8,
+   "officialKm": 180,
+   "deviationPct": -72.9,
+   "precision": "X",
+   "componentCount": 1,
+   "wayCount": 15,
+   "points": 166
+  }
+ ]
+}

@@ -93,7 +93,7 @@ const legendOpen = ref(false);
 const calibrateOpen = ref(false);
 /** 天象模式：地图彩色路段/标注常驻；与面板展开无关 */
 const skyMode = ref(false);
-/** 时间轴列表抽屉（按需打开；点天象默认不弹） */
+/** 时间轴列表抽屉（点天象直接展开；× 收起后可用「时间轴」按钮重开） */
 const skyPanelOpen = ref(false);
 /** 当前选中的时间轴片段（地图加粗高亮） */
 const skyFocus = ref<SkyFocusPayload | null>(null);
@@ -1310,9 +1310,9 @@ function toggleSky() {
     skyPanelOpen.value = false;
     clearSkyOverlay();
   } else {
-    // 默认只开地图彩段 + 迷你条，列表按需再开
+    // 打开天象直接展开时间轴列表，无需再点「时间轴」按钮
     skyMode.value = true;
-    skyPanelOpen.value = false;
+    skyPanelOpen.value = true;
   }
   nextTick(() => updateOverlayMetrics());
 }

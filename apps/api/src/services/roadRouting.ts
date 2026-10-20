@@ -147,6 +147,53 @@ async function amapDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [n
   }
 }
 
+// ── 引擎 1.6：百度地图驾车（v2 routing，WGS-84 进出免转换） ─────────────────
+// 2026-10-18 高德 Web 服务额度耗尽，主人提供百度 ak：坐标系用
+// coord_type=wgs84（输入）+ ret_coordtype=wgs84ll（输出），全程免 BD-09 转换；
+// 国内路网数据质量优于 OSRM，排在 OSRM 之前。
+async function baiduDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [number, number][]; distanceM: number; durationSec: number } | null> {
+  const key = process.env.BAIDU_MAP_KEY;
+  if (!key) return null;
+  const fmt = (p: Pt) => `${p.lat.toFixed(6)},${p.lng.toFixed(6)}`; // 百度坐标序：纬度在前
+  const wp = via.length ? via.map(fmt).join(';') : '';
+  const url = `https://api.map.baidu.com/direction/v2/routing?origin=${encodeURIComponent(fmt(from))}&destination=${encodeURIComponent(fmt(to))}${wp ? "&waypoints=" + encodeURIComponent(wp) : ""}&coord_type=wgs84&ret_coordtype=wgs84ll&tactics_infor=0&ak=${key}`;
+  try {
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(9000),
+      headers: { 'User-Agent': 'RailVista/0.4.0 (drive-routing)' },
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      status?: number;
+      result?: {
+        routes?: Array<{
+          distance?: number;
+          duration?: number;
+          steps?: Array<{ path?: string }>;
+        }>;
+      };
+    };
+    if (json.status !== 0 || !json.result?.routes?.length) return null;
+    const route = json.result.routes[0]!;
+    const coords: [number, number][] = [];
+    for (const step of route.steps ?? []) {
+      if (!step.path) continue;
+      for (const pair of step.path.split(';')) {
+        const [blat, blng] = pair.split(',').map(Number);
+        if (!Number.isFinite(blng) || !Number.isFinite(blat)) continue;
+        coords.push([blng, blat]);
+      }
+    }
+    if (coords.length < 2) return null;
+    return {
+      coords,
+      distanceM: Number(route.distance) || 0,
+      durationSec: Number(route.duration) || 0,
+    };
+  } catch {
+    return null;
+  }
+}
 // ── 引擎 1.5：OSRM 公共实例（开源 OSM 路网，WGS-84 免转换） ──────────────────
 // 2026-10-14 高德 Web 服务免费额度耗尽：驾车规划兜底改为开源优先。
 // OSRM（router.project-osrm.org）基于全量 OSM 路网，坐标进出均为 WGS-84，
@@ -353,7 +400,17 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
     }
   }
   if (!coords.length && input.engine !== 'local') {
-    // 开源优先：OSRM 兜底在前（额度耗尽后高德恒败，先打它省一次必败往返）
+    // 百度（主人提供的 ak）优先于 OSRM：国内路网质量更好；
+    // 高德额度耗尽恒败，排最后仅作 key 恢复后的保险。
+    const baidu = await baiduDriveRoute(from.pt, to.pt, viaPts);
+    if (baidu) {
+      engine = 'baidu';
+      coords = baidu.coords;
+      if (baidu.durationSec > 0) durationMin = Math.round(baidu.durationSec / 60);
+    }
+  }
+  if (!coords.length && input.engine !== 'local') {
+    // 开源兜底：OSRM（额度耗尽后高德恒败，先打它省一次必败往返）
     const osrm = await osrmDriveRoute(from.pt, to.pt, viaPts);
     if (osrm) {
       engine = 'osrm';

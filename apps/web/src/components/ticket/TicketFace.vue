@@ -10,7 +10,12 @@
  * 按印刷品规范保留，不套用界面令牌体系；界面交互控件不在此例外内
  * （2026-10-09 鸿蒙化收敛裁定，见 tokens.css 例外条款）。 */
 import { computed } from 'vue';
-import { mustDriveFromShields, type TicketConfig } from '@railvista/shared';
+import {
+  classifyTrain,
+  mustDriveFromShields,
+  type TicketConfig,
+  type TrainClass,
+} from '@railvista/shared';
 import { AIRLINES, ALLIANCES, ticketTheme } from '../../data/ticket';
 import {
   buildCode128Bars,
@@ -110,6 +115,19 @@ const endA = computed(() => props.config.route.ends[0]);
 const endB = computed(() => props.config.route.ends[1]);
 
 /**
+ * 站名连线上的车形徽记：按车次字母前缀分制式。
+ * G/D/C（高铁·动车·城际）用流线头型，Z/T/K 及普套用机车头型。
+ */
+const GLYPH_LOCO =
+  'M12 2C8 2 6 3.6 6 7v7.5A2.5 2.5 0 008.5 17l-1.5 2h1.6l1.5-2h3.8l1.5 2H17l-1.5-2a2.5 2.5 0 002.5-2.5V7c0-3.4-2-5-6-5zm-2.5 3h5A1.5 1.5 0 0116 6.5V10H8V6.5A1.5 1.5 0 019.5 5zM8.5 13a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6zm7 0a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6z';
+const GLYPH_HSR =
+  'M12 2.2c-3.2 0-5.2 2.9-5.4 7.1l-.9 6.4c-.15 1.3.85 2.3 2.15 2.3h8.3c1.3 0 2.3-1 2.15-2.3l-.9-6.4C17.2 5.1 15.2 2.2 12 2.2zM9.4 6.4h5.2c.4 0 .7.2.8.6l.9 4c.1.5-.2.9-.7.9H8.4c-.5 0-.8-.4-.7-.9l.9-4c.1-.4.4-.6.8-.6zM8.1 14.6h1.9c.5 0 .9.4.9.9s-.4.9-.9.9H8.1c-.5 0-.9-.4-.9-.9s.4-.9.9-.9zM14 14.6h1.9c.5 0 .9.4.9.9s-.4.9-.9.9H14c-.5 0-.9-.4-.9-.9s.4-.9.9-.9z';
+const HSR_CLASSES: TrainClass[] = ['G', 'D', 'C'];
+const trainGlyph = computed(() =>
+  HSR_CLASSES.includes(classifyTrain(props.config.route.middleLabel)) ? GLYPH_HSR : GLYPH_LOCO,
+);
+
+/**
  * 宫格双语标签拆分（如「里程 MILEAGE」→ 中文 + 英文）。
  * 窄票面（容器查询 ≤340px）下英文副标隐藏、仅留中文，保证四宫格不被省略号压坏。
  */
@@ -160,10 +178,13 @@ const statsView = computed(() =>
           </div>
           <div class="rail-line">
             <span class="rail-line__code">{{ config.route.middleLabel }}</span>
-            <span class="rail-line__track"></span>
-            <svg class="rail-line__train" viewBox="0 0 24 24" width="22" height="22">
-              <path fill="currentColor" d="M12 2C8 2 6 3.6 6 7v7.5A2.5 2.5 0 008.5 17l-1.5 2h1.6l1.5-2h3.8l1.5 2H17l-1.5-2a2.5 2.5 0 002.5-2.5V7c0-3.4-2-5-6-5zm-2.5 3h5A1.5 1.5 0 0116 6.5V10H8V6.5A1.5 1.5 0 019.5 5zM8.5 13a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6zm7 0a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6z"/>
-            </svg>
+            <span class="rail-line__bed">
+              <i class="rail-line__track" aria-hidden="true"></i>
+              <svg class="rail-line__train" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                <path fill="currentColor" fill-rule="evenodd" :d="trainGlyph" />
+              </svg>
+              <i class="rail-line__track" aria-hidden="true"></i>
+            </span>
           </div>
           <div class="rail-end rail-end--r">
             <strong>{{ endB?.name }}</strong>
@@ -478,7 +499,7 @@ const statsView = computed(() =>
 .rail-end strong { font-size: calc(25 * var(--s)); font-weight: 800; letter-spacing: 0.02em; }
 .rail-end span { font-size: calc(9.5 * var(--s)); letter-spacing: 0.18em; color: var(--tk-tx3); }
 .rail-line {
-  position: relative; display: flex; flex-direction: column; align-items: center;
+  display: flex; flex-direction: column; align-items: center;
   gap: calc(5 * var(--s)); width: calc(74 * var(--s)); flex-shrink: 0;
 }
 .rail-line__code {
@@ -488,12 +509,13 @@ const statsView = computed(() =>
   background: color-mix(in srgb, var(--tk-acc) 18%, transparent);
   border: 1px solid color-mix(in srgb, var(--tk-acc) 40%, transparent);
 }
-.rail-line__track { width: 100%; border-top: calc(2 * var(--s)) dashed var(--tk-line); }
+.rail-line__track { flex: 1 1 auto; border-top: calc(2 * var(--s)) dashed var(--tk-line); }
 .rail-line__train {
-  position: absolute; top: calc(16 * var(--s));
+  flex: 0 0 auto;
   width: calc(22 * var(--s)); height: calc(22 * var(--s));
-  color: var(--tk-acc); transform: rotate(90deg);
+  color: var(--tk-acc);
 }
+.rail-line__bed { display: flex; align-items: center; gap: calc(4 * var(--s)); width: 100%; }
 .rail-strip { display: grid; grid-template-columns: 1fr 1fr; gap: calc(10 * var(--s)); margin-top: calc(18 * var(--s)); }
 .rail-strip__cell {
   display: flex; flex-direction: column; gap: calc(4 * var(--s));

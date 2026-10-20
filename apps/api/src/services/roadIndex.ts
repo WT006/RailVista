@@ -6,13 +6,12 @@
  *   kind=spot     景点：公路侧景点库 roadside-spots.json
  *   kind=facility 服务区/互通/收费站：data/roads/facilities.json（Overpass 预抓）
  *
- * 降级链（照抄 geocode.ts 的容错风格）：本地命中 → 不请求网络；未命中 →
- * 高德 geocode（AMAP_KEY，GCJ-02 转 WGS-84）→ Nominatim → null（前端提示点地图选点）。
+ * 降级链：本地命中 → 不请求网络；未命中 → 百度 / Nominatim 并行竞速 → null。
+ * （不再调用高德 Web 服务；地图底图仍由前端 VITE_AMAP_KEY 渲染。）
  */
 import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gcj02ToWgs84 } from '@railvista/shared';
 import type { PlaceHit, PlaceKind, RoadIndexEntry } from '@railvista/shared';
 import { loadRoadIndex } from './roadNetwork.js';
 import { getRoadsideSpots } from './roadsideSpots.js';
@@ -365,53 +364,13 @@ export function resolvePlace(text: string): PlaceHit | undefined {
   return undefined;
 }
 
-// ── 网络降级链：高德 → Nominatim（PRD §4.3） ────────────────────────────────
+// ── 网络降级链：百度 → Nominatim ────────────────────────────────────────────
 function isPlausibleCnPoint(lng: number, lat: number): boolean {
   return lng > 73 && lng < 136 && lat > 17 && lat < 55;
 }
 
 /**
- * 高德 key 取用顺序：AMAP_SERVER_KEY → AMAP_KEY。
- *
- * 必须区分的原因（2026-10-11 实测）：apps/api/.env 里长期配的是前端 Web 端 key
- * （带 AMAP_SECURITY_CODE 的 JS API key），调 Web 服务接口恒返回
- * `USERKEY_PLAT_NOMATCH`，等于「配了 key 但在线 geocode / 驾车规划从来没成功过」。
- * 服务端调用必须用 Web 服务类型的 key，新增 AMAP_SERVER_KEY 承载它。
- */
-export function amapKey(): string {
-  return process.env.AMAP_SERVER_KEY || process.env.AMAP_KEY || '';
-}
-
-async function amapGeocode(name: string): Promise<PlaceAnchor | null> {
-  const key = amapKey();
-  if (!key) return null;
-  const qs = new URLSearchParams({ key, address: name });
-  try {
-    const res = await fetch(`https://restapi.amap.com/v3/geocode/geo?${qs}`, {
-      signal: AbortSignal.timeout(3500),
-      headers: { 'User-Agent': 'RailVista/0.4.0 (drive-geocode)' },
-    });
-    if (!res.ok) return null;
-    const json = (await res.json()) as {
-      status?: string;
-      geocodes?: Array<{ location?: string; province?: string; level?: string }>;
-    };
-    if (json.status !== '1' || !json.geocodes?.length) return null;
-    const loc = json.geocodes[0]!.location;
-    if (!loc) return null;
-    const [glng, glat] = loc.split(',').map(Number);
-    if (!Number.isFinite(glng) || !Number.isFinite(glat)) return null;
-    const { lng, lat } = gcj02ToWgs84(glng, glat); // GCJ-02 → WGS-84，不转会偏 300~600m
-    if (!isPlausibleCnPoint(lng, lat)) return null;
-    return { name, lng, lat, province: json.geocodes[0]!.province, level: 'county' };
-  } catch {
-    return null;
-  }
-}
-
-/**
- * 百度地理编码（2026-10-18）：geocoding/v3，ret_coordtype=wgs84ll 直接回 WGS-84 免转换。
- * 高德 Web 服务额度耗尽后恒快败返回 null，竞速数组里补百度源对冲。
+ * 百度地理编码：geocoding/v3，ret_coordtype=wgs84ll 直接回 WGS-84 免除转换。
  */
 async function baiduGeocode(name: string): Promise<PlaceAnchor | null> {
   const key = process.env.BAIDU_MAP_KEY;
@@ -459,28 +418,23 @@ async function nominatimGeocode(name: string): Promise<PlaceAnchor | null> {
 
 /**
  * A4：geocode 结果缓存（24h）。
- * 原实现每次未命中都要走网络，且高德失败后才串行试Nominatim，最长阻塞 12s；
+ * 原实现每次未命中都要走网络，串行失败时最长阻塞数秒；
  * 用户表现为「输入了没反应」（前端 DriveHome 是空 catch）。
  */
 const geocodeCache = new Map<string, { at: number; hit: PlaceHit | null }>();
 const GEOCODE_TTL_MS = 24 * 3600 * 1000;
 const GEOCACHE_MAX = 200;
 
-/** 本地未命中时的兜底 geocode：高德与 Nominatim 并行取先成功者，命中回写本地锚点 */
+/** 本地未命中时的兜底 geocode：百度与 Nominatim 并行取先成功者，命中回写本地锚点 */
 export async function geocodeFallback(name: string): Promise<PlaceHit | null> {
   const key = name.trim();
   if (!key) return null;
   const cached = geocodeCache.get(key);
   if (cached && Date.now() - cached.at < GEOCODE_TTL_MS) return cached.hit;
 
-  // A4：原为串行 await（高德 6s 超时后才试 Nominatim 再 6s，最长 12s）。
-  // 改为并行竞速，总耗时 = min(两者)，并把超时压到 3.5s。
-  // 2026-10-14 修竞速语义：Promise.any 对 fulfill(null) 也立即结算——高德额度
-  // 耗尽后恒快败返回 null，会把 Nominatim 的成功结果废掉（表现为「输入没反应」）。
-  // 改为 null 即 reject 再 any；全败（含 AggregateError）catch 归 null 不外抛。
-  // 2026-10-18 竞速源扩为 高德→百度→Nominatim（高德额度耗尽后百度兜上）。
+  // 并行竞速：null 当 miss（reject），避免 fulfill(null) 抢先废掉另一路成功结果。
   const hit = await Promise.any(
-    [amapGeocode(key), baiduGeocode(key), nominatimGeocode(key)].map((p) =>
+    [baiduGeocode(key), nominatimGeocode(key)].map((p) =>
       p.then((anchor) => {
         if (!anchor) throw new Error('miss');
         return anchor;

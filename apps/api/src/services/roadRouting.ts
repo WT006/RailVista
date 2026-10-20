@@ -1,19 +1,15 @@
 /**
- * 万里路书 · 全国公路旅游网 —— 双引擎路径规划（PRD §5.1）。
+ * 万里路书 · 全国公路旅游网 —— 路径规划（PRD §5.1）。
  *
- * 引擎 1（在线，默认）：高德 Web 服务「驾车路径规划 v5」
- *   - 返回 GCJ-02 折线，必须 gcj02ToWgs84() 后才与 OSM/景点库对齐
- *   - strategy 10 推荐；waypoints 支持途经点
- * 引擎 2（本地，兜底 + 鸿蒙端）：roadTopology CSR + A*
+ * 主引擎：本地 roadTopology CSR + A*
  *   - OD 端点 0.03° 网格 snap，容差 5km；超限降级「端点外接段 + 干线主段」拼接
- * 两种引擎出折线后走完全相同的下游（filterSpotsAlongRoad），保证景点结果一致。
- *
- * 本地拓扑不可用时最后降级 direct（两点直连，engine 标注 direct，前端明示）。
+ * 在线兜底：百度驾车 → OSRM（不再调用高德 Web 服务）
+ * 本地与在线均失败时降级 direct（两点直连，engine 标注 direct，前端明示）。
  */
-import { computeCumKm, gcj02ToWgs84 } from '@railvista/shared';
+import { computeCumKm } from '@railvista/shared';
 import type { GapAnnotation, RoadPoint, RoadRoute } from '@railvista/shared';
 import { getRoadEntry, getRoadGeometry, getRoadGeometryFull } from './roadNetwork.js';
-import { amapKey, geocodeFallback, nearestPlaceName, resolvePlace } from './roadIndex.js';
+import { geocodeFallback, nearestPlaceName, resolvePlace } from './roadIndex.js';
 import { buildChapters } from './roadsideSpots.js';
 import type { RoadGeometryNode } from '@railvista/shared';
 import {
@@ -33,16 +29,10 @@ export interface PlanRouteInput {
   to: string;
   via?: string[];
   /**
-   * auto（默认）→ 本地干线 A*，失败再试高德；
-   * local → 只用本地拓扑；
-   * amap → 只用高德驾车规划。
-   *
-   * 2026-10-11：默认从「高德优先」改为「本地优先」。国道/省道几何补全后
-   * 本地拓扑已是 148.9 万节点 / 370.3 万边、主连通分量覆盖 98.2% 节点的全国网，
-   * 上海→拉萨这类跨省 OD 实测 3802km / 382ms 可解；而高德依赖 key 类型与配额，
-   * 作为兜底比作为主路径更符合「数据在本地、可离线复算」的定位。
+   * auto（默认）→ 本地干线 A*，失败再试百度 / OSRM；
+   * local → 只用本地拓扑。
    */
-  engine?: 'auto' | 'local' | 'amap';
+  engine?: 'auto' | 'local';
 }
 
 export class PlaceNotFoundError extends Error {
@@ -56,8 +46,6 @@ export class PlaceNotFoundError extends Error {
 }
 
 type Pt = { lng: number; lat: number };
-
-const AMAP_TIMEOUT_MS = 8000;
 
 function parseLngLat(text: string): Pt | null {
   const m = /^(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)$/.exec(text.trim());
@@ -95,61 +83,8 @@ async function resolveEndpoint(text: string, field: 'from' | 'to'): Promise<{ pt
   throw new PlaceNotFoundError(field, text);
 }
 
-// ── 引擎 1：高德驾车规划（v5，GCJ-02 → WGS-84） ─────────────────────────────
-async function amapDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [number, number][]; distanceM: number; durationSec: number } | null> {
-  const key = amapKey();
-  if (!key) return null;
-  const fmt = (p: Pt) => `${p.lng.toFixed(6)},${p.lat.toFixed(6)}`;
-  const qs = new URLSearchParams({
-    key,
-    origin: fmt(from),
-    destination: fmt(to),
-    strategy: '10',
-    show_fields: 'polyline,cost',
-  });
-  if (via.length) qs.set('waypoints', via.map(fmt).join(';'));
-  try {
-    const res = await fetch(`https://restapi.amap.com/v5/direction/driving?${qs}`, {
-      signal: AbortSignal.timeout(AMAP_TIMEOUT_MS),
-      headers: { 'User-Agent': 'RailVista/0.4.0 (drive-routing)' },
-    });
-    if (!res.ok) return null;
-    const json = (await res.json()) as {
-      errcode?: number;
-      route?: {
-        paths?: Array<{
-          distance?: number;
-          cost?: { duration?: number };
-          steps?: Array<{ polyline?: string }>;
-        }>;
-      };
-    };
-    if (json.errcode !== 0 || !json.route?.paths?.length) return null;
-    const path = json.route.paths[0]!;
-    const coords: [number, number][] = [];
-    for (const step of path.steps ?? []) {
-      if (!step.polyline) continue;
-      for (const pair of step.polyline.split(';')) {
-        const [glng, glat] = pair.split(',').map(Number);
-        if (!Number.isFinite(glng) || !Number.isFinite(glat)) continue;
-        const { lng, lat } = gcj02ToWgs84(glng, glat);
-        coords.push([lng, lat]);
-      }
-    }
-    if (coords.length < 2) return null;
-    return {
-      coords,
-      distanceM: Number(path.distance) || 0,
-      durationSec: Number(path.cost?.duration) || 0,
-    };
-  } catch {
-    return null;
-  }
-}
-
 // ── 引擎 1.6：百度地图驾车（v2 routing，WGS-84 进出免转换） ─────────────────
-// 2026-10-18 高德 Web 服务额度耗尽，主人提供百度 ak：坐标系用
-// coord_type=wgs84（输入）+ ret_coordtype=wgs84ll（输出），全程免 BD-09 转换；
+// 百度 ak：coord_type=wgs84（输入）+ ret_coordtype=wgs84ll（输出），全程免 BD-09 转换；
 // 国内路网数据质量优于 OSRM，排在 OSRM 之前。
 async function baiduDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [number, number][]; distanceM: number; durationSec: number } | null> {
   const key = process.env.BAIDU_MAP_KEY;
@@ -194,17 +129,45 @@ async function baiduDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [
     return null;
   }
 }
+/** Google / OSRM encoded polyline → [lng, lat][]（precision 5） */
+function decodeOsrmPolyline(encoded: string): [number, number][] {
+  const coords: [number, number][] = [];
+  let index = 0;
+  let lat = 0;
+  let lng = 0;
+  while (index < encoded.length) {
+    let result = 0;
+    let shift = 0;
+    let b: number;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    lat += result & 1 ? ~(result >> 1) : result >> 1;
+    result = 0;
+    shift = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    lng += result & 1 ? ~(result >> 1) : result >> 1;
+    coords.push([lng / 1e5, lat / 1e5]);
+  }
+  return coords;
+}
 // ── 引擎 1.5：OSRM 公共实例（开源 OSM 路网，WGS-84 免转换） ──────────────────
-// 2026-10-14 高德 Web 服务免费额度耗尽：驾车规划兜底改为开源优先。
 // OSRM（router.project-osrm.org）基于全量 OSM 路网，坐标进出均为 WGS-84，
-// 无 GCJ 偏移，也不占任何商业额度；失败再回落高德（key 恢复后自动恢复双保险）。
+// 无 GCJ 偏移，也不占任何商业额度。
 async function osrmDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [number, number][]; distanceM: number; durationSec: number } | null> {
   const pts = [from, ...via, to];
   const coord = pts.map((p) => `${p.lng.toFixed(6)},${p.lat.toFixed(6)}`).join(';');
-  const qs = new URLSearchParams({ overview: 'full', geometries: 'geojson' });
+  // polyline 比 geojson 小一个数量级：北京→拉萨 full 约 1–2s，geojson 常 >15s 超时掉直线
+  const qs = new URLSearchParams({ overview: 'full', geometries: 'polyline' });
   try {
     const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coord}?${qs}`, {
-      signal: AbortSignal.timeout(9000),
+      signal: AbortSignal.timeout(15000),
       headers: { 'User-Agent': 'RailVista/0.4.0 (drive-routing)' },
     });
     if (!res.ok) return null;
@@ -213,17 +176,12 @@ async function osrmDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [n
       routes?: Array<{
         distance?: number;
         duration?: number;
-        geometry?: { coordinates?: [number, number][] };
+        geometry?: string;
       }>;
     };
     if (json.code !== 'Ok' || !json.routes?.length) return null;
     const r = json.routes[0]!;
-    const coords: [number, number][] = [];
-    for (const c of r.geometry?.coordinates ?? []) {
-      const [lng, lat] = [Number(c[0]), Number(c[1])];
-      if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue;
-      coords.push([lng, lat]);
-    }
+    const coords = typeof r.geometry === 'string' ? decodeOsrmPolyline(r.geometry) : [];
     if (coords.length < 2) return null;
     return {
       coords,
@@ -370,10 +328,33 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
   let durationMin: number | undefined;
   let roadKeys: string[] = [];
 
-  // 本地优先（见 PlanRouteInput.engine 注释）；engine='amap' 时跳过本地。
+  // 超长 OD（北京→拉萨级，含途经点）：本地 A* 与在线规划并行。
+  // 本地失败/偏慢时不再串行干等，避免公共 OSRM 慢查询把整请求拖进两点直线。
+  const odStraightKm = straightKm(from.pt, to.pt);
+  const raceOnline =
+    input.engine !== 'local' && odStraightKm >= 800;
+  const onlineRace = raceOnline
+    ? (async (): Promise<{
+        engine: string;
+        coords: [number, number][];
+        durationSec: number;
+      } | null> => {
+        const baidu = await baiduDriveRoute(from.pt, to.pt, viaPts);
+        if (baidu) {
+          return { engine: 'baidu', coords: baidu.coords, durationSec: baidu.durationSec };
+        }
+        const osrm = await osrmDriveRoute(from.pt, to.pt, viaPts);
+        if (osrm) {
+          return { engine: 'osrm', coords: osrm.coords, durationSec: osrm.durationSec };
+        }
+        return null;
+      })()
+    : null;
+
+  // 本地优先（见 PlanRouteInput.engine 注释）。
   // 有途经点时先按 from→via…→to 逐段 A* 再首尾相接（旧实现对本地引擎直接无视 via，
   // 换成本地优先后会变成「静默少走途经点」，比报错更糟）。
-  if (input.engine !== 'amap') {
+  {
     const pts = [from.pt, ...viaPts, to.pt];
     const legs: [number, number][][] = [];
     const keys = new Set<string>();
@@ -400,8 +381,15 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
     }
   }
   if (!coords.length && input.engine !== 'local') {
-    // 百度（主人提供的 ak）优先于 OSRM：国内路网质量更好；
-    // 高德额度耗尽恒败，排最后仅作 key 恢复后的保险。
+    const raced = onlineRace ? await onlineRace : null;
+    if (raced) {
+      engine = raced.engine;
+      coords = raced.coords;
+      if (raced.durationSec > 0) durationMin = Math.round(raced.durationSec / 60);
+    }
+  }
+  if (!coords.length && input.engine !== 'local') {
+    // 短途未并行时：串行百度 → OSRM
     const baidu = await baiduDriveRoute(from.pt, to.pt, viaPts);
     if (baidu) {
       engine = 'baidu';
@@ -410,20 +398,11 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
     }
   }
   if (!coords.length && input.engine !== 'local') {
-    // 开源兜底：OSRM（额度耗尽后高德恒败，先打它省一次必败往返）
     const osrm = await osrmDriveRoute(from.pt, to.pt, viaPts);
     if (osrm) {
       engine = 'osrm';
       coords = osrm.coords;
       if (osrm.durationSec > 0) durationMin = Math.round(osrm.durationSec / 60);
-    }
-  }
-  if (!coords.length && input.engine !== 'local') {
-    const amap = await amapDriveRoute(from.pt, to.pt, viaPts);
-    if (amap) {
-      engine = 'amap';
-      coords = amap.coords;
-      if (amap.durationSec > 0) durationMin = Math.round(amap.durationSec / 60);
     }
   }
   if (!coords.length) {
@@ -506,13 +485,13 @@ export function planRoadRoute(key: string): (RoadRoute & {
 
 /** 供 /along 响应标注引擎信息 */
 export function routeEngineNote(engine: string): string {
-  if (engine === 'amap') return '高德驾车规划（GCJ-02 已转 WGS-84）';
+  if (engine === 'baidu') return '百度驾车规划（WGS-84）';
+  if (engine === 'osrm') return 'OSRM 开源路网规划（OSM · WGS-84）';
   // 2026-10-11：国道/省道几何补全后本地网已是全国网（主分量覆盖 98.2% 节点）。
   // 里程是路网实算，时长是按等级限速折的估算——两件事必须分开说，不能让用户
   // 把「约 N 小时」当成导航 ETA。
   if (engine === 'local') return '本地公路网 A*（里程路网实算 · 时长按等级限速估算）';
   if (engine === 'local-spliced') return '本地公路网 A*（端点附近无干线节点，首尾为外接段 · 时长估算）';
-  // 走到这里说明两端都没 snap 上（端点落在海面/境外/无路区）。如实说明，
-  // 避免用户把两点直线误认为真实路线规划结果。
-  return '两点直连示意：起终点附近没有可吸附的公路网节点，未做寻路（不代表真实路线）';
+  // 真正走到 direct：本地 + 在线兜底全失败（超时/无 key/无路）。
+  return '两点直连示意：本地路网与在线规划均未成功，未做寻路（不代表真实路线）';
 }

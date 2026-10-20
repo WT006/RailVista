@@ -48,7 +48,6 @@ import { upsertTicketTrace } from '../lib/ticketTrace';
 
 usePointerSpotlight();
 const routePathRef = ref<SVGPathElement | null>(null);
-useRoadDraw(routePathRef);
 
 const route = useRoute();
 const router = useRouter();
@@ -245,6 +244,8 @@ function pathFromCoords(coords: [number, number][] | undefined): string {
 }
 
 const routePath = computed(() => pathFromCoords(roadRoute.value?.coords as [number, number][] | undefined));
+/** pathD 变化时重测长度，避免 dasharray 仍是旧值导致小地图「断线」 */
+useRoadDraw(routePathRef, 520, routePath);
 
 /** 未贯通 orphan 段：虚线绘制，与 DriveRoad 一致——景点挂在这些段上，不画就会「点飞线外」 */
 const segmentPaths = computed(() => {
@@ -345,13 +346,15 @@ onBeforeUnmount(() => {
   mapSvgRo = null;
 });
 
-/** 圆点按屏幕像素计（目标直径 ~8px），与线宽 non-scaling 同思路，超短线不再糊成一坨 */
+/** 圆点按屏幕像素计；预览卡景点密，直径压到 ~4.5px，避免盖住主链 */
 const mapDotR = computed(() => {
   const [, , w, h] = focusBbox.value;
   const span = Math.max(w, h, 0.05);
   const px = Math.max(mapSvgPx.value, 120);
-  const targetDiameterPx = 8;
-  return (targetDiameterPx / px) * (span / 2);
+  const targetDiameterPx = 4.5;
+  const r = (targetDiameterPx / px) * (span / 2);
+  // 硬顶：再密也不超过取景短边的 1/90，防止 Resize 前 px 偏小把点撑爆
+  return Math.min(r, span / 90);
 });
 
 /** 有未贯通段时用 meet，保证全部分量可见；单链仍用 slice 铺满预览卡 */
@@ -837,6 +840,8 @@ watch(gps, (sample) => {
               @click="openFullMap"
             >
               <g class="drive-netmap__outline" v-html="outlinePaths" />
+              <!-- 先画完整路线（底层保底 + 主链动画），景点圆点压在线上方 -->
+              <path class="drive-trip-map__route is-underlay" :d="routePath" />
               <path ref="routePathRef" class="drive-trip-map__route" :d="routePath" />
               <path
                 v-for="(d, i) in segmentPaths"
@@ -850,7 +855,7 @@ watch(gps, (sample) => {
                 class="drive-trip-map__dot"
                 :cx="spotPos(s)[0]"
                 :cy="spotPos(s)[1]"
-                :r="expandedSpotId === s.id ? mapDotR * 1.7 : mapDotR"
+                :r="expandedSpotId === s.id ? mapDotR * 1.55 : mapDotR"
                 :fill="tierColor(s.tier)"
                 :class="{ 'is-expanded': expandedSpotId === s.id }"
                 @click.stop="toggleSpot(s)"
@@ -863,9 +868,9 @@ watch(gps, (sample) => {
                 class="drive-trip-map__dot is-orphan"
                 :cx="spotPos(s)[0]"
                 :cy="spotPos(s)[1]"
-                :r="mapDotR * 0.85"
+                :r="mapDotR * 0.8"
                 :fill="tierColor(s.tier)"
-                opacity="0.55"
+                opacity="0.5"
                 @click.stop="toggleSpot(s)"
               >
                 <title>{{ s.name }} · 未贯通段</title>

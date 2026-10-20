@@ -57,7 +57,7 @@ driveRoute.get('/suggest', async (c) => {
     ? (kindRaw as PlaceKind)
     : undefined;
   let hits = suggestPlaces(q, kind, limit, province);
-  // 降级链：本地未命中 → 高德 → Nominatim（PRD §4.3；place 语义才兜底）
+  // 降级链：本地未命中 → 百度 / Nominatim（place 语义才兜底）
   if (!hits.length && q.trim().length >= 2 && (!kind || kind === 'place')) {
     const remote = await geocodeFallback(q.trim());
     if (remote) hits = [remote];
@@ -134,10 +134,9 @@ driveRoute.get('/route', async (c) => {
   const from = c.req.query('from');
   const to = c.req.query('to');
   const via = (c.req.query('via') ?? '').split(';').map((s) => s.trim()).filter(Boolean);
-  // auto（默认，本地网优先）/ local（只用本地拓扑）/ amap（只用高德驾车规划）
+  // auto（默认，本地网优先）/ local（只用本地拓扑）
   const engineQuery = c.req.query('engine');
-  const engine: 'auto' | 'local' | 'amap' =
-    engineQuery === 'local' ? 'local' : engineQuery === 'amap' ? 'amap' : 'auto';
+  const engine: 'auto' | 'local' = engineQuery === 'local' ? 'local' : 'auto';
   if (!from || !to) return badRequest(c, '缺少 from / to 参数');
   try {
     const route = await planDriveRoute({ from, to, via, engine });
@@ -206,12 +205,12 @@ driveRoute.get('/along', async (c) => {
   } else if (from && to) {
     // C1 点对点
     try {
-      // 与 /route 同口径：engine=local|amap 显式指定，缺省 auto
+      // 与 /route 同口径：engine=local 显式指定，缺省 auto
       const eq = c.req.query('engine');
       route = await planDriveRoute({
         from,
         to,
-        engine: eq === 'local' ? 'local' : eq === 'amap' ? 'amap' : 'auto',
+        engine: eq === 'local' ? 'local' : 'auto',
       });
     } catch (e) {
       if (e instanceof PlaceNotFoundError) {

@@ -108,7 +108,8 @@ app.route('/travel', travelRoute);
 app.route('/weather', weatherRoute);
 app.route('/sky', skyRoute);
 
-const port = Number(process.env.PORT || 3000);
+// 默认 3010：本机 Windows 常排除 2910–3009，绑 3000 会 EACCES
+const port = Number(process.env.PORT || 3010);
 
 await ensureSingleInstance(port);
 
@@ -117,8 +118,22 @@ const { loadLocalHsrRails } = await import('./services/localRails.js');
 loadLocalHsrRails();
 const qwReady = Boolean(process.env.QWEATHER_API_KEY?.trim() && process.env.QWEATHER_API_HOST?.trim());
 console.log(
-  `[railvista-api] AMAP_KEY=${process.env.AMAP_KEY ? 'set' : 'missing'} QWEATHER=${qwReady ? 'set' : 'fallback:open-meteo'} listening on :${port}`,
+  `[railvista-api] QWEATHER=${qwReady ? 'set' : 'fallback:open-meteo'} listening on :${port}`,
 );
+
+// 公路干线拓扑预热：避免首个「北京→拉萨」类 OD 冷启动加载拓扑时本地 A* 失手、
+// 再叠加上线超时，整请求掉进两点直线。
+setTimeout(() => {
+  void import('./services/roadTopology.js')
+    .then((m) => {
+      const ok = m.loadRoadTopology();
+      const info = m.roadTopologyInfo();
+      console.log(
+        `[road-topo] preload ${ok ? 'ok' : 'fail'} nodes=${info.nodeCount} edges=${info.edgeCount}`,
+      );
+    })
+    .catch((e) => console.warn('[road-topo] preload failed', e));
+}, 1500).unref?.();
 
 // F2 ③ 热门 OD 段几何预热：延后到空闲时段，避免与首个真实请求抢资源
 const prewarmDelayMs = Number(process.env.RAIL_SEG_PREWARM_DELAY_MS || 8000);

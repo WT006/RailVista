@@ -15,6 +15,7 @@ import TicketExportModal from '../components/ticket/TicketExportModal.vue';
 import TrainPicker from '../components/ticket/TrainPicker.vue';
 import RailwayPersonalize from '../components/ticket/RailwayPersonalize.vue';
 import TicketThemePicker from '../components/ticket/TicketThemePicker.vue';
+import ChinaFootprintMap from '../components/ticket/ChinaFootprintMap.vue';
 import DriveBuilder from '../components/ticket/DriveBuilder.vue';
 import FlightBuilder from '../components/ticket/FlightBuilder.vue';
 import HmSegmented, { type SegOption } from '../components/ticket/hm/HmSegmented.vue';
@@ -78,6 +79,7 @@ function flash(msg: string) {
 const exportOpen = ref(false);
 const exportName = ref('');
 const exportConfig = ref<TicketConfig | null>(null);
+const footprintOpen = ref(false);
 
 /** 居中弹窗提示（重复保存等），自动消失；key 强制重挂载避免连点无感 */
 const alertOpen = ref(false);
@@ -280,6 +282,19 @@ const showAdvanced = ref(false);
             <TicketThemePicker />
           </section>
 
+          <!-- 中国旅行足迹地图 -->
+          <section class="rv-card footprint-entry" data-spotlight>
+            <div class="footprint-entry__head">
+              <div>
+                <h2 class="builder-title">我的中国足迹</h2>
+                <p class="footprint-entry__hint">点亮去过的城市，生成纪念地图图片或动画</p>
+              </div>
+              <button type="button" class="btn primary btn-sm" @click="footprintOpen = true">
+                打开地图
+              </button>
+            </div>
+          </section>
+
           <!-- 高级全字段 -->
           <section class="rv-card" data-spotlight>
             <button type="button" class="adv-toggle" @click="showAdvanced = !showAdvanced">
@@ -343,6 +358,33 @@ const showAdvanced = ref(false);
         <div class="tk-alert__panel">
           <p class="tk-alert__msg">{{ alertMsg }}</p>
           <button type="button" class="btn primary btn-sm" @click="closeAlert">知道了</button>
+        </div>
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
+      <div
+        v-if="footprintOpen"
+        class="footprint-modal"
+        role="dialog"
+        aria-modal="true"
+      >
+        <button
+          type="button"
+          class="footprint-modal__backdrop"
+          aria-label="关闭"
+          @click="footprintOpen = false"
+        />
+        <div class="footprint-modal__panel">
+          <button
+            type="button"
+            class="footprint-modal__close"
+            aria-label="关闭"
+            @click="footprintOpen = false"
+          >
+            ×
+          </button>
+          <ChinaFootprintMap />
         </div>
       </div>
     </Teleport>
@@ -516,6 +558,54 @@ const showAdvanced = ref(false);
 }
 
 .footnote { margin: var(--space-3) 0 0; color: var(--text-3); font-size: var(--fs-cap); text-align: center; }
+.footprint-entry { background: linear-gradient(135deg, rgba(245,158,11,0.08), transparent); border-color: rgba(245,158,11,0.25); }
+.footprint-entry__head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); }
+.footprint-entry__hint { margin: 2px 0 0; font-size: var(--fs-cap); color: var(--text-3); }
+
+.footprint-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10060;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.footprint-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+.footprint-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(1100px, 100%);
+  max-height: 92vh;
+  overflow: auto;
+  padding: 16px;
+  border-radius: var(--radius-lg, 16px);
+  background: #070a10;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65);
+}
+.footprint-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #1f2d44;
+  border-radius: 50%;
+  background: #111827;
+  color: #e5e7eb;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
 </style>
 
 <!-- Teleport 到 body：非 scoped，避免弹层无样式像「没反应」 -->

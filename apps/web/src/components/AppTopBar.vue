@@ -12,8 +12,11 @@ import { appVersionInfo, APP_VERSION } from '@railvista/shared';
 import { APP_NAV_ITEMS } from '../data/appNav';
 import { navIcon } from '../data/navIcons';
 import BrandLogo from './BrandLogo.vue';
+import { Search } from 'lucide-vue-next';
+import { useGlobalSearch } from '../composables/useGlobalSearch';
 
 const route = useRoute();
+const gs = useGlobalSearch();
 
 /** 版本号与变更摘要（悬浮显示，与 CHANGELOG.md 首条同源） */
 const versionInfo = appVersionInfo();
@@ -56,6 +59,11 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 
       <div class="appbar__right">
         <slot name="actions" />
+        <button type="button" class="appbar__search" aria-label="全局搜索" @click="gs.open()">
+          <Search :size="16" :stroke-width="1.9" />
+          <span class="appbar__search-label">搜索</span>
+          <kbd class="appbar__search-kbd">Ctrl K</kbd>
+        </button>
         <span
           class="appbar__version"
           :title="`${versionInfo.summary}（${versionInfo.date}）`"
@@ -194,6 +202,37 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   align-items: center;
   gap: var(--space-2);
   flex-shrink: 0;
+}
+
+.appbar__search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: var(--fill-subtle);
+  color: var(--text-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--fs-cap);
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-standard), background var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard);
+}
+.appbar__search:hover {
+  color: var(--text-1);
+  background: var(--interactive-hover);
+  border-color: var(--line-strong);
+}
+.appbar__search-kbd {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--text-3);
+  border: 1px solid var(--line-default);
+  border-radius: 5px;
+  padding: 1px 5px;
+  background: var(--surface-2);
 }
 
 /* 版本徽标弱化为纯文字小字，不再带边框盒，减少导航条的"框"感 */

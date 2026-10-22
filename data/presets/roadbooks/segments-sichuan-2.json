@@ -1,0 +1,498 @@
+{
+  "version": "1",
+  "updated": "2026-10-22",
+  "area": "「四川」（补强覆盖：本轮前库内四川路线较少，本文件 +1 —— 成都平原文化漫游）",
+  "note": "本文件含 1 条路线：成都平原·眉山—乐山—峨眉—罗城 3 日（L2 / editorRank 160，3 日、单向线）。里程由本地国家公路网拓扑 A* 最短路实算，坐标取本地已核验景点库与测距节点坐标（保留两位小数）。",
+  "routes": [
+    {
+      "id": "sichuan-chengdu-meishan-leshan-3d",
+      "name": "成都平原·眉山—乐山—峨眉—罗城",
+      "subtitle": "三苏文脉·唐代巨佛·佛教名山",
+      "alias": "巴蜀文化",
+      "provinces": [
+        "四川"
+      ],
+      "cities": [
+        "成都",
+        "眉山",
+        "乐山"
+      ],
+      "anchorCity": "成都",
+      "primaryMode": "selfdrive",
+      "modes": [
+        "selfdrive",
+        "public",
+        "charter"
+      ],
+      "shape": "line",
+      "tier": "regional",
+      "layer": "L2",
+      "tags": [
+        "三苏祠",
+        "乐山大佛",
+        "峨眉山",
+        "罗城古镇",
+        "东风堰"
+      ],
+      "summary": "从成都南下把三苏祠、乐山大佛、东风堰与峨眉山、罗城古镇串成三天文化漫游，走通巴蜀文脉、唐代石刻与佛教名山的平原长卷。",
+      "totalKm": 384.6,
+      "mileageNote": "3 天累加约 384.6 公里：成都→眉山 74.3、眉山→彭祖山 31.1、眉山→乐山 79.4、乐山→东风堰 39.2、乐山→峨眉山 58.1、峨眉山→罗城 102.5。全部为本地国家公路网拓扑 A* 最短路实算，比值均低于 1.5，里程可信；本段为单向进入成都平原，返程沿 G0512 回成都。",
+      "days": 3,
+      "bestSeason": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "difficulty": 2,
+      "roadRefs": [
+        "G317",
+        "G0512",
+        "四川:S103",
+        "G93",
+        "G348",
+        "G661",
+        "G245",
+        "G213"
+      ],
+      "startNode": "成都",
+      "endNode": "罗城古镇",
+      "intro": {
+        "overview": "这是一条成都平原的文化漫游线，把三苏文脉、唐代巨佛、古代水利与佛教名山、船形古镇串成三天可读的行程。成都出发，第一站眉山三苏祠，看苏氏父子的宋风雅韵；彭祖山补足长寿文化的民俗侧写。第二站乐山，乐山大佛是依崖凿造的唐代弥勒巨佛，东风堰千佛岩是仍在灌溉的唐代古堰与石窟。第三站峨眉山，普贤道场、金顶云海与猴区构成完整朝圣体系；终点罗城古镇以船形街格局收尾。整条线地处成都平原与盆周过渡带，路网密集、节奏轻松，是周末与短假皆宜的巴蜀文化线（本段为单向进入，返程沿 G0512 回成都）。",
+        "bestSeason": "3-5 月与 9-11 月最合适：春有菜花、秋高气爽，景区舒适；夏季闷热多雨、冬季湿冷偶有雾。",
+        "seasonNotes": [
+          {
+            "months": [
+              3,
+              4,
+              5
+            ],
+            "note": "平原新绿、气候舒适，最适合文化漫游。"
+          },
+          {
+            "months": [
+              7,
+              8
+            ],
+            "note": "闷热多阵雨，优先清晨与傍晚，午间室内。"
+          },
+          {
+            "months": [
+              12,
+              1
+            ],
+            "note": "湿冷明显，山地与江边注意保暖。"
+          }
+        ],
+        "days": 3,
+        "daysNote": "可压成两天（合并乐山两日）；三天最从容，峨眉山留一整天。",
+        "difficultyNote": "难度低，以祠庙、石刻、名山与古镇步道为主；峨眉山金顶需乘索道。",
+        "audience": "喜欢巴蜀文化、石刻与古镇的文史与亲子游客。",
+        "avoid": "峨眉山猴区逗弄野猴；大佛游山游江择一以免赶；古镇石阶防滑。"
+      },
+      "nodes": [
+        {
+          "name": "成都",
+          "province": "四川",
+          "city": "成都",
+          "role": "start",
+          "note": "成都：本线途经节点。",
+          "lng": 104.06,
+          "lat": 30.58
+        },
+        {
+          "name": "眉山三苏祠",
+          "province": "四川",
+          "city": "眉山",
+          "role": "mid",
+          "note": "眉山三苏祠：本线途经节点。",
+          "lng": 103.83,
+          "lat": 30.04
+        },
+        {
+          "name": "彭祖山",
+          "province": "四川",
+          "city": "眉山",
+          "role": "mid",
+          "note": "彭祖山：本线途经节点。",
+          "lng": 103.93,
+          "lat": 30.22
+        },
+        {
+          "name": "乐山大佛",
+          "province": "四川",
+          "city": "乐山",
+          "role": "mid",
+          "note": "乐山大佛：本线途经节点。",
+          "lng": 103.77,
+          "lat": 29.54
+        },
+        {
+          "name": "东风堰千佛岩",
+          "province": "四川",
+          "city": "乐山",
+          "role": "mid",
+          "note": "东风堰千佛岩：本线途经节点。",
+          "lng": 103.54,
+          "lat": 29.75
+        },
+        {
+          "name": "峨眉山",
+          "province": "四川",
+          "city": "乐山",
+          "role": "mid",
+          "note": "峨眉山：本线途经节点。",
+          "lng": 103.34,
+          "lat": 29.55
+        },
+        {
+          "name": "罗城古镇",
+          "province": "四川",
+          "city": "乐山",
+          "role": "end",
+          "note": "罗城古镇：本线途经节点。",
+          "lng": 104.03,
+          "lat": 29.38
+        }
+      ],
+      "segments": [
+        {
+          "id": "seg1",
+          "index": 1,
+          "name": "成都→眉山三苏祠",
+          "fromNode": "成都",
+          "toNode": "眉山三苏祠",
+          "via": [],
+          "roadRefs": [
+            "G317",
+            "G0512"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 74.3,
+          "driveHours": 1.1,
+          "condition": "成都南下眉山",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg2",
+          "index": 2,
+          "name": "眉山三苏祠→彭祖山",
+          "fromNode": "眉山三苏祠",
+          "toNode": "彭祖山",
+          "via": [],
+          "roadRefs": [
+            "G0512",
+            "四川:S103"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 31.1,
+          "driveHours": 0.4,
+          "condition": "眉山彭山彭祖山",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg3",
+          "index": 3,
+          "name": "眉山三苏祠→乐山大佛",
+          "fromNode": "眉山三苏祠",
+          "toNode": "乐山大佛",
+          "via": [],
+          "roadRefs": [
+            "G0512",
+            "G93"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 79.4,
+          "driveHours": 1.1,
+          "condition": "眉山乐山",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg4",
+          "index": 4,
+          "name": "乐山大佛→东风堰千佛岩",
+          "fromNode": "乐山大佛",
+          "toNode": "东风堰千佛岩",
+          "via": [],
+          "roadRefs": [
+            "G93",
+            "G0512",
+            "G348",
+            "G661"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 39.2,
+          "driveHours": 0.6,
+          "condition": "乐山夹江千佛岩",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg5",
+          "index": 5,
+          "name": "乐山大佛→峨眉山",
+          "fromNode": "乐山大佛",
+          "toNode": "峨眉山",
+          "via": [],
+          "roadRefs": [
+            "G93",
+            "G0512",
+            "G348",
+            "G661",
+            "G245"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 58.1,
+          "driveHours": 0.8,
+          "condition": "乐山峨眉",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg6",
+          "index": 6,
+          "name": "峨眉山→罗城古镇",
+          "fromNode": "峨眉山",
+          "toNode": "罗城古镇",
+          "via": [],
+          "roadRefs": [
+            "G245",
+            "G661",
+            "G93",
+            "G348",
+            "G0512",
+            "G213"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 102.5,
+          "driveHours": 1.5,
+          "condition": "峨眉犍为罗城",
+          "note": "",
+          "poiIds": []
+        }
+      ],
+      "pois": [
+        {
+          "id": "s-p-chengdu",
+          "name": "成都",
+          "province": "四川",
+          "city": "成都",
+          "category": "cityview",
+          "tagline": "天府之国首府，休闲与美食之都。",
+          "intro": "成都为四川省会，是川西平原与川藏线、大九寨等环线的总门户，宽窄巷子、武侯祠与火锅文化尽显休闲气质，也是本线出发与补给中心。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "春秋气候宜人、美食最盛",
+          "ticketNote": "热门场馆开放以公告为准。",
+          "detourKm": 0,
+          "lng": 104.06,
+          "lat": 30.58
+        },
+        {
+          "id": "s-p-sansu",
+          "name": "眉山三苏祠",
+          "province": "四川",
+          "city": "眉山",
+          "category": "culture",
+          "tagline": "苏洵苏轼苏辙父子故居，宋风雅韵。",
+          "intro": "三苏祠位于眉山，是北宋文豪苏洵、苏轼、苏辙父子的故居与祠堂，园林典雅、碑刻满壁，是看宋代文人精神与巴蜀文脉的圣地。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "上午园林光影最佳",
+          "ticketNote": "开放与门票以官方公告为准。",
+          "detourKm": 0,
+          "lng": 103.83,
+          "lat": 30.04
+        },
+        {
+          "id": "s-p-pengzu",
+          "name": "彭祖山",
+          "province": "四川",
+          "city": "眉山",
+          "category": "culture",
+          "tagline": "彭祖养生文化圣地，寿乡意象。",
+          "intro": "彭祖山位于眉山彭山区，相传为长寿始祖彭祖故里，山间彭祖墓、养生殿与采气场构成独特的养生文化景观，是看巴蜀长寿民俗的轻量去处。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "清晨登山最清爽",
+          "ticketNote": "开放以现场为准。",
+          "detourKm": 0,
+          "lng": 103.93,
+          "lat": 30.22
+        },
+        {
+          "id": "s-p-leshan",
+          "name": "乐山大佛",
+          "province": "四川",
+          "city": "乐山",
+          "category": "culture",
+          "tagline": "依崖而凿的唐代弥勒坐佛，世界之最。",
+          "intro": "乐山大佛位于乐山岷江、青衣江、大渡河三江汇流处，是唐代依崖凿造的弥勒坐佛，通高七十余米，与凌云寺、九曲栈道共同构成世界文化遗产级的人文奇观。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "清晨与傍晚游人较少",
+          "ticketNote": "游山与游江以官方公告为准。",
+          "detourKm": 0,
+          "lng": 103.77,
+          "lat": 29.54
+        },
+        {
+          "id": "s-p-dongfeng",
+          "name": "东风堰千佛岩",
+          "province": "四川",
+          "city": "乐山",
+          "category": "culture",
+          "tagline": "夹江唐代摩崖与仍在灌溉的古堰。",
+          "intro": "东风堰—千佛岩位于乐山夹江县，是唐代开凿的摩崖造像群与仍在发挥灌溉作用的古代水利工程，石窟与渠堰并存，是看巴蜀水利与石刻的活标本。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "午后光线适合拍照",
+          "ticketNote": "开放以现场为准，临水注意安全。",
+          "detourKm": 0,
+          "lng": 103.54,
+          "lat": 29.75
+        },
+        {
+          "id": "s-p-emei",
+          "name": "峨眉山",
+          "province": "四川",
+          "city": "乐山",
+          "category": "mountain",
+          "tagline": "普贤道场，秀甲天下的佛教名山。",
+          "intro": "峨眉山位于乐山峨眉山市，是普贤菩萨道场、世界文化与自然双遗产，金顶云海与猴区、万年寺构成从山脚到绝顶的完整朝圣与观光体系。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "晴日金顶云海最震撼",
+          "ticketNote": "索道与门票以官方公告为准。",
+          "detourKm": 0,
+          "lng": 103.34,
+          "lat": 29.55
+        },
+        {
+          "id": "s-p-luocheng",
+          "name": "罗城古镇",
+          "province": "四川",
+          "city": "乐山",
+          "category": "village",
+          "tagline": "船形街格局的川南明清古镇。",
+          "intro": "罗城古镇位于乐山犍为县，以一艘「船形」街衢格局闻名，凉厅街、戏楼与老茶馆保留川南集镇原貌，是看传统场镇空间与市井慢生活的好去处。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "上午老街最安静",
+          "ticketNote": "古镇开放以现场为准。",
+          "detourKm": 0,
+          "lng": 104.03,
+          "lat": 29.38
+        }
+      ],
+      "plan": [
+        {
+          "day": 1,
+          "title": "成都→眉山：三苏祠与彭祖山",
+          "stayCity": "眉山",
+          "fromNode": "成都",
+          "toNode": "彭祖山",
+          "distanceKm": 105.4,
+          "driveHours": 1.5,
+          "poiIds": [
+            "s-p-chengdu",
+            "s-p-sansu",
+            "s-p-pengzu"
+          ],
+          "summary": "第一天从成都南下眉山，先看三苏祠的宋风雅韵与碑刻文脉，再往彭山彭祖山看长寿文化与养生殿、采气场，走山间步道感受川南慢生活，夜宿眉山。",
+          "tips": [
+            "成都出城早避早高峰",
+            "三苏祠预留半天",
+            "眉山住宿充足"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "眉山→乐山：大佛与千佛岩",
+          "stayCity": "乐山",
+          "fromNode": "眉山三苏祠",
+          "toNode": "东风堰千佛岩",
+          "distanceKm": 118.6,
+          "driveHours": 1.7,
+          "poiIds": [
+            "s-p-sansu",
+            "s-p-leshan",
+            "s-p-dongfeng"
+          ],
+          "summary": "第二天从眉山往乐山，先仰乐山大佛的唐代巨佛与九曲栈道，再往夹江看东风堰千佛岩的唐代石窟与仍在灌溉的古堰，把石刻与水利一次收齐，夜宿乐山吃一碗跷脚牛肉。",
+          "tips": [
+            "大佛游山或游江二选一",
+            "千佛岩临水注意安全",
+            "乐山美食集中晚餐"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "乐山→峨眉→罗城：名山与船形古镇",
+          "stayCity": "乐山",
+          "fromNode": "乐山大佛",
+          "toNode": "罗城古镇",
+          "distanceKm": 160.6,
+          "driveHours": 2.3,
+          "poiIds": [
+            "s-p-leshan",
+            "s-p-emei",
+            "s-p-luocheng"
+          ],
+          "summary": "第三天从乐山登峨眉山，看金顶云海与普贤道场，午后往犍为罗城古镇走船形街与老茶馆，结束成都平原文化漫游（返程沿 G0512 回成都）。",
+          "tips": [
+            "峨眉山索道旺季排队，早出发",
+            "罗城老茶馆可慢坐半日",
+            "返程走 G0512 接成都"
+          ]
+        }
+      ],
+      "practical": {
+        "permit": "全线常规道路与开放景区，无需证件审批；峨眉山、乐山大佛实行实名预约或分时段入园。",
+        "altitudeNote": "全线为成都平原与盆周低山，海拔低，无高原反应问题；峨眉山金顶约三千米，注意保暖。",
+        "carFree": "成都、眉山、乐山均有高铁与长途班车，城际间高铁可达；峨眉山、罗城建议自驾或旅游专线。不自驾可完成成都—眉山—乐山主干。",
+        "fuelNote": "三市城区加油与充电方便；成都出城、乐山环线服务区密集。",
+        "signalNote": "城区与高速信号稳定；峨眉山景区偶有弱信号。",
+        "gearNote": "以祠庙、石刻与古镇步道为主；防滑鞋必备，峨眉山金顶防风保暖。",
+        "bookingNote": "节假日乐山大佛、峨眉山排队最长，建议开园即入并提前预约；成都住宿充足。",
+        "lodgingNote": "以成都为出发与归点、眉山与乐山为中途住宿最顺：第一晚眉山，第二晚乐山，第三晚罗城，返程回成都。三市住宿供给充足、价格平稳，热门景区周边民宿旺季易满房，建议提前预订并选近高铁或停车方便的位置。",
+        "foodNote": "成都火锅、眉山东坡肉与乐山跷脚牛肉、甜皮鸭是代表，峨眉雪魔芋与罗城老茶馆小吃也别致；景区餐饮比市区贵且选择少，饭点错峰并在市区吃饱再进景区，泉水豆花与冰粉可作途中补给。",
+        "warnings": [
+          "峨眉山猴区勿逗弄野猴、收好塑料袋",
+          "乐山大佛游山游江择一避免赶场",
+          "古镇与石刻石阶注意防滑"
+        ]
+      },
+      "sources": [
+        {
+          "title": "本地国家公路网拓扑（国道+高速+省道主干）A* 最短路实算",
+          "publisher": "RailVista 路网底座 data/roads/china-road-topo.bin",
+          "usedFor": "各路段 distanceKm 与纯驾驶时长"
+        },
+        {
+          "title": "本地已核验景点库（roadside-spots 与 scenic-spots）",
+          "publisher": "RailVista 路网底座",
+          "usedFor": "景点名称与坐标取值"
+        },
+        {
+          "title": "青海省/四川省/浙江省文化和旅游厅及各地市文旅公开渠道",
+          "publisher": "官方渠道",
+          "usedFor": "开放时间与预约规则"
+        },
+        {
+          "title": "OTA 平台公开线路与自媒体攻略",
+          "publisher": "携程/飞猪/同程 + 小红书",
+          "usedFor": "行程节奏与住宿落点顺序"
+        }
+      ],
+      "editorRank": 160,
+      "status": "published",
+      "updatedAt": "2026-10-22"
+    }
+  ]
+}

@@ -50,6 +50,7 @@
         11
       ],
       "difficulty": 3,
+      "roadRefs": ["G105", "G323", "G45", "G6011", "G535", "G238", "G357"],
       "startNode": "赣州",
       "endNode": "赣州",
       "intro": {
@@ -608,6 +609,7 @@
         11
       ],
       "difficulty": 2,
+      "roadRefs": ["G316", "G7021", "G70", "G6521", "G238", "G206", "G35", "G320"],
       "startNode": "抚州",
       "endNode": "弋阳",
       "intro": {
@@ -1123,6 +1125,7 @@
         11
       ],
       "difficulty": 2,
+      "roadRefs": ["G316", "G7021", "G353", "G70", "G60", "G45", "G6001", "G220", "G320"],
       "startNode": "南昌",
       "endNode": "宜春",
       "intro": {

@@ -111,7 +111,7 @@
           "name": "益阳",
           "province": "湖南",
           "city": "益阳",
-          "role": "mid",
+          "role": "pass",
           "note": "益阳：本线途经节点。",
           "lng": 112.35,
           "lat": 28.56
@@ -120,7 +120,7 @@
           "name": "裴公亭",
           "province": "湖南",
           "city": "益阳",
-          "role": "mid",
+          "role": "pass",
           "note": "裴公亭：本线途经节点。",
           "lng": 112.34,
           "lat": 28.59
@@ -129,7 +129,7 @@
           "name": "南洞庭湖湿地",
           "province": "湖南",
           "city": "益阳",
-          "role": "mid",
+          "role": "pass",
           "note": "南洞庭湖湿地：本线途经节点。",
           "lng": 112.41,
           "lat": 28.81
@@ -138,7 +138,7 @@
           "name": "桃花江竹海",
           "province": "湖南",
           "city": "益阳",
-          "role": "mid",
+          "role": "stay",
           "note": "桃花江竹海：本线途经节点。",
           "lng": 112.18,
           "lat": 28.52
@@ -147,7 +147,7 @@
           "name": "常德",
           "province": "湖南",
           "city": "常德",
-          "role": "mid",
+          "role": "pass",
           "note": "常德：本线途经节点。",
           "lng": 111.69,
           "lat": 29.03
@@ -156,7 +156,7 @@
           "name": "柳叶湖",
           "province": "湖南",
           "city": "常德",
-          "role": "mid",
+          "role": "stay",
           "note": "柳叶湖：本线途经节点。",
           "lng": 111.74,
           "lat": 29.05
@@ -165,7 +165,7 @@
           "name": "桃花源",
           "province": "湖南",
           "city": "常德",
-          "role": "mid",
+          "role": "pass",
           "note": "桃花源：本线途经节点。",
           "lng": 111.44,
           "lat": 28.78
@@ -174,7 +174,7 @@
           "name": "城头山",
           "province": "湖南",
           "city": "常德",
-          "role": "mid",
+          "role": "stay",
           "note": "城头山：本线途经节点。",
           "lng": 111.66,
           "lat": 29.68
@@ -244,7 +244,8 @@
           "driveHours": 0.5,
           "condition": "益阳南下沅江方向进南洞庭湖湿地",
           "note": "",
-          "poiIds": []
+          "poiIds": [],
+          "refPending": true
         },
         {
           "id": "seg4",
@@ -274,7 +275,7 @@
           "via": [],
           "roadRefs": [
             "G234",
-            "湖南:S71",
+            "S71",
             "G5615",
             "G5517",
             "G319",
@@ -356,7 +357,7 @@
           "via": [],
           "roadRefs": [
             "G207",
-            "湖南:S12",
+            "S12",
             "湖南:X21"
           ],
           "roadClass": "国道",
@@ -364,7 +365,8 @@
           "driveHours": 0.4,
           "condition": "城头山往东到夹山国家森林公园",
           "note": "",
-          "poiIds": []
+          "poiIds": [],
+          "refPending": true
         },
         {
           "id": "seg10",
@@ -741,7 +743,7 @@
           "name": "阳明山国家森林公园",
           "province": "湖南",
           "city": "永州",
-          "role": "mid",
+          "role": "pass",
           "note": "阳明山国家森林公园：本线途经节点。",
           "lng": 111.93,
           "lat": 26.07
@@ -750,7 +752,7 @@
           "name": "九嶷山下灌景区",
           "province": "湖南",
           "city": "永州",
-          "role": "mid",
+          "role": "pass",
           "note": "九嶷山下灌景区：本线途经节点。",
           "lng": 112.01,
           "lat": 25.47
@@ -759,7 +761,7 @@
           "name": "舜帝陵景点",
           "province": "湖南",
           "city": "永州",
-          "role": "mid",
+          "role": "stay",
           "note": "舜帝陵景点：本线途经节点。",
           "lng": 111.98,
           "lat": 25.36
@@ -768,7 +770,7 @@
           "name": "穿岩千家峒古城址",
           "province": "湖南",
           "city": "永州",
-          "role": "mid",
+          "role": "pass",
           "note": "穿岩千家峒古城址：本线途经节点。",
           "lng": 111.32,
           "lat": 25.31
@@ -777,7 +779,7 @@
           "name": "上甘棠村",
           "province": "湖南",
           "city": "永州",
-          "role": "mid",
+          "role": "pass",
           "note": "上甘棠村：本线途经节点。",
           "lng": 111.19,
           "lat": 25.15
@@ -804,7 +806,7 @@
             "G322",
             "G55",
             "G72",
-            "湖南:S343"
+            "S343"
           ],
           "roadClass": "国道",
           "distanceKm": 66.9,
@@ -821,7 +823,7 @@
           "toNode": "九嶷山下灌景区",
           "via": [],
           "roadRefs": [
-            "湖南:S343",
+            "S343",
             "G55",
             "G76",
             "G647"
@@ -861,8 +863,8 @@
           "roadRefs": [
             "G647",
             "G76",
-            "湖南:S348",
-            "湖南:S239"
+            "S348",
+            "S239"
           ],
           "roadClass": "国道",
           "distanceKm": 88.6,
@@ -879,8 +881,8 @@
           "toNode": "上甘棠村",
           "via": [],
           "roadRefs": [
-            "湖南:S239",
-            "湖南:S348"
+            "S239",
+            "S348"
           ],
           "roadClass": "省道",
           "distanceKm": 27.9,
@@ -898,7 +900,7 @@
           "toNode": "中国女书村",
           "via": [],
           "roadRefs": [
-            "湖南:S348"
+            "S348"
           ],
           "roadClass": "省道",
           "distanceKm": 40.3,
@@ -916,7 +918,7 @@
           "toNode": "永州",
           "via": [],
           "roadRefs": [
-            "湖南:S348",
+            "S348",
             "G647",
             "G207",
             "G322",
@@ -1253,7 +1255,7 @@
           "name": "苏仙岭",
           "province": "湖南",
           "city": "郴州",
-          "role": "mid",
+          "role": "pass",
           "note": "苏仙岭：本线途经节点。",
           "lng": 113.05,
           "lat": 25.81
@@ -1262,7 +1264,7 @@
           "name": "飞天山景区",
           "province": "湖南",
           "city": "郴州",
-          "role": "mid",
+          "role": "stay",
           "note": "飞天山景区：本线途经节点。",
           "lng": 113.12,
           "lat": 25.93
@@ -1271,7 +1273,7 @@
           "name": "莽山旅游区国家森林公园",
           "province": "湖南",
           "city": "郴州",
-          "role": "mid",
+          "role": "stay",
           "note": "莽山旅游区国家森林公园：本线途经节点。",
           "lng": 112.88,
           "lat": 24.98
@@ -1280,7 +1282,7 @@
           "name": "板梁古村",
           "province": "湖南",
           "city": "郴州",
-          "role": "mid",
+          "role": "pass",
           "note": "板梁古村：本线途经节点。",
           "lng": 112.87,
           "lat": 26.08
@@ -1289,7 +1291,7 @@
           "name": "东江湖旅游区",
           "province": "湖南",
           "city": "郴州",
-          "role": "mid",
+          "role": "stay",
           "note": "东江湖旅游区：本线途经节点。",
           "lng": 113.26,
           "lat": 25.93
@@ -1298,7 +1300,7 @@
           "name": "东江湖景区-小东江景区",
           "province": "湖南",
           "city": "郴州",
-          "role": "mid",
+          "role": "pass",
           "note": "东江湖景区-小东江景区：本线途经节点。",
           "lng": 113.28,
           "lat": 25.91
@@ -1344,7 +1346,7 @@
             "G357",
             "G107",
             "G240",
-            "湖南:S214",
+            "S214",
             "湖南:Y504"
           ],
           "roadClass": "国道",
@@ -1352,7 +1354,8 @@
           "driveHours": 0.5,
           "condition": "郴州飞天山丹霞",
           "note": "",
-          "poiIds": []
+          "poiIds": [],
+          "refPending": true
         },
         {
           "id": "seg3",
@@ -1363,7 +1366,7 @@
           "via": [],
           "roadRefs": [
             "湖南:Y504",
-            "湖南:S214",
+            "S214",
             "G240",
             "G4",
             "G0423",
@@ -1374,7 +1377,8 @@
           "driveHours": 2.0,
           "condition": "飞天山往莽山",
           "note": "",
-          "poiIds": []
+          "poiIds": [],
+          "refPending": true
         },
         {
           "id": "seg4",
@@ -1385,7 +1389,7 @@
           "via": [],
           "roadRefs": [
             "湖南:X88",
-            "湖南:S215",
+            "S215",
             "G107",
             "G0423",
             "G4",
@@ -1409,7 +1413,7 @@
           "roadRefs": [
             "湖南:X53",
             "G4",
-            "湖南:S214",
+            "S214",
             "G240",
             "G357"
           ],
@@ -1436,7 +1440,8 @@
           "driveHours": 0.1,
           "condition": "东江湖小东江观雾",
           "note": "",
-          "poiIds": []
+          "poiIds": [],
+          "refPending": true
         },
         {
           "id": "seg7",

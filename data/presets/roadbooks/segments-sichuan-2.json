@@ -24,7 +24,7 @@
         "public",
         "charter"
       ],
-      "shape": "line",
+      "shape": "corridor",
       "tier": "regional",
       "layer": "L2",
       "tags": [
@@ -106,7 +106,7 @@
           "name": "眉山三苏祠",
           "province": "四川",
           "city": "眉山",
-          "role": "mid",
+          "role": "pass",
           "note": "眉山三苏祠：本线途经节点。",
           "lng": 103.83,
           "lat": 30.04
@@ -115,7 +115,7 @@
           "name": "彭祖山",
           "province": "四川",
           "city": "眉山",
-          "role": "mid",
+          "role": "stay",
           "note": "彭祖山：本线途经节点。",
           "lng": 103.93,
           "lat": 30.22
@@ -124,7 +124,7 @@
           "name": "乐山大佛",
           "province": "四川",
           "city": "乐山",
-          "role": "mid",
+          "role": "pass",
           "note": "乐山大佛：本线途经节点。",
           "lng": 103.77,
           "lat": 29.54
@@ -133,7 +133,7 @@
           "name": "东风堰千佛岩",
           "province": "四川",
           "city": "乐山",
-          "role": "mid",
+          "role": "stay",
           "note": "东风堰千佛岩：本线途经节点。",
           "lng": 103.54,
           "lat": 29.75
@@ -142,7 +142,7 @@
           "name": "峨眉山",
           "province": "四川",
           "city": "乐山",
-          "role": "mid",
+          "role": "pass",
           "note": "峨眉山：本线途经节点。",
           "lng": 103.34,
           "lat": 29.55
@@ -185,7 +185,7 @@
           "via": [],
           "roadRefs": [
             "G0512",
-            "四川:S103"
+            "S103"
           ],
           "roadClass": "高速",
           "distanceKm": 31.1,

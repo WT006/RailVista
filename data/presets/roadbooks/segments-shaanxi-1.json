@@ -49,6 +49,7 @@
         10
       ],
       "difficulty": 3,
+      "roadRefs": ["G210", "G1812", "G65", "G242", "G307", "G630", "G20", "G5618", "G338", "G339", "G628", "G6521"],
       "startNode": "榆林",
       "endNode": "榆林",
       "intro": {
@@ -605,6 +606,7 @@
         11
       ],
       "difficulty": 3,
+      "roadRefs": ["G85", "G3024", "G310", "G3511", "G344", "G30", "G342"],
       "startNode": "宝鸡",
       "endNode": "宝鸡",
       "intro": {
@@ -1092,6 +1094,7 @@
         11
       ],
       "difficulty": 2,
+      "roadRefs": ["G211", "G69", "G65", "G316", "G210", "G7011", "G541"],
       "startNode": "安康",
       "endNode": "安康",
       "intro": {

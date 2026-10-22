@@ -33,16 +33,22 @@ export interface PlanRouteInput {
   to: string;
   via?: string[];
   /**
-   * auto（默认）→ 本地干线 A*，失败再试高德；
+   * auto（默认）→ 本地干线 A*，失败再试百度 → OSRM → 高德；
    * local → 只用本地拓扑；
+   * baidu → 只用百度地图驾车规划（跳过本地拓扑，见 2026-10-22 路书库扩量）；
    * amap → 只用高德驾车规划。
    *
    * 2026-10-11：默认从「高德优先」改为「本地优先」。国道/省道几何补全后
    * 本地拓扑已是 148.9 万节点 / 370.3 万边、主连通分量覆盖 98.2% 节点的全国网，
    * 上海→拉萨这类跨省 OD 实测 3802km / 382ms 可解；而高德依赖 key 类型与配额，
    * 作为兜底比作为主路径更符合「数据在本地、可离线复算」的定位。
+   *
+   * 2026-10-22：补 `baidu` 档。百度 AK 的 IP 白名单校验落在边缘节点上，
+   * 同一把 AK 会因命中不同边缘而时通时不通（status 210 / 200「APP不存在」）；
+   * 因此需要「显式要求百度」与「百度不可用时回退本地」两种用法并存，
+   * 见 scripts/roadbook-measure.mts 的 --engine 选项。
    */
-  engine?: 'auto' | 'local' | 'amap';
+  engine?: 'auto' | 'local' | 'baidu' | 'amap';
 }
 
 export class PlaceNotFoundError extends Error {
@@ -373,7 +379,7 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
   // 本地优先（见 PlanRouteInput.engine 注释）；engine='amap' 时跳过本地。
   // 有途经点时先按 from→via…→to 逐段 A* 再首尾相接（旧实现对本地引擎直接无视 via，
   // 换成本地优先后会变成「静默少走途经点」，比报错更糟）。
-  if (input.engine !== 'amap') {
+  if (input.engine !== 'amap' && input.engine !== 'baidu') {
     const pts = [from.pt, ...viaPts, to.pt];
     const legs: [number, number][][] = [];
     const keys = new Set<string>();

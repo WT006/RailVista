@@ -49,18 +49,34 @@ export type DriveTicketMeta = {
   waypoints?: string[];
 };
 
-/** UserSegment → 铁路纪念票配置 */
-export function ticketConfigFromRailSegment(seg: UserSegment): TicketConfig {
+/**
+ * 票面只该出现钟点（HH:mm）。Stop.departTime / arriveTime 在不同来源下有三种形态：
+ * 「07:24」/ 完整 ISO / 空 —— 后两种都要归一，否则 ISO 串会整段印到票上。
+ */
+function clockOf(value: string | null | undefined, fallbackIso: string): string {
+  const s = String(value ?? '').trim();
+  if (/^\d{1,2}:\d{2}$/.test(s)) return s.length === 4 ? s : `0${s}`;
+  if (s.includes('T')) return hmFromIso(s);
+  return hmFromIso(fallbackIso);
+}
+
+/** UserSegment → 铁路纪念票配置。meta.mileageKm 传实际线路里程（地图已按几何算出），否则只能按两站直线估 */
+export function ticketConfigFromRailSegment(
+  seg: UserSegment,
+  meta: { mileageKm?: number } = {},
+): TicketConfig {
   const stops = seg.stops ?? [];
   const fromStop = stops[0];
   const toStop = stops[stops.length - 1];
-  const departTime = fromStop?.departTime || hmFromIso(seg.baseDepartureIso);
-  const arriveTime = toStop?.arriveTime || hmFromIso(seg.baseArrivalIso);
+  const departTime = clockOf(fromStop?.departTime, seg.baseDepartureIso);
+  const arriveTime = clockOf(toStop?.arriveTime, seg.baseArrivalIso);
   const duration = durationBetween(seg.baseDepartureIso, seg.baseArrivalIso);
   const date = (seg.date || seg.baseDepartureIso.slice(0, 10) || '').slice(0, 10);
 
   let mileage: string | undefined;
-  if (
+  if (Number.isFinite(meta.mileageKm) && (meta.mileageKm as number) > 0) {
+    mileage = nf(meta.mileageKm as number);
+  } else if (
     fromStop?.lat != null &&
     fromStop?.lng != null &&
     toStop?.lat != null &&

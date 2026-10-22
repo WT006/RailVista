@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.11.1`**（2026-10-19）
+**当前版本：`0.13.0`**（2026-10-22）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,174 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.13.0] — 2026-10-22
+
+**打通四条模块联动：走完铁路/自驾 → 提示生成纪念票；下车站 → 底栏常驻当地路书库玩法；自驾选路 → 路书库经典环线与「这条公路怎么玩」；保存纪念票 → 自动点亮中国足迹。顺带修掉路书库搜索整库 500 与两处票面数据错。**
+
+动机：主理人要求「根据整体软件再次建立联动」——各版块（铁路线 / 自驾线 / 旅行路书 / 纪念票 / 中国足迹）此前各自可用但互不递话：
+走完一趟只留一句 toast，纪念票要用户自己想到票页去手填；到站只报美食不报玩法；自驾首页找不到路书库里那 179 条现成攻略。
+本版把这些接口接上，并要求网页端与手机端都实测过。
+
+### 一、修复：路书库搜索与 by-road 反查整库 500（本版的阻塞项）
+
+- 根因：`data/presets/roadbooks/` 中 12 条路线（贵州 3 / 江西 3 / 宁夏 3 / 陕西 3，2026-10-19「薄弱省补强」批次）缺 required 字段 `roadRefs`，
+  `matchTravelRoute`（`packages/shared/src/travelbook/types.ts:664` 的 `includesText(r.roadRefs, kw)`）与
+  `getRoutesByRoadRef`（`apps/api/src/services/travelRoutes.ts:282`）对 `undefined` 做迭代 →
+  **`GET /api/travel/routes` 只要带 `q` 就 500，`/by-road/:ref` 恒 500**，路书库搜索框整条不可用（与关键词无关）。
+- 修法：按各路线 `segments[].roadRefs` 并集（首次出现序）补齐路线级字段——只用文件里已有的真实编号，不新增任何编号；
+  并加构建期判据 **V20**（`packages/shared/src/travelbook/index.ts`）：`roadRefs` 必须是数组，没有编号道路也要显式给 `[]`。
+- 验证：`pnpm roadbook:check` → ✓ 全部校验通过（0 error / 2 warn 为存量 anchorCity 项）；
+  `q=黄山` 3 条、`q=G318` 13 条、`by-road/G318` 14 条。
+
+### 二、行程完成 → 提示生成纪念票（铁路 TripMap / 自驾 DriveTrip / 自驾地图 DriveTripMap）
+
+- 新增 `components/TicketFinishCard.vue`：单行横条（金色装饰描边 + 标题 + 主按钮 + 关闭），
+  终态事件不自动收起，只接受手动关闭。做成横条而不是竖卡是实测结论——
+  1280×720 这类短屏上，顶部通告位与底栏之间只剩一两百像素，竖卡必然与景点卡/美食卡叠字。
+- 新增 `composables/useTripFinishTicket.ts`：三页共用「完成 → 留票」逻辑
+  （只在 `progress>=1` 出现、每一趟只提示一次、点了就 `upsertTicketTrace` + 写入票面草稿 + 跳 `/ticket?src=`）。
+  行程 key 复用既有 `tripCacheKey` / `driveTripKeyFromQuery`，与「设为当前行程」写的是同一条痕迹，不产生重复票。
+- 新增 `lib/ticketPrompted.ts`：本机记录已提示过的行程（`railvista:ticketPromptedTrips`，上限 40）。
+- `pages/TicketHome.vue` 接 `?src=trip|drive|drive-map`，进页说明这张票面是从哪一趟生成的。
+- 演示行程（`?demo=1`）不参与提示：它不是一次真实走完的旅行。
+
+### 三、下车站 → 当地路书库玩法（铁路 TripMap 底栏）
+
+- 新增 `lib/placeGuides.ts`：站名 → 地级市 → 路书库的三级兜底查询
+  （市名精确 → 关键词 → 同省精选）。市名口径两边不一致（美食索引写「湘西」，路书库写「湘西土家族苗族自治州」），
+  所以第二级必须走 `q`；三级都空则不渲染空壳。结果按 `省/市` 缓存，一次行程内同站不重复请求。
+- 新增 `composables/usePlaceGuide.ts`：按 `省/市` 变化拉取，附 `pending` 供让位判断；地图每秒 tick 不会造成重复请求。
+- 展示位选在**底栏 `.next-guide`**（紧邻既有「本站风味」）而不是顶部浮层：底栏高度是实测的
+  （`updateOverlayMetrics` 会据此带动其它浮层），任何屏高都不会叠字；顶部通告位则要和景点卡、美食卡排队。
+  chip 行沿用 `.next-food` 密度，触控热区靠 `::after` 扩到 44（`inset:-10px -3px`）而不是把 chip 撑高。
+- 命中口径写在标签上：按市名精确命中显示「拉萨 · 路书库」，同省兜底显示「西藏 · 精选」，不冒充当地攻略。
+- `pages/RoadbookHome.vue` 支持深链预置 `?province=&city=&q=`，从行程/自驾跳过来不必重新筛。
+
+### 四、自驾选路 → 路书库经典环线（DriveHome）
+
+- 第二屏新增「路书库 · 经典环线」区（`getTravelRoutes({shape:'loop', layer:'L1', sort:'layer'})`，10 条国家级大环线里取 8）：
+  卡身是整块链接进 `/roadbook/:id`，次级按钮「走 G109」按环线压着的主干编号开沿程图——
+  路书库条目没有整条折线几何，能直接开走的只有编号公路，所以不假装能一键导航整圈。
+  选了省道省份时该区跟着换成该省环线。守住 PRD 验收项：搜索区视觉权重仍高于榜单与环线推荐。
+- 公路编号键盘输入裸编号（G318 等）时，候选下方出现「G318 沿线的玩法」（`/travel/by-road/:ref`，依赖本节的 500 修复）。
+
+### 五、纪念票保存 → 中国足迹自动点亮
+
+- 新增 `lib/footprintSync.ts`：从票面推导走过的地名（铁路=起讫站、自驾=起讫+途经点、飞行=起降），
+  归一到 `chinaFootprintGeom` 的地级全称（「西宁」→「西宁市」，自治州走民族串前缀 + 唯一前缀匹配），
+  认不出来的名字直接跳过不猜。写入既有 `rv-footprint-cities` / `rv-footprint-provinces`，
+  足迹页与票页的「已点亮 N 城」随之变化。
+- `TicketHome.onSave` 保存成功后点亮并在关掉导出弹窗时补一句提示（弹窗期间说等于没说）。
+
+### 六、顺带修掉的两处票面数据错
+
+- 票面时刻：`Stop.departTime/arriveTime` 在不同来源下可能是完整 ISO 串，原样落到票上会印出
+  「2026-10-24T11:42:00+08:00 开」。`lib/ticketFromTrip.ts` 新增 `clockOf()` 统一归一为 `HH:mm`。
+- 票面里程：铁路原为两站直线 `haversineKm`（西宁→拉萨 1,266km，与底栏「全程 1885 公里」自相矛盾）。
+  `ticketConfigFromRailSegment` 增可选 `meta.mileageKm`，行程页传入地图实算的线路里程。
+
+### 涉及文件
+
+新增：`lib/placeGuides.ts`、`lib/ticketPrompted.ts`、`lib/footprintSync.ts`、`composables/usePlaceGuide.ts`、
+`composables/useTripFinishTicket.ts`、`components/TicketFinishCard.vue`；
+改动：`pages/TripMap.vue`、`pages/DriveHome.vue`、`pages/DriveTrip.vue`、`pages/DriveTripMap.vue`、
+`pages/TicketHome.vue`、`pages/RoadbookHome.vue`、`lib/ticketFromTrip.ts`、`components/SpotApproachCard.vue`、
+`components/StationFoodCard.vue`、`styles/map.css`、`styles/drive.css`、`packages/shared/src/travelbook/index.ts`、
+`data/presets/roadbooks/segments-{guizhou,jiangxi,ningxia,shaanxi}-*.json`（12 条补 `roadRefs`）。
+
+### 验证方式
+
+- `pnpm build`（`vue-tsc --noEmit` + vite build）通过；`pnpm roadbook:check` 0 error。
+- `node .tmp-diag/mobile-audit.mjs --w=390 --h=844` 与 `--w=1440 --h=900`：14 条路由全 ✓
+  （横向溢出 0、被遮挡 0、文字截断 0；剩余「小热区」全是既有的 `.btn-sm` 40px 控件）。
+- 新增 `node .tmp-diag/linkage-audit.mjs --only=rail|drive --w=.. --h=..`：走真实 12306 选车流程进终态，
+  在 390×844 / 1280×720 / 1440×900 三档核对浮层碰撞、卡内热区与遮挡，并跑完
+  「生成纪念票 → 保存 → 足迹点亮」全链路（票面 `HW-RAIL-…`、里程 1,885km、足迹 `["西宁市","拉萨市"]`）。
+- 顺带把 `SpotApproachCard` / `StationFoodCard` 的关闭按钮（28×28）补上 `.rv-hit` 命中区扩展。
+
+### 已知限制 / 回滚
+
+- 自驾「走完」以沿程进度到 100% 为准（GPS 投影或手动拖进度条）；未开定位时拖到末端同样会提示留票根。
+- 路书库条目没有整条折线几何，环线卡只能按主干编号开沿程图，不能一键导航整圈。
+- 下车玩法只在终到站出现（`progress>=0.97`），途经站仍只有景点与美食通告——顶部通告位再加第三张会开始抢位置。
+- 足迹点亮只认得出地级市名的部分；站名与地名对不上时跳过，不会误点亮相近城市。
+- 回滚：revert 本版提交即可；`roadRefs` 数据补齐与 V20 判据建议保留（否则路书库搜索回到整库 500）。
+
+---
+
+## [0.12.0] — 2026-10-22
+
+**铁路线版块全量上线「车站地方特色美食」：3498 个火车站全部配齐归属城市，356 个城市单元 / 1469 道特色菜（索引 200KB）；列车经过任一车站即弹出本站风味卡，底栏下一站、站点信息卡、走廊站点卡同步展示。**
+
+动机：主理人要求「铁路线版块每一个火车站都加上地方特色美食推荐，列车经过这个站就显示它推荐的美食」，
+并强调竖屏手机版必须逐屏核对。原状是：每站仅有 `Stop.intro` 一个自由文本字段，且只有预置示例包 `z8991.json` 写了 8 段介绍，
+真实 12306 车次经停站**没有任何站内内容**。
+
+### 一、数据（新增 `data/presets/foods/`，15 个文件）
+
+| 文件 | 内容 |
+| --- | --- |
+| `A-huanan` … `L-yunnan-shaanxi`（12 个） | 按省分区的 315 个地级市美食库，每城 `tag`（2-6 字风味短语）+ 3-5 道菜（`n` 菜名 / `d` 一句话吃法） |
+| `M-subcity.json` | 重庆区县级（万州烤鱼、涪陵榨菜、荣昌卤鹅、合川桃片、黔江鸡杂、奉节盬子鸡…）与中老铁路老挝段（万象 / 磨丁 / 孟赛 / 琅勃拉邦 / 万荣） |
+| `N1.json` / `N2.json` | 28 个只在 12306 口径下才有站归属的地级单元（兴安、大兴安岭、鸡西、七台河、本溪、抚顺、江门、梧州、北海、崇左、文昌、东营、淮北、益阳、荆门、鄂州、天门…） |
+| `city-aliases.json` | 112 条 12306 县级市 / 州府标签 → 政区单元（凯里→黔东南、库尔勒→巴音郭楞、格尔木与德令哈→海西、西昌→凉山、香格里拉→迪庆…） |
+| `unresolved-stations.json` | 3 个查不到任何坐标与地市归属的站（麦园、江边村、马桥河）登记为例外并写明原因，**不猜城市推错菜** |
+
+- 内容红线写进编写任务：只写当地真实公认的食物，禁止编造菜名 / 荣誉 / 排名 / 年份 / 「非遗」「老字号」，
+  不写价格与店铺名，不写养生功效，不写野生动物；清真与藏区饮食按真实口径（相关批次条目全文不含猪肉）。
+- 编写后逐城核对区分度：山西按地市分刀削面 / 剔尖 / 莜面 / 擦尖 / 碗托，广西分南宁老友粉 / 柳州螺蛳粉 / 桂林米粉，
+  潮汕与客家与广府分列，避免整省复制粘贴。
+
+### 二、归市口径改为 12306 官方归属（本轮最重要的修正）
+
+`scripts/build-station-city-12306.mjs` 解析 `kyfw.12306.cn station_name.js` 第 8 字段（售票系统地市归属），
+落盘 `data/stations-city-12306.json`（3404 站 / 432 标签）作为主源。
+
+原因：`data/stations-geo.json` 的经纬度多为走廊折线投影近似值，1272 个可对照站里 **238 个（19%）按坐标会归到邻市**——
+厦门站→漳州、义乌→绍兴、广州北→清远、永泰→三明、宝鸡南→天水。拿坐标做主源会把地方菜推错城。
+新索引的归市来源分布：12306 直命中 3400、去方位后缀（宣威北→宣威）22、坐标兜底 76、站名前缀 0。
+
+### 三、行为变化（四处展示位）
+
+1. **过站美食卡** `components/StationFoodCard.vue`：列车进入某站窗口（前方 12km / 过境 5km）即弹出，
+   标注「即将到达 / 正在经过 / 始发站 / 已到达」与「第 n/N 站」，列最多 4 道菜名 + 吃法，一站只弹一次，约 14s 自动收起、可手动关。
+2. **底栏下一站**：`kind` 为车站 / 终点时常驻一行「本站风味 · 城市标签」+ 最多 3 个菜名 chip（`.next-food`，用新令牌 `--food`）。
+3. **站点信息卡**：点地图上任一车站标记，卡片在时刻与简介之下追加「本站风味」全量列表（`lib/stationFoodHtml.ts` 统一拼装，内容经 `escHtml` 转义）。
+4. **走廊站点卡**：`CorridorMap.vue` 的示意站位卡同样挂上美食区块。
+
+读取层 `apps/web/src/data/stationFoods.ts` 的兜底顺序：站名索引 → 坐标归市 → 站名前缀地名；全落空返回 `null`，界面不渲染空壳。
+
+### 四、顺带修掉的三个既有缺陷
+
+- `stationKm` 轴单位是**米**（`buildMileageAxis` 内 `L = lengthKm * 1000`），而 `currentKm` 是公里；
+  新窗口逻辑先换算，否则除首站外永远命不中。
+- `pathMetrics` 是普通变量而非响应式，进度被固定（模拟进度 / 停车等待）时 computed 不重算，
+  会拿到画线前的 0 —— 底栏「已行 0 km · 剩余 0 km」即由此而来。`currentKm` 与 `locationInfo` 改读 `railLengthKm`。
+- 过站美食卡原先按「景点临近窗口是否存在」让位，景点窗口长达数分钟会把美食卡整段压掉；
+  改为 `SpotApproachCard` 暴露 `visible`，只在通告**确实在屏**的十几秒内让位。
+
+### 五、验证
+
+- `pnpm test` 18 项全绿，其中 `apps/web/src/data/stationFoods.test.ts` 是覆盖率门禁：
+  站名主表 1334 站与 12306 全量 3404 站必须在册（例外须登记原因且上限 5 个）、每站 ≥3 道有说明的菜、
+  10 组坐标错归回归（厦门 / 义乌 / 广州北 / 永泰 / 晋江 / 宝鸡南 / 凯里 / 格尔木 / 万象 / 香港西九龙）、
+  卡片 HTML 转义。
+- `pnpm foods:build` 门禁：任一站解析不到有数据的城市即 `exit 1`，不允许半成品上线。
+- 真实车次核验：G1（7 站）、G87（12 站）、Z8991（8 站）经停站全部命中且归市正确（曲阜东→济宁、沧州西→沧州、德州东→德州）。
+- 版式实测（Edge 无头渲染 + 同源 iframe 强制真实版心）：360×780、390×844 竖屏、768×1024 平板、1280×800 桌面
+  四处展示位均无越界、无横向溢出、不压顶栏与底栏；390 竖屏下美食卡宽 340、站点卡 271×292，chip 与说明文字无裁切。
+  手机横屏矮视口（≤560 高）卡片自动收成两列纯菜名。
+- `pnpm build`（vue-tsc + vite）通过；索引 200KB 打进主包。
+
+### 六、已知限制
+
+- 麦园、江边村、马桥河 3 站无任何坐标与地市归属可查（Overpass 亦超时），按例外登记，暂不出美食。
+- 美食是**地方特色推荐**，不是店铺 / 路线级餐饮指引：不含价格、营业信息、排队与位置。
+- 76 个站（多为青藏线未售票点与新建站）仍走坐标兜底，若主表坐标修正需重跑 `pnpm foods:build`。
+- 版本号按仓库规则递增到 0.12.0；本轮之前的纪念票足迹地图改动（`f6bef1ae`）未在本条目内记述。
 
 ---
 

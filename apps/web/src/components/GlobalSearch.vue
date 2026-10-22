@@ -579,17 +579,17 @@ function flatIndex(groupIdx: number, itemIdxInGroup: number): number {
   margin-left: auto;
 }
 
-/* 手机端：全屏抽屉 */
+/* 手机竖屏：面板整体等比缩放到 75%（transform scale，内容随之变小），
+ * 居中悬浮、四周露出页面背景，不再是全屏抽屉 */
 @media (max-width: 599px) {
   .gs-panel {
-    left: 0;
-    top: 0;
-    transform: none;
-    width: 100vw;
-    height: 100vh;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.75);
+    width: 100%;
+    height: 100%;
     max-height: none;
-    border-radius: 0;
-    border: 0;
+    border-radius: 20px;
   }
 }
 
@@ -613,7 +613,7 @@ function flatIndex(groupIdx: number, itemIdxInGroup: number): number {
 @media (max-width: 599px) {
   .gs-enter-from .gs-panel,
   .gs-leave-to .gs-panel {
-    transform: translateY(8%);
+    transform: translate(-50%, -50%) scale(0.71);
   }
 }
 </style>

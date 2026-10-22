@@ -390,6 +390,10 @@ onMounted(async () => {
 }
 
 .rd-crumb a {
+  position: relative;
+  display: inline-block;
+  padding: 10px 8px;
+  margin: -10px -8px;
   color: var(--rd-tone, var(--accent));
   text-decoration: none;
 }
@@ -637,10 +641,20 @@ onMounted(async () => {
   background: color-mix(in srgb, var(--surface-0) 72%, var(--surface-1));
   backdrop-filter: blur(var(--glass-blur-tile));
   overflow-x: auto;
+  /* 手机横滑：隐藏滚动条 + 贴边吸附，页签超出时可横滑切换 */
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+
+.rd-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .rd-tab {
   flex: 0 0 auto;
+  scroll-snap-align: start;
+  min-height: 40px;
   padding: 8px var(--space-4);
   border: none;
   border-radius: var(--radius-full);

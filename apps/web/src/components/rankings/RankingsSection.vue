@@ -312,6 +312,17 @@ function onItemClick(item: RankItem) {
   border-color: var(--line-strong);
 }
 
+/* 视觉 32px 胶囊、命中 ≥44px（榜单页签横排密度高，触区向外扩展） */
+.rankings__tab::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--hit-min));
+  height: max(100%, var(--hit-min));
+  transform: translate(-50%, -50%);
+}
+
 .rankings__tab.is-active {
   border-color: var(--line-accent);
   background: var(--accent-soft);
@@ -348,12 +359,24 @@ function onItemClick(item: RankItem) {
 }
 
 .rankings__source--link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
   align-self: start;
   text-decoration: none;
   transition: color var(--dur-micro) var(--ease-standard);
+}
+
+/* 行内来源链接：命中区扩到 ≥44px 高（不改行内布局） */
+.rankings__source--link::after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: 50%;
+  height: max(100%, var(--hit-min));
+  transform: translateY(-50%);
 }
 
 .rankings__source--link:hover {

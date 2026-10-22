@@ -9,11 +9,8 @@ import { onBeforeUnmount, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { APP_NAV_ITEMS } from '../data/appNav';
 import { navIcon } from '../data/navIcons';
-import { Search } from 'lucide-vue-next';
-import { useGlobalSearch } from '../composables/useGlobalSearch';
 
 const route = useRoute();
-const gs = useGlobalSearch();
 
 /** 弹跳动效：同一时刻只弹一个页签；先清后置以保证连点可重放 */
 const poppingId = ref('');
@@ -83,18 +80,6 @@ onBeforeUnmount(() => {
     @pointerup="clearPress"
     @pointercancel="clearPress"
   >
-    <button
-      type="button"
-      class="bottomnav__item bottomnav__item--search"
-      aria-label="全局搜索"
-      @click="gs.open()"
-      @pointerleave="clearPress"
-    >
-      <span class="bottomnav__icon">
-        <Search :size="24" :stroke-width="1.8" />
-      </span>
-      <span class="bottomnav__label">搜索</span>
-    </button>
     <template v-for="item in APP_NAV_ITEMS" :key="item.id">
       <RouterLink
         v-if="item.to"
@@ -319,10 +304,6 @@ onBeforeUnmount(() => {
     opacity: 0.42;
     cursor: default;
     pointer-events: none;
-  }
-
-  .bottomnav__item--search {
-    cursor: pointer;
   }
 
   @media (prefers-reduced-motion: reduce) {

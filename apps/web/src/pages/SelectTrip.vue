@@ -303,6 +303,12 @@ async function removeRecent(key: string) {
 
 onMounted(async () => {
   date.value = defaultDate();
+  // 全局搜索跳回：带 code 预填车次号并翻到车次查询面
+  const qCode = route.query.code;
+  if (typeof qCode === 'string' && qCode.trim()) {
+    codeQuery.value = qCode.trim().toUpperCase();
+    if (searchFace.value !== 'code') searchFace.value = 'code';
+  }
   // 线路详情页「进入实时地图」带 from/to 回来：预填 OD 输入框（零回归：仅赋值，不触发查询）
   const qFrom = route.query.from;
   const qTo = route.query.to;

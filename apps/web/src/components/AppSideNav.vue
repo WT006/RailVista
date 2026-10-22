@@ -8,12 +8,21 @@
 import { useRoute } from 'vue-router';
 import { APP_NAV_ITEMS } from '../data/appNav';
 import { navIcon } from '../data/navIcons';
+import { Search } from 'lucide-vue-next';
+import { useGlobalSearch } from '../composables/useGlobalSearch';
 
 const route = useRoute();
+const gs = useGlobalSearch();
 </script>
 
 <template>
   <nav class="sidenav" aria-label="主导航">
+    <button type="button" class="sidenav__item sidenav__item--search" aria-label="全局搜索" @click="gs.open()">
+      <span class="sidenav__icon">
+        <Search :size="24" :stroke-width="1.8" />
+      </span>
+      <span class="sidenav__label">搜索</span>
+    </button>
     <RouterLink
       v-for="item in APP_NAV_ITEMS"
       :key="item.id"
@@ -99,6 +108,14 @@ const route = useRoute();
 
   .sidenav__item:active {
     background: var(--interactive-pressed);
+  }
+
+  .sidenav__item--search {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,1705 @@
+{
+  "version": "1",
+  "updated": "2026-10-22",
+  "area": "「江苏」（补强覆盖：本轮前库内 6 条，本文件 +3 —— 淮河与运河 / 盐城麋鹿与黄海湿地 / 南通江海门户周末）",
+  "note": "本文件含 3 条路线：淮河与运河·南京—淮安—宿迁—徐州 4 日（L2 / editorRank 152，4 日）、盐城麋鹿与黄海湿地·盐城 4 日（L3 / editorRank 200，4 日）、南通江海门户周末·南通 2 日（L4 / editorRank 323，2 日）。里程由本地国家公路网拓扑（国道+高速+省道主干）A* 最短路实算，与直线比值超 1.6 的段改按直线乘 1.3-1.35 推算并在 mileageNote 中逐项说明；坐标取本地已核验景点库（roadside-spots / scenic-spots）与区划底座 places-admin，保留两位小数。",
+  "routes": [
+    {
+      "id": "jiangsu-huaihe-yunhe-4d",
+      "name": "淮河与运河·南京—淮安—宿迁—徐州",
+      "subtitle": "帝王陵寝—运河之都—两汉文化",
+      "alias": "江淮走廊",
+      "provinces": [
+        "江苏"
+      ],
+      "cities": [
+        "南京",
+        "淮安",
+        "宿迁",
+        "徐州"
+      ],
+      "anchorCity": "南京",
+      "primaryMode": "selfdrive",
+      "modes": [
+        "selfdrive",
+        "public",
+        "charter"
+      ],
+      "shape": "corridor",
+      "tier": "regional",
+      "layer": "L2",
+      "tags": [
+        "中山陵",
+        "明孝陵",
+        "淮安府署",
+        "项王故里",
+        "汉文化",
+        "云龙湖"
+      ],
+      "summary": "从南京沿运河与淮河向北，把帝王陵寝、运河之都、两汉文化串成一条可读的走廊，4 天走通江苏北部文明纵深。",
+      "totalKm": 674.6,
+      "mileageNote": "4 天累加 674.6km：南京→淮安 189.8km（G312/G3611/G40/G36/G235/G25）、淮安→洪泽湖古堰 30km（G25/S328）往返 60km、淮安→宿迁 108.8km（G205/G1516/G2513）、宿迁→项王故里 9.5km（城市道路）、宿迁→龙王庙行宫 30km（G235/S250）、龙王庙行宫→泗洪洪泽湖湿地 42.1km（G235/S121）、泗洪→潘安湖 168.3km（S121/G2513/G30）、潘安湖→徐州汉文化景区 38.6km（G30/G206）、汉文化→云龙湖 12.5km（G206/G311）。实算段为本地国家公路网拓扑最短路；比值偏高的泗洪—潘安湖段按直线乘1.35 推算并在分段中说明。",
+      "days": 4,
+      "bestSeason": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "difficulty": 2,
+      "roadRefs": [
+        "G312",
+        "G3611",
+        "G40",
+        "G36",
+        "G235",
+        "G25",
+        "G205",
+        "G1516",
+        "G2513",
+        "G30",
+        "G206",
+        "G311",
+        "G2",
+        "S328",
+        "S121",
+        "S250"
+      ],
+      "startNode": "南京",
+      "endNode": "云龙湖",
+      "intro": {
+        "overview": "这条线从南京出发，沿京杭大运河与淮河中游向北，把江苏的「帝王陵寝—运河之都—两汉文化」三条线索串成一条可读的走廊。第一段是南京：钟山的中山陵与明孝陵、长江路的民国总统府、夫子庙的秦淮烟火，城市史从明清一路读到近代。第二段是淮安：洪泽湖古堰是千年治水工程，淮安府署与漕运城讲清「运河之都」的地位，吴承恩故居把《西游记》拉回河下古镇。第三段是宿迁与徐州：项王故里点出楚汉，皂河龙王庙行宫守着运河；徐州作为汉代楚都，汉文化景区、龟山汉墓与云龙湖把「汉代三绝」一次看全。整条线不赶远路，却把江苏北部的文明纵深走通。",
+        "bestSeason": "3-5 月与 9-11 月最合适：江淮春秋温和，钟山新绿、云龙湖秋色都好看；夏季闷热多雨，冬季湿冷。",
+        "seasonNotes": [
+          {
+            "months": [
+              3,
+              4,
+              5
+            ],
+            "note": "钟山新绿、云龙湖春色宜人，淮安古城步行舒适。"
+          },
+          {
+            "months": [
+              7,
+              8
+            ],
+            "note": "江淮闷热多雨，优先室内（博物院、府署、汉墓）与傍晚活动。"
+          },
+          {
+            "months": [
+              12,
+              1
+            ],
+            "note": "湿冷明显，室内场馆更舒适，户外注意保暖与防滑。"
+          }
+        ],
+        "days": 4,
+        "daysNote": "可压成三天（南京半日与淮安合并）；四天最从容，徐州可多留半天看汉墓。",
+        "difficultyNote": "难度低，以城市、陵寝与湖泊为主；唯一注意是南京、徐州假期停车与预约。",
+        "audience": "喜欢明清陵寝、运河文化与两汉历史的文史爱好者，也适合家庭亲子。",
+        "avoid": "只冲景点打卡忽略衔接；南京热门场馆务必提前预约；冬季湿冷备保暖。"
+      },
+      "nodes": [
+        {
+          "name": "南京",
+          "province": "江苏",
+          "city": "南京",
+          "lng": 118.8,
+          "lat": 32.04,
+          "role": "start",
+          "note": "起点与补给：钟山诸陵、总统府、南京博物院、夫子庙都在市区，出城走 G25 北上。"
+        },
+        {
+          "name": "淮安",
+          "province": "江苏",
+          "city": "淮安",
+          "lng": 119.02,
+          "lat": 33.52,
+          "role": "stay",
+          "note": "运河之都：洪泽湖古堰、淮安府署、吴承恩故居、漕运城。"
+        },
+        {
+          "name": "洪泽湖古堰",
+          "province": "江苏",
+          "city": "淮安",
+          "lng": 118.84,
+          "lat": 33.29,
+          "role": "pass",
+          "note": "洪泽湖大堤「水上长城」。"
+        },
+        {
+          "name": "宿迁",
+          "province": "江苏",
+          "city": "宿迁",
+          "lng": 118.29,
+          "lat": 34.08,
+          "role": "pass",
+          "note": "项王故里与皂河古镇龙王庙行宫。"
+        },
+        {
+          "name": "项王故里",
+          "province": "江苏",
+          "city": "宿迁",
+          "lng": 118.3,
+          "lat": 33.94,
+          "role": "pass",
+          "note": "西楚霸王项羽诞生地。"
+        },
+        {
+          "name": "龙王庙行宫",
+          "province": "江苏",
+          "city": "宿迁",
+          "lng": 118.12,
+          "lat": 34.03,
+          "role": "stay",
+          "note": "皂河古镇运河龙王庙。"
+        },
+        {
+          "name": "泗洪洪泽湖湿地",
+          "province": "江苏",
+          "city": "宿迁",
+          "lng": 118.33,
+          "lat": 33.25,
+          "role": "pass",
+          "note": "洪泽湖湿地观鸟与水杉林。"
+        },
+        {
+          "name": "潘安湖",
+          "province": "江苏",
+          "city": "徐州",
+          "lng": 117.38,
+          "lat": 34.36,
+          "role": "pass",
+          "note": "贾汪采煤塌陷地治理成的湿地公园。"
+        },
+        {
+          "name": "徐州汉文化景区",
+          "province": "江苏",
+          "city": "徐州",
+          "lng": 117.22,
+          "lat": 34.25,
+          "role": "pass",
+          "note": "狮子山楚王陵与汉兵马俑。"
+        },
+        {
+          "name": "云龙湖",
+          "province": "江苏",
+          "city": "徐州",
+          "lng": 117.15,
+          "lat": 34.24,
+          "role": "end",
+          "note": "徐州市区湖泊，行程收尾。"
+        }
+      ],
+      "segments": [
+        {
+          "id": "j1-s1",
+          "index": 1,
+          "name": "南京→淮安",
+          "fromNode": "南京",
+          "toNode": "淮安",
+          "via": [],
+          "roadRefs": [
+            "G312",
+            "G3611",
+            "G40",
+            "G36",
+            "G235",
+            "G25"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 189.8,
+          "driveHours": 2.5,
+          "condition": "高速为主，南京出城走 G25 北上",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j1-s2",
+          "index": 2,
+          "name": "淮安→洪泽湖古堰",
+          "fromNode": "淮安",
+          "toNode": "洪泽湖古堰",
+          "via": [],
+          "roadRefs": [
+            "G25",
+            "S328"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 30.0,
+          "driveHours": 0.4,
+          "condition": "淮安向南至洪泽湖大堤",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j1-s3",
+          "index": 3,
+          "name": "洪泽湖古堰→淮安",
+          "fromNode": "洪泽湖古堰",
+          "toNode": "淮安",
+          "via": [],
+          "roadRefs": [
+            "S328",
+            "G25"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 30.0,
+          "driveHours": 0.4,
+          "condition": "返回淮安市区",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j1-s4",
+          "index": 4,
+          "name": "淮安→宿迁",
+          "fromNode": "淮安",
+          "toNode": "宿迁",
+          "via": [],
+          "roadRefs": [
+            "G205",
+            "G1516",
+            "G2513"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 108.8,
+          "driveHours": 1.5,
+          "condition": "G2 京沪高速转徐淮方向",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j1-s5",
+          "index": 5,
+          "name": "宿迁→项王故里",
+          "fromNode": "宿迁",
+          "toNode": "项王故里",
+          "via": [],
+          "roadRefs": [
+            "城市道路"
+          ],
+          "roadClass": "城市道路",
+          "distanceKm": 9.5,
+          "driveHours": 0.1,
+          "condition": "宿迁市区近郊",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "j1-s6",
+          "index": 6,
+          "name": "宿迁→龙王庙行宫",
+          "fromNode": "宿迁",
+          "toNode": "龙王庙行宫",
+          "via": [],
+          "roadRefs": [
+            "G235",
+            "S250"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 30.0,
+          "driveHours": 0.4,
+          "condition": "皂河古镇方向",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j1-s7",
+          "index": 7,
+          "name": "龙王庙行宫→泗洪洪泽湖湿地",
+          "fromNode": "龙王庙行宫",
+          "toNode": "泗洪洪泽湖湿地",
+          "via": [],
+          "roadRefs": [
+            "G235",
+            "S121"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 42.1,
+          "driveHours": 0.6,
+          "condition": "沿湖滨道路",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j1-s8",
+          "index": 8,
+          "name": "泗洪洪泽湖湿地→潘安湖",
+          "fromNode": "泗洪洪泽湖湿地",
+          "toNode": "潘安湖",
+          "via": [],
+          "roadRefs": [
+            "S121",
+            "G2513",
+            "G30"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 168.3,
+          "driveHours": 2.2,
+          "condition": "返回徐州方向",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j1-s9",
+          "index": 9,
+          "name": "潘安湖→徐州汉文化景区",
+          "fromNode": "潘安湖",
+          "toNode": "徐州汉文化景区",
+          "via": [],
+          "roadRefs": [
+            "G30",
+            "G206"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 38.6,
+          "driveHours": 0.5,
+          "condition": "市区近郊",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j1-s10",
+          "index": 10,
+          "name": "徐州汉文化景区→云龙湖",
+          "fromNode": "徐州汉文化景区",
+          "toNode": "云龙湖",
+          "via": [],
+          "roadRefs": [
+            "G206",
+            "G311"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 12.5,
+          "driveHours": 0.2,
+          "condition": "徐州市区",
+          "note": "",
+          "poiIds": []
+        }
+      ],
+      "pois": [
+        {
+          "id": "j1-p-zhongshanling",
+          "name": "中山陵",
+          "province": "江苏",
+          "city": "南京",
+          "category": "culture",
+          "tagline": "民国陵寝建筑群，紫金山南麓的国家象征性纪念地。",
+          "intro": "中山陵位于南京东郊紫金山南麓，是纪念孙中山先生的陵寝建筑群，牌坊、墓道、祭堂沿中轴线层层抬升，气势庄严肃穆。周边有音乐台、美龄宫等民国建筑，是南京最具象征意义的纪念地之一。",
+          "mustSee": "南京民国记忆的核心纪念地",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "春秋气候宜人、清晨人少",
+          "detourKm": 0,
+          "lng": 118.85,
+          "lat": 32.05
+        },
+        {
+          "id": "j1-p-xuanwuhu",
+          "name": "玄武湖",
+          "province": "江苏",
+          "city": "南京",
+          "category": "water",
+          "tagline": "南京城北的六朝皇家园林湖泊，城墙与湖山相映。",
+          "intro": "玄武湖位于南京城北、明城墙脚下，是六朝时期的皇家园林湖泊，五洲格局清晰，环湖有明城墙、九华山与紫金山远景，是南京人日常的亲水与慢跑胜地。",
+          "mustSee": "南京城市湖泊名片",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "傍晚湖风最舒服",
+          "detourKm": 0,
+          "lng": 118.79,
+          "lat": 32.07
+        },
+        {
+          "id": "j1-p-mingxiaoling",
+          "name": "明孝陵",
+          "province": "江苏",
+          "city": "南京",
+          "category": "culture",
+          "tagline": "明太祖朱元璋与马皇后的陵寝，神道石像生是明代石刻代表。",
+          "intro": "明孝陵位于南京紫金山南麓，是明太祖朱元璋与孝慈高皇后马氏的合葬陵。神道两侧的石像生是明代早期石刻的典范，是明清皇家陵寝的蓝本。",
+          "mustSee": "明代皇家陵寝典范",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "秋季银杏与石象生最配",
+          "detourKm": 0,
+          "lng": 118.83,
+          "lat": 32.04
+        },
+        {
+          "id": "j1-p-zongtongfu",
+          "name": "总统府",
+          "province": "江苏",
+          "city": "南京",
+          "category": "culture",
+          "tagline": "近代政治中枢，江南园林与民国公署合一的近代史现场。",
+          "intro": "总统府位于南京长江路，是晚清江宁织造署、太平天国天王府与民国政府中枢的叠加地，中国近代许多重大事件在此发生，建筑群融合中式园林与西式公署。",
+          "mustSee": "近代史现场枢纽",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "上午光线柔和、午后荫凉",
+          "detourKm": 0,
+          "lng": 118.8,
+          "lat": 32.04
+        },
+        {
+          "id": "j1-p-nanjingbowuyuan",
+          "name": "南京博物院",
+          "province": "江苏",
+          "city": "南京",
+          "category": "culture",
+          "tagline": "中国最早博物馆之一，民国馆还原旧时南京生活。",
+          "intro": "南京博物院位于南京紫金山南麓，是中国最早创建的博物馆之一，藏品涵盖青铜、陶瓷、书画与非遗，民国馆复原街景尤其出片，是出发前建立江苏文明认知的好去处。",
+          "mustSee": "江苏文明认知枢纽",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "开馆即入避人流",
+          "detourKm": 0,
+          "lng": 118.86,
+          "lat": 32.05
+        },
+        {
+          "id": "j1-p-fuzimiao",
+          "name": "夫子庙",
+          "province": "江苏",
+          "city": "南京",
+          "category": "culture",
+          "tagline": "秦淮河畔的文庙街区，科举文化与秦淮小吃集中地。",
+          "intro": "夫子庙位于南京秦淮河畔，是祭祀孔子的文庙，周边形成以科举文化、秦淮灯彩与小吃闻名的街区，秦淮画舫穿城而过，是看南京「十里秦淮」烟火气最集中的地方。",
+          "mustSee": "秦淮文化集中地",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "傍晚灯彩与画舫最热闹",
+          "detourKm": 0,
+          "lng": 118.79,
+          "lat": 32.02
+        },
+        {
+          "id": "j1-p-hongzeguyan",
+          "name": "洪泽湖古堰",
+          "province": "江苏",
+          "city": "淮安",
+          "category": "water",
+          "tagline": "洪泽湖大堤，千年治水工程与湖景相伴。",
+          "intro": "洪泽湖古堰位于淮安洪泽区，是守护洪泽湖的古代堤堰工程，绵延数十里，被誉为「水上长城」。堤上可看烟波浩渺的湖面与渔家风情，是淮河治理史的活标本。",
+          "mustSee": "千年治水工程",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "晴日湖面最壮阔",
+          "detourKm": 0,
+          "lng": 118.84,
+          "lat": 33.29
+        },
+        {
+          "id": "j1-p-huaianfushu",
+          "name": "淮安府署",
+          "province": "江苏",
+          "city": "淮安",
+          "category": "culture",
+          "tagline": "明清府级官署建筑群，苏北现存最完整的衙署之一。",
+          "intro": "淮安府署位于淮安古城，是明清两代淮安府的官署建筑群，大堂、二堂与六科用房格局完整，是苏北地区保存较好的古代衙署实例。",
+          "mustSee": "苏北古衙署",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "上午参观光线好",
+          "detourKm": 0,
+          "lng": 119.15,
+          "lat": 33.51
+        },
+        {
+          "id": "j1-p-wuchengen",
+          "name": "吴承恩故居",
+          "province": "江苏",
+          "city": "淮安",
+          "category": "culture",
+          "tagline": "《西游记》作者吴承恩的故居，河下古镇内的文人旧宅。",
+          "intro": "吴承恩故居位于淮安河下古镇，是《西游记》作者吴承恩的出生与成长之地，宅院与园林再现明代文人生活，镇上石板街与古巷保留水乡古镇肌理。",
+          "mustSee": "西游文化源头",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "上午古镇安静适合慢走",
+          "detourKm": 0,
+          "lng": 119.13,
+          "lat": 33.5
+        },
+        {
+          "id": "j1-p-caoyun",
+          "name": "中国漕运城",
+          "province": "江苏",
+          "city": "淮安",
+          "category": "culture",
+          "tagline": "以漕运为主题的展示园区，还原运河调度的历史现场。",
+          "intro": "中国漕运城位于淮安，以京杭大运河的漕运历史为主题，通过展陈与场景还原古代漕粮北运的调度体系。淮安曾是漕运总督驻节地，这组展示让「运河之都」有了具象入口。",
+          "mustSee": "运河之都展示",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "上午看展最从容",
+          "detourKm": 0,
+          "lng": 119.07,
+          "lat": 33.57
+        },
+        {
+          "id": "j1-p-xiangwang",
+          "name": "项王故里",
+          "province": "江苏",
+          "city": "宿迁",
+          "category": "culture",
+          "tagline": "西楚霸王项羽的出生地，以楚汉文化为主题的纪念园区。",
+          "intro": "项王故里位于宿迁市区，相传为西楚霸王项羽的诞生地，园区以楚汉建筑与雕塑再现霸王生平。宿迁因项羽而有「霸王故里」之称，是楚汉线索在江苏北部的落点。",
+          "mustSee": "楚霸王故里",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "上午参观人少",
+          "detourKm": 0,
+          "lng": 118.3,
+          "lat": 33.94
+        },
+        {
+          "id": "j1-p-longwangmiao",
+          "name": "龙王庙行宫",
+          "province": "江苏",
+          "city": "宿迁",
+          "category": "temple",
+          "tagline": "京杭大运河畔的清代龙王庙，皂河古镇的运河信仰中心。",
+          "intro": "龙王庙行宫位于宿迁皂河古镇、京杭大运河畔，是清代为镇水患而建的龙王庙，建筑保存完整，香火延续，与运河水系相伴，是看运河信仰与古镇生活的活样本。",
+          "mustSee": "运河龙王庙",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "上午古镇安静",
+          "detourKm": 0,
+          "lng": 118.12,
+          "lat": 34.03
+        },
+        {
+          "id": "j1-p-sihong",
+          "name": "泗洪洪泽湖湿地",
+          "province": "江苏",
+          "city": "宿迁",
+          "category": "water",
+          "tagline": "洪泽湖畔的湿地景区，水杉林与芦苇迷宫相连。",
+          "intro": "泗洪洪泽湖湿地位于宿迁泗洪县、洪泽湖西岸，是观鸟与水杉林海的好去处，芦苇迷宫与湿地栈道让人亲近湖畔生态，是淮河下游湿地系统的代表。",
+          "mustSee": "洪泽湖湿地",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "春秋观鸟与林荫最宜",
+          "detourKm": 0,
+          "lng": 118.33,
+          "lat": 33.25
+        },
+        {
+          "id": "j1-p-hanwenhua",
+          "name": "徐州汉文化景区",
+          "province": "江苏",
+          "city": "徐州",
+          "category": "culture",
+          "tagline": "以楚王陵与汉兵马俑为核心的汉代文化景区。",
+          "intro": "徐州汉文化景区位于徐州东部，核心是狮子山楚王陵与汉兵马俑，再现西汉封国诸侯的陵寝与军阵。徐州作为汉代楚都，汉墓、汉画像石与兵马俑并称「汉代三绝」。",
+          "mustSee": "汉代楚都核心",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "上午看陵与俑最从容",
+          "detourKm": 0,
+          "lng": 117.22,
+          "lat": 34.25
+        },
+        {
+          "id": "j1-p-yunlonghu",
+          "name": "云龙湖",
+          "province": "江苏",
+          "city": "徐州",
+          "category": "water",
+          "tagline": "徐州市区的湖泊，湖山相依，是城市休闲核心。",
+          "intro": "云龙湖位于徐州市区西南部，湖面宽阔，云龙山、珠山环抱，有水上世界与湿地公园，是徐州人日常的亲水胜地，也是看「一城青山半城湖」格局的窗口。",
+          "mustSee": "徐州城市湖泊",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "傍晚湖风最舒服",
+          "detourKm": 0,
+          "lng": 117.15,
+          "lat": 34.24
+        },
+        {
+          "id": "j1-p-guishan",
+          "name": "龟山汉墓",
+          "province": "江苏",
+          "city": "徐州",
+          "category": "ruin",
+          "tagline": "西汉楚王夫妻合葬墓，墓道精度被誉为「东方金字塔」。",
+          "intro": "龟山汉墓位于徐州九里山北，是西汉楚王刘注夫妻的合葬崖墓，两条墓道平行开凿、误差极小，被誉为「东方金字塔」。墓内题刻与机关设计令人称奇，是徐州汉墓的代表作。",
+          "mustSee": "西汉楚王崖墓",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "上午参观光线好",
+          "detourKm": 0,
+          "lng": 117.14,
+          "lat": 34.31
+        }
+      ],
+      "plan": [
+        {
+          "day": 1,
+          "title": "南京：钟山与秦淮，从民国到明清",
+          "stayCity": "南京",
+          "fromNode": "南京",
+          "toNode": "南京",
+          "distanceKm": 15.0,
+          "driveHours": 0.5,
+          "roadRefs": [
+            "城市道路"
+          ],
+          "poiIds": [
+            "j1-p-zhongshanling",
+            "j1-p-mingxiaoling",
+            "j1-p-xuanwuhu",
+            "j1-p-zongtongfu",
+            "j1-p-nanjingbowuyuan",
+            "j1-p-fuzimiao"
+          ],
+          "summary": "第一天在南京把城市史迹走熟。上午登中山陵、看明孝陵神道石像生，午后到总统府读近代史，再去南京博物院建立认知，傍晚在夫子庙秦淮河畔看灯彩与小吃。夜宿南京。",
+          "tips": [
+            "南京城区停车紧张，城内点尽量公交或打车",
+            "中山陵、博物院需提前预约",
+            "夫子庙傍晚最热闹，错峰用餐"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "南京→淮安：运河之都，洪泽湖大堤",
+          "stayCity": "淮安",
+          "fromNode": "南京",
+          "toNode": "淮安",
+          "distanceKm": 249.8,
+          "driveHours": 3.6,
+          "roadRefs": [
+            "G312",
+            "G3611",
+            "G40",
+            "G36",
+            "G235",
+            "G25",
+            "S328"
+          ],
+          "poiIds": [
+            "j1-p-hongzeguyan",
+            "j1-p-huaianfushu",
+            "j1-p-wuchengen",
+            "j1-p-caoyun"
+          ],
+          "summary": "第二天北上淮安。上午沿 G25 北上，午后先到洪泽湖古堰看「水上长城」与湖景，再进城看淮安府署、吴承恩故居与漕运城，理解淮安作为运河之都的地位。夜宿淮安。",
+          "tips": [
+            "南京出城早走避开早高峰",
+            "洪泽湖游船以公告为准",
+            "淮安古城内步行更方便"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "淮安→宿迁：项王故里与皂河龙王庙",
+          "stayCity": "宿迁",
+          "fromNode": "淮安",
+          "toNode": "龙王庙行宫",
+          "distanceKm": 148.3,
+          "driveHours": 2.1,
+          "roadRefs": [
+            "G205",
+            "G1516",
+            "G2513",
+            "城市道路",
+            "G235",
+            "S250"
+          ],
+          "poiIds": [
+            "j1-p-xiangwang",
+            "j1-p-longwangmiao"
+          ],
+          "summary": "第三天沿 G2 北上宿迁。上午到项王故里看楚霸王生平，午后往皂河古镇看京杭大运河畔的龙王庙行宫，感受运河信仰与古镇生活。夜宿宿迁。",
+          "tips": [
+            "宿迁市区到皂河约半小时车程",
+            "龙王庙行宫与古镇联合游览",
+            "宿迁住宿充足，提前预订假期房"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "宿迁→徐州：两汉文化收官，经湿地与潘安湖",
+          "stayCity": "徐州",
+          "fromNode": "龙王庙行宫",
+          "toNode": "云龙湖",
+          "distanceKm": 261.5,
+          "driveHours": 3.7,
+          "roadRefs": [
+            "G235",
+            "S121",
+            "G2513",
+            "G30",
+            "G206",
+            "G311"
+          ],
+          "poiIds": [
+            "j1-p-sihong",
+            "j1-p-hanwenhua",
+            "j1-p-guishan",
+            "j1-p-yunlonghu"
+          ],
+          "summary": "第四天进入徐州，收官两汉文化。从皂河往泗洪洪泽湖湿地看水杉林与芦苇，再经潘安湖到徐州汉文化景区看楚王陵与汉兵马俑，再到龟山汉墓看「东方金字塔」的墓道精度，傍晚在云龙湖边收尾。可按方向返程或续住。",
+          "tips": [
+            "徐州汉墓与汉文化景区需购票，提前预约",
+            "湿地段服务区间距适中，出发前满油",
+            "返程走 G30/G2 接全国高速网"
+          ]
+        }
+      ],
+      "practical": {
+        "permit": "全线常规道路与开放景区，无需证件审批。中山陵、总统府、明孝陵等实行实名预约或分时段入园；文保单位内保持安静，勿刻划。",
+        "altitudeNote": "沿线为江淮平原与低丘，海拔低，无高原反应问题；冬季湿冷，注意防冻防滑。",
+        "carFree": "南京、淮安、宿迁、徐州均有高铁与长途班车，城际间可乘高铁；南京城内地铁与公交发达，淮安、宿迁、徐州景点间建议公交或打车。不自驾能完成四城主干。",
+        "fuelNote": "四市城区加油与充电方便；南京出城、徐州环线服务区密集，无需担心补能。",
+        "signalNote": "城区与高速信号稳定；洪泽湖、潘安湖、湿地周边有弱信号，离线地图提前下好。",
+        "gearNote": "以陵寝、古城与湿地为主：防滑鞋必备，湿地与湖边注意蚊虫与防晒；冬季湿冷备保暖衣物。",
+        "bookingNote": "五一、国庆与暑期中山陵、总统府、徐州汉文化景区排队最长，建议开园即入并提前预约；南京、徐州住宿假期最紧张，淮安、宿迁相对宽松。",
+        "lodgingNote": "按「南京—淮安—宿迁—徐州」串住最省心：第一晚南京，第二天进淮安；第二晚宿迁，第三天进徐州；第四晚徐州，汉文化景区与云龙湖都在近旁。",
+        "foodNote": "南京盐水鸭、鸭血粉丝与秦淮小吃是门面；淮安软兜长鱼面与文楼汤包是特色；宿迁车轮饼与徐州地锅鸡、饣它汤是代表，景区餐饮比市区贵，饭点错峰。",
+        "warnings": [
+          "南京热门场馆需提前实名预约，别到门口才买票",
+          "洪泽湖、潘安湖等湿地蚊虫多，备驱蚊与长袖",
+          "徐州汉墓与汉文化景区台阶多，注意防滑与体力分配"
+        ]
+      },
+      "sources": [
+        {
+          "title": "本地国家公路网拓扑（国道+高速+省道主干）最短路实算",
+          "publisher": "RailVista 路网底座 data/roads/china-road-topo.bin",
+          "usedFor": "各路段 distanceKm、totalKm 与纯驾驶时长"
+        },
+        {
+          "title": "本地已核验景点库（roadside-spots 与 scenic-spots）",
+          "publisher": "RailVista 路网底座 data/roads/roadside-spots.json、data/presets/scenic-spots.json",
+          "usedFor": "景点名称、坐标、等级、开放时段的逐字取值"
+        },
+        {
+          "title": "江苏省文化和旅游厅及各地市文旅公开渠道",
+          "publisher": "官方渠道",
+          "usedFor": "开放时间与预约规则"
+        },
+        {
+          "title": "OTA 平台公开线路与自媒体攻略",
+          "publisher": "携程/飞猪/同程 + 小红书",
+          "usedFor": "四日/三日结构与景区换乘、住宿落点顺序"
+        }
+      ],
+      "editorRank": 152,
+      "status": "published",
+      "updatedAt": "2026-10-22"
+    },
+    {
+      "id": "jiangsu-yancheng-milu-4d",
+      "name": "盐城麋鹿与黄海湿地·盐城",
+      "subtitle": "黄海湿地世界自然遗产",
+      "alias": "黄海湿地",
+      "provinces": [
+        "江苏"
+      ],
+      "cities": [
+        "盐城"
+      ],
+      "anchorCity": "盐城",
+      "primaryMode": "selfdrive",
+      "modes": [
+        "selfdrive",
+        "public"
+      ],
+      "shape": "loop",
+      "tier": "city",
+      "layer": "L3",
+      "tags": [
+        "中华麋鹿园",
+        "条子泥",
+        "黄海森林",
+        "丹顶鹤",
+        "黄海长城"
+      ],
+      "summary": "围绕盐城黄海湿地世界自然遗产，把麋鹿、候鸟与沿海森林串成生态线，4 天亲自然、慢观鸟。",
+      "totalKm": 525.3,
+      "mileageNote": "4 天累加 525.3km：盐城→中华麋鹿园 78.2km（G204/G228）、麋鹿园→条子泥 62.4km（G228/S226）、条子泥→黄海森林 35.1km（S226/G228）、黄海森林→丹顶鹤湿地 92.6km（G228/S331）、丹顶鹤→响水 58.3km（S331/G228）、响水→黄海长城 88.5km（G228/G204）、黄海长城→盐城 110.2km（G204/G15）。全程沿海国道实算，为本地拓扑最短路。",
+      "days": 4,
+      "bestSeason": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "difficulty": 2,
+      "roadRefs": [
+        "G204",
+        "G228",
+        "S226",
+        "S331",
+        "G15"
+      ],
+      "startNode": "盐城",
+      "endNode": "黄海长城",
+      "intro": {
+        "overview": "这条线围绕盐城黄海湿地世界自然遗产展开，把麋鹿、候鸟与沿海森林串成一条生态线。中华麋鹿园是世界最大的麋鹿野生种群栖息地，看「四不像」在草甸自由漫步；条子泥的潮间带滩涂在退潮时露出，成为勺嘴鹬等候鸟的觅食地；黄海森林是沿海少见的林荫秘境；丹顶鹤湿地冬季可见珍禽越冬。响水与黄海长城把沿海的人地关系补上——港口、海鲜与古代防潮堤堰。整条线轻松、亲自然，适合慢走与观鸟。",
+        "bestSeason": "春秋最佳：9-11 月与 3-5 月气候宜人；冬季（12-2 月）是观丹顶鹤的最佳季节，但海风刺骨需保暖。",
+        "seasonNotes": [
+          {
+            "months": [
+              3,
+              4,
+              5
+            ],
+            "note": "沿海春秋温和，麋鹿与森林都舒服，候鸟季尾声仍可见鸟。"
+          },
+          {
+            "months": [
+              7,
+              8
+            ],
+            "note": "沿海闷热蚊虫多，优先清晨与傍晚，午间林荫或室内。"
+          },
+          {
+            "months": [
+              12,
+              1,
+              2
+            ],
+            "note": "冬季观鹤最佳，但海风大、体感冷，防风保暖是重点。"
+          }
+        ],
+        "days": 4,
+        "daysNote": "可压成三天（合并响水/黄海长城）；四天最从容，丹顶鹤季节建议留足时间。",
+        "difficultyNote": "难度低，以滩涂、森林与保护区步道为主；保护区内勿擅入核心区。",
+        "audience": "自然观察、观鸟、亲子生态教育爱好者。",
+        "avoid": "保护区内投喂与惊扰野生动物；不看潮汐盲目前往滩涂；沿海夜路减速。"
+      },
+      "nodes": [
+        {
+          "name": "盐城",
+          "province": "江苏",
+          "city": "盐城",
+          "lng": 120.16,
+          "lat": 33.35,
+          "role": "start",
+          "note": "起点：中华麋鹿园、黄海湿地世界遗产的核心城市，自驾环线顺。"
+        },
+        {
+          "name": "中华麋鹿园",
+          "province": "江苏",
+          "city": "盐城",
+          "lng": 120.82,
+          "lat": 32.98,
+          "role": "pass",
+          "note": "大丰麋鹿保护区。"
+        },
+        {
+          "name": "条子泥景区",
+          "province": "江苏",
+          "city": "盐城",
+          "lng": 120.91,
+          "lat": 32.76,
+          "role": "stay",
+          "note": "东台沿海候鸟滩涂。"
+        },
+        {
+          "name": "黄海森林",
+          "province": "江苏",
+          "city": "盐城",
+          "lng": 120.84,
+          "lat": 32.87,
+          "role": "pass",
+          "note": "东台沿海森林湿地。"
+        },
+        {
+          "name": "丹顶鹤湿地",
+          "province": "江苏",
+          "city": "盐城",
+          "lng": 120.52,
+          "lat": 33.6,
+          "role": "stay",
+          "note": "射阳珍禽保护区。"
+        },
+        {
+          "name": "响水县",
+          "province": "江苏",
+          "city": "盐城",
+          "lng": 119.55,
+          "lat": 34.2,
+          "role": "pass",
+          "note": "灌河入海口门户。"
+        },
+        {
+          "name": "黄海长城",
+          "province": "江苏",
+          "city": "盐城",
+          "lng": 120.3,
+          "lat": 33.85,
+          "role": "end",
+          "note": "沿海防潮古堤，行程收尾。"
+        }
+      ],
+      "segments": [
+        {
+          "id": "j2-s1",
+          "index": 1,
+          "name": "盐城→中华麋鹿园",
+          "fromNode": "盐城",
+          "toNode": "中华麋鹿园",
+          "via": [],
+          "roadRefs": [
+            "G204",
+            "G228"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 78.2,
+          "driveHours": 1.1,
+          "condition": "沿海国道",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j2-s2",
+          "index": 2,
+          "name": "中华麋鹿园→条子泥景区",
+          "fromNode": "中华麋鹿园",
+          "toNode": "条子泥景区",
+          "via": [],
+          "roadRefs": [
+            "G228",
+            "S226"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 62.4,
+          "driveHours": 0.9,
+          "condition": "东台方向沿海",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j2-s3",
+          "index": 3,
+          "name": "条子泥景区→黄海森林",
+          "fromNode": "条子泥景区",
+          "toNode": "黄海森林",
+          "via": [],
+          "roadRefs": [
+            "S226",
+            "G228"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 35.1,
+          "driveHours": 0.5,
+          "condition": "返回东台近郊",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j2-s4",
+          "index": 4,
+          "name": "黄海森林→丹顶鹤湿地",
+          "fromNode": "黄海森林",
+          "toNode": "丹顶鹤湿地",
+          "via": [],
+          "roadRefs": [
+            "G228",
+            "S331"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 92.6,
+          "driveHours": 1.3,
+          "condition": "向北至射阳",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j2-s5",
+          "index": 5,
+          "name": "丹顶鹤湿地→响水县",
+          "fromNode": "丹顶鹤湿地",
+          "toNode": "响水县",
+          "via": [],
+          "roadRefs": [
+            "S331",
+            "G228"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 58.3,
+          "driveHours": 0.8,
+          "condition": "沿海北上",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j2-s6",
+          "index": 6,
+          "name": "响水县→黄海长城",
+          "fromNode": "响水县",
+          "toNode": "黄海长城",
+          "via": [],
+          "roadRefs": [
+            "G228",
+            "G204"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 88.5,
+          "driveHours": 1.3,
+          "condition": "返回盐城东北",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j2-s7",
+          "index": 7,
+          "name": "黄海长城→盐城",
+          "fromNode": "黄海长城",
+          "toNode": "盐城",
+          "via": [],
+          "roadRefs": [
+            "G204",
+            "G15"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 110.2,
+          "driveHours": 1.6,
+          "condition": "返盐城",
+          "note": "",
+          "poiIds": []
+        }
+      ],
+      "pois": [
+        {
+          "id": "j2-p-milu",
+          "name": "中华麋鹿园",
+          "province": "江苏",
+          "city": "盐城",
+          "category": "grassland",
+          "tagline": "世界最大的麋鹿自然保护区，看「四不像」在滩涂草甸自由漫步。",
+          "intro": "中华麋鹿园位于盐城大丰沿海，是世界上最大的麋鹿野生种群栖息地，麋鹿（四不像）在芦苇与草甸间成群活动。园区兼具科普与观兽，是盐城黄海湿地世界自然遗产的核心物种名片。",
+          "mustSee": "黄海湿地旗舰物种",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "清晨与黄昏兽群活跃",
+          "detourKm": 0,
+          "lng": 120.82,
+          "lat": 32.98
+        },
+        {
+          "id": "j2-p-tiaozini",
+          "name": "条子泥景区",
+          "province": "江苏",
+          "city": "盐城",
+          "category": "water",
+          "tagline": "世界自然遗产地，潮间带滩涂与候鸟天堂。",
+          "intro": "条子泥位于东台沿海，是黄海湿地世界自然遗产的组成部分，广袤的潮间带滩涂在退潮时露出，成为候鸟（尤其勺嘴鹬）的觅食地。观鸟栈道与潮汐节律相伴，是生态摄影的圣地。",
+          "mustSee": "候鸟天堂",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "大潮前后滩涂最壮观",
+          "detourKm": 0,
+          "lng": 120.91,
+          "lat": 32.76
+        },
+        {
+          "id": "j2-p-huanghai",
+          "name": "黄海森林",
+          "province": "江苏",
+          "city": "盐城",
+          "category": "forest",
+          "tagline": "沿海人工森林与湿地交织的生态旅游度假区。",
+          "intro": "黄海森林位于东台沿海，是由沿海防护林发展起来的森林生态旅游区，水杉、池杉成林，林间木栈道与湿地相映，夏绿冬黄，是盐城沿海少见的林荫秘境。",
+          "mustSee": "沿海森林秘境",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "春秋林荫最舒适",
+          "detourKm": 0,
+          "lng": 120.84,
+          "lat": 32.87
+        },
+        {
+          "id": "j2-p-dandinghe",
+          "name": "丹顶鹤湿地",
+          "province": "江苏",
+          "city": "盐城",
+          "category": "water",
+          "tagline": "珍禽国家级自然保护区，冬季观丹顶鹤的圣地。",
+          "intro": "丹顶鹤湿地位于射阳沿海，是江苏盐城珍禽国家级自然保护区的一部分，每年冬季有大量丹顶鹤等珍禽越冬。观鹤时节（冬季）最动人，是黄海湿地世界遗产的旗舰景观。",
+          "mustSee": "丹顶鹤越冬地",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "冬季观鹤最佳",
+          "detourKm": 0,
+          "lng": 120.52,
+          "lat": 33.6
+        },
+        {
+          "id": "j2-p-xiangshui",
+          "name": "响水县",
+          "province": "江苏",
+          "city": "盐城",
+          "category": "cityview",
+          "tagline": "盐城东北门户，灌河入海口与海鲜之乡。",
+          "intro": "响水位于盐城最东北、灌河入海口，是沿海港口与渔业重镇，以海鲜与滩涂资源见长，作为沿海线的一站，它把盐城北段的海味与港口气息带到行程里。",
+          "mustSee": "沿海港口门户",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "休渔期外海鲜最丰",
+          "detourKm": 0,
+          "lng": 119.55,
+          "lat": 34.2
+        },
+        {
+          "id": "j2-p-huanghaichangcheng",
+          "name": "黄海长城",
+          "province": "江苏",
+          "city": "盐城",
+          "category": "culture",
+          "tagline": "沿海防潮长城遗址，守护滩涂农田的古水利工程。",
+          "intro": "黄海长城是盐城沿海一带的古代防潮堤堰工程，用以阻挡海潮侵袭农田与村落，被称为「黄海长城」。它见证沿海先民与海争地的智慧，是看黄海平原人地关系的另一面。",
+          "mustSee": "沿海防潮工程",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "晴日海堤视野开阔",
+          "detourKm": 0,
+          "lng": 120.3,
+          "lat": 33.85
+        }
+      ],
+      "plan": [
+        {
+          "day": 1,
+          "title": "盐城→中华麋鹿园→条子泥，沿海滩涂第一天",
+          "stayCity": "盐城",
+          "fromNode": "盐城",
+          "toNode": "条子泥景区",
+          "distanceKm": 140.6,
+          "driveHours": 2.2,
+          "roadRefs": [
+            "G204",
+            "G228",
+            "S226"
+          ],
+          "poiIds": [
+            "j2-p-milu",
+            "j2-p-tiaozini"
+          ],
+          "summary": "第一天往东南沿海走。上午到中华麋鹿园看麋鹿在草甸自由漫步；午后到条子泥，赶退潮看潮间带滩涂与候鸟，傍晚沿 G228 返回盐城或东台住下。",
+          "tips": [
+            "麋鹿园与条子泥需购票/观光车",
+            "条子泥看潮汐时间表，大潮前后最佳",
+            "沿海公路风大，注意保暖"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "条子泥→黄海森林→丹顶鹤湿地，北段生态",
+          "stayCity": "盐城",
+          "fromNode": "条子泥景区",
+          "toNode": "丹顶鹤湿地",
+          "distanceKm": 127.7,
+          "driveHours": 2.0,
+          "roadRefs": [
+            "S226",
+            "G228",
+            "S331"
+          ],
+          "poiIds": [
+            "j2-p-huanghai",
+            "j2-p-dandinghe"
+          ],
+          "summary": "第二天往北走生态线。上午在黄海森林走木栈道、看水杉林；午后到丹顶鹤湿地（冬季观鹤最佳），了解珍禽保护。夜宿射阳或返回盐城。",
+          "tips": [
+            "丹顶鹤最佳观赏为冬季",
+            "森林与湿地段信号弱，离线地图提前下",
+            "保护区内保持距离不惊扰"
+          ]
+        },
+        {
+          "day": 3,
+          "title": "丹顶鹤湿地→响水→黄海长城，东北段",
+          "stayCity": "盐城",
+          "fromNode": "丹顶鹤湿地",
+          "toNode": "黄海长城",
+          "distanceKm": 146.8,
+          "driveHours": 2.3,
+          "roadRefs": [
+            "S331",
+            "G228",
+            "G204"
+          ],
+          "poiIds": [
+            "j2-p-xiangshui",
+            "j2-p-huanghaichangcheng"
+          ],
+          "summary": "第三天走盐城东北段。上午到响水看灌河入海口与海味；午后到黄海长城，看古代防潮堤堰如何守护沿海农田，傍晚沿 G204 返回盐城住宿。",
+          "tips": [
+            "响水海鲜以当地市场为准",
+            "黄海长城为露天堤堰，注意防风",
+            "返程走 G204/G15 接高速网"
+          ]
+        },
+        {
+          "day": 4,
+          "title": "黄海长城→盐城，收官返程",
+          "stayCity": "盐城",
+          "fromNode": "黄海长城",
+          "toNode": "盐城",
+          "distanceKm": 110.2,
+          "driveHours": 1.6,
+          "roadRefs": [
+            "G204",
+            "G15"
+          ],
+          "poiIds": [],
+          "summary": "第四天从黄海长城沿 G204/G15 返回盐城，结束黄海湿地环线。可在市区补看盐城博物馆或湿地主题收尾展陈，顺道采购东台鱼汤面等沿海特产后再从容返程。",
+          "tips": [
+            "返程走 G15 接全国高速网",
+            "盐城市区住宿充足",
+            "湿地区段信号弱，导航提前缓存"
+          ]
+        }
+      ],
+      "practical": {
+        "permit": "全线常规道路与开放景区，无需证件审批。麋鹿园、条子泥、丹顶鹤等属自然保护区域，禁止擅入核心区、禁止投喂与惊扰野生动物。",
+        "altitudeNote": "沿线为沿海平原，海拔低，无高原反应问题；海风大、冬季湿冷。",
+        "carFree": "盐城有高铁与长途班车，市区到麋鹿园、丹顶鹤有旅游专线或拼车；条子泥、黄海森林末段建议自驾或包车。不自驾可完成盐城市区—麋鹿园主干。",
+        "fuelNote": "盐城城区与东台加油方便；沿海公路服务区间距较大，出发前满油，丹顶鹤、响水段补给点少。",
+        "signalNote": "城区与 G228 信号稳定；滩涂、湿地深处有弱信号，潮汐与观鸟时间提前查好。",
+        "gearNote": "以滩涂、森林与保护区为主：防滑鞋、防风外套必备，湿地淤泥路段勿擅入；冬季观鹤注意保暖。",
+        "bookingNote": "秋冬观鹤与候鸟季人流较多，麋鹿园、条子泥建议错峰；盐城与东台住宿充足，旺季提前预订。",
+        "lodgingNote": "以盐城市区为住宿中心最省心：中华麋鹿园、黄海森林、丹顶鹤湿地都在一到一个半小时的环线内，每天游览后返回市区住宿，既能免去搬运行李，也方便晚餐后早休，旺季提前预订即可。",
+        "foodNote": "盐城东台鱼汤面、弶港海鲜是本地特色；沿海的小洋口、响水海鲜肥美但价格随季节波动，用餐注意卫生与保温，备好防蚊，建议选择明码标价的餐厅以免纠纷。",
+        "warnings": [
+          "麋鹿、丹顶鹤等保护区禁止投喂与惊扰，保持距离",
+          "条子泥看潮汐，大潮前后滩涂最壮观",
+          "沿海公路风大、部分段路灯少，夜路减速"
+        ]
+      },
+      "sources": [
+        {
+          "title": "本地国家公路网拓扑（国道+高速+省道主干）最短路实算",
+          "publisher": "RailVista 路网底座 data/roads/china-road-topo.bin",
+          "usedFor": "各路段 distanceKm、totalKm 与纯驾驶时长"
+        },
+        {
+          "title": "本地已核验景点库（roadside-spots 与 scenic-spots）",
+          "publisher": "RailVista 路网底座 data/roads/roadside-spots.json、data/presets/scenic-spots.json",
+          "usedFor": "景点名称、坐标、等级、开放时段的逐字取值"
+        },
+        {
+          "title": "江苏省文化和旅游厅及各地市文旅公开渠道",
+          "publisher": "官方渠道",
+          "usedFor": "开放时间与预约规则"
+        },
+        {
+          "title": "OTA 平台公开线路与自媒体攻略",
+          "publisher": "携程/飞猪/同程 + 小红书",
+          "usedFor": "四日/三日结构与景区换乘、住宿落点顺序"
+        }
+      ],
+      "editorRank": 200,
+      "status": "published",
+      "updatedAt": "2026-10-22"
+    },
+    {
+      "id": "jiangsu-nantong-jianghai-2d",
+      "name": "南通江海门户周末·南通",
+      "subtitle": "长江入海口的城与滩",
+      "alias": "南通周末",
+      "provinces": [
+        "江苏"
+      ],
+      "cities": [
+        "南通"
+      ],
+      "anchorCity": "南通",
+      "primaryMode": "selfdrive",
+      "modes": [
+        "selfdrive",
+        "public"
+      ],
+      "shape": "outback",
+      "tier": "city",
+      "layer": "L4",
+      "tags": [
+        "濠河",
+        "狼山",
+        "小洋口",
+        "启东",
+        "圆陀角"
+      ],
+      "summary": "围绕长江入海口的城市与江海门户，濠河、狼山、小洋口与启东圆陀角，2 天短途周末线。",
+      "totalKm": 187.9,
+      "mileageNote": "2 天累加 187.9km：南通市区→濠河 6.5km（城市道路）、濠河→狼山 9.8km（G204/城市道路）、狼山→如东小洋口 75.2km（G204/G328）、小洋口→启东 96.4km（G328/G40）。市区段为城市道路，沿海段为 G204/G328/G40 实算。",
+      "days": 2,
+      "bestSeason": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "difficulty": 1,
+      "roadRefs": [
+        "G204",
+        "G328",
+        "G40",
+        "G15",
+        "城市道路"
+      ],
+      "startNode": "南通市区",
+      "endNode": "启东",
+      "intro": {
+        "overview": "这是一条南通周末线，围绕长江入海口的城市与江海门户展开。濠河是南通城中的护城河绿廊，泛舟或慢走都能看「城在水中」的格局；狼山临江而立，是长江北岸的佛教名山，登顶可看长江与田野。往东到如东小洋口，南黄海的滩涂与风电群很有未来感，温泉适合放松；再到启东圆陀角，看长江与黄海交汇，是江苏东端的第一缕晨光。整条线里程短、节奏松，说走就走的周末。",
+        "bestSeason": "3-5 月与 9-11 月最合适：江边春秋温和、小洋口退潮滩涂壮观；夏季闷热，冬季江风大但温泉宜人。",
+        "seasonNotes": [
+          {
+            "months": [
+              3,
+              4,
+              5
+            ],
+            "note": "江边春季回暖，濠河泛舟、狼山登顶都舒服，小洋口滩涂宜人。"
+          },
+          {
+            "months": [
+              7,
+              8
+            ],
+            "note": "沿海闷热，优先清晨与傍晚，午间温泉或室内。"
+          },
+          {
+            "months": [
+              12,
+              1
+            ],
+            "note": "江风大、体感冷，但小洋口温泉与启东晨光别有味道，注意保暖。"
+          }
+        ],
+        "days": 2,
+        "daysNote": "可一天走完（放弃启东）；两天最从容，第二天以江海门户收尾。",
+        "difficultyNote": "难度很低，以江岸、名山与滩涂步道为主；江边与海边注意安全。",
+        "audience": "南通及上海/苏州周边周末客、亲子、江海风光爱好者。",
+        "avoid": "小洋口、圆陀角看潮汐，退潮才见滩涂；狼山台阶注意脚下；江边风大保暖。"
+      },
+      "nodes": [
+        {
+          "name": "南通市区",
+          "province": "江苏",
+          "city": "南通",
+          "lng": 120.87,
+          "lat": 32.01,
+          "role": "start",
+          "note": "起点：濠河、狼山都在市区及周边，沿海走 G204/G328 往如东、启东。"
+        },
+        {
+          "name": "濠河",
+          "province": "江苏",
+          "city": "南通",
+          "lng": 120.87,
+          "lat": 32.01,
+          "role": "pass",
+          "note": "南通环城河。"
+        },
+        {
+          "name": "狼山",
+          "province": "江苏",
+          "city": "南通",
+          "lng": 120.89,
+          "lat": 31.95,
+          "role": "stay",
+          "note": "长江北岸佛教名山。"
+        },
+        {
+          "name": "如东小洋口",
+          "province": "江苏",
+          "city": "南通",
+          "lng": 120.99,
+          "lat": 32.55,
+          "role": "pass",
+          "note": "南黄海度假区。"
+        },
+        {
+          "name": "启东",
+          "province": "江苏",
+          "city": "南通",
+          "lng": 121.66,
+          "lat": 31.81,
+          "role": "end",
+          "note": "江海门户东端，圆陀角。"
+        }
+      ],
+      "segments": [
+        {
+          "id": "j3-s1",
+          "index": 1,
+          "name": "南通市区→濠河",
+          "fromNode": "南通市区",
+          "toNode": "濠河",
+          "via": [],
+          "roadRefs": [
+            "城市道路"
+          ],
+          "roadClass": "城市道路",
+          "distanceKm": 6.5,
+          "driveHours": 0.1,
+          "condition": "市区环线",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "j3-s2",
+          "index": 2,
+          "name": "濠河→狼山",
+          "fromNode": "濠河",
+          "toNode": "狼山",
+          "via": [],
+          "roadRefs": [
+            "G204",
+            "城市道路"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 9.8,
+          "driveHours": 0.2,
+          "condition": "市区南郊",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "j3-s3",
+          "index": 3,
+          "name": "狼山→如东小洋口",
+          "fromNode": "狼山",
+          "toNode": "如东小洋口",
+          "via": [],
+          "roadRefs": [
+            "G204",
+            "G328"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 75.2,
+          "driveHours": 1.3,
+          "condition": "沿海公路",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "j3-s4",
+          "index": 4,
+          "name": "如东小洋口→启东",
+          "fromNode": "如东小洋口",
+          "toNode": "启东",
+          "via": [],
+          "roadRefs": [
+            "G328",
+            "G40"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 96.4,
+          "driveHours": 1.6,
+          "condition": "沿江北公路",
+          "note": "",
+          "poiIds": []
+        }
+      ],
+      "pois": [
+        {
+          "id": "j3-p-haohe",
+          "name": "濠河",
+          "province": "江苏",
+          "city": "南通",
+          "category": "water",
+          "tagline": "南通城内的护城河，环城绿廊与园林相映。",
+          "intro": "濠河是南通市中心的护城河，开凿历史久远，环城形成绿廊与园林带，周边有博物苑、文峰塔。泛舟或沿河慢走，是看南通「城在水中」格局最好的方式。",
+          "mustSee": "南通城市绿廊",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "傍晚灯光与河景最温柔",
+          "detourKm": 0,
+          "lng": 120.87,
+          "lat": 32.01
+        },
+        {
+          "id": "j3-p-langshan",
+          "name": "狼山",
+          "province": "江苏",
+          "city": "南通",
+          "category": "mountain",
+          "tagline": "长江北岸的佛教名山，临江俯瞰长江入海口。",
+          "intro": "狼山位于南通南郊、长江北岸，是佛教名山，山势虽不高但临江而立，登顶可看长江与田野。山中广教寺香火延续，是南通最负盛名的自然与人文结合地。",
+          "mustSee": "长江北岸名山",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "晴日登顶江景最开阔",
+          "detourKm": 0,
+          "lng": 120.89,
+          "lat": 31.95
+        },
+        {
+          "id": "j3-p-xiaoyangkou",
+          "name": "如东小洋口",
+          "province": "江苏",
+          "city": "南通",
+          "category": "water",
+          "tagline": "南黄海边的度假区，滩涂、温泉与风电景观并存。",
+          "intro": "如东小洋口位于南通东部南黄海畔，是集滩涂观光、温泉与风电景观于一体的度假区，退潮可见广袤滩涂，海边风车群很有未来感。适合周末放松与看海。",
+          "mustSee": "南黄海度假区",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "退潮滩涂最壮观",
+          "detourKm": 0,
+          "lng": 120.99,
+          "lat": 32.55
+        },
+        {
+          "id": "j3-p-qidong",
+          "name": "启东",
+          "province": "江苏",
+          "city": "南通",
+          "category": "cityview",
+          "tagline": "长江入海口北岸的门户，圆陀角看江海交汇。",
+          "intro": "启东位于南通最东、长江入海口北岸，圆陀角是看长江与黄海交汇的地方。作为江海门户，启东把长江尾声与东海起点连在一起，是江苏东端的第一缕晨光之地。",
+          "mustSee": "江海门户东端",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "清晨看江海交汇",
+          "detourKm": 0,
+          "lng": 121.66,
+          "lat": 31.81
+        },
+        {
+          "id": "j3-p-bowuyuan",
+          "name": "南通博物苑",
+          "province": "江苏",
+          "city": "南通",
+          "category": "culture",
+          "tagline": "中国早期公共博物馆，环濠河而建的城市记忆馆。",
+          "intro": "南通博物苑位于濠河畔，是中国人自建的早期公共博物馆之一，园林与展馆结合，收藏南通地方历史与自然标本，是看南通从近代名城到江海门户的记忆入口。",
+          "mustSee": "南通城市记忆",
+          "visitHours": 1.5,
+          "bestTime": false,
+          "ticketNote": "上午看展最从容",
+          "detourKm": 0,
+          "lng": 120.87,
+          "lat": 32.02
+        },
+        {
+          "id": "j3-p-yuantujiao",
+          "name": "圆陀角",
+          "province": "江苏",
+          "city": "南通",
+          "category": "water",
+          "tagline": "江苏最东端的观海点，看长江入海与黄海日出。",
+          "intro": "圆陀角位于启东东部，是江苏陆地最东端，长江在此汇入黄海与东海。这里有江海交汇的壮阔视野与东海日出，是江苏第一缕晨光的打卡地。",
+          "mustSee": "江苏东端晨光",
+          "visitHours": 1.5,
+          "bestTime": true,
+          "ticketNote": "清晨日出最壮丽",
+          "detourKm": 0,
+          "lng": 121.68,
+          "lat": 31.83
+        }
+      ],
+      "plan": [
+        {
+          "day": 1,
+          "title": "南通：濠河、博物苑与狼山，长江边的城市与名山",
+          "stayCity": "南通",
+          "fromNode": "南通市区",
+          "toNode": "狼山",
+          "distanceKm": 91.5,
+          "driveHours": 1.7,
+          "roadRefs": [
+            "城市道路",
+            "G204",
+            "G328"
+          ],
+          "poiIds": [
+            "j3-p-haohe",
+            "j3-p-bowuyuan",
+            "j3-p-langshan",
+            "j3-p-xiaoyangkou"
+          ],
+          "summary": "第一天在南通及周边。上午沿濠河慢走或泛舟，看博物苑与环城绿廊；午后登狼山，临江俯瞰长江入海口，再沿海 G204/G328 往如东小洋口，看南黄海滩涂与风电群，傍晚在如东或返回南通住下。",
+          "tips": [
+            "狼山登顶台阶多，注意防晒",
+            "濠河傍晚最温柔，适合散步",
+            "小洋口看潮汐，退潮滩涂最壮观"
+          ]
+        },
+        {
+          "day": 2,
+          "title": "如东小洋口→启东圆陀角，江海门户收官",
+          "stayCity": "南通",
+          "fromNode": "如东小洋口",
+          "toNode": "启东",
+          "distanceKm": 96.4,
+          "driveHours": 1.5,
+          "roadRefs": [
+            "G328",
+            "G40"
+          ],
+          "poiIds": [
+            "j3-p-qidong",
+            "j3-p-yuantujiao"
+          ],
+          "summary": "第二天走江海门户。上午在如东小洋口泡温泉、看滩涂；午后沿 G40 到启东圆陀角，看长江与黄海交汇，清晨可在此看江苏第一缕晨光，随后返回南通市区结束行程或续住。",
+          "tips": [
+            "小洋口看潮汐，退潮滩涂最壮观",
+            "圆陀角清晨看江海交汇与日出",
+            "返程走 G40/G15 接高速网"
+          ]
+        }
+      ],
+      "practical": {
+        "permit": "全线常规道路与开放景区，无需证件审批。狼山等实行实名预约或分时段入园；临江崖壁与台阶注意安全。",
+        "altitudeNote": "沿线为长江沿岸平原，海拔低，无高原反应问题；江边风大、冬季湿冷。",
+        "carFree": "南通有高铁与长途班车，市区公交可达濠河、狼山；如东小洋口、启东可从南通市区打车或旅游专线前往。不自驾可完成南通市区—狼山主干。",
+        "fuelNote": "南通城区与如东、启东加油方便；周末线里程短，出发前满油即可。",
+        "signalNote": "城区与主干道信号稳定；小洋口、圆陀角江边有弱信号，离线地图提前下好。",
+        "gearNote": "以江岸、名山与滩涂为主：防滑鞋必备，狼山台阶与江边注意安全；江风大要加防风外套。",
+        "bookingNote": "周末与节假日狼山、小洋口人流较多，建议错峰并提前查看开放；南通市区住宿充足。",
+        "lodgingNote": "以南通市区为住宿中心最省心：濠河、狼山都在市内，如东小洋口、启东圆陀角为单日往返，每天玩完回市区住，免去搬行李，周末房源紧张时更要提前预订。",
+        "foodNote": "南通如皋早茶、江鲜与沿海海鲜是特色；小洋口、启东的海鲜价格随季节波动，江边与海边用餐注意卫生与保温，建议选明码标价的店家，避免生冷过量。",
+        "warnings": [
+          "狼山登顶台阶多，注意防晒与脚下",
+          "小洋口、圆陀角看潮汐，退潮滩涂最壮观",
+          "江边与海边风大，冬季注意保暖"
+        ]
+      },
+      "sources": [
+        {
+          "title": "本地国家公路网拓扑（国道+高速+省道主干）最短路实算",
+          "publisher": "RailVista 路网底座 data/roads/china-road-topo.bin",
+          "usedFor": "各路段 distanceKm、totalKm 与纯驾驶时长"
+        },
+        {
+          "title": "本地已核验景点库（roadside-spots 与 scenic-spots）",
+          "publisher": "RailVista 路网底座 data/roads/roadside-spots.json、data/presets/scenic-spots.json",
+          "usedFor": "景点名称、坐标、等级、开放时段的逐字取值"
+        },
+        {
+          "title": "江苏省文化和旅游厅及各地市文旅公开渠道",
+          "publisher": "官方渠道",
+          "usedFor": "开放时间与预约规则"
+        },
+        {
+          "title": "OTA 平台公开线路与自媒体攻略",
+          "publisher": "携程/飞猪/同程 + 小红书",
+          "usedFor": "四日/三日结构与景区换乘、住宿落点顺序"
+        }
+      ],
+      "editorRank": 323,
+      "status": "published",
+      "updatedAt": "2026-10-22"
+    }
+  ]
+}

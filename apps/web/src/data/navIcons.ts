@@ -1,4 +1,4 @@
-import { BookOpenText, Car, Map, Ticket, TrainFront } from 'lucide-vue-next';
+import { BookOpenText, Car, Map, Search, Ticket, TrainFront } from 'lucide-vue-next';
 import type { Component } from 'vue';
 
 /**
@@ -14,6 +14,7 @@ export const NAV_ICONS: Record<string, Component> = {
   atlas: Map,
   ticket: Ticket,
   roadbook: BookOpenText,
+  search: Search,
 };
 
 /** 取图标组件（未知 id 回退 Map，避免渲染空档） */

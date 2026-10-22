@@ -111,6 +111,10 @@
   --spot-soft: rgba(224, 145, 90, 0.2);
   --train: #74bd89;
   --gps: #6aa9f0;
+  /* 车站特色美食：与高亮类型 food 同色（data/highlightColors.ts），不随主题漂移 */
+  --food: #e0765c;
+  --food-soft: rgba(224, 118, 92, 0.14);
+  --food-line: rgba(224, 118, 92, 0.34);
 
   /* ══════════ 字体 ══════════ */
   --font-sans: 'HarmonyOS Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
@@ -187,6 +191,8 @@
   --ticket-gold: #d4a853;
   --ticket-gold-deep: #cba85c;
   --ticket-gold-bright: #e8cd92;
+  /* 金色「薄纱」：给卡片铺一层几乎看不出的暖底，只用于纪念属性内容的表面 */
+  --ticket-gold-veil: rgba(212, 168, 83, 0.08);
 
   /* ══════════ 动效 ══════════ */
   --dur-micro: 100ms; /* 颜色 / 描边 */
@@ -243,12 +249,13 @@
  */
 
 /* 底栏档：悬浮胶囊本体 56vp + 底边悬浮留白 8vp；内容避让总高 64vp。
- * 顶栏品牌条收起（--appbar-h=0，AppTopBar display:none）：手机主导航在底栏；
- * 刘海由 .rv-page/.drive-page 的 padding-top: var(--safe-top) 承担，
- * 避免透明顶栏占位与页面 scrim 叠出纯色接缝。 */
+ * 顶栏为极简品牌条（Logo + 全局搜索入口，主导航仍在底栏）；
+ * 页面用 slide-under 模式避让（margin-top 拉回 + padding-top 垫高，
+ * 与 ≥840 档同一纪律，见 base.css .rv-page 注释），保证页面 scrim
+ * 从视口顶连续铺下来，不露出 body 纯色接缝。 */
 @media (max-width: 839px) {
   :root {
-    --appbar-h: 0px;
+    --appbar-h: 52px;
     --bottomnav-h: 64px;
     --sidenav-w: 0px;
   }

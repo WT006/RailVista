@@ -34,7 +34,7 @@ import {
 
 usePointerSpotlight();
 import { ROAD_COLORS, roadColor, classOfRef } from '../data/roadColors';
-import type { PlaceHit } from '@railvista/shared';
+import { TRAVEL_SHAPE_LABEL, type PlaceHit, type TravelRouteSummary } from '@railvista/shared';
 
 const router = useRouter();
 
@@ -318,8 +318,89 @@ const coverageRatioPct = computed(() =>
   stats.value ? Math.round(stats.value.hasGeomRatio * 100) : null,
 );
 
+// ── 路书库联动：经典环线 + 「这条公路能怎么玩」 ──────────────────────────────
+const classicLoops = ref<TravelRouteSummary[]>([]);
+/** 键盘里输入的公路编号（G318 这种），命中时反查路书库玩法 */
+const roadPlays = ref<TravelRouteSummary[]>([]);
+const roadPlayRef = ref('');
+
+/** 编号输入 → 反查用的 key：裸编号才查（「河南:S307」这类省内键不反查） */
+const roadRefForPlay = computed(() => {
+  const v = codeQuery.value.trim().toUpperCase().replace(/\s+/g, '');
+  return /^[GSXYC]\d{1,4}$/.test(v) ? v : '';
+});
+
+let roadPlayTimer: ReturnType<typeof setTimeout> | null = null;
+
+async function refreshLoops() {
+  const province = selectedProvince.value;
+  try {
+    const res = await api.getTravelRoutes(
+      province
+        ? { shape: 'loop', province, sort: 'layer', limit: 8 }
+        : { shape: 'loop', layer: 'L1', sort: 'layer', limit: 8 },
+    );
+    // 迟到的响应不覆盖更新的筛选条件
+    if (province !== selectedProvince.value) return;
+    classicLoops.value = res.routes;
+  } catch {
+    /* 路书库不可用不影响自驾主流程 */
+  }
+}
+
+async function refreshRoadPlays() {
+  const ref = roadRefForPlay.value;
+  if (!ref) {
+    roadPlays.value = [];
+    roadPlayRef.value = '';
+    return;
+  }
+  try {
+    const res = await api.getTravelRoutesByRoad(ref);
+    if (ref !== roadRefForPlay.value) return;
+    roadPlays.value = res.routes.filter((r) => r.status === 'published').slice(0, 4);
+    roadPlayRef.value = ref;
+  } catch {
+    /* 反查失败只是少一块推荐 */
+  }
+}
+
+watch(selectedProvince, () => void refreshLoops());
+watch(
+  roadRefForPlay,
+  () => {
+    if (roadPlayTimer) clearTimeout(roadPlayTimer);
+    roadPlayTimer = setTimeout(() => void refreshRoadPlays(), 300);
+  },
+);
+
+/** 环线没有整条几何，能开走的是它压着的那条主干编号 */
+function loopRoadTarget(r: TravelRouteSummary): string {
+  const code = r.roadRefs?.[0] ?? '';
+  return /^[GSXYC]\d{1,4}$/i.test(code) ? code : '';
+}
+
+function loopMeta(r: TravelRouteSummary): string {
+  return [
+    TRAVEL_SHAPE_LABEL[r.shape] ?? '',
+    r.provinces.slice(0, 3).join('/'),
+    r.totalKm ? `${Math.round(r.totalKm)} km` : '',
+    r.days ? `${r.days} 天` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
+/** 标题链回路书库列表（选了省就带着省，别让用户重新筛一遍） */
+const loopsListTo = computed(() =>
+  selectedProvince.value
+    ? { path: '/roadbook', query: { province: selectedProvince.value } }
+    : '/roadbook',
+);
+
 onMounted(async () => {
   refreshRecentUi();
+  void refreshLoops();
   try {
     stats.value = await api.getDriveNetworkStats();
   } catch {
@@ -516,6 +597,21 @@ const levelLabel: Record<string, string> = {
             <p v-else-if="codeQuery.trim() && !roadBusy" class="road-kbd__none">
               没有匹配的编号（省道需先选省）
             </p>
+
+            <!-- 输入公路编号时直接给出「这条路能怎么玩」：路书库里压着同一编号的环线与走廊 -->
+            <div v-if="roadPlays.length" class="road-plays">
+              <p class="road-plays__label">{{ roadPlayRef }} 沿线的玩法</p>
+              <RouterLink
+                v-for="r in roadPlays"
+                :key="r.id"
+                class="road-plays__item"
+                :to="`/roadbook/${r.id}`"
+              >
+                <span class="road-plays__name">{{ r.name }}</span>
+                <span class="road-plays__meta">{{ loopMeta(r) }}</span>
+                <span class="road-plays__go">看攻略</span>
+              </RouterLink>
+            </div>
             <div v-if="roadCandidates.length" class="drive-actions">
               <p class="road-kbd__hint">
                 {{ selectedRoadHit ? `已选 ${selectedRoadHit.name}` : '先点选一条公路，再设为起点/终点' }}
@@ -635,6 +731,36 @@ const levelLabel: Record<string, string> = {
             有编号无走向的条目仍可搜索，地图会标明暂无几何；已贯通里程与官方里程分开展示。
           </p>
         </aside>
+      </section>
+
+      <!-- 第二屏：路书库经典环线（种草「走哪条」）+ 榜单入口（从属，视觉权重低于搜索） -->
+      <section v-if="classicLoops.length" class="drive-loops">
+        <h2 class="drive-loops__title">
+          <router-link class="drive-loops__entry" :to="loopsListTo">
+            {{ selectedProvince ? `${selectedProvince} · 环线玩法` : '路书库 · 经典环线' }}
+          </router-link>
+        </h2>
+        <p class="drive-loops__sub">
+          这些是全国跑得最多的闭环线路：先看攻略定天数与季节，再按它压着的主干编号开沿程图。
+        </p>
+        <div class="drive-loops__grid">
+          <article v-for="r in classicLoops" :key="r.id" class="drive-loop-card">
+            <RouterLink class="drive-loop-card__main" :to="`/roadbook/${r.id}`">
+              <h3 class="drive-loop-card__name">{{ r.name }}</h3>
+              <p class="drive-loop-card__meta">{{ loopMeta(r) }}</p>
+              <p class="drive-loop-card__summary">{{ r.summary }}</p>
+              <span class="drive-loop-card__go">看攻略 →</span>
+            </RouterLink>
+            <!-- 环线本身没有整条几何，能直接开走的是它压着的主干编号 -->
+            <RouterLink
+              v-if="loopRoadTarget(r)"
+              class="btn ghost drive-loop-card__road"
+              :to="{ path: '/drive/trip', query: { road: loopRoadTarget(r) } }"
+            >
+              走 {{ loopRoadTarget(r) }}
+            </RouterLink>
+          </article>
+        </div>
       </section>
 
       <!-- 第二屏：榜单入口（从属，视觉权重低于搜索；标题即全部榜单入口） -->

@@ -9,12 +9,13 @@
  * 筛选全部走 GET /api/travel/routes，与 shared 层共用同一套 matchTravelRoute。
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { api } from '../api/client';
 import { RECOMMEND_LAYER_ROTATION, TRAVEL_LAYER_LABEL } from '@railvista/shared';
 import type { RoadbookProvince, TravelLayer, TravelRouteSummary } from '@railvista/shared';
 
 const router = useRouter();
+const route = useRoute();
 
 const loading = ref(true);
 const error = ref('');
@@ -44,12 +45,16 @@ watch(page, (n) => {
   jumpInput.value = String(n);
 });
 
-const province = ref('');
-const city = ref('');
+/**
+ * 筛选条件支持深链预置（`/roadbook?province=青海&city=西宁&q=xxx`）：
+ * 行程页的「下车玩法」与自驾页的环线卡都带着上下文跳过来，不让用户再筛一遍。
+ */
+const province = ref(String(route.query.province ?? ''));
+const city = ref(String(route.query.city ?? ''));
 const mode = ref('');
 /** 内容分层（L1~L5）。缺省 = 全部层 */
 const layer = ref<TravelLayer | ''>('');
-const keyword = ref('');
+const keyword = ref(String(route.query.q ?? ''));
 const sort = ref('recommend');
 /** 天数上限。'' = 全部（默认不筛，避免隐藏存量长线）。语义是「N 天以内」，见 §4.3。 */
 const maxDays = ref<number | ''>('');
@@ -874,6 +879,7 @@ function seasonText(months: number[]): string {
 }
 
 .rb-expand {
+  position: relative;
   border: none;
   background: transparent;
   color: var(--accent);
@@ -883,6 +889,17 @@ function seasonText(months: number[]): string {
   cursor: pointer;
   min-height: 32px;
   padding: 0 var(--space-1);
+}
+
+/* 命中区扩到 ≥44×44（视觉保持紧凑） */
+.rb-expand::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--hit-min));
+  height: max(100%, var(--hit-min));
+  transform: translate(-50%, -50%);
 }
 
 .rb-chips {
@@ -1038,10 +1055,11 @@ function seasonText(months: number[]): string {
 }
 
 .rb-sort__trigger {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  min-height: 36px;
+  min-height: 40px;
   padding: 0 var(--space-2) 0 var(--space-3);
   border: 1px solid var(--line-default);
   border-radius: var(--radius-full);

@@ -1,0 +1,1738 @@
+{
+  "version": "1",
+  "updated": "2026-10-22",
+  "area": "「湖南」（补强覆盖：本轮前库内湖南路线较少，本文件 +3 —— 洞庭楚汉 / 九嶷女书 / 莽山东江湖）",
+  "note": "本文件含 3 条路线：洞庭楚汉·长沙—益阳—常德—夹山 4 日（L2 / editorRank 158，4 日）、九嶷女书·永州—九嶷山—千家峒—女书村 3 日（L3 / editorRank 299，3 日）、莽山东江湖·郴州—飞天山—莽山—东江湖 4 日（L5 / editorRank 416，4 日）。里程由本地国家公路网拓扑（国道+高速+省道主干）A* 最短路实算，比值偏高的少数段改按直线乘 1.33 推算并在 mileageNote 中逐项说明；坐标取本地已核验景点库（roadside-spots / scenic-spots）与区划底座 places-admin，保留两位小数。",
+  "routes": [
+    {
+      "id": "hunan-dongting-chuhan-4d",
+      "name": "洞庭楚汉·长沙—益阳—常德—夹山",
+      "subtitle": "湖湘文化—洞庭湿地—史前古城",
+      "alias": "洞庭走廊",
+      "provinces": [
+        "湖南"
+      ],
+      "cities": [
+        "长沙",
+        "益阳",
+        "常德"
+      ],
+      "anchorCity": "长沙",
+      "primaryMode": "selfdrive",
+      "modes": [
+        "selfdrive",
+        "public",
+        "charter"
+      ],
+      "shape": "loop",
+      "tier": "regional",
+      "layer": "L2",
+      "tags": [
+        "岳麓",
+        "南洞庭",
+        "桃花源",
+        "城头山",
+        "柳叶湖"
+      ],
+      "summary": "从长沙沿洞庭湖南缘，把湖湘文化、湿地生态与史前古城串成一条可读的环线，4 天走通洞庭湖平原的文明纵深。",
+      "totalKm": 699.7,
+      "mileageNote": "4 天累加约 699.7 公里：长沙→益阳 78.2（G107/G0421/G5513）、益阳→裴公亭 4.6、益阳→南洞庭 35.9、益阳→竹海 24.8、竹海→常德 106.9、常德→柳叶湖 8.2、常德→桃花源 48.9、常德→城头山 94、城头山→夹山 28.2（原 59.6，比值偏高按直线乘一点三三推算）、夹山→长沙 270（返程段按直线乘一点三三估算）。实算段为本地国家公路网拓扑最短路，少数高比值段已在分段中说明。",
+      "days": 4,
+      "bestSeason": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "difficulty": 2,
+      "roadRefs": [
+        "G107",
+        "G0421",
+        "G5513",
+        "G319",
+        "G234",
+        "湖南:X11",
+        "G5615",
+        "G5517",
+        "G207",
+        "G56",
+        "G55",
+        "G353",
+        "G4"
+      ],
+      "startNode": "长沙",
+      "endNode": "夹山",
+      "intro": {
+        "overview": "这条线从长沙出发，沿洞庭湖南缘把湖湘文化、湿地生态与史前文明串成一条可读的环线。第一段是长沙：岳麓书院、橘子洲与马王堆，把楚汉与湖湘精神立起来。第二段是益阳与南洞庭：资江畔的裴公亭、水网交错的南洞庭湖湿地、桃江的连片竹海，看长江中游湿地的呼吸。第三段是常德：城北的柳叶湖、桃源县的桃花源、澧县的城头山古遗址与夹山禅林，把田园理想、史前第一城与禅意一次收齐。整条线不赶远路，却把洞庭湖平原的文明纵深走通。",
+        "bestSeason": "3-5 月与 9-11 月最合适：春季桃花源的桃花、竹海新绿，秋季南洞庭候鸟与城头山旷野都好看；夏季闷热多雨，冬季湿冷。",
+        "seasonNotes": [
+          {
+            "months": [
+              3,
+              4,
+              5
+            ],
+            "note": "桃花源桃花与竹海新绿最盛，益阳、常德步行舒适。"
+          },
+          {
+            "months": [
+              7,
+              8
+            ],
+            "note": "洞庭闷热多雨，优先清晨与傍晚，室内场馆避暑。"
+          },
+          {
+            "months": [
+              12,
+              1
+            ],
+            "note": "湿冷明显，室内场馆更舒适，户外注意保暖防滑。"
+          }
+        ],
+        "days": 4,
+        "daysNote": "可压成三天（合并常德两日）；四天最从容，城头山与桃花源各留半天。",
+        "difficultyNote": "难度低，以城市、湖泊、竹林与遗址为主；唯一注意是长沙、常德假期停车与预约。",
+        "audience": "喜欢楚汉历史、湿地观鸟与田园文化的文史与亲子游客。",
+        "avoid": "只冲打卡忽略衔接；长沙热门场馆务必提前预约；冬季湿冷备保暖。"
+      },
+      "nodes": [
+        {
+          "name": "长沙",
+          "province": "湖南",
+          "city": "长沙",
+          "role": "start",
+          "note": "长沙：本线途经节点。",
+          "lng": 112.93,
+          "lat": 28.23
+        },
+        {
+          "name": "益阳",
+          "province": "湖南",
+          "city": "益阳",
+          "role": "pass",
+          "note": "益阳：本线途经节点。",
+          "lng": 112.35,
+          "lat": 28.56
+        },
+        {
+          "name": "裴公亭",
+          "province": "湖南",
+          "city": "益阳",
+          "role": "pass",
+          "note": "裴公亭：本线途经节点。",
+          "lng": 112.34,
+          "lat": 28.59
+        },
+        {
+          "name": "南洞庭湖湿地",
+          "province": "湖南",
+          "city": "益阳",
+          "role": "pass",
+          "note": "南洞庭湖湿地：本线途经节点。",
+          "lng": 112.41,
+          "lat": 28.81
+        },
+        {
+          "name": "桃花江竹海",
+          "province": "湖南",
+          "city": "益阳",
+          "role": "stay",
+          "note": "桃花江竹海：本线途经节点。",
+          "lng": 112.18,
+          "lat": 28.52
+        },
+        {
+          "name": "常德",
+          "province": "湖南",
+          "city": "常德",
+          "role": "pass",
+          "note": "常德：本线途经节点。",
+          "lng": 111.69,
+          "lat": 29.03
+        },
+        {
+          "name": "柳叶湖",
+          "province": "湖南",
+          "city": "常德",
+          "role": "stay",
+          "note": "柳叶湖：本线途经节点。",
+          "lng": 111.74,
+          "lat": 29.05
+        },
+        {
+          "name": "桃花源",
+          "province": "湖南",
+          "city": "常德",
+          "role": "pass",
+          "note": "桃花源：本线途经节点。",
+          "lng": 111.44,
+          "lat": 28.78
+        },
+        {
+          "name": "城头山",
+          "province": "湖南",
+          "city": "常德",
+          "role": "stay",
+          "note": "城头山：本线途经节点。",
+          "lng": 111.66,
+          "lat": 29.68
+        },
+        {
+          "name": "夹山",
+          "province": "湖南",
+          "city": "常德",
+          "role": "end",
+          "note": "夹山：本线途经节点。",
+          "lng": 111.49,
+          "lat": 29.56
+        }
+      ],
+      "segments": [
+        {
+          "id": "seg1",
+          "index": 1,
+          "name": "长沙→益阳",
+          "fromNode": "长沙",
+          "toNode": "益阳",
+          "via": [],
+          "roadRefs": [
+            "G107",
+            "G0421",
+            "G5513"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 78.2,
+          "driveHours": 1.1,
+          "condition": "长沙出城走复线转 G5513 西进益阳",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg2",
+          "index": 2,
+          "name": "益阳→裴公亭",
+          "fromNode": "益阳",
+          "toNode": "裴公亭",
+          "via": [],
+          "roadRefs": [
+            "G319",
+            "G234"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 4.6,
+          "driveHours": 0.1,
+          "condition": "益阳市区资江畔裴公亭",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg3",
+          "index": 3,
+          "name": "益阳→南洞庭湖湿地",
+          "fromNode": "益阳",
+          "toNode": "南洞庭湖湿地",
+          "via": [],
+          "roadRefs": [
+            "G319",
+            "G234",
+            "湖南:X11"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 35.9,
+          "driveHours": 0.5,
+          "condition": "益阳南下沅江方向进南洞庭湖湿地",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "seg4",
+          "index": 4,
+          "name": "益阳→桃花江竹海",
+          "fromNode": "益阳",
+          "toNode": "桃花江竹海",
+          "via": [],
+          "roadRefs": [
+            "G319",
+            "G234",
+            "G536"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 24.8,
+          "driveHours": 0.4,
+          "condition": "益阳西去桃江看竹海",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg5",
+          "index": 5,
+          "name": "桃花江竹海→常德",
+          "fromNode": "桃花江竹海",
+          "toNode": "常德",
+          "via": [],
+          "roadRefs": [
+            "G234",
+            "S71",
+            "G5615",
+            "G5517",
+            "G319",
+            "G207"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 106.9,
+          "driveHours": 1.5,
+          "condition": "桃江转 G5517/G56 北上常德",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg6",
+          "index": 6,
+          "name": "常德→柳叶湖",
+          "fromNode": "常德",
+          "toNode": "柳叶湖",
+          "via": [],
+          "roadRefs": [
+            "G207",
+            "G319",
+            "G5517"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 8.2,
+          "driveHours": 0.1,
+          "condition": "常德市区东北柳叶湖",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg7",
+          "index": 7,
+          "name": "常德→桃花源",
+          "fromNode": "常德",
+          "toNode": "桃花源",
+          "via": [],
+          "roadRefs": [
+            "G207",
+            "G319",
+            "G5517",
+            "G56"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 48.9,
+          "driveHours": 0.7,
+          "condition": "常德西去桃源县桃花源",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg8",
+          "index": 8,
+          "name": "常德→城头山",
+          "fromNode": "常德",
+          "toNode": "城头山",
+          "via": [],
+          "roadRefs": [
+            "G207",
+            "G319",
+            "G5517",
+            "G55",
+            "G353"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 94,
+          "driveHours": 1.3,
+          "condition": "常德北去澧县城头山古遗址",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg9",
+          "index": 9,
+          "name": "城头山→夹山",
+          "fromNode": "城头山",
+          "toNode": "夹山",
+          "via": [],
+          "roadRefs": [
+            "G207",
+            "S12",
+            "湖南:X21"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 28.2,
+          "driveHours": 0.4,
+          "condition": "城头山往东到夹山国家森林公园",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "seg10",
+          "index": 10,
+          "name": "夹山→长沙",
+          "fromNode": "夹山",
+          "toNode": "长沙",
+          "via": [],
+          "roadRefs": [
+            "G55",
+            "G5513",
+            "G107",
+            "G0421"
+          ],
+          "roadClass": "高速",
+          "distanceKm": 270.0,
+          "driveHours": 3.9,
+          "condition": "夹山返长沙，按直线乘一点三三估算",
+          "note": "",
+          "poiIds": []
+        }
+      ],
+      "pois": [
+        {
+          "id": "d-p-changsha",
+          "name": "长沙",
+          "province": "湖南",
+          "city": "长沙",
+          "category": "cityview",
+          "tagline": "湘江之滨的湖湘文化枢纽，岳麓书院与橘子洲是精神地标。",
+          "intro": "长沙是湖南的省会与文化中心，岳麓书院千年弦歌不绝，橘子洲头看湘江北去，马王堆汉墓与湖南省博物馆承载楚汉记忆，是洞庭线南端的人文起点。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "春秋气候宜人、清晨橘子洲最清爽",
+          "ticketNote": "部分场馆免费或按公告预约，湖南省博物馆需提前预约。",
+          "detourKm": 0,
+          "lng": 112.93,
+          "lat": 28.23
+        },
+        {
+          "id": "d-p-peigong",
+          "name": "裴公亭",
+          "province": "湖南",
+          "city": "益阳",
+          "category": "culture",
+          "tagline": "资江畔纪念唐代名相裴休的临江亭台。",
+          "intro": "裴公亭位于益阳市区资江畔，是为纪念唐代名相裴休而建的临江亭台，登亭可俯瞰资水穿城，是益阳人日常休闲与怀古的去处，也是洞庭线进入益阳的第一站。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "傍晚江风最舒服",
+          "ticketNote": "开放以现场公告为准。",
+          "detourKm": 0,
+          "lng": 112.34,
+          "lat": 28.59
+        },
+        {
+          "id": "d-p-nandongting",
+          "name": "南洞庭湖湿地",
+          "province": "湖南",
+          "city": "益阳",
+          "category": "water",
+          "tagline": "洞庭湖东洞庭与南洞庭交汇处的湿地水禽天堂。",
+          "intro": "南洞庭湖湿地位于益阳沅江方向，是洞庭湖湿地系统的重要组成部分，水网交错、芦苇连片，秋冬水落滩出时是观鸟与看湖的好时节，也是长江中游湿地生态的活样本。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "秋冬水退滩出、候鸟最多",
+          "ticketNote": "开放与游船以官方公告为准，保护区内勿擅入核心区。",
+          "detourKm": 0,
+          "lng": 112.41,
+          "lat": 28.81
+        },
+        {
+          "id": "d-p-zhuhai",
+          "name": "桃花江竹海",
+          "province": "湖南",
+          "city": "益阳",
+          "category": "forest",
+          "tagline": "桃江县的连片竹林，歌曲里桃花江畔的绿海。",
+          "intro": "桃花江竹海位于益阳桃江县，是湘中少见的连片竹林景观，春风一过绿浪翻涌，林间步道与竹海民宿适合慢走，因《桃花江》民歌而声名在外。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "春夏新绿最润",
+          "ticketNote": "开放以现场为准。",
+          "detourKm": 0,
+          "lng": 112.18,
+          "lat": 28.52
+        },
+        {
+          "id": "d-p-liuye",
+          "name": "柳叶湖",
+          "province": "湖南",
+          "city": "常德",
+          "category": "water",
+          "tagline": "常德城北的城郊湖泊，因形似柳叶得名。",
+          "intro": "柳叶湖位于常德市区东北，是城市近旁的湖泊型度假区，水面开阔、环湖绿道完整，司马楼与沙滩公园是亲子与慢跑的好去处，常德人周末亲水的首选。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "傍晚湖风最舒服",
+          "ticketNote": "环湖公园多免费开放。",
+          "detourKm": 0,
+          "lng": 111.74,
+          "lat": 29.05
+        },
+        {
+          "id": "d-p-taohuayuan",
+          "name": "桃花源",
+          "province": "湖南",
+          "city": "常德",
+          "category": "culture",
+          "tagline": "陶渊明笔下桃源的原型地，山水与田园合一。",
+          "intro": "桃花源位于常德桃源县，相传为陶渊明《桃花源记》的原型地，秦谷、桃源山与沅水相映，既有山水也有田园村落，是看「怡然自乐」理想乡如何落地的文化现场。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "春季桃花与油菜花最盛",
+          "ticketNote": "开放与门票以官方公告为准。",
+          "detourKm": 0,
+          "lng": 111.44,
+          "lat": 28.78
+        },
+        {
+          "id": "d-p-chengtoushan",
+          "name": "城头山",
+          "province": "湖南",
+          "city": "常德",
+          "category": "ruin",
+          "tagline": "距今六千多年的古城址，被誉为中国最早城。",
+          "intro": "城头山位于常德澧县，是迄今发现的中国最早古城址之一，保存有完整的环壕与稻作遗址，把长江中游的城邑起源往前推到六千年前，是看史前文明的硬核现场。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "上午参观光线好",
+          "ticketNote": "开放与门票以官方公告为准。",
+          "detourKm": 0,
+          "lng": 111.66,
+          "lat": 29.68
+        },
+        {
+          "id": "d-p-jiashan",
+          "name": "夹山",
+          "province": "湖南",
+          "city": "常德",
+          "category": "forest",
+          "tagline": "澧水之畔的国家森林公园，寺与林相映。",
+          "intro": "夹山位于常德石门方向，是国家森林公园，夹山寺为千年禅林，林海与溪谷清幽，是常德北部避暑与徒步的后花园，也是城头山之外的澧水人文延伸。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "夏绿冬静、林荫清幽",
+          "ticketNote": "开放与门票以官方公告为准。",
+          "detourKm": 0,
+          "lng": 111.49,
+          "lat": 29.56
+        }
+      ],
+      "plan": [
+        {
+          "day": 1,
+          "title": "长沙→益阳：洞庭南缘的湖湘与竹海",
+          "stayCity": "益阳",
+          "fromNode": "长沙",
+          "toNode": "桃花江竹海",
+          "poiIds": [
+            "d-p-changsha",
+            "d-p-peigong",
+            "d-p-nandongting",
+            "d-p-zhuhai"
+          ],
+          "summary": "第一天从长沙出发，沿 G5513 西进益阳。先到资江畔的裴公亭看江城格局，再南下沅江方向进南洞庭湖湿地看水网与候鸟，返程顺道去桃江竹海走绿浪步道，夜宿益阳。",
+          "tips": [
+            "长沙出城早走避开早高峰",
+            "南洞庭游船看潮汐与水位公告",
+            "竹海林间注意防蚊与防晒"
+          ],
+          "distanceKm": 143.5,
+          "driveHours": 2.0,
+          "roadRefs": []
+        },
+        {
+          "day": 2,
+          "title": "益阳→常德：柳叶湖与桃花源",
+          "stayCity": "常德",
+          "fromNode": "桃花江竹海",
+          "toNode": "柳叶湖",
+          "poiIds": [
+            "d-p-zhuhai",
+            "d-p-liuye",
+            "d-p-taohuayuan"
+          ],
+          "summary": "第二天从桃江北上常德。先入城到东北的柳叶湖走环湖绿道、看司马楼，午后西去桃源县桃花源，读秦谷与田园村落，理解陶渊明笔下的理想乡如何落地，夜宿常德。",
+          "tips": [
+            "常德市区到桃花源约一小时车程",
+            "桃花源景区较大，预留半天",
+            "柳叶湖傍晚最宜散步"
+          ],
+          "distanceKm": 115.1,
+          "driveHours": 1.6,
+          "roadRefs": []
+        },
+        {
+          "day": 3,
+          "title": "常德：城头山史前古城与夹山禅林",
+          "stayCity": "常德",
+          "fromNode": "常德",
+          "toNode": "城头山",
+          "poiIds": [
+            "d-p-chengtoushan",
+            "d-p-jiashan"
+          ],
+          "summary": "第三天留在常德周边。向北去澧县城头山看六千多年前的古城址与稻作环壕，再往东到夹山国家森林公园走林海、访千年禅寺，把洞庭西北的史前与禅意一次收齐。",
+          "tips": [
+            "城头山遗址需购票，提前预约",
+            "夹山步道多，穿防滑鞋",
+            "澧县方向服务区补给方便"
+          ],
+          "distanceKm": 142.9,
+          "driveHours": 2.0,
+          "roadRefs": []
+        },
+        {
+          "day": 4,
+          "title": "夹山→长沙：环线收官返程",
+          "stayCity": "长沙",
+          "fromNode": "城头山",
+          "toNode": "长沙",
+          "poiIds": [],
+          "summary": "第四天从夹山一带沿 G55/G5513 返回长沙，结束洞庭楚汉环线。若时间充裕，可在长沙补看湖南省博物馆的马王堆汉墓陈列，为整条线的楚汉线索收尾。",
+          "tips": [
+            "返程走 G5513/G4 接全国高速网",
+            "长沙湖南省博物馆需提前预约",
+            "环线里程含返程估算段"
+          ],
+          "distanceKm": 298.2,
+          "driveHours": 4.3,
+          "roadRefs": []
+        }
+      ],
+      "practical": {
+        "permit": "全线常规道路与开放景区，无需证件审批。岳阳楼、桃花源等实行实名预约或分时段入园；文保单位内保持安静，勿刻划。",
+        "altitudeNote": "沿线为洞庭湖平原与低丘，海拔低，无高原反应问题；冬季湿冷，注意防冻防滑。",
+        "carFree": "长沙、常德、益阳均有高铁与长途班车，城际间可乘高铁；长沙地铁与公交发达，常德、益阳景点间建议公交或打车。不自驾能完成三城主干。",
+        "fuelNote": "三市城区加油与充电方便；长沙出城、常德环线服务区密集，无需担心补能。",
+        "signalNote": "城区与高速信号稳定；南洞庭、桃花江等湿地周边有弱信号，离线地图提前下好。",
+        "gearNote": "以湖泊、古城与遗址为主：防滑鞋必备，湿地与湖边注意蚊虫与防晒；冬季湿冷备保暖衣物。",
+        "bookingNote": "五一、国庆与暑期长沙橘子洲、湖南省博物馆排队最长，建议开园即入并提前预约；益阳、常德住宿相对宽松。",
+        "lodgingNote": "按「长沙—益阳—常德」串住最省心：第一晚长沙，第二天进益阳；第二晚常德，第三晚常德；第四天返长沙。常德柳叶湖周边民宿适合多住一晚。",
+        "foodNote": "长沙臭豆腐、米粉与剁椒是门面；益阳擂茶与竹乡风味清新；常德米粉、钵子菜与酱板鸭是代表。三城口味偏辣，景区餐饮比市区贵且选择更少，建议饭点错峰并在市区吃饱再进景区。",
+        "warnings": [
+          "长沙热门场馆需提前实名预约，别到门口才买票",
+          "南洞庭、桃花江等湿地蚊虫多，备驱蚊与长袖",
+          "常德古城与遗址台阶多，注意防滑与体力分配"
+        ]
+      },
+      "sources": [
+        {
+          "title": "本地国家公路网拓扑（国道+高速+省道主干）最短路实算",
+          "publisher": "RailVista 路网底座 data/roads/china-road-topo.bin",
+          "usedFor": "各路段 distanceKm 与纯驾驶时长"
+        },
+        {
+          "title": "本地已核验景点库（roadside-spots 与 scenic-spots）",
+          "publisher": "RailVista 路网底座 data/roads/roadside-spots.json、data/presets/scenic-spots.json",
+          "usedFor": "景点名称、坐标、等级、开放时段的逐字取值"
+        },
+        {
+          "title": "湖南省文化和旅游厅及各地市文旅公开渠道",
+          "publisher": "官方渠道",
+          "usedFor": "开放时间与预约规则"
+        },
+        {
+          "title": "OTA 平台公开线路与自媒体攻略",
+          "publisher": "携程/飞猪/同程 + 小红书",
+          "usedFor": "四日/三日结构与景区换乘、住宿落点顺序"
+        }
+      ],
+      "editorRank": 158,
+      "status": "published",
+      "updatedAt": "2026-10-22"
+    },
+    {
+      "id": "hunan-jiuyi-nvshu-3d",
+      "name": "九嶷女书·永州—九嶷山—千家峒—女书村",
+      "subtitle": "舜帝圣山—瑶族秘境—女性文字",
+      "alias": "湘南文化走廊",
+      "provinces": [
+        "湖南"
+      ],
+      "cities": [
+        "永州"
+      ],
+      "anchorCity": "永州",
+      "primaryMode": "selfdrive",
+      "modes": [
+        "selfdrive",
+        "public"
+      ],
+      "shape": "loop",
+      "tier": "city",
+      "layer": "L3",
+      "tags": [
+        "九嶷山",
+        "舜帝陵",
+        "千家峒",
+        "上甘棠",
+        "女书"
+      ],
+      "summary": "以永州为枢纽，把九嶷山圣山圣陵、千家峒瑶族秘境与上甘棠、女书非遗串成湘南文化走廊，3 天走通精神地貌。",
+      "totalKm": 475.2,
+      "mileageNote": "3 天累加约 475.2 公里：永州→阳明山 66.9（原 82.6，比值偏高按直线乘一点三三推算）、阳明山→九嶷山 89.4（原 128.1，同法推算）、九嶷山→舜帝陵 16.8、舜帝陵→千家峒 88.6（原 111，同法）、千家峒→上甘棠 27.9、上甘棠→女书村 40.3、女书村→永州 145.3。实算段为本地国家公路网拓扑最短路，少数高比值段已按直线乘一点三三推算并在分段中说明。",
+      "days": 3,
+      "bestSeason": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "difficulty": 1,
+      "roadRefs": [
+        "G322",
+        "G55",
+        "G72",
+        "湖南:S343",
+        "G76",
+        "G647",
+        "湖南:S348",
+        "湖南:S239",
+        "G207"
+      ],
+      "startNode": "永州",
+      "endNode": "永州",
+      "intro": {
+        "overview": "这条线以永州为枢纽，把九嶷山的圣山圣陵、千家峒的瑶族秘境与上甘棠、女书的女性文字串成一条湘南文化走廊。永州本身是潇湘之源、柳宗元《永州八记》的诞生地；往南是双牌阳明山的高山杜鹃，再往宁远是九峰相似的九嶷山与舜帝陵，湖湘祭祖与寻古的重心在此。继续往江永，穿岩千家峒讲瑶族祖居，上甘棠村讲千年宗族，中国女书村讲世界上唯一的女性专用文字。整条线围绕「圣山—秘境—文字」三重文化符号，三天走通湘南的精神地貌。",
+        "bestSeason": "3-5 月与 9-11 月最合适：春季阳明山杜鹃、秋季山涧清爽；夏季闷热多阵雨，冬季湿冷。",
+        "seasonNotes": [
+          {
+            "months": [
+              3,
+              4,
+              5
+            ],
+            "note": "阳明山杜鹃花海最盛，永州古城步行舒适。"
+          },
+          {
+            "months": [
+              7,
+              8
+            ],
+            "note": "湘南闷热多雨，优先清晨与傍晚，午间室内。"
+          },
+          {
+            "months": [
+              12,
+              1
+            ],
+            "note": "湿冷明显，古村与山间注意保暖防滑。"
+          }
+        ],
+        "days": 3,
+        "daysNote": "可压成两天（合并女书与返程）；三天最从容，千家峒与上甘棠各留半天。",
+        "difficultyNote": "难度低，以山岳、古村与非遗为主；江永段山路弯多。",
+        "audience": "喜欢舜帝文化、瑶族民俗与女书非遗的文史与非遗爱好者。",
+        "avoid": "女书村与非遗展示保持尊重；江永山路减速；古村石阶防滑。"
+      },
+      "nodes": [
+        {
+          "name": "永州",
+          "province": "湖南",
+          "city": "永州",
+          "role": "start",
+          "note": "永州：本线途经节点。",
+          "lng": 111.61,
+          "lat": 26.42
+        },
+        {
+          "name": "阳明山国家森林公园",
+          "province": "湖南",
+          "city": "永州",
+          "role": "pass",
+          "note": "阳明山国家森林公园：本线途经节点。",
+          "lng": 111.93,
+          "lat": 26.07
+        },
+        {
+          "name": "九嶷山下灌景区",
+          "province": "湖南",
+          "city": "永州",
+          "role": "pass",
+          "note": "九嶷山下灌景区：本线途经节点。",
+          "lng": 112.01,
+          "lat": 25.47
+        },
+        {
+          "name": "舜帝陵景点",
+          "province": "湖南",
+          "city": "永州",
+          "role": "stay",
+          "note": "舜帝陵景点：本线途经节点。",
+          "lng": 111.98,
+          "lat": 25.36
+        },
+        {
+          "name": "穿岩千家峒古城址",
+          "province": "湖南",
+          "city": "永州",
+          "role": "pass",
+          "note": "穿岩千家峒古城址：本线途经节点。",
+          "lng": 111.32,
+          "lat": 25.31
+        },
+        {
+          "name": "上甘棠村",
+          "province": "湖南",
+          "city": "永州",
+          "role": "pass",
+          "note": "上甘棠村：本线途经节点。",
+          "lng": 111.19,
+          "lat": 25.15
+        },
+        {
+          "name": "中国女书村",
+          "province": "湖南",
+          "city": "永州",
+          "role": "end",
+          "note": "中国女书村：本线途经节点。",
+          "lng": 111.45,
+          "lat": 25.35
+        }
+      ],
+      "segments": [
+        {
+          "id": "seg1",
+          "index": 1,
+          "name": "永州→阳明山国家森林公园",
+          "fromNode": "永州",
+          "toNode": "阳明山国家森林公园",
+          "via": [],
+          "roadRefs": [
+            "G322",
+            "G55",
+            "G72",
+            "S343"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 66.9,
+          "driveHours": 1.0,
+          "condition": "永州南去双牌阳明山",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg2",
+          "index": 2,
+          "name": "阳明山国家森林公园→九嶷山下灌景区",
+          "fromNode": "阳明山国家森林公园",
+          "toNode": "九嶷山下灌景区",
+          "via": [],
+          "roadRefs": [
+            "S343",
+            "G55",
+            "G76",
+            "G647"
+          ],
+          "roadClass": "省道",
+          "distanceKm": 89.4,
+          "driveHours": 1.3,
+          "condition": "阳明山转 G76 往宁远九嶷山",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "seg3",
+          "index": 3,
+          "name": "九嶷山下灌景区→舜帝陵景点",
+          "fromNode": "九嶷山下灌景区",
+          "toNode": "舜帝陵景点",
+          "via": [],
+          "roadRefs": [
+            "G647"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 16.8,
+          "driveHours": 0.2,
+          "condition": "九嶷山下灌往舜帝陵",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg4",
+          "index": 4,
+          "name": "舜帝陵景点→穿岩千家峒古城址",
+          "fromNode": "舜帝陵景点",
+          "toNode": "穿岩千家峒古城址",
+          "via": [],
+          "roadRefs": [
+            "G647",
+            "G76",
+            "S348",
+            "S239"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 88.6,
+          "driveHours": 1.3,
+          "condition": "舜帝陵往江永千家峒",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg5",
+          "index": 5,
+          "name": "穿岩千家峒古城址→上甘棠村",
+          "fromNode": "穿岩千家峒古城址",
+          "toNode": "上甘棠村",
+          "via": [],
+          "roadRefs": [
+            "S239",
+            "S348"
+          ],
+          "roadClass": "省道",
+          "distanceKm": 27.9,
+          "driveHours": 0.4,
+          "condition": "千家峒往上甘棠古村",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "seg6",
+          "index": 6,
+          "name": "上甘棠村→中国女书村",
+          "fromNode": "上甘棠村",
+          "toNode": "中国女书村",
+          "via": [],
+          "roadRefs": [
+            "S348"
+          ],
+          "roadClass": "省道",
+          "distanceKm": 40.3,
+          "driveHours": 0.6,
+          "condition": "上甘棠往女书村",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "seg7",
+          "index": 7,
+          "name": "中国女书村→永州",
+          "fromNode": "中国女书村",
+          "toNode": "永州",
+          "via": [],
+          "roadRefs": [
+            "S348",
+            "G647",
+            "G207",
+            "G322",
+            "G72"
+          ],
+          "roadClass": "省道",
+          "distanceKm": 145.3,
+          "driveHours": 2.1,
+          "condition": "女书村返永州",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        }
+      ],
+      "pois": [
+        {
+          "id": "j-p-yongzhou",
+          "name": "永州",
+          "province": "湖南",
+          "city": "永州",
+          "category": "culture",
+          "tagline": "潇湘之源，柳宗元笔下的永州八记之地。",
+          "intro": "永州位于湖南南部、潇水与湘江交汇处，是柳宗元《永州八记》的诞生地，零陵古城、柳子庙与浯溪碑林承载唐宋文脉，也是九嶷山与女书文化的北端枢纽。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "春秋气候宜人、古城步行舒适",
+          "ticketNote": "柳子庙等开放以官方公告为准。",
+          "detourKm": 0,
+          "lng": 111.61,
+          "lat": 26.42
+        },
+        {
+          "id": "j-p-yangming",
+          "name": "阳明山国家森林公园",
+          "province": "湖南",
+          "city": "永州",
+          "category": "forest",
+          "tagline": "双牌境内的高山杜鹃与云海名山。",
+          "intro": "阳明山国家森林公园位于永州双牌县，以高山杜鹃、万寿寺与云海闻名，每年杜鹃花季漫山绯红，是湘南少有的高山避暑与观花地，也是永州南下九嶷的过渡。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "四五月杜鹃花海最盛",
+          "ticketNote": "开放与门票以官方公告为准。",
+          "detourKm": 0,
+          "lng": 111.93,
+          "lat": 26.07
+        },
+        {
+          "id": "j-p-jiuyi",
+          "name": "九嶷山下灌景区",
+          "province": "湖南",
+          "city": "永州",
+          "category": "mountain",
+          "tagline": "九嶷山九峰耸立，舜帝南巡的圣山。",
+          "intro": "九嶷山位于永州宁远县，因九峰相似而得名，是舜帝南巡崩葬之地的传说圣山，山下灌村一带保留舜庙与古韵，山间溪谷与古木清幽，是湖湘祭祖与寻古的重心。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "春秋登山最舒适",
+          "ticketNote": "开放与门票以官方公告为准。",
+          "detourKm": 0,
+          "lng": 112.01,
+          "lat": 25.47
+        },
+        {
+          "id": "j-p-shundi",
+          "name": "舜帝陵景点",
+          "province": "湖南",
+          "city": "永州",
+          "category": "temple",
+          "tagline": "纪念舜帝的陵庙建筑群，香火延续千年。",
+          "intro": "舜帝陵位于九嶷山麓，是纪念中华人文始祖舜帝的陵庙建筑群，红墙黄瓦、古柏参天，祭祀传统延续千年，与九嶷山共同构成湖湘圣山圣陵的文化核心。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "上午参观最庄重",
+          "ticketNote": "开放与门票以官方公告为准。",
+          "detourKm": 0,
+          "lng": 111.98,
+          "lat": 25.36
+        },
+        {
+          "id": "j-p-qianjia",
+          "name": "穿岩千家峒古城址",
+          "province": "湖南",
+          "city": "永州",
+          "category": "village",
+          "tagline": "瑶族传说中的祖居秘境，峡谷与古寨相依。",
+          "intro": "穿岩千家峒位于永州江永县，是瑶族传说中祖先居住的秘境，峡谷穿岩、溪流与古寨相映，保留了瑶族迁徙史与山地村落肌理，是看湘南少数民族文化的活样本。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "春秋山涧最清凉",
+          "ticketNote": "开放以现场为准，尊重当地习俗。",
+          "detourKm": 0,
+          "lng": 111.32,
+          "lat": 25.31
+        },
+        {
+          "id": "j-p-shanggantang",
+          "name": "上甘棠村",
+          "province": "湖南",
+          "city": "永州",
+          "category": "village",
+          "tagline": "周氏聚族千年的古村，步瀛桥与寿萱亭犹存。",
+          "intro": "上甘棠村位于永州江永县，是周氏聚族而居的千年古村，步瀛桥、寿萱亭与村口碑刻记录宗族历史，谢沐河绕村而过，是湘南保存较好的明清古村落之一。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "上午古村光影最佳",
+          "ticketNote": "村落开放以现场为准。",
+          "detourKm": 0,
+          "lng": 111.19,
+          "lat": 25.15
+        },
+        {
+          "id": "j-p-nvshu",
+          "name": "中国女书村",
+          "province": "湖南",
+          "city": "永州",
+          "category": "culture",
+          "tagline": "世界上唯一的女性专用文字女书的故乡。",
+          "intro": "中国女书村位于永州江永县，是女书这一女性专用文字的发源地，当地老人以女书吟唱、织锦记事，博物馆与传习所可看这种独一无二的文化遗产，是湖湘女性智慧的活化石。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "上午传习所活动最丰富",
+          "ticketNote": "女书博物馆开放以官方公告为准。",
+          "detourKm": 0,
+          "lng": 111.45,
+          "lat": 25.35
+        }
+      ],
+      "plan": [
+        {
+          "day": 1,
+          "title": "永州→阳明山→九嶷山：圣山与陵庙",
+          "stayCity": "永州",
+          "fromNode": "永州",
+          "toNode": "舜帝陵景点",
+          "poiIds": [
+            "j-p-yongzhou",
+            "j-p-yangming",
+            "j-p-jiuyi",
+            "j-p-shundi"
+          ],
+          "summary": "第一天从永州南下。先到双牌阳明山看高山杜鹃与云海，再转 G76 往宁远九嶷山，登九峰相似的圣山、访舜帝陵庙，把湖湘圣山圣陵的线索立起来，当晚返回永州住宿。",
+          "tips": [
+            "阳明山杜鹃季车位紧张，早到",
+            "九嶷山与舜帝陵相邻，可同游",
+            "永州古城餐饮充足"
+          ],
+          "distanceKm": 173.1,
+          "driveHours": 2.5,
+          "roadRefs": []
+        },
+        {
+          "day": 2,
+          "title": "永州→千家峒→上甘棠→女书村：瑶寨与女书",
+          "stayCity": "永州",
+          "fromNode": "舜帝陵景点",
+          "toNode": "中国女书村",
+          "poiIds": [
+            "j-p-qianjia",
+            "j-p-shanggantang",
+            "j-p-nvshu"
+          ],
+          "summary": "第二天往江永方向。先到穿岩千家峒看瑶族祖居的峡谷古寨，再去上甘棠村走千年周氏古村与步瀛桥，最后到中国女书村看独一无二的女性文字，当晚返回永州住宿。",
+          "tips": [
+            "江永段山路弯多，减速慢行",
+            "女书村尊重非遗展示礼仪",
+            "古村步道石阶注意防滑"
+          ],
+          "distanceKm": 156.8,
+          "driveHours": 2.2,
+          "roadRefs": []
+        },
+        {
+          "day": 3,
+          "title": "永州：收官与返程",
+          "stayCity": "永州",
+          "fromNode": "中国女书村",
+          "toNode": "永州",
+          "poiIds": [
+            "j-p-yongzhou"
+          ],
+          "summary": "第三天从女书村沿 G207/G322 返回永州，补看零陵古城与柳子庙，把潇湘文脉与九嶷女书的线索收尾，随后结束行程返程或续住。",
+          "tips": [
+            "返程走 G72/G322 接高速网",
+            "永州古城可慢走半日",
+            "柳子庙开放以公告为准"
+          ],
+          "distanceKm": 145.3,
+          "driveHours": 2.1,
+          "roadRefs": []
+        }
+      ],
+      "practical": {
+        "permit": "全线常规道路与开放景区，无需证件审批。九嶷山、舜帝陵等实行实名预约或分时段入园；女书村为非遗传习场所，请尊重展示礼仪。",
+        "altitudeNote": "沿线为南岭山地与丘陵，海拔低，无高原反应问题；山区早晚温差大，冬季湿冷。",
+        "carFree": "永州有高铁与长途班车，市区到阳明山、九嶷山有旅游专线或拼车；千家峒、上甘棠、女书村建议自驾或包车。不自驾可完成永州市区—九嶷山主干。",
+        "fuelNote": "永州市区与宁远、江永加油方便；湘南山区公路服务区间距适中，出发前满油。",
+        "signalNote": "城区与主干道信号稳定；千家峒、女书村等山区有弱信号，离线地图提前下好。",
+        "gearNote": "以山岳、古村与非遗为主：防滑鞋必备，江永山区弯路多减速；古村石阶注意安全。",
+        "bookingNote": "节假日九嶷山、女书村人流较多，建议错峰并提前查看开放；永州市区住宿充足。",
+        "lodgingNote": "以永州市区为住宿中心最省心：阳明山、九嶷山、千家峒、女书村都作单日往返，每天回永州住，免去搬运行李。永州市区酒店供给充足、价格平稳，山区与古村民宿选择少且旺季易满房。",
+        "foodNote": "永州喝螺、血鸭与东安鸡是特色；江永女书村周边瑶族风味与酿菜别致。山区与古村用餐卫生条件参差，注意食材新鲜与保温，林间与湿地用餐备好防蚊。",
+        "warnings": [
+          "江永山区弯路多，减速慢行",
+          "女书村与非遗展示保持尊重",
+          "古村石阶与山路注意防滑"
+        ]
+      },
+      "sources": [
+        {
+          "title": "本地国家公路网拓扑（国道+高速+省道主干）最短路实算",
+          "publisher": "RailVista 路网底座 data/roads/china-road-topo.bin",
+          "usedFor": "各路段 distanceKm 与纯驾驶时长"
+        },
+        {
+          "title": "本地已核验景点库（roadside-spots 与 scenic-spots）",
+          "publisher": "RailVista 路网底座 data/roads/roadside-spots.json、data/presets/scenic-spots.json",
+          "usedFor": "景点名称、坐标、等级、开放时段的逐字取值"
+        },
+        {
+          "title": "湖南省文化和旅游厅及各地市文旅公开渠道",
+          "publisher": "官方渠道",
+          "usedFor": "开放时间与预约规则"
+        },
+        {
+          "title": "OTA 平台公开线路与自媒体攻略",
+          "publisher": "携程/飞猪/同程 + 小红书",
+          "usedFor": "四日/三日结构与景区换乘、住宿落点顺序"
+        }
+      ],
+      "editorRank": 299,
+      "status": "published",
+      "updatedAt": "2026-10-22"
+    },
+    {
+      "id": "hunan-mangshan-dongjiang-4d",
+      "name": "莽山东江湖·郴州—飞天山—莽山—东江湖",
+      "subtitle": "南岭森林—丹霞—高山湖泊",
+      "alias": "郴州山水",
+      "provinces": [
+        "湖南"
+      ],
+      "cities": [
+        "郴州"
+      ],
+      "anchorCity": "郴州",
+      "primaryMode": "selfdrive",
+      "modes": [
+        "selfdrive",
+        "public"
+      ],
+      "shape": "loop",
+      "tier": "city",
+      "layer": "L5",
+      "tags": [
+        "苏仙岭",
+        "飞天山",
+        "莽山",
+        "板梁古村",
+        "东江湖"
+      ],
+      "summary": "围绕郴州把南岭原始森林、丹霞地貌与东江湖高山湖泊串成湘南山水环线，4 天短假周末皆宜。",
+      "totalKm": 477.4,
+      "mileageNote": "4 天累加约 477.9 公里：郴州→苏仙岭 8.1（原 10.2，比值偏高按直线乘一点三三推算）、郴州→飞天山 33.5、飞天山→莽山 140、莽山→板梁 166.2、板梁→东江湖 58.3、东江湖→小东江 4.5（景区内部道路）、东江湖→回龙山 27.1（原 35.5，同法推算）、东江湖→郴州 40.2。实算段为本地国家公路网拓扑最短路，少数高比值段已按直线乘一点三三推算并在分段中说明。",
+      "days": 4,
+      "bestSeason": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "difficulty": 1,
+      "roadRefs": [
+        "G357",
+        "G107",
+        "G240",
+        "湖南:S214",
+        "湖南:Y504",
+        "G4",
+        "G0423",
+        "湖南:X88",
+        "湖南:S215",
+        "湖南:X53",
+        "G4"
+      ],
+      "startNode": "郴州",
+      "endNode": "郴州",
+      "intro": {
+        "overview": "这是一条郴州周末与短假线，把南岭的原始森林、丹霞地貌与高山湖泊串成一条湘南山水环线。郴州是湖南南大门，苏仙岭的道教名山与「雾失楼台」词境就在城中；飞天山是离城最近的丹霞奇观；往宜章是莽山，南岭腹地的原始森林与云海；往永兴是板梁古村，明清宗族村落的活标本；往资兴是东江湖，高山湖泊的清晨江雾是摄影名片，回龙山则提供湖畔云海的另一视角。整条线里程短、节奏松，适合说走就走的湘南山水之旅。",
+        "bestSeason": "3-5 月与 9-11 月最合适：春季新绿、秋季江雾与云海最稳定；夏季山林清凉但多阵雨，冬季山间湿冷偶有雾凇。",
+        "seasonNotes": [
+          {
+            "months": [
+              3,
+              4,
+              5
+            ],
+            "note": "莽山新绿、东江湖晨雾都宜人，飞天山丹霞色彩浓。"
+          },
+          {
+            "months": [
+              7,
+              8
+            ],
+            "note": "山区清凉但多雨，优先清晨与傍晚，午间室内。"
+          },
+          {
+            "months": [
+              12,
+              1
+            ],
+            "note": "山间湿冷，看雾凇需保暖防滑，江雾依旧可看。"
+          }
+        ],
+        "days": 4,
+        "daysNote": "可压成两天（放弃莽山深度）；四天最从容，东江湖留一晚看晨雾。",
+        "difficultyNote": "难度低，以山林、丹霞与湖泊步道为主；莽山路程较长。",
+        "audience": "郴州及粤港澳周边周末客、山水摄影与亲子家庭。",
+        "avoid": "小东江看雾需早起；莽山保护区内勿擅入；江边山间注意保暖。"
+      },
+      "nodes": [
+        {
+          "name": "郴州",
+          "province": "湖南",
+          "city": "郴州",
+          "role": "start",
+          "note": "郴州：本线途经节点。",
+          "lng": 113.01,
+          "lat": 25.77
+        },
+        {
+          "name": "苏仙岭",
+          "province": "湖南",
+          "city": "郴州",
+          "role": "pass",
+          "note": "苏仙岭：本线途经节点。",
+          "lng": 113.05,
+          "lat": 25.81
+        },
+        {
+          "name": "飞天山景区",
+          "province": "湖南",
+          "city": "郴州",
+          "role": "stay",
+          "note": "飞天山景区：本线途经节点。",
+          "lng": 113.12,
+          "lat": 25.93
+        },
+        {
+          "name": "莽山旅游区国家森林公园",
+          "province": "湖南",
+          "city": "郴州",
+          "role": "stay",
+          "note": "莽山旅游区国家森林公园：本线途经节点。",
+          "lng": 112.88,
+          "lat": 24.98
+        },
+        {
+          "name": "板梁古村",
+          "province": "湖南",
+          "city": "郴州",
+          "role": "pass",
+          "note": "板梁古村：本线途经节点。",
+          "lng": 112.87,
+          "lat": 26.08
+        },
+        {
+          "name": "东江湖旅游区",
+          "province": "湖南",
+          "city": "郴州",
+          "role": "stay",
+          "note": "东江湖旅游区：本线途经节点。",
+          "lng": 113.26,
+          "lat": 25.93
+        },
+        {
+          "name": "东江湖景区-小东江景区",
+          "province": "湖南",
+          "city": "郴州",
+          "role": "pass",
+          "note": "东江湖景区-小东江景区：本线途经节点。",
+          "lng": 113.28,
+          "lat": 25.91
+        },
+        {
+          "name": "东江湖回龙山景区",
+          "province": "湖南",
+          "city": "郴州",
+          "role": "end",
+          "note": "东江湖回龙山景区：本线途经节点。",
+          "lng": 113.4,
+          "lat": 26.06
+        }
+      ],
+      "segments": [
+        {
+          "id": "seg1",
+          "index": 1,
+          "name": "郴州→苏仙岭",
+          "fromNode": "郴州",
+          "toNode": "苏仙岭",
+          "via": [],
+          "roadRefs": [
+            "G357",
+            "G107",
+            "G240"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 8.0,
+          "driveHours": 0.1,
+          "condition": "郴州市区苏仙岭",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg2",
+          "index": 2,
+          "name": "郴州→飞天山景区",
+          "fromNode": "郴州",
+          "toNode": "飞天山景区",
+          "via": [],
+          "roadRefs": [
+            "G357",
+            "G107",
+            "G240",
+            "S214",
+            "湖南:Y504"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 33.5,
+          "driveHours": 0.5,
+          "condition": "郴州飞天山丹霞",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "seg3",
+          "index": 3,
+          "name": "飞天山景区→莽山旅游区国家森林公园",
+          "fromNode": "飞天山景区",
+          "toNode": "莽山旅游区国家森林公园",
+          "via": [],
+          "roadRefs": [
+            "湖南:Y504",
+            "S214",
+            "G240",
+            "G4",
+            "G0423",
+            "G107"
+          ],
+          "roadClass": "乡道",
+          "distanceKm": 140.0,
+          "driveHours": 2.0,
+          "condition": "飞天山往莽山",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "seg4",
+          "index": 4,
+          "name": "莽山旅游区国家森林公园→板梁古村",
+          "fromNode": "莽山旅游区国家森林公园",
+          "toNode": "板梁古村",
+          "via": [],
+          "roadRefs": [
+            "湖南:X88",
+            "S215",
+            "G107",
+            "G0423",
+            "G4",
+            "湖南:X53"
+          ],
+          "roadClass": "县道",
+          "distanceKm": 166.2,
+          "driveHours": 2.4,
+          "condition": "莽山往板梁古村",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "seg5",
+          "index": 5,
+          "name": "板梁古村→东江湖旅游区",
+          "fromNode": "板梁古村",
+          "toNode": "东江湖旅游区",
+          "via": [],
+          "roadRefs": [
+            "湖南:X53",
+            "G4",
+            "S214",
+            "G240",
+            "G357"
+          ],
+          "roadClass": "县道",
+          "distanceKm": 58.3,
+          "driveHours": 0.8,
+          "condition": "板梁往东江湖",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "seg6",
+          "index": 6,
+          "name": "东江湖旅游区→东江湖景区-小东江景区",
+          "fromNode": "东江湖旅游区",
+          "toNode": "东江湖景区-小东江景区",
+          "via": [],
+          "roadRefs": [
+            "景区道路"
+          ],
+          "roadClass": "景区公路",
+          "distanceKm": 4.5,
+          "driveHours": 0.1,
+          "condition": "东江湖小东江观雾",
+          "note": "",
+          "poiIds": [],
+          "refPending": true
+        },
+        {
+          "id": "seg7",
+          "index": 7,
+          "name": "东江湖旅游区→东江湖回龙山景区",
+          "fromNode": "东江湖旅游区",
+          "toNode": "东江湖回龙山景区",
+          "via": [],
+          "roadRefs": [
+            "G357"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 26.7,
+          "driveHours": 0.4,
+          "condition": "东江湖往回龙山",
+          "note": "",
+          "poiIds": []
+        },
+        {
+          "id": "seg8",
+          "index": 8,
+          "name": "东江湖旅游区→郴州",
+          "fromNode": "东江湖旅游区",
+          "toNode": "郴州",
+          "via": [],
+          "roadRefs": [
+            "G357",
+            "G240",
+            "G107"
+          ],
+          "roadClass": "国道",
+          "distanceKm": 40.2,
+          "driveHours": 0.6,
+          "condition": "东江湖返郴州",
+          "note": "",
+          "poiIds": []
+        }
+      ],
+      "pois": [
+        {
+          "id": "m-p-chenzhou",
+          "name": "郴州",
+          "province": "湖南",
+          "city": "郴州",
+          "category": "cityview",
+          "tagline": "湖南南大门，林邑之城与湘粤赣通衢。",
+          "intro": "郴州位于湖南最南端，是连接湘粤赣的枢纽，苏仙岭、东江湖与莽山都在其辐射圈内，因「林中之城」得名，也是看南岭山水与客家文化的入口。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "春秋气候宜人",
+          "ticketNote": "市区景点多为开放或半开放。",
+          "detourKm": 0,
+          "lng": 113.01,
+          "lat": 25.77
+        },
+        {
+          "id": "m-p-suxian",
+          "name": "苏仙岭",
+          "province": "湖南",
+          "city": "郴州",
+          "category": "mountain",
+          "tagline": "郴州市区的道教名山，雾失楼台的意境地。",
+          "intro": "苏仙岭位于郴州市区东北，是道教名山，苏仙观、三绝碑与山顶视野俱佳，秦少游「雾失楼台」的词境即出于此，是郴州人日常登山与怀古的首选。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "晴日登顶视野开阔",
+          "ticketNote": "开放与门票以官方公告为准。",
+          "detourKm": 0,
+          "lng": 113.05,
+          "lat": 25.81
+        },
+        {
+          "id": "m-p-feitian",
+          "name": "飞天山景区",
+          "province": "湖南",
+          "city": "郴州",
+          "category": "landform",
+          "tagline": "丹霞与翠江相映的城郊地质公园。",
+          "intro": "飞天山位于郴州市区东北，是典型的丹霞地貌，红色砂岩峰林与翠江相依，卧牛山、仙女寨等景观密集，是郴州周边最易到达的地质奇观，适合半日徒步。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "春秋丹霞色彩最浓",
+          "ticketNote": "开放与门票以官方公告为准。",
+          "detourKm": 0,
+          "lng": 113.12,
+          "lat": 25.93
+        },
+        {
+          "id": "m-p-mangshan",
+          "name": "莽山旅游区国家森林公园",
+          "province": "湖南",
+          "city": "郴州",
+          "category": "forest",
+          "tagline": "南岭腹地的原始森林，广东与湖南界山。",
+          "intro": "莽山位于郴州宜章县、湘粤边界，是南岭腹地的原始森林保护区，峰峦叠翠、云海频现，莽山烙铁头蛇等珍稀物种栖息于此，是湖南南部最野性的山林。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "夏绿冬雾、云海频现",
+          "ticketNote": "开放与门票以官方公告为准，保护区内勿擅入。",
+          "detourKm": 0,
+          "lng": 112.88,
+          "lat": 24.98
+        },
+        {
+          "id": "m-p-banliang",
+          "name": "板梁古村",
+          "province": "湖南",
+          "city": "郴州",
+          "category": "village",
+          "tagline": "明清古村群落，湘南民居的活标本。",
+          "intro": "板梁古村位于郴州永兴县，是保存完整的明清古村落，石板街、祠堂与古民居连片，宗族文化与湘南民居营造技艺在此可见，是看传统村落格局的好去处。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "上午古村光影最佳",
+          "ticketNote": "村落开放以现场为准。",
+          "detourKm": 0,
+          "lng": 112.87,
+          "lat": 26.08
+        },
+        {
+          "id": "m-p-dongjiang",
+          "name": "东江湖旅游区",
+          "province": "湖南",
+          "city": "郴州",
+          "category": "water",
+          "tagline": "资兴境内的高山湖泊，小东江晨雾闻名。",
+          "intro": "东江湖位于郴州资兴市，是东江水电站形成的高山湖泊，湖面辽阔、水质清澈，清晨小东江的渔夫撒网与江雾是摄影经典画面，环湖有兜率岛与漂流等玩法。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "清晨六至八时江雾最美",
+          "ticketNote": "开放与游船以官方公告为准。",
+          "detourKm": 0,
+          "lng": 113.26,
+          "lat": 25.93
+        },
+        {
+          "id": "m-p-xiaodongjiang",
+          "name": "东江湖景区-小东江景区",
+          "province": "湖南",
+          "city": "郴州",
+          "category": "water",
+          "tagline": "东江湖最负盛名的晨雾观景段。",
+          "intro": "小东江是东江湖最精华的一段，因水温与气温差在清晨形成如梦似幻的江雾，渔舟与雾纱同框，是东江湖旅游的名片景观，观雾台与栈道便于拍摄。",
+          "mustSee": true,
+          "visitHours": 1.5,
+          "bestTime": "清晨江雾最梦幻",
+          "ticketNote": "开放以现场为准，清晨最佳。",
+          "detourKm": 0,
+          "lng": 113.28,
+          "lat": 25.91
+        },
+        {
+          "id": "m-p-huilong",
+          "name": "东江湖回龙山景区",
+          "province": "湖南",
+          "city": "郴州",
+          "category": "mountain",
+          "tagline": "东江湖畔的佛教名山，云海与日出俱佳。",
+          "intro": "回龙山位于东江湖畔，是湘南佛教名山，山顶视野开阔，云海、日出与湖景同框，是看东江湖全景的另一视角，也是环湖徒步的延伸点。",
+          "mustSee": false,
+          "visitHours": 1.5,
+          "bestTime": "晴日云海与日出最壮观",
+          "ticketNote": "开放以现场为准。",
+          "detourKm": 0,
+          "lng": 113.4,
+          "lat": 26.06
+        }
+      ],
+      "plan": [
+        {
+          "day": 1,
+          "title": "郴州：苏仙岭与飞天山丹霞",
+          "stayCity": "郴州",
+          "fromNode": "郴州",
+          "toNode": "飞天山景区",
+          "poiIds": [
+            "m-p-chenzhou",
+            "m-p-suxian",
+            "m-p-feitian"
+          ],
+          "summary": "第一天在郴州及周边。上午登城中的苏仙岭看道教名山与「雾失楼台」词境，午后往东北的飞天山走丹霞峰林与翠江，看湘南最易达的地质奇观，夜宿郴州。",
+          "tips": [
+            "苏仙岭台阶多，注意防晒",
+            "飞天山丹霞徒步带足水",
+            "郴州市区住宿充足"
+          ],
+          "distanceKm": 41.5,
+          "driveHours": 0.6,
+          "roadRefs": []
+        },
+        {
+          "day": 2,
+          "title": "郴州→莽山：南岭原始森林",
+          "stayCity": "郴州",
+          "fromNode": "飞天山景区",
+          "toNode": "莽山旅游区国家森林公园",
+          "poiIds": [
+            "m-p-mangshan"
+          ],
+          "summary": "第二天沿 G4/G107 往宜章莽山。进入南岭腹地的原始森林，看峰峦云海与珍稀物种，走林间栈道感受湖南最野性的山林，当晚返回郴州住宿。",
+          "tips": [
+            "莽山路程较长，出发前满油",
+            "保护区内勿擅入核心区",
+            "山区信号弱，离线地图提前下"
+          ],
+          "distanceKm": 140.0,
+          "driveHours": 2.0,
+          "roadRefs": []
+        },
+        {
+          "day": 3,
+          "title": "莽山→板梁古村→东江湖：古村与湖泊",
+          "stayCity": "郴州",
+          "fromNode": "莽山旅游区国家森林公园",
+          "toNode": "东江湖旅游区",
+          "poiIds": [
+            "m-p-banliang",
+            "m-p-dongjiang"
+          ],
+          "summary": "第三天从莽山往永兴板梁古村，走明清古村群落与宗祠民居，感受湘南宗族的营造技艺，再往资兴东江湖，傍晚环湖看水色与渔舟，为次日的晨雾做准备，夜宿郴州。",
+          "tips": [
+            "板梁古村石阶多，穿防滑鞋",
+            "东江湖傍晚湖风大，备外套",
+            "环湖公路限速注意"
+          ],
+          "distanceKm": 224.5,
+          "driveHours": 3.2,
+          "roadRefs": []
+        },
+        {
+          "day": 4,
+          "title": "东江湖：小东江晨雾与回龙山，返程",
+          "stayCity": "郴州",
+          "fromNode": "东江湖旅游区",
+          "toNode": "郴州",
+          "poiIds": [
+            "m-p-xiaodongjiang",
+            "m-p-huilong"
+          ],
+          "summary": "第四天清晨到小东江看渔舟与江雾的经典画面，再登回龙山看湖畔云海与日出，随后沿环湖公路返回郴州，结束莽山东江湖环线，为湘南山水之旅收尾。",
+          "tips": [
+            "小东江晨雾六至八时最佳，尽早到",
+            "回龙山看日出需早起",
+            "返程走 G4/G107 接高速网"
+          ],
+          "distanceKm": 71.4,
+          "driveHours": 1.0,
+          "roadRefs": []
+        }
+      ],
+      "practical": {
+        "permit": "全线常规道路与开放景区，无需证件审批。莽山等实行实名预约或分时段入园；东江湖游船以公告为准，临水注意安全。",
+        "altitudeNote": "沿线为南岭山地与高山湖泊，海拔低，无高原反应问题；山区早晚温差大，东江湖清晨江雾体感凉。",
+        "carFree": "郴州有高铁与长途班车，市区到苏仙岭、飞天山公交可达；莽山、东江湖、板梁建议自驾或旅游专线。不自驾可完成郴州市区—飞天山主干。",
+        "fuelNote": "郴州市区与宜章、资兴加油方便；莽山路程较长，出发前满油，山区补给点少。",
+        "signalNote": "城区与主干道信号稳定；莽山、东江湖回龙山等山区有弱信号，离线地图提前下好。",
+        "gearNote": "以山林、丹霞与湖泊为主：防滑鞋必备，莽山步道多、临水注意安全；清晨江雾体感凉加外套。",
+        "bookingNote": "节假日东江湖晨雾观景台人多，建议提早到；郴州市区住宿充足。",
+        "lodgingNote": "以郴州市区为住宿中心最省心：苏仙岭、飞天山在市内，莽山、板梁、东江湖为单日往返或当晚返回，免去搬行李。郴州市区酒店供给充足、价格平稳，山区与湖边民宿选择少且旺季易满房。",
+        "foodNote": "郴州鱼粉、临武鸭与东江鱼是特色；莽山山货与资兴湖鲜鲜美。江边湖边用餐注意卫生与保温，鱼鲜现点现做最稳，山货干货注意辨别真伪与价格。",
+        "warnings": [
+          "小东江看雾需清晨六至八时尽早到",
+          "莽山保护区内勿擅入核心区",
+          "山区弯路多减速，临水注意安全"
+        ]
+      },
+      "sources": [
+        {
+          "title": "本地国家公路网拓扑（国道+高速+省道主干）最短路实算",
+          "publisher": "RailVista 路网底座 data/roads/china-road-topo.bin",
+          "usedFor": "各路段 distanceKm 与纯驾驶时长"
+        },
+        {
+          "title": "本地已核验景点库（roadside-spots 与 scenic-spots）",
+          "publisher": "RailVista 路网底座 data/roads/roadside-spots.json、data/presets/scenic-spots.json",
+          "usedFor": "景点名称、坐标、等级、开放时段的逐字取值"
+        },
+        {
+          "title": "湖南省文化和旅游厅及各地市文旅公开渠道",
+          "publisher": "官方渠道",
+          "usedFor": "开放时间与预约规则"
+        },
+        {
+          "title": "OTA 平台公开线路与自媒体攻略",
+          "publisher": "携程/飞猪/同程 + 小红书",
+          "usedFor": "四日/三日结构与景区换乘、住宿落点顺序"
+        }
+      ],
+      "editorRank": 416,
+      "status": "published",
+      "updatedAt": "2026-10-22"
+    }
+  ]
+}

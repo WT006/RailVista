@@ -81,6 +81,9 @@ const intro = computed(() => {
 });
 
 const show = computed(() => Boolean(props.spot && open.value));
+
+/** TripMap 据此决定过站美食卡是否让位：只看通告是否真的可见，而不是景点窗口是否还在 */
+defineExpose({ visible: show });
 </script>
 
 <template>
@@ -96,7 +99,7 @@ const show = computed(() => Boolean(props.spot && open.value));
       >
         <header class="approach-toast__head">
           <span class="approach-toast__kicker">{{ kicker }}</span>
-          <button type="button" class="approach-toast__close" aria-label="关闭提示" @click="dismiss">
+          <button type="button" class="approach-toast__close rv-hit" aria-label="关闭提示" @click="dismiss">
             ×
           </button>
         </header>

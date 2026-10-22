@@ -18,6 +18,8 @@ import {
   isKnownDimension,
 } from '../data/spotDimensions';
 import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
+import { stationFood } from '../data/stationFoods';
+import { stationFoodCardHtml } from '../lib/stationFoodHtml';
 
 const route = useRoute();
 const router = useRouter();
@@ -31,7 +33,10 @@ const loadError = ref('');
 const mapError = ref('');
 const legendOpen = ref(false);
 const compact = ref(false);
-const statusCollapsed = ref(false);
+/** 手机竖屏默认收起状态卡：首屏优先呈现地图（有历史偏好时尊重偏好） */
+const statusCollapsed = ref(
+  typeof window !== 'undefined' && window.matchMedia('(max-width: 839px)').matches,
+);
 const selectedSpot = ref<AtlasCorridorSpot | null>(null);
 /** 左侧列表：景点 / 站序；null 表示收起 */
 const sideList = ref<'spots' | 'stations' | null>(null);
@@ -40,7 +45,8 @@ const STATUS_COLLAPSE_KEY = 'railvista:cormap:statusCollapsed';
 const SATELLITE_PREF_KEY = 'railvista:map:satellite';
 
 if (typeof localStorage !== 'undefined') {
-  statusCollapsed.value = localStorage.getItem(STATUS_COLLAPSE_KEY) === '1';
+  const saved = localStorage.getItem(STATUS_COLLAPSE_KEY);
+  if (saved !== null) statusCollapsed.value = saved === '1';
 }
 
 const satelliteOn = ref(
@@ -80,9 +86,9 @@ const lengthKm = computed(() => {
   return fromRank || detail.value?.lengthKm || 0;
 });
 
-const tagline = computed(
-  () => rankHits.value[0]?.item.tagline || detail.value?.note || '沿线风景与轨道走向',
-);
+/** 副标题：仅用榜单/数据的文案字段；corridor.note 是几何处理日志（如
+ *  "| cleaned spikes | densify>8km"），不是面向用户的文案，禁止直接上屏 */
+const tagline = computed(() => rankHits.value[0]?.item.tagline || '沿线风景与轨道走向');
 
 const corridorTitle = computed(() => detail.value?.name || corridorId.value || '线路');
 
@@ -310,6 +316,7 @@ function focusSpotFromList(spot: AtlasCorridorSpot) {
 
 function openStationCard(name: string, pos: [number, number]) {
   if (!map || !AMapRef) return;
+  const foodHtml = stationFoodCardHtml(stationFood(name, { lng: pos[0], lat: pos[1] }));
   const info = new AMapRef.InfoWindow({
     isCustom: true,
     autoMove: true,
@@ -318,6 +325,7 @@ function openStationCard(name: string, pos: [number, number]) {
       <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
       <div class="map-info-card__title">${escHtml(name)}</div>
       <p class="map-info-card__meta">示意站位 · ${escHtml(corridorTitle.value)}</p>
+      ${foodHtml}
       <div class="map-info-card__arrow" aria-hidden="true"></div>
     </div>`,
     offset: new AMapRef.Pixel(0, -22),

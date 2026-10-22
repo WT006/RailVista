@@ -29,6 +29,7 @@ import {
   approachWindow,
   honorLabels,
   withinApproach,
+  TRAVEL_SHAPE_LABEL,
   spotWeatherParts,
   type CalibrationRecord,
   type ScenicSpot,
@@ -38,6 +39,7 @@ import {
   type SkyMapResult,
   type SpotWeatherParts,
   type Stop,
+  type TravelRouteSummary,
 } from '@railvista/shared';
 import { api } from '../api/client';
 import { hydrateFromSnapshot, persistActiveTrip } from '../lib/persistTrip';
@@ -66,8 +68,15 @@ import PreciseRoutePanel from '../components/PreciseRoutePanel.vue';
 import SideBadge from '../components/SideBadge.vue';
 import SkyJourneyPanel, { type SkyFocusPayload } from '../components/SkyJourneyPanel.vue';
 import SpotApproachCard from '../components/SpotApproachCard.vue';
+import StationFoodCard from '../components/StationFoodCard.vue';
+import TicketFinishCard from '../components/TicketFinishCard.vue';
+import { stationFood, stationFoodTop } from '../data/stationFoods';
+import { placeOfStation } from '../lib/placeGuides';
+import { usePlaceGuide } from '../composables/usePlaceGuide';
+import { stationFoodCardHtml } from '../lib/stationFoodHtml';
 import { usePrefsStore } from '../stores/prefsStore';
 import { useTripStore } from '../stores/tripStore';
+import { useTripFinishTicket } from '../composables/useTripFinishTicket';
 import { useSmoothMarker } from '../composables/useSmoothMarker';
 
 const route = useRoute();
@@ -100,9 +109,13 @@ const skyFocus = ref<SkyFocusPayload | null>(null);
 /** 最近一次天象计算结果（迷你条摘要用） */
 const skyMapPayload = ref<SkyMapResult | null>(null);
 const STATUS_COLLAPSE_KEY = 'railvista:map:statusCollapsed';
-const statusCollapsed = ref(
-  typeof localStorage !== 'undefined' && localStorage.getItem(STATUS_COLLAPSE_KEY) === '1',
-);
+const statusCollapsed = ref((() => {
+  if (typeof localStorage === 'undefined') return false;
+  const saved = localStorage.getItem(STATUS_COLLAPSE_KEY);
+  if (saved !== null) return saved === '1';
+  /** 无历史偏好时：手机竖屏默认收起状态卡，首屏优先呈现地图与时间轴 */
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 839px)').matches;
+})());
 
 function toggleStatusCollapsed() {
   statusCollapsed.value = !statusCollapsed.value;
@@ -157,8 +170,12 @@ const schedule = computed(() => {
   return resolveSchedule(seg.baseDepartureIso, seg.baseArrivalIso, prefs.departureIso);
 });
 
-/** 列车当前里程（沿本次行程折线），用于临近景点判定 */
-const currentKm = computed(() => progress.value * pathMetrics.lengthKm);
+/**
+ * 列车当前里程（沿本次行程折线），用于临近景点与过站美食判定。
+ * 读 railLengthKm 而非 pathMetrics.lengthKm：后者是普通变量，进度被固定在某一格
+ * （模拟进度 / 停车等待）时 computed 不会重算，会拿到画线之前的 0。
+ */
+const currentKm = computed(() => progress.value * railLengthKm.value);
 
 /**
  * 当前处于「临近窗口」内的景点：进入点前 5km 起提示，过境 2km 后淡出（§4.3）。
@@ -188,6 +205,86 @@ const approachingWeather = computed(() => {
 const approachingWeatherParts = computed(() =>
   spotWeatherParts(approachingWeather.value, approachingSpot.value?.visibility),
 );
+
+/**
+ * 过站美食窗口：比景点窗口略宽（站少、且要留出「快到城里了」的预告感）。
+ */
+const STATION_FOOD_LEAD_KM = 12;
+const STATION_FOOD_TRAIL_KM = 5;
+
+/** 当前落在过站窗口内的车站（取窗口内最后一个，优先表达「正在经过」） */
+const approachingStation = computed(() => {
+  if (!prefs.layers.station) return null;
+  const stops = segment.value?.stops;
+  const kms = stationKmRef.value;
+  if (!stops?.length || !kms.length || kms.length !== stops.length) return null;
+  const km = currentKm.value;
+  let hit = -1;
+  for (let i = 0; i < stops.length; i++) {
+    // stationKm 轴是「米」（buildMileageAxis 内 L = lengthKm * 1000），currentKm 是公里，须先换算
+    const atKm = kms[i] / 1000;
+    if (!Number.isFinite(atKm)) continue;
+    if (withinApproach(approachWindow({ alongKm: atKm }, STATION_FOOD_LEAD_KM, STATION_FOOD_TRAIL_KM), km)) hit = i;
+  }
+  if (hit < 0) return null;
+  return {
+    stop: stops[hit],
+    seq: hit + 1,
+    total: stops.length,
+    isFirst: hit === 0,
+    isLast: hit === stops.length - 1,
+    passed: km >= kms[hit] / 1000,
+  };
+});
+
+const approachingStationFood = computed(() => {
+  const a = approachingStation.value;
+  if (!a) return null;
+  const food = stationFood(a.stop.name, { lng: a.stop.lng, lat: a.stop.lat });
+  if (!food) return null;
+  const kicker = a.isFirst ? '始发站' : a.isLast ? '已到达' : a.passed ? '正在经过' : '即将到达';
+  return { station: a.stop.name, food, kicker, seq: a.seq, total: a.total };
+});
+
+/** 景点通告是否真的在屏上（它约 10s 自动收起，但临近窗口还在）：收起后过站美食卡应能补位 */
+const spotCardRef = ref<InstanceType<typeof SpotApproachCard> | null>(null);
+const spotToastVisible = computed(() => Boolean(spotCardRef.value?.visible));
+const foodCardRef = ref<InstanceType<typeof StationFoodCard> | null>(null);
+const foodToastVisible = computed(() => Boolean(foodCardRef.value?.visible));
+
+/**
+ * 下车站玩法推荐：本趟快到终点/已到达时，把这一所在地的路书库攻略常驻在底栏。
+ * 放底栏而不是顶部浮层——面板高度是实测的（updateOverlayMetrics 会据此带动其它浮层），
+ * 而顶部通告位在任何屏高上都要和景点卡、美食卡、完成引导条抢位置，短屏必然叠字。
+ */
+const destPlace = computed(() => {
+  const seg = segment.value;
+  if (!seg || progress.value < 0.97) return null;
+  const last = seg.stops[seg.stops.length - 1];
+  if (!last) return null;
+  return placeOfStation({ name: last.name, lng: last.lng, lat: last.lat });
+});
+const { guide: destGuides } = usePlaceGuide(() => destPlace.value);
+
+/** 底栏只列 2 条，其余交给「查看全部」；命中口径要写在标签上，同省兜底不能冒充当地攻略 */
+const destGuideList = computed(() => destGuides.value?.routes.slice(0, 2) ?? []);
+const destGuideScope = computed(() => {
+  const g = destGuides.value;
+  if (!g) return '';
+  if (g.level === 'province') return `${g.place.province} · 精选`;
+  if (g.level === 'keyword') return `涉及${g.place.city}`;
+  return `${g.place.city} · 路书库`;
+});
+
+function destGuideMeta(r: TravelRouteSummary): string {
+  return [
+    TRAVEL_SHAPE_LABEL[r.shape] ?? '',
+    r.totalKm ? `${Math.round(r.totalKm)} km` : '',
+    r.days ? `${r.days} 天` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
 
 /** 图例用：左右侧含义说明 */
 const SIDE_LEGEND: Array<{ side: SpotSide; text: string }> = [
@@ -612,6 +709,14 @@ const upcomingMetaLine = computed(() => {
   return parts.join(' · ');
 });
 
+/** 底栏下一站/终点：车站类才挂风味，景点类保持原有信息密度 */
+const upcomingFood = computed(() => {
+  const u = upcoming.value;
+  if (!u || (u.kind !== 'station' && u.kind !== 'end')) return null;
+  const stop = segment.value?.stops.find((s) => s.name === u.name);
+  return stationFoodTop(u.name, stop ? { lng: stop.lng, lat: stop.lat } : null, 3);
+});
+
 function wxHintClass(hint?: SpotWeatherParts['viewHint']): string {
   if (hint === 'good') return 'is-good';
   if (hint === 'poor') return 'is-poor';
@@ -622,7 +727,7 @@ function wxHintClass(hint?: SpotWeatherParts['viewHint']): string {
 const locationInfo = computed(() => {
   const seg = segment.value;
   if (!seg) return { segment: '', meta: '' };
-  const km = pathMetrics.lengthKm;
+  const km = railLengthKm.value;
   if (progress.value <= 0) {
     return {
       segment: `${seg.fromName}站 · 尚未发车`,
@@ -1401,6 +1506,7 @@ async function initMap() {
         getCalibratableStations([s]).length > 0
           ? `<button type="button" class="info-calibrate-btn" data-station="${escHtml(s.name)}">我在 ${escHtml(s.name)} 站</button>`
           : '';
+      const foodHtml = stationFoodCardHtml(stationFood(s.name, { lng: s.lng, lat: s.lat }));
       const info = new AMap.InfoWindow({
         isCustom: true,
         autoMove: true,
@@ -1410,6 +1516,7 @@ async function initMap() {
           <div class="map-info-card__title">${escHtml(s.name)}</div>
           ${scheduleText ? `<p class="map-info-card__schedule">${escHtml(scheduleText)}</p>` : ''}
           ${s.intro ? `<p class="map-info-card__intro">${escHtml(s.intro)}</p>` : ''}
+          ${foodHtml}
           ${calibrateBtn}
           <div class="map-info-card__arrow" aria-hidden="true"></div>
         </div>`,
@@ -1542,6 +1649,33 @@ function openStartNewTrip() {
   confirmOpen.value = true;
 }
 
+// ── 行程完成 → 纪念票 ───────────────────────────────────────────────────────
+const currentTripKey = computed(() => (segment.value ? tripCacheKey(segment.value) : ''));
+
+/**
+ * 到终点是终态：每一趟只提示一次（本机记住），用户关掉就不再纠缠。
+ * 演示行程不参与——它不是一次真实走完的旅行。
+ */
+const {
+  visible: finishVisible,
+  dismiss: dismissFinish,
+  go: goFinishTicket,
+} = useTripFinishTicket({
+  key: () => currentTripKey.value,
+  finished: () => progress.value >= 1 && !trip.isDemo,
+  makeTicket: () =>
+    segment.value
+      ? ticketConfigFromRailSegment(segment.value, { mileageKm: railLengthKm.value })
+      : null,
+  src: 'trip',
+});
+
+const finishTitle = computed(() => {
+  const seg = segment.value;
+  if (!seg) return '本趟行程';
+  return [seg.trainCode, `${seg.fromName} → ${seg.toName}`].filter(Boolean).join(' · ');
+});
+
 async function setAsCurrentTrip() {
   if (trip.isDemo || !segment.value) return;
   if (isPinnedCurrent.value) {
@@ -1556,7 +1690,7 @@ async function setAsCurrentTrip() {
     try {
       upsertTicketTrace({
         sourceKey: snap.key,
-        config: ticketConfigFromRailSegment(snap.segment),
+        config: ticketConfigFromRailSegment(snap.segment, { mileageKm: railLengthKm.value }),
       });
     } catch {
       /* 痕迹落盘失败不影响设为当前 */
@@ -1970,10 +2104,33 @@ onUnmounted(() => {
 
       <SpotApproachCard
         v-if="approachingSpot"
+        ref="spotCardRef"
         :spot="approachingSpot"
         :current-km="currentKm"
         :compact="compact"
         :weather="approachingWeatherParts"
+      />
+
+      <!-- 过站美食与临近景点共用顶部通告位：景点通告有时效性且更该先看，仅它真的在屏上时让位 -->
+      <StationFoodCard
+        v-if="!spotToastVisible && approachingStationFood"
+        ref="foodCardRef"
+        :station="approachingStationFood.station"
+        :food="approachingStationFood.food"
+        :kicker="approachingStationFood.kicker"
+        :seq="approachingStationFood.seq"
+        :total="approachingStationFood.total"
+        :compact="compact"
+      />
+
+      <!-- 走完本趟：把「留下这张票」递到眼前。顶部通告位有卡（景点 / 过站美食）时它先让位：
+           短屏（1280×720 一类）通告位到底栏之间只剩一两百像素，同屏必然叠字。 -->
+      <TicketFinishCard
+        v-if="finishVisible && !spotToastVisible && !foodToastVisible"
+        :title="finishTitle"
+        :compact="compact"
+        @primary="goFinishTicket"
+        @dismiss="dismissFinish"
       />
 
       <footer class="bottom-panel">
@@ -2016,6 +2173,41 @@ onUnmounted(() => {
             <span v-if="upcoming.distText" class="next-tag next-tag--dist">{{ upcoming.distText }}</span>
           </div>
           <div v-if="upcomingMetaLine" class="next-meta">{{ upcomingMetaLine }}</div>
+          <div v-if="upcomingFood" class="next-food">
+            <div class="next-food__head">
+              <span class="next-food__label">本站风味</span>
+              <span class="next-food__place">{{ upcomingFood.city }}{{ upcomingFood.tag ? ` · ${upcomingFood.tag}` : '' }}</span>
+            </div>
+            <div class="next-food__list">
+              <span v-for="dish in upcomingFood.dishes" :key="dish.name" class="next-food__chip">
+                {{ dish.name }}
+              </span>
+            </div>
+          </div>
+          <!-- 下车站玩法：路书库里这一地的线路，到站就能翻攻略（与「本站风味」同一套 chip 行密度） -->
+          <div v-if="destGuideList.length" class="next-guide">
+            <div class="next-guide__head">
+              <span class="next-guide__label">下车玩法</span>
+              <span class="next-guide__scope">{{ destGuideScope }}</span>
+            </div>
+            <div class="next-guide__list">
+              <RouterLink
+                v-for="r in destGuideList"
+                :key="r.id"
+                class="next-guide__chip"
+                :to="`/roadbook/${r.id}`"
+                :title="destGuideMeta(r)"
+              >
+                {{ r.name }}
+              </RouterLink>
+              <RouterLink
+                class="next-guide__chip next-guide__chip--more"
+                :to="{ path: '/roadbook', query: { q: destGuides?.place.city } }"
+              >
+                查看全部 ›
+              </RouterLink>
+            </div>
+          </div>
           <div v-if="upcoming?.wx" class="wx-strip">
             <div class="wx-strip__main">
               <span class="wx-strip__emoji" aria-hidden="true">{{ upcoming.wx.emoji }}</span>

@@ -11,6 +11,7 @@ import DriveRankings from '../pages/DriveRankings.vue';
 import DriveBoard from '../pages/DriveBoard.vue';
 import DriveRoadbook from '../pages/DriveRoadbook.vue';
 import TicketHome from '../pages/TicketHome.vue';
+import FootprintPage from '../pages/FootprintPage.vue';
 import RoadbookHome from '../pages/RoadbookHome.vue';
 import RoadbookDetail from '../pages/RoadbookDetail.vue';
 
@@ -29,6 +30,8 @@ export const router = createRouter({
     { path: '/atlas', name: 'atlas', component: AtlasMap, meta: { fullscreenMap: true } },
     // ── 万里路书 · 旅行纪念票（顶部菜单第 4 入口） ──────────────────────────
     { path: '/ticket', name: 'ticket', component: TicketHome },
+    // 纪念票二级页：我的中国足迹（立体点亮地图）
+    { path: '/ticket/footprint', name: 'ticket-footprint', component: FootprintPage },
     // ── 旅行路书 · 省 → 市 → 路线（攻略层，含非自驾玩法） ───────────────────
     { path: '/roadbook', name: 'roadbook', component: RoadbookHome },
     {

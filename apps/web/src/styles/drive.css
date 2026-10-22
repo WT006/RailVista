@@ -569,7 +569,7 @@
 .drive-subnav__main,
 .drive-subnav__sub {
   flex-shrink: 0;
-  padding: 6px var(--space-3);
+  padding: 9px var(--space-3);
   border-radius: var(--radius-full);
   font-size: var(--fs-cap);
   font-weight: 600;
@@ -579,10 +579,23 @@
 }
 
 .drive-subnav__main {
+  position: relative;
   border: none;
   background: var(--fill-subtle);
   color: var(--text-2);
   text-decoration: none;
+}
+
+/* 视觉紧凑胶囊、命中 ≥44px（导航行上下留白充足，向外扩展不互侵） */
+.drive-subnav__main::after,
+.drive-subnav__sub::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--hit-min));
+  height: max(100%, var(--hit-min));
+  transform: translate(-50%, -50%);
 }
 
 .drive-subnav__main.is-active {
@@ -592,6 +605,7 @@
 
 /* 榜单入口：暖色实底，在深蓝标题区更易发现 */
 .drive-subnav__sub {
+  position: relative;
   border: 1px solid var(--warning);
   background: var(--warning);
   color: #1a1408;
@@ -905,6 +919,7 @@
 
 .road-kbd__digit {
   padding: var(--space-2) 0;
+  min-height: 44px; /* 数字键盘是高频触控目标（鸿蒙触控下限 44vp） */
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-hairline);
   background: var(--surface-2);
@@ -1032,17 +1047,27 @@
 }
 
 /* —— 榜单（从属：入口卡 + 聚合页 + 单榜页） —— */
-.drive-boards {
+.drive-boards,
+.drive-loops {
   margin-top: var(--space-6);
 }
 
-.drive-boards__title {
+.drive-boards__title,
+.drive-loops__title {
   margin: 0 0 var(--space-3);
   font-size: var(--fs-h2);
   font-weight: 700;
 }
 
-.drive-boards__entry {
+.drive-loops__sub {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-3);
+  font-size: var(--fs-cap);
+  line-height: var(--lh-normal);
+  color: var(--text-3);
+}
+
+.drive-boards__entry,
+.drive-loops__entry {
   display: inline-flex;
   align-items: center;
   gap: 0.35em;
@@ -1059,7 +1084,19 @@
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.drive-boards__entry::after {
+/* 标题胶囊的 ::after 已被「→」占用，触控命中区扩展只能挂 ::before（见 base.css .rv-hit 注释） */
+.drive-loops__entry {
+  position: relative;
+}
+
+.drive-loops__entry::before {
+  content: '';
+  position: absolute;
+  inset: -6px -8px;
+}
+
+.drive-boards__entry::after,
+.drive-loops__entry::after {
   content: '→';
   font-weight: 500;
   font-size: 0.85em;
@@ -1067,18 +1104,21 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .drive-boards__entry:hover {
+  .drive-boards__entry:hover,
+  .drive-loops__entry:hover {
     border-color: var(--line-accent);
     background: var(--surface-2);
   }
 }
 
-.drive-boards__entry:focus-visible {
+.drive-boards__entry:focus-visible,
+.drive-loops__entry:focus-visible {
   outline: 2px solid var(--accent-hover);
   outline-offset: 2px;
 }
 
-.drive-boards__grid {
+.drive-boards__grid,
+.drive-loops__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--space-3);
@@ -1133,6 +1173,146 @@
   font-size: var(--fs-micro);
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
+}
+
+/* —— 路书库联动：经典环线卡（种草「走哪条」，与榜单同屏同级） —— */
+.drive-loop-card {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .drive-loop-card:hover {
+    border-color: var(--line-accent);
+  }
+}
+
+/* 卡身整体是一个链接（热区天然 ≥44），下方再挂一个「走某条国道」的次级动作 */
+.drive-loop-card__main {
+  display: grid;
+  gap: var(--space-1);
+  min-height: var(--hit-min);
+  color: inherit;
+  text-decoration: none;
+}
+
+.drive-loop-card__main:focus-visible {
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.drive-loop-card__name {
+  margin: 0;
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  color: var(--text-1);
+}
+
+.drive-loop-card__go {
+  margin-top: var(--space-1);
+  font-size: var(--fs-cap);
+  color: var(--accent);
+}
+
+.drive-loop-card__road {
+  justify-self: start;
+  margin-top: var(--space-2);
+}
+
+.drive-loop-card__meta,
+.drive-loop-card__summary {
+  margin: 0;
+  font-size: var(--fs-cap);
+  line-height: 1.45;
+  color: var(--text-3);
+}
+
+.drive-loop-card__meta {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+
+.drive-loop-card__summary {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* —— 公路编号 → 路书库玩法反查（键盘内，输入 G318 时出现） —— */
+.road-plays {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line-hairline);
+}
+
+.road-plays__label {
+  margin: 0;
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent-hover);
+}
+
+.road-plays__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px var(--space-2);
+  min-height: var(--hit-min);
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-hairline);
+  background: var(--surface-1);
+  text-decoration: none;
+  color: inherit;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .road-plays__item:hover {
+    border-color: var(--line-accent);
+    background: var(--surface-2);
+  }
+}
+
+.road-plays__item:focus-visible {
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 2px;
+}
+
+.road-plays__name {
+  min-width: 0;
+  font-size: var(--fs-meta);
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--text-1);
+}
+
+.road-plays__meta {
+  grid-column: 1;
+  font-size: var(--fs-micro);
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.road-plays__go {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: var(--fs-micro);
+  color: var(--accent);
+  white-space: nowrap;
 }
 
 .drive-board-list {
@@ -1320,6 +1500,7 @@
 }
 
 .drive-chprog__head {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
@@ -1332,6 +1513,13 @@
   color: inherit;
   text-align: left;
   cursor: pointer;
+}
+
+/* 标题行视觉高度小（16px），触区向外扩（面板内边距内，不压到下方进度轨道的可点区） */
+.drive-chprog__head::after {
+  content: '';
+  position: absolute;
+  inset: -12px 0 -6px 0;
 }
 
 .drive-chprog__title {
@@ -3457,7 +3645,7 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 32px;
+  min-height: 40px;
   padding: 0 12px 0 10px;
   border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
   border-radius: var(--radius-full);
@@ -3926,6 +4114,13 @@
     border-color: var(--accent);
     color: var(--accent-hover);
   }
+}
+
+/* 全览按钮：视觉 32px、触区 40px（与右侧控件列同规则） */
+.drive-map-page .drive-map-fit-btn::after {
+  content: '';
+  position: absolute;
+  inset: -4px -8px;
 }
 
 /* 为「全览」腾出一层：图例开关再抬高一格 */

@@ -61,6 +61,11 @@ const loadError = ref('');
 const mapError = ref('');
 const heatSupported = ref(true);
 const heatOn = ref(false);
+/** 手机档筛选行折叠：默认收起（只留图层胶囊行），点「筛选」展开来源/维度 */
+const layersExpanded = ref(false);
+const hasActiveFilters = computed(
+  () => activeDims.value.length > 0 || activeProvinces.value.length > 0 || activeCity.value !== '',
+);
 /** 桌面默认展开侧栏；手机地图优先，面板收起（点「筛选」再开） */
 const sidebarOpen = ref(
   typeof window === 'undefined' ? true : window.matchMedia('(min-width: 840px)').matches,
@@ -1571,48 +1576,65 @@ watch(spotOrigin, (v) => {
   <div class="atlas-page">
     <div ref="mapEl" class="atlas-map"></div>
 
-    <!-- 图层开关独立浮层：桌面仅图层胶囊；手机收成一块分组面板 -->
-    <div class="atlas-layers" role="toolbar" aria-label="地图图层与筛选">
-      <div class="atlas-layers__group">
-        <span class="atlas-layers__k">图层</span>
-        <div class="atlas-layers__row">
-          <button
-            type="button"
-            class="atlas-layers__btn"
-            :class="{ 'is-on': expresswayLayerOn }"
-            style="--dot: var(--map-amber)"
-            :disabled="!!mapError"
-            :aria-pressed="expresswayLayerOn"
-            @click="toggleExpresswayLayer"
-          >
-            <i class="atlas-layers__dot" aria-hidden="true"></i>
-            高速
-          </button>
-          <button
-            type="button"
-            class="atlas-layers__btn"
-            :class="{ 'is-on': nationalLayerOn }"
-            style="--dot: var(--accent)"
-            :disabled="!!mapError"
-            :aria-pressed="nationalLayerOn"
-            @click="toggleNationalLayer"
-          >
-            <i class="atlas-layers__dot" aria-hidden="true"></i>
-            国道
-          </button>
-          <button
-            type="button"
-            class="atlas-layers__btn"
-            :class="{ 'is-on': heatOn }"
-            style="--dot: var(--map-heat)"
-            :disabled="!heatSupported || !!mapError"
-            :aria-pressed="heatOn"
-            @click="heatOn = !heatOn"
-          >
-            <i class="atlas-layers__dot" aria-hidden="true"></i>
-            热力
-          </button>
+    <!-- 图层开关独立浮层：桌面仅图层胶囊；手机收成一块分组面板（筛选默认折叠，点「筛选」展开） -->
+    <div
+      class="atlas-layers"
+      :class="{ 'is-expanded': layersExpanded }"
+      role="toolbar"
+      aria-label="地图图层与筛选"
+    >
+      <div class="atlas-layers__bar">
+        <div class="atlas-layers__group">
+          <span class="atlas-layers__k">图层</span>
+          <div class="atlas-layers__row">
+            <button
+              type="button"
+              class="atlas-layers__btn"
+              :class="{ 'is-on': expresswayLayerOn }"
+              style="--dot: var(--map-amber)"
+              :disabled="!!mapError"
+              :aria-pressed="expresswayLayerOn"
+              @click="toggleExpresswayLayer"
+            >
+              <i class="atlas-layers__dot" aria-hidden="true"></i>
+              高速
+            </button>
+            <button
+              type="button"
+              class="atlas-layers__btn"
+              :class="{ 'is-on': nationalLayerOn }"
+              style="--dot: var(--accent)"
+              :disabled="!!mapError"
+              :aria-pressed="nationalLayerOn"
+              @click="toggleNationalLayer"
+            >
+              <i class="atlas-layers__dot" aria-hidden="true"></i>
+              国道
+            </button>
+            <button
+              type="button"
+              class="atlas-layers__btn"
+              :class="{ 'is-on': heatOn }"
+              style="--dot: var(--map-heat)"
+              :disabled="!heatSupported || !!mapError"
+              :aria-pressed="heatOn"
+              @click="heatOn = !heatOn"
+            >
+              <i class="atlas-layers__dot" aria-hidden="true"></i>
+              热力
+            </button>
+          </div>
         </div>
+        <button
+          type="button"
+          class="atlas-layers__toggle"
+          :class="{ 'is-on': hasActiveFilters }"
+          :aria-expanded="layersExpanded"
+          @click="layersExpanded = !layersExpanded"
+        >
+          筛选
+          <span class="atlas-layers__toggle-chevron" :class="{ 'is-open': layersExpanded }" aria-hidden="true"></span>
+        </button>
       </div>
       <div class="atlas-layers__filters" aria-label="景点筛选">
         <div class="atlas-layers__group">
@@ -2039,6 +2061,15 @@ watch(spotOrigin, (v) => {
 }
 
 .atlas-layers__filters {
+  display: none;
+}
+
+/* 手机折叠条容器：桌面不参与布局（display:contents），行为与旧版一致 */
+.atlas-layers__bar {
+  display: contents;
+}
+
+.atlas-layers__toggle {
   display: none;
 }
 
@@ -2643,12 +2674,85 @@ watch(spotOrigin, (v) => {
   }
 
   .atlas-layers__filters {
-    display: flex;
+    display: none; /* 手机默认折叠，.is-expanded 时展开 */
     flex-direction: column;
     gap: 8px;
     width: 100%;
     padding-top: 8px;
     border-top: 1px solid var(--line-hairline);
+  }
+
+  .atlas-layers.is-expanded .atlas-layers__filters {
+    display: flex;
+  }
+
+  /* 折叠条：图层胶囊占满一行，右端「筛选」开关收放来源/维度 */
+  .atlas-layers__bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .atlas-layers__bar > .atlas-layers__group {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+    grid-template-columns: auto 1fr;
+  }
+
+  .atlas-layers__bar > .atlas-layers__group .atlas-layers__k {
+    padding-top: 0;
+    align-self: center;
+  }
+
+  .atlas-layers__toggle {
+    position: relative;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--line-default);
+    background: var(--fill-subtle);
+    color: var(--text-2);
+    font: inherit;
+    font-size: var(--fs-cap);
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 与图层胶囊一致的 44px 命中区 */
+  .atlas-layers__toggle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, var(--hit-min));
+    height: max(100%, var(--hit-min));
+    transform: translate(-50%, -50%);
+  }
+
+  .atlas-layers__toggle.is-on {
+    border-color: var(--line-accent);
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+  }
+
+  .atlas-layers__toggle-chevron {
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translateY(-1px);
+    transition: transform var(--dur-fast) var(--ease-standard);
+  }
+
+  .atlas-layers__toggle-chevron.is-open {
+    transform: rotate(-135deg) translateY(-2px);
   }
 
   .atlas-layers__btn {

@@ -12,6 +12,7 @@ import { flightsRoute } from './routes/flights.js';
 import { travelRoute } from './routes/travel.js';
 import { weatherRoute } from './routes/weather.js';
 import { skyRoute } from './routes/sky.js';
+import { searchRoute } from './routes/search.js';
 import { loadStationIndex } from './services/stationIndex.js';
 import { trustedClientIp } from './lib/clientIdentity.js';
 import { buildVersionFingerprint, type VersionFingerprint } from './services/versionFingerprint.js';
@@ -107,6 +108,7 @@ app.route('/flights', flightsRoute);
 app.route('/travel', travelRoute);
 app.route('/weather', weatherRoute);
 app.route('/sky', skyRoute);
+app.route('/search', searchRoute);
 
 // 默认 3010：本机 Windows 常排除 2910–3009，绑 3000 会 EACCES
 const port = Number(process.env.PORT || 3010);

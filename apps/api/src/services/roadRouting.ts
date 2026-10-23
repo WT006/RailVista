@@ -31,6 +31,8 @@ export interface PlanRouteInput {
   /**
    * auto（默认）→ 本地干线 A*，失败再试 OSRM；
    * local → 只用本地拓扑。
+   *
+   * 运行时不再调用高德 / 百度 Web 驾车（合规与配额）；在线兜底仅 OSRM。
    */
   engine?: 'auto' | 'local';
 }

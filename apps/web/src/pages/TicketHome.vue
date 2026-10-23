@@ -8,6 +8,7 @@
  *  - 主栏票面实时预览；按票种裁剪的微调编辑器折叠为「高级微调」。
  */
 import { computed, nextTick, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import type { TicketConfig, TicketKind, TrainSummary } from '@railvista/shared';
 import TicketFace from '../components/ticket/TicketFace.vue';
 import TicketEditor from '../components/ticket/TicketEditor.vue';
@@ -19,6 +20,7 @@ import DriveBuilder from '../components/ticket/DriveBuilder.vue';
 import FlightBuilder from '../components/ticket/FlightBuilder.vue';
 import HmSegmented, { type SegOption } from '../components/ticket/hm/HmSegmented.vue';
 import { usePointerSpotlight } from '../composables/usePointerSpotlight';
+import { footprintLitCount, lightFootprintFromTicket } from '../lib/footprintSync';
 import {
   listTicketTraces,
   removeTicketTrace,
@@ -34,6 +36,7 @@ import {
 usePointerSpotlight();
 
 const store = useTicketStore();
+const route = useRoute();
 const tracesAll = ref<TicketTrace[]>([]);
 /** 默认只展示最近 1 条，展开后显示其余 */
 const tracesExpanded = ref(false);
@@ -57,7 +60,20 @@ const savedForKind = computed(() =>
   store.saved.filter((s) => s.config.kind === store.config.kind),
 );
 
-onMounted(refreshTraces);
+/** 行程页「生成纪念票」跳过来的来源标记：说明这张票面是从哪一趟生成的 */
+const SRC_LABEL: Record<string, string> = {
+  trip: '本趟铁路行程',
+  drive: '本段自驾路线',
+  'drive-map': '本段自驾路线',
+};
+
+onMounted(() => {
+  refreshTraces();
+  const src = String(route.query.src ?? '');
+  if (SRC_LABEL[src]) {
+    flash(`已按${SRC_LABEL[src]}生成票面，可继续微调或直接保存`);
+  }
+});
 
 const kindOptions: SegOption[] = [
   { label: '铁路', value: 'railway', icon: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C8 2 6 3.6 6 7v7.5A2.5 2.5 0 008.5 17l-1.5 2h1.6l1.5-2h3.8l1.5 2H17l-1.5-2a2.5 2.5 0 002.5-2.5V7c0-3.4-2-5-6-5zm-2.5 3h5A1.5 1.5 0 0116 6.5V10H8V6.5A1.5 1.5 0 019.5 5zM8.5 13a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6zm7 0a1.3 1.3 0 110 2.6 1.3 1.3 0 010-2.6z"/></svg>' },
@@ -66,18 +82,27 @@ const kindOptions: SegOption[] = [
 ];
 
 const notice = ref('');
+/** 导出弹窗关掉之后才补一句的提示（弹窗期间绿字被盖住，说了等于没说） */
+const pendingNotice = ref('');
 let noticeTimer: number | undefined;
-function flash(msg: string) {
+function flash(msg: string, ms = 2400) {
   notice.value = msg;
   window.clearTimeout(noticeTimer);
   noticeTimer = window.setTimeout(() => {
     notice.value = '';
-  }, 2400);
+  }, ms);
 }
 
 const exportOpen = ref(false);
 const exportName = ref('');
 const exportConfig = ref<TicketConfig | null>(null);
+
+/** 足迹入口上显示的已点亮数量（数据存在本机，未进 store，这里直接读一次） */
+const footprintLit = ref(0);
+function refreshFootprintCount() {
+  footprintLit.value = footprintLitCount();
+}
+refreshFootprintCount();
 
 /** 居中弹窗提示（重复保存等），自动消失；key 强制重挂载避免连点无感 */
 const alertOpen = ref(false);
@@ -121,6 +146,10 @@ function openExport(item: Pick<SavedTicket, 'name' | 'config'>) {
 
 function closeExport() {
   exportOpen.value = false;
+  if (pendingNotice.value) {
+    flash(pendingNotice.value, 4200);
+    pendingNotice.value = '';
+  }
 }
 
 /** 保存到本机列表后仍留在编辑页；点列表项再弹图片预览 / 下载 */
@@ -139,6 +168,12 @@ function onSave() {
   }
   refreshTraces();
   flash('已保存到本机列表，点击条目可查看图片并下载');
+  // 票走过的城市同步点亮足迹；导出弹窗会盖住提示，留到关掉弹窗再说
+  const lit = lightFootprintFromTicket(result.item.config);
+  pendingNotice.value = lit.cities.length
+    ? `足迹已同步点亮 ${lit.cities.length} 城：${lit.cities.join('、')}`
+    : '';
+  refreshFootprintCount();
   openExport(result.item);
 }
 
@@ -280,6 +315,38 @@ const showAdvanced = ref(false);
             <TicketThemePicker />
           </section>
 
+          <!-- 中国旅行足迹地图：独立二级页 /ticket/footprint -->
+          <RouterLink to="/ticket/footprint" class="rv-card footprint-entry" data-spotlight>
+            <div class="footprint-entry__head">
+              <div>
+                <h2 class="builder-title">我的中国足迹</h2>
+                <p class="footprint-entry__hint">
+                  {{
+                    footprintLit
+                      ? `已点亮 ${footprintLit} 座城市，继续点亮更多`
+                      : '点亮去过的城市，金色会慢慢铺满地图'
+                  }}
+                </p>
+              </div>
+              <span class="footprint-entry__go">
+                进入
+                <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                  <path
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </span>
+            </div>
+            <div class="footprint-entry__mini" aria-hidden="true">
+              <span v-for="n in 5" :key="n" class="footprint-entry__pip" :style="{ animationDelay: `${n * 0.24}s` }" />
+            </div>
+          </RouterLink>
+
           <!-- 高级全字段 -->
           <section class="rv-card" data-spotlight>
             <button type="button" class="adv-toggle" @click="showAdvanced = !showAdvanced">
@@ -346,6 +413,7 @@ const showAdvanced = ref(false);
         </div>
       </div>
     </Teleport>
+
   </div>
 </template>
 
@@ -516,6 +584,73 @@ const showAdvanced = ref(false);
 }
 
 .footnote { margin: var(--space-3) 0 0; color: var(--text-3); font-size: var(--fs-cap); text-align: center; }
+/* 足迹入口：整卡可点，跳 /ticket/footprint 二级页。
+   金色只做装饰性暗示（光点、描边），交互态一律走系统令牌——
+   和足迹页同一套分工，纪念票首页才不会满屏烫金。 */
+.footprint-entry {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: linear-gradient(135deg, var(--ticket-gold-veil), transparent 62%);
+  border-color: var(--line-hairline);
+  transition:
+    border-color var(--dur-base) var(--ease-standard),
+    transform var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-standard);
+}
+.footprint-entry:hover {
+  border-color: var(--line-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--glow-accent);
+}
+.footprint-entry__head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); }
+.footprint-entry__hint { margin: 2px 0 0; font-size: var(--fs-cap); color: var(--text-3); }
+.footprint-entry__go {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-4);
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    gap var(--dur-fast) var(--ease-standard);
+}
+.footprint-entry:hover .footprint-entry__go {
+  background: var(--fill-accent);
+  border-color: var(--accent-border);
+  color: var(--text-1);
+  gap: 5px;
+}
+/* 底部一排呼吸光点，暗示「点亮」这件事 */
+.footprint-entry__mini {
+  display: flex;
+  gap: 7px;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line-hairline);
+}
+.footprint-entry__pip {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ticket-gold);
+  animation: footprint-pip 2.4s ease-in-out infinite;
+}
+@keyframes footprint-pip {
+  0%, 100% { opacity: 0.28; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .footprint-entry__pip { animation: none; opacity: 0.7; }
+}
 </style>
 
 <!-- Teleport 到 body：非 scoped，避免弹层无样式像「没反应」 -->

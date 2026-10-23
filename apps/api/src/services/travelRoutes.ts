@@ -176,6 +176,11 @@ export function getTravelRoute(id: string): TravelRouteDetail | null {
   return snapshot().byId.get(id) ?? null;
 }
 
+/** 全量路线详情（published），供全局搜索做「景点 ↔ 路书」反向索引与路书命中 */
+export function listAllTravelRoutes(): TravelRouteDetail[] {
+  return snapshot().routes.filter((r) => r.status === 'published');
+}
+
 export interface TravelSourceStat {
   file: string;
   area?: string;

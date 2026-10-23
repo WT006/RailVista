@@ -45,6 +45,8 @@ import {
 } from '../lib/driveCurrentTrip';
 import { ticketConfigFromDriveRoute } from '../lib/ticketFromTrip';
 import { upsertTicketTrace } from '../lib/ticketTrace';
+import TicketFinishCard from '../components/TicketFinishCard.vue';
+import { useTripFinishTicket } from '../composables/useTripFinishTicket';
 
 usePointerSpotlight();
 const routePathRef = ref<SVGPathElement | null>(null);
@@ -153,6 +155,26 @@ const entryMode = computed<'od' | 'road' | 'route'>(() => {
   if (route.query.road) return 'road';
   if (route.query.route) return 'route';
   return 'od';
+});
+
+// ── 走完这条路 → 纪念票 ─────────────────────────────────────────────────────
+const {
+  visible: finishVisible,
+  dismiss: dismissFinish,
+  go: goFinishTicket,
+} = useTripFinishTicket({
+  key: () => tripKey.value ?? '',
+  finished: () => progress.value >= 1,
+  makeTicket: () => {
+    const r = roadRoute.value;
+    if (!r) return null;
+    const waypoints =
+      entryMode.value === 'od'
+        ? [String(route.query.from ?? ''), String(route.query.to ?? '')].filter(Boolean)
+        : undefined;
+    return ticketConfigFromDriveRoute(r, { routeName: r.name, waypoints });
+  },
+  src: 'drive',
 });
 
 async function load() {
@@ -953,5 +975,13 @@ watch(gps, (sample) => {
     </main>
 
     <div v-if="pinToast" class="toast">{{ pinToast }}</div>
+
+    <TicketFinishCard
+      v-if="finishVisible"
+      placement="page"
+      :title="roadRoute?.name || '本段自驾'"
+      @primary="goFinishTicket"
+      @dismiss="dismissFinish"
+    />
   </div>
 </template>

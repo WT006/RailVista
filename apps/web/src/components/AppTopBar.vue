@@ -2,8 +2,9 @@
 /**
  * 顶部导航栏（App Bar）。
  *
- * 职责：品牌 + 版本；≥1200 网页档额外承载主导航（与底栏/侧栏同源 APP_NAV_ITEMS）。
- * 挪移：&lt;840 底栏（本条不渲染，safe-top 由页面 padding 承担）/
+ * 职责：品牌 + 版本；≥1200 网页档额外承载主导航（与底栏/侧栏同源 APP_NAV_ITEMS）；
+ *       <840 收敛为极简品牌条（Logo + 图标全局搜索钮，主导航仍在底栏）。
+ * 挪移：&lt;840 极简顶栏（搜索入口在此，不在底栏）/
  *       840–1199 侧边 Tab + 品牌条 / ≥1200 本组件顶栏。
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue';
@@ -12,8 +13,11 @@ import { appVersionInfo, APP_VERSION } from '@railvista/shared';
 import { APP_NAV_ITEMS } from '../data/appNav';
 import { navIcon } from '../data/navIcons';
 import BrandLogo from './BrandLogo.vue';
+import { Search } from 'lucide-vue-next';
+import { useGlobalSearch } from '../composables/useGlobalSearch';
 
 const route = useRoute();
+const gs = useGlobalSearch();
 
 /** 版本号与变更摘要（悬浮显示，与 CHANGELOG.md 首条同源） */
 const versionInfo = appVersionInfo();
@@ -56,6 +60,11 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 
       <div class="appbar__right">
         <slot name="actions" />
+        <button type="button" class="appbar__search" aria-label="全局搜索" @click="gs.open()">
+          <Search :size="16" :stroke-width="1.9" />
+          <span class="appbar__search-label">搜索</span>
+          <kbd class="appbar__search-kbd">Ctrl K</kbd>
+        </button>
         <span
           class="appbar__version"
           :title="`${versionInfo.summary}（${versionInfo.date}）`"
@@ -114,12 +123,22 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   height: var(--appbar-h);
 }
 
-/* 手机档：整条顶栏退出文档流（勿留透明占位）。
- * 此前 height=safe-top + background:none 会露出 body 纯色条，
- * 与下方 .drive-page / .rv-page 的 page-scrim 叠不成一条，公路网背景被「切断」。
- * 刘海避让改由页面自身 padding-top: var(--safe-top) 承担（见 base.css）。 */
+/* 手机档：极简品牌条（Logo + 图标搜索钮），主导航仍在底栏；
+ * 版本号与 Ctrl K 键位提示在手机上无意义，一并收起。 */
 @media (max-width: 839px) {
-  .appbar {
+  .appbar__version {
+    display: none;
+  }
+
+  .appbar__search {
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .appbar__search-label,
+  .appbar__search-kbd {
     display: none;
   }
 }
@@ -194,6 +213,37 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
   align-items: center;
   gap: var(--space-2);
   flex-shrink: 0;
+}
+
+.appbar__search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: var(--fill-subtle);
+  color: var(--text-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--fs-cap);
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-standard), background var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard);
+}
+.appbar__search:hover {
+  color: var(--text-1);
+  background: var(--interactive-hover);
+  border-color: var(--line-strong);
+}
+.appbar__search-kbd {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  color: var(--text-3);
+  border: 1px solid var(--line-default);
+  border-radius: 5px;
+  padding: 1px 5px;
+  background: var(--surface-2);
 }
 
 /* 版本徽标弱化为纯文字小字，不再带边框盒，减少导航条的"框"感 */

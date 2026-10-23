@@ -103,25 +103,15 @@ html {
   padding-left: var(--sidenav-w);
 }
 
-/* 手机档顶栏已 display:none：安全区改由页面自己垫，背景（page-scrim + 公路网）
- * 从视口顶连续铺下来，避免原先 AppTopBar 透明占位露出 body 纯色接缝。 */
-@media (max-width: 839px) {
-  .rv-page,
-  .route-page,
-  .drive-page {
-    padding-top: var(--safe-top);
-  }
-}
-
-/* ≥840 顶栏 sticky 占位：页面上拉到栏下，让 page-scrim / 公路网与顶栏玻璃
- * 采样同一层背景。否则栏下才开 scrim，亮路网会在栏底被切成一条缝（铁路星点淡，不明显）。 */
-@media (min-width: 840px) {
-  .rv-page,
-  .route-page,
-  .drive-page {
-    margin-top: calc(-1 * var(--appbar-offset));
-    padding-top: var(--appbar-offset);
-  }
+/* 顶栏 sticky 占位（全档位统一）：页面用 slide-under 模式避让——
+   margin-top 拉回 sticky 栏占位 + padding-top 垫回同高，让 page-scrim / 公路网
+   从视口顶连续铺下来，与顶栏玻璃采样同一层背景。否则栏下才开 scrim，
+   亮路网会在栏底被切成一条缝（铁路星点淡，不明显）。 */
+.rv-page,
+.route-page,
+.drive-page {
+  margin-top: calc(-1 * var(--appbar-offset));
+  padding-top: var(--appbar-offset);
 }
 
 .rv-grid {
@@ -476,7 +466,7 @@ html {
 }
 
 .btn-sm {
-  min-height: 36px;
+  min-height: 40px;
   padding: 0 var(--space-3);
   font-size: var(--fs-cap);
   border-radius: var(--radius-sm);
@@ -1130,7 +1120,7 @@ html {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 42px;
+  min-height: 44px;
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-default);

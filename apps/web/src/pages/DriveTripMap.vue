@@ -47,6 +47,8 @@ import {
 } from '../lib/driveCurrentTrip';
 import { ticketConfigFromDriveRoute } from '../lib/ticketFromTrip';
 import { upsertTicketTrace } from '../lib/ticketTrace';
+import TicketFinishCard from '../components/TicketFinishCard.vue';
+import { useTripFinishTicket } from '../composables/useTripFinishTicket';
 
 const route = useRoute();
 const router = useRouter();
@@ -128,9 +130,13 @@ const toast = ref('');
 let toastTimer: number | undefined;
 const compact = ref(false);
 const legendOpen = ref(false);
-const statusCollapsed = ref(
-  typeof localStorage !== 'undefined' && localStorage.getItem(STATUS_COLLAPSE_KEY) === '1',
-);
+const statusCollapsed = ref((() => {
+  if (typeof localStorage === 'undefined') return false;
+  const saved = localStorage.getItem(STATUS_COLLAPSE_KEY);
+  if (saved !== null) return saved === '1';
+  /** 无历史偏好时：手机竖屏默认收起状态卡 + 进度面板，把首屏留给地图（防遮挡） */
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 839px)').matches;
+})());
 const satelliteOn = ref(
   typeof localStorage !== 'undefined' && localStorage.getItem(SATELLITE_PREF_KEY) === '1',
 );
@@ -162,6 +168,26 @@ const entryMode = computed<'od' | 'road' | 'route'>(() => {
   if (route.query.road) return 'road';
   if (route.query.route) return 'route';
   return 'od';
+});
+
+// ── 走完这条路 → 纪念票 ─────────────────────────────────────────────────────
+const {
+  visible: finishVisible,
+  dismiss: dismissFinish,
+  go: goFinishTicket,
+} = useTripFinishTicket({
+  key: () => tripKey.value ?? '',
+  finished: () => progress.value >= 1,
+  makeTicket: () => {
+    const r = roadRoute.value;
+    if (!r) return null;
+    const waypoints =
+      entryMode.value === 'od'
+        ? [String(route.query.from ?? ''), String(route.query.to ?? '')].filter(Boolean)
+        : undefined;
+    return ticketConfigFromDriveRoute(r, { routeName: r.name, waypoints });
+  },
+  src: 'drive-map',
 });
 
 const nominalKm = computed(() => roadRoute.value?.lengthKm ?? 0);
@@ -1238,6 +1264,14 @@ onUnmounted(() => {
           </div>
         </section>
       </footer>
+
+      <TicketFinishCard
+        v-if="finishVisible"
+        :title="roadRoute?.name || '本段自驾'"
+        :compact="compact"
+        @primary="goFinishTicket"
+        @dismiss="dismissFinish"
+      />
 
       <div v-if="toast" class="toast">{{ toast }}</div>
     </template>

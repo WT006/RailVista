@@ -50,6 +50,7 @@
         11
       ],
       "difficulty": 2,
+      "roadRefs": ["G324", "G246", "G78", "G320", "G60", "G354", "G659"],
       "startNode": "兴义",
       "endNode": "兴义",
       "intro": {
@@ -628,6 +629,7 @@
         10
       ],
       "difficulty": 3,
+      "roadRefs": ["G210", "G75", "G4215", "G212", "G546", "G352", "G326"],
       "startNode": "遵义",
       "endNode": "赤水",
       "intro": {
@@ -1236,6 +1238,7 @@
         10
       ],
       "difficulty": 3,
+      "roadRefs": ["G321", "G658", "G326", "G56", "G8517", "G246", "G60", "G320"],
       "startNode": "织金县",
       "endNode": "盘州",
       "intro": {

@@ -49,6 +49,7 @@
         10
       ],
       "difficulty": 2,
+      "roadRefs": ["G344", "G109", "G211", "G307", "G20", "G338"],
       "startNode": "吴忠",
       "endNode": "吴忠",
       "intro": {
@@ -554,6 +555,7 @@
         11
       ],
       "difficulty": 2,
+      "roadRefs": ["G110", "G244", "G1816", "G109", "G20", "G6", "G1817", "G2004"],
       "startNode": "银川",
       "endNode": "银川",
       "intro": {
@@ -1053,6 +1055,7 @@
         10
       ],
       "difficulty": 2,
+      "roadRefs": ["G110", "G1816", "G109", "G244", "G6"],
       "startNode": "石嘴山",
       "endNode": "石嘴山",
       "intro": {

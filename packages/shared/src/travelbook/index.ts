@@ -116,6 +116,9 @@ export function validateTravelRoute(r: TravelRouteDetail): ValidationIssue[] {
   if (!Array.isArray(r.cities) || !r.cities.length) push('error', 'cities 不能为空', 'cities');
   if (!Array.isArray(r.modes) || !r.modes.length) push('error', 'modes 不能为空', 'modes');
   else if (!r.modes.includes(r.primaryMode)) push('error', 'primaryMode 必须包含在 modes 中', 'primaryMode');
+  // V20：路线级 roadRefs 是 /travel/routes?q= 与 /by-road/:ref 的必读字段，缺一条会让整库搜索抛错
+  // （2026-10-22 补强的 12 条缺该字段，路书库搜索全线 500）。没有编号也要显式给 []。
+  if (!Array.isArray(r.roadRefs)) push('error', 'roadRefs 必须是数组（无编号道路时给 []）', 'roadRefs');
   if (typeof r.totalKm !== 'number' || !(r.totalKm > 0)) push('error', 'totalKm 必须为正数', 'totalKm');
   if (typeof r.days !== 'number' || !(r.days > 0)) push('error', 'days 必须为正整数', 'days');
   if (r.difficulty < 1 || r.difficulty > 5) push('error', 'difficulty 需在 1~5', 'difficulty');

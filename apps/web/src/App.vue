@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onBeforeUnmount, onMounted } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import AppBackdrop from './components/AppBackdrop.vue';
 import AppBottomNav from './components/AppBottomNav.vue';
 import AppSideNav from './components/AppSideNav.vue';
 import AppTopBar from './components/AppTopBar.vue';
+import GlobalSearch from './components/GlobalSearch.vue';
+import { useGlobalSearch } from './composables/useGlobalSearch';
 
 const route = useRoute();
 /**
@@ -14,6 +16,17 @@ const route = useRoute();
 const isFullscreenMap = computed(() => Boolean(route.meta.fullscreenMap));
 const showTopBar = computed(() => !isFullscreenMap.value);
 const showAppNav = computed(() => !isFullscreenMap.value);
+
+// 全局搜索：单例命令面板 + Ctrl/Cmd+K 快捷键
+const gs = useGlobalSearch();
+function onGlobalKey(e: KeyboardEvent): void {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    gs.toggle();
+  }
+}
+onMounted(() => window.addEventListener('keydown', onGlobalKey));
+onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKey));
 </script>
 
 <template>
@@ -41,6 +54,9 @@ const showAppNav = computed(() => !isFullscreenMap.value);
       <component :is="Component" />
     </Transition>
   </RouterView>
+
+  <!-- 全局搜索命令面板（Ctrl/Cmd+K 唤起，三档导航入口共用） -->
+  <GlobalSearch />
 </template>
 
 <style>

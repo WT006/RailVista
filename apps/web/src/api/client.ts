@@ -546,4 +546,8 @@ export const api = {
     const qs = new URLSearchParams({ from, to, date });
     return request<import('@railvista/shared').FlightSearchResult[]>(`/flights/search?${qs}`);
   },
+  /** 全局搜索：车次 / 铁路走廊 / 编号公路 / 景点 / 路书 聚合（发现入口） */
+  searchAll(q: string) {
+    return request<import('@railvista/shared').GlobalSearchResult>(`/search?${new URLSearchParams({ q })}`);
+  },
 };

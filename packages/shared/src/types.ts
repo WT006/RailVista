@@ -842,7 +842,7 @@ export interface RoadRoute {
   cumKm?: number[];
   chapters?: RoadChapter[];
   boardIds?: string[];
-  /** 规划引擎：amap（在线）/ local / local-spliced（端点外接）/ direct（两点直连） */
+  /** 规划引擎：local / local-spliced / osrm / direct（两点直连） */
   engine?: string;
   /** 引擎说明（诚实标注，UI 直接展示） */
   engineNote?: string;

@@ -33,7 +33,7 @@ import outlineRaw from '../assets/china-outline.svg?raw';
 import { CHINA_OUTLINE_VIEWBOX, lngLatToViewBox } from '../data/chinaBackdrop';
 import { driveTierColor } from '../data/roadColors';
 import { spotCategoryLabel } from '../data/roadSpotLabels';
-import { loadAmap } from '../map/amap';
+import { loadMapEngine } from '../map/engine';
 import {
   buildDriveCurrentFromPage,
   clearDriveCurrentTrip,
@@ -387,11 +387,7 @@ function toggleSpot(s: AlongSpot) {
 }
 
 function openFullMap() {
-  // 提前拉高德脚本，进入全屏页时少等一轮网络
-  const key = import.meta.env.VITE_AMAP_KEY as string | undefined;
-  if (key) {
-    void loadAmap(key, import.meta.env.VITE_AMAP_SECURITY as string | undefined);
-  }
+  void loadMapEngine();
   void router.push({
     path: '/drive/trip/map',
     query: { ...route.query, progress: String(progress.value) },

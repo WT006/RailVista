@@ -24,9 +24,19 @@ import {
   isKnownDimension,
   type DimensionMeta,
 } from '../data/spotDimensions';
-import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
+import {
+  addMarker,
+  addPolyline,
+  createInfoWindow,
+  createMap,
+  loadMapEngine,
+  type InfoWindowHandle,
+  type MapHandle,
+  type MarkerHandle,
+  type PolylineHandle,
+} from '../map/engine';
 
-/** AMap Polyline 只认实色，不认 CSS 变量（历史坑：strokeColor:'var(--accent)' → 路线不可见） */
+/** MapLibre paint 只认实色，不认 CSS 变量 */
 function readToken(name: string, fallback: string): string {
   if (typeof window === 'undefined') return fallback;
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -45,10 +55,9 @@ const loadError = ref('');
 const mapError = ref('');
 
 const mapEl = ref<HTMLElement | null>(null);
-let map: any = null;
-let AMapRef: any = null;
-let infoWindow: any = null;
-let drawnOverlays: any[] = [];
+let map: MapHandle | null = null;
+let infoWindow: InfoWindowHandle | null = null;
+let drawnOverlays: Array<PolylineHandle | MarkerHandle> = [];
 
 /** 榜单反查：该走廊出现在哪些榜单 */
 const rankHits = computed(() => findRankingsByCorridor(corridorId.value));
@@ -150,10 +159,10 @@ const displayPath = computed<[number, number][]>(() => {
 });
 
 function clearOverlays() {
-  if (!map) return;
+  map?.clearInfoWindow();
   for (const o of drawnOverlays) {
     try {
-      map.remove(o);
+      o.remove();
     } catch {
       /* ignore */
     }
@@ -162,23 +171,18 @@ function clearOverlays() {
 }
 
 async function drawMap() {
-  if (!mapEl.value || !AMapRef) return;
+  if (!map) return;
   const path = displayPath.value;
   if (path.length < 2) return;
   clearOverlays();
 
-  const line = new AMapRef.Polyline({
+  const line = await addPolyline(map, {
     path,
-    strokeColor: readToken('--rail', ATLAS_RAIL_STROKE),
-    strokeWeight: 4,
-    strokeOpacity: 0.95,
-    strokeStyle: 'solid',
-    lineJoin: 'round',
-    lineCap: 'round',
+    color: readToken('--rail', ATLAS_RAIL_STROKE),
+    weight: 4,
+    opacity: 0.95,
     zIndex: 60,
-    bubble: true,
   });
-  map.add(line);
   drawnOverlays.push(line);
 
   const start = path[0]!;
@@ -188,30 +192,27 @@ async function drawMap() {
     [end, displayTo.value, 'route-pin--end'],
   ] as Array<[[number, number], string, string]>) {
     if (!label) continue;
-    const marker = new AMapRef.Marker({
+    const marker = addMarker(map, {
       position: pos,
       anchor: 'center',
-      offset: new AMapRef.Pixel(0, 0),
       zIndex: 80,
-      content: `<div class="route-pin ${cls}"><span class="route-pin__dot"></span><span class="route-pin__label">${escHtml(label)}</span></div>`,
+      contentHtml: `<div class="route-pin ${cls}"><span class="route-pin__dot"></span><span class="route-pin__label">${escHtml(label)}</span></div>`,
     });
-    map.add(marker);
     drawnOverlays.push(marker);
   }
 
-  // 沿线景点小圆点：最多 80 个，避免小地图上点位过密
   for (const spot of (detail.value?.spots || []).slice(0, 80)) {
     const inSlice = pointNearPath(spot.lng, spot.lat, path);
     if (!inSlice) continue;
     const color = dimensionColor(spot.dimensions);
-    const marker = new AMapRef.Marker({
+    const marker = addMarker(map, {
       position: [spot.lng, spot.lat],
       anchor: 'center',
       zIndex: 70,
       title: spot.name,
-      content: `<span class="route-spot-dot" style="--dot:${color}"></span>`,
+      contentHtml: `<span class="route-spot-dot" style="--dot:${color}"></span>`,
     });
-    marker.on('click', () => {
+    marker.onClick(() => {
       const dims = (spot.dimensions || [])
         .map((d) => `<span class="iw-dim" style="--dot:${dimensionColor([d])}">${escHtml(dimensionMeta(d).short)}</span>`)
         .join('');
@@ -222,19 +223,18 @@ async function drawMap() {
         ${spot.intro ? `<p class="route-iw__intro">${escHtml(spot.intro)}</p>` : ''}
       </div>`;
       if (!infoWindow) {
-        infoWindow = new AMapRef.InfoWindow({ offset: new AMapRef.Pixel(0, -12), isCustom: true });
+        infoWindow = createInfoWindow({ offsetPx: [0, -12] });
       }
       infoWindow.setContent(html);
-      infoWindow.open(map, [spot.lng, spot.lat]);
+      infoWindow.open(map!, [spot.lng, spot.lat]);
     });
-    map.add(marker);
     drawnOverlays.push(marker);
   }
 
   try {
-    map.setFitView([line], false, [40, 30, 40, 30]);
+    map.fitBounds(line.getBoundsCoords(), { top: 40, right: 30, bottom: 40, left: 30 }, false);
   } catch {
-    map.setCenter(path[Math.floor(path.length / 2)]);
+    map.setCenter(path[Math.floor(path.length / 2)]!);
   }
 }
 
@@ -253,23 +253,24 @@ function pointNearPath(lng: number, lat: number, path: [number, number][]): bool
 }
 
 async function initMap() {
-  const key = import.meta.env.VITE_AMAP_KEY;
-  if (!key) {
-    mapError.value = '未配置 VITE_AMAP_KEY，地图不可用（其余信息正常展示）';
+  if (!import.meta.env.VITE_TIANDITU_TK) {
+    mapError.value = '未配置 VITE_TIANDITU_TK，地图不可用（其余信息正常展示）';
     return;
   }
   try {
-    AMapRef = await loadAmap(key, import.meta.env.VITE_AMAP_SECURITY);
+    await loadMapEngine();
   } catch {
-    mapError.value = '地图脚本加载失败，其余信息正常展示';
+    mapError.value = '地图引擎加载失败，其余信息正常展示';
     return;
   }
   if (!mapEl.value) return;
-  map = new AMapRef.Map(mapEl.value, {
+  map = createMap(mapEl.value, {
     zoom: 5,
     center: displayPath.value[0] || [104, 35],
-    viewMode: '2D',
-    mapStyle: AMAP_MAP_STYLE,
+  });
+  await new Promise<void>((resolve) => {
+    if (map!.raw.isStyleLoaded()) resolve();
+    else map!.raw.once('load', () => resolve());
   });
   await drawMap();
 }
@@ -299,8 +300,12 @@ async function load() {
   }
 }
 
-/** 返回主页（选程页），不依赖浏览器历史——从榜单/全国地图/线路图进入时路径不一 */
+/** 优先回上一页（榜单 / 全国地图）；无历史时回选程首页 */
 function goBack() {
+  if (typeof window !== 'undefined' && window.history.length > 1) {
+    router.back();
+    return;
+  }
   void router.push('/');
 }
 
@@ -325,13 +330,13 @@ onMounted(async () => {
 
 onUnmounted(() => {
   try {
-    if (infoWindow) infoWindow.close();
+    infoWindow?.close();
   } catch {
     /* ignore */
   }
   clearOverlays();
   try {
-    if (map) map.destroy?.();
+    map?.destroy();
   } catch {
     /* ignore */
   }
@@ -348,7 +353,10 @@ watch(corridorId, async () => {
 <template>
   <div class="route-page">
     <header class="route-top">
-      <button type="button" class="back-link" aria-label="返回" @click="goBack">‹</button>
+      <button type="button" class="route-back" @click="goBack">
+        <span class="route-back__icon" aria-hidden="true">‹</span>
+        返回
+      </button>
       <div class="route-top__title">
         <p class="route-top__eyebrow">ROUTE DETAIL</p>
         <h1>{{ detail?.name || corridorId || '线路详情' }}</h1>
@@ -443,9 +451,11 @@ watch(corridorId, async () => {
   position: relative;
   z-index: 1;
   min-height: 100%;
-  /* 底部避让悬浮页签胶囊（--bottomnav-h 已含 8vp 悬浮留白）+ Home 指示条安全区，
-     此前固定 40px 在手机竖屏会让末段内容被胶囊压住约 21px */
-  padding: 14px 14px calc(40px + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
+  /* 勿用 padding 简写：会盖掉 base.css 按断点设的 padding-top
+     （手机 safe-top / ≥840 appbar-offset），导致返回栏被 sticky 顶栏压住。 */
+  padding-inline: 14px;
+  /* 底部避让悬浮页签胶囊（--bottomnav-h 已含 8vp 悬浮留白）+ Home 指示条安全区 */
+  padding-bottom: calc(40px + var(--bottomnav-h) + env(safe-area-inset-bottom, 0px));
   /* 半透明遮罩压住背景星点，卡片再叠一层；勿用全透明否则字叠光斑。
      双声明：不支持 color-mix 时回退不透明底，避免整页透穿。 */
   background: var(--surface-0);
@@ -459,6 +469,37 @@ watch(corridorId, async () => {
   gap: 10px;
   max-width: 560px;
   margin: 0 auto 12px;
+}
+
+.route-back {
+  appearance: none;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 36px;
+  padding: 0 12px 0 8px;
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-full);
+  background: var(--surface-1);
+  color: var(--text-1);
+  font-family: inherit;
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--elev-1);
+}
+
+.route-back:hover {
+  border-color: var(--line-accent);
+  background: var(--surface-2);
+}
+
+.route-back__icon {
+  font-size: 20px;
+  line-height: 1;
+  margin-top: -1px;
 }
 
 .route-top__title {

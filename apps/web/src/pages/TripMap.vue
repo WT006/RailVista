@@ -30,6 +30,7 @@ import {
   honorLabels,
   withinApproach,
   spotWeatherParts,
+  weatherSourceAttribution,
   type CalibrationRecord,
   type ScenicSpot,
   type SpotEta,
@@ -50,12 +51,20 @@ import {
   markStayOnSelect,
   tripCacheKey,
 } from '../lib/tripCache';
-import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
 import {
-  ATLAS_RAIL_HOVER_STROKE,
-  ATLAS_RAIL_STROKE,
+  addMarker,
+  addPolyline,
+  createInfoWindow,
+  createMap,
+  loadMapEngine,
+  type MapHandle,
+  type MarkerHandle,
+  type PolylineHandle,
+} from '../map/engine';
+import {
   TRIP_GLOW_STROKE,
   TRIP_HIGHLIGHT_STROKE,
+  TRIP_RAIL_STROKE_BRIGHT,
   TRIP_SKY_BLUE_STROKE,
   TRIP_SKY_GOLDEN_STROKE,
   TRIP_SKY_SUN_STROKE,
@@ -127,19 +136,16 @@ const satelliteOn = ref(
   typeof localStorage !== 'undefined' && localStorage.getItem(SATELLITE_PREF_KEY) === '1',
 );
 
-let map: any;
-let AMapRef: any;
-let satelliteLayer: any;
-let roadNetLayer: any;
-let railLine: any;
-let trainMarker: any;
-let gpsMarker: any;
+let map: MapHandle | null = null;
+let railLine: PolylineHandle | null = null;
+let trainMarker: MarkerHandle | null = null;
+let gpsMarker: MarkerHandle | null = null;
 const trainTarget = ref<[number, number] | null>(null);
 const gpsTarget = ref<[number, number] | null>(null);
-let spotMarkers: any[] = [];
-let stationMarkers: any[] = [];
+let spotMarkers: MarkerHandle[] = [];
+let stationMarkers: Array<MarkerHandle | null> = [];
 /** P0-4：无坐标经停的灰色空心占位标记（位置为前后站间近似插值） */
-let unresolvedMarkers: any[] = [];
+let unresolvedMarkers: MarkerHandle[] = [];
 let pathMetrics = { path: [] as ReturnType<typeof buildRailwayMetrics>['path'], lengthKm: 0 };
 /** pathMetrics 不是响应式对象，单独用 ref 暴露里程给精度面板 */
 const railLengthKm = ref(0);
@@ -417,14 +423,14 @@ function bindOverlayObserver() {
   if (topBar) bottomPanelObserver.observe(topBar);
 }
 
-function getMapPadding() {
+function getMapPadding(): { top: number; right: number; bottom: number; left: number } {
   const side = compact.value ? 20 : 48;
   const top = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--top-overlay'), 10) || 72;
   let bottom =
     parseInt(getComputedStyle(document.documentElement).getPropertyValue('--bottom-overlay'), 10) || 118;
   // 手机天象短条占高；桌面无浮条
   if (skyMode.value && !skyPanelOpen.value && compact.value) bottom += 52;
-  return [top, side, bottom, side];
+  return { top, right: side, bottom, left: side };
 }
 
 /** 景点气泡 / 底栏共用：只展示时间区间 */
@@ -555,6 +561,7 @@ const upcoming = computed(() => {
 
   const weather = spot ? weatherBySpotId.value[String(spot.id)] : undefined;
   const wx = weather?.queried ? spotWeatherParts(weather, spot?.visibility) : null;
+  const wxAttr = weather?.queried ? weatherSourceAttribution(weather.source) : null;
 
   /** 底栏常驻：方位 / 距轨 / 最佳时段（原 SpotApproachCard 展示项） */
   const side = spot ? spotSideKey(spot) : null;
@@ -579,6 +586,7 @@ const upcoming = computed(() => {
     timeBrief,
     hint,
     wx,
+    wxAttr,
     spotId: spot ? String(spot.id) : '',
     visibility: spot?.visibility,
     side,
@@ -667,7 +675,10 @@ const clockText = computed(() =>
 function applyLayers() {
   if (railLine) prefs.layers.rail ? railLine.show() : railLine.hide();
   spotMarkers.forEach((m) => (prefs.layers.spot ? m.show() : m.hide()));
-  stationMarkers.forEach((m) => (prefs.layers.station ? m.show() : m.hide()));
+  stationMarkers.forEach((m) => {
+    if (!m) return;
+    prefs.layers.station ? m.show() : m.hide();
+  });
   unresolvedMarkers.forEach((m) => (prefs.layers.station ? m.show() : m.hide()));
   if (trainMarker) prefs.layers.train ? trainMarker.show() : trainMarker.hide();
 }
@@ -696,62 +707,37 @@ function placeholderPosition(stops: Stop[], idx: number): [number, number] | nul
 
 function rebuildUnresolvedMarkers() {
   const seg = segment.value;
-  if (!map || !AMapRef || !seg) return;
-  unresolvedMarkers.forEach((m) => map.remove(m));
+  if (!map || !seg) return;
+  unresolvedMarkers.forEach((m) => m.remove());
   unresolvedMarkers = [];
   const unresolvedNames = new Set(trip.unresolvedStops);
   seg.stops.forEach((s, i) => {
     if (s.lng != null && s.lat != null && Number.isFinite(s.lng) && Number.isFinite(s.lat)) return;
-    // 仅渲染服务端明确标注未解析的站；服务端走廊 hint 兜底补到坐标后自动消失
     if (unresolvedNames.size && !unresolvedNames.has(s.name)) return;
     const pos = placeholderPosition(seg.stops, i);
     if (!pos) return;
-    const marker = new AMapRef.Marker({
+    const marker = addMarker(map!, {
       position: pos,
       title: `${s.name}（坐标待补，当前为近似占位）`,
-      content: `<div class="station-marker station-marker--unresolved${compact.value ? ' station-marker--compact' : ''}"><span class="station-dot station-dot--unresolved"></span><span class="station-label">${escHtml(s.name)}<em class="station-label__pending">坐标待补</em></span></div>`,
+      contentHtml: `<div class="station-marker station-marker--unresolved${compact.value ? ' station-marker--compact' : ''}"><span class="station-dot station-dot--unresolved"></span><span class="station-label">${escHtml(s.name)}<em class="station-label__pending">坐标待补</em></span></div>`,
       anchor: 'center',
       zIndex: 140,
     });
-    if (prefs.layers.station) map.add(marker);
+    if (!prefs.layers.station) marker.hide();
     unresolvedMarkers.push(marker);
   });
 }
 
-/**
- * 轨道线配色：从设计令牌读取，保证与「图例」里的示意铁路色完全一致。
- *
- * 历史坑：这里曾硬编码旧品牌金 `#e4b25c`，而图例用 `var(--accent)`；
- * 一旦主题色改变（如本轮改为鸿蒙宇宙蓝），硬编码值不会跟随，图例与线路就会"两张皮"。
- * 因此改为运行时读取 CSS 变量，并保留兜底值以防变量缺失。
- */
-function readToken(name: string, fallback: string): string {
-  if (typeof window === 'undefined') return fallback;
-  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return v || fallback;
-}
-
 function railStrokeOptions() {
-  const rail = readToken('--rail', ATLAS_RAIL_STROKE);
-  // 卫星底图偏亮，提高不透明度并略微提亮，保证线条仍可辨识
-  return satelliteOn.value
-    ? { strokeColor: readToken('--accent-hover', ATLAS_RAIL_HOVER_STROKE), strokeOpacity: 0.95 }
-    : { strokeColor: rail, strokeOpacity: 0.85 };
+  // 画在透明 overlay，真彩；与图例 --rail / accent 一致
+  return { strokeColor: TRIP_RAIL_STROKE_BRIGHT, strokeOpacity: 1 };
 }
 
 function applySatelliteLayers() {
-  if (!map || !AMapRef) return;
-  if (satelliteOn.value) {
-    if (!satelliteLayer) {
-      satelliteLayer = new AMapRef.TileLayer.Satellite();
-      roadNetLayer = new AMapRef.TileLayer.RoadNet();
-    }
-    map.add([satelliteLayer, roadNetLayer]);
-  } else {
-    if (satelliteLayer) map.remove(satelliteLayer);
-    if (roadNetLayer) map.remove(roadNetLayer);
-  }
-  railLine?.setOptions?.(railStrokeOptions());
+  if (!map) return;
+  map.setBasemapMode(satelliteOn.value ? 'satellite' : 'standard');
+  const stroke = railStrokeOptions();
+  railLine?.setStyle({ color: stroke.strokeColor, opacity: stroke.strokeOpacity });
 }
 
 function toggleSatellite() {
@@ -840,13 +826,20 @@ function weatherLineHtml(spotId: string, visibility?: string): string {
     : p.vis
       ? `<span class="wx-strip__vis">${escHtml(p.vis)}</span>`
       : '';
+  const attr = weatherSourceAttribution(w.source);
+  const attrHtml = attr
+    ? `<a class="wx-strip__attr" href="${escHtml(attr.href)}" target="_blank" rel="noopener noreferrer">${escHtml(attr.text)}</a>`
+    : '';
   return `<div class="wx-strip map-info-card__wx">
-      <div class="wx-strip__main">
-        <span class="wx-strip__emoji" aria-hidden="true">${escHtml(p.emoji)}</span>
-        ${p.cond ? `<span class="wx-strip__cond">${escHtml(p.cond)}</span>` : ''}
-        ${temp}
+      <div class="wx-strip__row">
+        <div class="wx-strip__main">
+          <span class="wx-strip__emoji" aria-hidden="true">${escHtml(p.emoji)}</span>
+          ${p.cond ? `<span class="wx-strip__cond">${escHtml(p.cond)}</span>` : ''}
+          ${temp}
+        </div>
+        ${hint}
       </div>
-      ${hint}
+      ${attrHtml}
     </div>`;
 }
 
@@ -854,17 +847,15 @@ function weatherLineHtml(spotId: string, visibility?: string): string {
  * 景点标记工厂：单个景点 → Marker（含点开后的详情气泡）。
  * 抽成函数是为了 B1：折线升级为精准路线后能整体重建标记层。
  */
-function buildSpotMarker(spot: ScenicSpot, idx: number) {
-  const AMap = AMapRef;
-  // 只有「方位待确认」才换样式，左/右/两侧均使用统一的景点色
+function buildSpotMarker(spot: ScenicSpot, idx: number): MarkerHandle {
   const reviewStyle = spotSideKey(spot) === 'unknown' ? ' spot-marker--unknown' : '';
-  const marker = new AMap.Marker({
+  const marker = addMarker(map!, {
     position: [spot.lng, spot.lat],
     title: spot.name,
-    anchor: 'bottom-center',
-    content: `<div class="spot-marker${reviewStyle}${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
+    anchor: 'bottom',
+    contentHtml: `<div class="spot-marker${reviewStyle}${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
   });
-  marker.on('click', () => {
+  marker.onClick(() => {
     const visLabel =
       spot.visibility === 'distant'
         ? '远眺'
@@ -886,7 +877,6 @@ function buildSpotMarker(spot: ScenicSpot, idx: number) {
         : spot.timeLabel || '';
     const isNight = spotNight(spot, eta);
     const weatherHtml = weatherLineHtml(String(spot.id), spot.visibility);
-    // 有天气观景提示时，不再单独挂「远眺/窗外」，避免与「远眺条件好」重复
     const hideVisBadge = Boolean(
       weatherBySpotId.value[String(spot.id)]?.queried &&
         weatherBySpotId.value[String(spot.id)]?.viewHint,
@@ -923,11 +913,7 @@ function buildSpotMarker(spot: ScenicSpot, idx: number) {
     ]
       .filter(Boolean)
       .join('');
-    const info = new AMap.InfoWindow({
-      isCustom: true,
-      autoMove: true,
-      closeWhenClickMap: true,
-      content: `<div class="map-info-card">
+    const html = `<div class="map-info-card">
           <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
           <div class="map-info-card__title">${escHtml(spot.name)}</div>
           ${badges ? `<div class="map-info-card__meta">${badges}</div>` : ''}
@@ -935,30 +921,24 @@ function buildSpotMarker(spot: ScenicSpot, idx: number) {
           ${honorHtml}
           ${spot.intro ? `<p class="map-info-card__intro">${escHtml(spot.intro)}</p>` : ''}
           <div class="map-info-card__arrow" aria-hidden="true"></div>
-        </div>`,
-      offset: new AMap.Pixel(0, -34),
-    });
-    info.open(map, marker.getPosition());
+        </div>`;
+    const info = createInfoWindow({ offsetPx: [0, -34] });
+    info.setContent(html);
+    info.open(map!, marker.getPosition());
   });
   return marker;
 }
 
-/**
- * B1 [P0] 重建整层景点标记。
- * 旧实现只在 initMap() 里建一次且没有监听，导致「折线刷新了、景点还是示意线那一组」。
- * 这里采用与 rebuildUnresolvedMarkers 一致的整体重建策略：稳健、无残留。
- */
 function rebuildSpotMarkers() {
-  if (!map || !AMapRef) return;
-  // 重建前关掉已打开的气泡，避免它停在已失效的位置
+  if (!map) return;
   try {
-    map.clearInfoWindow?.();
+    map.clearInfoWindow();
   } catch {
     /* ignore */
   }
   for (const m of spotMarkers) {
     try {
-      map.remove(m);
+      m.remove();
     } catch {
       /* ignore */
     }
@@ -967,21 +947,19 @@ function rebuildSpotMarkers() {
   trip.scenicSpots.forEach((spot, idx) => {
     if (!Number.isFinite(spot.lng) || !Number.isFinite(spot.lat)) return;
     const marker = buildSpotMarker(spot, idx);
-    map.add(marker);
     if (!prefs.layers.spot) marker.hide();
     spotMarkers.push(marker);
   });
 }
 
 // ── 天象观景：时间轴结果 → 地图标注 ─────────────────────────────────────────
-let skyOverlays: any[] = [];
-let skyFocusOverlays: any[] = [];
+let skyOverlays: Array<PolylineHandle | MarkerHandle> = [];
+let skyFocusOverlays: Array<PolylineHandle | MarkerHandle> = [];
 
-function removeMapOverlays(list: any[]) {
-  if (!map) return;
+function removeMapOverlays(list: Array<PolylineHandle | MarkerHandle>) {
   for (const m of list) {
     try {
-      map.remove(m);
+      m.remove();
     } catch {
       /* ignore */
     }
@@ -1022,18 +1000,16 @@ function skyStrokeForKind(kind: string): string {
 }
 
 function skyLineWeight(kind: string): number {
-  if (kind === 'dawnGlow' || kind === 'duskGlow') return 7;
-  if (kind === 'goldenMorning' || kind === 'goldenEvening') return 7;
-  if (kind === 'blueMorning' || kind === 'blueEvening') return 6;
-  if (kind === 'sunrise' || kind === 'sunset') return 6;
-  if (kind === 'nautical' || kind === 'astroTwilight') return 4;
-  return 5;
+  if (kind === 'dawnGlow' || kind === 'duskGlow') return 8;
+  if (kind === 'goldenMorning' || kind === 'goldenEvening') return 8;
+  if (kind === 'blueMorning' || kind === 'blueEvening') return 7;
+  if (kind === 'sunrise' || kind === 'sunset') return 7;
+  if (kind === 'nautical' || kind === 'astroTwilight') return 5;
+  return 6;
 }
 
-function skyLineOpacity(kind: string): number {
-  if (kind === 'nautical' || kind === 'astroTwilight') return 0.55;
-  if (kind === 'night') return 0.85;
-  return 0.92;
+function skyLineOpacity(_kind: string): number {
+  return 1;
 }
 
 /** 白天段不上色（会盖满全线）；短夜段跳过避免碎线 */
@@ -1110,8 +1086,8 @@ const skyPeekKicker = computed(() => {
  *   1) 各看点时段彩色路段（蓝/霞/金/日/夜…），可点击聚焦；
  *   2) 日月时刻与看点标注。
  */
-function rebuildSkyOverlay(payload: SkyMapResult | null) {
-  if (!map || !AMapRef) return;
+async function rebuildSkyOverlay(payload: SkyMapResult | null) {
+  if (!map) return;
   skyMapPayload.value = payload;
   clearSkyFocusOverlay();
   removeMapOverlays(skyOverlays);
@@ -1128,29 +1104,22 @@ function rebuildSkyOverlay(payload: SkyMapResult | null) {
     focus?: SkyFocusPayload;
   }> = [];
 
-  // 1) 全时段色带（白天除外）
   for (const e of result.episodes) {
     if (!shouldPaintSkyEpisode(e.kind, e.startMs, e.endMs)) continue;
     const coords = pathSliceKm(e.startKm, e.endKm);
     if (coords.length < 2) continue;
     const focus = episodeToFocus(e);
-    const line = new AMapRef.Polyline({
+    const line = await addPolyline(map, {
       path: coords,
-      strokeColor: skyStrokeForKind(e.kind),
-      strokeWeight: skyLineWeight(e.kind),
-      strokeOpacity: skyLineOpacity(e.kind),
-      lineJoin: 'round',
-      lineCap: 'round',
+      color: skyStrokeForKind(e.kind),
+      weight: skyLineWeight(e.kind),
+      opacity: skyLineOpacity(e.kind),
       zIndex: 150,
-      cursor: 'pointer',
-      bubble: true,
+      onClick: () => onSkyFocus(focus),
     });
-    line.on?.('click', () => onSkyFocus(focus));
-    map.add(line);
     skyOverlays.push(line);
   }
 
-  // 2) 路段中点标注：霞 / 高分夜段
   for (const e of result.episodes) {
     const isGlow = e.kind === 'dawnGlow' || e.kind === 'duskGlow';
     const score = scores[e.id];
@@ -1185,7 +1154,6 @@ function rebuildSkyOverlay(payload: SkyMapResult | null) {
     }
   }
 
-  // 3) 日月时刻标注
   for (const m of result.moments) {
     const isMoon = m.kind === 'moonrise' || m.kind === 'moonset';
     const t = formatTime(new Date(m.atMs));
@@ -1207,7 +1175,6 @@ function rebuildSkyOverlay(payload: SkyMapResult | null) {
     });
   }
 
-  // 4) 金/蓝时刻看点标注（霞/日已单独标注）
   for (const e of highlightEpisodes(result.episodes)) {
     const cls = SKY_EPISODE_CLS[e.kind];
     if (!cls || e.kind === 'sunrise' || e.kind === 'sunset') continue;
@@ -1225,27 +1192,26 @@ function rebuildSkyOverlay(payload: SkyMapResult | null) {
   }
 
   for (const it of items) {
-    const marker = new AMapRef.Marker({
+    const marker = addMarker(map, {
       position: [it.lng, it.lat],
       title: it.title,
-      content: `<div class="sky-marker ${it.cls}${compact.value ? ' sky-marker--compact' : ''}"><span class="sky-marker__text">${escHtml(it.text)}</span><span class="sky-marker__dot"></span></div>`,
-      anchor: 'bottom-center',
+      contentHtml: `<div class="sky-marker ${it.cls}${compact.value ? ' sky-marker--compact' : ''}"><span class="sky-marker__text">${escHtml(it.text)}</span><span class="sky-marker__dot"></span></div>`,
+      anchor: 'bottom',
       zIndex: 160,
     });
     if (it.focus) {
       const focus = it.focus;
-      marker.on?.('click', () => onSkyFocus(focus));
+      marker.onClick(() => onSkyFocus(focus));
     }
-    map.add(marker);
     skyOverlays.push(marker);
   }
 
-  if (skyFocus.value) paintSkyFocus(skyFocus.value);
+  if (skyFocus.value) void paintSkyFocus(skyFocus.value);
 }
 
 /** 选中片段：加粗鲜艳路段（或点标注）+ 视野对准 */
-function paintSkyFocus(p: SkyFocusPayload) {
-  if (!map || !AMapRef) return;
+async function paintSkyFocus(p: SkyFocusPayload) {
+  if (!map) return;
   clearSkyFocusOverlay();
   const color = skyStrokeForKind(p.kind);
   const cls = skyMarkerClsForKind(p.kind);
@@ -1255,35 +1221,28 @@ function paintSkyFocus(p: SkyFocusPayload) {
   }
 
   if (coords.length >= 2) {
-    const glow = new AMapRef.Polyline({
+    const glow = await addPolyline(map, {
       path: coords,
-      strokeColor: color,
-      strokeWeight: 16,
-      strokeOpacity: 0.32,
-      lineJoin: 'round',
-      lineCap: 'round',
+      color,
+      weight: 16,
+      opacity: 0.32,
       zIndex: 168,
-      bubble: true,
     });
-    const line = new AMapRef.Polyline({
+    const line = await addPolyline(map, {
       path: coords,
-      strokeColor: color,
-      strokeWeight: 10,
-      strokeOpacity: 1,
-      lineJoin: 'round',
-      lineCap: 'round',
+      color,
+      weight: 10,
+      opacity: 1,
       zIndex: 169,
-      bubble: true,
     });
-    map.add([glow, line]);
     skyFocusOverlays.push(glow, line);
     try {
-      map.setFitView([line], false, getMapPadding(), 14);
+      map.fitBounds(line.getBoundsCoords(), getMapPadding(), false);
     } catch {
-      map.setZoomAndCenter(Math.max(map.getZoom?.() ?? 6, 10), [p.lng, p.lat], false, 300);
+      map.setZoomAndCenter(Math.max(map.getZoom() ?? 6, 10), [p.lng, p.lat], false);
     }
   } else {
-    map.setZoomAndCenter(Math.max(map.getZoom?.() ?? 6, 10), [p.lng, p.lat], false, 300);
+    map.setZoomAndCenter(Math.max(map.getZoom() ?? 6, 10), [p.lng, p.lat], false);
   }
 
   const t =
@@ -1293,14 +1252,13 @@ function paintSkyFocus(p: SkyFocusPayload) {
         : formatTime(new Date(p.startMs))
       : '';
   const text = t ? `${t} ${p.title}` : p.title;
-  const marker = new AMapRef.Marker({
+  const marker = addMarker(map, {
     position: [p.lng, p.lat],
     title: p.title,
-    content: `<div class="sky-marker sky-marker--focus ${cls}"><span class="sky-marker__text">${escHtml(text)}</span><span class="sky-marker__dot"></span></div>`,
-    anchor: 'bottom-center',
+    contentHtml: `<div class="sky-marker sky-marker--focus ${cls}"><span class="sky-marker__text">${escHtml(text)}</span><span class="sky-marker__dot"></span></div>`,
+    anchor: 'bottom',
     zIndex: 175,
   });
-  map.add(marker);
   skyFocusOverlays.push(marker);
 }
 
@@ -1339,18 +1297,45 @@ function exitSkyMode() {
 function onSkyFocus(p: SkyFocusPayload) {
   skyFocus.value = p;
   skyPanelOpen.value = false;
-  paintSkyFocus(p);
+  void paintSkyFocus(p);
   nextTick(() => updateOverlayMetrics());
 }
 
+function makeStationMarker(s: Stop): MarkerHandle {
+  const marker = addMarker(map!, {
+    position: [s.lng!, s.lat!],
+    title: s.name,
+    contentHtml: `<div class="station-marker${compact.value ? ' station-marker--compact' : ''}"><span class="station-dot"></span><span class="station-label">${escHtml(s.name)}</span></div>`,
+    anchor: 'center',
+    zIndex: 150,
+  });
+  marker.onClick(() => {
+    const scheduleText = formatStationSchedule(s, shifted);
+    const calibrateBtn =
+      getCalibratableStations([s]).length > 0
+        ? `<button type="button" class="info-calibrate-btn" data-station="${escHtml(s.name)}">我在 ${escHtml(s.name)} 站</button>`
+        : '';
+    const html = `<div class="map-info-card">
+          <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
+          <div class="map-info-card__title">${escHtml(s.name)}</div>
+          ${scheduleText ? `<p class="map-info-card__schedule">${escHtml(scheduleText)}</p>` : ''}
+          ${s.intro ? `<p class="map-info-card__intro">${escHtml(s.intro)}</p>` : ''}
+          ${calibrateBtn}
+          <div class="map-info-card__arrow" aria-hidden="true"></div>
+        </div>`;
+    const info = createInfoWindow({ offsetPx: [0, -22] });
+    info.setContent(html);
+    info.open(map!, marker.getPosition());
+  });
+  return marker;
+}
+
 async function initMap() {
-  const key = import.meta.env.VITE_AMAP_KEY;
-  if (!key) {
-    error.value = '请配置 VITE_AMAP_KEY（apps/web/.env）';
+  if (!import.meta.env.VITE_TIANDITU_TK) {
+    error.value = '请配置 VITE_TIANDITU_TK（apps/web/.env）';
     return;
   }
-  const AMap = await loadAmap(key, import.meta.env.VITE_AMAP_SECURITY);
-  AMapRef = AMap;
+  await loadMapEngine();
   const seg = segment.value!;
   const coords =
     trip.railwayCoords.length >= 2
@@ -1367,78 +1352,59 @@ async function initMap() {
       '经停站缺少坐标，无法绘制线路。请返回重试；若仍失败，请检查网络（需访问 OpenStreetMap）。';
     return;
   }
+  if (!mapEl.value) return;
 
-  map = new AMap.Map(mapEl.value, {
+  map = createMap(mapEl.value, {
     zoom: 5,
     center: coords[0] || [104, 35],
-    viewMode: '2D',
-    mapStyle: AMAP_MAP_STYLE,
+    basemap: satelliteOn.value ? 'satellite' : 'standard',
+  });
+  await new Promise<void>((resolve) => {
+    if (map!.raw.isStyleLoaded()) resolve();
+    else map!.raw.once('load', () => resolve());
   });
 
   if (coords.length >= 2) {
-    railLine = new AMap.Polyline({
-      path: coords,
-      strokeWeight: compact.value ? 4 : 5,
-      lineJoin: 'round',
-      ...railStrokeOptions(),
-    });
-    map.add(railLine);
+    const stroke = railStrokeOptions();
+    try {
+      railLine = await addPolyline(map, {
+        path: coords,
+        weight: compact.value ? 6 : 7,
+        color: stroke.strokeColor,
+        opacity: stroke.strokeOpacity,
+      });
+    } catch (err) {
+      console.warn('[TripMap] rail polyline failed', err);
+      railLine = null;
+    }
   }
 
   rebuildSpotMarkers();
 
   stationMarkers = seg.stops.map((s) => {
-    const marker = new AMap.Marker({
-      position: [s.lng!, s.lat!],
-      title: s.name,
-      content: `<div class="station-marker${compact.value ? ' station-marker--compact' : ''}"><span class="station-dot"></span><span class="station-label">${escHtml(s.name)}</span></div>`,
-      anchor: 'center',
-      zIndex: 150,
-    });
-    marker.on('click', () => {
-      const scheduleText = formatStationSchedule(s, shifted);
-      const calibrateBtn =
-        getCalibratableStations([s]).length > 0
-          ? `<button type="button" class="info-calibrate-btn" data-station="${escHtml(s.name)}">我在 ${escHtml(s.name)} 站</button>`
-          : '';
-      const info = new AMap.InfoWindow({
-        isCustom: true,
-        autoMove: true,
-        closeWhenClickMap: true,
-        content: `<div class="map-info-card">
-          <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
-          <div class="map-info-card__title">${escHtml(s.name)}</div>
-          ${scheduleText ? `<p class="map-info-card__schedule">${escHtml(scheduleText)}</p>` : ''}
-          ${s.intro ? `<p class="map-info-card__intro">${escHtml(s.intro)}</p>` : ''}
-          ${calibrateBtn}
-          <div class="map-info-card__arrow" aria-hidden="true"></div>
-        </div>`,
-        offset: new AMap.Pixel(0, -22),
-      });
-      info.open(map, marker.getPosition());
-    });
-    if (s.lng != null && s.lat != null) map.add(marker);
+    if (s.lng == null || s.lat == null || !Number.isFinite(s.lng) || !Number.isFinite(s.lat)) {
+      return null;
+    }
+    const marker = makeStationMarker(s);
+    if (!prefs.layers.station) marker.hide();
     return marker;
   });
 
-  // P0-4：缺坐标经停的灰色占位（applyLayers 会统一控制显隐）
   rebuildUnresolvedMarkers();
 
-  trainMarker = new AMap.Marker({
+  trainMarker = addMarker(map, {
     position: coords[0] || [104, 35],
-    content: `<div class="train-marker-wrap"><div class="train-marker${compact.value ? ' train-marker--compact' : ''}"></div><span class="train-marker-label">列车</span></div>`,
+    contentHtml: `<div class="train-marker-wrap"><div class="train-marker${compact.value ? ' train-marker--compact' : ''}"></div><span class="train-marker-label">列车</span></div>`,
     anchor: 'center',
     zIndex: 200,
   });
-  map.add(trainMarker);
 
-  gpsMarker = new AMap.Marker({
+  gpsMarker = addMarker(map, {
     position: coords[0] || [104, 35],
-    content: '<div class="gps-marker"></div>',
+    contentHtml: '<div class="gps-marker"></div>',
     anchor: 'center',
     zIndex: 190,
   });
-  map.add(gpsMarker);
   gpsMarker.hide();
 
   trainTarget.value = (coords[0] as [number, number]) || [104, 35];
@@ -1446,10 +1412,10 @@ async function initMap() {
   useSmoothMarker(trainTarget, (p) => trainMarker?.setPosition(p), 0.12);
   useSmoothMarker(gpsTarget, (p) => gpsMarker?.setPosition(p), 0.18);
 
-  map.getContainer().addEventListener('click', (event: MouseEvent) => {
+  map.raw.getContainer().addEventListener('click', (event: MouseEvent) => {
     const t = event.target as HTMLElement;
     if (t.closest?.('[data-info-close]')) {
-      map?.clearInfoWindow?.();
+      map?.clearInfoWindow();
       return;
     }
     const btn = t.closest?.('[data-station]') as HTMLElement | null;
@@ -1463,7 +1429,7 @@ async function initMap() {
   await nextTick();
   bindOverlayObserver();
   updateOverlayMetrics();
-  if (coords.length) map.setFitView(null, false, getMapPadding());
+  if (coords.length) map.fitBounds(coords, getMapPadding(), false);
   tick();
 }
 
@@ -1480,7 +1446,7 @@ function openCalibrateConfirm(station: Stop) {
   confirmMode.value = 'calibrate';
   confirmText.value = `确认您现在在「${station.name}」？\n图定到点 ${formatTime(anchor)}，当前 ${formatTime(now.value)}（${formatOffsetLabel(offsetMs)}）。\n确认后，后续估算将整体${offsetMs >= 0 ? '延后' : '提前'} ${Math.abs(Math.round(offsetMs / 60000))} 分钟。`;
   confirmOpen.value = true;
-  map?.clearInfoWindow?.();
+  map?.clearInfoWindow();
 }
 
 function applyCalibration() {
@@ -1592,20 +1558,18 @@ function refreshStationMarkers() {
   const seg = segment.value;
   if (!map || !seg) return;
   seg.stops.forEach((s, i) => {
-    const marker = stationMarkers[i];
-    if (!marker) return;
     if (s.lng == null || s.lat == null || !Number.isFinite(s.lng) || !Number.isFinite(s.lat)) {
       return;
     }
-    marker.setPosition([s.lng, s.lat]);
-    // 进图时无坐标的站未上图；补坐标后需要动态 map.add
-    const onMap = typeof marker.getMap === 'function' ? marker.getMap() : null;
-    if (!onMap) {
-      map.add(marker);
+    let marker = stationMarkers[i];
+    if (!marker) {
+      marker = makeStationMarker(s);
+      stationMarkers[i] = marker;
       if (!prefs.layers.station) marker.hide();
+      return;
     }
+    marker.setPosition([s.lng, s.lat]);
   });
-  // 服务端补坐标 / unresolved 清单变化时，重建灰色占位标记
   rebuildUnresolvedMarkers();
 }
 
@@ -1618,7 +1582,7 @@ function onPreciseRefresh() {
   refreshRailLine();
   rebuildSpotMarkers();
   if (trip.railwayCoords.length >= 2) {
-    map?.setFitView(null, false, getMapPadding());
+    map?.fitBounds(trip.railwayCoords, getMapPadding(), false);
   }
   const st = trip.preciseJob?.status;
   if (trip.preciseError) {
@@ -2017,17 +1981,26 @@ onUnmounted(() => {
           </div>
           <div v-if="upcomingMetaLine" class="next-meta">{{ upcomingMetaLine }}</div>
           <div v-if="upcoming?.wx" class="wx-strip">
-            <div class="wx-strip__main">
-              <span class="wx-strip__emoji" aria-hidden="true">{{ upcoming.wx.emoji }}</span>
-              <span v-if="upcoming.wx.cond" class="wx-strip__cond">{{ upcoming.wx.cond }}</span>
-              <span v-if="upcoming.wx.temp" class="wx-strip__temp">{{ upcoming.wx.temp }}</span>
+            <div class="wx-strip__row">
+              <div class="wx-strip__main">
+                <span class="wx-strip__emoji" aria-hidden="true">{{ upcoming.wx.emoji }}</span>
+                <span v-if="upcoming.wx.cond" class="wx-strip__cond">{{ upcoming.wx.cond }}</span>
+                <span v-if="upcoming.wx.temp" class="wx-strip__temp">{{ upcoming.wx.temp }}</span>
+              </div>
+              <span
+                v-if="upcoming.wx.hint"
+                class="wx-strip__hint"
+                :class="wxHintClass(upcoming.wx.viewHint)"
+              >{{ upcoming.wx.hint }}</span>
+              <span v-else-if="upcoming.wx.vis" class="wx-strip__vis">{{ upcoming.wx.vis }}</span>
             </div>
-            <span
-              v-if="upcoming.wx.hint"
-              class="wx-strip__hint"
-              :class="wxHintClass(upcoming.wx.viewHint)"
-            >{{ upcoming.wx.hint }}</span>
-            <span v-else-if="upcoming.wx.vis" class="wx-strip__vis">{{ upcoming.wx.vis }}</span>
+            <a
+              v-if="upcoming.wxAttr"
+              class="wx-strip__attr"
+              :href="upcoming.wxAttr.href"
+              target="_blank"
+              rel="noopener noreferrer"
+            >{{ upcoming.wxAttr.text }}</a>
           </div>
           <div class="progress-track" role="progressbar" :aria-valuenow="progressPct" aria-valuemin="0" aria-valuemax="100">
             <div class="progress-bar" :style="{ transform: `scaleX(${progress})` }" />

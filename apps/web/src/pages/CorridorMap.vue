@@ -17,7 +17,17 @@ import {
   escHtml,
   isKnownDimension,
 } from '../data/spotDimensions';
-import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
+import {
+  addMarker,
+  addPolyline,
+  createInfoWindow,
+  createMap,
+  loadMapEngine,
+  type InfoWindowHandle,
+  type MapHandle,
+  type MarkerHandle,
+  type PolylineHandle,
+} from '../map/engine';
 
 const route = useRoute();
 const router = useRouter();
@@ -49,13 +59,10 @@ const satelliteOn = ref(
 
 const mapEl = ref<HTMLElement | null>(null);
 const pageEl = ref<HTMLElement | null>(null);
-let map: any = null;
-let AMapRef: any = null;
-let railLine: any = null;
-let satelliteLayer: any = null;
-let roadNetLayer: any = null;
-let drawnOverlays: any[] = [];
-let openInfo: any = null;
+let map: MapHandle | null = null;
+let railLine: PolylineHandle | null = null;
+let drawnOverlays: Array<PolylineHandle | MarkerHandle> = [];
+let openInfo: InfoWindowHandle | null = null;
 
 const rankHits = computed(() => findRankingsByCorridor(corridorId.value));
 
@@ -200,15 +207,15 @@ function railStrokeOptions() {
 
 function clearOverlays() {
   try {
-    openInfo?.close?.();
+    openInfo?.close();
   } catch {
     /* ignore */
   }
   openInfo = null;
-  if (!map) return;
+  map?.clearInfoWindow();
   for (const o of drawnOverlays) {
     try {
-      map.remove(o);
+      o.remove();
     } catch {
       /* ignore */
     }
@@ -218,18 +225,10 @@ function clearOverlays() {
 }
 
 function applySatelliteLayers() {
-  if (!map || !AMapRef) return;
-  if (satelliteOn.value) {
-    if (!satelliteLayer) {
-      satelliteLayer = new AMapRef.TileLayer.Satellite();
-      roadNetLayer = new AMapRef.TileLayer.RoadNet();
-    }
-    map.add([satelliteLayer, roadNetLayer]);
-  } else {
-    if (satelliteLayer) map.remove(satelliteLayer);
-    if (roadNetLayer) map.remove(roadNetLayer);
-  }
-  railLine?.setOptions?.(railStrokeOptions());
+  if (!map) return;
+  map.setBasemapMode(satelliteOn.value ? 'satellite' : 'standard');
+  const stroke = railStrokeOptions();
+  railLine?.setStyle({ color: stroke.strokeColor, opacity: stroke.strokeOpacity });
 }
 
 function toggleSatellite() {
@@ -261,7 +260,7 @@ function updateOverlayMetrics() {
 
 function openSpotCard(spot: AtlasCorridorSpot) {
   selectedSpot.value = spot;
-  if (!map || !AMapRef) return;
+  if (!map) return;
   const dims = (spot.dimensions || [])
     .filter((d) => isKnownDimension(d))
     .map((d) => dimensionMeta(d).short);
@@ -275,60 +274,50 @@ function openSpotCard(spot: AtlasCorridorSpot) {
     spot.matchKind === 'geo'
       ? `<span class="map-info-card__badge map-info-card__badge--distant">距离推算</span>`
       : '';
-  const info = new AMapRef.InfoWindow({
-    isCustom: true,
-    autoMove: true,
-    closeWhenClickMap: true,
-    content: `<div class="map-info-card">
+  const html = `<div class="map-info-card">
       <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
       <div class="map-info-card__title">${escHtml(spot.name)}</div>
       <p class="map-info-card__schedule">沿线 ${spot.alongKm} km · 距线 ${spot.distKm} km</p>
       <div class="map-info-card__meta">${dimHtml}${geo}</div>
       ${spot.intro ? `<p class="map-info-card__intro">${escHtml(spot.intro)}</p>` : ''}
       <div class="map-info-card__arrow" aria-hidden="true"></div>
-    </div>`,
-    offset: new AMapRef.Pixel(0, -22),
-  });
+    </div>`;
   try {
-    openInfo?.close?.();
+    openInfo?.close();
   } catch {
     /* ignore */
   }
-  openInfo = info;
-  info.open(map, [spot.lng, spot.lat]);
+  openInfo = createInfoWindow({ offsetPx: [0, -22] });
+  openInfo.setContent(html);
+  openInfo.open(map, [spot.lng, spot.lat]);
 }
 
 function focusSpotFromList(spot: AtlasCorridorSpot) {
   openSpotCard(spot);
   if (!map) return;
   try {
-    map.setZoomAndCenter(Math.max(map.getZoom?.() || 11, 12), [spot.lng, spot.lat]);
+    map.setZoomAndCenter(Math.max(map.getZoom() || 11, 12), [spot.lng, spot.lat]);
   } catch {
     map.setCenter([spot.lng, spot.lat]);
   }
 }
 
 function openStationCard(name: string, pos: [number, number]) {
-  if (!map || !AMapRef) return;
-  const info = new AMapRef.InfoWindow({
-    isCustom: true,
-    autoMove: true,
-    closeWhenClickMap: true,
-    content: `<div class="map-info-card">
+  if (!map) return;
+  const html = `<div class="map-info-card">
       <button type="button" class="map-info-card__close" data-info-close aria-label="关闭">×</button>
       <div class="map-info-card__title">${escHtml(name)}</div>
       <p class="map-info-card__meta">示意站位 · ${escHtml(corridorTitle.value)}</p>
       <div class="map-info-card__arrow" aria-hidden="true"></div>
-    </div>`,
-    offset: new AMapRef.Pixel(0, -22),
-  });
+    </div>`;
   try {
-    openInfo?.close?.();
+    openInfo?.close();
   } catch {
     /* ignore */
   }
-  openInfo = info;
-  info.open(map, pos);
+  openInfo = createInfoWindow({ offsetPx: [0, -22] });
+  openInfo.setContent(html);
+  openInfo.open(map, pos);
 }
 
 function focusStationFromList(name: string) {
@@ -338,7 +327,7 @@ function focusStationFromList(name: string) {
   openStationCard(hit.name, hit.pos);
   if (!map) return;
   try {
-    map.setZoomAndCenter(Math.max(map.getZoom?.() || 11, 12), hit.pos);
+    map.setZoomAndCenter(Math.max(map.getZoom() || 11, 12), hit.pos);
   } catch {
     map.setCenter(hit.pos);
   }
@@ -347,95 +336,92 @@ function focusStationFromList(name: string) {
 function fitRoute() {
   if (!map || !railLine) return;
   try {
-    map.setFitView([railLine], false, [72, 48, 180, 48]);
+    map.fitBounds(railLine.getBoundsCoords(), { top: 72, right: 48, bottom: 180, left: 48 }, false);
   } catch {
     /* ignore */
   }
 }
 
 async function drawMap() {
-  if (!map || !AMapRef) return;
+  if (!map) return;
   const path = displayPath.value;
   clearOverlays();
   selectedSpot.value = null;
   if (path.length < 2) return;
 
-  const line = new AMapRef.Polyline({
+  const stroke = railStrokeOptions();
+  const line = await addPolyline(map, {
     path,
-    strokeWeight: compact.value ? 4 : 5,
-    lineJoin: 'round',
-    lineCap: 'round',
+    weight: compact.value ? 4 : 5,
     zIndex: 60,
-    bubble: true,
-    ...railStrokeOptions(),
+    color: stroke.strokeColor,
+    opacity: stroke.strokeOpacity,
   });
-  map.add(line);
   drawnOverlays.push(line);
   railLine = line;
 
   const hints = detail.value?.stationsHint || [];
   const stations = projectedStations(path, hints);
   for (const s of stations) {
-    const marker = new AMapRef.Marker({
+    const marker = addMarker(map, {
       position: s.pos,
       title: s.name,
-      content: `<div class="station-marker${compact.value ? ' station-marker--compact' : ''}"><span class="station-dot"></span><span class="station-label">${escHtml(s.name)}</span></div>`,
+      contentHtml: `<div class="station-marker${compact.value ? ' station-marker--compact' : ''}"><span class="station-dot"></span><span class="station-label">${escHtml(s.name)}</span></div>`,
       anchor: 'center',
       zIndex: 150,
     });
-    marker.on('click', () => openStationCard(s.name, s.pos));
-    map.add(marker);
+    marker.onClick(() => openStationCard(s.name, s.pos));
     drawnOverlays.push(marker);
   }
 
   visibleSpots.value.slice(0, 120).forEach((spot, idx) => {
-    const marker = new AMapRef.Marker({
+    const marker = addMarker(map!, {
       position: [spot.lng, spot.lat],
       title: spot.name,
-      anchor: 'bottom-center',
+      anchor: 'bottom',
       zIndex: 160,
-      content: `<div class="spot-marker${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
+      contentHtml: `<div class="spot-marker${compact.value ? ' spot-marker--compact' : ''}">${idx + 1}</div>`,
     });
-    marker.on('click', () => openSpotCard(spot));
-    map.add(marker);
+    marker.onClick(() => openSpotCard(spot));
     drawnOverlays.push(marker);
   });
 
   try {
-    map.setFitView([line], false, [72, 48, 180, 48]);
+    map.fitBounds(line.getBoundsCoords(), { top: 72, right: 48, bottom: 180, left: 48 }, false);
   } catch {
-    map.setCenter(path[Math.floor(path.length / 2)]);
+    map.setCenter(path[Math.floor(path.length / 2)]!);
   }
 }
 
 async function initMap() {
-  const key = import.meta.env.VITE_AMAP_KEY;
-  if (!key) {
-    mapError.value = '请配置 VITE_AMAP_KEY（apps/web/.env）';
+  if (!import.meta.env.VITE_TIANDITU_TK) {
+    mapError.value = '请配置 VITE_TIANDITU_TK（apps/web/.env）';
     return;
   }
   try {
-    AMapRef = await loadAmap(key, import.meta.env.VITE_AMAP_SECURITY);
+    await loadMapEngine();
   } catch {
-    mapError.value = '地图脚本加载失败';
+    mapError.value = '地图引擎加载失败';
     return;
   }
   if (!mapEl.value) return;
   compact.value = window.matchMedia('(max-width: 640px)').matches;
-  map = new AMapRef.Map(mapEl.value, {
+  map = createMap(mapEl.value, {
     zoom: 5,
     center: displayPath.value[0] || [104, 35],
-    viewMode: '2D',
-    mapStyle: AMAP_MAP_STYLE,
+    basemap: satelliteOn.value ? 'satellite' : 'standard',
   });
-  map.getContainer().addEventListener('click', (event: MouseEvent) => {
+  map.raw.getContainer().addEventListener('click', (event: MouseEvent) => {
     const t = event.target as HTMLElement;
     if (t.closest?.('[data-info-close]')) {
-      map?.clearInfoWindow?.();
+      map?.clearInfoWindow();
       openInfo = null;
     }
   });
-  applySatelliteLayers();
+  await new Promise<void>((resolve) => {
+    if (map!.raw.isStyleLoaded()) resolve();
+    else map!.raw.once('load', () => resolve());
+  });
   await drawMap();
   updateOverlayMetrics();
 }

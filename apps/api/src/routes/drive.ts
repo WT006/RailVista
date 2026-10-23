@@ -57,7 +57,7 @@ driveRoute.get('/suggest', async (c) => {
     ? (kindRaw as PlaceKind)
     : undefined;
   let hits = suggestPlaces(q, kind, limit, province);
-  // 降级链：本地未命中 → 百度 / Nominatim（place 语义才兜底）
+  // 降级链：本地未命中 → Nominatim（place 语义才兜底）
   if (!hits.length && q.trim().length >= 2 && (!kind || kind === 'place')) {
     const remote = await geocodeFallback(q.trim());
     if (remote) hits = [remote];

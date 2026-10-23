@@ -3,7 +3,7 @@
  *
  * 主引擎：本地 roadTopology CSR + A*
  *   - OD 端点 0.03° 网格 snap，容差 5km；超限降级「端点外接段 + 干线主段」拼接
- * 在线兜底：百度驾车 → OSRM（不再调用高德 Web 服务）
+ * 在线兜底：OSRM 公共实例（不再调用高德 / 百度 Web 服务）
  * 本地与在线均失败时降级 direct（两点直连，engine 标注 direct，前端明示）。
  */
 import { computeCumKm } from '@railvista/shared';
@@ -29,7 +29,7 @@ export interface PlanRouteInput {
   to: string;
   via?: string[];
   /**
-   * auto（默认）→ 本地干线 A*，失败再试百度 / OSRM；
+   * auto（默认）→ 本地干线 A*，失败再试 OSRM；
    * local → 只用本地拓扑。
    */
   engine?: 'auto' | 'local';
@@ -83,52 +83,6 @@ async function resolveEndpoint(text: string, field: 'from' | 'to'): Promise<{ pt
   throw new PlaceNotFoundError(field, text);
 }
 
-// ── 引擎 1.6：百度地图驾车（v2 routing，WGS-84 进出免转换） ─────────────────
-// 百度 ak：coord_type=wgs84（输入）+ ret_coordtype=wgs84ll（输出），全程免 BD-09 转换；
-// 国内路网数据质量优于 OSRM，排在 OSRM 之前。
-async function baiduDriveRoute(from: Pt, to: Pt, via: Pt[]): Promise<{ coords: [number, number][]; distanceM: number; durationSec: number } | null> {
-  const key = process.env.BAIDU_MAP_KEY;
-  if (!key) return null;
-  const fmt = (p: Pt) => `${p.lat.toFixed(6)},${p.lng.toFixed(6)}`; // 百度坐标序：纬度在前
-  const wp = via.length ? via.map(fmt).join(';') : '';
-  const url = `https://api.map.baidu.com/direction/v2/routing?origin=${encodeURIComponent(fmt(from))}&destination=${encodeURIComponent(fmt(to))}${wp ? "&waypoints=" + encodeURIComponent(wp) : ""}&coord_type=wgs84&ret_coordtype=wgs84ll&tactics_infor=0&ak=${key}`;
-  try {
-    const res = await fetch(url, {
-      signal: AbortSignal.timeout(9000),
-      headers: { 'User-Agent': 'RailVista/0.4.0 (drive-routing)' },
-    });
-    if (!res.ok) return null;
-    const json = (await res.json()) as {
-      status?: number;
-      result?: {
-        routes?: Array<{
-          distance?: number;
-          duration?: number;
-          steps?: Array<{ path?: string }>;
-        }>;
-      };
-    };
-    if (json.status !== 0 || !json.result?.routes?.length) return null;
-    const route = json.result.routes[0]!;
-    const coords: [number, number][] = [];
-    for (const step of route.steps ?? []) {
-      if (!step.path) continue;
-      for (const pair of step.path.split(';')) {
-        const [blat, blng] = pair.split(',').map(Number);
-        if (!Number.isFinite(blng) || !Number.isFinite(blat)) continue;
-        coords.push([blng, blat]);
-      }
-    }
-    if (coords.length < 2) return null;
-    return {
-      coords,
-      distanceM: Number(route.distance) || 0,
-      durationSec: Number(route.duration) || 0,
-    };
-  } catch {
-    return null;
-  }
-}
 /** Google / OSRM encoded polyline → [lng, lat][]（precision 5） */
 function decodeOsrmPolyline(encoded: string): [number, number][] {
   const coords: [number, number][] = [];
@@ -339,10 +293,6 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
         coords: [number, number][];
         durationSec: number;
       } | null> => {
-        const baidu = await baiduDriveRoute(from.pt, to.pt, viaPts);
-        if (baidu) {
-          return { engine: 'baidu', coords: baidu.coords, durationSec: baidu.durationSec };
-        }
         const osrm = await osrmDriveRoute(from.pt, to.pt, viaPts);
         if (osrm) {
           return { engine: 'osrm', coords: osrm.coords, durationSec: osrm.durationSec };
@@ -389,15 +339,7 @@ export async function planDriveRoute(input: PlanRouteInput): Promise<RoadRoute> 
     }
   }
   if (!coords.length && input.engine !== 'local') {
-    // 短途未并行时：串行百度 → OSRM
-    const baidu = await baiduDriveRoute(from.pt, to.pt, viaPts);
-    if (baidu) {
-      engine = 'baidu';
-      coords = baidu.coords;
-      if (baidu.durationSec > 0) durationMin = Math.round(baidu.durationSec / 60);
-    }
-  }
-  if (!coords.length && input.engine !== 'local') {
+    // 短途未并行时：串行 OSRM
     const osrm = await osrmDriveRoute(from.pt, to.pt, viaPts);
     if (osrm) {
       engine = 'osrm';
@@ -485,13 +427,12 @@ export function planRoadRoute(key: string): (RoadRoute & {
 
 /** 供 /along 响应标注引擎信息 */
 export function routeEngineNote(engine: string): string {
-  if (engine === 'baidu') return '百度驾车规划（WGS-84）';
   if (engine === 'osrm') return 'OSRM 开源路网规划（OSM · WGS-84）';
   // 2026-10-11：国道/省道几何补全后本地网已是全国网（主分量覆盖 98.2% 节点）。
   // 里程是路网实算，时长是按等级限速折的估算——两件事必须分开说，不能让用户
   // 把「约 N 小时」当成导航 ETA。
   if (engine === 'local') return '本地公路网 A*（里程路网实算 · 时长按等级限速估算）';
   if (engine === 'local-spliced') return '本地公路网 A*（端点附近无干线节点，首尾为外接段 · 时长估算）';
-  // 真正走到 direct：本地 + 在线兜底全失败（超时/无 key/无路）。
+  // 真正走到 direct：本地 + OSRM 全失败（超时/无路）。
   return '两点直连示意：本地路网与在线规划均未成功，未做寻路（不代表真实路线）';
 }

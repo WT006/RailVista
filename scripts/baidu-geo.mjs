@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 /**
- * 百度地图取数：路书库坐标核实 + 路段里程实测。
+ * 百度地图取数：路书库坐标核实 + 路段里程实测（**仅离线脚本**）。
+ *
+ * 注意：apps/api 运行时已去掉百度驾车/geocode；公开上线勿再依赖 BAIDU_MAP_KEY。
+ * 本脚本仅供历史补库 / 人工核验，可选用。
  *
  * 用法:
  *   node scripts/baidu-geo.mjs geo  targets.json [out.json]   # 地名 → WGS-84 坐标

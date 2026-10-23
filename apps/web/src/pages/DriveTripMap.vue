@@ -25,7 +25,17 @@ import { useGeolocation } from '../composables/useGeolocation';
 import { escHtml } from '../data/spotDimensions';
 import { DRIVE_TIER_COLORS, ROAD_COLORS, ROAD_SHADOW_STROKE, driveTierColor } from '../data/roadColors';
 import { spotCategoryLabel } from '../data/roadSpotLabels';
-import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
+import {
+  addMarker,
+  addPolyline,
+  createInfoWindow,
+  createMap,
+  loadMapEngine,
+  type InfoWindowHandle,
+  type MapHandle,
+  type MarkerHandle,
+  type PolylineHandle,
+} from '../map/engine';
 import {
   buildDriveCurrentFromPage,
   clearDriveCurrentTrip,
@@ -135,17 +145,14 @@ const showGps = ref(true);
 const mapEl = ref<HTMLElement | null>(null);
 const pageEl = ref<HTMLElement | null>(null);
 
-let map: any = null;
-let AMapRef: any = null;
-let routeLine: any = null;
-let routeShadow: any = null;
-let vehicleMarker: any = null;
-let gpsMarker: any = null;
+let map: MapHandle | null = null;
+let routeLine: PolylineHandle | null = null;
+let routeShadow: PolylineHandle | null = null;
+let vehicleMarker: MarkerHandle | null = null;
+let gpsMarker: MarkerHandle | null = null;
 /** 已挂载的景点 Marker（含 tier，图例开关只 show/hide，避免整层重建闪烁） */
-let spotMarkers: { marker: any; tier: string }[] = [];
-let satelliteLayer: any = null;
-let roadNetLayer: any = null;
-let openInfo: any = null;
+let spotMarkers: { marker: MarkerHandle; tier: string }[] = [];
+let openInfo: InfoWindowHandle | null = null;
 let openSpot: AlongSpot | null = null;
 /** 分批挂载景点 Marker 的 rAF / 超时句柄 */
 let markerBatchRaf = 0;
@@ -466,18 +473,11 @@ function routeStrokeOptions() {
 }
 
 function applySatelliteLayers() {
-  if (!map || !AMapRef) return;
-  if (satelliteOn.value) {
-    if (!satelliteLayer) {
-      satelliteLayer = new AMapRef.TileLayer.Satellite();
-      roadNetLayer = new AMapRef.TileLayer.RoadNet();
-    }
-    map.add([satelliteLayer, roadNetLayer]);
-  } else {
-    if (satelliteLayer) map.remove(satelliteLayer);
-    if (roadNetLayer) map.remove(roadNetLayer);
-  }
-  routeLine?.setOptions?.(routeStrokeOptions());
+  if (!map) return;
+  map.setBasemapMode(satelliteOn.value ? 'satellite' : 'standard');
+  const stroke = routeStrokeOptions();
+  routeLine?.setStyle({ color: stroke.strokeColor, opacity: stroke.strokeOpacity });
+  routeShadow?.setStyle({ opacity: satelliteOn.value ? 0.55 : 0.35 });
 }
 
 function updateOverlayMetrics() {
@@ -504,7 +504,7 @@ function updateOverlayMetrics() {
   document.documentElement.style.setProperty('--bottom-overlay', `${panelClearance + 16}px`);
   document.documentElement.style.setProperty('--drive-map-controls-lift', `${controlsLift}px`);
   try {
-    map?.resize?.();
+    map?.resize();
   } catch {
     /* ignore */
   }
@@ -526,9 +526,8 @@ function bindOverlayObserver() {
   if (legend) bottomPanelObserver.observe(legend);
 }
 
-function buildSpotMarker(spot: AlongSpot) {
+function buildSpotMarker(spot: AlongSpot): MarkerHandle {
   const color = tierColor(spot.tier);
-  // A 级保留里程徽标；B/C 用轻量圆点，减少首屏 DOM/布局成本
   const content =
     spot.tier === 'A'
       ? `<div class="drive-map-pin is-tier-a${compact.value ? ' is-compact' : ''}" style="--pin-color:${color}">
@@ -536,34 +535,34 @@ function buildSpotMarker(spot: AlongSpot) {
       <span class="drive-map-pin__tail" aria-hidden="true"></span>
     </div>`
       : `<div class="drive-map-pin is-dot is-tier-${spot.tier.toLowerCase()}" style="--pin-color:${color}" title="${escHtml(spot.name)}"></div>`;
-  const marker = new AMapRef.Marker({
+  const marker = addMarker(map!, {
     position: [spot.lng, spot.lat],
     title: spot.name,
-    anchor: spot.tier === 'A' ? 'bottom-center' : 'center',
+    anchor: spot.tier === 'A' ? 'bottom' : 'center',
     zIndex: spot.tier === 'A' ? 170 : spot.tier === 'B' ? 165 : 160,
-    content,
+    contentHtml: content,
   });
-  marker.on('click', () => openSpotCard(spot));
+  marker.onClick(() => openSpotCard(spot));
   return marker;
 }
 
 function closeOpenInfo() {
   try {
-    openInfo?.close?.();
+    openInfo?.close();
   } catch {
     /* ignore */
   }
   openInfo = null;
   openSpot = null;
   try {
-    map?.clearInfoWindow?.();
+    map?.clearInfoWindow();
   } catch {
     /* ignore */
   }
 }
 
 function openSpotCard(spot: AlongSpot) {
-  if (!map || !AMapRef) return;
+  if (!map) return;
   if (!isTierVisible(spot.tier)) return;
   const color = tierColor(spot.tier);
   const ratingHtml =
@@ -581,7 +580,6 @@ function openSpotCard(spot: AlongSpot) {
   ]
     .filter(Boolean)
     .join('');
-  // 自驾视角的三件事：怎么到、开放到几点、票务要不要预约
   const facts = [
     spot.accessNote ? `<p class="drive-map-card__fact">到达：${escHtml(spot.accessNote)}</p>` : '',
     spot.visitHours ? `<p class="drive-map-card__fact">开放：${escHtml(spot.visitHours)}</p>` : '',
@@ -590,11 +588,7 @@ function openSpotCard(spot: AlongSpot) {
   ]
     .filter(Boolean)
     .join('');
-  const info = new AMapRef.InfoWindow({
-    isCustom: true,
-    autoMove: true,
-    closeWhenClickMap: true,
-    content: `<div class="drive-map-card" style="--card-accent:${color}">
+  const html = `<div class="drive-map-card" style="--card-accent:${color}">
       <button type="button" class="drive-map-card__close" data-info-close aria-label="关闭">×</button>
       <div class="drive-map-card__km">${kmText(spot.progressKm)}</div>
       <div class="drive-map-card__title">${escHtml(spot.name)}</div>
@@ -604,13 +598,12 @@ function openSpotCard(spot: AlongSpot) {
       ${spot.intro ? `<p class="drive-map-card__intro">${escHtml(spot.intro)}</p>` : ''}
       ${facts}
       <div class="drive-map-card__arrow" aria-hidden="true"></div>
-    </div>`,
-    offset: new AMapRef.Pixel(0, -36),
-  });
+    </div>`;
   closeOpenInfo();
-  openInfo = info;
+  openInfo = createInfoWindow({ offsetPx: [0, -36] });
+  openInfo.setContent(html);
   openSpot = spot;
-  info.open(map, [spot.lng, spot.lat]);
+  openInfo.open(map, [spot.lng, spot.lat]);
 }
 
 function cancelMarkerBatch() {
@@ -627,20 +620,11 @@ function cancelMarkerBatch() {
 function clearSpotMarkers() {
   cancelMarkerBatch();
   closeOpenInfo();
-  if (!map || !spotMarkers.length) {
-    spotMarkers = [];
-    return;
-  }
-  const markers = spotMarkers.map((e) => e.marker);
-  try {
-    map.remove(markers);
-  } catch {
-    for (const m of markers) {
-      try {
-        map.remove(m);
-      } catch {
-        /* ignore */
-      }
+  for (const { marker } of spotMarkers) {
+    try {
+      marker.remove();
+    } catch {
+      /* ignore */
     }
   }
   spotMarkers = [];
@@ -660,7 +644,7 @@ function applySpotTierVisibility() {
 }
 
 function rebuildSpotMarkers() {
-  if (!map || !AMapRef) return;
+  if (!map) return;
   clearSpotMarkers();
   const list = mapSpots.value;
   if (!list.length) return;
@@ -668,29 +652,20 @@ function rebuildSpotMarkers() {
   let i = 0;
   const step = () => {
     markerBatchRaf = 0;
-    if (!map || !AMapRef) return;
-    const batch: any[] = [];
+    if (!map) return;
     const end = Math.min(i + MARKER_CHUNK, list.length);
+    const batchStart = spotMarkers.length;
     for (; i < end; i += 1) {
       const spot = list[i]!;
       const marker = buildSpotMarker(spot);
-      batch.push(marker);
       spotMarkers.push({ marker, tier: spot.tier });
     }
-    if (batch.length) {
-      try {
-        map.add(batch);
-      } catch {
-        for (const m of batch) map.add(m);
-      }
-      // 先挂上地图再 hide，避免高德对未入图 Marker 的 hide 状态异常
-      for (const { marker, tier } of spotMarkers.slice(spotMarkers.length - batch.length)) {
-        if (!isTierVisible(tier)) {
-          try {
-            marker.hide();
-          } catch {
-            /* ignore */
-          }
+    for (const { marker, tier } of spotMarkers.slice(batchStart)) {
+      if (!isTierVisible(tier)) {
+        try {
+          marker.hide();
+        } catch {
+          /* ignore */
         }
       }
     }
@@ -698,7 +673,6 @@ function rebuildSpotMarkers() {
       markerBatchRaf = requestAnimationFrame(step);
     }
   };
-  // 先让路线 fitView / 瓦片绘制一帧，再开始挂 Marker
   markerBatchTimer = window.setTimeout(() => {
     markerBatchTimer = 0;
     markerBatchRaf = requestAnimationFrame(step);
@@ -735,11 +709,13 @@ function applyLayerVisibility() {
 function fitRoute() {
   cameraFollow.value = false;
   if (!map) return;
-  const overlays = [routeLine, routeShadow].filter(Boolean);
-  if (!overlays.length) return;
+  const coords = [
+    ...(routeLine?.getBoundsCoords() || []),
+    ...(routeShadow?.getBoundsCoords() || []),
+  ];
+  if (!coords.length) return;
   try {
-    // immediately=true：跳过镜头动画，避免与大批量 Marker/瓦片抢主线程导致卡顿
-    map.setFitView(overlays, true, [72, 48, 180, 48]);
+    map.fitBounds(coords, { top: 72, right: 48, bottom: 180, left: 48 }, false);
   } catch {
     /* ignore */
   }
@@ -757,7 +733,7 @@ function locateLive() {
   if (!map) return;
   updateGpsMarker();
   map.panTo([g.lng, g.lat]);
-  if ((map.getZoom?.() ?? 0) < 12) map.setZoom(14);
+  if (map.getZoom() < 12) map.setZoom(14);
   if (gpsOnRoute.value) {
     showToast('已开启实时定位跟随');
   } else if (gpsOffRouteM.value != null && gpsOffRouteM.value > OFF_ROUTE_MAX_M) {
@@ -780,148 +756,109 @@ function goBack() {
 }
 
 async function drawMap() {
-  if (!map || !AMapRef) return;
+  if (!map) return;
   const coords = routeCoords();
   if (coords.length < 2) {
     mapError.value = '路线坐标不足，无法绘制';
     return;
   }
 
-  if (routeShadow) {
-    try {
-      map.remove(routeShadow);
-    } catch {
-      /* ignore */
-    }
-  }
-  if (routeLine) {
-    try {
-      map.remove(routeLine);
-    } catch {
-      /* ignore */
-    }
-  }
+  routeShadow?.remove();
+  routeLine?.remove();
+  routeShadow = null;
+  routeLine = null;
 
   const path = displayPath(coords);
-  routeShadow = new AMapRef.Polyline({
+  const stroke = routeStrokeOptions();
+  routeShadow = await addPolyline(map, {
     path,
-    strokeColor: ROAD_SHADOW_STROKE,
-    strokeOpacity: satelliteOn.value ? 0.55 : 0.35,
-    strokeWeight: compact.value ? 9 : 11,
-    lineJoin: 'round',
-    lineCap: 'round',
+    color: ROAD_SHADOW_STROKE,
+    opacity: satelliteOn.value ? 0.55 : 0.35,
+    weight: compact.value ? 9 : 11,
     zIndex: 50,
-    bubble: true,
   });
-  routeLine = new AMapRef.Polyline({
+  routeLine = await addPolyline(map, {
     path,
-    strokeWeight: compact.value ? 5 : 6,
-    lineJoin: 'round',
-    lineCap: 'round',
+    weight: compact.value ? 5 : 6,
     zIndex: 60,
-    bubble: true,
-    ...routeStrokeOptions(),
+    color: stroke.strokeColor,
+    opacity: stroke.strokeOpacity,
   });
-  map.add([routeShadow, routeLine]);
 
   if (!vehicleMarker) {
-    vehicleMarker = new AMapRef.Marker({
+    vehicleMarker = addMarker(map, {
       position: vehiclePosition(),
       anchor: 'center',
       zIndex: 200,
-      content: `<div class="drive-map-vehicle${compact.value ? ' is-compact' : ''}"><span class="drive-map-vehicle__core"></span><span class="drive-map-vehicle__ring"></span></div>`,
+      contentHtml: `<div class="drive-map-vehicle${compact.value ? ' is-compact' : ''}"><span class="drive-map-vehicle__core"></span><span class="drive-map-vehicle__ring"></span></div>`,
     });
-    map.add(vehicleMarker);
   } else {
     updateVehicleMarker();
   }
 
   if (!gpsMarker) {
-    gpsMarker = new AMapRef.Marker({
+    gpsMarker = addMarker(map, {
       position: gps.value ? [gps.value.lng, gps.value.lat] : vehiclePosition(),
       anchor: 'center',
       zIndex: 195,
-      content: '<div class="drive-map-gps"><span class="drive-map-gps__pulse"></span></div>',
+      contentHtml: '<div class="drive-map-gps"><span class="drive-map-gps__pulse"></span></div>',
     });
-    map.add(gpsMarker);
   }
   updateGpsMarker();
 
   applyLayerVisibility();
   fitRoute();
-  // 景点 Marker 延后分批挂载，避免挡住首屏路线显示
   rebuildSpotMarkers();
 }
 
 async function initMap() {
-  const key = import.meta.env.VITE_AMAP_KEY;
-  if (!key) {
-    mapError.value = '请配置 VITE_AMAP_KEY（apps/web/.env）';
+  if (!import.meta.env.VITE_TIANDITU_TK) {
+    mapError.value = '请配置 VITE_TIANDITU_TK（apps/web/.env）';
     return;
   }
-  if (!AMapRef) {
-    try {
-      AMapRef = await loadAmap(key, import.meta.env.VITE_AMAP_SECURITY);
-    } catch (e) {
-      mapError.value = e instanceof Error ? e.message : '地图脚本加载失败';
-      return;
-    }
+  try {
+    await loadMapEngine();
+  } catch (e) {
+    mapError.value = e instanceof Error ? e.message : '地图引擎加载失败';
+    return;
   }
   if (!mapEl.value) return;
   compact.value = window.matchMedia('(max-width: 640px)').matches;
   const coords = routeCoords();
-  map = new AMapRef.Map(mapEl.value, {
+  map = createMap(mapEl.value, {
     zoom: 5,
     center: coords[0] || [104, 35],
-    viewMode: '2D',
-    mapStyle: AMAP_MAP_STYLE,
-    // 关掉默认动画，进入页时不跟镜头缓动抢帧
-    animateEnable: false,
-    jogEnable: false,
+    basemap: satelliteOn.value ? 'satellite' : 'standard',
   });
-  // 首屏路线画完后再开交互动画（拖拽惯性等）
-  map.getContainer().addEventListener('click', (event: MouseEvent) => {
+  map.raw.getContainer().addEventListener('click', (event: MouseEvent) => {
     const t = event.target as HTMLElement;
     if (t.closest?.('[data-info-close]')) {
-      map?.clearInfoWindow?.();
+      map?.clearInfoWindow();
       openInfo = null;
     }
   });
-  applySatelliteLayers();
+  await new Promise<void>((resolve) => {
+    if (map!.raw.isStyleLoaded()) resolve();
+    else map!.raw.once('load', () => resolve());
+  });
   await drawMap();
-  try {
-    map.setStatus?.({ animateEnable: true, jogEnable: true });
-  } catch {
-    /* ignore */
-  }
   updateOverlayMetrics();
 }
 
-/** 数据与高德脚本并行拉取，再初始化地图——缩短「进入地图 → 看见路线」空窗 */
 async function boot() {
   loading.value = true;
   mapError.value = '';
-  const key = import.meta.env.VITE_AMAP_KEY as string | undefined;
-  const security = import.meta.env.VITE_AMAP_SECURITY as string | undefined;
+  const tk = import.meta.env.VITE_TIANDITU_TK as string | undefined;
   try {
-    await Promise.all([
-      load(),
-      key
-        ? loadAmap(key, security)
-            .then((AMap) => {
-              AMapRef = AMap;
-            })
-            .catch((e) => {
-              mapError.value = e instanceof Error ? e.message : '地图脚本加载失败';
-            })
-        : Promise.resolve(),
-    ]);
+    await Promise.all([load(), loadMapEngine().catch((e) => {
+      mapError.value = e instanceof Error ? e.message : '地图引擎加载失败';
+    })]);
     if (loadError.value) return;
-    if (!key) {
-      mapError.value = '请配置 VITE_AMAP_KEY（apps/web/.env）';
+    if (!tk) {
+      mapError.value = '请配置 VITE_TIANDITU_TK（apps/web/.env）';
       return;
     }
-    if (mapError.value && !AMapRef) return;
+    if (mapError.value) return;
     await initMap();
   } finally {
     loading.value = false;

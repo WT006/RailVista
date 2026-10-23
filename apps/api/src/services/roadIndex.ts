@@ -6,8 +6,8 @@
  *   kind=spot     景点：公路侧景点库 roadside-spots.json
  *   kind=facility 服务区/互通/收费站：data/roads/facilities.json（Overpass 预抓）
  *
- * 降级链：本地命中 → 不请求网络；未命中 → 百度 / Nominatim 并行竞速 → null。
- * （不再调用高德 Web 服务；地图底图仍由前端 VITE_AMAP_KEY 渲染。）
+ * 降级链：本地命中 → 不请求网络；未命中 → Nominatim → null。
+ * （不再调用高德 / 百度 Web 服务；地图底图仍由前端 VITE_AMAP_KEY 渲染。）
  */
 import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -364,35 +364,9 @@ export function resolvePlace(text: string): PlaceHit | undefined {
   return undefined;
 }
 
-// ── 网络降级链：百度 → Nominatim ────────────────────────────────────────────
+// ── 网络降级：Nominatim（OSM）───────────────────────────────────────────────
 function isPlausibleCnPoint(lng: number, lat: number): boolean {
   return lng > 73 && lng < 136 && lat > 17 && lat < 55;
-}
-
-/**
- * 百度地理编码：geocoding/v3，ret_coordtype=wgs84ll 直接回 WGS-84 免除转换。
- */
-async function baiduGeocode(name: string): Promise<PlaceAnchor | null> {
-  const key = process.env.BAIDU_MAP_KEY;
-  if (!key) return null;
-  try {
-    const qs = new URLSearchParams({ address: name, ak: key, ret_coordtype: 'wgs84ll' });
-    const res = await fetch(`https://api.map.baidu.com/geocoding/v3/?${qs}`, {
-      signal: AbortSignal.timeout(3500),
-      headers: { 'User-Agent': 'RailVista/0.4.0 (drive-geocode)' },
-    });
-    if (!res.ok) return null;
-    const json = (await res.json()) as {
-      status?: number;
-      result?: { location?: { lng?: number; lat?: number }; level?: string };
-    };
-    const loc = json.status === 0 ? json.result?.location : undefined;
-    if (!loc?.lng || !loc?.lat) return null;
-    if (!isPlausibleCnPoint(loc.lng, loc.lat)) return null;
-    return { name, lng: loc.lng, lat: loc.lat, level: 'county' };
-  } catch {
-    return null;
-  }
 }
 
 async function nominatimGeocode(name: string): Promise<PlaceAnchor | null> {
@@ -425,23 +399,16 @@ const geocodeCache = new Map<string, { at: number; hit: PlaceHit | null }>();
 const GEOCODE_TTL_MS = 24 * 3600 * 1000;
 const GEOCACHE_MAX = 200;
 
-/** 本地未命中时的兜底 geocode：百度与 Nominatim 并行取先成功者，命中回写本地锚点 */
+/** 本地未命中时的兜底 geocode：Nominatim，命中回写本地锚点 */
 export async function geocodeFallback(name: string): Promise<PlaceHit | null> {
   const key = name.trim();
   if (!key) return null;
   const cached = geocodeCache.get(key);
   if (cached && Date.now() - cached.at < GEOCODE_TTL_MS) return cached.hit;
 
-  // 并行竞速：null 当 miss（reject），避免 fulfill(null) 抢先废掉另一路成功结果。
-  const hit = await Promise.any(
-    [baiduGeocode(key), nominatimGeocode(key)].map((p) =>
-      p.then((anchor) => {
-        if (!anchor) throw new Error('miss');
-        return anchor;
-      }),
-    ),
-  )
+  const hit = await nominatimGeocode(key)
     .then((anchor) => {
+      if (!anchor) return null;
       rememberPlace(anchor);
       return {
         kind: 'place' as const,

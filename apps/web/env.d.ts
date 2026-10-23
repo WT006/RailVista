@@ -1,20 +1,17 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_AMAP_KEY: string;
-  readonly VITE_AMAP_SECURITY: string;
+  readonly VITE_TIANDITU_TK: string;
+  readonly VITE_TIANDITU_REVIEW_NO?: string;
+  /** @deprecated Web 运行时已切天地图；离线脚本可能仍读 */
+  readonly VITE_AMAP_KEY?: string;
+  /** @deprecated */
+  readonly VITE_AMAP_SECURITY?: string;
   readonly VITE_API_BASE: string;
 }
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
-}
-
-declare global {
-  interface Window {
-    _AMapSecurityConfig?: { securityJsCode: string };
-    AMap: any;
-  }
 }
 
 export {};

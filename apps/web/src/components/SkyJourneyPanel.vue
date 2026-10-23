@@ -415,6 +415,11 @@ defineExpose({ compute });
 
       <footer class="sky-foot">
         <p>指数由沿途逐时气象与天文条件合成；光污染为城市灯光影响场估算。</p>
+        <p class="sky-foot__attr">
+          <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer"
+            >Weather data by Open-Meteo.com</a
+          >
+        </p>
       </footer>
     </div>
     <p v-else-if="computing" class="sky-empty sky-empty--pad">正在按地图发车时间计算天象…</p>
@@ -805,6 +810,20 @@ defineExpose({ compute });
   font-size: var(--fs-micro);
   color: var(--text-3);
   line-height: var(--lh-snug);
+}
+
+.sky-foot__attr {
+  margin-top: 4px !important;
+}
+
+.sky-foot__attr a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sky-foot__attr a:hover {
+  color: var(--text-2);
 }
 
 @media (min-width: 641px) {

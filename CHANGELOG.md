@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.11.1`**（2026-10-19）
+**当前版本：`0.11.2`**（2026-10-23）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,39 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.11.2] — 2026-10-23
+
+**天地图底图减负：中高倍注记淡到 40%，z10–12.5 改取 z9 瓦片（只留高速/国道），细小道路与街巷不再出现；`pnpm --filter @railvista/web build`（vue-tsc + vite）通过。**
+
+动机：主理人反馈「地图信息展示太多，路线与地名太杂乱」，要求屏蔽特别小的地名与道路。
+实测天地图 WMTS：文字全部在 `cva` 注记瓦片（含 `G40` 这类路牌），道路几何全部在 `vec` 瓦片，
+且两层都是按 zoom 预渲染的 PNG 切片——**没有要素属性，无法按道路等级过滤**。可行手段只有「整级换档」与「注记调透明度」。
+
+涉及文件：
+
+| 文件 | 改动 |
+| --- | --- |
+| `apps/web/src/map/tiandituStyle.ts` | 新增 `ROAD_LOD`（`enabled/capZoom 9/from 10/until 12.5`）与三档 vec 图层；`ANNOTATION_FADE` 增加 `dimFrom 9.5 / dimTo 10.6 / dimLevel 0.4`；图层 id 改为 `std-*` / `sat-*` 前缀；`applyBasemapVisibility` 改为按前缀批量开关 |
+| `apps/web/src/map/engine.ts` | 无逻辑改动（`applyBasemapVisibility` 签名兼容 MlMap） |
+| `packages/shared/src/version.ts` | `APP_VERSION` 0.11.1 → 0.11.2 |
+
+行为变化：
+
+1. 注记（地名）z<5.2 仍完全隐藏，5.2–6.4 淡入，6.4–9.5 全显，**9.5→10.6 淡到 40% 并保持**；卫星注记同规则。
+2. `vec` 分三段：`z<10` 原生级别；`10 ≤ z < 12.5` 用 `maxzoom: 9` 的第二条 source 放大（天地图 z9 只画高速+国道，无县道/街巷）；
+   `z ≥ 12.5` 回原生级别，贴近看站区仍有街道参照。关闭 `ROAD_LOD.enabled` 即回退单档。
+3. 隐藏档位不额外拉瓦片：MapLibre 的 `Layer.isHidden(zoom)` 参与 source `used` 判定（`maplibre-gl-dev.mjs:47512`），
+   z10–12.5 期间原生 `vec` source 不会被请求，带宽只走降档那一条。
+
+验证：`pnpm --filter @railvista/web exec vue-tsc --noEmit` 通过；`pnpm --filter @railvista/web build` 通过（仅存量 chunk 体积警告）；
+离线用真实天地图瓦片 + 复刻雅士灰滤镜渲染对照图（`tmp/tdt-probe/overzoom_check.png`），确认 z10/z11 降档后只剩高速/国道骨架。
+
+已知限制：栅格底图做不到「只要国道省道且完全清晰」——降档在中段是 2×–4× 放大的软边；
+若后续要求线宽随 zoom 加大、路牌自绘，只能改用自绘国道/省道（`data/roads` + API 取 bbox）或换矢量瓦片源。
+回滚：把 `ROAD_LOD.enabled` 置 `false`、`ANNOTATION_FADE.dimLevel` 改回 `1` 即可恢复原样。
 
 ---
 

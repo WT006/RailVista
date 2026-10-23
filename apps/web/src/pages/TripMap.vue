@@ -214,6 +214,7 @@ const approachingWeatherParts = computed(() =>
 
 /**
  * 过站美食窗口：比景点窗口略宽（站少、且要留出「快到城里了」的预告感）。
+ * 尚未发车（progress≤0）不弹——否则始发站永远落在窗口内，一进地图就出「始发站」卡。
  */
 const STATION_FOOD_LEAD_KM = 12;
 const STATION_FOOD_TRAIL_KM = 5;
@@ -221,6 +222,7 @@ const STATION_FOOD_TRAIL_KM = 5;
 /** 当前落在过站窗口内的车站（取窗口内最后一个，优先表达「正在经过」） */
 const approachingStation = computed(() => {
   if (!prefs.layers.station) return null;
+  if (progress.value <= 0) return null;
   const stops = segment.value?.stops;
   const kms = stationKmRef.value;
   if (!stops?.length || !kms.length || kms.length !== stops.length) return null;

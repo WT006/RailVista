@@ -51,18 +51,18 @@ function rasterSource(layer: 'vec' | 'cva' | 'img' | 'cia', tk: string, maxzoom 
  * 注记（地名）分三档，与 Atlas 公路 LOD 对齐：
  * - 全国/大区视角（< hideBelow）完全关掉，给景点·路线留空；
  * - 中段（fullAt 以上）全开；
- * - 中高倍（dimFrom 以上）压到 dimLevel 淡出。
+ * - 中高倍（dimFrom 以上）收到 0：天地图把市/县/乡镇/街道/POI 画在同一张注记瓦片上，
+ *   栅格没法只留「大名字」，所以高倍一律收起，免得满屏小地名。
  *
  * 天地图注记按 zoom 预渲染：z8 只有市/县名，z9 起乡镇，z10 起街道，z12 起 POI。
- * 所以放大后满屏小地名是瓦片本身的内容，压不透明度是栅格底图唯一可控的「减字」手段。
  */
 export const ANNOTATION_FADE = {
   hideBelow: 5.2,
   fullAt: 6.4,
   dimFrom: 9.5,
   dimTo: 10.6,
-  /** 淡出后的不透明度：看得见轮廓、不再抢主信息 */
-  dimLevel: 0.4,
+  /** 淡出后的不透明度：0 = 高倍不再显示底图地名 */
+  dimLevel: 0,
 } as const;
 
 /** 注记层 raster-opacity：zoom 表达式，无需 JS 监听 */
@@ -87,6 +87,13 @@ function annotationOpacityPaint(): NonNullable<
 }
 
 /**
+ * 注记收到 0 之后这层就没内容了：把 maxzoom 卡在淡出点，
+ * 让 MapLibre 认为该 source 在高倍不可用（`Layer.isHidden(zoom)` 参与 source 的 used 判定），
+ * 顺带省掉高倍时的注记瓦片请求。
+ */
+const ANNOTATION_MAXZOOM = ANNOTATION_FADE.dimLevel === 0 ? ANNOTATION_FADE.dimTo : 18;
+
+/**
  * 道路分级（raster 天地图只能「整级换档」，做不到按道路等级过滤）。
  *
  * 天地图 vec 瓦片按 zoom 预渲染泛化：
@@ -109,11 +116,46 @@ export const ROAD_LOD = {
   until: 12.5,
 } as const;
 
+/**
+ * 路网按「屏幕上的密度」渐进显影，而不是一直全亮：
+ * - 广域视角（z5–8）一屏要铺下整个省/大区，高速+国道会织成一整张网，
+ *   压到 0.25–0.55 只当纹理，省界/水系/城市名才是主体的轮廓；
+ * - 越放大屏幕里剩下的路越少，才让它逐步立起来（z10.5 到 0.95），
+ *   「紫色高速、橙色国道」以及国界/省界这些细线都在这个档位才真正看得清；
+ * - z≥12.5 街巷回到原生瓦片、密度又上去，再压回 0.6。
+ *
+ * 注意：天地图 vec 是一张烧好的栅格，路网、国界/省界、水系全在同一张图上，
+ * 没有独立图层可调——想让「界线」比「路」更重，只能把界线从底图里拿出来自绘。
+ */
+export const ROAD_FADE = {
+  /** [zoom, raster-opacity] */
+  stops: [
+    [5, 0.25],
+    [7, 0.36],
+    [8.5, 0.55],
+    [10.5, 0.95],
+    [12.4, 0.95],
+    [13.6, 0.6],
+  ],
+} as const;
+
 type RasterLayer = Extract<StyleSpecification['layers'][number], { type: 'raster' }>;
 type Visibility = 'visible' | 'none';
 
+/** 底图线网的不透明度：zoom 表达式，低倍淡成纹理、放大才立起来 */
+function vecOpacityPaint() {
+  return {
+    'raster-opacity': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      ...ROAD_FADE.stops.flat(),
+    ],
+  } as NonNullable<RasterLayer['paint']>;
+}
+
 function vecLayers(stdVis: Visibility): RasterLayer[] {
-  const paint = { 'raster-opacity': 1 };
+  const paint = vecOpacityPaint();
   const base = { type: 'raster' as const, layout: { visibility: stdVis }, paint };
   if (!ROAD_LOD.enabled) {
     return [{ id: `${STD}vec`, source: `${STD}vec`, minzoom: 0, maxzoom: 18, ...base }];
@@ -159,7 +201,7 @@ export function buildDualBasemapStyle(tk: string, mode: BasemapMode = 'standard'
         source: `${STD}cva`,
         layout: { visibility: stdVis },
         minzoom: 0,
-        maxzoom: 18,
+        maxzoom: ANNOTATION_MAXZOOM,
         paint: annPaint,
       },
       { id: `${SAT}img`, type: 'raster', source: `${SAT}img`, layout: { visibility: satVis }, minzoom: 0, maxzoom: 18 },
@@ -169,7 +211,7 @@ export function buildDualBasemapStyle(tk: string, mode: BasemapMode = 'standard'
         source: `${SAT}cia`,
         layout: { visibility: satVis },
         minzoom: 0,
-        maxzoom: 18,
+        maxzoom: ANNOTATION_MAXZOOM,
         paint: annPaint,
       },
     ],

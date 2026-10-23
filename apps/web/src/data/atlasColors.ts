@@ -18,20 +18,25 @@ export const ATLAS_RAIL_STROKE = '#4d9fff';
 /** 铁路线路悬停描边（accent-hover 的镜像值，画布取色回退用） */
 export const ATLAS_RAIL_HOVER_STROKE = '#74b2ff';
 
-/** 行程地图：车头光效描边 */
-export const TRIP_GLOW_STROKE = '#e0915a';
+/**
+ * 行程地图折线（overlay 真彩，与 --rail / accent 对齐）。
+ */
+export const TRIP_RAIL_STROKE_BRIGHT = '#4d9fff';
+
+/** 行程地图：车头/霞光描边 */
+export const TRIP_GLOW_STROKE = '#ff7a1a';
 
 /** 行程地图：线路高亮描边 */
-export const TRIP_HIGHLIGHT_STROKE = '#8f7ae8';
+export const TRIP_HIGHLIGHT_STROKE = '#a78bfa';
 
-/** 天象聚焦路段：金色时刻（与 tokens --warning 同值） */
-export const TRIP_SKY_GOLDEN_STROKE = '#e0b155';
+/** 天象聚焦路段：金色时刻 */
+export const TRIP_SKY_GOLDEN_STROKE = '#ffc107';
 
-/** 天象聚焦路段：蓝色时刻（与 tokens --info 同值） */
-export const TRIP_SKY_BLUE_STROKE = '#7fb4d8';
+/** 天象聚焦路段：蓝色时刻 */
+export const TRIP_SKY_BLUE_STROKE = '#00b0ff';
 
-/** 天象聚焦路段：日出/日落（与 tokens --danger 同值） */
-export const TRIP_SKY_SUN_STROKE = '#e0765c';
+/** 天象聚焦路段：日出/日落 */
+export const TRIP_SKY_SUN_STROKE = '#ff5722';
 
 /** 未选中线路网络描边（低饱和灰蓝） */
 export const ATLAS_NETWORK_STROKE = '#7a8494';

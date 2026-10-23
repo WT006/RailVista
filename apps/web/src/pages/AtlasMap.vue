@@ -5,13 +5,12 @@
  * 数据：GET /api/atlas/overview（apps/api 只读聚合，走廊折线已抽稀 ≤300 点，60s 缓存）。
  *
  * 图层：
- *  L1 铁路网   —— 全部走廊折线，细银灰、低透明度、只响应 click（hover 不响应，性能优先）
- *  L2 景点点位 —— 全量景点，AMap MarkerCluster 聚合，按六维着色，图例在侧栏
- *  L3 空间密度 —— AMap HeatMap，可开关
- *  L4 选中态   —— 点击走廊加粗高亮 + fitView；点击景点弹 InfoWindow
+ *  L1 铁路网   —— 全部走廊折线，细银灰、低透明度、不可点（选线走侧栏/搜索）
+ *  L2 景点点位 —— 全量景点，MapLibre+supercluster 聚合，按六维着色，图例在侧栏
+ *  L3 空间密度 —— MapLibre heatmap，可开关
+ *  L4 选中态   —— 点击走廊加粗高亮 + fitBounds；点击景点弹 InfoWindow
  *
- * 插件（MarkerCluster / HeatMap）若加载失败，自动降级为普通 Marker 并隐藏热力开关，
- * 页面其余能力不受影响。
+ * 聚合失败时降级为普通 Marker；热力由适配层原生支持。
  */
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -32,10 +31,22 @@ import {
   escHtml,
   resolveSpotDimensions,
 } from '../data/spotDimensions';
-import { AMAP_MAP_STYLE, loadAmap } from '../map/amap';
+import {
+  addMarker,
+  addMultiPolyline,
+  addPolyline,
+  createInfoWindow,
+  createMap,
+  loadMapEngine,
+  setCluster,
+  setHeatmap,
+  type InfoWindowHandle,
+  type MapHandle,
+  type MarkerHandle,
+  type PolylineHandle,
+} from '../map/engine';
 import { roadColor } from '../data/roadColors';
 import {
-  ATLAS_HEAT_GRADIENT,
   ATLAS_NETWORK_STROKE,
   ATLAS_ORIGIN_COLORS,
   ATLAS_RAIL_STROKE,
@@ -176,23 +187,20 @@ async function ensureRoadHeatSpots(): Promise<void> {
   }
 }
 
-let map: any = null;
-let AMapRef: any = null;
-let infoWindow: any = null;
-let cluster: any = null;
-let heat: any = null;
-let highlightLine: any = null;
-let focusMarker: any = null;
+let map: MapHandle | null = null;
+let infoWindow: InfoWindowHandle | null = null;
+let clusterCtl: { clear(): void } | null = null;
+let heatCtl: { clear(): void } | null = null;
+let highlightLine: PolylineHandle | null = null;
+let focusMarker: MarkerHandle | null = null;
 /** 当前选中的景点 id；再点同一处或点空白取消 */
 let focusedSpotId = '';
 /** 刚从景点 Marker 点进去时，挡住随后冒泡的地图 click，避免选中立刻被清掉 */
 let ignoreMapClickClear = false;
-let baseLines: any[] = [];
-let plainMarkers: any[] = [];
+let baseLines: PolylineHandle[] = [];
+let plainMarkers: MarkerHandle[] = [];
 /** 公路侧普通 Marker 列表（renderRoadSpots 维护） */
-let roadPlainMarkers: any[] = [];
-/** corridorId → 折线，供点击/搜索后 fitView */
-const lineByCorridor = new Map<string, any>();
+let roadPlainMarkers: MarkerHandle[] = [];
 
 // ── 公路图层：高速 / 国道分开关（琥珀 vs 蓝，不再绑在一起）────────────────
 // v0.5.5：数据直接取 /atlas/overview 的 roadCorridors，不再单独请求
@@ -201,7 +209,7 @@ const expresswayLayerOn = ref(false);
 const nationalLayerOn = ref(false);
 /** 任一公路线层开启（用于按需拉数据） */
 const roadLayerOn = computed(() => expresswayLayerOn.value || nationalLayerOn.value);
-let roadPolylines: any[] = [];
+let roadPolylines: PolylineHandle[] = [];
 
 function roadClassLayerOn(cls: string | undefined): boolean {
   if (cls === 'expressway') return expresswayLayerOn.value;
@@ -210,11 +218,16 @@ function roadClassLayerOn(cls: string | undefined): boolean {
   return nationalLayerOn.value;
 }
 
-function renderRoadLayer() {
-  if (!map || !AMapRef) return;
+function chromePadding() {
+  const [top, right, bottom, left] = getMapChromeInsets();
+  return { top, right, bottom, left };
+}
+
+async function renderRoadLayer() {
+  if (!map) return;
   for (const l of roadPolylines) {
     try {
-      map.remove(l);
+      l.remove();
     } catch {
       /* ignore */
     }
@@ -224,20 +237,16 @@ function renderRoadLayer() {
   for (const r of roadCorridors.value) {
     if (!r.polyline || r.polyline.length < 2) continue;
     if (!roadClassLayerOn(r.class)) continue;
-    const line = new AMapRef.Polyline({
-      path: r.polyline,
-      strokeColor: roadColor(r.class),
-      strokeWeight: 2.2,
-      strokeOpacity: 0.8,
-      lineJoin: 'round',
+    const line = await addPolyline(map, {
+      path: r.polyline as [number, number][],
+      color: roadColor(r.class),
+      weight: 2.2,
+      opacity: 0.8,
       zIndex: 28,
-      bubble: true,
-      cursor: 'pointer',
+      onClick: () => {
+        void router.push({ path: '/drive/trip', query: { road: r.key } });
+      },
     });
-    line.on('click', () => {
-      void router.push({ path: '/drive/trip', query: { road: r.key } });
-    });
-    map.add(line);
     roadPolylines.push(line);
   }
 }
@@ -574,16 +583,13 @@ function roadSpotLod(): 'province' | 'city' | 'spots' {
 }
 
 function lngLatInView(lng: number, lat: number, padDeg = 1.2): boolean {
-  const b = map?.getBounds?.();
+  const b = map?.raw?.getBounds?.();
   if (!b) return true;
-  const sw = b.getSouthWest?.();
-  const ne = b.getNorthEast?.();
-  if (!sw || !ne) return true;
   return (
-    lng >= Number(sw.lng) - padDeg &&
-    lng <= Number(ne.lng) + padDeg &&
-    lat >= Number(sw.lat) - padDeg &&
-    lat <= Number(ne.lat) + padDeg
+    lng >= b.getWest() - padDeg &&
+    lng <= b.getEast() + padDeg &&
+    lat >= b.getSouth() - padDeg &&
+    lat <= b.getNorth() + padDeg
   );
 }
 
@@ -597,9 +603,10 @@ function addRoadClusterMarker(opts: {
   size: number;
   title: string;
 }) {
-  const marker = new AMapRef.Marker({
+  if (!map) return;
+  const marker = addMarker(map, {
     position: [opts.lng, opts.lat],
-    content:
+    contentHtml:
       '<div class="atlas-prov-cluster" ' +
       opts.keyAttr +
       '="' +
@@ -616,12 +623,10 @@ function addRoadClusterMarker(opts: {
       opts.count +
       '</em>' +
       '</div>',
-    offset: new AMapRef.Pixel(-opts.size / 2, -opts.size / 2),
     zIndex: 95,
-    cursor: 'pointer',
+    anchor: 'center',
     title: opts.title,
   });
-  map.add(marker);
   roadPlainMarkers.push(marker);
 }
 
@@ -669,12 +674,11 @@ function spotMarkerColor(spot: AtlasSpotLite): string {
   return dimensionColor(spot.dimensions, spot.category, activeDims.value);
 }
 
-/** 聚合气泡主色：取簇内出现最多的维度色（同样尊重当前筛选） */
-function dominantClusterColor(items: unknown[]): string {
+/** 聚合气泡主色：取簇内出现最多的维度色（尊重当前筛选） */
+function dominantClusterColor(leaves: Array<{ properties?: Record<string, unknown> }>): string {
   const counts = new Map<string, number>();
-  for (const item of items) {
-    const raw = item as { spot?: AtlasSpotLite } | AtlasSpotLite | null;
-    const spot = raw && typeof raw === 'object' && 'spot' in raw ? raw.spot : (raw as AtlasSpotLite | undefined);
+  for (const leaf of leaves) {
+    const spot = leaf.properties?.spot as AtlasSpotLite | undefined;
     if (!spot?.id) continue;
     const color = spotMarkerColor(spot);
     counts.set(color, (counts.get(color) || 0) + 1);
@@ -690,14 +694,8 @@ function dominantClusterColor(items: unknown[]): string {
   return best;
 }
 
-function clusterItems(context: any): unknown[] {
-  if (Array.isArray(context?.clusterData)) return context.clusterData;
-  if (Array.isArray(context?.data)) return context.data;
-  return [];
-}
-
 function openSpotInfo(spot: AtlasSpotLite) {
-  if (!map || !AMapRef) return;
+  if (!map) return;
   const dims = resolveSpotDimensions(spot)
     .map(
       (d) =>
@@ -715,23 +713,11 @@ function openSpotInfo(spot: AtlasSpotLite) {
     ${spot.intro ? `<p class="atlas-iw__intro">${escHtml(spot.intro)}</p>` : ''}
   </div>`;
   if (!infoWindow) {
-    infoWindow = new AMapRef.InfoWindow({
-      offset: new AMapRef.Pixel(0, -10),
-      isCustom: true,
-      closeWhenClickMap: true,
-      // 禁止为弹窗自动挪图，否则会冲掉我们算好的「居中偏左」
-      autoMove: false,
-    });
-  } else {
-    try {
-      infoWindow.setOptions?.({ autoMove: false });
-    } catch {
-      /* ignore */
-    }
+    infoWindow = createInfoWindow({ offsetPx: [0, -10] });
   }
   infoWindow.setContent(html);
   infoWindow.open(map, [spot.lng, spot.lat]);
-  // isCustom 内容有时不冒泡到 map container，打开后直接绑关闭钮
+  // 自定义关闭钮：打开后直接绑，避免依赖 popup DOM 冒泡
   requestAnimationFrame(() => {
     const btn = document.querySelector('.atlas-iw [data-info-close]');
     if (!btn) return;
@@ -748,17 +734,17 @@ function openSpotInfo(spot: AtlasSpotLite) {
 }
 
 function clearCluster() {
-  if (cluster) {
+  if (clusterCtl) {
     try {
-      cluster.setMap?.(null);
+      clusterCtl.clear();
     } catch {
       /* ignore */
     }
-    cluster = null;
+    clusterCtl = null;
   }
   for (const m of plainMarkers) {
     try {
-      map?.remove(m);
+      m.remove();
     } catch {
       /* ignore */
     }
@@ -767,9 +753,9 @@ function clearCluster() {
 }
 
 function renderSpots() {
-  if (!map || !AMapRef) return;
+  if (!map) return;
   /*
-   * 铁路走 MarkerCluster；公路优先画服务端省/市聚合圈，
+   * 铁路走 setCluster；公路优先画服务端省/市聚合圈，
    * 点开某市再按需拉明细（不再一次塞 2.7 万 Marker）。
    */
   const list = filteredSpots.value;
@@ -783,55 +769,51 @@ function renderSpots() {
 }
 
 function renderRailSpots(list: AtlasSpotLite[]) {
-  if (!map || !AMapRef) return;
-  const data = list.map((s) => ({ lnglat: [s.lng, s.lat], spot: s }));
-
-  if (typeof AMapRef.MarkerCluster === 'function') {
-    // 着色逻辑变更后必须重建，避免沿用旧的全蓝 renderClusterMarker
-    clearCluster();
-    if (!data.length) return;
-    cluster = new AMapRef.MarkerCluster(map, data, {
-      gridSize: 70,
-      maxZoom: 12,
-      averageCenter: true,
-      clusterByZoomChange: false,
-      renderClusterMarker: (context: any) => {
-        const count = context.count || 0;
-        const size = count < 10 ? 22 : count < 50 ? 26 : 32;
-        const color = dominantClusterColor(clusterItems(context));
-        context.marker.setContent(
-          `<div class="atlas-cluster" style="--cluster:${color};width:${size}px;height:${size}px">${count}</div>`,
-        );
-        context.marker.setOffset(new AMapRef.Pixel(-size / 2, -size / 2));
-      },
-      renderMarker: (context: any) => {
-        const raw = Array.isArray(context.data) ? context.data[0] : context.data;
-        const spot: AtlasSpotLite | undefined = raw?.spot || raw;
-        if (!spot) return;
-        const color = spotMarkerColor(spot);
-        context.marker.setContent(
-          `<span class="atlas-dot" style="--dot:${color}" title="${escHtml(spot.name)}"></span>`,
-        );
-        context.marker.setOffset(new AMapRef.Pixel(-3.5, -3.5));
-        context.marker.on('click', () => selectSpot(spot));
-      },
-    });
-    return;
-  }
-
-  // 降级：聚合插件不可用时直接画普通 Marker
+  if (!map) return;
   clearCluster();
-  for (const item of data.slice(0, 600)) {
-    const spot = item.spot;
-    const m = new AMapRef.Marker({
-      position: item.lnglat,
-      anchor: 'center',
-      title: spot.name,
-      content: `<span class="atlas-dot" style="--dot:${spotMarkerColor(spot)}"></span>`,
-    });
-    m.on('click', () => selectSpot(spot));
-    map.add(m);
-    plainMarkers.push(m);
+  if (!list.length) return;
+
+  const points = list.map((s) => ({
+    id: s.id,
+    lng: s.lng,
+    lat: s.lat,
+    properties: { spot: s },
+  }));
+
+  try {
+    clusterCtl = setCluster(
+      map,
+      points,
+      {
+        cluster: (count, _lng, _lat, leaves) => {
+          const size = count < 10 ? 22 : count < 50 ? 26 : 32;
+          const color = dominantClusterColor(leaves);
+          return `<div class="atlas-cluster" style="--cluster:${color};width:${size}px;height:${size}px">${count}</div>`;
+        },
+        leaf: (p) => {
+          const spot = p.properties?.spot as AtlasSpotLite | undefined;
+          const color = spot ? spotMarkerColor(spot) : UNCLASSIFIED_DIMENSION.color;
+          const name = spot?.name || '';
+          return `<span class="atlas-dot" style="--dot:${color}" title="${escHtml(name)}"></span>`;
+        },
+      },
+      (p) => {
+        const spot = p.properties?.spot as AtlasSpotLite | undefined;
+        if (spot) selectSpot(spot);
+      },
+    );
+  } catch (e) {
+    console.warn('[atlas] setCluster failed, falling back to plain markers', e);
+    for (const s of list.slice(0, 600)) {
+      const m = addMarker(map, {
+        position: [s.lng, s.lat],
+        anchor: 'center',
+        title: s.name,
+        contentHtml: `<span class="atlas-dot" style="--dot:${spotMarkerColor(s)}"></span>`,
+      });
+      m.onClick(() => selectSpot(s));
+      plainMarkers.push(m);
+    }
   }
 }
 
@@ -839,7 +821,7 @@ function renderRailSpots(list: AtlasSpotLite[]) {
  * 公路侧点渲染：优先用服务端省/市聚合；点开某市再按需拉高分单点。
  */
 function renderRoadSpots(_list: AtlasSpotLite[]) {
-  if (!map || !AMapRef) return;
+  if (!map) return;
   if (roadLoading.value && !roadLoaded.value) return;
   clearRoadSpots();
 
@@ -858,20 +840,19 @@ function renderRoadSpots(_list: AtlasSpotLite[]) {
           .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
           .slice(0, CITY_EXPAND_MARKERS);
       }
-      if (!map || !AMapRef) return;
+      if (!map) return;
       // 异步回来时用户可能已切走市/缩放
       if (roadSpotLod() !== 'spots' || (cityKey && activeCity.value !== cityKey)) return;
       clearRoadSpots();
       for (const spot of inCity) {
-        const m = new AMapRef.Marker({
+        const m = addMarker(map, {
           position: [spot.lng, spot.lat],
           anchor: 'center',
           title: `${spot.name} · ${spot.score ?? '—'}分`,
-          content: `<span class="atlas-dot atlas-dot--road" data-spot="${escHtml(spot.id)}" title="${escHtml(spot.name)}"></span>`,
+          contentHtml: `<span class="atlas-dot atlas-dot--road" data-spot="${escHtml(spot.id)}" title="${escHtml(spot.name)}"></span>`,
           zIndex: 96,
         });
-        m.on('click', () => selectSpot(spot));
-        map.add(m);
+        m.onClick(() => selectSpot(spot));
         roadPlainMarkers.push(m);
       }
     })();
@@ -982,7 +963,7 @@ function onRoadMapViewChange() {
 function clearRoadSpots() {
   for (const m of roadPlainMarkers) {
     try {
-      map?.remove(m);
+      m.remove();
     } catch {
       /* ignore */
     }
@@ -990,100 +971,71 @@ function clearRoadSpots() {
   roadPlainMarkers = [];
 }
 
-function resolveHeatMapCtor(): (new (...args: any[]) => any) | null {
-  if (!AMapRef) return null;
-  const ctor = AMapRef.HeatMap || AMapRef.Heatmap;
-  return typeof ctor === 'function' ? ctor : null;
-}
-
-function renderHeat() {
-  if (!map || !AMapRef) return;
-  if (heat) {
+async function renderHeat() {
+  if (!map) return;
+  if (heatCtl) {
     try {
-      heat.hide?.();
-      heat.setMap?.(null);
+      heatCtl.clear();
     } catch {
       /* ignore */
     }
-    heat = null;
+    heatCtl = null;
   }
   if (!heatOn.value) return;
 
-  const HeatMapCtor = resolveHeatMapCtor();
-  if (!HeatMapCtor) {
-    heatSupported.value = false;
-    heatOn.value = false;
-    return;
-  }
+  // MapLibre 原生 heatmap，始终可用
+  heatSupported.value = true;
 
   /*
-   * HeatMap 走 canvas，颜色必须是实色；CSS 变量无效会导致整层不渲染。
-   *
-   * 权重口径（v0.6.4 修正）：原先每点 count 固定 1、max 按总数动态
-   * （`points.length / 80`）。切到公路来源后点数从 624 涨到 1.2 万，
-   * max 随之变成 ~151，单点相对强度降到 1/151 —— 热力层几乎不可见，
-   * 表现为「热力图开关打开但看不到东西」。
-   * 改为：max 固定 12（有评分用评分、无评分用 1），密度差异由点数与评分共同表达，
-   * 两侧来源的观感一致，且高评分景点自然更热。
+   * 权重口径（v0.6.4）：max 固定 12（有评分用评分、无评分用 1），
+   * 密度差异由点数与评分共同表达；适配层 weight 期望 0–1，故除以 12。
    */
   const points = filteredSpots.value
     .filter((s) => Number.isFinite(s.lng) && Number.isFinite(s.lat))
-    .map((s) => ({
-      lng: s.lng,
-      lat: s.lat,
-      // 评分 0–100 → 1–12；无评分（铁路侧数据源无 score）按 6 计
-      count: Number.isFinite(s.score) ? Math.max(1, Math.min(12, s.score! / 8)) : 6,
-    }));
+    .map((s) => {
+      const scoreW = Number.isFinite(s.score) ? Math.max(1, Math.min(12, s.score! / 8)) : 6;
+      return { lng: s.lng, lat: s.lat, weight: scoreW / 12 };
+    });
   if (!points.length) return;
 
   try {
-    heat = new HeatMapCtor(map, {
-      radius: 16,
-      opacity: [0, 0.72],
-      gradient: ATLAS_HEAT_GRADIENT,
-      zooms: [3, 20],
-      zIndex: 120,
-    });
-    heat.setDataSet({
-      // 固定上限：与来源无关，铁路/公路两侧观感一致
-      max: 12,
-      data: points,
-    });
-    heat.show?.();
+    heatCtl = await setHeatmap(map, points, { radius: 16, opacity: 0.72 });
   } catch (e) {
-    console.warn('[atlas] HeatMap failed', e);
-    heatSupported.value = false;
+    console.warn('[atlas] heatmap failed', e);
     heatOn.value = false;
-    heat = null;
+    heatCtl = null;
   }
 }
 
-function renderNetwork() {
-  if (!map || !AMapRef) return;
-  for (const c of corridors.value) {
-    if (c.polyline.length < 2) continue;
-    const line = new AMapRef.Polyline({
-      path: c.polyline,
-      strokeColor: ATLAS_NETWORK_STROKE,
-      strokeWeight: 1.5,
-      strokeOpacity: 0.42,
-      strokeStyle: 'solid',
-      lineJoin: 'round',
-      lineCap: 'round',
-      zIndex: 30,
-      // 底图路网只作示意：不可点。选中线路走侧栏/搜索，避免密线区误触弹出蓝线
-      clickable: false,
-      bubble: true,
-      cursor: 'default',
-    });
-    map.add(line);
-    baseLines.push(line);
-    lineByCorridor.set(c.id, line);
+async function renderNetwork() {
+  if (!map) return;
+  for (const l of baseLines) {
+    try {
+      l.remove();
+    } catch {
+      /* ignore */
+    }
   }
+  baseLines = [];
+  // 全部走廊合成一个 source：旧路径对每条线 await addPolyline，
+  // 在 isStyleLoaded 等 source 时会把景点绘制堵死数分钟。
+  const paths = corridors.value
+    .filter((c) => c.polyline.length >= 2)
+    .map((c) => c.polyline as [number, number][]);
+  if (!paths.length) return;
+  // 底图路网只作示意：不可点。选中线路走侧栏/搜索，避免密线区误触弹出蓝线
+  const line = await addMultiPolyline(map, {
+    paths,
+    color: ATLAS_NETWORK_STROKE,
+    weight: 1.25,
+    opacity: 0.28,
+    zIndex: 30,
+  });
+  baseLines.push(line);
 }
 
 function getMapChromeInsets(): [number, number, number, number] {
-  // setFitView avoid：[上, 右, 下, 左]，为单位像素
+  // fitBounds padding 源：[上, 右, 下, 左]，为单位像素；调用处转 {top,right,bottom,left}
   const edge = 36;
   const dock = document.querySelector('.atlas-dock') as HTMLElement | null;
   const layers = document.querySelector('.atlas-layers') as HTMLElement | null;
@@ -1119,10 +1071,8 @@ function mapPixelSize(): { w: number; h: number } {
   if (el?.clientWidth && el?.clientHeight) {
     return { w: el.clientWidth, h: el.clientHeight };
   }
-  const size = map?.getSize?.();
-  const w = Number(size?.width ?? size?.getWidth?.() ?? 0);
-  const h = Number(size?.height ?? size?.getHeight?.() ?? 0);
-  return { w, h };
+  const canvas = map?.raw?.getCanvas?.();
+  return { w: canvas?.clientWidth ?? 0, h: canvas?.clientHeight ?? 0 };
 }
 
 /**
@@ -1135,26 +1085,7 @@ function centerSpotInView(lng: number, lat: number, preferZoom = 12) {
   const [top, right, bottom, left] = getMapChromeInsets();
   const { w, h } = mapPixelSize();
   // 12 ≈ 区县/景区级：比全国视野大很多，又不到街道级
-  const prevAnimate = map.getStatus?.()?.animateEnable;
-  try {
-    map.setStatus?.({ animateEnable: false });
-  } catch {
-    /* ignore */
-  }
-  try {
-    map.setZoomAndCenter(preferZoom, [lng, lat]);
-  } catch {
-    try {
-      map.setZoom(preferZoom, true);
-    } catch {
-      map.setZoom(preferZoom);
-    }
-    try {
-      map.setCenter([lng, lat], true);
-    } catch {
-      map.setCenter([lng, lat]);
-    }
-  }
+  map.setZoomAndCenter(preferZoom, [lng, lat], false);
 
   if (w && h) {
     const availW = Math.max(1, w - left - right);
@@ -1164,24 +1095,18 @@ function centerSpotInView(lng: number, lat: number, preferZoom = 12) {
     const panY = top + availH * 0.42 - h / 2;
     if (Number.isFinite(panX) && Number.isFinite(panY) && (Math.abs(panX) >= 1 || Math.abs(panY) >= 1)) {
       try {
-        map.panBy(panX, panY);
+        map.raw.panBy([panX, panY], { animate: false });
       } catch {
         /* ignore */
       }
     }
-  }
-
-  try {
-    map.setStatus?.({ animateEnable: prevAnimate !== false });
-  } catch {
-    /* ignore */
   }
 }
 
 function clearFocusMarker() {
   if (!focusMarker) return;
   try {
-    map?.remove(focusMarker);
+    focusMarker.remove();
   } catch {
     /* ignore */
   }
@@ -1189,63 +1114,56 @@ function clearFocusMarker() {
 }
 
 function showFocusMarker(spot: AtlasSpotLite) {
-  if (!map || !AMapRef) return;
+  if (!map) return;
   clearFocusMarker();
   const color = spotMarkerColor(spot);
-  focusMarker = new AMapRef.Marker({
+  focusMarker = addMarker(map, {
     position: [spot.lng, spot.lat],
     anchor: 'center',
     zIndex: 320,
-    content: `<span class="atlas-focus" style="--dot:${color}" title="${escHtml(spot.name)}"><i></i></span>`,
-    offset: new AMapRef.Pixel(0, 0),
+    contentHtml: `<span class="atlas-focus" style="--dot:${color}" title="${escHtml(spot.name)}"><i></i></span>`,
   });
-  focusMarker.on('click', () => {
+  focusMarker.onClick(() => {
     ignoreMapClickClear = true;
     clearSpotSelection();
   });
-  map.add(focusMarker);
 }
 
 function clearCorridorHighlight() {
   selectedCorridorId.value = '';
   if (!highlightLine) return;
   try {
-    map?.remove(highlightLine);
+    highlightLine.remove();
   } catch {
     /* ignore */
   }
   highlightLine = null;
 }
 
-function focusCorridor(id: string) {
-  const line = lineByCorridor.get(id);
+async function focusCorridor(id: string) {
   const target = corridors.value.find((c) => c.id === id);
-  if (!line || !target || !map) return;
+  if (!target || !map || target.polyline.length < 2) return;
   selectedCorridorId.value = id;
   if (highlightLine) {
     try {
-      map.remove(highlightLine);
+      highlightLine.remove();
     } catch {
       /* ignore */
     }
+    highlightLine = null;
   }
-  highlightLine = new AMapRef.Polyline({
-    path: target.polyline,
-    strokeColor: ATLAS_RAIL_STROKE,
-    strokeWeight: 5,
-    strokeOpacity: 0.95,
-    lineJoin: 'round',
-    lineCap: 'round',
+  // 高亮线不抢景点点击（无 onClick）
+  highlightLine = await addPolyline(map, {
+    path: target.polyline as [number, number][],
+    color: ATLAS_RAIL_STROKE,
+    weight: 5,
+    opacity: 0.95,
     zIndex: 50,
-    // 高亮线同样不抢景点点击
-    clickable: false,
-    bubble: true,
   });
-  map.add(highlightLine);
   try {
-    map.setFitView([highlightLine], false, getMapChromeInsets());
+    map.fitBounds(highlightLine.getBoundsCoords(), chromePadding(), false);
   } catch {
-    map.setZoomAndCenter(7, target.polyline[0]!);
+    map.setZoomAndCenter(7, target.polyline[0]! as [number, number]);
   }
 }
 
@@ -1275,7 +1193,7 @@ function focusSpotById(id: string) {
 
 /** 景点榜点击：选中并把地图移到该点（榜单条目可点开的核心交互） */
 function focusSpot(spot: AtlasSpotLite) {
-  if (!map || !AMapRef) {
+  if (!map) {
     selectSpot(spot);
     return;
   }
@@ -1314,34 +1232,30 @@ function goRouteDetail() {
   void router.push(`/route/${selectedCorridorId.value}`);
 }
 
-/** 聚焦一条编号公路：加粗高亮 + fitView（与铁路走廊同一套交互） */
-function focusRoad(key: string) {
+/** 聚焦一条编号公路：加粗高亮 + fitBounds（与铁路走廊同一套交互） */
+async function focusRoad(key: string) {
   const target = roadCorridors.value.find((r) => r.key === key);
-  if (!target || !map || !AMapRef) return;
+  if (!target || !map) return;
   selectedCorridorId.value = key;
   if (highlightLine) {
     try {
-      map.remove(highlightLine);
+      highlightLine.remove();
     } catch {
       /* ignore */
     }
+    highlightLine = null;
   }
-  highlightLine = new AMapRef.Polyline({
-    path: target.polyline,
-    strokeColor: roadColor(target.class),
-    strokeWeight: 5,
-    strokeOpacity: 0.95,
-    lineJoin: 'round',
-    lineCap: 'round',
+  highlightLine = await addPolyline(map, {
+    path: target.polyline as [number, number][],
+    color: roadColor(target.class),
+    weight: 5,
+    opacity: 0.95,
     zIndex: 50,
-    clickable: false,
-    bubble: true,
   });
-  map.add(highlightLine);
   try {
-    map.setFitView([highlightLine], false, getMapChromeInsets());
+    map.fitBounds(highlightLine.getBoundsCoords(), chromePadding(), false);
   } catch {
-    map.setZoomAndCenter(7, target.polyline[0]!);
+    map.setZoomAndCenter(7, target.polyline[0]! as [number, number]);
   }
 }
 
@@ -1350,51 +1264,30 @@ function goRoadBoard(boardId: string) {
   void router.push(`/drive/rankings/${encodeURIComponent(boardId)}`);
 }
 
-async function loadPlugins() {
-  if (!map || !AMapRef) return;
-  await new Promise<void>((resolve) => {
-    let done = false;
-    const finish = () => {
-      if (done) return;
-      done = true;
-      resolve();
-    };
-    try {
-      // 官方示例用 map.plugin；AMap.plugin 作兜底
-      const loader = typeof map.plugin === 'function' ? map.plugin.bind(map) : AMapRef.plugin?.bind(AMapRef);
-      if (!loader) {
-        finish();
-        return;
-      }
-      loader(['AMap.MarkerCluster', 'AMap.HeatMap'], () => finish());
-    } catch {
-      finish();
-    }
-    window.setTimeout(finish, 8000);
-  });
-  heatSupported.value = !!resolveHeatMapCtor();
-}
-
 async function initMap() {
-  const key = import.meta.env.VITE_AMAP_KEY;
-  if (!key) {
-    mapError.value = '未配置 VITE_AMAP_KEY（apps/web/.env），地图不可用';
+  const tk = (import.meta.env.VITE_TIANDITU_TK || '').trim();
+  if (!tk) {
+    mapError.value = '未配置 VITE_TIANDITU_TK（apps/web/.env），地图不可用';
     return;
   }
   try {
-    AMapRef = await loadAmap(key, import.meta.env.VITE_AMAP_SECURITY);
+    await loadMapEngine();
   } catch {
-    mapError.value = '高德地图脚本加载失败，请检查网络或 Key 配置';
+    mapError.value = '地图引擎加载失败，请检查网络';
     return;
   }
   if (!mapEl.value) return;
-  map = new AMapRef.Map(mapEl.value, {
+  map = createMap(mapEl.value, {
     zoom: 4.4,
     center: [104.5, 34.5],
-    viewMode: '2D',
-    mapStyle: AMAP_MAP_STYLE,
   });
-  map.getContainer().addEventListener('click', (event: MouseEvent) => {
+  await new Promise<void>((resolve) => {
+    if (map!.raw.isStyleLoaded()) resolve();
+    else map!.raw.once('load', () => resolve());
+  });
+  heatSupported.value = true;
+
+  map.raw.getContainer().addEventListener('click', (event: MouseEvent) => {
     const t = event.target as HTMLElement;
     if (t.closest?.('[data-info-close]')) {
       clearSpotSelection();
@@ -1404,8 +1297,8 @@ async function initMap() {
     onMapClickDelegated(event);
   });
   // 点空白处收起高亮蓝线与景点选中（路网已不可点，避免密线区误触）
-  map.on('click', (e: { originEvent?: Event }) => {
-    const t = e?.originEvent?.target as HTMLElement | undefined;
+  map.on('click', (e: { originalEvent?: Event }) => {
+    const t = e?.originalEvent?.target as HTMLElement | undefined;
     if (t?.closest?.('.atlas-focus, .atlas-dot, .atlas-cluster, .atlas-iw, .atlas-prov-cluster')) {
       return;
     }
@@ -1418,9 +1311,14 @@ async function initMap() {
   });
   map.on('zoomend', onRoadMapViewChange);
   map.on('moveend', onRoadMapViewChange);
-  await loadPlugins();
-  renderNetwork();
+  // 景点优先：路网再厚也不能挡住首屏点位
   renderSpots();
+  if (heatOn.value) void renderHeat();
+  try {
+    await renderNetwork();
+  } catch (e) {
+    console.warn('[atlas] renderNetwork failed', e);
+  }
 }
 
 async function load() {
@@ -1457,9 +1355,14 @@ async function reloadAll() {
   await load();
   if (!map) await initMap();
   else {
-    renderNetwork();
     renderSpots();
-    if (roadLayerOn.value) renderRoadLayer();
+    try {
+      await renderNetwork();
+    } catch (e) {
+      console.warn('[atlas] renderNetwork failed', e);
+    }
+    if (roadLayerOn.value) void renderRoadLayer();
+    if (heatOn.value) void renderHeat();
   }
 }
 
@@ -1488,12 +1391,13 @@ onUnmounted(() => {
   } catch {
     /* ignore */
   }
+  infoWindow = null;
   clearFocusMarker();
   clearCluster();
   clearRoadSpots();
   for (const l of baseLines) {
     try {
-      map?.remove(l);
+      l.remove();
     } catch {
       /* ignore */
     }
@@ -1501,28 +1405,27 @@ onUnmounted(() => {
   baseLines = [];
   for (const l of roadPolylines) {
     try {
-      map?.remove(l);
+      l.remove();
     } catch {
       /* ignore */
     }
   }
   roadPolylines = [];
-  lineByCorridor.clear();
   if (highlightLine) {
     try {
-      map?.remove(highlightLine);
+      highlightLine.remove();
     } catch {
       /* ignore */
     }
     highlightLine = null;
   }
-  if (heat) {
+  if (heatCtl) {
     try {
-      heat.setMap?.(null);
+      heatCtl.clear();
     } catch {
       /* ignore */
     }
-    heat = null;
+    heatCtl = null;
   }
   if (roadLodRedrawTimer) {
     clearTimeout(roadLodRedrawTimer);
@@ -1676,7 +1579,7 @@ watch(spotOrigin, (v) => {
       </div>
     </div>
 
-    <!-- 外层必须是 .atlas-dock：样式 / fitView 避让都认这个类；勿改回 atlas-side（会沉到地图下面） -->
+    <!-- 外层必须是 .atlas-dock：样式 / fitBounds 避让都认这个类；勿改回 atlas-side（会沉到地图下面） -->
     <aside class="atlas-dock" :class="{ 'is-collapsed': !sidebarOpen }">
       <template v-if="sidebarOpen">
         <header class="atlas-dock__head">
@@ -2988,7 +2891,7 @@ watch(spotOrigin, (v) => {
 </style>
 
 <style>
-/* AMap 注入 DOM 的全局片段 */
+/* 地图 Marker / 聚合气泡（挂到 MapLibre DOM） */
 .atlas-dot {
   display: block;
   width: 7px;

@@ -352,14 +352,13 @@ export const api = {
   },
   /**
    * 双引擎 OD 规划。
-   * engine：auto（默认，本地公路网 A* 优先）/ local（只用本地拓扑）/ amap（只用高德驾车规划）。
-   * 缺省不再走高德 —— 本地拓扑已是全国网，跨省 OD 可离线复算。
+   * engine：auto（默认，本地公路网 A* 优先）/ local（只用本地拓扑）。
    */
   planDriveRoute(params: {
     from: string;
     to: string;
     via?: string[];
-    engine?: 'auto' | 'local' | 'amap';
+    engine?: 'auto' | 'local';
   }) {
     const qs = new URLSearchParams({ from: params.from, to: params.to });
     if (params.via?.length) qs.set('via', params.via.join(';'));
@@ -375,7 +374,7 @@ export const api = {
     cat?: string[];
     min?: number;
     max?: number;
-    engine?: 'auto' | 'local' | 'amap';
+    engine?: 'auto' | 'local';
   }) {
     const qs = new URLSearchParams();
     if (params.from) qs.set('from', params.from);
@@ -438,7 +437,7 @@ export const api = {
       geomAvailable: boolean[];
     }>(`/drive/board/${encodeURIComponent(boardId)}`);
   },
-  /** 景点到达时刻天气（和风优先，未配置 Key 时服务端回退 Open-Meteo） */
+  /** 景点到达时刻天气（和风优先，未配置 Key 时服务端回退 Open-Meteo；前端按 source 署名） */
   getSpotWeathers(
     spots: Array<{
       spotId: string;
@@ -458,7 +457,7 @@ export const api = {
       body: JSON.stringify({ spots }),
     });
   },
-  /** 天象观景 · 事件时刻逐时气象采样（云量分层/湿度/风/零度层，Open-Meteo） */
+  /** 天象观景 · 事件时刻逐时气象采样（云量分层/湿度/风/零度层；当前 Open-Meteo，面板须署名） */
   getSkyMet(
     points: Array<{ pointId: string; lng: number; lat: number; atIso: string }>,
   ) {

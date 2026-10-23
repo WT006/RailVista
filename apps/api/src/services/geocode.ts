@@ -1,7 +1,6 @@
 import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { gcj02ToWgs84 } from '@railvista/shared';
 import { cache } from './cache.js';
 import { lookupStopCoordFromCorridors } from './corridorNetwork.js';
 
@@ -384,52 +383,6 @@ async function nominatimStation(name: string): Promise<Point | null> {
   }
 }
 
-/** 高德地名搜索（火车站类型），GCJ-02，仅作缺坐标兜底 */
-async function amapStation(name: string): Promise<Point | null> {
-  const key = process.env.AMAP_KEY;
-  if (!key) return null;
-  const keywords = name.endsWith('站') ? name : `${name}站`;
-  const qs = new URLSearchParams({
-    key,
-    keywords,
-    types: '150200',
-    offset: '5',
-    page: '1',
-    extensions: 'base',
-  });
-  try {
-    const res = await fetch(`https://restapi.amap.com/v3/place/text?${qs}`, {
-      signal: AbortSignal.timeout(6000),
-    });
-    if (!res.ok) return null;
-    const json = (await res.json()) as {
-      status?: string;
-      pois?: Array<{ name?: string; location?: string }>;
-    };
-    if (json.status !== '1' || !json.pois?.length) return null;
-    const want = normalizeStationName(name);
-    const ranked = [...json.pois].sort((a, b) => {
-      const an = normalizeStationName(a.name || '');
-      const bn = normalizeStationName(b.name || '');
-      const as = an === want || (a.name || '').includes(want) ? 0 : 1;
-      const bs = bn === want || (b.name || '').includes(want) ? 0 : 1;
-      return as - bs;
-    });
-    for (const poi of ranked) {
-      const loc = poi.location?.split(',');
-      if (!loc || loc.length < 2) continue;
-      const lng = Number(loc[0]);
-      const lat = Number(loc[1]);
-      if (!isPlausibleCnRailPoint(lng, lat)) continue;
-      const wgs = gcj02ToWgs84(lng, lat);
-      return { lng: wgs.lng, lat: wgs.lat };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 function acceptPoint(point: Point | null | undefined): point is Point {
   return !!point && isPlausibleCnRailPoint(point.lng, point.lat);
 }
@@ -525,11 +478,6 @@ export async function geocodeStation(name: string): Promise<Point | null> {
     return nom;
   }
 
-  const amap = await amapStation(name);
-  if (acceptPoint(amap) && matchesStationRegion(name, amap.lng, amap.lat)) {
-    rememberGeo(name, amap);
-    return amap;
-  }
   return null;
 }
 
@@ -697,15 +645,14 @@ export async function enrichStopsCoords<
     }
   }
   if (toResolve.length) {
-    // 限并发，避免 Nominatim/高德打爆
+    // 限并发，避免 Nominatim 打爆
     const concurrency = 4;
     const hits: Array<{ name: string; point: Point } | null> = [];
     for (let i = 0; i < toResolve.length; i += concurrency) {
       const batchNames = toResolve.slice(i, i + concurrency);
       const part = await Promise.all(
         batchNames.map(async (s) => {
-          const point =
-            (await nominatimStation(s.name)) || (await amapStation(s.name));
+          const point = await nominatimStation(s.name);
           if (!acceptPoint(point) || !matchesStationRegion(s.name, point.lng, point.lat)) {
             return null;
           }

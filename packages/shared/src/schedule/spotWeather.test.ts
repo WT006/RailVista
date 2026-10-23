@@ -7,6 +7,7 @@ import {
   spotWeatherParts,
   viewHintLabel,
   weatherEmoji,
+  weatherSourceAttribution,
 } from './spotWeather.js';
 
 describe('computeViewHint', () => {
@@ -83,6 +84,27 @@ describe('formatSpotWeatherLabel / spotWeatherParts', () => {
     assert.equal(viewHintLabel('good', 'window'), '窗外视野好');
     assert.equal(viewHintLabel('poor', 'distant'), '远眺受限');
     assert.equal(viewHintLabel('fair', 'on_track'), '穿行一般');
+  });
+});
+
+describe('weatherSourceAttribution', () => {
+  it('returns QWeather attribution', () => {
+    const a = weatherSourceAttribution('qweather');
+    assert.ok(a);
+    assert.match(a!.text, /和风天气/);
+    assert.equal(a!.href, 'https://www.qweather.com');
+  });
+
+  it('returns Open-Meteo attribution', () => {
+    const a = weatherSourceAttribution('open-meteo');
+    assert.ok(a);
+    assert.match(a!.text, /Open-Meteo/);
+    assert.equal(a!.href, 'https://open-meteo.com/');
+  });
+
+  it('returns null for none / missing', () => {
+    assert.equal(weatherSourceAttribution('none'), null);
+    assert.equal(weatherSourceAttribution(undefined), null);
   });
 });
 

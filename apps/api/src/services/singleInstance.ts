@@ -10,10 +10,18 @@ export async function ensureSingleInstance(port: number): Promise<void> {
             `Kill the old process or set PORT to another value. Exiting.`,
         );
         process.exit(1);
-      } else {
-        console.error('[singleInstance] unexpected error', err);
+      }
+      if (err.code === 'EACCES') {
+        console.error(
+          `[singleInstance] port ${port} permission denied (EACCES). ` +
+            `On Windows this often means Hyper-V reserved the port range — ` +
+            `run: netsh interface ipv4 show excludedportrange protocol=tcp ` +
+            `then set PORT outside those ranges. Exiting.`,
+        );
         process.exit(1);
       }
+      console.error('[singleInstance] unexpected error', err);
+      process.exit(1);
     });
     tester.once('listening', () => {
       tester.close(() => resolve());

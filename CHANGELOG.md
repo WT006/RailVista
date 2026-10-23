@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.13.0`**（2026-10-22）
+**当前版本：`0.13.1`**（2026-10-23）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -24,6 +24,25 @@
 4. 变更条目建议包含：改动动机 → 涉及文件 → 行为变化 → 验证方式 → 已知限制/回滚方式。
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
+
+---
+
+## [0.13.1] — 2026-10-23
+
+**合并 `origin/main`（0.13.0 四模块联动）后：Web 运行时切 MapLibre/天地图底图并减负注记与细小道路；线路详情页返回键不再被顶栏压住。**
+
+动机：本分支地图服务替换与合规改造需与 main 的美食/路书/纪念票联动并存；线路详情顶栏返回在桌面档因 `padding` 简写盖掉 `appbar-offset` 而不可见。
+
+涉及要点：
+
+| 项 | 说明 |
+| --- | --- |
+| `apps/web/src/map/{engine,tiandituStyle,attribution}.ts` | 去掉运行时高德 Web 底图；天地图 WMTS + MapLibre；`ROAD_LOD` / 注记淡出 |
+| `apps/web/src/pages/{TripMap,CorridorMap,AtlasMap,DriveTripMap,RouteDetail}.vue` | 统一走 map engine；站点卡保留美食 HTML；RouteDetail 显式「‹ 返回」并修顶栏避让 |
+| `apps/api/src/services/roadRouting.ts` | 运行时驾车仍本地 A* + OSRM，不回调高德/百度 Web |
+| 版本 | `0.13.0` → `0.13.1`（并入本分支地图改动） |
+
+验证：合并冲突已手工解决；建议本地再跑 `pnpm --filter @railvista/web build`。
 
 ---
 

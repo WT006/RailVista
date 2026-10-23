@@ -2021,6 +2021,14 @@
   stroke-linejoin: round;
   stroke-linecap: round;
   filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 50%, transparent));
+  pointer-events: none;
+}
+
+/* 底层保底整线：略粗略淡，不被 dash 动画裁切；圆点仍画在整条线之上 */
+.drive-trip-map__route.is-underlay {
+  stroke-width: 4px;
+  stroke-opacity: 0.55;
+  filter: none;
 }
 
 .drive-trip-map__segment {

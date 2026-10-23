@@ -908,17 +908,25 @@ html:has(.drive-map-page) #app {
   border-color: var(--line-hairline);
 }
 
-/* 天气条：左现象+气温，右观景提示徽章 */
+/* 天气条：上行现象+提示，下行数据源署名（和风 / Open-Meteo 合规） */
 .wx-strip {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
   margin: 8px 0 2px;
   padding: 7px 10px;
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--text-2) 8%, transparent);
   border: 1px solid color-mix(in srgb, var(--text-2) 16%, transparent);
+  min-width: 0;
+}
+
+.wx-strip__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -928,6 +936,22 @@ html:has(.drive-map-page) #app {
   gap: 6px;
   min-width: 0;
   flex: 1;
+}
+
+.wx-strip__attr {
+  display: block;
+  font-size: 10px;
+  line-height: 1.35;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-3);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: normal;
+}
+
+.wx-strip__attr:hover {
+  color: var(--text-2);
 }
 
 .wx-strip__emoji {
@@ -1773,8 +1797,13 @@ html:has(.drive-map-page) #app {
 }
 
 .spot-marker {
-  background: linear-gradient(160deg, var(--spot), var(--spot));
-  color: var(--text-1);
+  background: linear-gradient(
+    160deg,
+    var(--map-amber-bright, #ffd08a),
+    var(--map-amber, #ffb84d) 55%,
+    var(--map-amber-deep, #ffa028)
+  );
+  color: var(--map-amber-ink, #1a1206);
   font-size: 11px;
   font-weight: 700;
   min-width: 22px;
@@ -1785,7 +1814,10 @@ html:has(.drive-map-page) #app {
   white-space: nowrap;
   line-height: 18px;
   text-align: center;
-  box-shadow: 0 4px 12px var(--danger);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--map-amber-deep, #ffa028) 35%, transparent),
+    0 0 12px color-mix(in srgb, var(--map-amber, #ffb84d) 55%, transparent),
+    0 4px 10px rgba(0, 0, 0, 0.45);
 }
 
 .spot-marker--compact {
@@ -2292,4 +2324,118 @@ html:has(.drive-map-page) #app {
     transition: none;
     animation: none;
   }
+}
+
+/* ── MapLibre + 天地图适配层 ─────────────────────────────────────────── */
+/*
+ * 双 map 叠层（见 engine createMap）：
+ *   .rv-map-basemap  — 仅瓦片 + 雅士灰滤镜（对标旧高德 amap://styles/grey）
+ *   .rv-map-overlay  — 透明，铁路/景点/Marker/热力真彩，优先级更高
+ */
+.rv-map-stack {
+  position: relative;
+  /* 雅士灰陆面基准（参考稿 / 旧高德 grey ≈ #1a1c22） */
+  background: #1a1c22;
+}
+
+.rv-map-stack > .rv-map-basemap,
+.rv-map-stack > .rv-map-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.rv-map-basemap {
+  z-index: 0;
+  pointer-events: none;
+}
+
+.rv-map-overlay {
+  z-index: 1;
+  background: transparent !important;
+}
+
+.maplibregl-map {
+  font: inherit;
+  background: #1a1c22;
+}
+
+.rv-map-basemap.maplibregl-map {
+  background: #1a1c22;
+}
+
+.rv-map-overlay.maplibregl-map {
+  background: transparent;
+}
+
+.rv-map-overlay .maplibregl-canvas {
+  background: transparent !important;
+}
+
+/*
+ * 雅士灰：严格对标旧高德 `amap://styles/grey` / 产品参考中国地图。
+ * 只滤底图 canvas —— 陆面炭灰、海面略深、国界保留淡珊瑚红；
+ * 铁路/景点在 overlay，不受滤镜。
+ * saturate 过高路网发紫；过低国界红被洗掉。brightness 过低变死黑。
+ */
+.rv-map-basemap.rv-map--yashi-grey .maplibregl-canvas {
+  filter: invert(1) hue-rotate(180deg) saturate(0.58) brightness(1.06) contrast(0.94);
+}
+
+.maplibregl-map .maplibregl-marker {
+  z-index: 2 !important;
+}
+
+.maplibregl-map .maplibregl-control-container {
+  z-index: 3;
+}
+
+/* 景点/站点介绍卡片须压过 Marker，否则编号点会盖住正文 */
+.maplibregl-map .maplibregl-popup,
+.maplibregl-map .rv-map-popup {
+  z-index: 20 !important;
+}
+
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+  line-height: 1.35;
+  max-width: min(72vw, 360px);
+  color: var(--text-2, #9aa7b8);
+  background: color-mix(in srgb, var(--surface-1, #131820) 88%, transparent) !important;
+}
+
+.rv-map-attribution {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 4;
+  pointer-events: none;
+  max-width: min(70vw, 340px);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--text-2, #9aa7b8);
+  background: color-mix(in srgb, var(--surface-1, #131820) 90%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 35%);
+}
+
+.rv-map-marker {
+  cursor: pointer;
+}
+
+.rv-map-popup .maplibregl-popup-content {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.rv-map-popup .maplibregl-popup-tip {
+  display: none;
+}
+
+/* 关闭钮由卡片内 .map-info-card__close 负责，隐藏 MapLibre 默认 × */
+.rv-map-popup .maplibregl-popup-close-button {
+  display: none !important;
 }

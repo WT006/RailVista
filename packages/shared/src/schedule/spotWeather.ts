@@ -218,6 +218,40 @@ export function formatSpotWeatherLabel(
   return parts.filter(Boolean).join(' · ');
 }
 
+/** 天气数据源署名（和风许可 / Open-Meteo CC BY） */
+export type WeatherAttribution = {
+  source: Exclude<SpotWeatherSource, 'none'>;
+  text: string;
+  href: string;
+};
+
+/**
+ * 按实际 provider 返回合规署名；`none` / 未知返回 null。
+ * UI 须清晰可见、独立放置，勿埋进正文或紧挨广告。
+ */
+export function weatherSourceAttribution(
+  source?: SpotWeatherSource | null,
+): WeatherAttribution | null {
+  if (source === 'qweather') {
+    return {
+      source: 'qweather',
+      text: '天气服务由和风天气驱动',
+      href: 'https://www.qweather.com',
+    };
+  }
+  if (source === 'open-meteo') {
+    return {
+      source: 'open-meteo',
+      text: 'Weather data by Open-Meteo.com',
+      href: 'https://open-meteo.com/',
+    };
+  }
+  return null;
+}
+
+/** @deprecated 使用 weatherSourceAttribution */
+export const weatherAttribution = weatherSourceAttribution;
+
 /** 从小时序列中取最接近 targetIso 的一档；超出范围返回 null */
 export function pickHourlyNearest<T extends { atMs: number }>(
   hours: T[],

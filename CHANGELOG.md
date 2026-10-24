@@ -3,7 +3,7 @@
 > 本文件位于仓库根目录，是**唯一的变更记录入口**。
 > 所有版本历史、改动内容与版本号都在这里维护。
 
-**当前版本：`0.13.2`**（2026-10-23）
+**当前版本：`0.13.5`**（2026-10-24）
 
 版本号的唯一来源是 `packages/shared/src/version.ts` 的 `APP_VERSION` 常量，
 前端首页（"选择行程"页顶部徽标）直接读取该常量渲染，因此**界面版本号与本文件始终一致**。
@@ -25,6 +25,98 @@
 5. 若一次改动同时影响需求文档（如 `docs/scenic-supplement-20260928.md`），在条目中注明对应章节，便于回溯。
 6. 目前仍处于 `0.x` 阶段，允许在 `MINOR` 中做少量不兼容调整，但必须在本文件显式说明。
 
+---
+
+## [0.13.5] — 2026-10-24
+
+**天地图瓦片改为 BFF 反代 + 磁盘缓存：Key 留服务端，热门瓦片多人共享，降低个人版日配额压力。**
+
+动机：浏览器直连会把 `tk` 打进前端包，且每用户每刷一遍都计配额；单用户拖图即可接近日限。
+
+改动：
+
+| 项 | 说明 |
+| --- | --- |
+| `apps/api/src/routes/mapTiles.ts` | `GET /api/map-tiles/{layer}/{z}/{y}/{x}`；磁盘缓存；`/_status` |
+| `apps/api/src/index.ts` | 挂载路由；瓦片路径排除 120/min 全局限流 |
+| `apps/web/src/map/tileSource.ts` | 默认 `proxy`；可选 `direct` |
+| `apps/web/src/map/tiandituStyle.ts` / `engine.ts` | 底图 URL 走 BFF |
+| `TIANDITU_TK` | 仅 `apps/api/.env`；`apps/api/.cache/` 已 gitignore |
+
+验证：`/api/map-tiles/_status` → `tk:set`；同一瓦片连续请求 `X-Tile-Cache: HIT`。
+
+回滚：前端设 `VITE_TIANDITU_TILE_MODE=direct` 并配浏览器端 Key；或还原 style URL。
+
+---
+
+## [0.13.4] — 2026-10-24
+
+**缓存行程已到站超过 10 分钟后，地图不再自动弹出终站美食与临近景点通告。**
+
+动机：从缓存恢复已结束行程时，进度钉在终点，终站落在过站美食窗口、终点附近景点仍命中临近窗口，一进地图就弹出「已到达」美食卡 / 景点卡，挡视野。
+
+改动：`apps/web/src/pages/TripMap.vue` 新增 `suppressPostArrivalToasts`（图定到站后 ≥10 分钟，或进度已满且已过到站宽限）→ `approachingSpot` / `approachingStation` / `approachingStationFood` 直接返回 null。到站后 10 分钟内仍正常提示。
+
+验证：打开一趟到站已逾 10 分钟的缓存行程地图，顶部不应再自动出「已到达」美食卡或终点附近景点卡；在途行程不受影响。
+
+回滚：删掉 `suppressPostArrivalToasts` 相关三处短路即可。
+
+---
+
+## [0.13.3] — 2026-10-24
+
+**地图页在 overlay 自绘省界与完整国土外轮廓（红色国界），补回底图路网淡化时被一并压淡的行政区轮廓。**
+
+动机：0.13.2 用 `ROAD_FADE` 压低天地图 `vec` 路网后，烧在同一张栅格里的国界/省界一起变淡，广域视角轮廓发虚。天地图无法单独调境界透明度，只能自绘。原数据「境界线」只是局部补段，不足以画整条邻国交界。
+
+改动：
+
+| 项 | 说明 |
+| --- | --- |
+| `apps/web/public/geo/china-admin-boundaries.json` | 省级面（34）+ 合并后国土外轮廓 `kind:national`（红）+ 原境界线补段 |
+| `scripts/extract-china-national-border.mjs` | `polygon-clipping` union 省级面 → 外轮廓 MultiLineString |
+| `apps/web/src/map/engine.ts` | `createMap` 默认 `ensureAdminBoundaries`：省界淡珊瑚、国界 `#e11d2e`；沉底；`adminBoundaries: false` 可关 |
+| `apps/web/src/map/engine.ts` | 新增 `MAP_MAX_ZOOM = 15`，两张 map 同时设 `maxZoom`；可用 `createMap(..., { maxZoom })` 覆盖 |
+| `apps/web/src/map/tiandituStyle.ts` | 注释指向自绘境界方案 |
+
+行为：淡珊瑚省界；大陆/岛屿外缘与邻国交界为红色（`#e11d2e`）；不受雅士灰滤镜与 `ROAD_FADE` 影响。
+
+顺带限高：地图最大缩放收到 **z15**（1440px 屏宽约 2.9km，纬度 32°；z14 ≈ 5.8km、z16 ≈ 1.5km）。
+z15 之后天地图只剩街区轮廓、注记在 10.6 就已关闭，继续放大只是把瓦片拉大、越拉越糊，还会让街巷网格铺满整屏；
+`fitBounds` 本来在 14 就停，留到 15 只为手动细看站点周边。改 `MAP_MAX_ZOOM` 一个常量即可整体调整。
+
+到顶即「卡死」：`maxZoom` 只保证相机不越界，手势本身仍在跑（滚轮惯性在顶档会反复触发 `easeTo`、双击会再发一次放大动画）。
+新增 `lockZoomInAtMax()`（`apps/web/src/map/engine.ts`）：在容器上以**捕获阶段**拦掉向上放大方向的 `wheel` / `dblclick` / 双指外扩 `touchmove`，
+早于 MapLibre 挂在 canvas 上的监听器，所以到顶后地图完全不动；缩小方向与平移不受影响，`destroy` 时解绑。
+
+### 注记改为「瓦片级 + 单调递增」曲线（修「视角还很大就一屏乡镇名」与「越放大越没字」）
+
+现象一：屏幕 zoom 约 8.6（约 240km 宽）时，底图已经铺满乡镇名。查因：MapLibre 取瓦片时
+`tileZ = mapZoom + log2(512 / tileSize)`——`tileSize` 256 深 1 级、128（2× 屏）深 2 级，
+而 style 里的 `['zoom']` 表达式算的是**屏幕 zoom**。早先按屏幕 zoom 设 9.5→10.6 淡出，
+实际早就在看 z9–z10 的瓦片（z9 起就是乡镇名），阈值等于失效。
+
+现象二：把高倍阈值直接收到 0 之后，又出现「越放大地名越少、最深一档全无」的反直觉行为。
+
+改法：`ANNOTATION_FADE` 改为 `[contentZoom, opacity]` 曲线，横轴是瓦片级、纵轴是不透明度，
+构建 style 时用 `tileZoomOffset()` 把 contentZoom 换算回屏幕 zoom：
+
+| contentZoom | 6.2 | 8.4 | 9.2 | 11 | 15 |
+| --- | --- | --- | --- | --- | --- |
+| opacity | 0.95 | 0.95 | 0.6 | 0.55 | 0.5 |
+
+即「越放大、出现的地名越多（市/县 → 加乡镇 → 加街道/POI），但每上一档整体压暗一次」，
+既保留单调递增的直觉，又不让字号密集的档位盖过铁路与路线；`ROAD_LOD.from` 同步改为 `fromContent: 10`。
+
+已知限制：天地图注记是一张图，z9 起县与乡镇同图、z12 起街道与 POI 同图，
+所以做不到「只要县、不要镇」，也无法让字号在各档间保持稳定——真正可控的分级注记需自绘。
+
+验证：`vue-tsc` + `vite build` 通过、style 过 spec 校验；离线按 1× 屏（content = map + 1）
+渲染 z5 / z8 / z10.5 / z13 四档对照（`tmp/tdt-probe/ann_ladder.png`）。
+
+验证：刷新地图广域（约 z5–8），东北—西北—西南邻国边界与海岸线应连续红色；内陆省界仍为淡色。
+
+回滚：`createMap(..., { adminBoundaries: false })`，或删掉 `ensureAdminBoundaries` 调用。
 ---
 
 ## [0.13.2] — 2026-10-23

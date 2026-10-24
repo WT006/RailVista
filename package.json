@@ -1,7 +1,7 @@
 {
   "name": "railvista",
   "private": true,
-  "version": "0.13.2",
+  "version": "0.13.5",
   "description": "RailVista — 铁路旅客车上沿途风景与行程定位伴侣",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
@@ -38,6 +38,8 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "polygon-clipping": "^0.15.7"
   }
 }
-

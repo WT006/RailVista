@@ -33,6 +33,7 @@ import {
   syncYashiGreyClass,
   type BasemapMode,
 } from './tiandituStyle';
+import { resolveBasemapTileSource } from './tileSource';
 
 export type LngLat = [number, number];
 export type { BasemapMode };
@@ -146,12 +147,12 @@ export function loadMapEngine(): Promise<void> {
   return engineReady;
 }
 
+/** @deprecated 用 resolveBasemapTileSource / basemapConfigError */
 export function requireTiandituTk(): string {
-  const tk = (import.meta.env.VITE_TIANDITU_TK || '').trim();
-  if (!tk) {
-    throw new Error('未配置 VITE_TIANDITU_TK（apps/web/.env）');
-  }
-  return tk;
+  const src = resolveBasemapTileSource();
+  if (src.mode === 'direct') return src.tk;
+  // 代理模式前端无 Key；保留此函数以免旧调用崩掉
+  return (import.meta.env.VITE_TIANDITU_TK || '').trim() || 'proxy';
 }
 
 function paddingToObj(
@@ -188,14 +189,85 @@ function toPlainPath(path: LngLat[]): LngLat[] {
   return out;
 }
 
+/**
+ * 到顶之后把「放大」这条路彻底掐住。
+ *
+ * MapLibre 的 maxZoom 只保证最终相机不越界，手势本身仍在跑：滚轮/触控板的惯性事件
+ * 会持续触发 easeTo，到顶后表现为地图在极小的区间里抖；双击也会再发起一次放大动画。
+ * 这里在**捕获阶段**拦掉「向上放大」的事件（早于 MapLibre 挂在 canvas 上的监听器），
+ * 到顶就是真的不动；缩小方向完全不受影响。
+ *
+ * 返回解绑函数，destroy 时调用。
+ */
+function lockZoomInAtMax(el: HTMLElement, map: MlMap, maxZoom: number): () => void {
+  const atMax = () => map.getZoom() >= maxZoom - 1e-3;
+
+  const onWheel = (ev: WheelEvent) => {
+    if (ev.deltaY >= 0) return;
+    if (!atMax()) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+  };
+  const onDblClick = (ev: MouseEvent) => {
+    if (!atMax()) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+  };
+  // pinch 用两指距离判定：间距变大 = 放大，到顶就整段吞掉
+  let pinchStart = 0;
+  const touchDistance = (ev: TouchEvent) =>
+    Math.hypot(ev.touches[0]!.clientX - ev.touches[1]!.clientX, ev.touches[0]!.clientY - ev.touches[1]!.clientY);
+  const onTouchStart = (ev: TouchEvent) => {
+    pinchStart = ev.touches.length === 2 ? touchDistance(ev) : 0;
+  };
+  const onTouchMove = (ev: TouchEvent) => {
+    if (ev.touches.length !== 2 || !pinchStart) return;
+    const spread = touchDistance(ev) - pinchStart;
+    if (spread <= 0 || !atMax()) return;
+    ev.stopPropagation();
+  };
+
+  el.addEventListener('wheel', onWheel, { capture: true, passive: false });
+  el.addEventListener('dblclick', onDblClick, { capture: true });
+  el.addEventListener('touchstart', onTouchStart, { capture: true, passive: true });
+  el.addEventListener('touchmove', onTouchMove, { capture: true, passive: true });
+
+  return () => {
+    el.removeEventListener('wheel', onWheel, true);
+    el.removeEventListener('dblclick', onDblClick, true);
+    el.removeEventListener('touchstart', onTouchStart, true);
+    el.removeEventListener('touchmove', onTouchMove, true);
+  };
+}
+
+/**
+ * 地图最大缩放。
+ *
+ * 天地图 vec/cva 瓦片最多到 z18，但 z15 之后屏幕里只剩街区轮廓、没有新信息
+ * （注记 z10.6 起已关，站区 z15 一屏约 2.9km 足够认站点周边），
+ * 再放大只是把瓦片拉大、越拉越糊，还会把街巷网格铺满整屏。
+ * z14 = 5.8km / z15 = 2.9km / z16 = 1.5km（1440px 屏宽，纬度 32°）。
+ */
+export const MAP_MAX_ZOOM = 15;
+
 export function createMap(
   el: HTMLElement,
-  opts: { center?: LngLat; zoom?: number; basemap?: BasemapMode } = {},
+  opts: {
+    center?: LngLat;
+    zoom?: number;
+    basemap?: BasemapMode;
+    /** 默认 true：在 overlay 自绘省界/境界线（底图路网淡化后补回轮廓） */
+    adminBoundaries?: boolean;
+    /** 默认 MAP_MAX_ZOOM（15）；传更小的值可进一步收紧 */
+    maxZoom?: number;
+  } = {},
 ): MapHandle {
-  const tk = requireTiandituTk();
+  const tileSource = resolveBasemapTileSource();
   const mode: BasemapMode = opts.basemap || 'standard';
   const center = opts.center || ([104, 35] as LngLat);
   const zoom = opts.zoom ?? 5;
+  const maxZoom = opts.maxZoom ?? MAP_MAX_ZOOM;
+  const wantAdminBoundaries = opts.adminBoundaries !== false;
 
   /*
    * 双 map 叠层：底图 canvas 可安全做雅士灰滤镜（对标 amap://styles/grey）；
@@ -215,9 +287,10 @@ export function createMap(
 
   const basemap = new maplibregl.Map({
     container: basemapEl,
-    style: buildDualBasemapStyle(tk, mode),
+    style: buildDualBasemapStyle(tileSource, mode),
     center,
     zoom,
+    maxZoom,
     interactive: false,
     attributionControl: false,
     pixelRatio,
@@ -229,6 +302,7 @@ export function createMap(
     style: buildOverlayStyle(),
     center,
     zoom,
+    maxZoom,
     attributionControl: false,
     pixelRatio,
     canvasContextAttributes: { alpha: true, antialias: true },
@@ -256,17 +330,19 @@ export function createMap(
   );
 
   const attributionEl = ensureAttribution(el);
+  const unlockZoomIn = lockZoomInAtMax(el, raw, maxZoom);
 
   const handle: MapHandle = {
     raw,
     _basemap: basemap,
     _openPopup: null,
     _basemapMode: mode,
-    _tk: tk,
+    _tk: tileSource.mode === 'direct' ? tileSource.tk : 'proxy',
     _overlaySeq: 0,
     _attributionEl: attributionEl,
     destroy() {
       handle.clearInfoWindow();
+      unlockZoomIn();
       raw.off('move', syncBasemapCamera);
       raw.off('moveend', syncBasemapCamera);
       raw.remove();
@@ -339,7 +415,112 @@ export function createMap(
     },
   };
 
+  if (wantAdminBoundaries) {
+    void ensureAdminBoundaries(handle);
+  }
+
   return handle;
+}
+
+/** overlay 行政区划源/层 id（业务线通过 moveLayer 顶到上层，本层保持在底） */
+const ADMIN_SRC = 'rv-admin-boundaries';
+const ADMIN_PROVINCE_LAYER = 'rv-admin-province';
+const ADMIN_BORDER_LAYER = 'rv-admin-border';
+const ADMIN_GEOJSON_URL = '/geo/china-admin-boundaries.json';
+
+/**
+ * 天地图 vec 把路网与国界/省界烧在同一张栅格上，ROAD_FADE 压路时境界一起淡。
+ * overlay 自绘：省界（淡珊瑚）+ 国土外轮廓/邻国交界（红，kind=national）。
+ * 国界几何由 scripts/extract-china-national-border.mjs 合并省级面得到。
+ */
+async function ensureAdminBoundaries(map: MapHandle): Promise<void> {
+  await waitForStyle(map);
+  const raw = map.raw;
+  if (raw.getSource(ADMIN_SRC)) return;
+
+  raw.addSource(ADMIN_SRC, {
+    type: 'geojson',
+    data: ADMIN_GEOJSON_URL,
+  });
+
+  // 省界：淡珊瑚细线（含内陆省界；外缘会被上层红色国界盖住）
+  raw.addLayer({
+    id: ADMIN_PROVINCE_LAYER,
+    type: 'line',
+    source: ADMIN_SRC,
+    filter: ['==', ['get', 'kind'], 'province'],
+    layout: {
+      'line-join': 'round',
+      'line-cap': 'round',
+    },
+    paint: {
+      'line-color': '#c4786a',
+      'line-opacity': 0.55,
+      'line-width': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        3,
+        0.6,
+        6,
+        0.9,
+        10,
+        1.2,
+        13,
+        1.5,
+      ],
+    },
+  });
+
+  // 国界：合并各省后的国土外轮廓 + 原「境界线」补段，整段红色
+  raw.addLayer({
+    id: ADMIN_BORDER_LAYER,
+    type: 'line',
+    source: ADMIN_SRC,
+    filter: ['==', ['get', 'kind'], 'national'],
+    layout: {
+      'line-join': 'round',
+      'line-cap': 'round',
+    },
+    paint: {
+      'line-color': '#e11d2e',
+      'line-opacity': 0.9,
+      'line-width': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        3,
+        1.0,
+        6,
+        1.4,
+        10,
+        1.8,
+        13,
+        2.2,
+      ],
+    },
+  });
+
+  sendAdminBoundariesToBack(raw);
+}
+
+/** 把行政区划层沉到 overlay 最底，避免盖住铁路/景点 */
+function sendAdminBoundariesToBack(raw: MlMap): void {
+  const layers = raw.getStyle()?.layers ?? [];
+  const firstBusiness = layers.find(
+    (l) => l.id !== ADMIN_PROVINCE_LAYER && l.id !== ADMIN_BORDER_LAYER,
+  );
+  if (!firstBusiness) return;
+  try {
+    if (raw.getLayer(ADMIN_PROVINCE_LAYER)) {
+      raw.moveLayer(ADMIN_PROVINCE_LAYER, firstBusiness.id);
+    }
+    if (raw.getLayer(ADMIN_BORDER_LAYER)) {
+      raw.moveLayer(ADMIN_BORDER_LAYER, firstBusiness.id);
+    }
+  } catch {
+    /* style 尚未就绪时忽略 */
+  }
 }
 
 function nextOverlayId(map: MapHandle, prefix: string): string {

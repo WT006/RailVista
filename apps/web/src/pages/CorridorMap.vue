@@ -402,8 +402,10 @@ async function drawMap() {
 }
 
 async function initMap() {
-  if (!import.meta.env.VITE_TIANDITU_TK) {
-    mapError.value = '请配置 VITE_TIANDITU_TK（apps/web/.env）';
+  const { basemapConfigError } = await import('../map/tileSource');
+  const cfgErr = basemapConfigError();
+  if (cfgErr) {
+    mapError.value = cfgErr;
     return;
   }
   try {

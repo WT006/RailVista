@@ -184,11 +184,29 @@ const schedule = computed(() => {
 const currentKm = computed(() => progress.value * railLengthKm.value);
 
 /**
+ * 缓存/回溯行程已到站超过此时长后，不再自动弹出终站美食与临近景点通告。
+ * 刚到站的 10 分钟内仍提示；之后再打开地图不应被终态弹框挡住。
+ */
+const ARRIVAL_TOAST_GRACE_MS = 10 * 60 * 1000;
+
+const suppressPostArrivalToasts = computed(() => {
+  const sch = schedule.value;
+  if (!sch) return false;
+  const arrivedAt = sch.arrival.getTime();
+  if (!Number.isFinite(arrivedAt)) return false;
+  // 进度未走完且时钟未到站：仍在途，正常弹
+  if (progress.value < 1 && now.value.getTime() < arrivedAt) return false;
+  return now.value.getTime() - arrivedAt >= ARRIVAL_TOAST_GRACE_MS;
+});
+
+/**
  * 当前处于「临近窗口」内的景点：进入点前 5km 起提示，过境 2km 后淡出（§4.3）。
  * 多个同时命中时取最先到达的那个。
  * 尚未发车（progress≤0）不弹——起点附近景点会落在 5km 窗口内，否则一进地图就误报。
+ * 到站已超过 {@link ARRIVAL_TOAST_GRACE_MS} 也不弹（缓存终态回看）。
  */
 const approachingSpot = computed<ScenicSpot | null>(() => {
+  if (suppressPostArrivalToasts.value) return null;
   if (!prefs.layers.spot) return null;
   if (progress.value <= 0) return null;
   const list = trip.scenicSpots;
@@ -221,6 +239,7 @@ const STATION_FOOD_TRAIL_KM = 5;
 
 /** 当前落在过站窗口内的车站（取窗口内最后一个，优先表达「正在经过」） */
 const approachingStation = computed(() => {
+  if (suppressPostArrivalToasts.value) return null;
   if (!prefs.layers.station) return null;
   if (progress.value <= 0) return null;
   const stops = segment.value?.stops;
@@ -246,6 +265,7 @@ const approachingStation = computed(() => {
 });
 
 const approachingStationFood = computed(() => {
+  if (suppressPostArrivalToasts.value) return null;
   const a = approachingStation.value;
   if (!a) return null;
   const food = stationFood(a.stop.name, { lng: a.stop.lng, lat: a.stop.lat });
@@ -1440,8 +1460,10 @@ function makeStationMarker(s: Stop): MarkerHandle {
 }
 
 async function initMap() {
-  if (!import.meta.env.VITE_TIANDITU_TK) {
-    error.value = '请配置 VITE_TIANDITU_TK（apps/web/.env）';
+  const { basemapConfigError } = await import('../map/tileSource');
+  const cfgErr = basemapConfigError();
+  if (cfgErr) {
+    error.value = cfgErr;
     return;
   }
   await loadMapEngine();

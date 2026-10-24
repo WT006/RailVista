@@ -253,8 +253,10 @@ function pointNearPath(lng: number, lat: number, path: [number, number][]): bool
 }
 
 async function initMap() {
-  if (!import.meta.env.VITE_TIANDITU_TK) {
-    mapError.value = '未配置 VITE_TIANDITU_TK，地图不可用（其余信息正常展示）';
+  const { basemapConfigError } = await import('../map/tileSource');
+  const cfgErr = basemapConfigError();
+  if (cfgErr) {
+    mapError.value = `${cfgErr}（其余信息正常展示）`;
     return;
   }
   try {

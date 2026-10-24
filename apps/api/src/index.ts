@@ -13,6 +13,7 @@ import { travelRoute } from './routes/travel.js';
 import { weatherRoute } from './routes/weather.js';
 import { skyRoute } from './routes/sky.js';
 import { searchRoute } from './routes/search.js';
+import { mapTilesRoute } from './routes/mapTiles.js';
 import { loadStationIndex } from './services/stationIndex.js';
 import { trustedClientIp } from './lib/clientIdentity.js';
 import { buildVersionFingerprint, type VersionFingerprint } from './services/versionFingerprint.js';
@@ -52,9 +53,15 @@ function pruneHits(map: Map<string, Bucket>, now: number) {
 }
 
 app.use('*', async (c, next) => {
+  const path = c.req.path;
+  // 地图瓦片：一屏可打几十～上百请求，不走通用 API 限流（由上游配额 + 磁盘缓存约束）
+  if (path.includes('/map-tiles/')) {
+    await next();
+    return;
+  }
+
   const ip = trustedClientIp((n) => c.req.header(n));
   const now = Date.now();
-  const path = c.req.path;
   const isRailJobPoll = c.req.method === 'GET' && path.includes('/rail-geometry/jobs/');
   const isRailMutate = path.includes('/rail-geometry') && !isRailJobPoll;
 
@@ -109,6 +116,7 @@ app.route('/travel', travelRoute);
 app.route('/weather', weatherRoute);
 app.route('/sky', skyRoute);
 app.route('/search', searchRoute);
+app.route('/map-tiles', mapTilesRoute);
 
 // 默认 3010：本机 Windows 常排除 2910–3009，绑 3000 会 EACCES
 const port = Number(process.env.PORT || 3010);
@@ -119,8 +127,9 @@ await loadStationIndex();
 const { loadLocalHsrRails } = await import('./services/localRails.js');
 loadLocalHsrRails();
 const qwReady = Boolean(process.env.QWEATHER_API_KEY?.trim() && process.env.QWEATHER_API_HOST?.trim());
+const tdtReady = Boolean((process.env.TIANDITU_TK || process.env.VITE_TIANDITU_TK || '').trim());
 console.log(
-  `[railvista-api] QWEATHER=${qwReady ? 'set' : 'fallback:open-meteo'} listening on :${port}`,
+  `[railvista-api] QWEATHER=${qwReady ? 'set' : 'fallback:open-meteo'} TIANDITU_TILES=${tdtReady ? 'proxy' : 'off'} listening on :${port}`,
 );
 
 // 公路干线拓扑预热：避免首个「北京→拉萨」类 OD 冷启动加载拓扑时本地 A* 失手、

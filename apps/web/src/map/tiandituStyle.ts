@@ -18,7 +18,10 @@ const SAT = 'sat-';
  */
 export const MAP_STYLE_BG = '#e8ecf1';
 
-function wmtsUrl(layer: 'vec' | 'cva' | 'img' | 'cia', tk: string): string {
+export type TileLayerId = 'vec' | 'cva' | 'img' | 'cia';
+
+/** 直连天地图（开发兜底；Key 会暴露在浏览器） */
+function wmtsDirectUrl(layer: TileLayerId, tk: string): string {
   return (
     `https://t{s}.tianditu.gov.cn/${layer}_w/wmts` +
     `?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=${layer}&STYLE=default` +
@@ -26,6 +29,16 @@ function wmtsUrl(layer: 'vec' | 'cva' | 'img' | 'cia', tk: string): string {
     `&tk=${encodeURIComponent(tk)}`
   );
 }
+
+/** 走 BFF 反代缓存：/api/map-tiles/{layer}/{z}/{y}/{x} */
+function wmtsProxyUrl(layer: TileLayerId, base: string): string {
+  const root = base.replace(/\/$/, '');
+  return `${root}/${layer}/{z}/{y}/{x}`;
+}
+
+export type BasemapTileSource =
+  | { mode: 'proxy'; baseUrl: string }
+  | { mode: 'direct'; tk: string };
 
 /**
  * 天地图公开 WMTS 只有 256px 瓦片、无 @2x。
@@ -37,10 +50,31 @@ function rasterTileSize(): number {
   return dpr >= 1.5 ? 128 : 256;
 }
 
-function rasterSource(layer: 'vec' | 'cva' | 'img' | 'cia', tk: string, maxzoom = 18) {
+/**
+ * 瓦片级 = 屏幕 zoom + log2(512 / tileSize)：
+ * tileSize 256 深 1 级，128 深 2 级。
+ *
+ * 这条换算是整张地图「信息量对不上」的根因所在：
+ * 天地图的注记和道路是按**瓦片级**预渲染的（z9 出乡镇、z10 出县道、z12 出 POI），
+ * 而 style 里的 ['zoom'] 表达式算的是**屏幕 zoom**。
+ * 早先按屏幕 zoom 设阈值，等于用「浅档的视图」去调「深档的内容」——
+ * 2× 屏（tileSize 128）下屏幕 zoom 6.6 实际已经在看 z8.6 的瓦片，
+ * 所以视角还很大就冒出一屏乡镇名。
+ *
+ * 下面所有注记/换档阈值都写成「内容级 contentZoom」，构建 style 时再减掉这个偏移。
+ */
+function tileZoomOffset(): number {
+  return Math.round(Math.log2(512 / rasterTileSize()));
+}
+
+function rasterSource(layer: TileLayerId, src: BasemapTileSource, maxzoom = 18) {
+  const tiles =
+    src.mode === 'proxy'
+      ? [wmtsProxyUrl(layer, src.baseUrl)]
+      : SUBDOMAINS.map((s) => wmtsDirectUrl(layer, src.tk).replace('{s}', s));
   return {
     type: 'raster' as const,
-    tiles: SUBDOMAINS.map((s) => wmtsUrl(layer, tk).replace('{s}', s)),
+    tiles,
     tileSize: rasterTileSize(),
     attribution: TIANDITU_SOURCE_LABEL,
     maxzoom,
@@ -48,71 +82,62 @@ function rasterSource(layer: 'vec' | 'cva' | 'img' | 'cia', tk: string, maxzoom 
 }
 
 /**
- * 注记（地名）分三档，与 Atlas 公路 LOD 对齐：
- * - 全国/大区视角（< hideBelow）完全关掉，给景点·路线留空；
- * - 中段（fullAt 以上）全开；
- * - 中高倍（dimFrom 以上）收到 0：天地图把市/县/乡镇/街道/POI 画在同一张注记瓦片上，
- *   栅格没法只留「大名字」，所以高倍一律收起，免得满屏小地名。
+ * 注记（地名）曲线。**横轴是瓦片级 contentZoom**（构建 style 时减去 tileZoomOffset）。
  *
- * 天地图注记按 zoom 预渲染：z8 只有市/县名，z9 起乡镇，z10 起街道，z12 起 POI。
+ * 天地图注记按瓦片级预渲染：z8 = 市/县，z9 起冒乡镇，z10 起街道，z12 起 POI——
+ * 一张图上没法只要「县」不要「镇」，所以只能「越放大、字越多、整体越淡」：
+ * 让地名随缩放单调增加（符合看地图的直觉），但每上一档密度就压一次，
+ * 免得高档位的乡镇/街道名把铁路和路线盖住。
  */
 export const ANNOTATION_FADE = {
-  hideBelow: 5.2,
-  fullAt: 6.4,
-  dimFrom: 9.5,
-  dimTo: 10.6,
-  /** 淡出后的不透明度：0 = 高倍不再显示底图地名 */
-  dimLevel: 0,
+  /** [contentZoom, raster-opacity] */
+  stops: [
+    [5.6, 0],
+    [6.2, 0.95],
+    [8.4, 0.95],
+    [9.2, 0.6],
+    [11, 0.55],
+    [15, 0.5],
+  ],
 } as const;
 
-/** 注记层 raster-opacity：zoom 表达式，无需 JS 监听 */
-function annotationOpacityPaint(): NonNullable<
+/**
+ * 注记层 raster-opacity：把 contentZoom 阈值换算成屏幕 zoom 的表达式。
+ * offset = log2(512 / tileSize)，见 tileZoomOffset()。
+ */
+function annotationOpacityPaint(offset: number): NonNullable<
   Extract<StyleSpecification['layers'][number], { type: 'raster' }>['paint']
 > {
+  const stops: Array<number | string> = [];
+  for (const [contentZoom, opacity] of ANNOTATION_FADE.stops) {
+    stops.push(Math.round((contentZoom - offset) * 100) / 100, opacity);
+  }
   return {
-    'raster-opacity': [
-      'interpolate',
-      ['linear'],
-      ['zoom'],
-      ANNOTATION_FADE.hideBelow,
-      0,
-      ANNOTATION_FADE.fullAt,
-      1,
-      ANNOTATION_FADE.dimFrom,
-      1,
-      ANNOTATION_FADE.dimTo,
-      ANNOTATION_FADE.dimLevel,
-    ],
-  };
+    'raster-opacity': ['interpolate', ['linear'], ['zoom'], ...stops],
+  } as NonNullable<RasterLayer['paint']>;
 }
 
-/**
- * 注记收到 0 之后这层就没内容了：把 maxzoom 卡在淡出点，
- * 让 MapLibre 认为该 source 在高倍不可用（`Layer.isHidden(zoom)` 参与 source 的 used 判定），
- * 顺带省掉高倍时的注记瓦片请求。
- */
-const ANNOTATION_MAXZOOM = ANNOTATION_FADE.dimLevel === 0 ? ANNOTATION_FADE.dimTo : 18;
 
 /**
  * 道路分级（raster 天地图只能「整级换档」，做不到按道路等级过滤）。
  *
- * 天地图 vec 瓦片按 zoom 预渲染泛化：
+ * 天地图 vec 瓦片按瓦片级预渲染泛化：
  *   z9   = 高速 + 国道（无县道、无城区路网）
  *   z10  = 加县道
  *   z11+ = 加城区路网、地铁、街巷
- * 因此在最杂的中段（from → until）改用 capZoom 的瓦片放大（overzoom），
- * 一次性把细小道路滤掉，只保留高速/国道骨架；贴到站区级别（until 以上）再回真实级别。
+ * 所以瓦片级一旦要到 z10（会带县道），就改取 capZoom 的瓦片放大（overzoom），
+ * 只保留高速/国道骨架；屏幕贴到站区级别（until 以上）再回真实级别。
  *
  * 代价：中段是 2×–4× 放大的软边（暗色细线下几乎看不出）；
  * 关闭 enabled 即回退到原始单档行为。
  */
 export const ROAD_LOD = {
   enabled: true,
-  /** 降档取用的瓦片级别：只留高速/国道 */
+  /** 降档取用的瓦片级：只留高速/国道 */
   capZoom: 9,
-  /** 从该 zoom 起降档 */
-  from: 10,
-  /** 到该 zoom 起恢复真实级别（贴近看站区需要街道参照） */
+  /** 瓦片级达到该值（天地图 z10 起加县道）就开始降档 */
+  fromContent: 10,
+  /** 屏幕 zoom 到这一档恢复真实级别（贴近看站区需要街道参照） */
   until: 12.5,
 } as const;
 
@@ -125,7 +150,8 @@ export const ROAD_LOD = {
  * - z≥12.5 街巷回到原生瓦片、密度又上去，再压回 0.6。
  *
  * 注意：天地图 vec 是一张烧好的栅格，路网、国界/省界、水系全在同一张图上，
- * 没有独立图层可调——想让「界线」比「路」更重，只能把界线从底图里拿出来自绘。
+ * 没有独立图层可调——想让「界线」比「路」更重，只能把界线从底图里拿出来自绘
+ *（见 engine.ts `ensureAdminBoundaries` + `/geo/china-admin-boundaries.json`）。
  */
 export const ROAD_FADE = {
   /** [zoom, raster-opacity] */
@@ -154,15 +180,17 @@ function vecOpacityPaint() {
   } as NonNullable<RasterLayer['paint']>;
 }
 
-function vecLayers(stdVis: Visibility): RasterLayer[] {
+function vecLayers(stdVis: Visibility, offset: number): RasterLayer[] {
   const paint = vecOpacityPaint();
   const base = { type: 'raster' as const, layout: { visibility: stdVis }, paint };
   if (!ROAD_LOD.enabled) {
     return [{ id: `${STD}vec`, source: `${STD}vec`, minzoom: 0, maxzoom: 18, ...base }];
   }
+  // 内容级阈值换算成屏幕 zoom，才能和 source 的瓦片级 maxzoom 对上
+  const from = Math.max(0, ROAD_LOD.fromContent - offset);
   return [
-    { id: `${STD}vec`, source: `${STD}vec`, minzoom: 0, maxzoom: ROAD_LOD.from, ...base },
-    { id: `${STD}vec-lo`, source: `${STD}vec-lo`, minzoom: ROAD_LOD.from, maxzoom: ROAD_LOD.until, ...base },
+    { id: `${STD}vec`, source: `${STD}vec`, minzoom: 0, maxzoom: from, ...base },
+    { id: `${STD}vec-lo`, source: `${STD}vec-lo`, minzoom: from, maxzoom: ROAD_LOD.until, ...base },
     { id: `${STD}vec-hi`, source: `${STD}vec`, minzoom: ROAD_LOD.until, maxzoom: 18, ...base },
   ];
 }
@@ -171,19 +199,23 @@ function vecLayers(stdVis: Visibility): RasterLayer[] {
  * 仅底图瓦片（供下层 basemap map 使用）。
  * 雅士灰滤镜只加在该 map 的 canvas 上，见 map.css `.rv-map-basemap`。
  */
-export function buildDualBasemapStyle(tk: string, mode: BasemapMode = 'standard'): StyleSpecification {
+export function buildDualBasemapStyle(
+  tileSource: BasemapTileSource,
+  mode: BasemapMode = 'standard',
+): StyleSpecification {
   const stdVis: Visibility = mode === 'standard' ? 'visible' : 'none';
   const satVis: Visibility = mode === 'satellite' ? 'visible' : 'none';
-  const annPaint = annotationOpacityPaint();
+  const offset = tileZoomOffset();
+  const annPaint = annotationOpacityPaint(offset);
   const sources: Record<string, ReturnType<typeof rasterSource>> = {
-    [`${STD}vec`]: rasterSource('vec', tk),
-    [`${STD}cva`]: rasterSource('cva', tk),
-    [`${SAT}img`]: rasterSource('img', tk),
-    [`${SAT}cia`]: rasterSource('cia', tk),
+    [`${STD}vec`]: rasterSource('vec', tileSource),
+    [`${STD}cva`]: rasterSource('cva', tileSource),
+    [`${SAT}img`]: rasterSource('img', tileSource),
+    [`${SAT}cia`]: rasterSource('cia', tileSource),
   };
   if (ROAD_LOD.enabled) {
-    // 同层第二条 source：maxzoom 卡在 capZoom，z>capZoom 由引擎放大该级瓦片
-    sources[`${STD}vec-lo`] = rasterSource('vec', tk, ROAD_LOD.capZoom);
+    // 同层第二条 source：maxzoom 卡在 capZoom，瓦片级超过它就由引擎放大该级瓦片
+    sources[`${STD}vec-lo`] = rasterSource('vec', tileSource, ROAD_LOD.capZoom);
   }
   return {
     version: 8,
@@ -194,14 +226,14 @@ export function buildDualBasemapStyle(tk: string, mode: BasemapMode = 'standard'
         type: 'background',
         paint: { 'background-color': MAP_STYLE_BG },
       },
-      ...vecLayers(stdVis),
+      ...vecLayers(stdVis, offset),
       {
         id: `${STD}cva`,
         type: 'raster',
         source: `${STD}cva`,
         layout: { visibility: stdVis },
         minzoom: 0,
-        maxzoom: ANNOTATION_MAXZOOM,
+        maxzoom: 18,
         paint: annPaint,
       },
       { id: `${SAT}img`, type: 'raster', source: `${SAT}img`, layout: { visibility: satVis }, minzoom: 0, maxzoom: 18 },
@@ -211,7 +243,7 @@ export function buildDualBasemapStyle(tk: string, mode: BasemapMode = 'standard'
         source: `${SAT}cia`,
         layout: { visibility: satVis },
         minzoom: 0,
-        maxzoom: ANNOTATION_MAXZOOM,
+        maxzoom: 18,
         paint: annPaint,
       },
     ],
@@ -234,13 +266,13 @@ export function buildOverlayStyle(): StyleSpecification {
 }
 
 /** @deprecated 用 buildDualBasemapStyle */
-export function buildStandardStyle(tk: string): StyleSpecification {
-  return buildDualBasemapStyle(tk, 'standard');
+export function buildStandardStyle(tileSource: BasemapTileSource): StyleSpecification {
+  return buildDualBasemapStyle(tileSource, 'standard');
 }
 
 /** @deprecated 用 buildDualBasemapStyle */
-export function buildSatelliteStyle(tk: string): StyleSpecification {
-  return buildDualBasemapStyle(tk, 'satellite');
+export function buildSatelliteStyle(tileSource: BasemapTileSource): StyleSpecification {
+  return buildDualBasemapStyle(tileSource, 'satellite');
 }
 
 /** 按 id 前缀批量切底图：标准 = std-*，卫星 = sat-* */

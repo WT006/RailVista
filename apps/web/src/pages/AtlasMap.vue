@@ -1265,9 +1265,10 @@ function goRoadBoard(boardId: string) {
 }
 
 async function initMap() {
-  const tk = (import.meta.env.VITE_TIANDITU_TK || '').trim();
-  if (!tk) {
-    mapError.value = '未配置 VITE_TIANDITU_TK（apps/web/.env），地图不可用';
+  const { basemapConfigError } = await import('../map/tileSource');
+  const cfgErr = basemapConfigError();
+  if (cfgErr) {
+    mapError.value = cfgErr;
     return;
   }
   try {

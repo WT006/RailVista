@@ -838,8 +838,10 @@ async function drawMap() {
 }
 
 async function initMap() {
-  if (!import.meta.env.VITE_TIANDITU_TK) {
-    mapError.value = '请配置 VITE_TIANDITU_TK（apps/web/.env）';
+  const { basemapConfigError } = await import('../map/tileSource');
+  const cfgErr = basemapConfigError();
+  if (cfgErr) {
+    mapError.value = cfgErr;
     return;
   }
   try {
@@ -874,14 +876,18 @@ async function initMap() {
 async function boot() {
   loading.value = true;
   mapError.value = '';
-  const tk = import.meta.env.VITE_TIANDITU_TK as string | undefined;
   try {
-    await Promise.all([load(), loadMapEngine().catch((e) => {
-      mapError.value = e instanceof Error ? e.message : '地图引擎加载失败';
-    })]);
+    await Promise.all([
+      load(),
+      loadMapEngine().catch((e) => {
+        mapError.value = e instanceof Error ? e.message : '地图引擎加载失败';
+      }),
+    ]);
     if (loadError.value) return;
-    if (!tk) {
-      mapError.value = '请配置 VITE_TIANDITU_TK（apps/web/.env）';
+    const { basemapConfigError } = await import('../map/tileSource');
+    const cfgErr = basemapConfigError();
+    if (cfgErr) {
+      mapError.value = cfgErr;
       return;
     }
     if (mapError.value) return;

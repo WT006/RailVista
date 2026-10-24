@@ -7,7 +7,8 @@ dist
 apps/web/.env
 apps/web/.env.production
 apps/api/.env
-
+# 天地图瓦片磁盘缓存（按需访问产生，勿提交）
+apps/api/.cache/
 # 本机打好的上线包（可能含密钥，勿提交）
 deploy/out/
 config.js
